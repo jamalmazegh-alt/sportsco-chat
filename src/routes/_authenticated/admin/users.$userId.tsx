@@ -23,7 +23,7 @@ function AdminUserDetailPage() {
     enabled: !!activeClubId && role === "admin",
     queryFn: async () => {
       const [{ data: profile }, { data: memberships }, { data: linkedPlayers }, { data: parentLinks }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, first_name, last_name, phone, phone_verified_at, created_at, avatar_url").eq("id", userId).maybeSingle(),
+        supabase.from("profiles").select("id, full_name, first_name, last_name, phone, created_at, avatar_url").eq("id", userId).maybeSingle(),
         supabase.from("club_members").select("club_id, role, created_at, clubs:club_id(name)").eq("user_id", userId),
         supabase.from("players").select("id, first_name, last_name, club_id").eq("user_id", userId),
         supabase.from("player_parents").select("id, player_id, players:player_id(id, first_name, last_name, club_id)").eq("parent_user_id", userId),
