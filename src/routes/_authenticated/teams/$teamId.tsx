@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -37,7 +38,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, age_group, championship, sport, season")
+        .select("id, name, age_group, championship, competitions, sport, season")
         .eq("id", teamId)
         .single();
       return data;
@@ -79,6 +80,7 @@ function TeamDetail() {
   const [editName, setEditName] = useState("");
   const [editAge, setEditAge] = useState("");
   const [editChamp, setEditChamp] = useState("");
+  const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editBusy, setEditBusy] = useState(false);
 
@@ -86,6 +88,7 @@ function TeamDetail() {
     setEditName(team?.name ?? "");
     setEditAge(team?.age_group ?? "");
     setEditChamp(team?.championship ?? "");
+    setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditOpen(true);
   }
@@ -99,6 +102,7 @@ function TeamDetail() {
         name: editName,
         age_group: editAge || null,
         championship: editChamp || null,
+        competitions: editCompetitions,
         season: editSeason || null,
       })
       .eq("id", teamId);
