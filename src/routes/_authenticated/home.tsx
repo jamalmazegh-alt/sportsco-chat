@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, Copy, UserPlus, Megaphone } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users, Copy, UserPlus } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
