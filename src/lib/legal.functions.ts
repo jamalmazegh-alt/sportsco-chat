@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const KindSchema = z.enum(["terms", "privacy", "data_processing", "media", "notifications"]);
+const KindSchema = z.enum(["terms", "privacy", "data_processing", "media", "notifications", "legal_notice", "parental_consent"]);
 
 export const getLegalDoc = createServerFn({ method: "GET" })
   .inputValidator((input: { kind: string; locale?: string }) =>

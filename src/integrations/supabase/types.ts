@@ -1143,6 +1143,8 @@ export type Database = {
         | "data_processing"
         | "media"
         | "notifications"
+        | "legal_notice"
+        | "parental_consent"
       event_status: "draft" | "published" | "cancelled"
       event_type: "training" | "match" | "tournament" | "meeting" | "other"
       media_consent_status: "pending" | "granted" | "denied"
@@ -1288,6 +1290,8 @@ export const Constants = {
         "data_processing",
         "media",
         "notifications",
+        "legal_notice",
+        "parental_consent",
       ],
       event_status: ["draft", "published", "cancelled"],
       event_type: ["training", "match", "tournament", "meeting", "other"],
