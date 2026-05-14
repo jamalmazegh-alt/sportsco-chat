@@ -58,18 +58,12 @@ function AdminUserDetailPage() {
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold truncate">{name || "—"}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {p?.phone ?? "—"} · {verified ? t("admin.phoneVerified") : t("admin.phoneNotVerified")}
+            {p?.phone ?? "—"}
           </p>
           {p?.created_at && (
             <p className="text-[11px] text-muted-foreground mt-0.5">{t("admin.joined")}: {fmt(new Date(p.created_at), "PP")}</p>
           )}
         </div>
-        <span className={cn(
-          "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
-          verified ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-        )}>
-          {verified ? t("admin.statusActive") : t("admin.statusPending")}
-        </span>
       </header>
 
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
