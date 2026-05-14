@@ -83,6 +83,9 @@ function ResetPasswordPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <p className={`text-xs ${password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"}`}>
+              {t("auth.passwordRequirements")}
+            </p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
