@@ -458,7 +458,7 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
             </>
           )}
 
-          <AddressField label={t("events.location")} value={location ?? ""} onValueChange={setLocation} onPlaceUrl={setLocationUrl} placeholder={t("events.locationHint")} helper={googlePlacesEnabled ? t("events.locationGoogleHelper") : t("events.locationGoogleNeedsKey")} />
+          <AddressField label={t("events.location")} value={location ?? ""} onValueChange={setLocation} onPlaceUrl={(url) => setLocationUrl(url ?? "")} placeholder={t("events.locationHint")} helper={googlePlacesEnabled ? t("events.locationGoogleHelper") : t("events.locationGoogleNeedsKey")} />
           <div className="space-y-1.5">
             <Label>
               {t("events.locationUrl")}{" "}
