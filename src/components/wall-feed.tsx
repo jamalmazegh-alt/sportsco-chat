@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare, Send, Trash2 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { toast } from "sonner";
+import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
@@ -131,34 +132,99 @@ export function WallFeed({ clubId }: { clubId: string }) {
         </div>
       </div>
 
-      {posts.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center py-6">{t("wall.empty")}</p>
-      ) : (
-        <ul className="space-y-3">
-          {posts.map((p) => (
-            <li key={p.id} className="rounded-2xl border border-border bg-card p-4">
-              <header className="flex items-start justify-between gap-2 mb-2">
-                <div>
-                  <p className="text-sm font-semibold">{p.author?.full_name ?? "—"}</p>
-                  <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(p.created_at), { addSuffix: true })}</p>
-                </div>
-                {(p.author_user_id === user?.id || role === "admin") && (
-                  <button onClick={() => deletePost(p.id)} className="text-muted-foreground hover:text-destructive">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-              </header>
-              <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>
-              {p.attachments?.length > 0 && (
-                <div className="mt-2"><AttachmentList items={p.attachments as Attachment[]} /></div>
-              )}
-              {commentsEnabled && (
-                <CommentBlock post={p} currentUserId={user?.id ?? null} role={role} />
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+      <WallGrouped
+        posts={posts}
+        currentUserId={user?.id ?? null}
+        role={role}
+        commentsEnabled={commentsEnabled}
+        onDelete={deletePost}
+      />
+    </div>
+  );
+}
+
+function WallGrouped({
+  posts,
+  currentUserId,
+  role,
+  commentsEnabled,
+  onDelete,
+}: {
+  posts: Post[];
+  currentUserId: string | null;
+  role: string | null;
+  commentsEnabled: boolean;
+  onDelete: (id: string) => void;
+}) {
+  const { t } = useTranslation();
+  const grouped = useMemo(() => {
+    const map = new Map<string, { label: string; items: Post[] }>();
+    for (const p of posts) {
+      const d = new Date(p.created_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+      const label = format(d, "MMMM yyyy", { locale: dateLocale() });
+      if (!map.has(key)) map.set(key, { label, items: [] });
+      map.get(key)!.items.push(p);
+    }
+    return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
+  }, [posts]);
+
+  if (posts.length === 0) {
+    return <p className="text-sm text-muted-foreground text-center py-6">{t("wall.empty")}</p>;
+  }
+
+  return (
+    <div className="space-y-7">
+      {grouped.map((group) => (
+        <section key={group.key} className="space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
+            {group.label}
+          </h2>
+          <ul className="space-y-2.5">
+            {group.items.map((p) => {
+              const d = new Date(p.created_at);
+              return (
+                <li
+                  key={p.id}
+                  className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden"
+                >
+                  <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/8">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                      {fmt(d, "EEE")}
+                    </span>
+                    <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
+                    <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
+                  </div>
+                  <div className="flex-1 min-w-0 py-3 pr-3">
+                    <header className="flex items-start justify-between gap-2 mb-1.5">
+                      <p className="text-sm font-semibold truncate">{p.author?.full_name ?? "—"}</p>
+                      {(p.author_user_id === currentUserId || role === "admin") && (
+                        <button
+                          onClick={() => onDelete(p.id)}
+                          className="text-muted-foreground hover:text-destructive shrink-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </header>
+                    {p.body && (
+                      <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>
+                    )}
+                    {p.attachments?.length > 0 && (
+                      <div className="mt-2">
+                        <AttachmentList items={p.attachments as Attachment[]} />
+                      </div>
+                    )}
+                    {commentsEnabled && (
+                      <CommentBlock post={p} currentUserId={currentUserId} role={role} />
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }
@@ -195,7 +261,7 @@ function CommentBlock({ post, currentUserId, role }: { post: Post; currentUserId
               <span className="whitespace-pre-wrap break-words">{c.body}</span>
             </p>
             <p className="text-[10px] text-muted-foreground">
-              {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
+              {fmt(c.created_at, "d MMM HH:mm")}
             </p>
           </div>
           {(c.author_user_id === currentUserId || role === "admin") && (
