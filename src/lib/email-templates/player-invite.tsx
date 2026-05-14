@@ -81,3 +81,6 @@ const button = {
 };
 const small = { fontSize: "12px", color: "#64748b", margin: "20px 0 0", lineHeight: "1.5" };
 const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };
+const clubHeader = { textAlign: "center" as const, margin: "0 0 20px" };
+const clubLogo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
+const clubLabel = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "8px 0 0", textAlign: "center" as const };
