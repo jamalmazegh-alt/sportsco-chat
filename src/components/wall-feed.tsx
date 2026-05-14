@@ -261,7 +261,7 @@ function CommentBlock({ post, currentUserId, role }: { post: Post; currentUserId
               <span className="whitespace-pre-wrap break-words">{c.body}</span>
             </p>
             <p className="text-[10px] text-muted-foreground">
-              {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
+              {fmt(c.created_at, "d MMM HH:mm")}
             </p>
           </div>
           {(c.author_user_id === currentUserId || role === "admin") && (
