@@ -131,6 +131,16 @@ function EventDetail() {
     else refetch();
   }
 
+  async function cancelConvocation(convocationId: string) {
+    if (!confirm(t("attendance.confirmCancelConvocation"))) return;
+    const { error } = await supabase.from("convocations").delete().eq("id", convocationId);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(t("attendance.convocationCancelled"));
+      refetch();
+    }
+  }
+
   function openPicker() {
     if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
