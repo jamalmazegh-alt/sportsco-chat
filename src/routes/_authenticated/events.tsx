@@ -126,13 +126,27 @@ function EventsPage() {
         )}
       </div>
 
+      {pastCount > 0 && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowPast((s) => !s)}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+          >
+            {showPast
+              ? t("events.hidePast")
+              : t("events.showPast", { count: pastCount })}
+          </button>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />
           ))}
         </div>
-      ) : !events || events.length === 0 ? (
+      ) : !visibleEvents || visibleEvents.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
           <Calendar className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
           <p className="text-sm text-muted-foreground">{t("events.noEvents")}</p>
@@ -193,6 +207,11 @@ function EventsPage() {
                                 e.competition_type === "cup" && "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
                               )}>
                                 {t(`events.competitionTypes.${e.competition_type}`)}
+                              </span>
+                            )}
+                            {e.type === "match" && e.competition_name && (
+                              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground truncate">
+                                · {e.competition_name}
                               </span>
                             )}
                             {e.team_name && (
