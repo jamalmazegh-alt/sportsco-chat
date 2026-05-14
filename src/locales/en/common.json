@@ -53,7 +53,12 @@
     "resetLinkRequired": "Open the email link to reset your password.",
     "passwordRequirements": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
     "passwordTooWeak": "Password must include uppercase, lowercase and a digit.",
-    "passwordsMustMatch": "Passwords must match."
+    "passwordsMustMatch": "Passwords must match.",
+    "emailNotFound": "No account found for this email address.",
+    "resetSentTitle": "Check your inbox",
+    "resetSentTo": "We sent a password reset link to",
+    "resetSentHint": "Didn't get it? Check your spam folder, or try again in a minute.",
+    "useDifferentEmail": "Use a different email"
   },
   "common": {
     "save": "Save",
