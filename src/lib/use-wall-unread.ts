@@ -43,14 +43,15 @@ export function useWallUnread(clubId: string | null) {
   // Realtime: refresh on any new post for the active club
   useEffect(() => {
     if (!clubId) return;
-    const ch = supabase
-      .channel(`wall-unread:${clubId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "wall_posts", filter: `club_id=eq.${clubId}` },
-        () => refresh(),
-      )
-      .subscribe();
+    // Unique channel name per hook instance — multiple components mount this hook
+    // simultaneously (bottom-nav + inbox), and Realtime forbids reusing a channel name.
+    const uniq = Math.random().toString(36).slice(2, 10);
+    const ch = supabase.channel(`wall-unread:${clubId}:${uniq}`);
+    ch.on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "wall_posts", filter: `club_id=eq.${clubId}` },
+      () => refresh(),
+    ).subscribe();
     return () => {
       supabase.removeChannel(ch);
     };
