@@ -21,6 +21,17 @@ import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { getGoogleMapsKey } from "@/lib/maps.functions";
+
+let cachedMapsKeyPromise: Promise<string | null> | null = null;
+function fetchGoogleMapsKey(): Promise<string | null> {
+  if (!cachedMapsKeyPromise) {
+    cachedMapsKeyPromise = getGoogleMapsKey()
+      .then((r) => r.key ?? null)
+      .catch(() => null);
+  }
+  return cachedMapsKeyPromise;
+}
 
 const TRAINING_DEFAULT_DURATION_MIN = 90;
 
@@ -120,8 +131,7 @@ function competitionOptions(team?: TeamOption): CompetitionType[] {
   return configured.length > 0 ? configured : ["friendly", "championship", "cup"];
 }
 
-function loadGoogleMapsPlaces(): Promise<void> | null {
-  const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+function loadGoogleMapsPlaces(key: string | null | undefined): Promise<void> | null {
   if (!key || typeof window === "undefined") return null;
   if (window.google?.maps?.places) return Promise.resolve();
   if (!window.__squadlyGoogleMapsPromise) {
@@ -279,15 +289,17 @@ function AddressField({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadGoogleMapsPlaces()
-      ?.then(() => {
-        const places = window.google?.maps?.places;
-        if (places) {
-          setService(new places.AutocompleteService());
-          sessionTokenRef.current = new places.AutocompleteSessionToken();
-        }
-      })
-      .catch(() => undefined);
+    fetchGoogleMapsKey().then((key) => {
+      loadGoogleMapsPlaces(key)
+        ?.then(() => {
+          const places = window.google?.maps?.places;
+          if (places) {
+            setService(new places.AutocompleteService());
+            sessionTokenRef.current = new places.AutocompleteSessionToken();
+          }
+        })
+        .catch(() => undefined);
+    });
   }, []);
 
   // Debounced predictions
@@ -383,7 +395,7 @@ export function EventFormSheet({
   onSaved,
 }: Props) {
   const { t } = useTranslation();
-  const googlePlacesEnabled = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
+  
 
   const [teamId, setTeamId] = useState(initial?.team_id ?? "");
   const [type, setType] = useState<EventType>((initial?.type as EventType) ?? "training");
@@ -451,9 +463,11 @@ export function EventFormSheet({
   }, [availableCompetitionTypes, competitionType]);
 
   useEffect(() => {
-    if (!open || !googlePlacesEnabled) return;
-    loadGoogleMapsPlaces()?.catch(() => undefined);
-  }, [googlePlacesEnabled, open]);
+    if (!open) return;
+    fetchGoogleMapsKey().then((key) => {
+      loadGoogleMapsPlaces(key)?.catch(() => undefined);
+    });
+  }, [open]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -718,11 +732,7 @@ export function EventFormSheet({
             onValueChange={setLocation}
             onPlaceUrl={(url) => setLocationUrl(url ?? "")}
             placeholder={t("events.locationHint")}
-            helper={
-              googlePlacesEnabled
-                ? t("events.locationGoogleHelper")
-                : t("events.locationGoogleNeedsKey")
-            }
+            helper={t("events.locationGoogleHelper")}
           />
           <div className="space-y-1.5">
             <Label>
