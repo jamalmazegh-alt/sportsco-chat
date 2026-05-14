@@ -61,8 +61,6 @@ function PlayerProfile() {
     if (!player || !user) return;
     if (pp.parent_user_id) { toast.info(t("players.alreadyLinked")); return; }
     if (!pp.email && !pp.phone) { toast.warning(t("players.inviteNoContact")); return; }
-    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
-    if (!inviter?.phone_verified_at) { toast.warning(t("players.inviterPhoneRequired")); return; }
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
       club_id: player.club_id, created_by: user.id, token,
