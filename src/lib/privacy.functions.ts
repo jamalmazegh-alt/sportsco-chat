@@ -18,6 +18,7 @@ export const getConsentStatus = createServerFn({ method: "GET" })
       .from("consent_versions")
       .select("id, kind, version, locale, required, title, content_md, published_at")
       .eq("locale", data.locale)
+      .in("kind", ["terms", "privacy", "data_processing", "media", "notifications"])
       .order("version", { ascending: false });
     if (vErr) throw vErr;
 
