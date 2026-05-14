@@ -398,18 +398,12 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
                 <Select value={competitionType} onValueChange={(v) => setCompetitionType(v as CompetitionType)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {(["friendly", "championship", "cup"] as const).map((k) => (
+                    {availableCompetitionTypes.map((k) => (
                       <SelectItem key={k} value={k}>{t(`events.competitionTypes.${k}`)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              {competitionType !== "friendly" && (
-                <div className="space-y-1.5">
-                  <Label>{t("events.competitionName")}</Label>
-                  <Input value={competitionName ?? ""} onChange={(e) => setCompetitionName(e.target.value)} />
-                </div>
-              )}
               <div className="space-y-1.5">
                 <Label>{t("events.opponent")}</Label>
                 <Input required value={opponent ?? ""} onChange={(e) => setOpponent(e.target.value)} />
@@ -443,31 +437,28 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
             </>
           )}
 
-          <DateTimeField
-            label={t("events.startsAt")}
-            date={startDate} time={startTime}
-            onDate={setStartDate} onTime={setStartTime} required
-          />
-          <DateTimeField
-            label={t("events.endsAt")}
-            date={endDate} time={endTime}
-            onDate={setEndDate} onTime={setEndTime}
-          />
-          <DateTimeField
-            label={t("events.convocationTime")}
-            date={convocDate} time={convocTime}
-            onDate={setConvocDate} onTime={setConvocTime}
-          />
+          {type === "match" ? (
+            <>
+              <DateTimeField label={t("events.convocationDateTime")} date={convocDate} time={convocTime} onDate={setConvocDate} onTime={setConvocTime} />
+              <DateTimeField label={t("events.matchDateTime")} date={startDate} time={startTime} onDate={setStartDate} onTime={setStartTime} required />
+            </>
+          ) : type === "training" ? (
+            <>
+              <DateOnlyField label={t("events.trainingDate")} date={startDate} onDate={setStartDate} required />
+              <div className="grid grid-cols-3 gap-2">
+                <TimeField label={t("events.convocationTimeShort")} time={convocTime} onTime={setConvocTime} />
+                <TimeField label={t("events.startTime")} time={startTime} onTime={setStartTime} required />
+                <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
+              </div>
+            </>
+          ) : (
+            <>
+              <DateTimeField label={t("events.startsAt")} date={startDate} time={startTime} onDate={setStartDate} onTime={setStartTime} required />
+              <DateTimeField label={t("events.convocationTime")} date={convocDate} time={convocTime} onDate={setConvocDate} onTime={setConvocTime} />
+            </>
+          )}
 
-          <div className="space-y-1.5">
-            <Label>{t("events.location")}</Label>
-            <Input
-              value={location ?? ""}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder={t("events.locationHint")}
-            />
-            <p className="text-[11px] text-muted-foreground">{t("events.locationAutoMaps")}</p>
-          </div>
+          <AddressField label={t("events.location")} value={location ?? ""} onValueChange={setLocation} onPlaceUrl={setLocationUrl} placeholder={t("events.locationHint")} helper={googlePlacesEnabled ? t("events.locationGoogleHelper") : t("events.locationGoogleNeedsKey")} />
           <div className="space-y-1.5">
             <Label>
               {t("events.locationUrl")}{" "}
