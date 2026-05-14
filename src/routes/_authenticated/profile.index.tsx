@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { requestPhoneCode, verifyPhoneCode } from "@/lib/phone-verify.functions";
 
-export const Route = createFileRoute("/_authenticated/profile")({
+export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
   head: () => ({ meta: [{ title: "Profile — Clubero" }] }),
 });
