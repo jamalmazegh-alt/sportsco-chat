@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/password-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -101,7 +102,7 @@ function RegisterPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={96} height={96} className="mx-auto mb-2 h-24 w-24 object-contain" />
+          <img src={logo} alt="Clubero" width={144} height={144} className="mx-auto mb-3 h-32 w-32 object-contain drop-shadow-sm" />
           <h1 className="text-2xl font-semibold">{t("auth.register")}</h1>
         </div>
 
@@ -174,9 +175,8 @@ function RegisterPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">{t("auth.password")}</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               required
               autoComplete="new-password"
               minLength={8}
@@ -189,9 +189,8 @@ function RegisterPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-            <Input
+            <PasswordInput
               id="confirm"
-              type="password"
               required
               autoComplete="new-password"
               value={confirm}
