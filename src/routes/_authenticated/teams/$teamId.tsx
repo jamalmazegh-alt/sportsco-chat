@@ -246,12 +246,6 @@ function TeamDetail() {
 
   async function inviteOne(playerId: string) {
     if (!user) return;
-    // Verify inviter has a verified phone
-    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
-    if (!inviter?.phone_verified_at) {
-      toast.warning(t("players.inviterPhoneRequired"));
-      return;
-    }
     setInviting(true);
     const r = await sendInvitesForPlayer(playerId);
     setInviting(false);
@@ -263,11 +257,6 @@ function TeamDetail() {
 
   async function inviteSelected() {
     if (!user || selectedIds.size === 0) return;
-    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
-    if (!inviter?.phone_verified_at) {
-      toast.warning(t("players.inviterPhoneRequired"));
-      return;
-    }
     setInviting(true);
     let totalSent = 0; let totalFailed = 0; let totalSkipped = 0;
     for (const id of selectedIds) {
