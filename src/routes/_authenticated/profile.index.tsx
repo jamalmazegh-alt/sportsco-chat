@@ -209,50 +209,17 @@ function ProfilePage() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <Label>{t("profile.phone")}</Label>
-          {isVerified && (
-            <span className="inline-flex items-center gap-1 text-xs text-present font-medium">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              {t("profile.verified")}
-            </span>
-          )}
-        </div>
-        <PhoneInput
-          value={phoneToUse}
-          onChange={(v) => { setPhone(v); setCodeSent(false); }}
-        />
-        {!isVerified && !codeSent && (
-          <Button type="button" className="w-full h-11" disabled={phoneBusy || !phoneToUse} onClick={onSendCode}>
-            {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("profile.sendCode")}
-          </Button>
-        )}
-        {!isVerified && codeSent && (
-          <div className="space-y-2">
-            <Label>{t("profile.enterCode")}</Label>
-            <Input
-              inputMode="numeric"
-              maxLength={6}
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="123456"
-            />
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" className="h-11 flex-1" onClick={onSendCode} disabled={phoneBusy}>
-                {t("profile.resendCode")}
-              </Button>
-              <Button type="button" className="h-11 flex-1" onClick={onVerifyCode} disabled={phoneBusy || code.length !== 6}>
-                {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("profile.verify")}
-              </Button>
-            </div>
-          </div>
-        )}
-        {isVerified && phone && phone !== profile?.phone && (
-          <Button type="button" variant="outline" className="w-full h-11" onClick={onSendCode} disabled={phoneBusy}>
-            {t("profile.verifyNewNumber")}
-          </Button>
-        )}
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <Label>{t("profile.phone")}</Label>
+        <PhoneInput value={phone} onChange={setPhone} />
+        <Button
+          type="button"
+          className="w-full h-11"
+          disabled={phoneBusy || phone === (profile?.phone ?? "")}
+          onClick={onSavePhone}
+        >
+          {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Save" })}
+        </Button>
       </div>
 
       <Link
