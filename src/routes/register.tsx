@@ -33,6 +33,7 @@ function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [signupRole, setSignupRole] = useState<SignupRole>(
     search.invite ? "player" : "club_admin"
   );
@@ -40,11 +41,18 @@ function RegisterPage() {
   const [busy, setBusy] = useState(false);
 
   const needsInvite = signupRole === "player" || signupRole === "parent";
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  const passwordValid = passwordRegex.test(password);
+  const passwordsMatch = password.length > 0 && password === confirm;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (password.length < 8) {
-      toast.error(t("auth.weakPassword"));
+    if (!passwordValid) {
+      toast.error(t("auth.passwordTooWeak"));
+      return;
+    }
+    if (!passwordsMatch) {
+      toast.error(t("auth.passwordsMustMatch"));
       return;
     }
     if (needsInvite && !inviteToken.trim()) {
