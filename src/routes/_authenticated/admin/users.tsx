@@ -70,7 +70,6 @@ function AdminUsersPage() {
       ) : (
         <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
           {(data ?? []).map((u) => {
-            const verified = !!u.profile?.phone_verified_at;
             const name = u.profile?.full_name
               ?? [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ")
               ?? "—";
