@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -26,7 +26,6 @@ function PlayerProfile() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
-  const navigate = useNavigate();
 
   const { data: player } = useQuery({
     queryKey: ["player", playerId],
@@ -153,13 +152,9 @@ function PlayerProfile() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-      <button
-        type="button"
-        onClick={() => navigate({ to: ".." as any })}
-        className="inline-flex items-center text-sm text-muted-foreground gap-1"
-      >
+      <Link to="/teams" className="inline-flex items-center text-sm text-muted-foreground gap-1">
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </button>
+      </Link>
 
       <div className="flex items-center gap-4">
         <div className="relative h-16 w-16 rounded-full bg-muted overflow-hidden shrink-0">
