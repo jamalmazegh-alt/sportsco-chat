@@ -39,10 +39,13 @@ function ResetPasswordPage() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  const passwordValid = passwordRegex.test(password);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (password.length < 8) {
-      toast.error(t("auth.weakPassword"));
+    if (!passwordValid) {
+      toast.error(t("auth.passwordTooWeak"));
       return;
     }
     if (password !== confirm) {
