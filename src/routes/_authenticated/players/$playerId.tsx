@@ -267,7 +267,7 @@ function PlayerProfile() {
             )}
           />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold truncate">
             {player.first_name} {player.last_name}
           </h1>
@@ -285,6 +285,11 @@ function PlayerProfile() {
             )}
           </div>
         </div>
+        {isCoach && (
+          <Button size="icon" variant="ghost" className="h-9 w-9 shrink-0 text-destructive" onClick={() => setConfirmDelete(true)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
