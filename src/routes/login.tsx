@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import logo from "@/assets/clubero-logo.png";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -41,10 +42,7 @@ function LoginPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-bold text-xl shadow-sm">
-            S
-          </div>
-          <h1 className="text-2xl font-semibold">{t("app.name")}</h1>
+          <img src={logo} alt="Clubero" width={96} height={96} className="mx-auto mb-2 h-24 w-24 object-contain" />
           <p className="mt-1 text-sm text-muted-foreground">{t("app.tagline")}</p>
         </div>
 
