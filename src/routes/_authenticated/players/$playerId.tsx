@@ -340,32 +340,36 @@ function PlayerProfile() {
             <Input value={position} onChange={(e) => setPosition(e.target.value)} disabled={!isCoach} />
           </div>
         </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.birthDate")}</Label>
-          <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={!isCoach} />
-        </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.phone")}</Label>
-          {isCoach ? (
-            <PhoneInput value={phone} onChange={setPhone} />
-          ) : (
-            <Input value={phone} disabled />
-          )}
-        </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.email")}</Label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isCoach} />
-        </div>
-        <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
-          <span className="text-sm">{t("players.canRespond")} ({t("players.respondPlayer")})</span>
-          <input
-            type="checkbox"
-            className="h-5 w-5 accent-primary"
-            checked={canRespond}
-            onChange={(e) => setCanRespond(e.target.checked)}
-            disabled={!isCoach}
-          />
-        </div>
+        {canSeePrivate && (
+          <>
+            <div className="space-y-1.5">
+              <Label>{t("players.birthDate")}</Label>
+              <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={!isCoach} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("players.phone")}</Label>
+              {isCoach ? (
+                <PhoneInput value={phone} onChange={setPhone} />
+              ) : (
+                <Input value={phone} disabled />
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("players.email")}</Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isCoach} />
+            </div>
+            <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
+              <span className="text-sm">{t("players.canRespond")} ({t("players.respondPlayer")})</span>
+              <input
+                type="checkbox"
+                className="h-5 w-5 accent-primary"
+                checked={canRespond}
+                onChange={(e) => setCanRespond(e.target.checked)}
+                disabled={!isCoach}
+              />
+            </div>
+          </>
+        )}
 
         {isCoach && (
           <Button type="submit" className="w-full h-11" disabled={busy}>
