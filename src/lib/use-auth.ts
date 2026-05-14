@@ -85,7 +85,7 @@ export function useAuthState(): AuthState {
       if (newSession) {
         // defer to avoid deadlocks
         setTimeout(() => {
-          refreshMemberships();
+          redeemPendingInvite(newSession).finally(() => refreshMemberships());
         }, 0);
       } else {
         setMemberships([]);
