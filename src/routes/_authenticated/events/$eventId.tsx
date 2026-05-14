@@ -7,6 +7,7 @@ import {
   ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info,
 } from "lucide-react";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
+import { EventChat } from "@/components/event-chat";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
