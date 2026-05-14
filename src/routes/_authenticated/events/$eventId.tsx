@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X,
 } from "lucide-react";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,7 +61,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
-        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
+        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
@@ -74,7 +74,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
         .eq("team_id", event!.team_id)
         .eq("role", "player");
       if (error) throw error;
@@ -129,6 +129,16 @@ function EventDetail() {
       .eq("id", convocationId);
     if (error) toast.error(error.message);
     else refetch();
+  }
+
+  async function cancelConvocation(convocationId: string) {
+    if (!confirm(t("attendance.confirmCancelConvocation"))) return;
+    const { error } = await supabase.from("convocations").delete().eq("id", convocationId);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(t("attendance.convocationCancelled"));
+      refetch();
+    }
   }
 
   function openPicker() {
@@ -467,6 +477,9 @@ function EventDetail() {
                         {p?.jersey_number ? (
                           <span className="text-muted-foreground"> · #{p.jersey_number}</span>
                         ) : null}
+                        {p?.preferred_position ? (
+                          <span className="text-muted-foreground"> · {p.preferred_position}</span>
+                        ) : null}
                       </span>
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
@@ -529,33 +542,37 @@ function EventDetail() {
         </section>
       )}
 
-      {/* Coach attendance board */}
-      {isCoach && event.convocations_sent && (
+      {/* Attendance board (visible to all team viewers once convocations are sent) */}
+      {event.convocations_sent && (
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              {t("attendance.title")}
+              {isCoach ? t("attendance.title") : t("attendance.convokedPlayers")}
             </h2>
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="h-8" onClick={remindAllPending}>
-                <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
-              </Button>
-              <Button size="sm" variant="outline" className="h-8" onClick={toggleLock}>
-                {event.responses_locked ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-              </Button>
-            </div>
+            {isCoach && (
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="h-8" onClick={remindAllPending}>
+                  <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
+                </Button>
+                <Button size="sm" variant="outline" className="h-8" onClick={toggleLock}>
+                  {event.responses_locked ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+                </Button>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-4 gap-2 mb-3">
-            <Stat label={t("attendance.present")} value={counts.present} cls="bg-present text-present-foreground" />
-            <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain text-uncertain-foreground" />
-            <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent text-absent-foreground" />
-            <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending text-pending-foreground" />
-          </div>
+          {isCoach && (
+            <div className="grid grid-cols-4 gap-2 mb-3">
+              <Stat label={t("attendance.present")} value={counts.present} cls="bg-present text-present-foreground" />
+              <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain text-uncertain-foreground" />
+              <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent text-absent-foreground" />
+              <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending text-pending-foreground" />
+            </div>
+          )}
 
           {convocations && convocations.length === 0 ? (
             <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-              {t("players.noPlayers")}
+              {t("attendance.noConvokedPlayers")}
             </div>
           ) : (
             <ul className="space-y-2">
@@ -580,17 +597,31 @@ function EventDetail() {
                         {c.players?.jersey_number ? (
                           <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
                         ) : null}
+                        {c.players?.preferred_position ? (
+                          <span className="text-muted-foreground font-normal"> · {c.players.preferred_position}</span>
+                        ) : null}
                       </p>
                       {c.comment && (
                         <p className="text-xs text-muted-foreground mt-0.5 italic truncate">"{c.comment}"</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0">
                     <AttendancePill status={c.status} />
-                    {c.status === "pending" && (
+                    {isCoach && c.status === "pending" && (
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remind(c.id)}>
                         <Bell className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {isCoach && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => cancelConvocation(c.id)}
+                        title={t("attendance.cancelConvocation")}
+                      >
+                        <X className="h-4 w-4" />
                       </Button>
                     )}
                   </div>

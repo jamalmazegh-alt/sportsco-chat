@@ -182,7 +182,12 @@
     "noPlayersSelected": "Sélectionnez au moins un joueur.",
     "youResponded": "Votre réponse est enregistrée.",
     "respondPrompt": "Serez-vous présent ?",
-    "summary": "{{p}} présents · {{a}} absents · {{u}} incertains · {{pe}} en attente"
+    "summary": "{{p}} présents · {{a}} absents · {{u}} incertains · {{pe}} en attente",
+    "cancelConvocation": "Annuler la convocation",
+    "confirmCancelConvocation": "Annuler cette convocation ?",
+    "convocationCancelled": "Convocation annulée",
+    "convokedPlayers": "Joueurs convoqués",
+    "noConvokedPlayers": "Aucun joueur convoqué pour le moment."
   },
   "inbox": {
     "title": "Boîte de réception",
