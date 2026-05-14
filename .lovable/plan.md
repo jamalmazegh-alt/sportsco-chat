@@ -1,76 +1,72 @@
-## Plan
+## GDPR & Privacy Architecture for Clubero
 
-Large iteration grouped in 6 chunks. I'll do one DB migration, then code in passes.
+This is a large, multi-area build. Here's how I'd phase it so each chunk is testable. The existing app already has clubs / teams / players / parents / club_members / RLS — I'll extend rather than replace.
 
-### 1. Auth UX — password & validation
+### Phase 1 — Database foundations (one migration)
 
-- **Register / reset-password**: add a "Confirm password" field + live regex helper. Rule: ≥8 chars, 1 uppercase, 1 lowercase, 1 digit. Show the rule to the user with green checkmarks as they type.
-- Enable HIBP leaked-password check on Supabase auth.
-- Keep email-confirmation ON (already the case) so signup → email verification is required before login.
+Add what's missing for GDPR. Reuse what exists.
 
-### 2. App emails (transactional)
+- `consent_versions` — `id, kind, version, locale, content_md, published_at`. Kinds: `terms`, `privacy`, `data_processing`, `media`, `notifications`.
+- `user_consents` — `id, user_id, kind, version_id, granted, granted_at, withdrawn_at, ip, user_agent, on_behalf_of_player_id (nullable, for parents consenting for minor)`.
+- `players.is_minor boolean generated` (from `birth_date`) + `players.media_consent_status` (denormalized for fast filtering: `granted | denied | pending`).
+- `data_export_requests` — `id, user_id, status, requested_at, completed_at, file_url`.
+- `account_deletion_requests` — `id, user_id, requested_at, scheduled_for (now()+30d), reason, status, processed_at`.
+- `audit_logs` already exists — reuse for consent + privacy events.
+- `profiles.notifications_email/push` booleans (or roll into consents).
 
-Set up Lovable's transactional email infrastructure on `notify.clubero.app` and create templates:
-- `player-invite` — sent when admin creates a player (link → `/accept-invite?token=...`)
-- `parent-invite` — same for a parent contact
-- `event-convocation` — when admin clicks "Send convocations"
-- `account-verified` — confirmation
+RLS:
+- `user_consents`: user reads their own + parent reads consents they made on behalf of their child. Insert by self only.
+- `data_export_requests` / `account_deletion_requests`: owner read/insert; service role processes.
+- `consent_versions`: public read.
+- Strengthen `players` SELECT: minors' email/phone/photo only visible to (parents of player) ∪ (coaches/admins of that team's club). Achieved via a SECURITY DEFINER `can_view_player_pii(uid, player_id)` + view `players_safe` for others. Existing policy is club-wide — keep for non-PII, restrict PII columns through a view.
+- Media (`photo_url`): nulled in `players_safe` when `is_minor AND media_consent_status <> 'granted'`.
 
-The forgot-password flow already uses Supabase's auth email; we'll brand it via auth email templates (`scaffold_auth_email_templates`).
+Roles: existing `app_role` enum has `admin/coach/parent/player/dirigeant`. Add `super_admin` with platform-wide RLS bypass via `has_super_admin(uid)` helper backed by a `super_admins` table (single source of truth, no role on profile).
 
-### 3. Team-scoped invites
+### Phase 2 — Server functions (`createServerFn`)
 
-New table `member_invites`:
-- `id, club_id, team_id, player_id (nullable), parent_for_player_id (nullable), role ('player'|'parent'|'coach'), email, phone, token, expires_at, used_at, created_by, created_at`
-- RPC `redeem_member_invite(token)`:
-  - links `auth.uid()` to the matching `players.user_id` or `player_parents.parent_user_id`
-  - inserts `club_members` row
-  - inserts `team_members` row
-  - marks invite used
+- `recordConsent({ kind, version_id, granted, on_behalf_of_player_id? })`
+- `withdrawConsent({ consent_id })`
+- `requestDataExport()` — enqueues; worker generates JSON of user's data + their minor children + writes to `attachments` bucket private path, signed URL stored.
+- `requestAccountDeletion({ reason? })` — soft-schedules in 30 days, sends confirmation email, anonymizes on processing (replace name/email with `deleted-user-<uuid>`, null PII, keep aggregated stats).
+- `exportMyData` worker route under `/api/public/cron/process-privacy-requests` (signed).
+- `getConsentStatus()` — returns missing/outdated consents to drive onboarding gate.
 
-Flow for admin:
-1. Create player (form already exists) → on success, if email/phone provided, create invite + send email (and/or SMS depending on club channel config).
-2. Same on the parent sub-form.
-3. New page `/accept-invite?token=...`: if not logged in → register pre-filled with email; if logged in → call RPC + redirect to `/home`.
+### Phase 3 — Privacy UX
 
-### 4. SMS + WhatsApp via Twilio
+- **Onboarding consent gate**: after signup (and after each consent version bump), block app shell with a modal listing required consents (Terms, Privacy, Data processing) + optional (Media, Notifications). Stored via `recordConsent`.
+- **Parent flow for minors**: when a parent creates/edits a minor player, sub-form requires parental consent for: data processing, media, notifications. Persist with `on_behalf_of_player_id`.
+- **Privacy settings page** `/profile/privacy`:
+  - current consents with toggle (granted/withdrawn)
+  - per-child consent management (parents only)
+  - download my data button → triggers export request
+  - delete my account button → confirmation modal → schedules deletion
+  - consent history table (read-only audit)
+- **Player card / lists**: photos respect `media_consent_status`. Use `players_safe` view in non-admin contexts.
 
-- Add secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `TWILIO_WHATSAPP_FROM` (optional).
-- Server function `sendSms({ to, body })` and `sendWhatsApp({ to, body })` using Twilio REST.
-- Server function `sendVerificationCode({ channel, target })` storing 6-digit code in a new `verification_codes` table (5-min TTL, hashed); `verifyCode({ target, code })` consumes it.
-- Profile page: "Verify phone" button → modal asks for code → marks `profiles.phone_verified_at`.
-- Email verification status comes from `auth.users.email_confirmed_at` (already populated by Supabase) — surface it on profile.
-- **Account-active rule**: a player/parent is "active" if `user_id IS NOT NULL` AND (`email_verified` OR `phone_verified`). Show green/orange dot in player & parent lists.
+### Phase 4 — Role hardening
 
-### 5. Club notification channels
+- Add `super_admins` table + `has_super_admin()` helper.
+- Audit existing RLS to ensure: parent can only see their own children (already via `player_parents`), coach scoped to assigned teams (already via `team_members`), club admin scoped to their club (already via `has_club_role`). Player role: tighten so they can't see siblings or other parents' contact info — restrict `player_parents` SELECT to (self parent) ∪ (admin/coach of player's club).
+- Document role matrix in `docs/privacy.md`.
 
-Extend `clubs` with `default_channels jsonb default '["email"]'` (admin-editable list, choices: email/sms/whatsapp). New admin screen: Settings → Notifications.
+### Phase 5 — Documentation
 
-Notification dispatcher (server fn): for each recipient, look up club channels → for each channel, render template → enqueue email / send Twilio SMS or WhatsApp.
+- `docs/privacy/data-map.md` — what we store, why, retention, lawful basis.
+- `docs/privacy/role-matrix.md`.
+- Public `/privacy` and `/terms` routes rendered from `consent_versions` so legal copy lives in DB.
 
-### 6. Sports list reorder
+### Out of scope (per your constraints)
+No biometrics, no medical fields, no behavioral analytics, no AI profiling of minors. Push/email consent UI exists but no provider wiring beyond what's already in the app.
 
-Update the sports dropdown source to:
-1. Football
-2. Basketball
-— separator —
-Handball, Volleyball, Rugby, Hockey sur gazon, Hockey sur glace, Water-polo, Baseball, Softball, Cricket, Football américain, Football australien, Football gaélique, Lacrosse, Netball, Korfball, Ultimate, Floorball, Sepak takraw, Kabaddi, Polo, Aviron (8), Bobsleigh, Curling.
+---
 
-### Technical notes
+### Suggested execution order
 
-- One migration: new tables (`member_invites`, `verification_codes`), new columns (`profiles.phone_verified_at`, `clubs.default_channels`), enums updates, RLS policies, RPCs.
-- Twilio called via `createServerFn` (server-only secrets).
-- Email templates use the existing transactional pipeline (`send-transactional-email` route).
-- Password regex shared in `src/lib/password.ts` and reused in register + reset.
-- Sports list moved to `src/lib/sports.ts` (single source).
+1. Phase 1 migration + linter pass
+2. Phase 2 server functions
+3. Phase 3 onboarding gate + privacy settings page (biggest UI chunk)
+4. Phase 4 role hardening + super_admin
+5. Phase 5 docs + legal pages
 
-### Order of execution
-
-1. Migration + auth config (HIBP, channels column)
-2. Email infra + templates scaffolding on `notify.clubero.app`
-3. Twilio integration + verification code flow
-4. Member invite system (RPC + page + send hook in player creation)
-5. Password confirm/regex UX + sports list update
-6. Account-active indicators on player/parent lists
-
-I'll hand back after each chunk so you can test before I move on. Ready to start with #1 (migration + auth) when you approve this plan.
+I'll hand back after each phase so you can test. **Ready to start with Phase 1 (migration) when you approve.** Want me to adjust scope — e.g. skip super_admin for now, or merge phases 1+2 into a single delivery?
