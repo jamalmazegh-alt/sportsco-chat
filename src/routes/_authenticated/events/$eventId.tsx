@@ -368,16 +368,126 @@ function EventDetail() {
 
       {/* Coach: send convocations */}
       {isCoach && !event.convocations_sent && (
-        <Button onClick={sendConvocations} className="w-full h-11" disabled={sending}>
-          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+        <Button onClick={openPicker} className="w-full h-11">
+          <Send className="h-4 w-4" />
           {t("events.sendConvocations")}
         </Button>
       )}
       {isCoach && event.convocations_sent && (
-        <p className="text-xs text-center text-muted-foreground">
-          ✓ {t("events.convocationsSent")}
-        </p>
+        <div className="space-y-2">
+          <p className="text-xs text-center text-muted-foreground">
+            ✓ {t("events.convocationsSent")}
+          </p>
+          {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
+            <Button onClick={openPicker} variant="outline" className="w-full h-10">
+              <Send className="h-4 w-4" />
+              {t("attendance.addMorePlayers")}
+            </Button>
+          )}
+        </div>
       )}
+
+      {/* Player picker dialog */}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("attendance.selectPlayers")}</DialogTitle>
+            <DialogDescription>{t("attendance.selectPlayersHint")}</DialogDescription>
+          </DialogHeader>
+          {teamPlayers && (
+            <>
+              <div className="flex items-center justify-between border-b pb-2">
+                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                  <Checkbox
+                    checked={
+                      selectedIds.size > 0 &&
+                      teamPlayers.every((tp: any) =>
+                        (convocations ?? []).some((c: any) => c.player_id === tp.player_id) ||
+                          selectedIds.has(tp.player_id)
+                      )
+                    }
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        const all = new Set<string>(
+                          teamPlayers
+                            .map((tp: any) => tp.player_id)
+                            .filter(
+                              (pid: string) =>
+                                !(convocations ?? []).some((c: any) => c.player_id === pid)
+                            )
+                        );
+                        setSelectedIds(all);
+                      } else {
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                  />
+                  {t("attendance.selectAll")}
+                </label>
+                <span className="text-xs text-muted-foreground">{selectedIds.size}</span>
+              </div>
+              <div className="max-h-72 overflow-y-auto space-y-1">
+                {teamPlayers.map((tp: any) => {
+                  const p = tp.players;
+                  const alreadyConvoked = (convocations ?? []).some(
+                    (c: any) => c.player_id === tp.player_id
+                  );
+                  const checked = alreadyConvoked || selectedIds.has(tp.player_id);
+                  return (
+                    <label
+                      key={tp.player_id}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg p-2 cursor-pointer hover:bg-accent",
+                        alreadyConvoked && "opacity-60 cursor-not-allowed"
+                      )}
+                    >
+                      <Checkbox
+                        checked={checked}
+                        disabled={alreadyConvoked}
+                        onCheckedChange={(v) => {
+                          setSelectedIds((prev) => {
+                            const next = new Set(prev);
+                            if (v) next.add(tp.player_id);
+                            else next.delete(tp.player_id);
+                            return next;
+                          });
+                        }}
+                      />
+                      <div className="h-8 w-8 rounded-full bg-muted overflow-hidden shrink-0">
+                        {p?.photo_url ? (
+                          <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
+                            {(p?.first_name?.[0] ?? "") + (p?.last_name?.[0] ?? "")}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-sm flex-1 truncate">
+                        {p?.first_name} {p?.last_name}
+                        {p?.jersey_number ? (
+                          <span className="text-muted-foreground"> · #{p.jersey_number}</span>
+                        ) : null}
+                      </span>
+                      {alreadyConvoked && (
+                        <span className="text-[10px] uppercase text-muted-foreground">✓</span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPickerOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={sendConvocations} disabled={sending || selectedIds.size === 0}>
+              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {t("events.sendConvocations")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* My response (player/parent) */}
       {visibleMyConvocs.length > 0 && (
