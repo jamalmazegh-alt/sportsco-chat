@@ -225,6 +225,7 @@
     "locationAutoMaps": "A Google Maps link is created automatically.",
     "locationUrl": "Google Maps link",
     "openInMaps": "Open in Maps",
+    "openInWaze": "Open in Waze",
     "attachments": "Attachments",
     "meetingPoint": "Meeting point",
     "meetingPointHint": "Where to meet before leaving (e.g. club parking)",

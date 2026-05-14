@@ -348,19 +348,33 @@ function EventDetail() {
             </p>
           )}
           {event.location && (
-            <p className="flex items-center gap-2 flex-wrap">
-              <MapPin className="h-4 w-4" /> {event.location}
-              {event.location_url && (
-                <a
-                  href={event.location_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary inline-flex items-center gap-1 text-xs font-medium"
-                >
-                  {t("events.openInMaps")} <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
-            </p>
+            <div className="flex items-start gap-2 flex-wrap">
+              <MapPin className="h-4 w-4 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p>{event.location}</p>
+                <div className="mt-1 flex flex-wrap gap-3">
+                  <a
+                    href={
+                      event.location_url ??
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary inline-flex items-center gap-1 text-xs font-medium"
+                  >
+                    {t("events.openInMaps")} <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <a
+                    href={`https://www.waze.com/ul?q=${encodeURIComponent(event.location)}&navigate=yes`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary inline-flex items-center gap-1 text-xs font-medium"
+                  >
+                    {t("events.openInWaze")} <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+            </div>
           )}
           {event.type === "match" && event.is_home === false && event.meeting_point && (
             <p className="flex items-center gap-2">
