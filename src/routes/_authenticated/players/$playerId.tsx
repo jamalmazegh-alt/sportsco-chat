@@ -495,6 +495,21 @@ function PlayerProfile() {
       </div>
 
       <span className="sr-only">{activeClubId}</span>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("players.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("players.deleteConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={onDeletePlayer} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
