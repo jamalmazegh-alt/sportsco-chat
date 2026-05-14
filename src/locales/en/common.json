@@ -199,6 +199,11 @@
   },
   "players": {
     "title": "Players",
+    "deleted": "Player deleted",
+    "deleteTitle": "Delete this player?",
+    "deleteConfirm": "This will remove the player and all related data (parents, attendance, convocations). This cannot be undone.",
+    "resendInvite": "Resend invite",
+    "alreadyLinked": "This account is already active",
     "firstName": "First name",
     "lastName": "Last name",
     "jerseyNumber": "Jersey #",
