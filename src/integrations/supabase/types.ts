@@ -114,28 +114,43 @@ export type Database = {
       }
       clubs: {
         Row: {
+          convocation_channels: Json
           created_at: string
           created_by: string
           default_channels: Json
+          event_chat_enabled: boolean
+          event_chat_parents_enabled: boolean
+          event_chat_players_enabled: boolean
           id: string
           logo_url: string | null
           name: string
+          wall_comments_enabled: boolean
         }
         Insert: {
+          convocation_channels?: Json
           created_at?: string
           created_by: string
           default_channels?: Json
+          event_chat_enabled?: boolean
+          event_chat_parents_enabled?: boolean
+          event_chat_players_enabled?: boolean
           id?: string
           logo_url?: string | null
           name: string
+          wall_comments_enabled?: boolean
         }
         Update: {
+          convocation_channels?: Json
           created_at?: string
           created_by?: string
           default_channels?: Json
+          event_chat_enabled?: boolean
+          event_chat_parents_enabled?: boolean
+          event_chat_players_enabled?: boolean
           id?: string
           logo_url?: string | null
           name?: string
+          wall_comments_enabled?: boolean
         }
         Relationships: []
       }

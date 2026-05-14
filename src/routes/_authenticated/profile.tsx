@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,7 +11,7 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, Settings2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { requestPhoneCode, verifyPhoneCode } from "@/lib/phone-verify.functions";
@@ -165,6 +165,21 @@ function ProfilePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {isAdmin && (
+        <Link
+          to="/admin"
+          className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Settings2 className="h-5 w-5 text-primary" />
+            </div>
+            <span className="font-medium">{t("admin.openSettings")}</span>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </Link>
       )}
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
