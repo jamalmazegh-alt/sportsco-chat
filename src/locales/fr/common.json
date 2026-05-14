@@ -199,6 +199,11 @@
   },
   "players": {
     "title": "Joueurs",
+    "deleted": "Joueur supprimé",
+    "deleteTitle": "Supprimer ce joueur ?",
+    "deleteConfirm": "Cela supprimera le joueur et toutes ses données associées (parents, présences, convocations). Action irréversible.",
+    "resendInvite": "Renvoyer l'invitation",
+    "alreadyLinked": "Ce compte est déjà actif",
     "firstName": "Prénom",
     "lastName": "Nom",
     "jerseyNumber": "N°",

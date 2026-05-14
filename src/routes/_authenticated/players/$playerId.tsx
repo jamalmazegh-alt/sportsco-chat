@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,9 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PhoneInput } from "@/components/phone-input";
-import { ChevronLeft, Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ChevronLeft, Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { sendTransactionalEmail } from "@/lib/email/send";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId")({
   component: PlayerProfile,
@@ -33,6 +38,56 @@ function PlayerProfile() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function onDeletePlayer() {
+    if (!player) return;
+    setDeleting(true);
+    // Cascade-clean dependents we manage from the client. RLS allows admin/coach.
+    await supabase.from("player_parents").delete().eq("player_id", player.id);
+    await supabase.from("team_members").delete().eq("player_id", player.id);
+    await supabase.from("convocations").delete().eq("player_id", player.id);
+    const { error } = await supabase.from("players").delete().eq("id", player.id);
+    setDeleting(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("players.deleted"));
+    qc.invalidateQueries({ queryKey: ["team-players"] });
+    navigate({ to: "/teams" });
+  }
+
+  async function resendParentInvite(pp: { id: string; full_name: string | null; email: string | null; phone: string | null; parent_user_id: string | null }) {
+    if (!player || !user) return;
+    if (pp.parent_user_id) { toast.info(t("players.alreadyLinked")); return; }
+    if (!pp.email && !pp.phone) { toast.warning(t("players.inviteNoContact")); return; }
+    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+    if (!inviter?.phone_verified_at) { toast.warning(t("players.inviterPhoneRequired")); return; }
+    const token = crypto.randomUUID().replace(/-/g, "");
+    const { error: invErr } = await supabase.from("member_invites").insert({
+      club_id: player.club_id, created_by: user.id, token,
+      parent_for_player_id: player.id, role: "parent",
+      email: pp.email ?? null, phone: pp.phone ?? null,
+    });
+    if (invErr) { toast.error(invErr.message); return; }
+    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+    if (pp.email) {
+      try {
+        await sendTransactionalEmail({
+          templateName: "player-invite",
+          recipientEmail: pp.email,
+          idempotencyKey: `member-invite-${token}`,
+          templateData: { firstName: (pp.full_name ?? "").split(" ")[0] || undefined, clubName: undefined, inviteUrl },
+        });
+        toast.success(t("players.inviteSent"));
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed");
+      }
+    } else {
+      toast.success(t("players.inviteSent"));
+    }
+  }
+
 
   const { data: player, refetch: refetchPlayer } = useQuery({
     queryKey: ["player", playerId],
@@ -212,7 +267,7 @@ function PlayerProfile() {
             )}
           />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold truncate">
             {player.first_name} {player.last_name}
           </h1>
@@ -230,6 +285,11 @@ function PlayerProfile() {
             )}
           </div>
         </div>
+        {isCoach && (
+          <Button size="icon" variant="ghost" className="h-9 w-9 shrink-0 text-destructive" onClick={() => setConfirmDelete(true)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
@@ -375,6 +435,11 @@ function PlayerProfile() {
                     {pp.can_respond ? ` · ${t("players.canRespond")}` : ""}
                   </p>
                 </div>
+                {isCoach && !linked && (pp.email || pp.phone) && (
+                  <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => resendParentInvite(pp)} title={t("players.resendInvite")}>
+                    <Send className="h-4 w-4 text-primary" />
+                  </Button>
+                )}
                 {isCoach && (
                   <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => onDeleteParent(pp.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -430,6 +495,21 @@ function PlayerProfile() {
       </div>
 
       <span className="sr-only">{activeClubId}</span>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("players.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("players.deleteConfirm")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={onDeletePlayer} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
