@@ -82,7 +82,12 @@
     "coaches": "Coachs",
     "viewPlayers": "Voir les joueurs",
     "image": "Image de l'équipe",
-    "uploadImage": "Ajouter une image"
+    "uploadImage": "Ajouter une image",
+    "selectSport": "Choisir un sport",
+    "sports": {
+      "football": "Football",
+      "basketball": "Basketball"
+    }
   },
   "club": {
     "logo": "Logo du club",

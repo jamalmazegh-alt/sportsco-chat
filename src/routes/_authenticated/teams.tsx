@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Users, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -59,6 +60,7 @@ function TeamsPage() {
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
   const [championship, setChampionship] = useState("");
+  const [sport, setSport] = useState("football");
   const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
   const [busy, setBusy] = useState(false);
 
@@ -77,6 +79,7 @@ function TeamsPage() {
       name,
       age_group: ageGroup || null,
       championship: championship || null,
+      sport: sport || null,
       competitions,
     });
     setBusy(false);
@@ -88,6 +91,7 @@ function TeamsPage() {
     setName("");
     setAgeGroup("");
     setChampionship("");
+    setSport("football");
     setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     qc.invalidateQueries({ queryKey: ["teams"] });
@@ -113,6 +117,16 @@ function TeamsPage() {
                 <div className="space-y-1.5">
                   <Label>{t("teams.name")}</Label>
                   <Input required value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{t("teams.sport")}</Label>
+                  <Select value={sport} onValueChange={setSport}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="football">{t("teams.sports.football")}</SelectItem>
+                      <SelectItem value="basketball">{t("teams.sports.basketball")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label>{t("teams.ageGroup")}</Label>
