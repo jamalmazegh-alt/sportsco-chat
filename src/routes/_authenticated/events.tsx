@@ -1,13 +1,15 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
+import { format, isPast, isToday } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Plus, ChevronRight } from "lucide-react";
+import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/events")({
   component: EventsRoute,
@@ -20,13 +22,22 @@ function EventsRoute() {
   return <EventsPage />;
 }
 
+const TYPE_ICONS: Record<string, typeof Calendar> = {
+  training: Dumbbell,
+  match: Trophy,
+  tournament: Trophy,
+  meeting: Users,
+  other: Calendar,
+};
+
 function EventsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: teams } = useQuery({
     queryKey: ["teams", activeClubId],
@@ -59,8 +70,21 @@ function EventsPage() {
     },
   });
 
+  const grouped = useMemo(() => {
+    if (!events) return [];
+    const map = new Map<string, { label: string; items: typeof events }>();
+    for (const e of events) {
+      const d = new Date(e.starts_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+      const label = format(d, "MMMM yyyy", { locale: dateLocale });
+      if (!map.has(key)) map.set(key, { label, items: [] as typeof events });
+      map.get(key)!.items.push(e);
+    }
+    return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
+  }, [events, dateLocale]);
+
   return (
-    <div className="px-5 pt-8 space-y-5">
+    <div className="px-5 pt-8 pb-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t("events.title")}</h1>
         {isCoach && user && (
@@ -87,7 +111,7 @@ function EventsPage() {
       {isLoading ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-20 rounded-2xl bg-muted animate-pulse" />
+            <div key={i} className="h-24 rounded-2xl bg-muted animate-pulse" />
           ))}
         </div>
       ) : !events || events.length === 0 ? (
@@ -96,38 +120,80 @@ function EventsPage() {
           <p className="text-sm text-muted-foreground">{t("events.noEvents")}</p>
         </div>
       ) : (
-        <ul className="space-y-2">
-          {events.map((e) => (
-            <li key={e.id}>
-              <Link
-                to="/events/$eventId"
-                params={{ eventId: e.id }}
-                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                      {t(`events.types.${e.type}`)}
-                    </span>
-                    <p className="font-medium truncate">{e.title}</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
-                    <Calendar className="h-3 w-3" />
-                    {format(new Date(e.starts_at), "EEE d MMM · HH:mm")}
-                    {e.location && (
-                      <>
-                        <span>·</span>
-                        <MapPin className="h-3 w-3" />
-                        <span className="truncate">{e.location}</span>
-                      </>
-                    )}
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-              </Link>
-            </li>
+        <div className="space-y-7">
+          {grouped.map((group) => (
+            <section key={group.key} className="space-y-3">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
+                {group.label}
+              </h2>
+              <ul className="space-y-2.5">
+                {group.items.map((e) => {
+                  const Icon = TYPE_ICONS[e.type] ?? Calendar;
+                  const d = new Date(e.starts_at);
+                  const past = isPast(d) && !isToday(d);
+                  return (
+                    <li key={e.id}>
+                      <Link
+                        to="/events/$eventId"
+                        params={{ eventId: e.id }}
+                        className={cn(
+                          "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden active:scale-[0.99] transition-transform",
+                          past ? "border-border/60 opacity-70" : "border-border hover:border-primary/40",
+                        )}
+                      >
+                        {/* Date block */}
+                        <div className={cn(
+                          "flex flex-col items-center justify-center w-16 shrink-0 py-3",
+                          past ? "bg-muted/40" : "bg-primary/8",
+                        )}>
+                          <span className={cn(
+                            "text-[10px] font-semibold uppercase tracking-wider",
+                            past ? "text-muted-foreground" : "text-primary",
+                          )}>
+                            {format(d, "EEE", { locale: dateLocale })}
+                          </span>
+                          <span className="text-2xl font-bold leading-none mt-0.5">
+                            {format(d, "d")}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground mt-1">
+                            {format(d, "HH:mm")}
+                          </span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
+                          <div className="flex items-center gap-1.5">
+                            <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                              {t(`events.types.${e.type}`)}
+                            </span>
+                            {e.team_name && (
+                              <span className="text-[10px] text-muted-foreground truncate">
+                                · {e.team_name}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-medium truncate leading-tight">
+                            {e.title}
+                            {e.opponent && (
+                              <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
+                            )}
+                          </p>
+                          {e.location && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                              <MapPin className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{e.location}</span>
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

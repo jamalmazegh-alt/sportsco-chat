@@ -19,7 +19,7 @@ import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { useServerFn } from "@tanstack/react-start";
 import { sendSms } from "@/lib/sms.functions";
-import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +56,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id)")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id, email, phone)")
         .eq("team_id", teamId)
         .eq("role", "player");
       return (tm ?? [])
@@ -66,6 +66,20 @@ function TeamDetail() {
     },
   });
 
+  // Selection state for bulk invitations
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [inviting, setInviting] = useState(false);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   // Add player form state
   const [open, setOpen] = useState(false);
   const [first, setFirst] = useState("");
@@ -74,7 +88,8 @@ function TeamDetail() {
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [parentName, setParentName] = useState("");
+  const [parentFirst, setParentFirst] = useState("");
+  const [parentLast, setParentLast] = useState("");
   const [parentPhone, setParentPhone] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [respondBy, setRespondBy] = useState<RespondBy>("both");
@@ -130,7 +145,7 @@ function TeamDetail() {
   function reset() {
     setFirst(""); setLast(""); setJersey(""); setPosition("");
     setPhone(""); setEmail("");
-    setParentName(""); setParentPhone(""); setParentEmail("");
+    setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
   }
 
@@ -146,6 +161,117 @@ function TeamDetail() {
     }
     const { data } = supabase.storage.from("player-photos").getPublicUrl(path);
     return data.publicUrl;
+  }
+
+  type InviteTarget = {
+    role: "player" | "parent";
+    firstName?: string;
+    email?: string;
+    phone?: string;
+    playerId: string;
+  };
+
+  // Send invitation(s) for a player (player + linked parents). Returns true if at least one invite was dispatched.
+  async function sendInvitesForPlayer(playerId: string): Promise<{ sent: number; failed: number; skipped: number }> {
+    if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1 };
+
+    // Load player + parents
+    const [{ data: pl }, { data: parents }] = await Promise.all([
+      supabase.from("players").select("id, first_name, email, phone, user_id").eq("id", playerId).maybeSingle(),
+      supabase.from("player_parents").select("id, full_name, email, phone, parent_user_id").eq("player_id", playerId),
+    ]);
+
+    const targets: InviteTarget[] = [];
+    if (pl && !pl.user_id && (pl.email || pl.phone)) {
+      targets.push({ role: "player", firstName: pl.first_name ?? undefined, email: pl.email ?? undefined, phone: pl.phone ?? undefined, playerId });
+    }
+    for (const p of parents ?? []) {
+      if (!p.parent_user_id && (p.email || p.phone)) {
+        targets.push({ role: "parent", firstName: (p.full_name ?? "").split(" ")[0] || undefined, email: p.email ?? undefined, phone: p.phone ?? undefined, playerId });
+      }
+    }
+
+    if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
+
+    const { data: clubRow } = await supabase.from("clubs").select("name").eq("id", activeClubId).maybeSingle();
+    const clubLabel = clubRow?.name ?? "Clubero";
+
+    let sent = 0; let failed = 0;
+    for (const target of targets) {
+      const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+      const { error: invErr } = await supabase.from("member_invites").insert({
+        club_id: activeClubId,
+        team_id: teamId,
+        player_id: target.role === "player" ? target.playerId : null,
+        parent_for_player_id: target.role === "parent" ? target.playerId : null,
+        role: target.role === "player" ? "player" : "parent",
+        email: target.email ?? null,
+        phone: target.phone ?? null,
+        token,
+        created_by: user.id,
+      });
+      if (invErr) { failed += 1; continue; }
+      const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+      let dispatched = false;
+      if (target.email) {
+        try {
+          await sendTransactionalEmail({
+            templateName: "player-invite",
+            recipientEmail: target.email,
+            idempotencyKey: `member-invite-${token}`,
+            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, inviteUrl },
+          });
+          dispatched = true;
+        } catch { /* fallthrough to sms */ }
+      }
+      if (target.phone) {
+        try {
+          const greet = target.firstName ? `${target.firstName}, ` : "";
+          await sendSmsFn({ data: { to: target.phone, body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}` } });
+          dispatched = true;
+        } catch { /* ignore */ }
+      }
+      if (dispatched) sent += 1; else failed += 1;
+    }
+    return { sent, failed, skipped: 0 };
+  }
+
+  async function inviteOne(playerId: string) {
+    if (!user) return;
+    // Verify inviter has a verified phone
+    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+    if (!inviter?.phone_verified_at) {
+      toast.warning(t("players.inviterPhoneRequired"));
+      return;
+    }
+    setInviting(true);
+    const r = await sendInvitesForPlayer(playerId);
+    setInviting(false);
+    if (r.skipped) toast.warning(t("players.inviteNoContact"));
+    else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
+    else if (r.failed) toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
+    else toast.success(t("players.inviteSent"));
+  }
+
+  async function inviteSelected() {
+    if (!user || selectedIds.size === 0) return;
+    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+    if (!inviter?.phone_verified_at) {
+      toast.warning(t("players.inviterPhoneRequired"));
+      return;
+    }
+    setInviting(true);
+    let totalSent = 0; let totalFailed = 0; let totalSkipped = 0;
+    for (const id of selectedIds) {
+      const r = await sendInvitesForPlayer(id);
+      totalSent += r.sent; totalFailed += r.failed; totalSkipped += r.skipped;
+    }
+    setInviting(false);
+    setSelectMode(false);
+    setSelectedIds(new Set());
+    if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
+    else if (totalFailed) toast.warning(t("players.inviteBulkResult", { sent: totalSent, failed: totalFailed, skipped: totalSkipped }));
+    else toast.success(t("players.inviteBulkSent", { count: totalSent }));
   }
 
   async function onAdd(e: FormEvent) {
@@ -192,101 +318,16 @@ function TeamDetail() {
       return;
     }
 
-    if (parentName || parentPhone || parentEmail) {
+    const parentFullName = `${parentFirst.trim()} ${parentLast.trim()}`.trim();
+    if (parentFullName || parentPhone || parentEmail) {
       await supabase.from("player_parents").insert({
         player_id: player.id,
         parent_user_id: null,
-        full_name: parentName || null,
+        full_name: parentFullName || null,
         phone: parentPhone || null,
         email: parentEmail || null,
         can_respond: parentCanRespond,
       });
-    }
-
-    // Auto-send invitations (player + parent) when an email or phone is provided
-    type InviteTarget = {
-      role: "player" | "parent";
-      firstName?: string;
-      email?: string;
-      phone?: string;
-    };
-    const inviteTargets: InviteTarget[] = [];
-    if (email || phone) inviteTargets.push({ role: "player", firstName: first, email: email || undefined, phone: phone || undefined });
-    if (parentEmail || parentPhone) inviteTargets.push({ role: "parent", firstName: parentName || undefined, email: parentEmail || undefined, phone: parentPhone || undefined });
-
-    if (inviteTargets.length > 0) {
-      // Gate: inviter must have a verified phone before invites can be sent
-      const { data: inviter } = await supabase
-        .from("profiles")
-        .select("phone_verified_at")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (!inviter?.phone_verified_at) {
-        setBusy(false);
-        setOpen(false);
-        reset();
-        qc.invalidateQueries({ queryKey: ["team-players", teamId] });
-        toast.warning(t("players.inviterPhoneRequired"));
-        return;
-      }
-
-      const { data: clubRow } = await supabase
-        .from("clubs")
-        .select("name")
-        .eq("id", activeClubId)
-        .maybeSingle();
-
-      let anyFailed = false;
-      for (const target of inviteTargets) {
-        const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
-        const { error: invErr } = await supabase.from("member_invites").insert({
-          club_id: activeClubId,
-          team_id: teamId,
-          player_id: target.role === "player" ? player.id : null,
-          parent_for_player_id: target.role === "parent" ? player.id : null,
-          role: target.role === "player" ? "player" : "parent",
-          email: target.email ?? null,
-          phone: target.phone ?? null,
-          token,
-          created_by: user.id,
-        });
-        if (invErr) { anyFailed = true; continue; }
-        const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
-        const clubLabel = clubRow?.name ?? "Clubero";
-
-        if (target.email) {
-          try {
-            await sendTransactionalEmail({
-              templateName: "player-invite",
-              recipientEmail: target.email,
-              idempotencyKey: `member-invite-${token}`,
-              templateData: {
-                firstName: target.firstName,
-                teamName: team?.name,
-                clubName: clubLabel,
-                inviteUrl,
-              },
-            });
-          } catch (e) {
-            anyFailed = true;
-          }
-        }
-        if (target.phone) {
-          try {
-            const greet = target.firstName ? `${target.firstName}, ` : "";
-            await sendSmsFn({
-              data: {
-                to: target.phone,
-                body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}`,
-              },
-            });
-          } catch (e) {
-            anyFailed = true;
-          }
-        }
-      }
-      if (anyFailed) toast.error(t("players.inviteFailed"));
-      else toast.success(t("players.inviteSent"));
     }
 
     setBusy(false);
@@ -374,18 +415,37 @@ function TeamDetail() {
         </Sheet>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("teams.players")}
         </h2>
         {isCoach && (
-          <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-            <SheetTrigger asChild>
-              <Button size="sm" className="h-9">
-                <Plus className="h-4 w-4" />
-                {t("teams.addPlayer")}
-              </Button>
-            </SheetTrigger>
+          <div className="flex items-center gap-2">
+            {selectMode ? (
+              <>
+                <Button size="sm" variant="outline" className="h-9" onClick={() => { setSelectMode(false); setSelectedIds(new Set()); }}>
+                  <X className="h-4 w-4" />
+                </Button>
+                <Button size="sm" className="h-9" disabled={inviting || selectedIds.size === 0} onClick={inviteSelected}>
+                  {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {t("players.inviteSelected", { count: selectedIds.size })}
+                </Button>
+              </>
+            ) : (
+              <>
+                {(players ?? []).some((p: any) => !p.user_id && (p.email || p.phone)) && (
+                  <Button size="sm" variant="outline" className="h-9" onClick={() => setSelectMode(true)}>
+                    <CheckSquare className="h-4 w-4" />
+                    {t("players.invite")}
+                  </Button>
+                )}
+                <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
+                  <SheetTrigger asChild>
+                    <Button size="sm" className="h-9">
+                      <Plus className="h-4 w-4" />
+                      {t("teams.addPlayer")}
+                    </Button>
+                  </SheetTrigger>
             <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
@@ -455,9 +515,15 @@ function TeamDetail() {
                     {t("players.parents")}
                   </p>
                   <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label>{t("players.parentName")}</Label>
-                      <Input value={parentName} onChange={(e) => setParentName(e.target.value)} />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label>{t("players.firstName")}</Label>
+                        <Input value={parentFirst} onChange={(e) => setParentFirst(e.target.value)} />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>{t("players.lastName")}</Label>
+                        <Input value={parentLast} onChange={(e) => setParentLast(e.target.value)} />
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
@@ -490,6 +556,9 @@ function TeamDetail() {
               </form>
             </SheetContent>
           </Sheet>
+              </>
+            )}
+          </div>
         )}
       </div>
 
@@ -506,13 +575,12 @@ function TeamDetail() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {players.map((p: any) => (
-            <li key={p.id}>
-              <Link
-                to="/players/$playerId"
-                params={{ playerId: p.id }}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
-              >
+          {players.map((p: any) => {
+            const canInvite = !p.user_id && (p.email || p.phone);
+            const checked = selectedIds.has(p.id);
+            const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const inner = (
+              <>
                 <div className="relative h-12 w-12 shrink-0 rounded-full bg-muted overflow-hidden">
                   {p.photo_url ? (
                     <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
@@ -524,9 +592,8 @@ function TeamDetail() {
                   <span
                     className={cn(
                       "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
-                      p.user_id ? "bg-present" : "bg-muted-foreground/40"
+                      p.user_id ? "bg-present" : "bg-muted-foreground/40",
                     )}
-                    title={p.user_id ? t("players.accountActive") : t("players.accountInactive")}
                   />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -540,10 +607,43 @@ function TeamDetail() {
                     {p.preferred_position ?? (p.user_id ? t("players.accountActive") : t("players.accountInactive"))}
                   </p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-              </Link>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={p.id}>
+                {selectMode ? (
+                  <button
+                    type="button"
+                    disabled={!canInvite}
+                    onClick={() => canInvite && toggleSelected(p.id)}
+                    className={cn(rowClass, "w-full text-left", !canInvite && "opacity-50")}
+                  >
+                    <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
+                    {inner}
+                  </button>
+                ) : (
+                  <div className={rowClass}>
+                    <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
+                      {inner}
+                    </Link>
+                    {isCoach && canInvite && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 shrink-0"
+                        title={t("players.invite")}
+                        disabled={inviting}
+                        onClick={() => inviteOne(p.id)}
+                      >
+                        <Send className="h-4 w-4 text-primary" />
+                      </Button>
+                    )}
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
