@@ -191,21 +191,6 @@ function HomePage() {
         </section>
       )}
 
-      <Link
-        to="/wall"
-        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Megaphone className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="font-medium">{t("wall.title")}</p>
-            <p className="text-xs text-muted-foreground">{t("wall.subtitle")}</p>
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-      </Link>
 
       {/* Upcoming */}
       <section>
