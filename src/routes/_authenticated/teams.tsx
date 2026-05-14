@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/teams")({
   component: TeamsRoute,
-  head: () => ({ meta: [{ title: "Teams — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Teams — Clubero" }] }),
 });
 
 function TeamsRoute() {

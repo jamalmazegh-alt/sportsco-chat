@@ -12,7 +12,7 @@ import { EventFormSheet } from "@/components/event-form-sheet";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
-  head: () => ({ meta: [{ title: "Home — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Home — Clubero" }] }),
 });
 
 function formatWhen(d: Date, locale?: string) {

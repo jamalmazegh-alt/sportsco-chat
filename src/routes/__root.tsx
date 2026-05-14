@@ -20,14 +20,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
       },
-      { title: "Squadly — Team coordination, made simple" },
+      { title: "Clubero — Team coordination, made simple" },
       {
         name: "description",
         content:
-          "Squadly is a fast, mobile-first app for sports clubs to coordinate events, convocations and attendance in seconds.",
+          "Clubero is a fast, mobile-first app for sports clubs to coordinate events, convocations and attendance in seconds.",
       },
       { name: "theme-color", content: "#10b981" },
-      { property: "og:title", content: "Squadly — Team coordination, made simple" },
+      { property: "og:title", content: "Clubero — Team coordination, made simple" },
       {
         property: "og:description",
         content:

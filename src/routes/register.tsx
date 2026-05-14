@@ -12,8 +12,8 @@ export const Route = createFileRoute("/register")({
   component: RegisterPage,
   head: () => ({
     meta: [
-      { title: "Create account — Squadly" },
-      { name: "description", content: "Create your Squadly account in seconds." },
+      { title: "Create account — Clubero" },
+      { name: "description", content: "Create your Clubero account in seconds." },
     ],
   }),
 });

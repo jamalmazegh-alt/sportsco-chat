@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
-  head: () => ({ meta: [{ title: "Profile — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Profile — Clubero" }] }),
 });
 
 function ProfilePage() {

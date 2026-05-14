@@ -12,7 +12,7 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({
     meta: [
-      { title: "Log in — Squadly" },
+      { title: "Log in — Clubero" },
       { name: "description", content: "Log in to manage your team and events." },
     ],
   }),

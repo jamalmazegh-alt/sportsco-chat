@@ -11,7 +11,7 @@ import { EventFormSheet } from "@/components/event-form-sheet";
 
 export const Route = createFileRoute("/_authenticated/events")({
   component: EventsRoute,
-  head: () => ({ meta: [{ title: "Events — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Events — Clubero" }] }),
 });
 
 function EventsRoute() {

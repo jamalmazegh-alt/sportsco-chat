@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId")({
   component: TeamDetail,
-  head: () => ({ meta: [{ title: "Team — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Team — Clubero" }] }),
 });
 
 type RespondBy = "player" | "parent" | "both";
