@@ -94,14 +94,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
   }, [clubId]);
 
   async function submitPost() {
-    if (!body.trim() || !user) return;
+    if ((!body.trim() && atts.length === 0) || !user) return;
     setPosting(true);
     const { error } = await supabase
       .from("wall_posts")
-      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim() });
+      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never });
     setPosting(false);
     if (error) { toast.error(error.message); return; }
     setBody("");
+    setAtts([]);
   }
 
   async function deletePost(id: string) {
