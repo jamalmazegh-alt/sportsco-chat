@@ -263,7 +263,21 @@
     "confirmCancelConvocation": "Cancel this convocation?",
     "convocationCancelled": "Convocation cancelled",
     "convokedPlayers": "Convoked players",
-    "noConvokedPlayers": "No players convoked yet."
+    "noConvokedPlayers": "No players convoked yet.",
+    "details": "Details",
+    "status": "Status",
+    "comment": "Comment",
+    "history": "Activity",
+    "respondedAt": "Responded",
+    "reminderVia": "Reminder via {{channel}}",
+    "noActivity": "No activity yet."
+  },
+  "channels": {
+    "in_app": "in-app",
+    "email": "email",
+    "sms": "SMS",
+    "whatsapp": "WhatsApp",
+    "push": "push"
   },
   "inbox": {
     "title": "Inbox",
