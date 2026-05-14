@@ -11,6 +11,7 @@ import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
