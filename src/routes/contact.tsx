@@ -12,9 +12,9 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Clubero" },
-      { name: "description", content: "Get in touch with the Clubero team." },
+      { name: "description", content: "Contactez l'équipe Clubero." },
       { property: "og:title", content: "Contact — Clubero" },
-      { property: "og:description", content: "Get in touch with the Clubero team." },
+      { property: "og:description", content: "Contactez l'équipe Clubero." },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/contact" }],
   }),
@@ -27,8 +27,8 @@ function ContactPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const subject = `Clubero contact — ${name}`;
-    const body = `From: ${name} <${email}>\n\n${message}`;
+    const subject = `Contact Clubero — ${name}`;
+    const body = `De : ${name} <${email}>\n\n${message}`;
     window.location.href = `mailto:hello@clubero.app?subject=${encodeURIComponent(
       subject,
     )}&body=${encodeURIComponent(body)}`;
@@ -42,10 +42,10 @@ function ContactPage() {
             Contact
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Let&apos;s talk.
+            Discutons.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Questions, partnerships or just curious? Drop us a line.
+            Question, partenariat ou simple curiosité ? Écrivez-nous.
           </p>
         </div>
       </section>
@@ -58,7 +58,7 @@ function ContactPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
                   <Mail className="h-5 w-5" />
                 </div>
-                <h2 className="mt-4 font-display text-base font-semibold">Email</h2>
+                <h2 className="mt-4 font-display text-base font-semibold">E-mail</h2>
                 <a
                   href="mailto:hello@clubero.app"
                   className="mt-1 block text-sm text-muted-foreground hover:text-foreground"
@@ -70,9 +70,9 @@ function ContactPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
                   <MapPin className="h-5 w-5" />
                 </div>
-                <h2 className="mt-4 font-display text-base font-semibold">Where</h2>
+                <h2 className="mt-4 font-display text-base font-semibold">Où</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Made for European grassroots clubs.
+                  Conçu pour les clubs amateurs européens.
                 </p>
               </div>
             </div>
@@ -84,24 +84,24 @@ function ContactPage() {
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="c-name">Name</Label>
+                <Label htmlFor="c-name">Nom</Label>
                 <Input
                   id="c-name"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
+                  placeholder="Votre nom"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="c-email">Email</Label>
+                <Label htmlFor="c-email">E-mail</Label>
                 <Input
                   id="c-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@club.com"
+                  placeholder="vous@club.fr"
                 />
               </div>
             </div>
@@ -113,11 +113,11 @@ function ContactPage() {
                 rows={6}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="How can we help?"
+                placeholder="Comment pouvons-nous aider ?"
               />
             </div>
             <Button type="submit" size="lg" className="mt-6 w-full h-12">
-              Send message
+              Envoyer le message
             </Button>
           </form>
         </div>

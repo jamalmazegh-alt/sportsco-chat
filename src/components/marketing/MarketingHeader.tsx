@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/clubero-logo.png";
 
 const NAV = [
-  { to: "/features", label: "Features" },
-  { to: "/pricing", label: "Pricing" },
+  { to: "/features", label: "Fonctionnalités" },
+  { to: "/pricing", label: "Tarifs" },
   { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
 ] as const;
@@ -39,10 +39,10 @@ export function MarketingHeader() {
 
         <div className="hidden items-center gap-2 md:flex">
           <Button asChild variant="ghost" size="sm" className="h-9">
-            <Link to="/login">Log in</Link>
+            <Link to="/login">Connexion</Link>
           </Button>
           <Button asChild size="sm" className="h-9">
-            <Link to="/demo">Request a demo</Link>
+            <Link to="/demo">Demander une démo</Link>
           </Button>
         </div>
 
@@ -50,7 +50,7 @@ export function MarketingHeader() {
           type="button"
           className="rounded-md p-2 md:hidden"
           onClick={() => setOpen((s) => !s)}
-          aria-label="Toggle menu"
+          aria-label="Menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -71,10 +71,10 @@ export function MarketingHeader() {
             ))}
             <div className="mt-2 flex gap-2 px-1">
               <Button asChild variant="outline" className="flex-1" onClick={() => setOpen(false)}>
-                <Link to="/login">Log in</Link>
+                <Link to="/login">Connexion</Link>
               </Button>
               <Button asChild className="flex-1" onClick={() => setOpen(false)}>
-                <Link to="/demo">Request a demo</Link>
+                <Link to="/demo">Demander une démo</Link>
               </Button>
             </div>
           </nav>

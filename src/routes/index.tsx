@@ -10,16 +10,16 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Clubero — Team coordination for sports clubs" },
+      { title: "Clubero — La coordination d'équipe pour clubs sportifs" },
       {
         name: "description",
         content:
-          "Clubero replaces WhatsApp chaos with a clean app for convocations, attendance and club communication. Built for clubs, coaches, parents and players.",
+          "Clubero remplace le chaos WhatsApp par une appli claire pour les convocations, présences et communication de club. Pour clubs, coachs, parents et joueurs.",
       },
-      { property: "og:title", content: "Clubero — Team coordination for sports clubs" },
+      { property: "og:title", content: "Clubero — La coordination d'équipe pour clubs sportifs" },
       {
         property: "og:description",
-        content: "Convocations, attendance, reminders. One tap. Zero chaos.",
+        content: "Convocations, présences, rappels. En un clic. Zéro chaos.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/" }],
@@ -34,7 +34,6 @@ function Index() {
   }, []);
 
   if (appHost === null) {
-    // SSR / first paint: render marketing landing.
     return <Landing />;
   }
   if (appHost) return <AppHostRedirect />;
@@ -57,7 +56,6 @@ function Landing() {
   return (
     <MarketingLayout>
       <Hero />
-      <Logos />
       <FeaturesGrid />
       <ForEveryone />
       <CTA />
@@ -80,28 +78,28 @@ function Hero() {
           <div className="lg:col-span-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Built for grassroots sports clubs
+              Conçu pour les clubs sportifs amateurs
             </div>
             <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Team coordination,{" "}
-              <span className="text-[color:var(--brand-blue)]">made simple.</span>
+              La coordination d&apos;équipe,{" "}
+              <span className="text-[color:var(--brand-blue)]">simplifiée.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Stop chasing parents in WhatsApp. Clubero gives clubs a single place
-              for convocations, attendance, communication and reminders — in one tap.
+              Arrêtez de courir après les parents sur WhatsApp. Clubero centralise
+              les convocations, présences, communication et rappels — en un seul clic.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 text-base">
                 <Link to="/demo">
-                  Request a demo <ArrowRight className="ml-1.5 h-4 w-4" />
+                  Demander une démo <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link to="/features">See features</Link>
+                <Link to="/features">Voir les fonctionnalités</Link>
               </Button>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
-              Free to try · No credit card required
+              Essai gratuit · Sans carte bancaire
             </p>
           </div>
 
@@ -118,7 +116,7 @@ function Hero() {
                 <div className="mb-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Saturday · 14:30
+                      Samedi · 14:30
                     </p>
                     <p className="font-display text-base font-semibold">
                       U13 — Match vs FC Riverside
@@ -130,11 +128,11 @@ function Hero() {
                 </div>
                 <div className="space-y-2">
                   {[
-                    { name: "Lucas M.", status: "Present", c: "bg-primary/15 text-[color:var(--secondary)]" },
-                    { name: "Emma D.", status: "Present", c: "bg-primary/15 text-[color:var(--secondary)]" },
-                    { name: "Noah B.", status: "Maybe", c: "bg-amber-500/15 text-amber-700" },
+                    { name: "Lucas M.", status: "Présent", c: "bg-primary/15 text-[color:var(--secondary)]" },
+                    { name: "Emma D.", status: "Présent", c: "bg-primary/15 text-[color:var(--secondary)]" },
+                    { name: "Noah B.", status: "Peut-être", c: "bg-amber-500/15 text-amber-700" },
                     { name: "Léa S.", status: "Absent", c: "bg-red-500/15 text-red-700" },
-                    { name: "Adam K.", status: "Pending", c: "bg-muted text-muted-foreground" },
+                    { name: "Adam K.", status: "En attente", c: "bg-muted text-muted-foreground" },
                   ].map((p) => (
                     <div
                       key={p.name}
@@ -153,7 +151,7 @@ function Hero() {
                   ))}
                 </div>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>14 of 18 responded</span>
+                  <span>14 sur 18 ont répondu</span>
                   <span className="font-semibold text-foreground">78%</span>
                 </div>
               </div>
@@ -165,55 +163,36 @@ function Hero() {
   );
 }
 
-function Logos() {
-  return (
-    <section className="border-b border-border/60 bg-muted/30">
-      <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
-        <p className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Trusted by clubs across Europe
-        </p>
-        <div className="mt-6 grid grid-cols-2 gap-6 opacity-60 sm:grid-cols-3 md:grid-cols-6">
-          {["AS Marigny", "FC Riverside", "USAG Uckange", "PSG Académie", "OL Junior", "Stade Rennais"].map((c) => (
-            <div key={c} className="text-center font-display text-sm font-semibold text-muted-foreground">
-              {c}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 const FEATURES = [
   {
     icon: CalendarCheck,
-    title: "Smart convocations",
-    body: "Send convocations in seconds. Players and parents respond in one tap.",
+    title: "Convocations intelligentes",
+    body: "Envoyez vos convocations en quelques secondes. Joueurs et parents répondent en un clic.",
   },
   {
     icon: Users,
-    title: "Team management",
-    body: "Manage rosters, parent links, jersey numbers and positions in one place.",
+    title: "Gestion d'équipe",
+    body: "Effectifs, liens parents, numéros et postes — tout au même endroit.",
   },
   {
     icon: Bell,
-    title: "Automated reminders",
-    body: "Never chase a response again. Reminders go out automatically.",
+    title: "Rappels automatiques",
+    body: "Plus besoin de relancer. Les rappels partent tout seuls.",
   },
   {
     icon: MessageSquareText,
-    title: "Club communication",
-    body: "A clean wall and event-level chat replace messy group chats.",
+    title: "Communication de club",
+    body: "Un mur propre et un chat par événement remplacent les groupes WhatsApp.",
   },
   {
     icon: BarChart3,
-    title: "Attendance insights",
-    body: "Track who showed up, who didn't, and spot patterns over the season.",
+    title: "Suivi des présences",
+    body: "Voyez qui est venu, qui a manqué, et repérez les tendances de la saison.",
   },
   {
     icon: ShieldCheck,
-    title: "GDPR-ready & safe",
-    body: "Role-based access, parental controls and data hosted in the EU.",
+    title: "RGPD & sécurité",
+    body: "Accès par rôle, contrôle parental et données hébergées en Europe.",
   },
 ];
 
@@ -223,13 +202,13 @@ function FeaturesGrid() {
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Everything your club needs.
+            Tout ce dont votre club a besoin.
             <br />
-            Nothing it doesn&apos;t.
+            Rien de superflu.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Replace four group chats, two spreadsheets and a printed roster with one
-            simple, mobile-first app.
+            Remplacez quatre groupes WhatsApp, deux tableurs et une feuille
+            imprimée par une appli mobile-first, simple et claire.
           </p>
         </div>
 
@@ -255,19 +234,19 @@ function FeaturesGrid() {
 const AUDIENCES = [
   {
     title: "Clubs",
-    points: ["Centralize teams and members", "Multi-team dashboard", "Season-wide insights"],
+    points: ["Centralisez équipes et membres", "Tableau de bord multi-équipes", "Statistiques sur la saison"],
   },
   {
-    title: "Coaches",
-    points: ["Send convocations in seconds", "Live attendance tracking", "Event-level chat"],
+    title: "Coachs",
+    points: ["Convocations en quelques secondes", "Présences en temps réel", "Chat dédié à chaque événement"],
   },
   {
     title: "Parents",
-    points: ["Respond in one tap", "Calendar in your pocket", "Zero notification overload"],
+    points: ["Réponse en un clic", "Calendrier dans la poche", "Zéro surcharge de notifications"],
   },
   {
-    title: "Players",
-    points: ["See your next match", "Confirm attendance", "Stay in the loop"],
+    title: "Joueurs",
+    points: ["Voyez votre prochain match", "Confirmez votre présence", "Restez dans la boucle"],
   },
 ];
 
@@ -277,10 +256,10 @@ function ForEveryone() {
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
-            For everyone in the club
+            Pour tout le club
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            One app, four perspectives.
+            Une appli, quatre points de vue.
           </h2>
         </div>
 
@@ -319,17 +298,17 @@ function CTA() {
           }}
         >
           <h2 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Ready to bring calm to your club?
+            Prêt à apporter du calme à votre club ?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
-            Book a 15-minute demo. We&apos;ll set up your first team with you.
+            Réservez une démo de 15 minutes. On configure votre première équipe avec vous.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button asChild size="lg" className="h-12 px-6 bg-white text-[color:var(--brand-blue-deep)] hover:bg-white/90">
-              <Link to="/demo">Request a demo</Link>
+              <Link to="/demo">Demander une démo</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-              <Link to="/pricing">See pricing</Link>
+              <Link to="/pricing">Voir les tarifs</Link>
             </Button>
           </div>
         </div>

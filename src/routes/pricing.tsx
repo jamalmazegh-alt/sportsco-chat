@@ -7,16 +7,16 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
   head: () => ({
     meta: [
-      { title: "Pricing — Clubero" },
+      { title: "Tarifs — Clubero" },
       {
         name: "description",
         content:
-          "Simple, club-friendly pricing. Start free, upgrade when your club grows.",
+          "Une tarification simple, pensée pour les clubs. Commencez gratuitement, évoluez quand votre club grandit.",
       },
-      { property: "og:title", content: "Pricing — Clubero" },
+      { property: "og:title", content: "Tarifs — Clubero" },
       {
         property: "og:description",
-        content: "Start free. Upgrade when your club grows.",
+        content: "Commencez gratuitement. Évoluez quand votre club grandit.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/pricing" }],
@@ -25,52 +25,52 @@ export const Route = createFileRoute("/pricing")({
 
 const TIERS = [
   {
-    name: "Starter",
-    price: "Free",
-    cadence: "forever",
-    description: "Perfect for a single team trying Clubero.",
-    cta: "Get started",
-    href: "/register",
+    name: "Découverte",
+    price: "Gratuit",
+    cadence: "à vie",
+    description: "Parfait pour une équipe qui essaie Clubero.",
+    cta: "Commencer",
+    href: "/register" as const,
     highlight: false,
     features: [
-      "1 team",
-      "Up to 25 members",
-      "Convocations & attendance",
-      "Mobile app for all roles",
-      "Email support",
+      "1 équipe",
+      "Jusqu'à 25 membres",
+      "Convocations & présences",
+      "Application mobile pour tous les rôles",
+      "Support par e-mail",
     ],
   },
   {
     name: "Club",
-    price: "€39",
-    cadence: "per month",
-    description: "For clubs running multiple teams.",
-    cta: "Request a demo",
-    href: "/demo",
+    price: "39 €",
+    cadence: "par mois",
+    description: "Pour les clubs avec plusieurs équipes.",
+    cta: "Demander une démo",
+    href: "/demo" as const,
     highlight: true,
     features: [
-      "Unlimited teams",
-      "Unlimited members",
-      "Club-wide communication wall",
-      "Attendance insights & exports",
-      "Custom roles & permissions",
-      "Priority support",
+      "Équipes illimitées",
+      "Membres illimités",
+      "Mur de communication du club",
+      "Statistiques et exports de présences",
+      "Rôles & permissions personnalisés",
+      "Support prioritaire",
     ],
   },
   {
-    name: "Federation",
-    price: "Custom",
-    cadence: "tailored",
-    description: "Multi-club setups, federations and academies.",
-    cta: "Contact sales",
-    href: "/contact",
+    name: "Fédération",
+    price: "Sur mesure",
+    cadence: "personnalisé",
+    description: "Multi-clubs, fédérations et académies.",
+    cta: "Nous contacter",
+    href: "/contact" as const,
     highlight: false,
     features: [
-      "Multi-club organization",
-      "SSO & advanced security",
-      "Dedicated onboarding",
-      "Custom data exports",
-      "SLA & training",
+      "Organisation multi-clubs",
+      "SSO et sécurité avancée",
+      "Onboarding dédié",
+      "Exports de données personnalisés",
+      "SLA et formation",
     ],
   },
 ];
@@ -81,13 +81,13 @@ function PricingPage() {
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-4xl px-5 py-16 text-center lg:px-8 lg:py-24">
           <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
-            Pricing
+            Tarifs
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Simple pricing for every club.
+            Une tarification simple pour chaque club.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Start free with one team. Upgrade when your club grows. No setup fees.
+            Commencez gratuitement avec une équipe. Évoluez quand votre club grandit. Sans frais d&apos;installation.
           </p>
         </div>
       </section>
@@ -106,7 +106,7 @@ function PricingPage() {
               >
                 {t.highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[color:var(--brand-blue-deep)] px-3 py-1 text-xs font-semibold text-white">
-                    Most popular
+                    Le plus populaire
                   </div>
                 )}
                 <h2 className="font-display text-xl font-bold">{t.name}</h2>
@@ -135,8 +135,8 @@ function PricingPage() {
           </div>
 
           <p className="mt-10 text-center text-sm text-muted-foreground">
-            All plans include EU data hosting, GDPR compliance and unlimited
-            convocations.
+            Toutes les offres incluent l&apos;hébergement européen, la conformité RGPD
+            et les convocations illimitées.
           </p>
         </div>
       </section>
