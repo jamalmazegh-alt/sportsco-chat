@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { ChevronLeft } from "lucide-react";
 import { getLegalDoc } from "@/lib/legal.functions";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -53,7 +54,7 @@ function renderMarkdown(md: string) {
 
 function inline(text: string) {
   // Bold **x** and links [t](u)
-  const parts: Array<string | JSX.Element> = [];
+  const parts: Array<string | ReactNode> = [];
   const regex = /(\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^)]+)\))/g;
   let lastIndex = 0;
   let m: RegExpExecArray | null;
