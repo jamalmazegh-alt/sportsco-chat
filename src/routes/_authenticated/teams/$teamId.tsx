@@ -88,7 +88,8 @@ function TeamDetail() {
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [parentName, setParentName] = useState("");
+  const [parentFirst, setParentFirst] = useState("");
+  const [parentLast, setParentLast] = useState("");
   const [parentPhone, setParentPhone] = useState("");
   const [parentEmail, setParentEmail] = useState("");
   const [respondBy, setRespondBy] = useState<RespondBy>("both");
