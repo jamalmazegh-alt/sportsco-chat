@@ -11,6 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { toast } from "sonner";
@@ -33,6 +37,7 @@ function EventDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
@@ -131,9 +136,11 @@ function EventDetail() {
     else refetch();
   }
 
-  async function cancelConvocation(convocationId: string) {
-    if (!confirm(t("attendance.confirmCancelConvocation"))) return;
-    const { error } = await supabase.from("convocations").delete().eq("id", convocationId);
+  async function confirmCancelConvocation() {
+    if (!cancelTargetId) return;
+    const id = cancelTargetId;
+    setCancelTargetId(null);
+    const { error } = await supabase.from("convocations").delete().eq("id", id);
     if (error) toast.error(error.message);
     else {
       toast.success(t("attendance.convocationCancelled"));
@@ -618,7 +625,7 @@ function EventDetail() {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => cancelConvocation(c.id)}
+                        onClick={() => setCancelTargetId(c.id)}
                         title={t("attendance.cancelConvocation")}
                       >
                         <X className="h-4 w-4" />
@@ -631,6 +638,24 @@ function EventDetail() {
           )}
         </section>
       )}
+
+      <AlertDialog open={!!cancelTargetId} onOpenChange={(o) => !o && setCancelTargetId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("attendance.cancelConvocation")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("attendance.confirmCancelConvocation")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmCancelConvocation}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("attendance.cancelConvocation")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
