@@ -61,7 +61,16 @@
     "subtitle": "Créez un club pour gérer vos équipes et événements.",
     "clubName": "Nom du club",
     "createClub": "Créer le club",
-    "joinHint": "Déjà membre ? Demandez à votre admin de vous inviter."
+    "joinHint": "Déjà membre ? Demandez à votre admin de vous inviter.",
+    "joinClub": "Rejoindre avec un code"
+  },
+  "invites": {
+    "title": "Inviter joueurs & parents",
+    "role": "Rôle",
+    "generate": "Générer un lien d'invitation",
+    "generateAnother": "Générer un autre",
+    "copied": "Lien copié",
+    "expiresHint": "Lien valable 30 jours. Partagez-le avec le joueur ou le parent."
   },
   "dashboard": {
     "greeting": "Salut {{name}} 👋",
