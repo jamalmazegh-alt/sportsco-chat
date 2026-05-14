@@ -371,6 +371,7 @@ export function EventFormSheet({
     initial?.is_home === false ? "away" : "home",
   );
   const [meetingPoint, setMeetingPoint] = useState(initial?.meeting_point ?? "");
+  const [attachments, setAttachments] = useState<Attachment[]>((initial?.attachments as Attachment[] | undefined) ?? []);
 
   const startsInit = splitDateTime(initial?.starts_at);
   const endsInit = splitDateTime(initial?.ends_at);
