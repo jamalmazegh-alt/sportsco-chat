@@ -145,17 +145,20 @@ export function EventChat({ eventId }: { eventId: string }) {
 
       <form
         onSubmit={(e) => { e.preventDefault(); send(); }}
-        className="flex gap-2 p-3 border-t border-border"
+        className="p-3 border-t border-border space-y-2"
       >
-        <Input
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder={t("chat.placeholder")}
-          className="h-10"
-        />
-        <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || !body.trim()}>
-          <Send className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Input
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={t("chat.placeholder")}
+            className="h-10"
+          />
+          <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || (!body.trim() && atts.length === 0)}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+        <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
       </form>
     </section>
   );
