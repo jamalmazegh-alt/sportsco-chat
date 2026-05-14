@@ -17,7 +17,7 @@ type Msg = {
   author?: { full_name: string | null; avatar_url: string | null } | null;
 };
 
-export function EventChat({ eventId, clubId }: { eventId: string; clubId: string | null }) {
+export function EventChat({ eventId }: { eventId: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -30,17 +30,15 @@ export function EventChat({ eventId, clubId }: { eventId: string; clubId: string
   useEffect(() => {
     let active = true;
     (async () => {
-      if (clubId) {
-        const { data: club } = await supabase
-          .from("clubs")
-          .select("event_chat_enabled")
-          .eq("id", clubId)
-          .single();
-        if (!active) return;
-        setEnabled(!!club?.event_chat_enabled);
-      } else {
-        setEnabled(true);
-      }
+      const { data: ev } = await supabase
+        .from("events")
+        .select("team_id, teams:team_id(club_id, clubs:club_id(event_chat_enabled))")
+        .eq("id", eventId)
+        .single();
+      // fallback: try to read setting; if select with embed not allowed, just allow
+      const ec = (ev as { teams?: { clubs?: { event_chat_enabled?: boolean } } } | null)?.teams?.clubs?.event_chat_enabled;
+      if (!active) return;
+      setEnabled(ec === undefined ? true : !!ec);
       const { data } = await supabase
         .from("event_messages")
         .select("id, event_id, author_user_id, body, created_at")
