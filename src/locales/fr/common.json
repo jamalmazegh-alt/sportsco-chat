@@ -298,5 +298,21 @@
     "verifyNewNumber": "Vérifier le nouveau numéro",
     "codeSent": "Code de vérification envoyé.",
     "phoneVerified": "Téléphone vérifié."
+  },
+  "admin": {
+    "title": "Paramètres du club",
+    "subtitle": "Préférences globales pour {{club}}.",
+    "openSettings": "Paramètres du club",
+    "convocationChannels": "Canaux de convocation par défaut",
+    "convocationChannelsHint": "Canaux utilisés par défaut pour envoyer les convocations et rappels.",
+    "communications": "Communications",
+    "wallComments": "Activer les commentaires sur le mur",
+    "wallCommentsHint": "Les membres peuvent commenter les publications et annonces.",
+    "eventChat": "Activer le chat sur chaque événement",
+    "eventChatHint": "Ouvrir un fil de discussion par événement.",
+    "eventChatPlayers": "Les joueurs peuvent accéder aux chats d'événement",
+    "eventChatParents": "Les parents peuvent accéder aux chats d'événement",
+    "save": "Enregistrer",
+    "saved": "Paramètres enregistrés."
   }
 }
