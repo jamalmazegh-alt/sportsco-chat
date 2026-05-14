@@ -314,5 +314,20 @@
     "eventChatParents": "Les parents peuvent accéder aux chats d'événement",
     "save": "Enregistrer",
     "saved": "Paramètres enregistrés."
+  },
+  "wall": {
+    "title": "Mur du club",
+    "subtitle": "Annonces et discussions.",
+    "placeholder": "Partagez quelque chose avec le club…",
+    "post": "Publier",
+    "comment": "Répondre",
+    "commentPlaceholder": "Écrire une réponse…",
+    "empty": "Aucune publication. Soyez le premier !"
+  },
+  "chat": {
+    "title": "Chat de l'événement",
+    "empty": "Aucun message pour l'instant.",
+    "placeholder": "Écrivez un message…",
+    "disabled": "Le chat est désactivé pour cet événement."
   }
 }
