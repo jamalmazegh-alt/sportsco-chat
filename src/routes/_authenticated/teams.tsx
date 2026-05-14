@@ -8,9 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Plus, Users, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -45,7 +43,10 @@ function TeamsPage() {
       const { data: tm } = await supabase
         .from("team_members")
         .select("team_id, role")
-        .in("team_id", ts.map((t) => t.id));
+        .in(
+          "team_id",
+          ts.map((t) => t.id),
+        );
       const counts: Record<string, number> = {};
       (tm ?? []).forEach((m) => {
         counts[m.team_id] = (counts[m.team_id] ?? 0) + 1;
@@ -62,29 +63,32 @@ function TeamsPage() {
   const [busy, setBusy] = useState(false);
 
   function toggleCompetition(value: string, checked: boolean) {
-    setCompetitions((current) => checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value));
+    setCompetitions((current) =>
+      checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value),
+    );
   }
 
   async function onCreate(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId) return;
     setBusy(true);
-    const { error } = await supabase
-      .from("teams")
-      .insert({
-        club_id: activeClubId,
-        name,
-        age_group: ageGroup || null,
-        championship: championship || null,
-        competitions,
-      });
+    const { error } = await supabase.from("teams").insert({
+      club_id: activeClubId,
+      name,
+      age_group: ageGroup || null,
+      championship: championship || null,
+      competitions,
+    });
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
     setOpen(false);
-    setName(""); setAgeGroup(""); setChampionship(""); setCompetitions(["friendly", "championship", "cup"]);
+    setName("");
+    setAgeGroup("");
+    setChampionship("");
+    setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     qc.invalidateQueries({ queryKey: ["teams"] });
   }
@@ -112,21 +116,35 @@ function TeamsPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>{t("teams.ageGroup")}</Label>
-                  <Input value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} placeholder="U13" />
+                  <Input
+                    value={ageGroup}
+                    onChange={(e) => setAgeGroup(e.target.value)}
+                    placeholder="U13"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label>
                     {t("teams.championship")}{" "}
                     <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
                   </Label>
-                  <Input value={championship} onChange={(e) => setChampionship(e.target.value)} placeholder="District D2" />
+                  <Input
+                    value={championship}
+                    onChange={(e) => setChampionship(e.target.value)}
+                    placeholder="District D2"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>{t("teams.competitions")}</Label>
                   <div className="grid grid-cols-3 gap-2">
                     {(["friendly", "championship", "cup"] as const).map((key) => (
-                      <label key={key} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm">
-                        <Checkbox checked={competitions.includes(key)} onCheckedChange={(checked) => toggleCompetition(key, checked === true)} />
+                      <label
+                        key={key}
+                        className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                      >
+                        <Checkbox
+                          checked={competitions.includes(key)}
+                          onCheckedChange={(checked) => toggleCompetition(key, checked === true)}
+                        />
                         {t(`events.competitionTypes.${key}`)}
                       </label>
                     ))}

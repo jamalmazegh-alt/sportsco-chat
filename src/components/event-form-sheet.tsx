@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -96,7 +98,9 @@ function loadGoogleMapsPlaces(): Promise<void> | null {
   if (window.google?.maps?.places) return Promise.resolve();
   if (!window.__squadlyGoogleMapsPromise) {
     window.__squadlyGoogleMapsPromise = new Promise((resolve, reject) => {
-      const existing = document.querySelector<HTMLScriptElement>('script[data-squadly-google-maps="true"]');
+      const existing = document.querySelector<HTMLScriptElement>(
+        'script[data-squadly-google-maps="true"]',
+      );
       if (existing) {
         existing.addEventListener("load", () => resolve());
         existing.addEventListener("error", reject);
@@ -116,10 +120,19 @@ function loadGoogleMapsPlaces(): Promise<void> | null {
 }
 
 function DateTimeField({
-  label, date, time, onDate, onTime, required,
+  label,
+  date,
+  time,
+  onDate,
+  onTime,
+  required,
 }: {
-  label: string; date: Date | undefined; time: string;
-  onDate: (d: Date | undefined) => void; onTime: (t: string) => void; required?: boolean;
+  label: string;
+  date: Date | undefined;
+  time: string;
+  onDate: (d: Date | undefined) => void;
+  onTime: (t: string) => void;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
@@ -127,45 +140,101 @@ function DateTimeField({
       <div className="grid grid-cols-[1fr_110px] gap-2">
         <Popover>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className={cn("h-10 justify-start font-normal", !date && "text-muted-foreground")}>
+            <Button
+              type="button"
+              variant="outline"
+              className={cn("h-10 justify-start font-normal", !date && "text-muted-foreground")}
+            >
               <CalendarIcon className="h-4 w-4" />
               {date ? format(date, "EEE d MMM") : "—"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={date} onSelect={onDate} initialFocus className="p-3 pointer-events-auto" />
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={onDate}
+              initialFocus
+              className="p-3 pointer-events-auto"
+            />
           </PopoverContent>
         </Popover>
-        <Input type="time" value={time} onChange={(e) => onTime(e.target.value)} required={required} className="h-10" />
+        <Input
+          type="time"
+          value={time}
+          onChange={(e) => onTime(e.target.value)}
+          required={required}
+          className="h-10"
+        />
       </div>
     </div>
   );
 }
 
-function DateOnlyField({ label, date, onDate, required }: { label: string; date: Date | undefined; onDate: (d: Date | undefined) => void; required?: boolean }) {
+function DateOnlyField({
+  label,
+  date,
+  onDate,
+  required,
+}: {
+  label: string;
+  date: Date | undefined;
+  onDate: (d: Date | undefined) => void;
+  required?: boolean;
+}) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
       <Popover>
         <PopoverTrigger asChild>
-          <Button type="button" variant="outline" className={cn("h-10 w-full justify-start font-normal", !date && "text-muted-foreground")} aria-required={required}>
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(
+              "h-10 w-full justify-start font-normal",
+              !date && "text-muted-foreground",
+            )}
+            aria-required={required}
+          >
             <CalendarIcon className="h-4 w-4" />
             {date ? format(date, "EEE d MMM") : "—"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar mode="single" selected={date} onSelect={onDate} initialFocus className="p-3 pointer-events-auto" />
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={onDate}
+            initialFocus
+            className="p-3 pointer-events-auto"
+          />
         </PopoverContent>
       </Popover>
     </div>
   );
 }
 
-function TimeField({ label, time, onTime, required }: { label: string; time: string; onTime: (t: string) => void; required?: boolean }) {
+function TimeField({
+  label,
+  time,
+  onTime,
+  required,
+}: {
+  label: string;
+  time: string;
+  onTime: (t: string) => void;
+  required?: boolean;
+}) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <Input type="time" value={time} onChange={(e) => onTime(e.target.value)} required={required} className="h-10" />
+      <Input
+        type="time"
+        value={time}
+        onChange={(e) => onTime(e.target.value)}
+        required={required}
+        className="h-10"
+      />
     </div>
   );
 }
@@ -185,13 +254,18 @@ function AddressField({
   placeholder: string;
   helper: string;
 }) {
-  const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>([]);
+  const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>(
+    [],
+  );
   const [service, setService] = useState<any>(null);
 
   useEffect(() => {
-    loadGoogleMapsPlaces()?.then(() => {
-      if (window.google?.maps?.places) setService(new window.google.maps.places.AutocompleteService());
-    }).catch(() => undefined);
+    loadGoogleMapsPlaces()
+      ?.then(() => {
+        if (window.google?.maps?.places)
+          setService(new window.google.maps.places.AutocompleteService());
+      })
+      .catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -199,14 +273,23 @@ function AddressField({
       setSuggestions([]);
       return;
     }
-    service.getPlacePredictions({ input: value, types: ["geocode", "establishment"] }, (items: any[] | null) => {
-      setSuggestions((items ?? []).slice(0, 5).map((item) => ({ description: item.description, place_id: item.place_id })));
-    });
+    service.getPlacePredictions(
+      { input: value, types: ["geocode", "establishment"] },
+      (items: any[] | null) => {
+        setSuggestions(
+          (items ?? [])
+            .slice(0, 5)
+            .map((item) => ({ description: item.description, place_id: item.place_id })),
+        );
+      },
+    );
   }, [service, value]);
 
   function selectPlace(suggestion: { description: string; place_id: string }) {
     onValueChange(suggestion.description);
-    onPlaceUrl(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suggestion.description)}&query_place_id=${suggestion.place_id}`);
+    onPlaceUrl(
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suggestion.description)}&query_place_id=${suggestion.place_id}`,
+    );
     setSuggestions([]);
   }
 
@@ -215,11 +298,24 @@ function AddressField({
       <Label>{label}</Label>
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input value={value} onChange={(e) => { onValueChange(e.target.value); onPlaceUrl(null); }} placeholder={placeholder} className="pl-9" />
+        <Input
+          value={value}
+          onChange={(e) => {
+            onValueChange(e.target.value);
+            onPlaceUrl(null);
+          }}
+          placeholder={placeholder}
+          className="pl-9"
+        />
         {suggestions.length > 0 && (
           <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
             {suggestions.map((suggestion) => (
-              <button key={suggestion.place_id} type="button" onClick={() => selectPlace(suggestion)} className="flex w-full items-start gap-2 px-3 py-2 text-left text-sm hover:bg-accent">
+              <button
+                key={suggestion.place_id}
+                type="button"
+                onClick={() => selectPlace(suggestion)}
+                className="flex w-full items-start gap-2 px-3 py-2 text-left text-sm hover:bg-accent"
+              >
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                 <span>{suggestion.description}</span>
               </button>
@@ -232,7 +328,16 @@ function AddressField({
   );
 }
 
-export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mode, userId, onSaved }: Props) {
+export function EventFormSheet({
+  open,
+  onOpenChange,
+  trigger,
+  teams,
+  initial,
+  mode,
+  userId,
+  onSaved,
+}: Props) {
   const { t } = useTranslation();
   const googlePlacesEnabled = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
@@ -243,9 +348,13 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
   const [location, setLocation] = useState(initial?.location ?? "");
   const [locationUrl, setLocationUrl] = useState(initial?.location_url ?? "");
   const [opponent, setOpponent] = useState(getInitialOpponent(initial));
-  const [competitionType, setCompetitionType] = useState<CompetitionType>((initial?.competition_type as CompetitionType) ?? "friendly");
+  const [competitionType, setCompetitionType] = useState<CompetitionType>(
+    (initial?.competition_type as CompetitionType) ?? "friendly",
+  );
   const [competitionName, setCompetitionName] = useState(initial?.competition_name ?? "");
-  const [isHome, setIsHome] = useState<"home" | "away">(initial?.is_home === false ? "away" : "home");
+  const [isHome, setIsHome] = useState<"home" | "away">(
+    initial?.is_home === false ? "away" : "home",
+  );
   const [meetingPoint, setMeetingPoint] = useState(initial?.meeting_point ?? "");
 
   const startsInit = splitDateTime(initial?.starts_at);
@@ -280,9 +389,12 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
     const c = splitDateTime(initial?.convocation_time);
-    setStartDate(s.date); setStartTime(s.time);
-    setEndDate(e.date); setEndTime(e.time);
-    setConvocDate(c.date); setConvocTime(c.time);
+    setStartDate(s.date);
+    setStartTime(s.time);
+    setEndDate(e.date);
+    setEndTime(e.time);
+    setConvocDate(c.date);
+    setConvocTime(c.time);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -299,24 +411,36 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!teamId) { toast.error(t("events.selectTeam")); return; }
+    if (!teamId) {
+      toast.error(t("events.selectTeam"));
+      return;
+    }
     const startsIso = combineDateTime(startDate, startTime);
-    if (!startsIso) { toast.error(t("events.startsAt")); return; }
+    if (!startsIso) {
+      toast.error(t("events.startsAt"));
+      return;
+    }
     setBusy(true);
 
-    const finalTitle = type === "training"
-      ? (title.trim() || t("events.types.training"))
-      : type === "match"
-        ? (opponent ? `vs ${opponent}` : t("events.types.match"))
-        : title.trim();
+    const finalTitle =
+      type === "training"
+        ? title.trim() || t("events.types.training")
+        : type === "match"
+          ? opponent
+            ? `vs ${opponent}`
+            : t("events.types.match")
+          : title.trim();
 
     const finalLocationUrl = locationUrl?.trim()
       ? locationUrl.trim()
-      : (location?.trim() ? toGoogleMapsUrl(location.trim()) : null);
+      : location?.trim()
+        ? toGoogleMapsUrl(location.trim())
+        : null;
 
-    const eventConvocationTime = type === "training"
-      ? combineDateTime(startDate, convocTime)
-      : combineDateTime(convocDate ?? startDate, convocTime);
+    const eventConvocationTime =
+      type === "training"
+        ? combineDateTime(startDate, convocTime)
+        : combineDateTime(convocDate ?? startDate, convocTime);
 
     const payload = {
       team_id: teamId,
@@ -325,11 +449,11 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
       description: description || null,
       location: location || null,
       location_url: finalLocationUrl,
-      opponent: type === "match" ? (opponent || null) : null,
+      opponent: type === "match" ? opponent || null : null,
       competition_type: type === "match" ? competitionType : null,
-      competition_name: type === "match" ? (competitionName || null) : null,
-      is_home: type === "match" ? (isHome === "home") : null,
-      meeting_point: type === "match" && isHome === "away" ? (meetingPoint || null) : null,
+      competition_name: type === "match" ? competitionName || null : null,
+      is_home: type === "match" ? isHome === "home" : null,
+      meeting_point: type === "match" && isHome === "away" ? meetingPoint || null : null,
       starts_at: startsIso,
       ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
       convocation_time: eventConvocationTime,
@@ -342,14 +466,20 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
         .select("id")
         .single();
       setBusy(false);
-      if (error || !data) { toast.error(error?.message ?? "Failed"); return; }
+      if (error || !data) {
+        toast.error(error?.message ?? "Failed");
+        return;
+      }
       toast.success(t("events.publish"));
       onOpenChange(false);
       onSaved(data.id);
     } else {
       const { error } = await supabase.from("events").update(payload).eq("id", initial!.id!);
       setBusy(false);
-      if (error) { toast.error(error.message); return; }
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       toast.success(t("common.saved"));
       onOpenChange(false);
       onSaved(initial!.id!);
@@ -367,9 +497,15 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
           <div className="space-y-1.5">
             <Label>{t("events.selectTeam")}</Label>
             <Select value={teamId} onValueChange={setTeamId} required>
-              <SelectTrigger><SelectValue placeholder={t("events.selectTeam")} /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder={t("events.selectTeam")} />
+              </SelectTrigger>
               <SelectContent>
-                {teams.map((tm) => <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>)}
+                {teams.map((tm) => (
+                  <SelectItem key={tm.id} value={tm.id}>
+                    {tm.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -377,10 +513,14 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
           <div className="space-y-1.5">
             <Label>{t("events.type")}</Label>
             <Select value={type} onValueChange={(v) => setType(v as EventType)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
-                  <SelectItem key={k} value={k}>{t(`events.types.${k}`)}</SelectItem>
+                  <SelectItem key={k} value={k}>
+                    {t(`events.types.${k}`)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -402,18 +542,29 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
             <>
               <div className="space-y-1.5">
                 <Label>{t("events.competitionType")}</Label>
-                <Select value={competitionType} onValueChange={(v) => setCompetitionType(v as CompetitionType)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={competitionType}
+                  onValueChange={(v) => setCompetitionType(v as CompetitionType)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {availableCompetitionTypes.map((k) => (
-                      <SelectItem key={k} value={k}>{t(`events.competitionTypes.${k}`)}</SelectItem>
+                      <SelectItem key={k} value={k}>
+                        {t(`events.competitionTypes.${k}`)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
                 <Label>{t("events.opponent")}</Label>
-                <Input required value={opponent ?? ""} onChange={(e) => setOpponent(e.target.value)} />
+                <Input
+                  required
+                  value={opponent ?? ""}
+                  onChange={(e) => setOpponent(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>{t("events.venue")}</Label>
@@ -427,7 +578,7 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
                         "rounded-xl py-2.5 text-sm font-medium border transition",
                         isHome === v
                           ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card border-border text-muted-foreground"
+                          : "bg-card border-border text-muted-foreground",
                       )}
                     >
                       {t(`events.${v}`)}
@@ -438,7 +589,11 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
               {isHome === "away" && (
                 <div className="space-y-1.5">
                   <Label>{t("events.meetingPoint")}</Label>
-                  <Input value={meetingPoint ?? ""} onChange={(e) => setMeetingPoint(e.target.value)} placeholder={t("events.meetingPointHint")} />
+                  <Input
+                    value={meetingPoint ?? ""}
+                    onChange={(e) => setMeetingPoint(e.target.value)}
+                    placeholder={t("events.meetingPointHint")}
+                  />
                 </div>
               )}
             </>
@@ -446,32 +601,88 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
 
           {type === "match" ? (
             <>
-              <DateTimeField label={t("events.convocationDateTime")} date={convocDate} time={convocTime} onDate={setConvocDate} onTime={setConvocTime} />
-              <DateTimeField label={t("events.matchDateTime")} date={startDate} time={startTime} onDate={setStartDate} onTime={setStartTime} required />
+              <DateTimeField
+                label={t("events.convocationDateTime")}
+                date={convocDate}
+                time={convocTime}
+                onDate={setConvocDate}
+                onTime={setConvocTime}
+              />
+              <DateTimeField
+                label={t("events.matchDateTime")}
+                date={startDate}
+                time={startTime}
+                onDate={setStartDate}
+                onTime={setStartTime}
+                required
+              />
             </>
           ) : type === "training" ? (
             <>
-              <DateOnlyField label={t("events.trainingDate")} date={startDate} onDate={setStartDate} required />
+              <DateOnlyField
+                label={t("events.trainingDate")}
+                date={startDate}
+                onDate={setStartDate}
+                required
+              />
               <div className="grid grid-cols-3 gap-2">
-                <TimeField label={t("events.convocationTimeShort")} time={convocTime} onTime={setConvocTime} />
-                <TimeField label={t("events.startTime")} time={startTime} onTime={setStartTime} required />
+                <TimeField
+                  label={t("events.convocationTimeShort")}
+                  time={convocTime}
+                  onTime={setConvocTime}
+                />
+                <TimeField
+                  label={t("events.startTime")}
+                  time={startTime}
+                  onTime={setStartTime}
+                  required
+                />
                 <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
               </div>
             </>
           ) : (
             <>
-              <DateTimeField label={t("events.startsAt")} date={startDate} time={startTime} onDate={setStartDate} onTime={setStartTime} required />
-              <DateTimeField label={t("events.convocationTime")} date={convocDate} time={convocTime} onDate={setConvocDate} onTime={setConvocTime} />
+              <DateTimeField
+                label={t("events.startsAt")}
+                date={startDate}
+                time={startTime}
+                onDate={setStartDate}
+                onTime={setStartTime}
+                required
+              />
+              <DateTimeField
+                label={t("events.convocationTime")}
+                date={convocDate}
+                time={convocTime}
+                onDate={setConvocDate}
+                onTime={setConvocTime}
+              />
             </>
           )}
 
-          <AddressField label={t("events.location")} value={location ?? ""} onValueChange={setLocation} onPlaceUrl={(url) => setLocationUrl(url ?? "")} placeholder={t("events.locationHint")} helper={googlePlacesEnabled ? t("events.locationGoogleHelper") : t("events.locationGoogleNeedsKey")} />
+          <AddressField
+            label={t("events.location")}
+            value={location ?? ""}
+            onValueChange={setLocation}
+            onPlaceUrl={(url) => setLocationUrl(url ?? "")}
+            placeholder={t("events.locationHint")}
+            helper={
+              googlePlacesEnabled
+                ? t("events.locationGoogleHelper")
+                : t("events.locationGoogleNeedsKey")
+            }
+          />
           <div className="space-y-1.5">
             <Label>
               {t("events.locationUrl")}{" "}
               <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
             </Label>
-            <Input type="url" value={locationUrl ?? ""} onChange={(e) => setLocationUrl(e.target.value)} placeholder="https://maps.google.com/..." />
+            <Input
+              type="url"
+              value={locationUrl ?? ""}
+              onChange={(e) => setLocationUrl(e.target.value)}
+              placeholder="https://maps.google.com/..."
+            />
           </div>
 
           <div className="space-y-1.5">
@@ -480,7 +691,13 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
           </div>
 
           <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (mode === "create" ? t("events.publish") : t("common.save"))}
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : mode === "create" ? (
+              t("events.publish")
+            ) : (
+              t("common.save")
+            )}
           </Button>
         </form>
       </SheetContent>
