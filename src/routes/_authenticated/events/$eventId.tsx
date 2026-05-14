@@ -131,40 +131,44 @@ function EventDetail() {
     else refetch();
   }
 
-  async function sendConvocations() {
-    if (!event || !user) return;
-    setSending(true);
-    // get team players
-    const { data: tPlayers } = await supabase
-      .from("team_members")
-      .select("player_id, players:player_id(id, user_id)")
-      .eq("team_id", event.team_id)
-      .eq("role", "player");
-    const playerIds = (tPlayers ?? []).map((tp: any) => tp.player_id).filter(Boolean);
-    if (playerIds.length === 0) {
-      setSending(false);
+  function openPicker() {
+    if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
       return;
     }
-    // skip players that already have a convocation
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
-    const toInsert = playerIds.filter((pid: string) => !existing.has(pid));
-    if (toInsert.length > 0) {
-      const { error: convocationError } = await supabase.from("convocations").insert(
-        toInsert.map((pid: string) => ({ event_id: event.id, player_id: pid }))
-      );
-      if (convocationError) {
-        setSending(false);
-        toast.error(convocationError.message);
-        return;
-      }
+    // pre-select players that don't already have a convocation
+    const preselect = new Set(
+      teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid))
+    );
+    setSelectedIds(preselect);
+    setPickerOpen(true);
+  }
+
+  async function sendConvocations() {
+    if (!event || !user) return;
+    const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
+    const toInsert = Array.from(selectedIds).filter((pid) => !existing.has(pid));
+    if (toInsert.length === 0) {
+      toast.error(t("attendance.noPlayersSelected"));
+      return;
+    }
+    setSending(true);
+    const { error: convocationError } = await supabase.from("convocations").insert(
+      toInsert.map((pid) => ({ event_id: event.id, player_id: pid }))
+    );
+    if (convocationError) {
+      setSending(false);
+      toast.error(convocationError.message);
+      return;
     }
     // notify
     const { data: parents } = await supabase
       .from("player_parents")
-      .select("parent_user_id, can_respond")
-      .in("player_id", playerIds);
-    const playerUserIds = (tPlayers ?? [])
+      .select("parent_user_id")
+      .in("player_id", toInsert);
+    const playerUserIds = (teamPlayers ?? [])
+      .filter((tp: any) => toInsert.includes(tp.player_id))
       .map((tp: any) => tp.players?.user_id)
       .filter(Boolean);
     const recipients = Array.from(
@@ -185,13 +189,16 @@ function EventDetail() {
       );
       if (notificationError) toast.error(notificationError.message);
     }
-    const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
-    if (sentError) {
-      setSending(false);
-      toast.error(sentError.message);
-      return;
+    if (!event.convocations_sent) {
+      const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+      if (sentError) {
+        setSending(false);
+        toast.error(sentError.message);
+        return;
+      }
     }
     setSending(false);
+    setPickerOpen(false);
     refetch();
     refetchEvent();
     toast.success(t("events.convocationsSent"));
