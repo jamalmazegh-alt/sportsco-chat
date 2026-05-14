@@ -69,6 +69,13 @@ function splitDateTime(iso: string | null | undefined): { date: Date | undefined
   const d = new Date(iso);
   return { date: d, time: format(d, "HH:mm") };
 }
+
+function getInitialOpponent(initial?: Partial<EventFormValues>): string {
+  if (initial?.opponent) return initial.opponent;
+  if (initial?.type === "match" && initial.title) return initial.title.replace(/^vs\s+/i, "");
+  return "";
+}
+
 function combineDateTime(date: Date | undefined, time: string): string | null {
   if (!date || !time) return null;
   const [h, m] = time.split(":").map(Number);
@@ -235,7 +242,7 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
   const [description, setDescription] = useState(initial?.description ?? "");
   const [location, setLocation] = useState(initial?.location ?? "");
   const [locationUrl, setLocationUrl] = useState(initial?.location_url ?? "");
-  const [opponent, setOpponent] = useState(initial?.opponent ?? "");
+  const [opponent, setOpponent] = useState(getInitialOpponent(initial));
   const [competitionType, setCompetitionType] = useState<CompetitionType>((initial?.competition_type as CompetitionType) ?? "friendly");
   const [competitionName, setCompetitionName] = useState(initial?.competition_name ?? "");
   const [isHome, setIsHome] = useState<"home" | "away">(initial?.is_home === false ? "away" : "home");
@@ -265,7 +272,7 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
     setDescription(initial?.description ?? "");
     setLocation(initial?.location ?? "");
     setLocationUrl(initial?.location_url ?? "");
-    setOpponent(initial?.opponent ?? "");
+    setOpponent(getInitialOpponent(initial));
     setCompetitionType((initial?.competition_type as CompetitionType) ?? "friendly");
     setCompetitionName(initial?.competition_name ?? "");
     setIsHome(initial?.is_home === false ? "away" : "home");
