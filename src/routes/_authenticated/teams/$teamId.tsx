@@ -230,13 +230,6 @@ function TeamDetail() {
           dispatched = true;
         } catch { /* fallthrough to sms */ }
       }
-      if (target.phone) {
-        try {
-          const greet = target.firstName ? `${target.firstName}, ` : "";
-          await sendSmsFn({ data: { to: target.phone, body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}` } });
-          dispatched = true;
-        } catch { /* ignore */ }
-      }
       if (dispatched) sent += 1; else failed += 1;
     }
     return { sent, failed, skipped: 0 };
