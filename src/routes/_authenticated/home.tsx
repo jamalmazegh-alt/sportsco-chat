@@ -11,6 +11,7 @@ import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -158,86 +159,113 @@ function HomePage() {
         </div>
       )}
 
-      
-
-      {/* My convocations (parents/players priority) */}
-      {myConvocs && myConvocs.length > 0 && (
+      {/* For players/parents: unified list of their upcoming events with action-required highlight */}
+      {!isCoach && myConvocs && myConvocs.length > 0 && (
         <section>
           <h2 className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
             {t("dashboard.myConvocations")}
           </h2>
           <ul className="space-y-2">
-            {myConvocs.map((c: any) => (
-              <li key={c.id}>
-                <Link
-                  to="/events/$eventId"
-                  params={{ eventId: c.event.id }}
-                  className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{c.event.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {formatWhen(new Date(c.event.starts_at))}
-                      {c.player ? ` · ${c.player.first_name}` : ""}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <AttendancePill status={c.status} />
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </Link>
-              </li>
-            ))}
+            {myConvocs.map((c: any) => {
+              const actionRequired = c.status === "pending";
+              return (
+                <li key={c.id}>
+                  <Link
+                    to="/events/$eventId"
+                    params={{ eventId: c.event.id }}
+                    className={cn(
+                      "flex items-center justify-between rounded-2xl border p-4 active:scale-[0.99] transition-transform",
+                      actionRequired
+                        ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30"
+                        : "border-border bg-card",
+                    )}
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium truncate">{c.event.title}</p>
+                        {actionRequired && (
+                          <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
+                            {t("dashboard.actionRequired", { defaultValue: "Action required" })}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatWhen(new Date(c.event.starts_at))}
+                        {c.player ? ` · ${c.player.first_name}` : ""}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <AttendancePill status={c.status} />
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
+          <Link to="/events" className="mt-3 inline-block text-xs text-primary font-medium">
+            {t("dashboard.viewAll")}
+          </Link>
         </section>
       )}
 
+      {/* For coaches/admins: upcoming events for all teams */}
+      {isCoach && (
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              {t("dashboard.nextEvent")}
+            </h2>
+            <Link to="/events" className="text-xs text-primary font-medium">
+              {t("dashboard.viewAll")}
+            </Link>
+          </div>
+          {!upcoming || upcoming.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {upcoming.map((e) => (
+                <li key={e.id}>
+                  <Link
+                    to="/events/$eventId"
+                    params={{ eventId: e.id }}
+                    className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{e.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
+                        <Calendar className="h-3 w-3" />
+                        {formatWhen(new Date(e.starts_at))}
+                        {e.location && (
+                          <>
+                            <span>·</span>
+                            <MapPin className="h-3 w-3" />
+                            <span className="truncate">{e.location}</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
-      {/* Upcoming */}
-      <section>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            {t("dashboard.nextEvent")}
-          </h2>
-          <Link to="/events" className="text-xs text-primary font-medium">
-            {t("dashboard.viewAll")}
-          </Link>
-        </div>
-        {!upcoming || upcoming.length === 0 ? (
+      {/* Empty state for parents/players with no convocations */}
+      {!isCoach && (!myConvocs || myConvocs.length === 0) && (
+        <section>
           <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
             <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
           </div>
-        ) : (
-          <ul className="space-y-2">
-            {upcoming.map((e) => (
-              <li key={e.id}>
-                <Link
-                  to="/events/$eventId"
-                  params={{ eventId: e.id }}
-                  className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{e.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                      <Calendar className="h-3 w-3" />
-                      {formatWhen(new Date(e.starts_at))}
-                      {e.location && (
-                        <>
-                          <span>·</span>
-                          <MapPin className="h-3 w-3" />
-                          <span className="truncate">{e.location}</span>
-                        </>
-                      )}
-                    </p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        </section>
+      )}
     </div>
   );
 }
