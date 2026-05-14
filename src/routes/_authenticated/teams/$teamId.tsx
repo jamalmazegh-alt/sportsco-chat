@@ -575,13 +575,12 @@ function TeamDetail() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {players.map((p: any) => (
-            <li key={p.id}>
-              <Link
-                to="/players/$playerId"
-                params={{ playerId: p.id }}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
-              >
+          {players.map((p: any) => {
+            const canInvite = !p.user_id && (p.email || p.phone);
+            const checked = selectedIds.has(p.id);
+            const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const inner = (
+              <>
                 <div className="relative h-12 w-12 shrink-0 rounded-full bg-muted overflow-hidden">
                   {p.photo_url ? (
                     <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
@@ -593,9 +592,8 @@ function TeamDetail() {
                   <span
                     className={cn(
                       "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
-                      p.user_id ? "bg-present" : "bg-muted-foreground/40"
+                      p.user_id ? "bg-present" : "bg-muted-foreground/40",
                     )}
-                    title={p.user_id ? t("players.accountActive") : t("players.accountInactive")}
                   />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -609,10 +607,43 @@ function TeamDetail() {
                     {p.preferred_position ?? (p.user_id ? t("players.accountActive") : t("players.accountInactive"))}
                   </p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-              </Link>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={p.id}>
+                {selectMode ? (
+                  <button
+                    type="button"
+                    disabled={!canInvite}
+                    onClick={() => canInvite && toggleSelected(p.id)}
+                    className={cn(rowClass, "w-full text-left", !canInvite && "opacity-50")}
+                  >
+                    <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
+                    {inner}
+                  </button>
+                ) : (
+                  <div className={rowClass}>
+                    <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
+                      {inner}
+                    </Link>
+                    {isCoach && canInvite && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 shrink-0"
+                        title={t("players.invite")}
+                        disabled={inviting}
+                        onClick={() => inviteOne(p.id)}
+                      >
+                        <Send className="h-4 w-4 text-primary" />
+                      </Button>
+                    )}
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
