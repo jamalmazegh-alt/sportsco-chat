@@ -28,7 +28,7 @@ function EventsPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name")
+        .select("id, name, competitions")
         .eq("club_id", activeClubId!)
         .order("name");
       return data ?? [];
