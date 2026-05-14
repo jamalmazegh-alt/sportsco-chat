@@ -279,6 +279,10 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
       ? locationUrl.trim()
       : (location?.trim() ? toGoogleMapsUrl(location.trim()) : null);
 
+    const eventConvocationTime = type === "training"
+      ? combineDateTime(startDate, convocTime)
+      : combineDateTime(convocDate ?? startDate, convocTime);
+
     const payload = {
       team_id: teamId,
       type,
@@ -292,8 +296,8 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
       is_home: type === "match" ? (isHome === "home") : null,
       meeting_point: type === "match" && isHome === "away" ? (meetingPoint || null) : null,
       starts_at: startsIso,
-      ends_at: type === "training" ? combineDateTime(endDate ?? startDate, endTime) : null,
-      convocation_time: combineDateTime(convocDate ?? startDate, convocTime),
+      ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
+      convocation_time: eventConvocationTime,
     };
 
     if (mode === "create") {
