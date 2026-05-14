@@ -38,6 +38,56 @@ function PlayerProfile() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function onDeletePlayer() {
+    if (!player) return;
+    setDeleting(true);
+    // Cascade-clean dependents we manage from the client. RLS allows admin/coach.
+    await supabase.from("player_parents").delete().eq("player_id", player.id);
+    await supabase.from("team_members").delete().eq("player_id", player.id);
+    await supabase.from("convocations").delete().eq("player_id", player.id);
+    const { error } = await supabase.from("players").delete().eq("id", player.id);
+    setDeleting(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("players.deleted"));
+    qc.invalidateQueries({ queryKey: ["team-players"] });
+    navigate({ to: "/teams" });
+  }
+
+  async function resendParentInvite(pp: { id: string; full_name: string | null; email: string | null; phone: string | null; parent_user_id: string | null }) {
+    if (!player || !user) return;
+    if (pp.parent_user_id) { toast.info(t("players.alreadyLinked")); return; }
+    if (!pp.email && !pp.phone) { toast.warning(t("players.inviteNoContact")); return; }
+    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+    if (!inviter?.phone_verified_at) { toast.warning(t("players.inviterPhoneRequired")); return; }
+    const token = crypto.randomUUID().replace(/-/g, "");
+    const { error: invErr } = await supabase.from("member_invites").insert({
+      club_id: player.club_id, created_by: user.id, token,
+      parent_for_player_id: player.id, role: "parent",
+      email: pp.email ?? null, phone: pp.phone ?? null,
+    });
+    if (invErr) { toast.error(invErr.message); return; }
+    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+    if (pp.email) {
+      try {
+        await sendTransactionalEmail({
+          templateName: "player-invite",
+          recipientEmail: pp.email,
+          idempotencyKey: `member-invite-${token}`,
+          templateData: { firstName: (pp.full_name ?? "").split(" ")[0] || undefined, clubName: undefined, inviteUrl },
+        });
+        toast.success(t("players.inviteSent"));
+      } catch (e: any) {
+        toast.error(e?.message ?? "Failed");
+      }
+    } else {
+      toast.success(t("players.inviteSent"));
+    }
+  }
+
 
   const { data: player, refetch: refetchPlayer } = useQuery({
     queryKey: ["player", playerId],
