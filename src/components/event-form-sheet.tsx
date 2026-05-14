@@ -72,6 +72,7 @@ export type EventFormValues = {
   starts_at: string; // ISO
   ends_at: string | null;
   convocation_time: string | null;
+  attachments?: Attachment[] | null;
 };
 
 type Team = { id: string; name: string };
