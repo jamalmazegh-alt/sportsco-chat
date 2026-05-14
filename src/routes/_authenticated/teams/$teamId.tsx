@@ -226,6 +226,7 @@ function TeamDetail() {
             templateName: "player-invite",
             recipientEmail: target.email,
             idempotencyKey: `member-invite-${token}`,
+            fromName: `${clubLabel} via Clubero`,
             templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, clubLogoUrl, inviteUrl },
           });
           dispatched = true;

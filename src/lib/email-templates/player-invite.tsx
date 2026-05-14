@@ -56,7 +56,7 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
 
 export const template = {
   component: PlayerInviteEmail,
-  subject: (data) => data.clubName ? `${data.clubName} invited you on Clubero` : "Your Clubero invitation",
+  subject: (data) => data.clubName ? `${data.clubName} vous invite sur Clubero` : "Votre invitation Clubero",
   displayName: "Player invitation",
   previewData: {
     firstName: "Alex",
