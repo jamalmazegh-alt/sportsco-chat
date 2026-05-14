@@ -474,6 +474,7 @@ export function EventFormSheet({
       starts_at: startsIso,
       ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
       convocation_time: eventConvocationTime,
+      attachments: attachments as unknown as never,
     };
 
     if (mode === "create") {
