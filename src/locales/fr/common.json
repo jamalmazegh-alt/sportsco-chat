@@ -388,7 +388,15 @@
     "usersEmpty": "Aucun utilisateur.",
     "openUsers": "Gérer les utilisateurs",
     "statusActive": "Actif",
-    "statusPending": "En attente"
+    "statusPending": "En attente",
+    "userDetailTitle": "Détail utilisateur",
+    "memberships": "Adhésions au club",
+    "linkedPlayers": "Joueurs liés",
+    "noLinkedPlayers": "Aucun joueur lié.",
+    "phone": "Téléphone",
+    "phoneVerified": "Téléphone vérifié",
+    "phoneNotVerified": "Téléphone non vérifié",
+    "joined": "Rejoint le"
   },
   "attachments": {
     "add": "Ajouter un fichier",
