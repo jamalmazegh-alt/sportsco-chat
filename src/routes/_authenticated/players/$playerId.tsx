@@ -435,6 +435,11 @@ function PlayerProfile() {
                     {pp.can_respond ? ` · ${t("players.canRespond")}` : ""}
                   </p>
                 </div>
+                {isCoach && !linked && (pp.email || pp.phone) && (
+                  <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => resendParentInvite(pp)} title={t("players.resendInvite")}>
+                    <Send className="h-4 w-4 text-primary" />
+                  </Button>
+                )}
                 {isCoach && (
                   <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => onDeleteParent(pp.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
