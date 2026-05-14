@@ -286,6 +286,30 @@ export type Database = {
         }
         Relationships: []
       }
+      event_messages: {
+        Row: {
+          author_user_id: string
+          body: string
+          created_at: string
+          event_id: string
+          id: string
+        }
+        Insert: {
+          author_user_id: string
+          body: string
+          created_at?: string
+          event_id: string
+          id?: string
+        }
+        Update: {
+          author_user_id?: string
+          body?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           competition_name: string | null
@@ -793,11 +817,71 @@ export type Database = {
         }
         Relationships: []
       }
+      wall_comments: {
+        Row: {
+          author_user_id: string
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          author_user_id: string
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          author_user_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wall_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "wall_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wall_posts: {
+        Row: {
+          author_user_id: string
+          body: string
+          club_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          author_user_id: string
+          body: string
+          club_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          author_user_id?: string
+          body?: string
+          club_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_access_event_chat: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_respond_for_player: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean

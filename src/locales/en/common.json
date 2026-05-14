@@ -314,5 +314,20 @@
     "eventChatParents": "Parents can access event chats",
     "save": "Save settings",
     "saved": "Settings saved."
+  },
+  "wall": {
+    "title": "Club wall",
+    "subtitle": "Announcements and conversations.",
+    "placeholder": "Share something with the club…",
+    "post": "Post",
+    "comment": "Reply",
+    "commentPlaceholder": "Write a reply…",
+    "empty": "No posts yet. Be the first to share!"
+  },
+  "chat": {
+    "title": "Event chat",
+    "empty": "No messages yet.",
+    "placeholder": "Type a message…",
+    "disabled": "Chat is disabled for this event."
   }
 }
