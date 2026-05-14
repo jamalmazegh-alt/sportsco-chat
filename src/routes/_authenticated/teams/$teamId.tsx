@@ -269,13 +269,7 @@ function TeamDetail() {
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.sport")}</Label>
-                <Select value={editSport || undefined} onValueChange={setEditSport}>
-                  <SelectTrigger><SelectValue placeholder={t("teams.selectSport")} /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="football">{t("teams.sports.football")}</SelectItem>
-                    <SelectItem value="basketball">{t("teams.sports.basketball")}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SportSelect value={editSport || undefined} onValueChange={setEditSport} />
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.season")}</Label>
