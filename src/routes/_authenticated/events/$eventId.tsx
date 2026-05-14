@@ -61,7 +61,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
-        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
+        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
@@ -74,7 +74,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
         .eq("team_id", event!.team_id)
         .eq("role", "player");
       if (error) throw error;
