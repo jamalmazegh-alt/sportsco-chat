@@ -1,18 +1,22 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Calendar, Users, Inbox, User } from "lucide-react";
+import { Home, Calendar, Users, Megaphone, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
+import { useWallUnread } from "@/lib/use-wall-unread";
 
 export function BottomNav() {
   const { t } = useTranslation();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { activeClubId } = useAuth();
+  const { count: wallUnread } = useWallUnread(activeClubId);
 
   const items = [
-    { to: "/home", icon: Home, label: t("nav.home") },
-    { to: "/events", icon: Calendar, label: t("nav.events") },
-    { to: "/teams", icon: Users, label: t("nav.teams") },
-    { to: "/inbox", icon: Inbox, label: t("nav.inbox") },
-    { to: "/profile", icon: User, label: t("nav.profile") },
+    { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
+    { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
+    { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
+    { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
+    { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
   ];
 
   return (
@@ -33,7 +37,14 @@ export function BottomNav() {
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className={cn("h-5 w-5", active && "stroke-[2.4]")} />
+                <span className="relative">
+                  <Icon className={cn("h-5 w-5", active && "stroke-[2.4]")} />
+                  {it.badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center leading-none">
+                      {it.badge > 9 ? "9+" : it.badge}
+                    </span>
+                  )}
+                </span>
                 <span>{it.label}</span>
               </Link>
             </li>
