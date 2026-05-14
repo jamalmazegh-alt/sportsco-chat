@@ -123,8 +123,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
           onChange={(e) => setBody(e.target.value)}
           placeholder={t("wall.placeholder")}
         />
+        <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
         <div className="flex justify-end">
-          <Button onClick={submitPost} disabled={posting || !body.trim()}>
+          <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0)}>
             {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
           </Button>
         </div>
