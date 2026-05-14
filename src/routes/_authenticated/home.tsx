@@ -4,15 +4,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, Copy, UserPlus } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -157,7 +153,7 @@ function HomePage() {
         </div>
       )}
 
-      {role === "admin" && activeClubId && <InviteCard clubId={activeClubId} />}
+      
 
       {/* My convocations (parents/players priority) */}
       {myConvocs && myConvocs.length > 0 && (
@@ -238,87 +234,5 @@ function HomePage() {
         )}
       </section>
     </div>
-  );
-}
-
-function InviteCard({ clubId }: { clubId: string }) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [role, setRole] = useState<"player" | "parent">("player");
-  const [busy, setBusy] = useState(false);
-  const [link, setLink] = useState<string | null>(null);
-
-  async function generate() {
-    setBusy(true);
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) { setBusy(false); return; }
-    const token = `${Math.random().toString(36).slice(2, 6)}-${Math.random().toString(36).slice(2, 6)}`;
-    const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString();
-    const { error } = await supabase.from("club_invites").insert({
-      club_id: clubId,
-      token,
-      role,
-      created_by: userData.user.id,
-      expires_at: expires,
-    });
-    setBusy(false);
-    if (error) { toast.error(error.message); return; }
-    const url = `${window.location.origin}/register?invite=${token}`;
-    setLink(url);
-  }
-
-  function copy() {
-    if (!link) return;
-    navigator.clipboard.writeText(link);
-    toast.success(t("invites.copied"));
-  }
-
-  return (
-    <section className="rounded-2xl border border-border bg-card p-4">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center justify-between w-full text-left"
-      >
-        <div className="flex items-center gap-2">
-          <UserPlus className="h-4 w-4 text-primary" />
-          <span className="font-medium text-sm">{t("invites.title")}</span>
-        </div>
-        <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-90" : ""}`} />
-      </button>
-      {open && (
-        <div className="mt-3 space-y-3">
-          <div className="space-y-1.5">
-            <Label className="text-xs">{t("invites.role")}</Label>
-            <RadioGroup value={role} onValueChange={(v) => setRole(v as "player" | "parent")} className="flex gap-3">
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <RadioGroupItem value="player" /> {t("auth.rolePlayer")}
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <RadioGroupItem value="parent" /> {t("auth.roleParent")}
-              </label>
-            </RadioGroup>
-          </div>
-          {!link ? (
-            <Button onClick={generate} disabled={busy} className="w-full h-10">
-              {t("invites.generate")}
-            </Button>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <Input readOnly value={link} className="text-xs" />
-                <Button type="button" variant="outline" size="icon" onClick={copy}>
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">{t("invites.expiresHint")}</p>
-              <Button variant="ghost" size="sm" onClick={() => setLink(null)}>
-                {t("invites.generateAnother")}
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
-    </section>
   );
 }
