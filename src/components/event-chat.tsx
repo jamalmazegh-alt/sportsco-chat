@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, MessageCircle, Lock } from "lucide-react";
-import { format } from "date-fns";
+import { Send, MessageCircle, Lock, ChevronDown } from "lucide-react";
+import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
@@ -27,6 +27,7 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
+  const [open, setOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   // Check club setting + load messages
@@ -79,7 +80,7 @@ export function EventChat({ eventId }: { eventId: string }) {
     return () => { supabase.removeChannel(ch); };
   }, [eventId, enabled]);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length]);
+  useEffect(() => { if (open) endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length, open]);
 
   async function send() {
     if ((!body.trim() && atts.length === 0) || !user) return;
@@ -109,57 +110,71 @@ export function EventChat({ eventId }: { eventId: string }) {
 
   return (
     <section className="rounded-2xl border border-border bg-card overflow-hidden">
-      <header className="flex items-center gap-2 px-4 py-3 border-b border-border">
-        <MessageCircle className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
-      </header>
-
-      <div className="max-h-80 overflow-y-auto px-3 py-3 space-y-2">
-        {messages.length === 0 && (
-          <p className="text-xs text-muted-foreground text-center py-6">{t("chat.empty")}</p>
-        )}
-        {messages.map((m) => {
-          const mine = m.author_user_id === user?.id;
-          return (
-            <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
-              <div className={cn(
-                "max-w-[78%] rounded-2xl px-3 py-2 text-sm",
-                mine ? "bg-primary text-primary-foreground" : "bg-muted"
-              )}>
-                <p className={cn("text-[11px] font-medium mb-0.5", mine ? "opacity-90" : "text-foreground/80")}>
-                  {mine ? t("chat.you") : (m.author?.full_name ?? "—")}
-                </p>
-                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
-                {m.attachments?.length > 0 && (
-                  <div className="mt-1.5"><AttachmentList items={m.attachments as Attachment[]} /></div>
-                )}
-                <p className={cn("text-[10px] mt-0.5", mine ? "opacity-80" : "text-muted-foreground")}>
-                  {format(new Date(m.created_at), "HH:mm")}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={endRef} />
-      </div>
-
-      <form
-        onSubmit={(e) => { e.preventDefault(); send(); }}
-        className="p-3 border-t border-border space-y-2"
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/40 transition-colors"
       >
-        <div className="flex gap-2">
-          <Input
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder={t("chat.placeholder")}
-            className="h-10"
-          />
-          <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || (!body.trim() && atts.length === 0)}>
-            <Send className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center gap-2">
+          <MessageCircle className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
+          {messages.length > 0 && (
+            <span className="text-[11px] text-muted-foreground">· {messages.length}</span>
+          )}
         </div>
-        <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
-      </form>
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </button>
+
+      {open && (
+        <>
+          <div className="max-h-80 overflow-y-auto px-3 py-3 space-y-2 border-t border-border">
+            {messages.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-6">{t("chat.empty")}</p>
+            )}
+            {messages.map((m) => {
+              const mine = m.author_user_id === user?.id;
+              return (
+                <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                  <div className={cn(
+                    "max-w-[78%] rounded-2xl px-3 py-2 text-sm",
+                    mine ? "bg-primary text-primary-foreground" : "bg-muted"
+                  )}>
+                    <p className={cn("text-[11px] font-medium mb-0.5", mine ? "opacity-90" : "text-foreground/80")}>
+                      {mine ? t("chat.you") : (m.author?.full_name ?? "—")}
+                    </p>
+                    {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                    {m.attachments?.length > 0 && (
+                      <div className="mt-1.5"><AttachmentList items={m.attachments as Attachment[]} /></div>
+                    )}
+                    <p className={cn("text-[10px] mt-0.5", mine ? "opacity-80" : "text-muted-foreground")}>
+                      {fmt(m.created_at, "HH:mm")}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={endRef} />
+          </div>
+
+          <form
+            onSubmit={(e) => { e.preventDefault(); send(); }}
+            className="p-3 border-t border-border space-y-2"
+          >
+            <div className="flex gap-2">
+              <Input
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder={t("chat.placeholder")}
+                className="h-10"
+              />
+              <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || (!body.trim() && atts.length === 0)}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
+          </form>
+        </>
+      )}
     </section>
   );
 }

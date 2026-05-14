@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
+import { fmt } from "@/lib/date-locale";
 import {
   ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info,
 } from "lucide-react";
@@ -338,13 +338,13 @@ function EventDetail() {
         <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            {format(new Date(event.starts_at), "EEEE d MMMM · HH:mm")}
-            {event.ends_at && ` → ${format(new Date(event.ends_at), "HH:mm")}`}
+            <span className="capitalize">{fmt(event.starts_at, "EEEE d MMMM · HH:mm")}</span>
+            {event.ends_at && ` → ${fmt(event.ends_at, "HH:mm")}`}
           </p>
           {event.convocation_time && (
             <p className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              {t("events.convocationTime")}: {format(new Date(event.convocation_time), "HH:mm")}
+              {t("events.convocationTime")}: {fmt(event.convocation_time, "HH:mm")}
             </p>
           )}
           {event.location && (
@@ -593,11 +593,11 @@ function EventDetail() {
           </div>
 
           {isCoach && (
-            <div className="grid grid-cols-4 gap-2 mb-3">
-              <Stat label={t("attendance.present")} value={counts.present} cls="bg-present text-present-foreground" />
-              <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain text-uncertain-foreground" />
-              <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent text-absent-foreground" />
-              <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending text-pending-foreground" />
+            <div className="grid grid-cols-4 gap-1.5 mb-3">
+              <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present-foreground border-present/30" />
+              <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain/15 text-uncertain-foreground border-uncertain/30" />
+              <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent/10 text-absent border-absent/30" />
+              <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending/40 text-pending-foreground border-border" />
             </div>
           )}
 
@@ -606,64 +606,61 @@ function EventDetail() {
               {t("attendance.noConvokedPlayers")}
             </div>
           ) : (
-            <ul className="space-y-2">
+            <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
               {(convocations ?? []).map((c: any) => (
                 <li
                   key={c.id}
-                  className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3"
+                  className="flex items-center justify-between px-3 py-2"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 shrink-0 rounded-full bg-muted overflow-hidden">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
                       {c.players?.photo_url ? (
                         <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                        <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
                           {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
                         </div>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-medium truncate">
+                      <p className="text-sm font-medium truncate leading-tight">
                         {c.players?.first_name} {c.players?.last_name}
                         {c.players?.jersey_number ? (
                           <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
                         ) : null}
-                        {c.players?.preferred_position ? (
-                          <span className="text-muted-foreground font-normal"> · {c.players.preferred_position}</span>
-                        ) : null}
                       </p>
                       {c.comment && (
-                        <p className="text-xs text-muted-foreground mt-0.5 italic truncate">"{c.comment}"</p>
+                        <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-0.5 shrink-0">
                     <AttendancePill status={c.status} />
                     {isCoach && (
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="h-8 w-8 text-muted-foreground"
+                        className="h-7 w-7 text-muted-foreground"
                         onClick={() => setDetailConvocId(c.id)}
                         title={t("attendance.details")}
                       >
-                        <Info className="h-4 w-4" />
+                        <Info className="h-3.5 w-3.5" />
                       </Button>
                     )}
                     {isCoach && c.status === "pending" && (
-                      <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remind(c.id)}>
-                        <Bell className="h-4 w-4" />
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remind(c.id)}>
+                        <Bell className="h-3.5 w-3.5" />
                       </Button>
                     )}
                     {isCoach && (
                       <Button
                         size="icon"
                         variant="ghost"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
                         onClick={() => setCancelTargetId(c.id)}
                         title={t("attendance.cancelConvocation")}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3.5 w-3.5" />
                       </Button>
                     )}
                   </div>
@@ -714,9 +711,9 @@ function EventDetail() {
 
 function Stat({ label, value, cls }: { label: string; value: number; cls: string }) {
   return (
-    <div className={cn("rounded-xl p-3 text-center", cls)}>
-      <p className="text-xl font-bold leading-none">{value}</p>
-      <p className="text-[10px] uppercase tracking-wider mt-1 opacity-90">{label}</p>
+    <div className={cn("rounded-lg border p-2 text-center", cls)}>
+      <p className="text-base font-bold leading-none">{value}</p>
+      <p className="text-[9px] uppercase tracking-wider mt-1 opacity-90">{label}</p>
     </div>
   );
 }
