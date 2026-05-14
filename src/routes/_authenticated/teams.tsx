@@ -119,6 +119,16 @@ function TeamsPage() {
                   <Input required value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
+                  <Label>{t("teams.sport")}</Label>
+                  <Select value={sport} onValueChange={setSport}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="football">{t("teams.sports.football")}</SelectItem>
+                      <SelectItem value="basketball">{t("teams.sports.basketball")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
                   <Label>{t("teams.ageGroup")}</Label>
                   <Input
                     value={ageGroup}
