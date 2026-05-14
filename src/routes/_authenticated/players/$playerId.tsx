@@ -297,6 +297,7 @@ function PlayerProfile() {
           {t("players.details")}
         </h2>
 
+        {canSeePrivate && (
         <div className="space-y-1.5">
           <Label>{t("players.photo")}</Label>
           <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
@@ -317,6 +318,7 @@ function PlayerProfile() {
             />
           </label>
         </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
