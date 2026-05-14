@@ -47,7 +47,7 @@ export type EventFormValues = {
 };
 
 type Team = { id: string; name: string };
-type TeamOption = Team & { competitions?: CompetitionType[] | null };
+type TeamOption = Team & { competitions?: string[] | null };
 
 type Props = {
   open: boolean;
