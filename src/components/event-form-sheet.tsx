@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CalendarIcon, Check, Loader2, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+declare global {
+  interface Window {
+    google?: any;
+    __squadlyGoogleMapsPromise?: Promise<void>;
+  }
+}
 
 export type EventType = "training" | "match" | "tournament" | "meeting" | "other";
 export type CompetitionType = "friendly" | "championship" | "cup";
@@ -40,12 +47,13 @@ export type EventFormValues = {
 };
 
 type Team = { id: string; name: string };
+type TeamOption = Team & { competitions?: CompetitionType[] | null };
 
 type Props = {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   trigger?: ReactNode;
-  teams: Team[];
+  teams: TeamOption[];
   initial?: Partial<EventFormValues>;
   mode: "create" | "edit";
   userId: string;
@@ -67,6 +75,37 @@ function combineDateTime(date: Date | undefined, time: string): string | null {
   const d = new Date(date);
   d.setHours(h ?? 0, m ?? 0, 0, 0);
   return d.toISOString();
+}
+
+function competitionOptions(team?: TeamOption): CompetitionType[] {
+  const allowed = new Set(["friendly", "championship", "cup"]);
+  const configured = (team?.competitions ?? []).filter((c): c is CompetitionType => allowed.has(c));
+  return configured.length > 0 ? configured : ["friendly", "championship", "cup"];
+}
+
+function loadGoogleMapsPlaces(): Promise<void> | null {
+  const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  if (!key || typeof window === "undefined") return null;
+  if (window.google?.maps?.places) return Promise.resolve();
+  if (!window.__squadlyGoogleMapsPromise) {
+    window.__squadlyGoogleMapsPromise = new Promise((resolve, reject) => {
+      const existing = document.querySelector<HTMLScriptElement>('script[data-squadly-google-maps="true"]');
+      if (existing) {
+        existing.addEventListener("load", () => resolve());
+        existing.addEventListener("error", reject);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.dataset.squadlyGoogleMaps = "true";
+      script.onload = () => resolve();
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+  return window.__squadlyGoogleMapsPromise;
 }
 
 function DateTimeField({
