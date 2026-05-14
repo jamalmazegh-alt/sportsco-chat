@@ -28,7 +28,7 @@ function AdminUsersPage() {
       const { data: profiles } = ids.length
         ? await supabase
             .from("profiles")
-            .select("id, full_name, first_name, last_name, phone, phone_verified_at")
+            .select("id, full_name, first_name, last_name, phone")
             .in("id", ids)
         : { data: [] as any[] };
       const byId = new Map((profiles ?? []).map((p: any) => [p.id, p]));
