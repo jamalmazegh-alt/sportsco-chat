@@ -402,6 +402,7 @@ export function EventFormSheet({
     setCompetitionName(initial?.competition_name ?? "");
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
+    setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
     const c = splitDateTime(initial?.convocation_time);
