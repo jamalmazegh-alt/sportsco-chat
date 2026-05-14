@@ -135,6 +135,8 @@ function PlayerProfile() {
 
   const minor = isMinorFromBirthDate(player?.birth_date);
   const isParentOfThisPlayer = !!parents?.some((p) => p.parent_user_id === user?.id);
+  const isSelf = !!player?.user_id && player.user_id === user?.id;
+  const canSeePrivate = isCoach || isSelf || isParentOfThisPlayer;
 
   async function onSave(e: FormEvent) {
     e.preventDefault();
