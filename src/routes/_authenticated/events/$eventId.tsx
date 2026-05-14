@@ -685,6 +685,8 @@ function EventDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EventChat eventId={eventId} />
     </div>
   );
 }
