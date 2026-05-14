@@ -18,6 +18,8 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
+import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -64,6 +66,18 @@ const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedTeamsTeamIdRoute =
+  AuthenticatedTeamsTeamIdRouteImport.update({
+    id: '/$teamId',
+    path: '/$teamId',
+    getParentRoute: () => AuthenticatedTeamsRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdRoute =
+  AuthenticatedPlayersPlayerIdRouteImport.update({
+    id: '/players/$playerId',
+    path: '/players/$playerId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedEventsEventIdRoute =
   AuthenticatedEventsEventIdRouteImport.update({
     id: '/$eventId',
@@ -79,8 +93,10 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/teams': typeof AuthenticatedTeamsRoute
+  '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,8 +106,10 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/teams': typeof AuthenticatedTeamsRoute
+  '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -103,8 +121,10 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/teams': typeof AuthenticatedTeamsRoute
+  '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
+  '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -118,6 +138,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/teams'
     | '/events/$eventId'
+    | '/players/$playerId'
+    | '/teams/$teamId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -129,6 +151,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/teams'
     | '/events/$eventId'
+    | '/players/$playerId'
+    | '/teams/$teamId'
   id:
     | '__root__'
     | '/'
@@ -141,6 +165,8 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/teams'
     | '/_authenticated/events/$eventId'
+    | '/_authenticated/players/$playerId'
+    | '/_authenticated/teams/$teamId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -215,6 +241,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/teams/$teamId': {
+      id: '/_authenticated/teams/$teamId'
+      path: '/$teamId'
+      fullPath: '/teams/$teamId'
+      preLoaderRoute: typeof AuthenticatedTeamsTeamIdRouteImport
+      parentRoute: typeof AuthenticatedTeamsRoute
+    }
+    '/_authenticated/players/$playerId': {
+      id: '/_authenticated/players/$playerId'
+      path: '/players/$playerId'
+      fullPath: '/players/$playerId'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/events/$eventId': {
       id: '/_authenticated/events/$eventId'
       path: '/$eventId'
@@ -236,12 +276,24 @@ const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
 const AuthenticatedEventsRouteWithChildren =
   AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
+interface AuthenticatedTeamsRouteChildren {
+  AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRoute
+}
+
+const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
+  AuthenticatedTeamsTeamIdRoute: AuthenticatedTeamsTeamIdRoute,
+}
+
+const AuthenticatedTeamsRouteWithChildren =
+  AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
+  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
+  AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -249,7 +301,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
+  AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
+  AuthenticatedPlayersPlayerIdRoute: AuthenticatedPlayersPlayerIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -265,3 +318,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

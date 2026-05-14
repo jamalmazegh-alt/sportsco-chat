@@ -16,6 +16,8 @@
     "email": "Email",
     "password": "Password",
     "fullName": "Full name",
+    "firstName": "First name",
+    "lastName": "Last name",
     "forgotPassword": "Forgot password?",
     "noAccount": "No account yet?",
     "hasAccount": "Already have an account?",
@@ -39,7 +41,9 @@
     "back": "Back",
     "comment": "Comment (optional)",
     "send": "Send",
-    "all": "All"
+    "all": "All",
+    "optional": "optional",
+    "saved": "Saved"
   },
   "onboarding": {
     "title": "Set up your club",
@@ -67,23 +71,45 @@
     "name": "Team name",
     "season": "Season",
     "sport": "Sport",
-    "ageGroup": "Age group",
+    "ageGroup": "Age category",
+    "championship": "Championship",
     "members": "members",
     "noTeams": "No teams yet. Create your first team to get started.",
     "addPlayer": "Add player",
     "players": "Players",
-    "coaches": "Coaches"
+    "coaches": "Coaches",
+    "viewPlayers": "View players"
   },
   "players": {
+    "title": "Players",
     "firstName": "First name",
     "lastName": "Last name",
     "jerseyNumber": "Jersey #",
     "position": "Position",
-    "noPlayers": "No players yet."
+    "preferredPosition": "Preferred position",
+    "photo": "Player photo",
+    "uploadPhoto": "Upload photo",
+    "contact": "Player contact",
+    "phone": "Phone",
+    "email": "Email",
+    "parents": "Parents / guardians",
+    "addParent": "Add parent",
+    "parentName": "Parent name",
+    "canRespond": "Can respond to convocations",
+    "respondPlayer": "Player",
+    "respondParent": "Parent",
+    "respondBoth": "Both",
+    "accountActive": "Account active",
+    "accountInactive": "No account yet",
+    "noPlayers": "No players yet.",
+    "profile": "Player profile",
+    "details": "Details",
+    "save": "Save player"
   },
   "events": {
     "title": "Events",
     "create": "New event",
+    "name": "Event name",
     "type": "Type",
     "types": {
       "training": "Training",
@@ -97,15 +123,27 @@
       "published": "Published",
       "cancelled": "Cancelled"
     },
-    "publish": "Publish & convocate",
+    "publish": "Publish event",
+    "sendConvocations": "Send convocations",
+    "convocationsSent": "Convocations sent",
     "noEvents": "No events scheduled.",
     "location": "Location",
+    "locationUrl": "Google Maps link",
+    "openInMaps": "Open in Maps",
     "meetingPoint": "Meeting point",
     "opponent": "Opponent",
-    "startsAt": "Start",
-    "endsAt": "End",
+    "startsAt": "Start time",
+    "endsAt": "End time",
+    "convocationTime": "Convocation time",
     "details": "Details",
-    "selectTeam": "Select a team"
+    "selectTeam": "Select a team",
+    "competitionType": "Competition",
+    "competitionName": "Competition name",
+    "competitionTypes": {
+      "friendly": "Friendly",
+      "championship": "Championship",
+      "cup": "Cup"
+    }
   },
   "attendance": {
     "title": "Attendance",
@@ -133,6 +171,7 @@
     "title": "Profile",
     "preferredLanguage": "Preferred language",
     "english": "English",
-    "french": "Français"
+    "french": "Français",
+    "languageSaved": "Language saved"
   }
 }
