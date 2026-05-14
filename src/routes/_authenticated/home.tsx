@@ -171,14 +171,14 @@ function HomePage() {
               {t("dashboard.viewAll")}
             </Link>
           </div>
-          {!myEvents || myEvents.length === 0 ? (
+          {!myConvocs || myConvocs.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
               <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
             </div>
           ) : (
             <ul className="space-y-2">
-              {myEvents.map((e: any) => {
+              {myConvocs.map((e: any) => {
                 const actionRequired = e.convocation?.status === "pending";
                 return (
                   <li key={e.id}>
