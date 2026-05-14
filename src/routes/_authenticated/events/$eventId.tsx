@@ -369,11 +369,12 @@ function EventDetail() {
             </p>
           )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
-          {(event as { attachments?: Attachment[] }).attachments && (event as { attachments?: Attachment[] }).attachments!.length > 0 && (
-            <div className="pt-3">
-              <AttachmentList items={(event as { attachments?: Attachment[] }).attachments!} />
-            </div>
-          )}
+          {(() => {
+            const list = (event.attachments as unknown as Attachment[] | null) ?? [];
+            return list.length > 0 ? (
+              <div className="pt-3"><AttachmentList items={list} /></div>
+            ) : null;
+          })()}
         </div>
       </div>
 
