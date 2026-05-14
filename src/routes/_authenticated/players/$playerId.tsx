@@ -71,11 +71,17 @@ function PlayerProfile() {
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     if (pp.email) {
       try {
+        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", player.club_id).maybeSingle();
         await sendTransactionalEmail({
           templateName: "player-invite",
           recipientEmail: pp.email,
           idempotencyKey: `member-invite-${token}`,
-          templateData: { firstName: (pp.full_name ?? "").split(" ")[0] || undefined, clubName: undefined, inviteUrl },
+          templateData: {
+            firstName: (pp.full_name ?? "").split(" ")[0] || undefined,
+            clubName: clubRow?.name ?? undefined,
+            clubLogoUrl: clubRow?.logo_url ?? undefined,
+            inviteUrl,
+          },
         });
         toast.success(t("players.inviteSent"));
       } catch (e: any) {
