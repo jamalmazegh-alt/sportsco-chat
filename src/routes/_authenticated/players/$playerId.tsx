@@ -286,9 +286,15 @@ function PlayerProfile() {
 
         {isCoach && (
           <form onSubmit={onAddParent} className="space-y-3 pt-2 border-t border-border">
-            <div className="space-y-1.5">
-              <Label>{t("players.parentName")}</Label>
-              <Input value={pName} onChange={(e) => setPName(e.target.value)} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>{t("players.parentFirstName")}</Label>
+                <Input value={pFirstName} onChange={(e) => setPFirstName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("players.parentLastName")}</Label>
+                <Input value={pLastName} onChange={(e) => setPLastName(e.target.value)} />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
