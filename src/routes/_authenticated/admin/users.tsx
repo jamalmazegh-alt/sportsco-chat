@@ -28,7 +28,7 @@ function AdminUsersPage() {
       const { data: profiles } = ids.length
         ? await supabase
             .from("profiles")
-            .select("id, full_name, first_name, last_name, phone, phone_verified_at")
+            .select("id, full_name, first_name, last_name, phone")
             .in("id", ids)
         : { data: [] as any[] };
       const byId = new Map((profiles ?? []).map((p: any) => [p.id, p]));
@@ -70,7 +70,6 @@ function AdminUsersPage() {
       ) : (
         <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
           {(data ?? []).map((u) => {
-            const verified = !!u.profile?.phone_verified_at;
             const name = u.profile?.full_name
               ?? [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ")
               ?? "—";
@@ -94,12 +93,6 @@ function AdminUsersPage() {
                       ))}
                     </div>
                   </div>
-                  <span className={cn(
-                    "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
-                    verified ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-                  )}>
-                    {verified ? t("admin.statusActive") : t("admin.statusPending")}
-                  </span>
                 </Link>
               </li>
             );

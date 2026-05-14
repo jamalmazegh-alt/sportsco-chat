@@ -23,7 +23,7 @@ function AdminUserDetailPage() {
     enabled: !!activeClubId && role === "admin",
     queryFn: async () => {
       const [{ data: profile }, { data: memberships }, { data: linkedPlayers }, { data: parentLinks }] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, first_name, last_name, phone, phone_verified_at, created_at, avatar_url").eq("id", userId).maybeSingle(),
+        supabase.from("profiles").select("id, full_name, first_name, last_name, phone, created_at, avatar_url").eq("id", userId).maybeSingle(),
         supabase.from("club_members").select("club_id, role, created_at, clubs:club_id(name)").eq("user_id", userId),
         supabase.from("players").select("id, first_name, last_name, club_id").eq("user_id", userId),
         supabase.from("player_parents").select("id, player_id, players:player_id(id, first_name, last_name, club_id)").eq("parent_user_id", userId),
@@ -39,7 +39,7 @@ function AdminUserDetailPage() {
 
   const p = data.profile;
   const name = p?.full_name ?? [p?.first_name, p?.last_name].filter(Boolean).join(" ") ?? "—";
-  const verified = !!p?.phone_verified_at;
+  
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
@@ -58,18 +58,12 @@ function AdminUserDetailPage() {
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold truncate">{name || "—"}</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {p?.phone ?? "—"} · {verified ? t("admin.phoneVerified") : t("admin.phoneNotVerified")}
+            {p?.phone ?? "—"}
           </p>
           {p?.created_at && (
             <p className="text-[11px] text-muted-foreground mt-0.5">{t("admin.joined")}: {fmt(new Date(p.created_at), "PP")}</p>
           )}
         </div>
-        <span className={cn(
-          "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
-          verified ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-        )}>
-          {verified ? t("admin.statusActive") : t("admin.statusPending")}
-        </span>
       </header>
 
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">

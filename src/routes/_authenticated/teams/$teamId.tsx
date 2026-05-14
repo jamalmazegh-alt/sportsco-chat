@@ -17,8 +17,6 @@ import {
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { useServerFn } from "@tanstack/react-start";
-import { sendSms } from "@/lib/sms.functions";
 import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -37,7 +35,7 @@ function TeamDetail() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
-  const sendSmsFn = useServerFn(sendSms);
+  
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
@@ -231,13 +229,6 @@ function TeamDetail() {
           });
           dispatched = true;
         } catch { /* fallthrough to sms */ }
-      }
-      if (target.phone) {
-        try {
-          const greet = target.firstName ? `${target.firstName}, ` : "";
-          await sendSmsFn({ data: { to: target.phone, body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}` } });
-          dispatched = true;
-        } catch { /* ignore */ }
       }
       if (dispatched) sent += 1; else failed += 1;
     }
