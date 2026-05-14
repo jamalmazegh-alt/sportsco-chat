@@ -625,7 +625,7 @@ function EventDetail() {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        onClick={() => cancelConvocation(c.id)}
+                        onClick={() => setCancelTargetId(c.id)}
                         title={t("attendance.cancelConvocation")}
                       >
                         <X className="h-4 w-4" />
