@@ -713,6 +713,11 @@ export function EventFormSheet({
             <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
           </div>
 
+          <div className="space-y-1.5">
+            <Label>{t("events.attachments")}</Label>
+            <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
+          </div>
+
           <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
