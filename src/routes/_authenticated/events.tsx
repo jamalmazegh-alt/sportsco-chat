@@ -162,11 +162,21 @@ function EventsPage() {
 
                         {/* Content */}
                         <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
                               {t(`events.types.${e.type}`)}
                             </span>
+                            {e.type === "match" && e.competition_type && (
+                              <span className={cn(
+                                "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border",
+                                e.competition_type === "friendly" && "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-300",
+                                e.competition_type === "championship" && "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
+                                e.competition_type === "cup" && "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
+                              )}>
+                                {t(`events.competitionTypes.${e.competition_type}`)}
+                              </span>
+                            )}
                             {e.team_name && (
                               <span className="text-[10px] text-muted-foreground truncate">
                                 · {e.team_name}
