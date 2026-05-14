@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
@@ -31,7 +32,7 @@ function TeamsPage() {
     queryFn: async () => {
       const { data: ts } = await supabase
         .from("teams")
-        .select("id, name, season, sport, age_group, championship")
+        .select("id, name, season, sport, age_group, championship, competitions")
         .eq("club_id", activeClubId!)
         .order("name");
       if (!ts) return [];
@@ -51,7 +52,12 @@ function TeamsPage() {
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
   const [championship, setChampionship] = useState("");
+  const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
   const [busy, setBusy] = useState(false);
+
+  function toggleCompetition(value: string, checked: boolean) {
+    setCompetitions((current) => checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value));
+  }
 
   async function onCreate(e: FormEvent) {
     e.preventDefault();
@@ -64,6 +70,7 @@ function TeamsPage() {
         name,
         age_group: ageGroup || null,
         championship: championship || null,
+        competitions,
       });
     setBusy(false);
     if (error) {
@@ -71,7 +78,7 @@ function TeamsPage() {
       return;
     }
     setOpen(false);
-    setName(""); setAgeGroup(""); setChampionship("");
+    setName(""); setAgeGroup(""); setChampionship(""); setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     qc.invalidateQueries({ queryKey: ["teams"] });
   }
