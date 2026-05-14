@@ -1,49 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { ChevronLeft } from "lucide-react";
-
-const KindSchema = z.enum(["terms", "privacy", "data_processing", "media", "notifications"]);
-
-const getLegal = createServerFn({ method: "GET" })
-  .inputValidator((input: { kind: string; locale?: string }) =>
-    z
-      .object({
-        kind: KindSchema,
-        locale: z.string().min(2).max(5).default("en"),
-      })
-      .parse(input)
-  )
-  .handler(async ({ data }) => {
-    const { data: row, error } = await supabaseAdmin
-      .from("consent_versions")
-      .select("title, content_md, version, published_at, locale")
-      .eq("kind", data.kind)
-      .eq("locale", data.locale)
-      .order("version", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (error) throw error;
-    if (!row) {
-      // Fallback to English
-      const { data: en } = await supabaseAdmin
-        .from("consent_versions")
-        .select("title, content_md, version, published_at, locale")
-        .eq("kind", data.kind)
-        .eq("locale", "en")
-        .order("version", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (!en) return null;
-      return en;
-    }
-    return row;
-  });
+import { getLegalDoc } from "@/lib/legal.functions";
 
 export const Route = createFileRoute("/legal/$kind")({
   loader: async ({ params }) => {
-    const doc = await getLegal({ data: { kind: params.kind, locale: "en" } });
+    const doc = await getLegalDoc({ data: { kind: params.kind, locale: "en" } });
     if (!doc) throw notFound();
     return { doc };
   },
@@ -64,12 +25,12 @@ function LegalPage() {
         <Link to="/" className="inline-flex items-center text-sm text-muted-foreground mb-4">
           <ChevronLeft className="h-4 w-4" /> Home
         </Link>
-        <article className="prose prose-sm max-w-none">
-          <h1>{doc.title}</h1>
-          <p className="text-xs text-muted-foreground">
+        <article>
+          <h1 className="text-2xl font-semibold mb-1">{doc.title}</h1>
+          <p className="text-xs text-muted-foreground mb-4">
             v{doc.version} · {new Date(doc.published_at).toLocaleDateString()}
           </p>
-          <pre className="whitespace-pre-wrap font-sans text-sm">{doc.content_md}</pre>
+          <pre className="whitespace-pre-wrap font-sans text-sm leading-6">{doc.content_md}</pre>
         </article>
       </div>
     </div>
