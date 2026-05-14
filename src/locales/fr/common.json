@@ -7,7 +7,8 @@
     "admin": "Administrateur",
     "coach": "Coach",
     "player": "Joueur",
-    "parent": "Parent"
+    "parent": "Parent",
+    "dirigeant": "Dirigeant"
   },
   "nav": {
     "home": "Accueil",
