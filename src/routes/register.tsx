@@ -183,6 +183,23 @@ function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <p className={`text-xs ${password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"}`}>
+              {t("auth.passwordRequirements")}
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
+            <Input
+              id="confirm"
+              type="password"
+              required
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+            {confirm.length > 0 && !passwordsMatch && (
+              <p className="text-xs text-destructive">{t("auth.passwordsMustMatch")}</p>
+            )}
           </div>
           <Button type="submit" className="w-full h-11" disabled={busy}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.register")}
