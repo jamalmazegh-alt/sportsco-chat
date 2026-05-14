@@ -72,6 +72,11 @@ function LoginPage() {
           <Button type="submit" className="w-full h-11" disabled={busy}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.login")}
           </Button>
+          <div className="text-center">
+            <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
+              {t("auth.forgotPassword")}
+            </Link>
+          </div>
         </form>
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
