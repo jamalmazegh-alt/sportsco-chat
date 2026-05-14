@@ -36,7 +36,21 @@
     "inviteCode": "Code d'invitation",
     "inviteHint": "Demandez à l'admin de votre club un lien ou code d'invitation.",
     "inviteRequired": "Un code d'invitation est requis.",
-    "inviteInvalid": "Cette invitation est invalide ou expirée."
+    "inviteInvalid": "Cette invitation est invalide ou expirée.",
+    "forgotTitle": "Mot de passe oublié",
+    "forgotSubtitle": "Entrez votre e-mail pour recevoir un lien de réinitialisation.",
+    "sendResetLink": "Envoyer le lien",
+    "resetSent": "Si un compte existe pour cette adresse, vous recevrez un e-mail dans quelques instants.",
+    "resetError": "Impossible d'envoyer l'e-mail. Réessayez plus tard.",
+    "backToLogin": "Retour à la connexion",
+    "resetTitle": "Nouveau mot de passe",
+    "resetSubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "updatePassword": "Mettre à jour",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "passwordUpdated": "Mot de passe mis à jour.",
+    "resetLinkRequired": "Ouvrez le lien reçu par e-mail pour réinitialiser votre mot de passe."
   },
   "common": {
     "save": "Enregistrer",
