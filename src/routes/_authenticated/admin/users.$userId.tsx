@@ -39,7 +39,7 @@ function AdminUserDetailPage() {
 
   const p = data.profile;
   const name = p?.full_name ?? [p?.first_name, p?.last_name].filter(Boolean).join(" ") ?? "—";
-  const verified = !!p?.phone_verified_at;
+  
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
