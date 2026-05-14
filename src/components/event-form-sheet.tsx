@@ -17,8 +17,19 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const TRAINING_DEFAULT_DURATION_MIN = 90;
+
+function addMinutesToTime(time: string, minutes: number): string {
+  if (!time) return "";
+  const [h, m] = time.split(":").map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return "";
+  const total = (h * 60 + m + minutes) % (24 * 60);
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
 
 declare global {
   interface Window {
@@ -173,13 +184,7 @@ function DateTimeField({
             />
           </PopoverContent>
         </Popover>
-        <Input
-          type="time"
-          value={time}
-          onChange={(e) => onTime(e.target.value)}
-          required={required}
-          className="h-10"
-        />
+        <TimePicker value={time} onChange={onTime} required={required} className="w-full" />
       </div>
     </div>
   );
@@ -242,13 +247,7 @@ function TimeField({
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <Input
-        type="time"
-        value={time}
-        onChange={(e) => onTime(e.target.value)}
-        required={required}
-        className="h-10"
-      />
+      <TimePicker value={time} onChange={onTime} required={required} className="w-full" />
     </div>
   );
 }
