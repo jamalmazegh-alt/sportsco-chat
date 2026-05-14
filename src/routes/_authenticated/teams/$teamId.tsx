@@ -524,6 +524,11 @@ function TeamDetail() {
                   </div>
                 </div>
 
+                <div className="space-y-1.5">
+                  <Label>{t("players.birthDate")}</Label>
+                  <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+                </div>
+
                 <div className="pt-2">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                     {t("players.contact")}
@@ -541,9 +546,17 @@ function TeamDetail() {
                 </div>
 
                 <div className="pt-2">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                    {t("players.parents")}
-                  </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {t("players.parents")}
+                      {minor && <span className="text-destructive ml-1">*</span>}
+                    </p>
+                  </div>
+                  {minor && (
+                    <p className="text-xs text-muted-foreground bg-accent/40 rounded-lg px-3 py-2 mb-3">
+                      {t("players.minorParentNotice")}
+                    </p>
+                  )}
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
