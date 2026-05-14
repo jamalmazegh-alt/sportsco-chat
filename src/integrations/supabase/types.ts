@@ -116,6 +116,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          default_channels: Json
           id: string
           logo_url: string | null
           name: string
@@ -123,6 +124,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          default_channels?: Json
           id?: string
           logo_url?: string | null
           name: string
@@ -130,6 +132,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          default_channels?: Json
           id?: string
           logo_url?: string | null
           name?: string
@@ -345,6 +348,83 @@ export type Database = {
           },
         ]
       }
+      member_invites: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string
+          email: string | null
+          expires_at: string
+          id: string
+          parent_for_player_id: string | null
+          phone: string | null
+          player_id: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          team_id: string | null
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          parent_for_player_id?: string | null
+          phone?: string | null
+          player_id?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          team_id?: string | null
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          expires_at?: string
+          id?: string
+          parent_for_player_id?: string | null
+          phone?: string | null
+          player_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          team_id?: string | null
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_invites_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_invites_parent_for_player_id_fkey"
+            columns: ["parent_for_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_invites_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_invites_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
@@ -487,6 +567,7 @@ export type Database = {
           id: string
           last_name: string | null
           phone: string | null
+          phone_verified_at: string | null
           preferred_language: string
           updated_at: string
         }
@@ -498,6 +579,7 @@ export type Database = {
           id: string
           last_name?: string | null
           phone?: string | null
+          phone_verified_at?: string | null
           preferred_language?: string
           updated_at?: string
         }
@@ -509,6 +591,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone?: string | null
+          phone_verified_at?: string | null
           preferred_language?: string
           updated_at?: string
         }
@@ -659,6 +742,42 @@ export type Database = {
           },
         ]
       }
+      verification_codes: {
+        Row: {
+          attempts: number
+          channel: string
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          target: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          target: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          target?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -714,6 +833,7 @@ export type Database = {
         }[]
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
+      redeem_member_invite: { Args: { _token: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "coach" | "parent" | "player"

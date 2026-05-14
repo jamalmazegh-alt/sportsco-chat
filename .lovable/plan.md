@@ -1,57 +1,76 @@
-## Plan: Squadly admin & event flow improvements
+## Plan
 
-A large set of related improvements across registration, club/team setup, player management, and event creation. I'll group into a coherent migration + UI pass.
+Large iteration grouped in 6 chunks. I'll do one DB migration, then code in passes.
 
-### 1. Database migration
+### 1. Auth UX — password & validation
 
-Add columns and a new table:
+- **Register / reset-password**: add a "Confirm password" field + live regex helper. Rule: ≥8 chars, 1 uppercase, 1 lowercase, 1 digit. Show the rule to the user with green checkmarks as they type.
+- Enable HIBP leaked-password check on Supabase auth.
+- Keep email-confirmation ON (already the case) so signup → email verification is required before login.
 
-- `profiles`: already has `full_name`. Registration flow will collect first + last and store concatenated `full_name` (+ `first_name`, `last_name` columns).
-- `teams`: add `championship text` (optional). `age_group` already exists.
-- `players`: add `preferred_position text` (rename usage of existing `position`), `phone text`, `email text`, `photo_url` already exists, `can_respond boolean default true` (whether player can accept convocations).
-- `player_parents`: add `phone text`, `email text`, `full_name text`, `can_respond boolean default true`.
-- `events`: add `convocation_time timestamptz`, `competition_type text` (friendly/championship/cup), `competition_name text`, `location_url text`. `ends_at` already exists.
-- Add `profiles.first_name`, `profiles.last_name`.
+### 2. App emails (transactional)
 
-### 2. Auth / registration
+Set up Lovable's transactional email infrastructure on `notify.clubero.app` and create templates:
+- `player-invite` — sent when admin creates a player (link → `/accept-invite?token=...`)
+- `parent-invite` — same for a parent contact
+- `event-convocation` — when admin clicks "Send convocations"
+- `account-verified` — confirmation
 
-- `register.tsx`: add First name + Last name fields, store on profile via `handle_new_user` (update trigger to read `first_name` / `last_name` from metadata) and pass them in `signUp` options.
+The forgot-password flow already uses Supabase's auth email; we'll brand it via auth email templates (`scaffold_auth_email_templates`).
 
-### 3. Teams
+### 3. Team-scoped invites
 
-- Create form: keep name, add `championship` (optional). Already has age_group, season, sport.
+New table `member_invites`:
+- `id, club_id, team_id, player_id (nullable), parent_for_player_id (nullable), role ('player'|'parent'|'coach'), email, phone, token, expires_at, used_at, created_by, created_at`
+- RPC `redeem_member_invite(token)`:
+  - links `auth.uid()` to the matching `players.user_id` or `player_parents.parent_user_id`
+  - inserts `club_members` row
+  - inserts `team_members` row
+  - marks invite used
 
-### 4. Players (admin)
+Flow for admin:
+1. Create player (form already exists) → on success, if email/phone provided, create invite + send email (and/or SMS depending on club channel config).
+2. Same on the parent sub-form.
+3. New page `/accept-invite?token=...`: if not logged in → register pre-filled with email; if logged in → call RPC + redirect to `/home`.
 
-- Replace inline `TeamQuickAdd` with: clicking a team navigates to `/teams/$teamId` showing player list with photos and account-active indicator (player has linked `user_id`).
-- New route `/teams/$teamId` lists players (avatar, name, jersey, position, account active dot).
-- "Add player" sheet with: photo upload, first/last name, jersey, preferred position, phone, email, parent contact (name/phone/email), who can respond (player/parent/both).
-- Player detail route `/players/$playerId` for editing same fields.
-- Storage bucket `player-photos` (public) for avatars.
+### 4. SMS + WhatsApp via Twilio
 
-### 5. Events
+- Add secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`, `TWILIO_WHATSAPP_FROM` (optional).
+- Server function `sendSms({ to, body })` and `sendWhatsApp({ to, body })` using Twilio REST.
+- Server function `sendVerificationCode({ channel, target })` storing 6-digit code in a new `verification_codes` table (5-min TTL, hashed); `verifyCode({ target, code })` consumes it.
+- Profile page: "Verify phone" button → modal asks for code → marks `profiles.phone_verified_at`.
+- Email verification status comes from `auth.users.email_confirmed_at` (already populated by Supabase) — surface it on profile.
+- **Account-active rule**: a player/parent is "active" if `user_id IS NOT NULL` AND (`email_verified` OR `phone_verified`). Show green/orange dot in player & parent lists.
 
-- Form changes:
-  - Add **event name** (title) — for trainings default to "Training".
-  - Add **convocation time** (datetime), **start time**, **end time**.
-  - Location: free text + optional **Google Maps URL**.
-  - For `match`: add **competition type** (friendly/championship/cup) and competition name; remove team-name display, show opponent only.
-  - **Publish event** vs **Send convocations later**: events default to `published`, but only create convocations + notifications when admin clicks "Send convocations". Add status `convocations_sent boolean` (or use existing convocation rows existence).
-- Event card: show event title, not team name.
+### 5. Club notification channels
 
-### 6. Profile / language persistence
+Extend `clubs` with `default_channels jsonb default '["email"]'` (admin-editable list, choices: email/sms/whatsapp). New admin screen: Settings → Notifications.
 
-- `setLang`: already updates `profiles.preferred_language`. Confirm and ensure on app load we read it (already done in auth context). Make sure UI reflects saved language correctly.
+Notification dispatcher (server fn): for each recipient, look up club channels → for each channel, render template → enqueue email / send Twilio SMS or WhatsApp.
+
+### 6. Sports list reorder
+
+Update the sports dropdown source to:
+1. Football
+2. Basketball
+— separator —
+Handball, Volleyball, Rugby, Hockey sur gazon, Hockey sur glace, Water-polo, Baseball, Softball, Cricket, Football américain, Football australien, Football gaélique, Lacrosse, Netball, Korfball, Ultimate, Floorball, Sepak takraw, Kabaddi, Polo, Aviron (8), Bobsleigh, Curling.
 
 ### Technical notes
 
-- All DB changes via one migration.
-- Add storage bucket via SQL.
-- Adjust `useAuth` to include `first_name` / `last_name` if needed; otherwise just used in profile display.
-- Update i18n strings (en + fr) for new labels.
-- Keep RLS unchanged (existing policies cover new columns).
+- One migration: new tables (`member_invites`, `verification_codes`), new columns (`profiles.phone_verified_at`, `clubs.default_channels`), enums updates, RLS policies, RPCs.
+- Twilio called via `createServerFn` (server-only secrets).
+- Email templates use the existing transactional pipeline (`send-transactional-email` route).
+- Password regex shared in `src/lib/password.ts` and reused in register + reset.
+- Sports list moved to `src/lib/sports.ts` (single source).
 
-### Out of scope (not requested)
+### Order of execution
 
-- Email/SMS sending of convocations — only in-app notifications continue.
-- Real account-invite flow for players — "active" simply means `players.user_id IS NOT NULL`.
+1. Migration + auth config (HIBP, channels column)
+2. Email infra + templates scaffolding on `notify.clubero.app`
+3. Twilio integration + verification code flow
+4. Member invite system (RPC + page + send hook in player creation)
+5. Password confirm/regex UX + sports list update
+6. Account-active indicators on player/parent lists
+
+I'll hand back after each chunk so you can test before I move on. Ready to start with #1 (migration + auth) when you approve this plan.
