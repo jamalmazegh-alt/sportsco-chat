@@ -251,15 +251,28 @@ function EventDetail() {
       </Link>
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-            {t(`events.types.${event.type}`)}
-          </span>
-          {event.type === "match" && event.competition_type && (
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded">
-              {t(`events.competitionTypes.${event.competition_type}`)}
-              {event.competition_name ? ` · ${event.competition_name}` : ""}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+              {t(`events.types.${event.type}`)}
             </span>
+            {event.type === "match" && event.competition_type && (
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded">
+                {t(`events.competitionTypes.${event.competition_type}`)}
+                {event.competition_name ? ` · ${event.competition_name}` : ""}
+              </span>
+            )}
+            {event.type === "match" && event.is_home !== null && (
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded inline-flex items-center gap-1">
+                {event.is_home ? <Home className="h-2.5 w-2.5" /> : <Plane className="h-2.5 w-2.5" />}
+                {t(event.is_home ? "events.home" : "events.away")}
+              </span>
+            )}
+          </div>
+          {isCoach && teams && (
+            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
           )}
         </div>
         <h1 className="text-xl font-semibold mt-2">
@@ -292,9 +305,30 @@ function EventDetail() {
               )}
             </p>
           )}
+          {event.type === "match" && event.is_home === false && event.meeting_point && (
+            <p className="flex items-center gap-2">
+              <Plane className="h-4 w-4" />
+              {t("events.meetingPoint")}: {event.meeting_point}
+            </p>
+          )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
         </div>
       </div>
+
+      {isCoach && teams && (
+        <EventFormSheet
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          mode="edit"
+          teams={teams}
+          userId={user!.id}
+          initial={event as any}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["event", eventId] });
+            qc.invalidateQueries({ queryKey: ["events"] });
+          }}
+        />
+      )}
 
       {/* Coach: send convocations */}
       {isCoach && !event.convocations_sent && (
