@@ -72,7 +72,7 @@ function EventsPage() {
   });
 
   const visibleEvents = useMemo(() => {
-    if (!events) return [] as typeof events;
+    if (!events) return [];
     if (showPast) return events;
     return events.filter((e) => {
       const d = new Date(e.starts_at);
