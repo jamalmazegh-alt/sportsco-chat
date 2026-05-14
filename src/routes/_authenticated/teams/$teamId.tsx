@@ -56,7 +56,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id)")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id, email, phone)")
         .eq("team_id", teamId)
         .eq("role", "player");
       return (tm ?? [])
@@ -65,6 +65,20 @@ function TeamDetail() {
         .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
     },
   });
+
+  // Selection state for bulk invitations
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [inviting, setInviting] = useState(false);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   // Add player form state
   const [open, setOpen] = useState(false);
