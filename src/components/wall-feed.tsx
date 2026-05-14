@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare, Send, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
@@ -16,6 +17,7 @@ type Post = {
   author_user_id: string;
   body: string;
   created_at: string;
+  attachments: Attachment[];
   author?: Profile | null;
   comments?: Comment[];
 };
