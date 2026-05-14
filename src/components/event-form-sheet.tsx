@@ -137,6 +137,7 @@ function DateTimeField({
 
 export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mode, userId, onSaved }: Props) {
   const { t } = useTranslation();
+  const googlePlacesEnabled = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
   const [teamId, setTeamId] = useState(initial?.team_id ?? "");
   const [type, setType] = useState<EventType>((initial?.type as EventType) ?? "training");
@@ -162,6 +163,8 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
   const [busy, setBusy] = useState(false);
+  const selectedTeam = teams.find((tm) => tm.id === teamId);
+  const availableCompetitionTypes = competitionOptions(selectedTeam);
 
   // When opening fresh, sync from initial
   useEffect(() => {
@@ -185,6 +188,17 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
     setConvocDate(c.date); setConvocTime(c.time);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  useEffect(() => {
+    if (!availableCompetitionTypes.includes(competitionType)) {
+      setCompetitionType(availableCompetitionTypes[0] ?? "friendly");
+    }
+  }, [availableCompetitionTypes, competitionType]);
+
+  useEffect(() => {
+    if (!open || !googlePlacesEnabled) return;
+    loadGoogleMapsPlaces()?.catch(() => undefined);
+  }, [googlePlacesEnabled, open]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -216,7 +230,7 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
       is_home: type === "match" ? (isHome === "home") : null,
       meeting_point: type === "match" && isHome === "away" ? (meetingPoint || null) : null,
       starts_at: startsIso,
-      ends_at: combineDateTime(endDate ?? startDate, endTime),
+      ends_at: type === "training" ? combineDateTime(endDate ?? startDate, endTime) : null,
       convocation_time: combineDateTime(convocDate ?? startDate, convocTime),
     };
 
