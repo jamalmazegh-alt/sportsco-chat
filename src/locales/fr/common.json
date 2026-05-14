@@ -296,6 +296,7 @@
   },
   "inbox": {
     "title": "Boîte de réception",
+    "tabNotifications": "Notifications",
     "noNotifications": "Rien de neuf. Tout est OK."
   },
   "profile": {
