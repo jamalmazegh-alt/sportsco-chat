@@ -263,7 +263,21 @@
     "confirmCancelConvocation": "Annuler cette convocation ?",
     "convocationCancelled": "Convocation annulée",
     "convokedPlayers": "Joueurs convoqués",
-    "noConvokedPlayers": "Aucun joueur convoqué pour le moment."
+    "noConvokedPlayers": "Aucun joueur convoqué pour le moment.",
+    "details": "Détails",
+    "status": "Statut",
+    "comment": "Commentaire",
+    "history": "Activité",
+    "respondedAt": "Réponse",
+    "reminderVia": "Relance par {{channel}}",
+    "noActivity": "Aucune activité pour le moment."
+  },
+  "channels": {
+    "in_app": "in-app",
+    "email": "email",
+    "sms": "SMS",
+    "whatsapp": "WhatsApp",
+    "push": "push"
   },
   "inbox": {
     "title": "Boîte de réception",

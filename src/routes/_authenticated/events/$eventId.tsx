@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info,
 } from "lucide-react";
+import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ function EventDetail() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
+  const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
@@ -615,6 +617,17 @@ function EventDetail() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <AttendancePill status={c.status} />
+                    {isCoach && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-muted-foreground"
+                        onClick={() => setDetailConvocId(c.id)}
+                        title={t("attendance.details")}
+                      >
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    )}
                     {isCoach && c.status === "pending" && (
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remind(c.id)}>
                         <Bell className="h-4 w-4" />
@@ -638,6 +651,21 @@ function EventDetail() {
           )}
         </section>
       )}
+
+      <ConvocationDetailDialog
+        open={!!detailConvocId}
+        onOpenChange={(o) => !o && setDetailConvocId(null)}
+        convocation={(convocations ?? []).find((c: any) => c.id === detailConvocId) ?? null}
+        eventConvocationsSentAt={null}
+        isCoach={isCoach}
+        onRemind={(id) => {
+          remind(id);
+        }}
+        onCancel={(id) => {
+          setDetailConvocId(null);
+          setCancelTargetId(id);
+        }}
+      />
 
       <AlertDialog open={!!cancelTargetId} onOpenChange={(o) => !o && setCancelTargetId(null)}>
         <AlertDialogContent>
