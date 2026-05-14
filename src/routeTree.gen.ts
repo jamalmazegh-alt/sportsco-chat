@@ -19,11 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
@@ -87,11 +87,6 @@ const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   path: '/teams',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -112,6 +107,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProfileIndexRoute =
+  AuthenticatedProfileIndexRouteImport.update({
+    id: '/profile/',
+    path: '/profile/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -130,9 +131,9 @@ const AuthenticatedTeamsTeamIdRoute =
   } as any)
 const AuthenticatedProfilePrivacyRoute =
   AuthenticatedProfilePrivacyRouteImport.update({
-    id: '/privacy',
-    path: '/privacy',
-    getParentRoute: () => AuthenticatedProfileRoute,
+    id: '/profile/privacy',
+    path: '/profile/privacy',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedPlayersPlayerIdRoute =
   AuthenticatedPlayersPlayerIdRouteImport.update({
@@ -197,7 +198,6 @@ export interface FileRoutesByFullPath {
   '/events': typeof AuthenticatedEventsRouteWithChildren
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -208,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/profile/': typeof AuthenticatedProfileIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -225,7 +226,6 @@ export interface FileRoutesByTo {
   '/events': typeof AuthenticatedEventsRouteWithChildren
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -236,6 +236,7 @@ export interface FileRoutesByTo {
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/profile': typeof AuthenticatedProfileIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -256,7 +257,6 @@ export interface FileRoutesById {
   '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -267,6 +267,7 @@ export interface FileRoutesById {
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -287,7 +288,6 @@ export interface FileRouteTypes {
     | '/events'
     | '/home'
     | '/inbox'
-    | '/profile'
     | '/teams'
     | '/email/unsubscribe'
     | '/legal/$kind'
@@ -298,6 +298,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId'
     | '/lovable/email/suppression'
     | '/admin/'
+    | '/profile/'
     | '/admin/users/$userId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -315,7 +316,6 @@ export interface FileRouteTypes {
     | '/events'
     | '/home'
     | '/inbox'
-    | '/profile'
     | '/teams'
     | '/email/unsubscribe'
     | '/legal/$kind'
@@ -326,6 +326,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId'
     | '/lovable/email/suppression'
     | '/admin'
+    | '/profile'
     | '/admin/users/$userId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -345,7 +346,6 @@ export interface FileRouteTypes {
     | '/_authenticated/events'
     | '/_authenticated/home'
     | '/_authenticated/inbox'
-    | '/_authenticated/profile'
     | '/_authenticated/teams'
     | '/email/unsubscribe'
     | '/legal/$kind'
@@ -356,6 +356,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams/$teamId'
     | '/lovable/email/suppression'
     | '/_authenticated/admin/'
+    | '/_authenticated/profile/'
     | '/_authenticated/admin/users/$userId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -454,13 +455,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/inbox': {
       id: '/_authenticated/inbox'
       path: '/inbox'
@@ -489,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/profile/': {
+      id: '/_authenticated/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -512,10 +513,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/profile/privacy': {
       id: '/_authenticated/profile/privacy'
-      path: '/privacy'
+      path: '/profile/privacy'
       fullPath: '/profile/privacy'
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/players/$playerId': {
       id: '/_authenticated/players/$playerId'
@@ -621,17 +622,6 @@ const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
 const AuthenticatedEventsRouteWithChildren =
   AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
-interface AuthenticatedProfileRouteChildren {
-  AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
-}
-
-const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
-  AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
-}
-
-const AuthenticatedProfileRouteWithChildren =
-  AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
-
 interface AuthenticatedTeamsRouteChildren {
   AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRoute
 }
@@ -648,9 +638,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRoute
+  AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
+  AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -658,9 +649,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
-  AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
   AuthenticatedPlayersPlayerIdRoute: AuthenticatedPlayersPlayerIdRoute,
+  AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
+  AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -687,3 +679,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
