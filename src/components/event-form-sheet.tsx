@@ -135,6 +135,15 @@ function DateTimeField({
   );
 }
 
+function TimeField({ label, time, onTime, required }: { label: string; time: string; onTime: (t: string) => void; required?: boolean }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Input type="time" value={time} onChange={(e) => onTime(e.target.value)} required={required} className="h-10" />
+    </div>
+  );
+}
+
 function AddressField({
   label,
   value,
