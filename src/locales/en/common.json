@@ -296,6 +296,7 @@
   },
   "inbox": {
     "title": "Inbox",
+    "tabNotifications": "Notifications",
     "noNotifications": "Nothing new. You're all set."
   },
   "profile": {
