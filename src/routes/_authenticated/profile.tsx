@@ -131,6 +131,11 @@ function ProfilePage() {
         <p className="text-sm text-muted-foreground mt-1">
           {profile?.full_name ?? user?.email}
         </p>
+        {role && (
+          <span className="inline-flex items-center mt-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
+            {t(`roles.${role}`, { defaultValue: role })}
+          </span>
+        )}
       </div>
 
       {club && (
