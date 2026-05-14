@@ -177,6 +177,8 @@
     "parents": "Parents / guardians",
     "addParent": "Add parent",
     "parentName": "Parent name",
+    "parentFirstName": "Parent first name",
+    "parentLastName": "Parent last name",
     "canRespond": "Can respond to convocations",
     "respondPlayer": "Player",
     "respondParent": "Parent",
@@ -187,8 +189,14 @@
     "profile": "Player profile",
     "details": "Details",
     "save": "Save player",
+    "invite": "Invite",
+    "inviteSelected": "Invite selected ({{count}})",
     "inviteSent": "Invitation sent.",
     "inviteFailed": "Player created, but invitation could not be sent.",
+    "inviteNoContact": "No contact info (email or phone) provided.",
+    "invitePartial": "{{sent}} sent, {{failed}} failed.",
+    "inviteBulkSent": "{{count}} invitation(s) sent.",
+    "inviteBulkResult": "{{sent}} sent, {{failed}} failed, {{skipped}} skipped.",
     "inviterPhoneRequired": "Player created. Verify your phone number in your profile to send invitations."
   },
   "events": {

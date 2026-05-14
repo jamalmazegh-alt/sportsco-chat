@@ -113,7 +113,8 @@ function PlayerProfile() {
   }
 
   // Parent management
-  const [pName, setPName] = useState("");
+  const [pFirstName, setPFirstName] = useState("");
+  const [pLastName, setPLastName] = useState("");
   const [pPhone, setPPhone] = useState("");
   const [pEmail, setPEmail] = useState("");
   const [pCanRespond, setPCanRespond] = useState(true);
@@ -121,10 +122,11 @@ function PlayerProfile() {
   async function onAddParent(e: FormEvent) {
     e.preventDefault();
     if (!playerId) return;
+    const fullName = [pFirstName, pLastName].map((s) => s.trim()).filter(Boolean).join(" ");
     const { error } = await supabase.from("player_parents").insert({
       player_id: playerId,
       parent_user_id: null,
-      full_name: pName || null,
+      full_name: fullName || null,
       phone: pPhone || null,
       email: pEmail || null,
       can_respond: pCanRespond,
@@ -133,7 +135,7 @@ function PlayerProfile() {
       toast.error(error.message);
       return;
     }
-    setPName(""); setPPhone(""); setPEmail(""); setPCanRespond(true);
+    setPFirstName(""); setPLastName(""); setPPhone(""); setPEmail(""); setPCanRespond(true);
     refetchParents();
   }
 
@@ -284,9 +286,15 @@ function PlayerProfile() {
 
         {isCoach && (
           <form onSubmit={onAddParent} className="space-y-3 pt-2 border-t border-border">
-            <div className="space-y-1.5">
-              <Label>{t("players.parentName")}</Label>
-              <Input value={pName} onChange={(e) => setPName(e.target.value)} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>{t("players.parentFirstName")}</Label>
+                <Input value={pFirstName} onChange={(e) => setPFirstName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("players.parentLastName")}</Label>
+                <Input value={pLastName} onChange={(e) => setPLastName(e.target.value)} />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
