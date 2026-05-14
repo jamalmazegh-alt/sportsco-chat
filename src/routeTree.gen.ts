@@ -17,7 +17,6 @@ import { Route as DnsCheckRouteImport } from './routes/dns-check'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as AuthenticatedWallRouteImport } from './routes/_authenticated/wall'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
@@ -72,11 +71,6 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedWallRoute = AuthenticatedWallRouteImport.update({
-  id: '/wall',
-  path: '/wall',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   id: '/teams',
@@ -173,7 +167,6 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
-  '/wall': typeof AuthenticatedWallRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
@@ -198,7 +191,6 @@ export interface FileRoutesByTo {
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
-  '/wall': typeof AuthenticatedWallRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
@@ -225,7 +217,6 @@ export interface FileRoutesById {
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
-  '/_authenticated/wall': typeof AuthenticatedWallRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
@@ -252,7 +243,6 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/profile'
     | '/teams'
-    | '/wall'
     | '/email/unsubscribe'
     | '/events/$eventId'
     | '/players/$playerId'
@@ -277,7 +267,6 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/profile'
     | '/teams'
-    | '/wall'
     | '/email/unsubscribe'
     | '/events/$eventId'
     | '/players/$playerId'
@@ -303,7 +292,6 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox'
     | '/_authenticated/profile'
     | '/_authenticated/teams'
-    | '/_authenticated/wall'
     | '/email/unsubscribe'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/players/$playerId'
@@ -390,13 +378,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/wall': {
-      id: '/_authenticated/wall'
-      path: '/wall'
-      fullPath: '/wall'
-      preLoaderRoute: typeof AuthenticatedWallRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/teams': {
       id: '/_authenticated/teams'
@@ -535,7 +516,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
-  AuthenticatedWallRoute: typeof AuthenticatedWallRoute
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRoute
 }
 
@@ -546,7 +526,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
-  AuthenticatedWallRoute: AuthenticatedWallRoute,
   AuthenticatedPlayersPlayerIdRoute: AuthenticatedPlayersPlayerIdRoute,
 }
 
@@ -573,3 +552,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
