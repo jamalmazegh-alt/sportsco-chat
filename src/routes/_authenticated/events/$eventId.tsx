@@ -68,6 +68,20 @@ function EventDetail() {
     },
   });
 
+  const { data: teamPlayers } = useQuery({
+    queryKey: ["team-players", event?.team_id],
+    enabled: !!event,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_members")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
+        .eq("team_id", event!.team_id)
+        .eq("role", "player");
+      if (error) throw error;
+      return (data ?? []).filter((tp: any) => tp.players);
+    },
+  });
+
   // Realtime
   useEffect(() => {
     const channel = supabase
