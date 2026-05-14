@@ -388,7 +388,15 @@
     "usersEmpty": "No users yet.",
     "openUsers": "Manage users",
     "statusActive": "Active",
-    "statusPending": "Pending"
+    "statusPending": "Pending",
+    "userDetailTitle": "User detail",
+    "memberships": "Club memberships",
+    "linkedPlayers": "Linked players",
+    "noLinkedPlayers": "No linked players.",
+    "phone": "Phone",
+    "phoneVerified": "Phone verified",
+    "phoneNotVerified": "Phone not verified",
+    "joined": "Joined"
   },
   "attachments": {
     "add": "Add file",
