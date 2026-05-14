@@ -617,6 +617,17 @@ function EventDetail() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <AttendancePill status={c.status} />
+                    {isCoach && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-muted-foreground"
+                        onClick={() => setDetailConvocId(c.id)}
+                        title={t("attendance.details")}
+                      >
+                        <Info className="h-4 w-4" />
+                      </Button>
+                    )}
                     {isCoach && c.status === "pending" && (
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remind(c.id)}>
                         <Bell className="h-4 w-4" />
