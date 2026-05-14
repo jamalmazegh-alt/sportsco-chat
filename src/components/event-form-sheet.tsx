@@ -21,6 +21,17 @@ import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { getGoogleMapsKey } from "@/lib/maps.functions";
+
+let cachedMapsKeyPromise: Promise<string | null> | null = null;
+function fetchGoogleMapsKey(): Promise<string | null> {
+  if (!cachedMapsKeyPromise) {
+    cachedMapsKeyPromise = getGoogleMapsKey()
+      .then((r) => r.key ?? null)
+      .catch(() => null);
+  }
+  return cachedMapsKeyPromise;
+}
 
 const TRAINING_DEFAULT_DURATION_MIN = 90;
 
