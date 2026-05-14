@@ -232,7 +232,16 @@
     "invitePartial": "{{sent}} sent, {{failed}} failed.",
     "inviteBulkSent": "{{count}} invitation(s) sent.",
     "inviteBulkResult": "{{sent}} sent, {{failed}} failed, {{skipped}} skipped.",
-    "inviterPhoneRequired": "Player created. Verify your phone number in your profile to send invitations."
+    "inviterPhoneRequired": "Player created. Verify your phone number in your profile to send invitations.",
+    "birthDate": "Date of birth",
+    "minor": "Minor",
+    "parentRequiredForMinor": "A parent must be added for a minor player.",
+    "noParents": "No parent linked yet.",
+    "childAccessTitle": "Allow my child to access the platform",
+    "childAccessHint": "By default, children do not receive any account or notifications. Toggle this on if you (the parent) want your child to have their own platform access.",
+    "minorParentNotice": "This player is a minor — a parent is required and will receive the invitation. The child does not receive an account by default.",
+    "autoInviteSent": "Invitation sent automatically.",
+    "autoInviteParentSent": "Invitation sent to the parent."
   },
   "events": {
     "title": "Events",
@@ -368,7 +377,13 @@
     "eventChatPlayers": "Players can access event chats",
     "eventChatParents": "Parents can access event chats",
     "save": "Save settings",
-    "saved": "Settings saved."
+    "saved": "Settings saved.",
+    "usersTitle": "Platform users",
+    "usersSubtitle": "All users with access to this club, with their roles and status.",
+    "usersEmpty": "No users yet.",
+    "openUsers": "Manage users",
+    "statusActive": "Active",
+    "statusPending": "Pending"
   },
   "attachments": {
     "add": "Add file",

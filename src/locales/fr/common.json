@@ -232,7 +232,16 @@
     "invitePartial": "{{sent}} envoyée(s), {{failed}} échec(s).",
     "inviteBulkSent": "{{count}} invitation(s) envoyée(s).",
     "inviteBulkResult": "{{sent}} envoyée(s), {{failed}} échec(s), {{skipped}} ignoré(s).",
-    "inviterPhoneRequired": "Joueur créé. Vérifiez votre numéro de téléphone dans votre profil pour envoyer des invitations."
+    "inviterPhoneRequired": "Joueur créé. Vérifiez votre numéro de téléphone dans votre profil pour envoyer des invitations.",
+    "birthDate": "Date de naissance",
+    "minor": "Mineur",
+    "parentRequiredForMinor": "Un parent doit être ajouté pour un joueur mineur.",
+    "noParents": "Aucun parent lié pour l'instant.",
+    "childAccessTitle": "Autoriser mon enfant à accéder à la plateforme",
+    "childAccessHint": "Par défaut, les enfants ne reçoivent ni compte ni notifications. Activez cette option si vous (le parent) souhaitez donner à votre enfant un accès à la plateforme.",
+    "minorParentNotice": "Ce joueur est mineur — un parent est obligatoire et recevra l'invitation. L'enfant ne reçoit pas de compte par défaut.",
+    "autoInviteSent": "Invitation envoyée automatiquement.",
+    "autoInviteParentSent": "Invitation envoyée au parent."
   },
   "events": {
     "title": "Événements",
@@ -368,7 +377,13 @@
     "eventChatPlayers": "Les joueurs peuvent accéder aux chats d'événement",
     "eventChatParents": "Les parents peuvent accéder aux chats d'événement",
     "save": "Enregistrer",
-    "saved": "Paramètres enregistrés."
+    "saved": "Paramètres enregistrés.",
+    "usersTitle": "Utilisateurs de la plateforme",
+    "usersSubtitle": "Tous les utilisateurs ayant accès à ce club, avec leur rôle et leur statut.",
+    "usersEmpty": "Aucun utilisateur.",
+    "openUsers": "Gérer les utilisateurs",
+    "statusActive": "Actif",
+    "statusPending": "En attente"
   },
   "attachments": {
     "add": "Ajouter un fichier",

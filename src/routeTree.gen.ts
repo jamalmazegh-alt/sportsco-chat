@@ -29,6 +29,7 @@ import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -138,6 +139,11 @@ const AuthenticatedEventsEventIdRoute =
     path: '/$eventId',
     getParentRoute: () => AuthenticatedEventsRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -174,7 +180,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/events': typeof AuthenticatedEventsRouteWithChildren
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -200,7 +207,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/events': typeof AuthenticatedEventsRouteWithChildren
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -228,7 +236,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/admin/users'
     | '/events/$eventId'
     | '/players/$playerId'
     | '/profile/privacy'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/admin/users'
     | '/events/$eventId'
     | '/players/$playerId'
     | '/profile/privacy'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/_authenticated/admin/users'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/privacy'
@@ -489,6 +501,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport
       parentRoute: typeof AuthenticatedEventsRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -527,6 +546,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedEventsRouteChildren {
   AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
 }
@@ -561,7 +591,7 @@ const AuthenticatedTeamsRouteWithChildren =
   AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
@@ -571,7 +601,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,

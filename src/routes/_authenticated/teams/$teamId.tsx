@@ -94,7 +94,15 @@ function TeamDetail() {
   const [parentEmail, setParentEmail] = useState("");
   const [respondBy, setRespondBy] = useState<RespondBy>("both");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const minor = (() => {
+    if (!birthDate) return false;
+    const d = new Date(birthDate);
+    const age = (Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000);
+    return age < 18;
+  })();
 
   // Edit team form state
   const [editOpen, setEditOpen] = useState(false);
@@ -144,7 +152,7 @@ function TeamDetail() {
 
   function reset() {
     setFirst(""); setLast(""); setJersey(""); setPosition("");
-    setPhone(""); setEmail("");
+    setPhone(""); setEmail(""); setBirthDate("");
     setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
   }
@@ -277,6 +285,14 @@ function TeamDetail() {
   async function onAdd(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
+
+    // Validate: minor requires a parent with at least name + (email or phone)
+    const hasParentInfo = (parentFirst.trim() || parentLast.trim()) && (parentEmail.trim() || parentPhone.trim());
+    if (minor && !hasParentInfo) {
+      toast.error(t("players.parentRequiredForMinor"));
+      return;
+    }
+
     setBusy(true);
 
     const playerCanRespond = respondBy === "player" || respondBy === "both";
@@ -292,7 +308,10 @@ function TeamDetail() {
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
-        can_respond: playerCanRespond,
+        birth_date: birthDate || null,
+        // For minors, the player has no platform access by default — only the parent decides later.
+        can_respond: minor ? false : playerCanRespond,
+        child_platform_access: false,
       })
       .select("id")
       .single();
@@ -329,6 +348,17 @@ function TeamDetail() {
         can_respond: parentCanRespond,
       });
     }
+
+    // Auto-send invites: parent (always for minor); player too if adult and contactable.
+    try {
+      const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+      if (inviter?.phone_verified_at) {
+        const r = await sendInvitesForPlayer(player.id);
+        if (r.sent > 0) {
+          toast.success(minor ? t("players.autoInviteParentSent") : t("players.autoInviteSent"));
+        }
+      }
+    } catch { /* non-blocking */ }
 
     setBusy(false);
     setOpen(false);
@@ -494,6 +524,11 @@ function TeamDetail() {
                   </div>
                 </div>
 
+                <div className="space-y-1.5">
+                  <Label>{t("players.birthDate")}</Label>
+                  <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+                </div>
+
                 <div className="pt-2">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                     {t("players.contact")}
@@ -511,18 +546,26 @@ function TeamDetail() {
                 </div>
 
                 <div className="pt-2">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                    {t("players.parents")}
-                  </p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {t("players.parents")}
+                      {minor && <span className="text-destructive ml-1">*</span>}
+                    </p>
+                  </div>
+                  {minor && (
+                    <p className="text-xs text-muted-foreground bg-accent/40 rounded-lg px-3 py-2 mb-3">
+                      {t("players.minorParentNotice")}
+                    </p>
+                  )}
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label>{t("players.firstName")}</Label>
-                        <Input value={parentFirst} onChange={(e) => setParentFirst(e.target.value)} />
+                        <Input required={minor} value={parentFirst} onChange={(e) => setParentFirst(e.target.value)} />
                       </div>
                       <div className="space-y-1.5">
                         <Label>{t("players.lastName")}</Label>
-                        <Input value={parentLast} onChange={(e) => setParentLast(e.target.value)} />
+                        <Input required={minor} value={parentLast} onChange={(e) => setParentLast(e.target.value)} />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">

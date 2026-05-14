@@ -641,6 +641,7 @@ export type Database = {
         Row: {
           birth_date: string | null
           can_respond: boolean
+          child_platform_access: boolean
           club_id: string
           created_at: string
           email: string | null
@@ -658,6 +659,7 @@ export type Database = {
         Insert: {
           birth_date?: string | null
           can_respond?: boolean
+          child_platform_access?: boolean
           club_id: string
           created_at?: string
           email?: string | null
@@ -675,6 +677,7 @@ export type Database = {
         Update: {
           birth_date?: string | null
           can_respond?: boolean
+          child_platform_access?: boolean
           club_id?: string
           created_at?: string
           email?: string | null
