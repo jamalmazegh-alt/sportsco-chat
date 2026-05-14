@@ -11,13 +11,17 @@ import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
-const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+type Locale = 'fr' | 'en'
+const pickLocale = (input?: string | null): Locale =>
+  (input ?? '').toLowerCase().startsWith('fr') ? 'fr' : 'en'
+
+const EMAIL_SUBJECTS: Record<string, Record<Locale, string>> = {
+  signup: { fr: 'Confirmez votre email Clubero', en: 'Confirm your Clubero email' },
+  invite: { fr: 'Vous êtes invité·e sur Clubero', en: "You've been invited to Clubero" },
+  magiclink: { fr: 'Votre lien de connexion Clubero', en: 'Your Clubero login link' },
+  recovery: { fr: 'Réinitialisez votre mot de passe Clubero', en: 'Reset your Clubero password' },
+  email_change: { fr: 'Confirmez votre nouvelle adresse email Clubero', en: 'Confirm your new Clubero email' },
+  reauthentication: { fr: 'Votre code de vérification Clubero', en: 'Your Clubero verification code' },
 }
 
 // Template mapping
@@ -31,7 +35,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "sportsco-chat"
+const SITE_NAME = "Clubero"
 const SENDER_DOMAIN = "notify.clubero.app"
 const ROOT_DOMAIN = "clubero.app"
 const FROM_DOMAIN = "clubero.app"
@@ -131,6 +135,15 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           )
         }
 
+        // Detect locale from user metadata (set at signup as preferred_language)
+        const userMeta =
+          (payload.data as any).user?.user_metadata ??
+          (payload.data as any).user?.raw_user_meta_data ??
+          {}
+        const locale: Locale = pickLocale(
+          userMeta.preferred_language ?? userMeta.locale ?? userMeta.lang
+        )
+
         // Build template props from payload.data (HookData structure)
         const templateProps = {
           siteName: SITE_NAME,
@@ -139,8 +152,9 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           confirmationUrl: payload.data.url,
           token: payload.data.token,
           email: payload.data.email,
-          oldEmail: payload.data.old_email,
+          oldEmail: (payload.data as any).old_email,
           newEmail: payload.data.new_email,
+          locale,
         }
 
         // Render React Email to HTML and plain text
@@ -171,6 +185,9 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           status: 'pending',
         })
 
+        const subjectMap = EMAIL_SUBJECTS[emailType]
+        const subject = subjectMap ? subjectMap[locale] : 'Clubero'
+
         const { error: enqueueError } = await supabase.rpc('enqueue_email', {
           queue_name: 'auth_emails',
           payload: {
@@ -179,7 +196,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             to: payload.data.email,
             from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
-            subject: EMAIL_SUBJECTS[emailType] || 'Notification',
+            subject,
             html,
             text,
             purpose: 'transactional',

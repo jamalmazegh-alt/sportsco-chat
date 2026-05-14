@@ -1,58 +1,63 @@
 import * as React from 'react'
+import { BrandedEmail, pickLocale, type Locale } from './_layout'
 
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Text,
-} from '@react-email/components'
-
-interface ReauthenticationEmailProps {
-  token: string
+interface Props {
+  token?: string
+  locale?: string
 }
 
-export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Your verification code</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm reauthentication</Heading>
-        <Text style={text}>Use the code below to confirm your identity:</Text>
-        <Text style={codeStyle}>{token}</Text>
-        <Text style={footer}>
-          This code will expire shortly. If you didn't request this, you can
-          safely ignore this email.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
+const COPY = {
+  fr: {
+    preview: 'Votre code de vérification Clubero',
+    heading: 'Votre code de vérification',
+    intro:
+      'Pour confirmer votre identité, saisissez le code ci-dessous dans Clubero. Il est valable quelques minutes.',
+    footer:
+      "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message et changez votre mot de passe.",
+    signOff: "À bientôt,\nL'équipe Clubero",
+  },
+  en: {
+    preview: 'Your Clubero verification code',
+    heading: 'Your verification code',
+    intro:
+      'To confirm your identity, enter the code below in Clubero. It’s valid for a few minutes.',
+    footer:
+      "If you didn't request this code, ignore this message and change your password.",
+    signOff: 'Talk soon,\nThe Clubero team',
+  },
+} as const
+
+export const ReauthenticationEmail = ({ token, locale }: Props) => {
+  const l: Locale = pickLocale(locale)
+  const c = COPY[l]
+  return (
+    <BrandedEmail
+      locale={l}
+      preview={c.preview}
+      heading={c.heading}
+      intro={c.intro}
+      body={
+        <div
+          style={{
+            textAlign: 'center',
+            fontSize: '32px',
+            letterSpacing: '8px',
+            fontWeight: 700,
+            color: '#1f3320',
+            backgroundColor: '#ffffff',
+            border: '1px solid #e3ecd7',
+            borderRadius: '12px',
+            padding: '20px 16px',
+            margin: '8px 0 24px',
+          }}
+        >
+          {token ?? '------'}
+        </div>
+      }
+      footer={c.footer}
+      signOff={c.signOff}
+    />
+  )
+}
 
 export default ReauthenticationEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const codeStyle = {
-  fontFamily: 'Courier, monospace',
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 30px',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }

@@ -1,77 +1,49 @@
 import * as React from 'react'
+import { BrandedEmail, pickLocale, type Locale } from './_layout'
 
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from '@react-email/components'
-
-interface InviteEmailProps {
-  siteName: string
-  siteUrl: string
+interface Props {
   confirmationUrl: string
+  locale?: string
 }
 
-export const InviteEmail = ({
-  siteName,
-  siteUrl,
-  confirmationUrl,
-}: InviteEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>You've been invited to join {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>You've been invited</Heading>
-        <Text style={text}>
-          You've been invited to join{' '}
-          <Link href={siteUrl} style={link}>
-            <strong>{siteName}</strong>
-          </Link>
-          . Click the button below to accept the invitation and create your
-          account.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Accept Invitation
-        </Button>
-        <Text style={footer}>
-          If you weren't expecting this invitation, you can safely ignore this
-          email.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
+const COPY = {
+  fr: {
+    preview: 'Vous êtes invité·e à rejoindre Clubero',
+    heading: 'Vous êtes invité·e sur Clubero',
+    intro:
+      'Un club vous invite à rejoindre Clubero, la plateforme qui simplifie la vie des clubs sportifs, des entraîneurs, des joueurs et de leurs familles.',
+    cta: "Accepter l'invitation",
+    footer:
+      "Si vous pensez avoir reçu cette invitation par erreur, vous pouvez ignorer ce message.",
+    signOff: "À très vite,\nL'équipe Clubero",
+  },
+  en: {
+    preview: "You've been invited to join Clubero",
+    heading: "You've been invited to Clubero",
+    intro:
+      "A club is inviting you to join Clubero — the platform that makes life easier for sports clubs, coaches, players and their families.",
+    cta: 'Accept the invitation',
+    footer:
+      "If you think you received this invitation by mistake, you can safely ignore this message.",
+    signOff: 'See you soon,\nThe Clubero team',
+  },
+} as const
+
+export const InviteEmail = ({ confirmationUrl, locale }: Props) => {
+  const l: Locale = pickLocale(locale)
+  const c = COPY[l]
+  return (
+    <BrandedEmail
+      locale={l}
+      preview={c.preview}
+      heading={c.heading}
+      intro={c.intro}
+      ctaLabel={c.cta}
+      ctaUrl={confirmationUrl}
+      footer={c.footer}
+      signOff={c.signOff}
+    />
+  )
+}
 
 export default InviteEmail
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
