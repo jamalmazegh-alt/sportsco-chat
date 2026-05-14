@@ -1,16 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2 } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { requestPhoneCode, verifyPhoneCode } from "@/lib/phone-verify.functions";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -33,12 +37,53 @@ function ProfilePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, preferred_language")
+        .select("full_name, preferred_language, phone, phone_verified_at")
         .eq("id", user!.id)
         .single();
       return data;
     },
   });
+
+  const requestCode = useServerFn(requestPhoneCode);
+  const verifyCode = useServerFn(verifyPhoneCode);
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [phoneBusy, setPhoneBusy] = useState(false);
+
+  const isVerified = !!profile?.phone_verified_at;
+  const phoneToUse = phone || profile?.phone || "";
+
+  async function onSendCode() {
+    if (!phoneToUse) return;
+    setPhoneBusy(true);
+    try {
+      await requestCode({ data: { phone: phoneToUse } });
+      setCodeSent(true);
+      toast.success(t("profile.codeSent"));
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    } finally {
+      setPhoneBusy(false);
+    }
+  }
+
+  async function onVerifyCode() {
+    if (!phoneToUse || code.length !== 6) return;
+    setPhoneBusy(true);
+    try {
+      await verifyCode({ data: { phone: phoneToUse, code } });
+      toast.success(t("profile.phoneVerified"));
+      setCode("");
+      setCodeSent(false);
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Invalid code");
+    } finally {
+      setPhoneBusy(false);
+    }
+  }
+
 
   async function setLang(lang: string) {
     if (!user) return;
@@ -148,6 +193,52 @@ function ProfilePage() {
               </SelectContent>
             </Select>
           </div>
+        )}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <Label>{t("profile.phone")}</Label>
+          {isVerified && (
+            <span className="inline-flex items-center gap-1 text-xs text-present font-medium">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              {t("profile.verified")}
+            </span>
+          )}
+        </div>
+        <PhoneInput
+          value={phoneToUse}
+          onChange={(v) => { setPhone(v); setCodeSent(false); }}
+        />
+        {!isVerified && !codeSent && (
+          <Button type="button" className="w-full h-11" disabled={phoneBusy || !phoneToUse} onClick={onSendCode}>
+            {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("profile.sendCode")}
+          </Button>
+        )}
+        {!isVerified && codeSent && (
+          <div className="space-y-2">
+            <Label>{t("profile.enterCode")}</Label>
+            <Input
+              inputMode="numeric"
+              maxLength={6}
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="123456"
+            />
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" className="h-11 flex-1" onClick={onSendCode} disabled={phoneBusy}>
+                {t("profile.resendCode")}
+              </Button>
+              <Button type="button" className="h-11 flex-1" onClick={onVerifyCode} disabled={phoneBusy || code.length !== 6}>
+                {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("profile.verify")}
+              </Button>
+            </div>
+          </div>
+        )}
+        {isVerified && phone && phone !== profile?.phone && (
+          <Button type="button" variant="outline" className="w-full h-11" onClick={onSendCode} disabled={phoneBusy}>
+            {t("profile.verifyNewNumber")}
+          </Button>
         )}
       </div>
 

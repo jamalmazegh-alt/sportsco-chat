@@ -17,6 +17,8 @@ import {
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { useServerFn } from "@tanstack/react-start";
+import { sendSms } from "@/lib/sms.functions";
 import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -35,6 +37,7 @@ function TeamDetail() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
+  const sendSmsFn = useServerFn(sendSms);
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
@@ -200,17 +203,33 @@ function TeamDetail() {
       });
     }
 
-    // Auto-send invitations (player + parent) when an email is provided
-    const inviteTargets: Array<{
-      email: string;
+    // Auto-send invitations (player + parent) when an email or phone is provided
+    type InviteTarget = {
       role: "player" | "parent";
       firstName?: string;
-    }> = [];
-    if (email) inviteTargets.push({ email, role: "player", firstName: first });
-    if (parentEmail) inviteTargets.push({ email: parentEmail, role: "parent", firstName: parentName || undefined });
+      email?: string;
+      phone?: string;
+    };
+    const inviteTargets: InviteTarget[] = [];
+    if (email || phone) inviteTargets.push({ role: "player", firstName: first, email: email || undefined, phone: phone || undefined });
+    if (parentEmail || parentPhone) inviteTargets.push({ role: "parent", firstName: parentName || undefined, email: parentEmail || undefined, phone: parentPhone || undefined });
 
     if (inviteTargets.length > 0) {
-      const clubName = team?.name ? undefined : undefined;
+      // Gate: inviter must have a verified phone before invites can be sent
+      const { data: inviter } = await supabase
+        .from("profiles")
+        .select("phone_verified_at")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!inviter?.phone_verified_at) {
+        setBusy(false);
+        setOpen(false);
+        reset();
+        qc.invalidateQueries({ queryKey: ["team-players", teamId] });
+        toast.warning(t("players.inviterPhoneRequired"));
+        return;
+      }
+
       const { data: clubRow } = await supabase
         .from("clubs")
         .select("name")
@@ -226,26 +245,44 @@ function TeamDetail() {
           player_id: target.role === "player" ? player.id : null,
           parent_for_player_id: target.role === "parent" ? player.id : null,
           role: target.role === "player" ? "player" : "parent",
-          email: target.email,
+          email: target.email ?? null,
+          phone: target.phone ?? null,
           token,
           created_by: user.id,
         });
         if (invErr) { anyFailed = true; continue; }
         const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
-        try {
-          await sendTransactionalEmail({
-            templateName: "player-invite",
-            recipientEmail: target.email,
-            idempotencyKey: `member-invite-${token}`,
-            templateData: {
-              firstName: target.firstName,
-              teamName: team?.name,
-              clubName: clubRow?.name ?? clubName,
-              inviteUrl,
-            },
-          });
-        } catch (e) {
-          anyFailed = true;
+        const clubLabel = clubRow?.name ?? "Clubero";
+
+        if (target.email) {
+          try {
+            await sendTransactionalEmail({
+              templateName: "player-invite",
+              recipientEmail: target.email,
+              idempotencyKey: `member-invite-${token}`,
+              templateData: {
+                firstName: target.firstName,
+                teamName: team?.name,
+                clubName: clubLabel,
+                inviteUrl,
+              },
+            });
+          } catch (e) {
+            anyFailed = true;
+          }
+        }
+        if (target.phone) {
+          try {
+            const greet = target.firstName ? `${target.firstName}, ` : "";
+            await sendSmsFn({
+              data: {
+                to: target.phone,
+                body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}`,
+              },
+            });
+          } catch (e) {
+            anyFailed = true;
+          }
         }
       }
       if (anyFailed) toast.error(t("players.inviteFailed"));
