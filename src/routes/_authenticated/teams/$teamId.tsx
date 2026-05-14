@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -37,7 +38,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, age_group, championship, sport, season")
+        .select("id, name, age_group, championship, competitions, sport, season")
         .eq("id", teamId)
         .single();
       return data;
@@ -79,6 +80,7 @@ function TeamDetail() {
   const [editName, setEditName] = useState("");
   const [editAge, setEditAge] = useState("");
   const [editChamp, setEditChamp] = useState("");
+  const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editBusy, setEditBusy] = useState(false);
 
@@ -86,8 +88,13 @@ function TeamDetail() {
     setEditName(team?.name ?? "");
     setEditAge(team?.age_group ?? "");
     setEditChamp(team?.championship ?? "");
+    setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditOpen(true);
+  }
+
+  function toggleEditCompetition(value: string, checked: boolean) {
+    setEditCompetitions((current) => checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value));
   }
 
   async function onSaveTeam(e: FormEvent) {
@@ -99,6 +106,7 @@ function TeamDetail() {
         name: editName,
         age_group: editAge || null,
         championship: editChamp || null,
+        competitions: editCompetitions,
         season: editSeason || null,
       })
       .eq("id", teamId);
@@ -234,6 +242,17 @@ function TeamDetail() {
               <div className="space-y-1.5">
                 <Label>{t("teams.championship")}</Label>
                 <Input value={editChamp} onChange={(e) => setEditChamp(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>{t("teams.competitions")}</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["friendly", "championship", "cup"] as const).map((key) => (
+                    <label key={key} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm">
+                      <Checkbox checked={editCompetitions.includes(key)} onCheckedChange={(checked) => toggleEditCompetition(key, checked === true)} />
+                      {t(`events.competitionTypes.${key}`)}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.season")}</Label>

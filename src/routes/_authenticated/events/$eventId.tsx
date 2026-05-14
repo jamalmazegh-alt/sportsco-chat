@@ -47,7 +47,7 @@ function EventDetail() {
     queryKey: ["teams-min", event?.team_id],
     enabled: !!event,
     queryFn: async () => {
-      const { data } = await supabase.from("teams").select("id, name").eq("id", event!.team_id);
+      const { data } = await supabase.from("teams").select("id, name, competitions").eq("id", event!.team_id);
       return data ?? [];
     },
   });
@@ -132,9 +132,14 @@ function EventDetail() {
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
     const toInsert = playerIds.filter((pid: string) => !existing.has(pid));
     if (toInsert.length > 0) {
-      await supabase.from("convocations").insert(
+      const { error: convocationError } = await supabase.from("convocations").insert(
         toInsert.map((pid: string) => ({ event_id: event.id, player_id: pid }))
       );
+      if (convocationError) {
+        setSending(false);
+        toast.error(convocationError.message);
+        return;
+      }
     }
     // notify
     const { data: parents } = await supabase
@@ -151,7 +156,7 @@ function EventDetail() {
       ])
     );
     if (recipients.length > 0) {
-      await supabase.from("notifications").insert(
+      const { error: notificationError } = await supabase.from("notifications").insert(
         recipients.map((uid) => ({
           user_id: uid,
           type: "convocation",
@@ -160,8 +165,14 @@ function EventDetail() {
           link: `/events/${event.id}`,
         }))
       );
+      if (notificationError) toast.error(notificationError.message);
     }
-    await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+    const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+    if (sentError) {
+      setSending(false);
+      toast.error(sentError.message);
+      return;
+    }
     setSending(false);
     refetch();
     refetchEvent();

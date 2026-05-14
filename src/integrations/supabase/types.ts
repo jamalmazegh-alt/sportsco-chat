@@ -470,6 +470,7 @@ export type Database = {
           age_group: string | null
           championship: string | null
           club_id: string
+          competitions: string[]
           created_at: string
           id: string
           name: string
@@ -480,6 +481,7 @@ export type Database = {
           age_group?: string | null
           championship?: string | null
           club_id: string
+          competitions?: string[]
           created_at?: string
           id?: string
           name: string
@@ -490,6 +492,7 @@ export type Database = {
           age_group?: string | null
           championship?: string | null
           club_id?: string
+          competitions?: string[]
           created_at?: string
           id?: string
           name?: string

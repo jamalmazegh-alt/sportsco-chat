@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { Calendar, MapPin, ChevronRight, Plus, Users } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
+import { EventFormSheet } from "@/components/event-form-sheet";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -24,16 +26,27 @@ function HomePage() {
   const { user, activeClubId, memberships } = useAuth();
   const role = useActiveRole();
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
+  const qc = useQueryClient();
+  const [createOpen, setCreateOpen] = useState(false);
+
+  const { data: teams } = useQuery({
+    queryKey: ["teams", activeClubId],
+    enabled: !!activeClubId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("teams")
+        .select("id, name, competitions")
+        .eq("club_id", activeClubId!)
+        .order("name");
+      return data ?? [];
+    },
+  });
 
   // Next event (any team in club user can see)
   const { data: upcoming } = useQuery({
     queryKey: ["upcoming", activeClubId],
-    enabled: !!activeClubId,
+    enabled: !!activeClubId && !!teams,
     queryFn: async () => {
-      const { data: teams } = await supabase
-        .from("teams")
-        .select("id, name")
-        .eq("club_id", activeClubId!);
       if (!teams || teams.length === 0) return [];
       const teamIds = teams.map((t) => t.id);
       const { data, error } = await supabase
@@ -105,12 +118,20 @@ function HomePage() {
       {/* Quick actions */}
       {isCoach && (
         <div className="flex gap-2">
-          <Button asChild className="flex-1 h-11">
-            <Link to="/events">
-              <Plus className="h-4 w-4" />
-              {t("dashboard.createEvent")}
-            </Link>
-          </Button>
+          {user && (
+            <EventFormSheet
+              open={createOpen}
+              onOpenChange={setCreateOpen}
+              mode="create"
+              teams={teams ?? []}
+              userId={user.id}
+              onSaved={() => {
+                qc.invalidateQueries({ queryKey: ["events"] });
+                qc.invalidateQueries({ queryKey: ["upcoming"] });
+              }}
+              trigger={<Button className="flex-1 h-11"><Plus className="h-4 w-4" />{t("dashboard.createEvent")}</Button>}
+            />
+          )}
           <Button asChild variant="outline" className="flex-1 h-11">
             <Link to="/teams">
               <Users className="h-4 w-4" />

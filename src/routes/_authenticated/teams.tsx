@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
@@ -31,7 +32,7 @@ function TeamsPage() {
     queryFn: async () => {
       const { data: ts } = await supabase
         .from("teams")
-        .select("id, name, season, sport, age_group, championship")
+        .select("id, name, season, sport, age_group, championship, competitions")
         .eq("club_id", activeClubId!)
         .order("name");
       if (!ts) return [];
@@ -51,7 +52,12 @@ function TeamsPage() {
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
   const [championship, setChampionship] = useState("");
+  const [competitions, setCompetitions] = useState(["friendly", "championship", "cup"]);
   const [busy, setBusy] = useState(false);
+
+  function toggleCompetition(value: string, checked: boolean) {
+    setCompetitions((current) => checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value));
+  }
 
   async function onCreate(e: FormEvent) {
     e.preventDefault();
@@ -64,6 +70,7 @@ function TeamsPage() {
         name,
         age_group: ageGroup || null,
         championship: championship || null,
+        competitions,
       });
     setBusy(false);
     if (error) {
@@ -71,7 +78,7 @@ function TeamsPage() {
       return;
     }
     setOpen(false);
-    setName(""); setAgeGroup(""); setChampionship("");
+    setName(""); setAgeGroup(""); setChampionship(""); setCompetitions(["friendly", "championship", "cup"]);
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     qc.invalidateQueries({ queryKey: ["teams"] });
   }
@@ -107,6 +114,17 @@ function TeamsPage() {
                     <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
                   </Label>
                   <Input value={championship} onChange={(e) => setChampionship(e.target.value)} placeholder="District D2" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("teams.competitions")}</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["friendly", "championship", "cup"] as const).map((key) => (
+                      <label key={key} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm">
+                        <Checkbox checked={competitions.includes(key)} onCheckedChange={(checked) => toggleCompetition(key, checked === true)} />
+                        {t(`events.competitionTypes.${key}`)}
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <Button type="submit" className="w-full h-11" disabled={busy}>
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
