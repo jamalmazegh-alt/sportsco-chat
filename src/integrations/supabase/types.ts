@@ -14,16 +14,483 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          changes: Json | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          changes?: Json | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          changes?: Json | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      club_members: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_members_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clubs: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          logo_url: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          logo_url?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      convocations: {
+        Row: {
+          comment: string | null
+          created_at: string
+          event_id: string
+          id: string
+          player_id: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["attendance_status"]
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          player_id: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          player_id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["attendance_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convocations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "convocations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          location: string | null
+          meeting_point: string | null
+          opponent: string | null
+          responses_locked: boolean
+          starts_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          team_id: string
+          title: string
+          type: Database["public"]["Enums"]["event_type"]
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          location?: string | null
+          meeting_point?: string | null
+          opponent?: string | null
+          responses_locked?: boolean
+          starts_at: string
+          status?: Database["public"]["Enums"]["event_status"]
+          team_id: string
+          title: string
+          type?: Database["public"]["Enums"]["event_type"]
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          location?: string | null
+          meeting_point?: string | null
+          opponent?: string | null
+          responses_locked?: boolean
+          starts_at?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          team_id?: string
+          title?: string
+          type?: Database["public"]["Enums"]["event_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      player_parents: {
+        Row: {
+          created_at: string
+          id: string
+          parent_user_id: string
+          player_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parent_user_id: string
+          player_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parent_user_id?: string
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_parents_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          birth_date: string | null
+          club_id: string
+          created_at: string
+          first_name: string
+          id: string
+          jersey_number: number | null
+          last_name: string
+          photo_url: string | null
+          position: string | null
+          user_id: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          club_id: string
+          created_at?: string
+          first_name: string
+          id?: string
+          jersey_number?: number | null
+          last_name: string
+          photo_url?: string | null
+          position?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          club_id?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          jersey_number?: number | null
+          last_name?: string
+          photo_url?: string | null
+          position?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "players_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          preferred_language: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          preferred_language?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          preferred_language?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reminders: {
+        Row: {
+          channel: Database["public"]["Enums"]["reminder_channel"]
+          convocation_id: string
+          id: string
+          sent_at: string
+          sent_by: string | null
+        }
+        Insert: {
+          channel?: Database["public"]["Enums"]["reminder_channel"]
+          convocation_id: string
+          id?: string
+          sent_at?: string
+          sent_by?: string | null
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["reminder_channel"]
+          convocation_id?: string
+          id?: string
+          sent_at?: string
+          sent_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_convocation_id_fkey"
+            columns: ["convocation_id"]
+            isOneToOne: false
+            referencedRelation: "convocations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          team_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          team_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          team_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          age_group: string | null
+          club_id: string
+          created_at: string
+          id: string
+          name: string
+          season: string | null
+          sport: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          club_id: string
+          created_at?: string
+          id?: string
+          name: string
+          season?: string | null
+          sport?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          club_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          season?: string | null
+          sport?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_respond_for_player: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_team: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_club_role: {
+        Args: {
+          _club_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_club_member: {
+        Args: { _club_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_team_coach: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "coach" | "parent" | "player"
+      attendance_status: "present" | "absent" | "uncertain" | "pending"
+      event_status: "draft" | "published" | "cancelled"
+      event_type: "training" | "match" | "tournament" | "meeting" | "other"
+      reminder_channel: "in_app" | "email" | "push"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +617,12 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "coach", "parent", "player"],
+      attendance_status: ["present", "absent", "uncertain", "pending"],
+      event_status: ["draft", "published", "cancelled"],
+      event_type: ["training", "match", "tournament", "meeting", "other"],
+      reminder_channel: ["in_app", "email", "push"],
+    },
   },
 } as const
