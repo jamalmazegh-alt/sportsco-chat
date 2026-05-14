@@ -220,6 +220,8 @@
     "sendConvocations": "Envoyer les convocations",
     "convocationsSent": "Convocations envoyées",
     "noEvents": "Aucun événement prévu.",
+    "showPast": "Afficher les événements passés ({{count}})",
+    "hidePast": "Masquer les événements passés",
     "location": "Lieu",
     "locationHint": "Adresse, nom du stade, …",
     "locationAutoMaps": "Un lien Google Maps est créé automatiquement.",
