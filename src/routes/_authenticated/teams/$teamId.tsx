@@ -267,6 +267,16 @@ function TeamDetail() {
                 </div>
               </div>
               <div className="space-y-1.5">
+                <Label>{t("teams.sport")}</Label>
+                <Select value={editSport || undefined} onValueChange={setEditSport}>
+                  <SelectTrigger><SelectValue placeholder={t("teams.selectSport")} /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="football">{t("teams.sports.football")}</SelectItem>
+                    <SelectItem value="basketball">{t("teams.sports.basketball")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
                 <Label>{t("teams.season")}</Label>
                 <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
               </div>
@@ -345,7 +355,7 @@ function TeamDetail() {
                   <div className="space-y-3">
                     <div className="space-y-1.5">
                       <Label>{t("players.phone")}</Label>
-                      <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                      <PhoneInput value={phone} onChange={setPhone} />
                     </div>
                     <div className="space-y-1.5">
                       <Label>{t("players.email")}</Label>
@@ -366,7 +376,7 @@ function TeamDetail() {
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label>{t("players.phone")}</Label>
-                        <Input type="tel" value={parentPhone} onChange={(e) => setParentPhone(e.target.value)} />
+                        <PhoneInput value={parentPhone} onChange={setParentPhone} />
                       </div>
                       <div className="space-y-1.5">
                         <Label>{t("players.email")}</Label>
