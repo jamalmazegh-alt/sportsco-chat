@@ -72,7 +72,7 @@ function ConsentModal({ items }: { items: Item[] }) {
         if (!i.upToDate || checked[i.kind] !== i.granted) {
           await record({
             data: {
-              kind: i.kind as Item["kind"],
+              kind: i.kind as "terms" | "privacy" | "data_processing" | "media" | "notifications",
               version_id: i.version_id,
               granted: !!checked[i.kind],
             },
