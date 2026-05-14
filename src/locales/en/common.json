@@ -1,0 +1,138 @@
+{
+  "app": {
+    "name": "Squadly",
+    "tagline": "Team coordination, made simple."
+  },
+  "nav": {
+    "home": "Home",
+    "events": "Events",
+    "teams": "Teams",
+    "inbox": "Inbox",
+    "profile": "Profile"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full name",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "No account yet?",
+    "hasAccount": "Already have an account?",
+    "logout": "Log out",
+    "signupSuccess": "Welcome aboard!",
+    "checkEmail": "Check your email to confirm your account.",
+    "loginError": "Invalid email or password.",
+    "weakPassword": "Use at least 8 characters."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading…",
+    "search": "Search",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "language": "Language",
+    "back": "Back",
+    "comment": "Comment (optional)",
+    "send": "Send",
+    "all": "All"
+  },
+  "onboarding": {
+    "title": "Set up your club",
+    "subtitle": "Create a club to start managing teams and events.",
+    "clubName": "Club name",
+    "createClub": "Create club",
+    "joinHint": "Already a member? Ask your admin to invite you."
+  },
+  "dashboard": {
+    "greeting": "Hi {{name}} 👋",
+    "nextEvent": "Next event",
+    "noUpcoming": "No upcoming events",
+    "pendingResponses": "Pending responses",
+    "quickActions": "Quick actions",
+    "createEvent": "Create event",
+    "viewTeams": "View teams",
+    "respondNow": "Respond now",
+    "myConvocations": "Your invitations",
+    "noConvocations": "You're all caught up.",
+    "viewAll": "View all"
+  },
+  "teams": {
+    "title": "Teams",
+    "create": "New team",
+    "name": "Team name",
+    "season": "Season",
+    "sport": "Sport",
+    "ageGroup": "Age group",
+    "members": "members",
+    "noTeams": "No teams yet. Create your first team to get started.",
+    "addPlayer": "Add player",
+    "players": "Players",
+    "coaches": "Coaches"
+  },
+  "players": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "jerseyNumber": "Jersey #",
+    "position": "Position",
+    "noPlayers": "No players yet."
+  },
+  "events": {
+    "title": "Events",
+    "create": "New event",
+    "type": "Type",
+    "types": {
+      "training": "Training",
+      "match": "Match",
+      "tournament": "Tournament",
+      "meeting": "Meeting",
+      "other": "Other"
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "cancelled": "Cancelled"
+    },
+    "publish": "Publish & convocate",
+    "noEvents": "No events scheduled.",
+    "location": "Location",
+    "meetingPoint": "Meeting point",
+    "opponent": "Opponent",
+    "startsAt": "Start",
+    "endsAt": "End",
+    "details": "Details",
+    "selectTeam": "Select a team"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "present": "Present",
+    "absent": "Absent",
+    "uncertain": "Uncertain",
+    "pending": "Pending",
+    "lockResponses": "Lock responses",
+    "unlockResponses": "Unlock responses",
+    "responsesLocked": "Responses are locked",
+    "remindAll": "Remind all pending",
+    "remind": "Remind",
+    "remindSent": "Reminder sent",
+    "alreadyRemindedRecently": "Already reminded recently",
+    "addAllPlayers": "Convocate all players",
+    "youResponded": "Your response is recorded.",
+    "respondPrompt": "Will you attend?",
+    "summary": "{{p}} present · {{a}} absent · {{u}} uncertain · {{pe}} pending"
+  },
+  "inbox": {
+    "title": "Inbox",
+    "noNotifications": "Nothing new. You're all set."
+  },
+  "profile": {
+    "title": "Profile",
+    "preferredLanguage": "Preferred language",
+    "english": "English",
+    "french": "Français"
+  }
+}

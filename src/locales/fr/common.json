@@ -1,0 +1,138 @@
+{
+  "app": {
+    "name": "Squadly",
+    "tagline": "La coordination d'équipe, en toute simplicité."
+  },
+  "nav": {
+    "home": "Accueil",
+    "events": "Événements",
+    "teams": "Équipes",
+    "inbox": "Boîte",
+    "profile": "Profil"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "register": "Créer un compte",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà inscrit ?",
+    "logout": "Se déconnecter",
+    "signupSuccess": "Bienvenue !",
+    "checkEmail": "Vérifiez votre e-mail pour confirmer votre compte.",
+    "loginError": "Identifiants invalides.",
+    "weakPassword": "Utilisez au moins 8 caractères."
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "loading": "Chargement…",
+    "search": "Rechercher",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "language": "Langue",
+    "back": "Retour",
+    "comment": "Commentaire (facultatif)",
+    "send": "Envoyer",
+    "all": "Tous"
+  },
+  "onboarding": {
+    "title": "Configurez votre club",
+    "subtitle": "Créez un club pour gérer vos équipes et événements.",
+    "clubName": "Nom du club",
+    "createClub": "Créer le club",
+    "joinHint": "Déjà membre ? Demandez à votre admin de vous inviter."
+  },
+  "dashboard": {
+    "greeting": "Salut {{name}} 👋",
+    "nextEvent": "Prochain événement",
+    "noUpcoming": "Aucun événement à venir",
+    "pendingResponses": "Réponses en attente",
+    "quickActions": "Actions rapides",
+    "createEvent": "Créer un événement",
+    "viewTeams": "Voir les équipes",
+    "respondNow": "Répondre",
+    "myConvocations": "Vos convocations",
+    "noConvocations": "Tout est à jour.",
+    "viewAll": "Voir tout"
+  },
+  "teams": {
+    "title": "Équipes",
+    "create": "Nouvelle équipe",
+    "name": "Nom de l'équipe",
+    "season": "Saison",
+    "sport": "Sport",
+    "ageGroup": "Catégorie",
+    "members": "membres",
+    "noTeams": "Aucune équipe. Créez la première pour commencer.",
+    "addPlayer": "Ajouter un joueur",
+    "players": "Joueurs",
+    "coaches": "Coachs"
+  },
+  "players": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "jerseyNumber": "N°",
+    "position": "Poste",
+    "noPlayers": "Aucun joueur."
+  },
+  "events": {
+    "title": "Événements",
+    "create": "Nouvel événement",
+    "type": "Type",
+    "types": {
+      "training": "Entraînement",
+      "match": "Match",
+      "tournament": "Tournoi",
+      "meeting": "Réunion",
+      "other": "Autre"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "published": "Publié",
+      "cancelled": "Annulé"
+    },
+    "publish": "Publier et convoquer",
+    "noEvents": "Aucun événement prévu.",
+    "location": "Lieu",
+    "meetingPoint": "Point de RDV",
+    "opponent": "Adversaire",
+    "startsAt": "Début",
+    "endsAt": "Fin",
+    "details": "Détails",
+    "selectTeam": "Choisir une équipe"
+  },
+  "attendance": {
+    "title": "Présences",
+    "present": "Présent",
+    "absent": "Absent",
+    "uncertain": "Incertain",
+    "pending": "En attente",
+    "lockResponses": "Verrouiller les réponses",
+    "unlockResponses": "Déverrouiller",
+    "responsesLocked": "Réponses verrouillées",
+    "remindAll": "Relancer tous",
+    "remind": "Relancer",
+    "remindSent": "Relance envoyée",
+    "alreadyRemindedRecently": "Déjà relancé récemment",
+    "addAllPlayers": "Convoquer tous les joueurs",
+    "youResponded": "Votre réponse est enregistrée.",
+    "respondPrompt": "Serez-vous présent ?",
+    "summary": "{{p}} présents · {{a}} absents · {{u}} incertains · {{pe}} en attente"
+  },
+  "inbox": {
+    "title": "Boîte de réception",
+    "noNotifications": "Rien de neuf. Tout est OK."
+  },
+  "profile": {
+    "title": "Profil",
+    "preferredLanguage": "Langue préférée",
+    "english": "English",
+    "french": "Français"
+  }
+}
