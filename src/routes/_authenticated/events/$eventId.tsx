@@ -638,6 +638,24 @@ function EventDetail() {
           )}
         </section>
       )}
+
+      <AlertDialog open={!!cancelTargetId} onOpenChange={(o) => !o && setCancelTargetId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("attendance.cancelConvocation")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("attendance.confirmCancelConvocation")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmCancelConvocation}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("attendance.cancelConvocation")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
