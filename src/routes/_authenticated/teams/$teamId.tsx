@@ -415,18 +415,37 @@ function TeamDetail() {
         </Sheet>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("teams.players")}
         </h2>
         {isCoach && (
-          <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-            <SheetTrigger asChild>
-              <Button size="sm" className="h-9">
-                <Plus className="h-4 w-4" />
-                {t("teams.addPlayer")}
-              </Button>
-            </SheetTrigger>
+          <div className="flex items-center gap-2">
+            {selectMode ? (
+              <>
+                <Button size="sm" variant="outline" className="h-9" onClick={() => { setSelectMode(false); setSelectedIds(new Set()); }}>
+                  <X className="h-4 w-4" />
+                </Button>
+                <Button size="sm" className="h-9" disabled={inviting || selectedIds.size === 0} onClick={inviteSelected}>
+                  {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {t("players.inviteSelected", { count: selectedIds.size })}
+                </Button>
+              </>
+            ) : (
+              <>
+                {(players ?? []).some((p: any) => !p.user_id && (p.email || p.phone)) && (
+                  <Button size="sm" variant="outline" className="h-9" onClick={() => setSelectMode(true)}>
+                    <CheckSquare className="h-4 w-4" />
+                    {t("players.invite")}
+                  </Button>
+                )}
+                <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
+                  <SheetTrigger asChild>
+                    <Button size="sm" className="h-9">
+                      <Plus className="h-4 w-4" />
+                      {t("teams.addPlayer")}
+                    </Button>
+                  </SheetTrigger>
             <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
