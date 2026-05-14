@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
+import { fmt } from "@/lib/date-locale";
 import {
   ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info,
 } from "lucide-react";
@@ -338,13 +338,13 @@ function EventDetail() {
         <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
-            {format(new Date(event.starts_at), "EEEE d MMMM · HH:mm")}
-            {event.ends_at && ` → ${format(new Date(event.ends_at), "HH:mm")}`}
+            <span className="capitalize">{fmt(event.starts_at, "EEEE d MMMM · HH:mm")}</span>
+            {event.ends_at && ` → ${fmt(event.ends_at, "HH:mm")}`}
           </p>
           {event.convocation_time && (
             <p className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              {t("events.convocationTime")}: {format(new Date(event.convocation_time), "HH:mm")}
+              {t("events.convocationTime")}: {fmt(event.convocation_time, "HH:mm")}
             </p>
           )}
           {event.location && (
