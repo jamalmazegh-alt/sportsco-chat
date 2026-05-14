@@ -28,6 +28,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const role = useActiveRole();
   const [posts, setPosts] = useState<Post[]>([]);
   const [body, setBody] = useState("");
+  const [atts, setAtts] = useState<Attachment[]>([]);
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
