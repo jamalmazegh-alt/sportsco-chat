@@ -36,7 +36,7 @@ function TeamsPage() {
     queryFn: async () => {
       const { data: ts } = await supabase
         .from("teams")
-        .select("id, name, season, sport, age_group, championship, competitions")
+        .select("id, name, season, sport, age_group, championship, competitions, image_url")
         .eq("club_id", activeClubId!)
         .order("name");
       if (!ts) return [];
@@ -177,9 +177,16 @@ function TeamsPage() {
               <Link
                 to="/teams/$teamId"
                 params={{ teamId: tm.id }}
-                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
               >
-                <div className="min-w-0">
+                <div className="h-14 w-14 rounded-xl bg-muted shrink-0 overflow-hidden flex items-center justify-center">
+                  {tm.image_url ? (
+                    <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <Users className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">{tm.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
