@@ -24,6 +24,7 @@ export function EventChat({ eventId }: { eventId: string }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [body, setBody] = useState("");
+  const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
