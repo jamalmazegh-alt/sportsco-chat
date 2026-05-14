@@ -13,8 +13,12 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -35,6 +39,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -45,20 +64,34 @@ const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEventsEventIdRoute =
+  AuthenticatedEventsEventIdRouteImport.update({
+    id: '/$eventId',
+    path: '/$eventId',
+    getParentRoute: () => AuthenticatedEventsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/events': typeof AuthenticatedEventsRoute
+  '/events': typeof AuthenticatedEventsRouteWithChildren
   '/home': typeof AuthenticatedHomeRoute
+  '/inbox': typeof AuthenticatedInboxRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/teams': typeof AuthenticatedTeamsRoute
+  '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/events': typeof AuthenticatedEventsRoute
+  '/events': typeof AuthenticatedEventsRouteWithChildren
   '/home': typeof AuthenticatedHomeRoute
+  '/inbox': typeof AuthenticatedInboxRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/teams': typeof AuthenticatedTeamsRoute
+  '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,14 +99,36 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/teams': typeof AuthenticatedTeamsRoute
+  '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/events' | '/home'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/events'
+    | '/home'
+    | '/inbox'
+    | '/profile'
+    | '/teams'
+    | '/events/$eventId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/events' | '/home'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/events'
+    | '/home'
+    | '/inbox'
+    | '/profile'
+    | '/teams'
+    | '/events/$eventId'
   id:
     | '__root__'
     | '/'
@@ -82,6 +137,10 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authenticated/events'
     | '/_authenticated/home'
+    | '/_authenticated/inbox'
+    | '/_authenticated/profile'
+    | '/_authenticated/teams'
+    | '/_authenticated/events/$eventId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -121,6 +180,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/teams': {
+      id: '/_authenticated/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof AuthenticatedTeamsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -135,17 +215,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/events/$eventId': {
+      id: '/_authenticated/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport
+      parentRoute: typeof AuthenticatedEventsRoute
+    }
   }
 }
 
+interface AuthenticatedEventsRouteChildren {
+  AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
+}
+
+const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
+  AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
+}
+
+const AuthenticatedEventsRouteWithChildren =
+  AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTeamsRoute: AuthenticatedTeamsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
