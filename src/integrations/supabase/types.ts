@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          id: string
+          processed_at: string | null
+          reason: string | null
+          requested_at: string
+          scheduled_for: string
+          status: Database["public"]["Enums"]["privacy_request_status"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          scheduled_for?: string
+          status?: Database["public"]["Enums"]["privacy_request_status"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          scheduled_for?: string
+          status?: Database["public"]["Enums"]["privacy_request_status"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -154,6 +184,39 @@ export type Database = {
         }
         Relationships: []
       }
+      consent_versions: {
+        Row: {
+          content_md: string
+          id: string
+          kind: Database["public"]["Enums"]["consent_kind"]
+          locale: string
+          published_at: string
+          required: boolean
+          title: string
+          version: number
+        }
+        Insert: {
+          content_md: string
+          id?: string
+          kind: Database["public"]["Enums"]["consent_kind"]
+          locale?: string
+          published_at?: string
+          required?: boolean
+          title: string
+          version: number
+        }
+        Update: {
+          content_md?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["consent_kind"]
+          locale?: string
+          published_at?: string
+          required?: boolean
+          title?: string
+          version?: number
+        }
+        Relationships: []
+      }
       convocations: {
         Row: {
           comment: string | null
@@ -198,6 +261,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_export_requests: {
+        Row: {
+          completed_at: string | null
+          error: string | null
+          file_url: string | null
+          id: string
+          requested_at: string
+          status: Database["public"]["Enums"]["privacy_request_status"]
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error?: string | null
+          file_url?: string | null
+          id?: string
+          requested_at?: string
+          status?: Database["public"]["Enums"]["privacy_request_status"]
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          error?: string | null
+          file_url?: string | null
+          id?: string
+          requested_at?: string
+          status?: Database["public"]["Enums"]["privacy_request_status"]
+          user_id?: string
+        }
+        Relationships: []
       }
       email_send_log: {
         Row: {
@@ -555,6 +648,7 @@ export type Database = {
           id: string
           jersey_number: number | null
           last_name: string
+          media_consent_status: Database["public"]["Enums"]["media_consent_status"]
           phone: string | null
           photo_url: string | null
           position: string | null
@@ -571,6 +665,7 @@ export type Database = {
           id?: string
           jersey_number?: number | null
           last_name: string
+          media_consent_status?: Database["public"]["Enums"]["media_consent_status"]
           phone?: string | null
           photo_url?: string | null
           position?: string | null
@@ -587,6 +682,7 @@ export type Database = {
           id?: string
           jersey_number?: number | null
           last_name?: string
+          media_consent_status?: Database["public"]["Enums"]["media_consent_status"]
           phone?: string | null
           photo_url?: string | null
           position?: string | null
@@ -611,6 +707,8 @@ export type Database = {
           full_name: string | null
           id: string
           last_name: string | null
+          notifications_email: boolean
+          notifications_push: boolean
           phone: string | null
           phone_verified_at: string | null
           preferred_language: string
@@ -623,6 +721,8 @@ export type Database = {
           full_name?: string | null
           id: string
           last_name?: string | null
+          notifications_email?: boolean
+          notifications_push?: boolean
           phone?: string | null
           phone_verified_at?: string | null
           preferred_language?: string
@@ -635,6 +735,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           last_name?: string | null
+          notifications_email?: boolean
+          notifications_push?: boolean
           phone?: string | null
           phone_verified_at?: string | null
           preferred_language?: string
@@ -673,6 +775,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      super_admins: {
+        Row: {
+          granted_at: string
+          granted_by: string | null
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          granted_by?: string | null
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          granted_by?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       suppressed_emails: {
         Row: {
@@ -787,6 +907,53 @@ export type Database = {
           },
         ]
       }
+      user_consents: {
+        Row: {
+          granted: boolean
+          granted_at: string
+          id: string
+          ip: string | null
+          kind: Database["public"]["Enums"]["consent_kind"]
+          on_behalf_of_player_id: string | null
+          user_agent: string | null
+          user_id: string
+          version_id: string
+          withdrawn_at: string | null
+        }
+        Insert: {
+          granted: boolean
+          granted_at?: string
+          id?: string
+          ip?: string | null
+          kind: Database["public"]["Enums"]["consent_kind"]
+          on_behalf_of_player_id?: string | null
+          user_agent?: string | null
+          user_id: string
+          version_id: string
+          withdrawn_at?: string | null
+        }
+        Update: {
+          granted?: boolean
+          granted_at?: string
+          id?: string
+          ip?: string | null
+          kind?: Database["public"]["Enums"]["consent_kind"]
+          on_behalf_of_player_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+          version_id?: string
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_consents_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "consent_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       verification_codes: {
         Row: {
           attempts: number
@@ -895,6 +1062,10 @@ export type Database = {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_player_media: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_team: {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
@@ -916,8 +1087,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_super_admin: { Args: { _user_id: string }; Returns: boolean }
       is_club_member: {
         Args: { _club_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_parent_of_player: {
+        Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
       is_team_coach: {
@@ -933,6 +1109,7 @@ export type Database = {
         }
         Returns: number
       }
+      player_is_minor: { Args: { _player_id: string }; Returns: boolean }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -947,8 +1124,21 @@ export type Database = {
     Enums: {
       app_role: "admin" | "coach" | "parent" | "player" | "dirigeant"
       attendance_status: "present" | "absent" | "uncertain" | "pending"
+      consent_kind:
+        | "terms"
+        | "privacy"
+        | "data_processing"
+        | "media"
+        | "notifications"
       event_status: "draft" | "published" | "cancelled"
       event_type: "training" | "match" | "tournament" | "meeting" | "other"
+      media_consent_status: "pending" | "granted" | "denied"
+      privacy_request_status:
+        | "pending"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "cancelled"
       reminder_channel: "in_app" | "email" | "push"
     }
     CompositeTypes: {
@@ -1079,8 +1269,23 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "coach", "parent", "player", "dirigeant"],
       attendance_status: ["present", "absent", "uncertain", "pending"],
+      consent_kind: [
+        "terms",
+        "privacy",
+        "data_processing",
+        "media",
+        "notifications",
+      ],
       event_status: ["draft", "published", "cancelled"],
       event_type: ["training", "match", "tournament", "meeting", "other"],
+      media_consent_status: ["pending", "granted", "denied"],
+      privacy_request_status: [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "cancelled",
+      ],
       reminder_channel: ["in_app", "email", "push"],
     },
   },
