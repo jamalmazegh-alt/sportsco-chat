@@ -735,19 +735,6 @@ export function EventFormSheet({
             helper={t("events.locationGoogleHelper")}
           />
           <div className="space-y-1.5">
-            <Label>
-              {t("events.locationUrl")}{" "}
-              <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
-            </Label>
-            <Input
-              type="url"
-              value={locationUrl ?? ""}
-              onChange={(e) => setLocationUrl(e.target.value)}
-              placeholder="https://maps.google.com/..."
-            />
-          </div>
-
-          <div className="space-y-1.5">
             <Label>{t("events.details")}</Label>
             <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
           </div>
