@@ -25,7 +25,18 @@
     "signupSuccess": "Bienvenue !",
     "checkEmail": "Vérifiez votre e-mail pour confirmer votre compte.",
     "loginError": "Identifiants invalides.",
-    "weakPassword": "Utilisez au moins 8 caractères."
+    "weakPassword": "Utilisez au moins 8 caractères.",
+    "signupAs": "Je m'inscris en tant que…",
+    "roleClubAdmin": "Responsable de club",
+    "roleClubAdminHint": "Créer et gérer votre club, vos équipes et événements.",
+    "rolePlayer": "Joueur",
+    "rolePlayerHint": "Rejoindre votre club via un lien d'invitation.",
+    "roleParent": "Parent",
+    "roleParentHint": "Répondre aux convocations de votre enfant.",
+    "inviteCode": "Code d'invitation",
+    "inviteHint": "Demandez à l'admin de votre club un lien ou code d'invitation.",
+    "inviteRequired": "Un code d'invitation est requis.",
+    "inviteInvalid": "Cette invitation est invalide ou expirée."
   },
   "common": {
     "save": "Enregistrer",
