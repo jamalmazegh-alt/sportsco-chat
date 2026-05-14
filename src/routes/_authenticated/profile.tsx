@@ -146,6 +146,11 @@ function ProfilePage() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="font-medium truncate">{club.name}</p>
+              {role && (
+                <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
+                  {t(`roles.${role}`, { defaultValue: role })}
+                </span>
+              )}
               {isAdmin && (
                 <label className="mt-2 inline-flex items-center gap-2 text-sm text-primary font-medium cursor-pointer">
                   {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
