@@ -71,10 +71,10 @@ function HomePage() {
     },
   });
 
-  // My upcoming events (as player or parent) merged with my convocation status
-  const { data: myEvents } = useQuery({
-    queryKey: ["my-events", user?.id, activeClubId, teams?.map((t) => t.id).join(",")],
-    enabled: !!user && !!teams,
+  // My convocations only (player or parent)
+  const { data: myConvocs } = useQuery({
+    queryKey: ["my-convocs-home", user?.id, activeClubId],
+    enabled: !!user && !!activeClubId,
     queryFn: async () => {
       const [{ data: own }, { data: children }] = await Promise.all([
         supabase.from("players").select("id, first_name, last_name").eq("user_id", user!.id),
@@ -88,40 +88,24 @@ function HomePage() {
         ...((children ?? []).map((c: any) => c.players).filter(Boolean) as any[]),
       ];
       const playerIds = players.map((p) => p.id);
+      if (playerIds.length === 0) return [];
 
-      // All upcoming published events from teams I can see
-      const teamIds = (teams ?? []).map((t) => t.id);
-      if (teamIds.length === 0) return [];
-      const { data: events } = await supabase
-        .from("events")
-        .select("id, title, starts_at, location, type, status, team_id")
-        .in("team_id", teamIds)
-        .eq("status", "published")
-        .gte("starts_at", new Date().toISOString())
-        .order("starts_at", { ascending: true })
-        .limit(10);
+      const { data } = await supabase
+        .from("convocations")
+        .select("id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id)")
+        .in("player_id", playerIds)
+        .order("created_at", { ascending: false });
 
-      // My convocations for these events
-      let convocs: any[] = [];
-      if (playerIds.length > 0 && events && events.length > 0) {
-        const { data } = await supabase
-          .from("convocations")
-          .select("id, status, player_id, event_id")
-          .in("player_id", playerIds)
-          .in("event_id", events.map((e) => e.id));
-        convocs = data ?? [];
-      }
-
-      return (events ?? []).map((e) => {
-        const myConvoc = convocs.find((c) => c.event_id === e.id);
-        const player = myConvoc ? players.find((p) => p.id === myConvoc.player_id) : null;
-        return {
-          ...e,
-          team_name: (teams ?? []).find((t) => t.id === e.team_id)?.name ?? "",
-          convocation: myConvoc ?? null,
-          player,
-        };
-      });
+      const now = new Date();
+      return (data ?? [])
+        .filter((c: any) => c.event && c.event.status === "published" && new Date(c.event.starts_at) >= now)
+        .map((c: any) => ({
+          ...c.event,
+          team_name: (teams ?? []).find((t) => t.id === c.event.team_id)?.name ?? "",
+          convocation: { id: c.id, status: c.status },
+          player: players.find((p) => p.id === c.player_id) ?? null,
+        }))
+        .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
     },
   });
 
