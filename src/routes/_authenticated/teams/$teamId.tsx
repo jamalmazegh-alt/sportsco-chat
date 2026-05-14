@@ -82,6 +82,7 @@ function TeamDetail() {
   const [editChamp, setEditChamp] = useState("");
   const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
+  const [editSport, setEditSport] = useState("");
   const [editBusy, setEditBusy] = useState(false);
 
   function openEdit() {
@@ -90,6 +91,7 @@ function TeamDetail() {
     setEditChamp(team?.championship ?? "");
     setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
+    setEditSport(team?.sport ?? "");
     setEditOpen(true);
   }
 
@@ -108,6 +110,7 @@ function TeamDetail() {
         championship: editChamp || null,
         competitions: editCompetitions,
         season: editSeason || null,
+        sport: editSport || null,
       })
       .eq("id", teamId);
     setEditBusy(false);
