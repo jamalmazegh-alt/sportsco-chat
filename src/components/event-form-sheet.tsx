@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { CalendarIcon, Check, Loader2, MapPin, Search } from "lucide-react";
@@ -131,6 +131,25 @@ function DateTimeField({
         </Popover>
         <Input type="time" value={time} onChange={(e) => onTime(e.target.value)} required={required} className="h-10" />
       </div>
+    </div>
+  );
+}
+
+function DateOnlyField({ label, date, onDate, required }: { label: string; date: Date | undefined; onDate: (d: Date | undefined) => void; required?: boolean }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button type="button" variant="outline" className={cn("h-10 w-full justify-start font-normal", !date && "text-muted-foreground")} aria-required={required}>
+            <CalendarIcon className="h-4 w-4" />
+            {date ? format(date, "EEE d MMM") : "—"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar mode="single" selected={date} onSelect={onDate} initialFocus className="p-3 pointer-events-auto" />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
