@@ -37,6 +37,7 @@ function EventsPage() {
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [showPast, setShowPast] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: teams } = useQuery({
@@ -60,7 +61,7 @@ function EventsPage() {
       if (teamIds.length === 0) return [];
       const { data } = await supabase
         .from("events")
-        .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type")
+        .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name")
         .in("team_id", teamIds)
         .order("starts_at", { ascending: true });
       return (data ?? []).map((e) => ({
@@ -70,18 +71,35 @@ function EventsPage() {
     },
   });
 
+  const visibleEvents = useMemo(() => {
+    if (!events) return [] as typeof events;
+    if (showPast) return events;
+    return events.filter((e) => {
+      const d = new Date(e.starts_at);
+      return !(isPast(d) && !isToday(d));
+    });
+  }, [events, showPast]);
+
+  const pastCount = useMemo(() => {
+    if (!events) return 0;
+    return events.filter((e) => {
+      const d = new Date(e.starts_at);
+      return isPast(d) && !isToday(d);
+    }).length;
+  }, [events]);
+
   const grouped = useMemo(() => {
-    if (!events) return [];
-    const map = new Map<string, { label: string; items: typeof events }>();
-    for (const e of events) {
+    if (!visibleEvents) return [];
+    const map = new Map<string, { label: string; items: typeof visibleEvents }>();
+    for (const e of visibleEvents) {
       const d = new Date(e.starts_at);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
       const label = format(d, "MMMM yyyy", { locale: dateLocale });
-      if (!map.has(key)) map.set(key, { label, items: [] as typeof events });
+      if (!map.has(key)) map.set(key, { label, items: [] as typeof visibleEvents });
       map.get(key)!.items.push(e);
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
-  }, [events, dateLocale]);
+  }, [visibleEvents, dateLocale]);
 
   return (
     <div className="px-5 pt-8 pb-8 space-y-6">
