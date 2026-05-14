@@ -44,6 +44,42 @@ export type Database = {
         }
         Relationships: []
       }
+      club_invites: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          role: Database["public"]["Enums"]["app_role"]
+          token: string
+          uses_count: number
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          role?: Database["public"]["Enums"]["app_role"]
+          token: string
+          uses_count?: number
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          role?: Database["public"]["Enums"]["app_role"]
+          token?: string
+          uses_count?: number
+        }
+        Relationships: []
+      }
       club_members: {
         Row: {
           club_id: string
@@ -541,6 +577,7 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      redeem_club_invite: { Args: { _token: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "coach" | "parent" | "player"

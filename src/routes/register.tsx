@@ -1,15 +1,21 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
 
+type SignupRole = "club_admin" | "player" | "parent";
+
 export const Route = createFileRoute("/register")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    invite: typeof search.invite === "string" ? search.invite : undefined,
+  }),
   component: RegisterPage,
   head: () => ({
     meta: [
@@ -22,16 +28,27 @@ export const Route = createFileRoute("/register")({
 function RegisterPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const search = useSearch({ from: "/register" });
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signupRole, setSignupRole] = useState<SignupRole>(
+    search.invite ? "player" : "club_admin"
+  );
+  const [inviteToken, setInviteToken] = useState(search.invite ?? "");
   const [busy, setBusy] = useState(false);
+
+  const needsInvite = signupRole === "player" || signupRole === "parent";
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (password.length < 8) {
       toast.error(t("auth.weakPassword"));
+      return;
+    }
+    if (needsInvite && !inviteToken.trim()) {
+      toast.error(t("auth.inviteRequired"));
       return;
     }
     setBusy(true);
@@ -46,14 +63,28 @@ function RegisterPage() {
           first_name: firstName.trim(),
           last_name: lastName.trim(),
           preferred_language: i18n.language?.slice(0, 2) || "en",
+          signup_role: signupRole,
+          invite_token: needsInvite ? inviteToken.trim() : null,
         },
       },
     });
-    setBusy(false);
     if (error) {
+      setBusy(false);
       toast.error(error.message);
       return;
     }
+    // If session is immediately available (auto-confirm), redeem invite now
+    if (needsInvite) {
+      const { error: rErr } = await supabase.rpc("redeem_club_invite", {
+        _token: inviteToken.trim(),
+      });
+      if (rErr) {
+        setBusy(false);
+        toast.error(rErr.message || t("auth.inviteInvalid"));
+        return;
+      }
+    }
+    setBusy(false);
     toast.success(t("auth.signupSuccess"));
     navigate({ to: "/home" });
   }
@@ -67,6 +98,51 @@ function RegisterPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-2">
+            <Label>{t("auth.signupAs")}</Label>
+            <RadioGroup
+              value={signupRole}
+              onValueChange={(v) => setSignupRole(v as SignupRole)}
+              className="grid gap-2"
+            >
+              <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <RadioGroupItem value="club_admin" id="r-admin" className="mt-0.5" />
+                <div className="text-sm">
+                  <div className="font-medium">{t("auth.roleClubAdmin")}</div>
+                  <div className="text-xs text-muted-foreground">{t("auth.roleClubAdminHint")}</div>
+                </div>
+              </label>
+              <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <RadioGroupItem value="player" id="r-player" className="mt-0.5" />
+                <div className="text-sm">
+                  <div className="font-medium">{t("auth.rolePlayer")}</div>
+                  <div className="text-xs text-muted-foreground">{t("auth.rolePlayerHint")}</div>
+                </div>
+              </label>
+              <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <RadioGroupItem value="parent" id="r-parent" className="mt-0.5" />
+                <div className="text-sm">
+                  <div className="font-medium">{t("auth.roleParent")}</div>
+                  <div className="text-xs text-muted-foreground">{t("auth.roleParentHint")}</div>
+                </div>
+              </label>
+            </RadioGroup>
+          </div>
+
+          {needsInvite && (
+            <div className="space-y-1.5">
+              <Label htmlFor="invite">{t("auth.inviteCode")}</Label>
+              <Input
+                id="invite"
+                required
+                value={inviteToken}
+                onChange={(e) => setInviteToken(e.target.value)}
+                placeholder="abcd-1234"
+              />
+              <p className="text-xs text-muted-foreground">{t("auth.inviteHint")}</p>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="first">{t("auth.firstName")}</Label>

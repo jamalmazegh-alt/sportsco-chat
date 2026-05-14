@@ -25,7 +25,18 @@
     "signupSuccess": "Welcome aboard!",
     "checkEmail": "Check your email to confirm your account.",
     "loginError": "Invalid email or password.",
-    "weakPassword": "Use at least 8 characters."
+    "weakPassword": "Use at least 8 characters.",
+    "signupAs": "I'm signing up as…",
+    "roleClubAdmin": "Club manager",
+    "roleClubAdminHint": "Create and manage your club, teams and events.",
+    "rolePlayer": "Player",
+    "rolePlayerHint": "Join your club with an invitation link.",
+    "roleParent": "Parent",
+    "roleParentHint": "Respond to convocations for your child.",
+    "inviteCode": "Invitation code",
+    "inviteHint": "Ask your club admin for an invitation link or code.",
+    "inviteRequired": "An invitation code is required.",
+    "inviteInvalid": "This invitation is invalid or expired."
   },
   "common": {
     "save": "Save",
@@ -50,7 +61,16 @@
     "subtitle": "Create a club to start managing teams and events.",
     "clubName": "Club name",
     "createClub": "Create club",
-    "joinHint": "Already a member? Ask your admin to invite you."
+    "joinHint": "Already a member? Ask your admin to invite you.",
+    "joinClub": "Join with code"
+  },
+  "invites": {
+    "title": "Invite players & parents",
+    "role": "Role",
+    "generate": "Generate invitation link",
+    "generateAnother": "Generate another",
+    "copied": "Link copied",
+    "expiresHint": "Link valid for 30 days. Share it with the player or parent."
   },
   "dashboard": {
     "greeting": "Hi {{name}} 👋",

@@ -25,7 +25,18 @@
     "signupSuccess": "Bienvenue !",
     "checkEmail": "Vérifiez votre e-mail pour confirmer votre compte.",
     "loginError": "Identifiants invalides.",
-    "weakPassword": "Utilisez au moins 8 caractères."
+    "weakPassword": "Utilisez au moins 8 caractères.",
+    "signupAs": "Je m'inscris en tant que…",
+    "roleClubAdmin": "Responsable de club",
+    "roleClubAdminHint": "Créer et gérer votre club, vos équipes et événements.",
+    "rolePlayer": "Joueur",
+    "rolePlayerHint": "Rejoindre votre club via un lien d'invitation.",
+    "roleParent": "Parent",
+    "roleParentHint": "Répondre aux convocations de votre enfant.",
+    "inviteCode": "Code d'invitation",
+    "inviteHint": "Demandez à l'admin de votre club un lien ou code d'invitation.",
+    "inviteRequired": "Un code d'invitation est requis.",
+    "inviteInvalid": "Cette invitation est invalide ou expirée."
   },
   "common": {
     "save": "Enregistrer",
@@ -50,7 +61,16 @@
     "subtitle": "Créez un club pour gérer vos équipes et événements.",
     "clubName": "Nom du club",
     "createClub": "Créer le club",
-    "joinHint": "Déjà membre ? Demandez à votre admin de vous inviter."
+    "joinHint": "Déjà membre ? Demandez à votre admin de vous inviter.",
+    "joinClub": "Rejoindre avec un code"
+  },
+  "invites": {
+    "title": "Inviter joueurs & parents",
+    "role": "Rôle",
+    "generate": "Générer un lien d'invitation",
+    "generateAnother": "Générer un autre",
+    "copied": "Lien copié",
+    "expiresHint": "Lien valable 30 jours. Partagez-le avec le joueur ou le parent."
   },
   "dashboard": {
     "greeting": "Salut {{name}} 👋",
