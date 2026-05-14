@@ -135,6 +135,68 @@ function DateTimeField({
   );
 }
 
+function AddressField({
+  label,
+  value,
+  onValueChange,
+  onPlaceUrl,
+  placeholder,
+  helper,
+}: {
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  onPlaceUrl: (url: string | null) => void;
+  placeholder: string;
+  helper: string;
+}) {
+  const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>([]);
+  const [service, setService] = useState<any>(null);
+
+  useEffect(() => {
+    loadGoogleMapsPlaces()?.then(() => {
+      if (window.google?.maps?.places) setService(new window.google.maps.places.AutocompleteService());
+    }).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (!service || value.trim().length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    service.getPlacePredictions({ input: value, types: ["geocode", "establishment"] }, (items: any[] | null) => {
+      setSuggestions((items ?? []).slice(0, 5).map((item) => ({ description: item.description, place_id: item.place_id })));
+    });
+  }, [service, value]);
+
+  function selectPlace(suggestion: { description: string; place_id: string }) {
+    onValueChange(suggestion.description);
+    onPlaceUrl(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suggestion.description)}&query_place_id=${suggestion.place_id}`);
+    setSuggestions([]);
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <div className="relative">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input value={value} onChange={(e) => { onValueChange(e.target.value); onPlaceUrl(null); }} placeholder={placeholder} className="pl-9" />
+        {suggestions.length > 0 && (
+          <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
+            {suggestions.map((suggestion) => (
+              <button key={suggestion.place_id} type="button" onClick={() => selectPlace(suggestion)} className="flex w-full items-start gap-2 px-3 py-2 text-left text-sm hover:bg-accent">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <span>{suggestion.description}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <p className="text-[11px] text-muted-foreground">{helper}</p>
+    </div>
+  );
+}
+
 export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mode, userId, onSaved }: Props) {
   const { t } = useTranslation();
   const googlePlacesEnabled = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
