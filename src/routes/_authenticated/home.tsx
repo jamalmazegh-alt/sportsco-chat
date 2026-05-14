@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, Copy, UserPlus, Megaphone } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users, Copy, UserPlus } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -191,21 +191,6 @@ function HomePage() {
         </section>
       )}
 
-      <Link
-        to="/wall"
-        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Megaphone className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="font-medium">{t("wall.title")}</p>
-            <p className="text-xs text-muted-foreground">{t("wall.subtitle")}</p>
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-      </Link>
 
       {/* Upcoming */}
       <section>
