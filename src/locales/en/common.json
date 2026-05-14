@@ -80,7 +80,14 @@
     "addPlayer": "Add player",
     "players": "Players",
     "coaches": "Coaches",
-    "viewPlayers": "View players"
+    "viewPlayers": "View players",
+    "image": "Team image",
+    "uploadImage": "Upload team image"
+  },
+  "club": {
+    "logo": "Club logo",
+    "uploadLogo": "Upload club logo",
+    "logoUpdated": "Club logo updated"
   },
   "players": {
     "title": "Players",

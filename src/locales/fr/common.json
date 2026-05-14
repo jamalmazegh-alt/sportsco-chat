@@ -80,7 +80,14 @@
     "addPlayer": "Ajouter un joueur",
     "players": "Joueurs",
     "coaches": "Coachs",
-    "viewPlayers": "Voir les joueurs"
+    "viewPlayers": "Voir les joueurs",
+    "image": "Image de l'équipe",
+    "uploadImage": "Ajouter une image"
+  },
+  "club": {
+    "logo": "Logo du club",
+    "uploadLogo": "Ajouter le logo",
+    "logoUpdated": "Logo du club mis à jour"
   },
   "players": {
     "title": "Joueurs",
