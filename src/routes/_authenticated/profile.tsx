@@ -267,6 +267,20 @@ function ProfilePage() {
         )}
       </div>
 
+      <Link
+        to="/profile/privacy"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
+      >
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("privacy.menu")}</div>
+            <p className="text-xs text-muted-foreground">{t("privacy.subtitle")}</p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
+
       <Button
         variant="outline"
         className="w-full h-11"

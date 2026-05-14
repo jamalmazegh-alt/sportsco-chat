@@ -203,6 +203,11 @@ function RegisterPage() {
           <Button type="submit" className="w-full h-11" disabled={busy}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.register")}
           </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            <Link to="/legal/$kind" params={{ kind: "terms" }} className="underline">Terms</Link>
+            {" · "}
+            <Link to="/legal/$kind" params={{ kind: "privacy" }} className="underline">Privacy</Link>
+          </p>
         </form>
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
