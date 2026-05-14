@@ -340,12 +340,9 @@ function TeamDetail() {
 
     // Auto-send invites: parent (always for minor); player too if adult and contactable.
     try {
-      const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
-      if (inviter?.phone_verified_at) {
-        const r = await sendInvitesForPlayer(player.id);
-        if (r.sent > 0) {
-          toast.success(minor ? t("players.autoInviteParentSent") : t("players.autoInviteSent"));
-        }
+      const r = await sendInvitesForPlayer(player.id);
+      if (r.sent > 0) {
+        toast.success(minor ? t("players.autoInviteParentSent") : t("players.autoInviteSent"));
       }
     } catch { /* non-blocking */ }
 
