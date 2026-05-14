@@ -647,7 +647,12 @@ export function EventFormSheet({
                 <TimeField
                   label={t("events.startTime")}
                   time={startTime}
-                  onTime={setStartTime}
+                  onTime={(v) => {
+                    setStartTime(v);
+                    if (!endTime && v) {
+                      setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
+                    }
+                  }}
                   required
                 />
                 <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
