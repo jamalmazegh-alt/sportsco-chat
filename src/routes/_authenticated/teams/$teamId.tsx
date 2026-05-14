@@ -200,14 +200,52 @@ function TeamDetail() {
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
 
-      <div>
-        <h1 className="text-2xl font-semibold">{team?.name ?? ""}</h1>
-        {team && (
-          <p className="text-xs text-muted-foreground mt-1">
-            {[team.age_group, team.championship, team.sport].filter(Boolean).join(" · ")}
-          </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">{team?.name ?? ""}</h1>
+          {team && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {[team.age_group, team.championship, team.sport, team.season].filter(Boolean).join(" · ")}
+            </p>
+          )}
+        </div>
+        {isCoach && team && (
+          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={openEdit}>
+            <Pencil className="h-4 w-4" />
+          </Button>
         )}
       </div>
+
+      {isCoach && (
+        <Sheet open={editOpen} onOpenChange={setEditOpen}>
+          <SheetContent side="bottom" className="rounded-t-3xl">
+            <SheetHeader>
+              <SheetTitle>{t("common.edit")}</SheetTitle>
+            </SheetHeader>
+            <form onSubmit={onSaveTeam} className="space-y-4 mt-4 pb-6">
+              <div className="space-y-1.5">
+                <Label>{t("teams.name")}</Label>
+                <Input required value={editName} onChange={(e) => setEditName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.ageGroup")}</Label>
+                <Input value={editAge} onChange={(e) => setEditAge(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.championship")}</Label>
+                <Input value={editChamp} onChange={(e) => setEditChamp(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.season")}</Label>
+                <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
+              </div>
+              <Button type="submit" className="w-full h-11" disabled={editBusy}>
+                {editBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
+              </Button>
+            </form>
+          </SheetContent>
+        </Sheet>
+      )}
 
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
