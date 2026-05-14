@@ -28,17 +28,27 @@ function EventDetail() {
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home")
         .eq("id", eventId)
         .single();
       if (error) throw error;
       return data;
+    },
+  });
+
+  const { data: teams } = useQuery({
+    queryKey: ["teams-min", event?.team_id],
+    enabled: !!event,
+    queryFn: async () => {
+      const { data } = await supabase.from("teams").select("id, name").eq("id", event!.team_id);
+      return data ?? [];
     },
   });
 
