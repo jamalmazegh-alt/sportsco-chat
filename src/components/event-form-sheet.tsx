@@ -732,11 +732,7 @@ export function EventFormSheet({
             onValueChange={setLocation}
             onPlaceUrl={(url) => setLocationUrl(url ?? "")}
             placeholder={t("events.locationHint")}
-            helper={
-              googlePlacesEnabled
-                ? t("events.locationGoogleHelper")
-                : t("events.locationGoogleNeedsKey")
-            }
+            helper={t("events.locationGoogleHelper")}
           />
           <div className="space-y-1.5">
             <Label>
