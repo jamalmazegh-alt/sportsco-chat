@@ -71,12 +71,11 @@ function HomePage() {
     },
   });
 
-  // My pending convocations (as player or parent)
-  const { data: myConvocs } = useQuery({
-    queryKey: ["my-convocations", user?.id],
-    enabled: !!user,
+  // My upcoming events (as player or parent) merged with my convocation status
+  const { data: myEvents } = useQuery({
+    queryKey: ["my-events", user?.id, activeClubId, teams?.map((t) => t.id).join(",")],
+    enabled: !!user && !!teams,
     queryFn: async () => {
-      // playerIds = own player record + linked children
       const [{ data: own }, { data: children }] = await Promise.all([
         supabase.from("players").select("id, first_name, last_name").eq("user_id", user!.id),
         supabase
@@ -88,23 +87,41 @@ function HomePage() {
         ...(own ?? []),
         ...((children ?? []).map((c: any) => c.players).filter(Boolean) as any[]),
       ];
-      if (players.length === 0) return [];
       const playerIds = players.map((p) => p.id);
-      const { data } = await supabase
-        .from("convocations")
-        .select("id, status, player_id, event:event_id(id, title, starts_at, status)")
-        .in("player_id", playerIds);
-      return (data ?? [])
-        .filter((c: any) => c.event?.status === "published")
-        .filter((c: any) => new Date(c.event.starts_at) > new Date())
-        .map((c: any) => ({
-          ...c,
-          player: players.find((p) => p.id === c.player_id),
-        }))
-        .sort((a: any, b: any) =>
-          new Date(a.event.starts_at).getTime() - new Date(b.event.starts_at).getTime()
-        )
-        .slice(0, 5);
+
+      // All upcoming published events from teams I can see
+      const teamIds = (teams ?? []).map((t) => t.id);
+      if (teamIds.length === 0) return [];
+      const { data: events } = await supabase
+        .from("events")
+        .select("id, title, starts_at, location, type, status, team_id")
+        .in("team_id", teamIds)
+        .eq("status", "published")
+        .gte("starts_at", new Date().toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(10);
+
+      // My convocations for these events
+      let convocs: any[] = [];
+      if (playerIds.length > 0 && events && events.length > 0) {
+        const { data } = await supabase
+          .from("convocations")
+          .select("id, status, player_id, event_id")
+          .in("player_id", playerIds)
+          .in("event_id", events.map((e) => e.id));
+        convocs = data ?? [];
+      }
+
+      return (events ?? []).map((e) => {
+        const myConvoc = convocs.find((c) => c.event_id === e.id);
+        const player = myConvoc ? players.find((p) => p.id === myConvoc.player_id) : null;
+        return {
+          ...e,
+          team_name: (teams ?? []).find((t) => t.id === e.team_id)?.name ?? "",
+          convocation: myConvoc ?? null,
+          player,
+        };
+      });
     },
   });
 
@@ -159,53 +176,70 @@ function HomePage() {
         </div>
       )}
 
-      {/* For players/parents: unified list of their upcoming events with action-required highlight */}
-      {!isCoach && myConvocs && myConvocs.length > 0 && (
+      {/* For players/parents: unified list of upcoming events with action-required highlight on pending convocations */}
+      {!isCoach && (
         <section>
-          <h2 className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
-            {t("dashboard.myConvocations")}
-          </h2>
-          <ul className="space-y-2">
-            {myConvocs.map((c: any) => {
-              const actionRequired = c.status === "pending";
-              return (
-                <li key={c.id}>
-                  <Link
-                    to="/events/$eventId"
-                    params={{ eventId: c.event.id }}
-                    className={cn(
-                      "flex items-center justify-between rounded-2xl border p-4 active:scale-[0.99] transition-transform",
-                      actionRequired
-                        ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30"
-                        : "border-border bg-card",
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium truncate">{c.event.title}</p>
-                        {actionRequired && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
-                            {t("dashboard.actionRequired", { defaultValue: "Action required" })}
-                          </span>
-                        )}
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              {t("dashboard.myConvocations")}
+            </h2>
+            <Link to="/events" className="text-xs text-primary font-medium">
+              {t("dashboard.viewAll")}
+            </Link>
+          </div>
+          {!myEvents || myEvents.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {myEvents.map((e: any) => {
+                const actionRequired = e.convocation?.status === "pending";
+                return (
+                  <li key={e.id}>
+                    <Link
+                      to="/events/$eventId"
+                      params={{ eventId: e.id }}
+                      className={cn(
+                        "flex items-center justify-between rounded-2xl border p-4 active:scale-[0.99] transition-transform",
+                        actionRequired
+                          ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30"
+                          : "border-border bg-card",
+                      )}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium truncate">{e.title}</p>
+                          {actionRequired && (
+                            <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
+                              {t("dashboard.actionRequired", { defaultValue: "Action required" })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatWhen(new Date(e.starts_at))}</span>
+                          {e.player && <span>· {e.player.first_name}</span>}
+                          {e.team_name && <span>· {e.team_name}</span>}
+                          {e.location && (
+                            <>
+                              <MapPin className="h-3 w-3" />
+                              <span className="truncate">{e.location}</span>
+                            </>
+                          )}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {formatWhen(new Date(c.event.starts_at))}
-                        {c.player ? ` · ${c.player.first_name}` : ""}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <AttendancePill status={c.status} />
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <Link to="/events" className="mt-3 inline-block text-xs text-primary font-medium">
-            {t("dashboard.viewAll")}
-          </Link>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {e.convocation && <AttendancePill status={e.convocation.status} />}
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       )}
 
@@ -254,16 +288,6 @@ function HomePage() {
               ))}
             </ul>
           )}
-        </section>
-      )}
-
-      {/* Empty state for parents/players with no convocations */}
-      {!isCoach && (!myConvocs || myConvocs.length === 0) && (
-        <section>
-          <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-            <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
-          </div>
         </section>
       )}
     </div>
