@@ -129,7 +129,10 @@ export function EventChat({ eventId }: { eventId: string }) {
                 <p className={cn("text-[11px] font-medium mb-0.5", mine ? "opacity-90" : "text-foreground/80")}>
                   {mine ? t("chat.you") : (m.author?.full_name ?? "—")}
                 </p>
-                <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                {m.attachments?.length > 0 && (
+                  <div className="mt-1.5"><AttachmentList items={m.attachments as Attachment[]} /></div>
+                )}
                 <p className={cn("text-[10px] mt-0.5", mine ? "opacity-80" : "text-muted-foreground")}>
                   {format(new Date(m.created_at), "HH:mm")}
                 </p>
