@@ -22,10 +22,24 @@ import { toast } from "sonner";
 
 declare global {
   interface Window {
-    google?: any;
+    google?: {
+      maps?: {
+        places?: {
+          AutocompleteService: new () => GoogleAutocompleteService;
+        };
+      };
+    };
     __squadlyGoogleMapsPromise?: Promise<void>;
   }
 }
+
+type GooglePlacePrediction = { description: string; place_id: string };
+type GoogleAutocompleteService = {
+  getPlacePredictions: (
+    request: { input: string; types: string[] },
+    callback: (items: GooglePlacePrediction[] | null) => void,
+  ) => void;
+};
 
 export type EventType = "training" | "match" | "tournament" | "meeting" | "other";
 export type CompetitionType = "friendly" | "championship" | "cup";
@@ -257,7 +271,7 @@ function AddressField({
   const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>(
     [],
   );
-  const [service, setService] = useState<any>(null);
+  const [service, setService] = useState<GoogleAutocompleteService | null>(null);
 
   useEffect(() => {
     loadGoogleMapsPlaces()
@@ -275,7 +289,7 @@ function AddressField({
     }
     service.getPlacePredictions(
       { input: value, types: ["geocode", "establishment"] },
-      (items: any[] | null) => {
+      (items: GooglePlacePrediction[] | null) => {
         setSuggestions(
           (items ?? [])
             .slice(0, 5)
