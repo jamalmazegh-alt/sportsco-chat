@@ -36,7 +36,21 @@
     "inviteCode": "Invitation code",
     "inviteHint": "Ask your club admin for an invitation link or code.",
     "inviteRequired": "An invitation code is required.",
-    "inviteInvalid": "This invitation is invalid or expired."
+    "inviteInvalid": "This invitation is invalid or expired.",
+    "forgotTitle": "Forgot password",
+    "forgotSubtitle": "Enter your email to receive a reset link.",
+    "sendResetLink": "Send reset link",
+    "resetSent": "If an account exists for this address, you'll receive an email shortly.",
+    "resetError": "Could not send the email. Please try again later.",
+    "backToLogin": "Back to login",
+    "resetTitle": "New password",
+    "resetSubtitle": "Choose a new password for your account.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "updatePassword": "Update password",
+    "passwordMismatch": "Passwords don't match.",
+    "passwordUpdated": "Password updated.",
+    "resetLinkRequired": "Open the email link to reset your password."
   },
   "common": {
     "save": "Save",
