@@ -175,6 +175,11 @@
     "remindSent": "Relance envoyée",
     "alreadyRemindedRecently": "Déjà relancé récemment",
     "addAllPlayers": "Convoquer tous les joueurs",
+    "selectPlayers": "Choisir les joueurs à convoquer",
+    "selectPlayersHint": "Seuls les joueurs cochés recevront une convocation.",
+    "selectAll": "Tout sélectionner",
+    "addMorePlayers": "Convoquer d'autres joueurs",
+    "noPlayersSelected": "Sélectionnez au moins un joueur.",
     "youResponded": "Votre réponse est enregistrée.",
     "respondPrompt": "Serez-vous présent ?",
     "summary": "{{p}} présents · {{a}} absents · {{u}} incertains · {{pe}} en attente"

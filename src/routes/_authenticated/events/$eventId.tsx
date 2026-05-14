@@ -9,6 +9,8 @@ import {
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { toast } from "sonner";
@@ -29,6 +31,8 @@ function EventDetail() {
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
@@ -61,6 +65,20 @@ function EventDetail() {
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
+    },
+  });
+
+  const { data: teamPlayers } = useQuery({
+    queryKey: ["team-players", event?.team_id],
+    enabled: !!event,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_members")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
+        .eq("team_id", event!.team_id)
+        .eq("role", "player");
+      if (error) throw error;
+      return (data ?? []).filter((tp: any) => tp.players);
     },
   });
 
@@ -113,40 +131,44 @@ function EventDetail() {
     else refetch();
   }
 
-  async function sendConvocations() {
-    if (!event || !user) return;
-    setSending(true);
-    // get team players
-    const { data: tPlayers } = await supabase
-      .from("team_members")
-      .select("player_id, players:player_id(id, user_id)")
-      .eq("team_id", event.team_id)
-      .eq("role", "player");
-    const playerIds = (tPlayers ?? []).map((tp: any) => tp.player_id).filter(Boolean);
-    if (playerIds.length === 0) {
-      setSending(false);
+  function openPicker() {
+    if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
       return;
     }
-    // skip players that already have a convocation
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
-    const toInsert = playerIds.filter((pid: string) => !existing.has(pid));
-    if (toInsert.length > 0) {
-      const { error: convocationError } = await supabase.from("convocations").insert(
-        toInsert.map((pid: string) => ({ event_id: event.id, player_id: pid }))
-      );
-      if (convocationError) {
-        setSending(false);
-        toast.error(convocationError.message);
-        return;
-      }
+    // pre-select players that don't already have a convocation
+    const preselect = new Set(
+      teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid))
+    );
+    setSelectedIds(preselect);
+    setPickerOpen(true);
+  }
+
+  async function sendConvocations() {
+    if (!event || !user) return;
+    const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
+    const toInsert = Array.from(selectedIds).filter((pid) => !existing.has(pid));
+    if (toInsert.length === 0) {
+      toast.error(t("attendance.noPlayersSelected"));
+      return;
+    }
+    setSending(true);
+    const { error: convocationError } = await supabase.from("convocations").insert(
+      toInsert.map((pid) => ({ event_id: event.id, player_id: pid }))
+    );
+    if (convocationError) {
+      setSending(false);
+      toast.error(convocationError.message);
+      return;
     }
     // notify
     const { data: parents } = await supabase
       .from("player_parents")
-      .select("parent_user_id, can_respond")
-      .in("player_id", playerIds);
-    const playerUserIds = (tPlayers ?? [])
+      .select("parent_user_id")
+      .in("player_id", toInsert);
+    const playerUserIds = (teamPlayers ?? [])
+      .filter((tp: any) => toInsert.includes(tp.player_id))
       .map((tp: any) => tp.players?.user_id)
       .filter(Boolean);
     const recipients = Array.from(
@@ -167,13 +189,16 @@ function EventDetail() {
       );
       if (notificationError) toast.error(notificationError.message);
     }
-    const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
-    if (sentError) {
-      setSending(false);
-      toast.error(sentError.message);
-      return;
+    if (!event.convocations_sent) {
+      const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+      if (sentError) {
+        setSending(false);
+        toast.error(sentError.message);
+        return;
+      }
     }
     setSending(false);
+    setPickerOpen(false);
     refetch();
     refetchEvent();
     toast.success(t("events.convocationsSent"));
@@ -343,16 +368,126 @@ function EventDetail() {
 
       {/* Coach: send convocations */}
       {isCoach && !event.convocations_sent && (
-        <Button onClick={sendConvocations} className="w-full h-11" disabled={sending}>
-          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+        <Button onClick={openPicker} className="w-full h-11">
+          <Send className="h-4 w-4" />
           {t("events.sendConvocations")}
         </Button>
       )}
       {isCoach && event.convocations_sent && (
-        <p className="text-xs text-center text-muted-foreground">
-          ✓ {t("events.convocationsSent")}
-        </p>
+        <div className="space-y-2">
+          <p className="text-xs text-center text-muted-foreground">
+            ✓ {t("events.convocationsSent")}
+          </p>
+          {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
+            <Button onClick={openPicker} variant="outline" className="w-full h-10">
+              <Send className="h-4 w-4" />
+              {t("attendance.addMorePlayers")}
+            </Button>
+          )}
+        </div>
       )}
+
+      {/* Player picker dialog */}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("attendance.selectPlayers")}</DialogTitle>
+            <DialogDescription>{t("attendance.selectPlayersHint")}</DialogDescription>
+          </DialogHeader>
+          {teamPlayers && (
+            <>
+              <div className="flex items-center justify-between border-b pb-2">
+                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                  <Checkbox
+                    checked={
+                      selectedIds.size > 0 &&
+                      teamPlayers.every((tp: any) =>
+                        (convocations ?? []).some((c: any) => c.player_id === tp.player_id) ||
+                          selectedIds.has(tp.player_id)
+                      )
+                    }
+                    onCheckedChange={(v) => {
+                      if (v) {
+                        const all = new Set<string>(
+                          teamPlayers
+                            .map((tp: any) => tp.player_id)
+                            .filter(
+                              (pid: string) =>
+                                !(convocations ?? []).some((c: any) => c.player_id === pid)
+                            )
+                        );
+                        setSelectedIds(all);
+                      } else {
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                  />
+                  {t("attendance.selectAll")}
+                </label>
+                <span className="text-xs text-muted-foreground">{selectedIds.size}</span>
+              </div>
+              <div className="max-h-72 overflow-y-auto space-y-1">
+                {teamPlayers.map((tp: any) => {
+                  const p = tp.players;
+                  const alreadyConvoked = (convocations ?? []).some(
+                    (c: any) => c.player_id === tp.player_id
+                  );
+                  const checked = alreadyConvoked || selectedIds.has(tp.player_id);
+                  return (
+                    <label
+                      key={tp.player_id}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg p-2 cursor-pointer hover:bg-accent",
+                        alreadyConvoked && "opacity-60 cursor-not-allowed"
+                      )}
+                    >
+                      <Checkbox
+                        checked={checked}
+                        disabled={alreadyConvoked}
+                        onCheckedChange={(v) => {
+                          setSelectedIds((prev) => {
+                            const next = new Set(prev);
+                            if (v) next.add(tp.player_id);
+                            else next.delete(tp.player_id);
+                            return next;
+                          });
+                        }}
+                      />
+                      <div className="h-8 w-8 rounded-full bg-muted overflow-hidden shrink-0">
+                        {p?.photo_url ? (
+                          <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
+                            {(p?.first_name?.[0] ?? "") + (p?.last_name?.[0] ?? "")}
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-sm flex-1 truncate">
+                        {p?.first_name} {p?.last_name}
+                        {p?.jersey_number ? (
+                          <span className="text-muted-foreground"> · #{p.jersey_number}</span>
+                        ) : null}
+                      </span>
+                      {alreadyConvoked && (
+                        <span className="text-[10px] uppercase text-muted-foreground">✓</span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPickerOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={sendConvocations} disabled={sending || selectedIds.size === 0}>
+              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {t("events.sendConvocations")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* My response (player/parent) */}
       {visibleMyConvocs.length > 0 && (

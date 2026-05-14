@@ -175,6 +175,11 @@
     "remindSent": "Reminder sent",
     "alreadyRemindedRecently": "Already reminded recently",
     "addAllPlayers": "Convocate all players",
+    "selectPlayers": "Select players to convoke",
+    "selectPlayersHint": "Only checked players will receive a convocation.",
+    "selectAll": "Select all",
+    "addMorePlayers": "Convoke more players",
+    "noPlayersSelected": "Select at least one player.",
     "youResponded": "Your response is recorded.",
     "respondPrompt": "Will you attend?",
     "summary": "{{p}} present · {{a}} absent · {{u}} uncertain · {{pe}} pending"
