@@ -182,7 +182,12 @@
     "noPlayersSelected": "Select at least one player.",
     "youResponded": "Your response is recorded.",
     "respondPrompt": "Will you attend?",
-    "summary": "{{p}} present · {{a}} absent · {{u}} uncertain · {{pe}} pending"
+    "summary": "{{p}} present · {{a}} absent · {{u}} uncertain · {{pe}} pending",
+    "cancelConvocation": "Cancel convocation",
+    "confirmCancelConvocation": "Cancel this convocation?",
+    "convocationCancelled": "Convocation cancelled",
+    "convokedPlayers": "Convoked players",
+    "noConvokedPlayers": "No players convoked yet."
   },
   "inbox": {
     "title": "Inbox",
