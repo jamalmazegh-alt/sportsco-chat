@@ -177,7 +177,7 @@ function HomePage() {
                   <div className="min-w-0">
                     <p className="font-medium truncate">{c.event.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {formatWhen(new Date(c.event.starts_at), i18n.language)}
+                      {formatWhen(new Date(c.event.starts_at))}
                       {c.player ? ` · ${c.player.first_name}` : ""}
                     </p>
                   </div>
@@ -221,7 +221,7 @@ function HomePage() {
                     <p className="font-medium truncate">{e.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                       <Calendar className="h-3 w-3" />
-                      {formatWhen(new Date(e.starts_at), i18n.language)}
+                      {formatWhen(new Date(e.starts_at))}
                       {e.location && (
                         <>
                           <span>·</span>
