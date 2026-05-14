@@ -74,6 +74,42 @@ function TeamDetail() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
 
+  // Edit team form state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editAge, setEditAge] = useState("");
+  const [editChamp, setEditChamp] = useState("");
+  const [editSeason, setEditSeason] = useState("");
+  const [editBusy, setEditBusy] = useState(false);
+
+  function openEdit() {
+    setEditName(team?.name ?? "");
+    setEditAge(team?.age_group ?? "");
+    setEditChamp(team?.championship ?? "");
+    setEditSeason(team?.season ?? "");
+    setEditOpen(true);
+  }
+
+  async function onSaveTeam(e: FormEvent) {
+    e.preventDefault();
+    setEditBusy(true);
+    const { error } = await supabase
+      .from("teams")
+      .update({
+        name: editName,
+        age_group: editAge || null,
+        championship: editChamp || null,
+        season: editSeason || null,
+      })
+      .eq("id", teamId);
+    setEditBusy(false);
+    if (error) { toast.error(error.message); return; }
+    setEditOpen(false);
+    qc.invalidateQueries({ queryKey: ["team", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+    toast.success(t("common.saved"));
+  }
+
   function reset() {
     setFirst(""); setLast(""); setJersey(""); setPosition("");
     setPhone(""); setEmail("");
