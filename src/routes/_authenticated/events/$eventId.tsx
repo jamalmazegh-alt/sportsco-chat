@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info,
 } from "lucide-react";
+import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ function EventDetail() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
+  const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
