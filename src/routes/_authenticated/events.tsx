@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,9 +10,15 @@ import { Calendar, MapPin, Plus, ChevronRight } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 
 export const Route = createFileRoute("/_authenticated/events")({
-  component: EventsPage,
+  component: EventsRoute,
   head: () => ({ meta: [{ title: "Events — Squadly" }] }),
 });
+
+function EventsRoute() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  if (pathname !== "/events") return <Outlet />;
+  return <EventsPage />;
+}
 
 function EventsPage() {
   const { t } = useTranslation();
