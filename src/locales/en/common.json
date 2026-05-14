@@ -61,7 +61,16 @@
     "subtitle": "Create a club to start managing teams and events.",
     "clubName": "Club name",
     "createClub": "Create club",
-    "joinHint": "Already a member? Ask your admin to invite you."
+    "joinHint": "Already a member? Ask your admin to invite you.",
+    "joinClub": "Join with code"
+  },
+  "invites": {
+    "title": "Invite players & parents",
+    "role": "Role",
+    "generate": "Generate invitation link",
+    "generateAnother": "Generate another",
+    "copied": "Link copied",
+    "expiresHint": "Link valid for 30 days. Share it with the player or parent."
   },
   "dashboard": {
     "greeting": "Hi {{name}} 👋",
