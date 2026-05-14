@@ -120,8 +120,7 @@ function competitionOptions(team?: TeamOption): CompetitionType[] {
   return configured.length > 0 ? configured : ["friendly", "championship", "cup"];
 }
 
-function loadGoogleMapsPlaces(): Promise<void> | null {
-  const key = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+function loadGoogleMapsPlaces(key: string | null | undefined): Promise<void> | null {
   if (!key || typeof window === "undefined") return null;
   if (window.google?.maps?.places) return Promise.resolve();
   if (!window.__squadlyGoogleMapsPromise) {
