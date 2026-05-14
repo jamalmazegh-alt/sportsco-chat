@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Send, MessageCircle, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
 type Msg = {
   id: string;
@@ -14,6 +15,7 @@ type Msg = {
   author_user_id: string;
   body: string;
   created_at: string;
+  attachments: Attachment[];
   author?: { full_name: string | null; avatar_url: string | null } | null;
 };
 
