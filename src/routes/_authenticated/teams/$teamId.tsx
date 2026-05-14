@@ -38,7 +38,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, age_group, championship, competitions, sport, season")
+        .select("id, name, age_group, championship, competitions, sport, season, image_url, club_id")
         .eq("id", teamId)
         .single();
       return data;
@@ -208,20 +208,29 @@ function TeamDetail() {
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
 
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">{team?.name ?? ""}</h1>
-          {team && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {[team.age_group, team.championship, team.sport, team.season].filter(Boolean).join(" · ")}
-            </p>
-          )}
+      <div className="flex items-start gap-4">
+        <TeamImage
+          team={team as any}
+          isCoach={isCoach}
+          onUploaded={() => qc.invalidateQueries({ queryKey: ["team", teamId] })}
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
+              {team && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {[team.age_group, team.championship, team.sport, team.season].filter(Boolean).join(" · ")}
+                </p>
+              )}
+            </div>
+            {isCoach && team && (
+              <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={openEdit}>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
-        {isCoach && team && (
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={openEdit}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-        )}
       </div>
 
       {isCoach && (
