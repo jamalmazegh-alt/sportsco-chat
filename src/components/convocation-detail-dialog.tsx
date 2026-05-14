@@ -145,7 +145,7 @@ export function ConvocationDetailDialog({
                     {t("events.convocationsSent")}
                   </span>
                   <span className="ml-auto tabular-nums text-xs">
-                    {format(new Date(sentAt), "d MMM HH:mm")}
+                    {fmt(new Date(sentAt), "d MMM HH:mm")}
                   </span>
                 </li>
               )}
@@ -154,7 +154,7 @@ export function ConvocationDetailDialog({
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                   <span className="text-muted-foreground">{t("attendance.respondedAt")}</span>
                   <span className="ml-auto tabular-nums text-xs">
-                    {format(new Date(meta.responded_at), "d MMM HH:mm")}
+                    {fmt(new Date(meta.responded_at), "d MMM HH:mm")}
                   </span>
                 </li>
               )}
@@ -167,7 +167,7 @@ export function ConvocationDetailDialog({
                       {t("attendance.reminderVia", { channel: t(`channels.${r.channel}`, r.channel) })}
                     </span>
                     <span className="ml-auto tabular-nums text-xs">
-                      {format(new Date(r.sent_at), "d MMM HH:mm")}
+                      {fmt(new Date(r.sent_at), "d MMM HH:mm")}
                     </span>
                   </li>
                 );
