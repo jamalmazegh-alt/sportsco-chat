@@ -177,6 +177,8 @@
     "parents": "Parents / tuteurs",
     "addParent": "Ajouter un parent",
     "parentName": "Nom du parent",
+    "parentFirstName": "Prénom du parent",
+    "parentLastName": "Nom du parent",
     "canRespond": "Peut répondre aux convocations",
     "respondPlayer": "Joueur",
     "respondParent": "Parent",
@@ -187,8 +189,14 @@
     "profile": "Profil du joueur",
     "details": "Informations",
     "save": "Enregistrer le joueur",
+    "invite": "Inviter",
+    "inviteSelected": "Inviter la sélection ({{count}})",
     "inviteSent": "Invitation envoyée.",
     "inviteFailed": "Joueur créé, mais l'invitation n'a pas pu être envoyée.",
+    "inviteNoContact": "Aucun contact (e-mail ou téléphone) renseigné.",
+    "invitePartial": "{{sent}} envoyée(s), {{failed}} échec(s).",
+    "inviteBulkSent": "{{count}} invitation(s) envoyée(s).",
+    "inviteBulkResult": "{{sent}} envoyée(s), {{failed}} échec(s), {{skipped}} ignoré(s).",
     "inviterPhoneRequired": "Joueur créé. Vérifiez votre numéro de téléphone dans votre profil pour envoyer des invitations."
   },
   "events": {
