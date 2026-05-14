@@ -16,6 +16,8 @@
     "email": "E-mail",
     "password": "Mot de passe",
     "fullName": "Nom complet",
+    "firstName": "Prénom",
+    "lastName": "Nom",
     "forgotPassword": "Mot de passe oublié ?",
     "noAccount": "Pas encore de compte ?",
     "hasAccount": "Déjà inscrit ?",
@@ -39,7 +41,9 @@
     "back": "Retour",
     "comment": "Commentaire (facultatif)",
     "send": "Envoyer",
-    "all": "Tous"
+    "all": "Tous",
+    "optional": "facultatif",
+    "saved": "Enregistré"
   },
   "onboarding": {
     "title": "Configurez votre club",
@@ -67,23 +71,45 @@
     "name": "Nom de l'équipe",
     "season": "Saison",
     "sport": "Sport",
-    "ageGroup": "Catégorie",
+    "ageGroup": "Catégorie d'âge",
+    "championship": "Championnat",
     "members": "membres",
     "noTeams": "Aucune équipe. Créez la première pour commencer.",
     "addPlayer": "Ajouter un joueur",
     "players": "Joueurs",
-    "coaches": "Coachs"
+    "coaches": "Coachs",
+    "viewPlayers": "Voir les joueurs"
   },
   "players": {
+    "title": "Joueurs",
     "firstName": "Prénom",
     "lastName": "Nom",
     "jerseyNumber": "N°",
     "position": "Poste",
-    "noPlayers": "Aucun joueur."
+    "preferredPosition": "Poste préféré",
+    "photo": "Photo du joueur",
+    "uploadPhoto": "Ajouter une photo",
+    "contact": "Contact joueur",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "parents": "Parents / tuteurs",
+    "addParent": "Ajouter un parent",
+    "parentName": "Nom du parent",
+    "canRespond": "Peut répondre aux convocations",
+    "respondPlayer": "Joueur",
+    "respondParent": "Parent",
+    "respondBoth": "Les deux",
+    "accountActive": "Compte actif",
+    "accountInactive": "Pas de compte",
+    "noPlayers": "Aucun joueur.",
+    "profile": "Profil du joueur",
+    "details": "Informations",
+    "save": "Enregistrer le joueur"
   },
   "events": {
     "title": "Événements",
     "create": "Nouvel événement",
+    "name": "Nom de l'événement",
     "type": "Type",
     "types": {
       "training": "Entraînement",
@@ -97,15 +123,27 @@
       "published": "Publié",
       "cancelled": "Annulé"
     },
-    "publish": "Publier et convoquer",
+    "publish": "Publier l'événement",
+    "sendConvocations": "Envoyer les convocations",
+    "convocationsSent": "Convocations envoyées",
     "noEvents": "Aucun événement prévu.",
     "location": "Lieu",
+    "locationUrl": "Lien Google Maps",
+    "openInMaps": "Ouvrir dans Maps",
     "meetingPoint": "Point de RDV",
     "opponent": "Adversaire",
-    "startsAt": "Début",
-    "endsAt": "Fin",
+    "startsAt": "Heure de début",
+    "endsAt": "Heure de fin",
+    "convocationTime": "Heure de convocation",
     "details": "Détails",
-    "selectTeam": "Choisir une équipe"
+    "selectTeam": "Choisir une équipe",
+    "competitionType": "Compétition",
+    "competitionName": "Nom de la compétition",
+    "competitionTypes": {
+      "friendly": "Amical",
+      "championship": "Championnat",
+      "cup": "Coupe"
+    }
   },
   "attendance": {
     "title": "Présences",
@@ -133,6 +171,7 @@
     "title": "Profil",
     "preferredLanguage": "Langue préférée",
     "english": "English",
-    "french": "Français"
+    "french": "Français",
+    "languageSaved": "Langue enregistrée"
   }
 }

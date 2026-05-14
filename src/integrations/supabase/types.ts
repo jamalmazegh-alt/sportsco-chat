@@ -147,12 +147,17 @@ export type Database = {
       }
       events: {
         Row: {
+          competition_name: string | null
+          competition_type: string | null
+          convocation_time: string | null
+          convocations_sent: boolean
           created_at: string
           created_by: string
           description: string | null
           ends_at: string | null
           id: string
           location: string | null
+          location_url: string | null
           meeting_point: string | null
           opponent: string | null
           responses_locked: boolean
@@ -163,12 +168,17 @@ export type Database = {
           type: Database["public"]["Enums"]["event_type"]
         }
         Insert: {
+          competition_name?: string | null
+          competition_type?: string | null
+          convocation_time?: string | null
+          convocations_sent?: boolean
           created_at?: string
           created_by: string
           description?: string | null
           ends_at?: string | null
           id?: string
           location?: string | null
+          location_url?: string | null
           meeting_point?: string | null
           opponent?: string | null
           responses_locked?: boolean
@@ -179,12 +189,17 @@ export type Database = {
           type?: Database["public"]["Enums"]["event_type"]
         }
         Update: {
+          competition_name?: string | null
+          competition_type?: string | null
+          convocation_time?: string | null
+          convocations_sent?: boolean
           created_at?: string
           created_by?: string
           description?: string | null
           ends_at?: string | null
           id?: string
           location?: string | null
+          location_url?: string | null
           meeting_point?: string | null
           opponent?: string | null
           responses_locked?: boolean
@@ -239,21 +254,33 @@ export type Database = {
       }
       player_parents: {
         Row: {
+          can_respond: boolean
           created_at: string
+          email: string | null
+          full_name: string | null
           id: string
-          parent_user_id: string
+          parent_user_id: string | null
+          phone: string | null
           player_id: string
         }
         Insert: {
+          can_respond?: boolean
           created_at?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
-          parent_user_id: string
+          parent_user_id?: string | null
+          phone?: string | null
           player_id: string
         }
         Update: {
+          can_respond?: boolean
           created_at?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
-          parent_user_id?: string
+          parent_user_id?: string | null
+          phone?: string | null
           player_id?: string
         }
         Relationships: [
@@ -269,38 +296,50 @@ export type Database = {
       players: {
         Row: {
           birth_date: string | null
+          can_respond: boolean
           club_id: string
           created_at: string
+          email: string | null
           first_name: string
           id: string
           jersey_number: number | null
           last_name: string
+          phone: string | null
           photo_url: string | null
           position: string | null
+          preferred_position: string | null
           user_id: string | null
         }
         Insert: {
           birth_date?: string | null
+          can_respond?: boolean
           club_id: string
           created_at?: string
+          email?: string | null
           first_name: string
           id?: string
           jersey_number?: number | null
           last_name: string
+          phone?: string | null
           photo_url?: string | null
           position?: string | null
+          preferred_position?: string | null
           user_id?: string | null
         }
         Update: {
           birth_date?: string | null
+          can_respond?: boolean
           club_id?: string
           created_at?: string
+          email?: string | null
           first_name?: string
           id?: string
           jersey_number?: number | null
           last_name?: string
+          phone?: string | null
           photo_url?: string | null
           position?: string | null
+          preferred_position?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -317,8 +356,10 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          first_name: string | null
           full_name: string | null
           id: string
+          last_name: string | null
           phone: string | null
           preferred_language: string
           updated_at: string
@@ -326,8 +367,10 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          first_name?: string | null
           full_name?: string | null
           id: string
+          last_name?: string | null
           phone?: string | null
           preferred_language?: string
           updated_at?: string
@@ -335,8 +378,10 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          last_name?: string | null
           phone?: string | null
           preferred_language?: string
           updated_at?: string
@@ -420,6 +465,7 @@ export type Database = {
       teams: {
         Row: {
           age_group: string | null
+          championship: string | null
           club_id: string
           created_at: string
           id: string
@@ -429,6 +475,7 @@ export type Database = {
         }
         Insert: {
           age_group?: string | null
+          championship?: string | null
           club_id: string
           created_at?: string
           id?: string
@@ -438,6 +485,7 @@ export type Database = {
         }
         Update: {
           age_group?: string | null
+          championship?: string | null
           club_id?: string
           created_at?: string
           id?: string

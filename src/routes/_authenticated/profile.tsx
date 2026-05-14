@@ -9,6 +9,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { LogOut } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -35,9 +36,17 @@ function ProfilePage() {
 
   async function setLang(lang: string) {
     if (!user) return;
-    i18n.changeLanguage(lang);
-    await supabase.from("profiles").update({ preferred_language: lang }).eq("id", user.id);
+    await i18n.changeLanguage(lang);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ preferred_language: lang })
+      .eq("id", user.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     refetch();
+    toast.success(t("profile.languageSaved"));
   }
 
   return (

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import i18n from "@/lib/i18n";
 
 export type AppRole = "admin" | "coach" | "parent" | "player";
 
@@ -45,6 +46,18 @@ export function useAuthState(): AuthState {
       setMemberships([]);
       return;
     }
+    // Sync preferred language from profile
+    supabase
+      .from("profiles")
+      .select("preferred_language")
+      .eq("id", userData.user.id)
+      .single()
+      .then(({ data: prof }) => {
+        const lang = prof?.preferred_language;
+        if (lang && (lang === "en" || lang === "fr") && i18n.language?.slice(0, 2) !== lang) {
+          i18n.changeLanguage(lang);
+        }
+      });
     const { data, error } = await supabase
       .from("club_members")
       .select("club_id, role, clubs:club_id(id, name, logo_url)")

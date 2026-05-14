@@ -21,7 +21,8 @@ export const Route = createFileRoute("/register")({
 function RegisterPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -33,12 +34,18 @@ function RegisterPage() {
       return;
     }
     setBusy(true);
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName, preferred_language: i18n.language?.slice(0, 2) || "en" },
+        data: {
+          full_name: fullName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          preferred_language: i18n.language?.slice(0, 2) || "en",
+        },
       },
     });
     setBusy(false);
@@ -61,9 +68,15 @@ function RegisterPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <div className="space-y-1.5">
-            <Label htmlFor="name">{t("auth.fullName")}</Label>
-            <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="first">{t("auth.firstName")}</Label>
+              <Input id="first" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="last">{t("auth.lastName")}</Label>
+              <Input id="last" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">{t("auth.email")}</Label>

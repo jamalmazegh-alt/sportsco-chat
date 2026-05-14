@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,6 @@ function TeamsPage() {
   const { activeClubId } = useAuth();
   const role = useActiveRole();
   const isAdmin = role === "admin";
-  const isCoach = role === "coach" || role === "admin";
   const qc = useQueryClient();
 
   const { data: teams, isLoading } = useQuery({
@@ -32,7 +31,7 @@ function TeamsPage() {
     queryFn: async () => {
       const { data: ts } = await supabase
         .from("teams")
-        .select("id, name, season, sport, age_group")
+        .select("id, name, season, sport, age_group, championship")
         .eq("club_id", activeClubId!)
         .order("name");
       if (!ts) return [];
@@ -50,9 +49,8 @@ function TeamsPage() {
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [season, setSeason] = useState("");
-  const [sport, setSport] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
+  const [championship, setChampionship] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function onCreate(e: FormEvent) {
@@ -61,14 +59,19 @@ function TeamsPage() {
     setBusy(true);
     const { error } = await supabase
       .from("teams")
-      .insert({ club_id: activeClubId, name, season: season || null, sport: sport || null, age_group: ageGroup || null });
+      .insert({
+        club_id: activeClubId,
+        name,
+        age_group: ageGroup || null,
+        championship: championship || null,
+      });
     setBusy(false);
     if (error) {
       toast.error(error.message);
       return;
     }
     setOpen(false);
-    setName(""); setSeason(""); setSport(""); setAgeGroup("");
+    setName(""); setAgeGroup(""); setChampionship("");
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
     qc.invalidateQueries({ queryKey: ["teams"] });
   }
@@ -94,19 +97,16 @@ function TeamsPage() {
                   <Label>{t("teams.name")}</Label>
                   <Input required value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>{t("teams.season")}</Label>
-                    <Input value={season} onChange={(e) => setSeason(e.target.value)} placeholder="2025–26" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("teams.ageGroup")}</Label>
-                    <Input value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} placeholder="U13" />
-                  </div>
+                <div className="space-y-1.5">
+                  <Label>{t("teams.ageGroup")}</Label>
+                  <Input value={ageGroup} onChange={(e) => setAgeGroup(e.target.value)} placeholder="U13" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>{t("teams.sport")}</Label>
-                  <Input value={sport} onChange={(e) => setSport(e.target.value)} placeholder="Football" />
+                  <Label>
+                    {t("teams.championship")}{" "}
+                    <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
+                  </Label>
+                  <Input value={championship} onChange={(e) => setChampionship(e.target.value)} placeholder="District D2" />
                 </div>
                 <Button type="submit" className="w-full h-11" disabled={busy}>
                   {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
@@ -131,99 +131,25 @@ function TeamsPage() {
       ) : (
         <ul className="space-y-2">
           {teams.map((tm) => (
-            <li
-              key={tm.id}
-              className="flex items-center justify-between rounded-2xl border border-border bg-card p-4"
-            >
-              <div className="min-w-0">
-                <p className="font-medium truncate">{tm.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {[tm.season, tm.age_group, tm.sport].filter(Boolean).join(" · ")}
-                  {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
-                </p>
-              </div>
-              {isCoach && <TeamQuickAdd teamId={tm.id} clubId={activeClubId!} />}
+            <li key={tm.id}>
+              <Link
+                to="/teams/$teamId"
+                params={{ teamId: tm.id }}
+                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
+              >
+                <div className="min-w-0">
+                  <p className="font-medium truncate">{tm.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
+                    {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+              </Link>
             </li>
           ))}
         </ul>
       )}
     </div>
-  );
-}
-
-function TeamQuickAdd({ teamId, clubId }: { teamId: string; clubId: string }) {
-  const { t } = useTranslation();
-  const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [first, setFirst] = useState("");
-  const [last, setLast] = useState("");
-  const [jersey, setJersey] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function onAdd(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { data: player, error } = await supabase
-      .from("players")
-      .insert({
-        club_id: clubId,
-        first_name: first,
-        last_name: last,
-        jersey_number: jersey ? Number(jersey) : null,
-      })
-      .select("id")
-      .single();
-    if (error || !player) {
-      setBusy(false);
-      toast.error(error?.message ?? "Failed");
-      return;
-    }
-    const { error: tmErr } = await supabase
-      .from("team_members")
-      .insert({ team_id: teamId, player_id: player.id, role: "player" });
-    setBusy(false);
-    if (tmErr) {
-      toast.error(tmErr.message);
-      return;
-    }
-    setOpen(false);
-    setFirst(""); setLast(""); setJersey("");
-    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
-    toast.success(t("teams.addPlayer"));
-  }
-
-  return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button size="sm" variant="ghost" className="h-9">
-          <Plus className="h-4 w-4" />
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-3xl">
-        <SheetHeader>
-          <SheetTitle>{t("teams.addPlayer")}</SheetTitle>
-        </SheetHeader>
-        <form onSubmit={onAdd} className="space-y-4 mt-4 pb-6">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>{t("players.firstName")}</Label>
-              <Input required value={first} onChange={(e) => setFirst(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("players.lastName")}</Label>
-              <Input required value={last} onChange={(e) => setLast(e.target.value)} />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t("players.jerseyNumber")}</Label>
-            <Input type="number" value={jersey} onChange={(e) => setJersey(e.target.value)} />
-          </div>
-          <Button type="submit" className="w-full h-11" disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
-          </Button>
-        </form>
-      </SheetContent>
-    </Sheet>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink,
 } from "lucide-react";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,13 +26,14 @@ function EventDetail() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
+  const [sending, setSending] = useState(false);
 
-  const { data: event } = useQuery({
+  const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, location, meeting_point, opponent, type, status, team_id, responses_locked")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent")
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -45,7 +46,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
-        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, user_id)")
+        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id)")
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
@@ -70,7 +71,6 @@ function EventDetail() {
     };
   }, [eventId, refetch, qc]);
 
-  // Find current user's convocations (own player + parent of)
   const myConvocs = useMemo(() => {
     if (!user || !convocations) return [];
     return convocations.filter((c: any) => c.players?.user_id === user.id);
@@ -102,9 +102,63 @@ function EventDetail() {
     else refetch();
   }
 
+  async function sendConvocations() {
+    if (!event || !user) return;
+    setSending(true);
+    // get team players
+    const { data: tPlayers } = await supabase
+      .from("team_members")
+      .select("player_id, players:player_id(id, user_id)")
+      .eq("team_id", event.team_id)
+      .eq("role", "player");
+    const playerIds = (tPlayers ?? []).map((tp: any) => tp.player_id).filter(Boolean);
+    if (playerIds.length === 0) {
+      setSending(false);
+      toast.error(t("players.noPlayers"));
+      return;
+    }
+    // skip players that already have a convocation
+    const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
+    const toInsert = playerIds.filter((pid: string) => !existing.has(pid));
+    if (toInsert.length > 0) {
+      await supabase.from("convocations").insert(
+        toInsert.map((pid: string) => ({ event_id: event.id, player_id: pid }))
+      );
+    }
+    // notify
+    const { data: parents } = await supabase
+      .from("player_parents")
+      .select("parent_user_id, can_respond")
+      .in("player_id", playerIds);
+    const playerUserIds = (tPlayers ?? [])
+      .map((tp: any) => tp.players?.user_id)
+      .filter(Boolean);
+    const recipients = Array.from(
+      new Set([
+        ...(parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean),
+        ...playerUserIds,
+      ])
+    );
+    if (recipients.length > 0) {
+      await supabase.from("notifications").insert(
+        recipients.map((uid) => ({
+          user_id: uid,
+          type: "convocation",
+          title: event.title,
+          body: t("attendance.respondPrompt"),
+          link: `/events/${event.id}`,
+        }))
+      );
+    }
+    await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+    setSending(false);
+    refetch();
+    refetchEvent();
+    toast.success(t("events.convocationsSent"));
+  }
+
   async function remind(convocationId: string) {
     if (!user) return;
-    // dedupe: check last reminder within 30min
     const { data: recent } = await supabase
       .from("reminders")
       .select("id, sent_at")
@@ -117,7 +171,6 @@ function EventDetail() {
     }
     const c = convocations?.find((x: any) => x.id === convocationId) as any;
     const playerUserId = c?.players?.user_id;
-    // Get parents
     const { data: parents } = await supabase
       .from("player_parents")
       .select("parent_user_id")
@@ -125,7 +178,7 @@ function EventDetail() {
     const recipients = Array.from(
       new Set([
         ...(playerUserId ? [playerUserId] : []),
-        ...((parents ?? []).map((p) => p.parent_user_id)),
+        ...((parents ?? []).map((p) => p.parent_user_id).filter(Boolean)),
       ])
     );
     await supabase.from("reminders").insert({
@@ -162,7 +215,6 @@ function EventDetail() {
     qc.invalidateQueries({ queryKey: ["event", eventId] });
   }
 
-  // Counts
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
     (convocations ?? []).forEach((x) => {
@@ -188,24 +240,63 @@ function EventDetail() {
       </Link>
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-          {t(`events.types.${event.type}`)}
-        </span>
-        <h1 className="text-xl font-semibold mt-2">{event.title}</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+            {t(`events.types.${event.type}`)}
+          </span>
+          {event.type === "match" && event.competition_type && (
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded">
+              {t(`events.competitionTypes.${event.competition_type}`)}
+              {event.competition_name ? ` · ${event.competition_name}` : ""}
+            </span>
+          )}
+        </div>
+        <h1 className="text-xl font-semibold mt-2">
+          {event.type === "match" && event.opponent ? `vs ${event.opponent}` : event.title}
+        </h1>
         <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             {format(new Date(event.starts_at), "EEEE d MMMM · HH:mm")}
+            {event.ends_at && ` → ${format(new Date(event.ends_at), "HH:mm")}`}
           </p>
-          {event.location && (
+          {event.convocation_time && (
             <p className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" /> {event.location}
+              <Clock className="h-4 w-4" />
+              {t("events.convocationTime")}: {format(new Date(event.convocation_time), "HH:mm")}
             </p>
           )}
-          {event.opponent && <p>vs {event.opponent}</p>}
+          {event.location && (
+            <p className="flex items-center gap-2 flex-wrap">
+              <MapPin className="h-4 w-4" /> {event.location}
+              {event.location_url && (
+                <a
+                  href={event.location_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary inline-flex items-center gap-1 text-xs font-medium"
+                >
+                  {t("events.openInMaps")} <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </p>
+          )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
         </div>
       </div>
+
+      {/* Coach: send convocations */}
+      {isCoach && !event.convocations_sent && (
+        <Button onClick={sendConvocations} className="w-full h-11" disabled={sending}>
+          {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          {t("events.sendConvocations")}
+        </Button>
+      )}
+      {isCoach && event.convocations_sent && (
+        <p className="text-xs text-center text-muted-foreground">
+          ✓ {t("events.convocationsSent")}
+        </p>
+      )}
 
       {/* My response (player/parent) */}
       {visibleMyConvocs.length > 0 && (
@@ -248,7 +339,7 @@ function EventDetail() {
       )}
 
       {/* Coach attendance board */}
-      {isCoach && (
+      {isCoach && event.convocations_sent && (
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -282,16 +373,27 @@ function EventDetail() {
                   key={c.id}
                   className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3"
                 >
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">
-                      {c.players?.first_name} {c.players?.last_name}
-                      {c.players?.jersey_number ? (
-                        <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
-                      ) : null}
-                    </p>
-                    {c.comment && (
-                      <p className="text-xs text-muted-foreground mt-0.5 italic truncate">"{c.comment}"</p>
-                    )}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-9 w-9 shrink-0 rounded-full bg-muted overflow-hidden">
+                      {c.players?.photo_url ? (
+                        <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                          {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">
+                        {c.players?.first_name} {c.players?.last_name}
+                        {c.players?.jersey_number ? (
+                          <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
+                        ) : null}
+                      </p>
+                      {c.comment && (
+                        <p className="text-xs text-muted-foreground mt-0.5 italic truncate">"{c.comment}"</p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <AttendancePill status={c.status} />
