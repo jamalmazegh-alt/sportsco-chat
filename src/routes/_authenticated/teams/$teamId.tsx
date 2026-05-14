@@ -17,6 +17,8 @@ import {
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { useServerFn } from "@tanstack/react-start";
+import { sendSms } from "@/lib/sms.functions";
 import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
