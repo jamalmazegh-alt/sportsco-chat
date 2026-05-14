@@ -1,16 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2 } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { requestPhoneCode, verifyPhoneCode } from "@/lib/phone-verify.functions";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
