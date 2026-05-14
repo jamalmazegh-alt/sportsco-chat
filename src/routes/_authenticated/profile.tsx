@@ -11,7 +11,7 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, Settings2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { requestPhoneCode, verifyPhoneCode } from "@/lib/phone-verify.functions";
