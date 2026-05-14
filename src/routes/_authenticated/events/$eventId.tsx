@@ -37,6 +37,7 @@ function EventDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
