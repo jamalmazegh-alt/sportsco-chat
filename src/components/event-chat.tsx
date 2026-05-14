@@ -43,11 +43,21 @@ export function EventChat({ eventId, clubId }: { eventId: string; clubId: string
       }
       const { data } = await supabase
         .from("event_messages")
-        .select("id, event_id, author_user_id, body, created_at, author:profiles!event_messages_author_user_id_fkey(full_name, avatar_url)")
+        .select("id, event_id, author_user_id, body, created_at")
         .eq("event_id", eventId)
         .order("created_at", { ascending: true });
+      const msgs = (data ?? []) as Msg[];
+      const ids = Array.from(new Set(msgs.map((m) => m.author_user_id)));
+      if (ids.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, full_name, avatar_url")
+          .in("id", ids);
+        const map = new Map((profs ?? []).map((p) => [p.id, p]));
+        msgs.forEach((m) => { m.author = map.get(m.author_user_id) ?? null; });
+      }
       if (!active) return;
-      setMessages((data ?? []) as unknown as Msg[]);
+      setMessages(msgs);
     })();
     return () => { active = false; };
   }, [eventId, clubId]);
