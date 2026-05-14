@@ -332,6 +332,10 @@
     "save": "Enregistrer",
     "saved": "Paramètres enregistrés."
   },
+  "attachments": {
+    "add": "Ajouter un fichier",
+    "tooLarge": "{{name}} dépasse 10 Mo."
+  },
   "wall": {
     "title": "Mur du club",
     "subtitle": "Annonces et discussions.",
