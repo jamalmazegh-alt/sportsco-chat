@@ -3,8 +3,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/password-input";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
@@ -67,7 +67,7 @@ function ResetPasswordPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={96} height={96} className="mx-auto mb-2 h-24 w-24 object-contain" />
+          <img src={logo} alt="Clubero" width={144} height={144} className="mx-auto mb-3 h-32 w-32 object-contain drop-shadow-sm" />
           <h1 className="text-xl font-semibold">{t("auth.resetTitle")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("auth.resetSubtitle")}</p>
         </div>
@@ -75,9 +75,8 @@ function ResetPasswordPage() {
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="space-y-1.5">
             <Label htmlFor="password">{t("auth.newPassword")}</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               required
               autoComplete="new-password"
               value={password}
@@ -89,9 +88,8 @@ function ResetPasswordPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
-            <Input
+            <PasswordInput
               id="confirm"
-              type="password"
               required
               autoComplete="new-password"
               value={confirm}

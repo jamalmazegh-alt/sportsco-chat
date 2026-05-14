@@ -53,7 +53,12 @@
     "resetLinkRequired": "Ouvrez le lien reçu par e-mail pour réinitialiser votre mot de passe.",
     "passwordRequirements": "Au moins 8 caractères, avec une majuscule, une minuscule et un chiffre.",
     "passwordTooWeak": "Le mot de passe doit contenir une majuscule, une minuscule et un chiffre.",
-    "passwordsMustMatch": "Les mots de passe doivent correspondre."
+    "passwordsMustMatch": "Les mots de passe doivent correspondre.",
+    "emailNotFound": "Aucun compte n'est associé à cette adresse e-mail.",
+    "resetSentTitle": "Vérifiez votre boîte mail",
+    "resetSentTo": "Nous avons envoyé un lien de réinitialisation à",
+    "resetSentHint": "Pas reçu ? Vérifiez vos spams ou réessayez dans une minute.",
+    "useDifferentEmail": "Utiliser une autre adresse"
   },
   "common": {
     "save": "Enregistrer",

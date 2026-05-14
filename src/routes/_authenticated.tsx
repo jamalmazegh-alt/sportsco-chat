@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import logo from "@/assets/clubero-logo.png";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthLayout,
@@ -44,6 +45,10 @@ function AuthLayout() {
   return (
     <div className="min-h-screen bg-background pb-24">
       <div className="mx-auto max-w-xl">
+        <div className="flex items-center justify-center gap-2 pt-3 pb-1">
+          <img src={logo} alt="Clubero" width={28} height={28} className="h-7 w-7 object-contain" />
+          <span className="text-sm font-semibold tracking-tight text-foreground/80">Clubero</span>
+        </div>
         <Outlet />
       </div>
       <BottomNav />

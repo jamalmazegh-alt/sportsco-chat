@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/password-input";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
@@ -39,6 +40,12 @@ function LoginPage() {
     navigate({ to: "/home" });
   }
 
+  function rememberEmailForReset() {
+    if (typeof window !== "undefined" && email) {
+      sessionStorage.setItem("clubero:forgot_email", email);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
@@ -58,7 +65,7 @@ function LoginPage() {
           })}
         </div>
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={96} height={96} className="mx-auto mb-2 h-24 w-24 object-contain" />
+          <img src={logo} alt="Clubero" width={176} height={176} className="mx-auto mb-3 h-40 w-40 object-contain drop-shadow-sm" />
           <p className="mt-1 text-sm text-muted-foreground">{t("app.tagline")}</p>
         </div>
 
@@ -76,9 +83,8 @@ function LoginPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">{t("auth.password")}</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               required
               autoComplete="current-password"
               value={password}
@@ -89,7 +95,11 @@ function LoginPage() {
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.login")}
           </Button>
           <div className="text-center">
-            <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
+            <Link
+              to="/forgot-password"
+              onClick={rememberEmailForReset}
+              className="text-sm text-muted-foreground hover:text-primary hover:underline"
+            >
               {t("auth.forgotPassword")}
             </Link>
           </div>

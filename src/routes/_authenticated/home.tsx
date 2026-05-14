@@ -110,22 +110,25 @@ function HomePage() {
 
   return (
     <div className="px-5 pt-8 space-y-6">
-      <header className="flex items-center gap-3">
+      {/* Club hero — centered logo */}
+      <header className="flex flex-col items-center text-center pt-2">
         {club?.logo_url ? (
-          <img src={club.logo_url} alt={club.name} className="h-12 w-12 rounded-xl object-cover border border-border" />
+          <img
+            src={club.logo_url}
+            alt={club.name}
+            className="h-28 w-28 rounded-3xl object-cover border border-border shadow-sm"
+          />
         ) : (
-          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center font-bold text-primary">
+          <div className="h-28 w-28 rounded-3xl bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary border border-border">
             {club?.name?.[0] ?? "C"}
           </div>
         )}
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold truncate">
-            {club?.name}
-          </p>
-          <h1 className="text-2xl font-semibold mt-0.5">
-            {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
-          </h1>
-        </div>
+        <p className="mt-3 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+          {club?.name}
+        </p>
+        <h1 className="text-2xl font-semibold mt-1">
+          {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
+        </h1>
       </header>
 
       {/* Quick actions */}
