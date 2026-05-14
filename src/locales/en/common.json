@@ -377,7 +377,13 @@
     "eventChatPlayers": "Players can access event chats",
     "eventChatParents": "Parents can access event chats",
     "save": "Save settings",
-    "saved": "Settings saved."
+    "saved": "Settings saved.",
+    "usersTitle": "Platform users",
+    "usersSubtitle": "All users with access to this club, with their roles and status.",
+    "usersEmpty": "No users yet.",
+    "openUsers": "Manage users",
+    "statusActive": "Active",
+    "statusPending": "Pending"
   },
   "attachments": {
     "add": "Add file",
