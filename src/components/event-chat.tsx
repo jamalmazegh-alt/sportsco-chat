@@ -44,7 +44,7 @@ export function EventChat({ eventId }: { eventId: string }) {
       setEnabled(ec === undefined ? true : !!ec);
       const { data } = await supabase
         .from("event_messages")
-        .select("id, event_id, author_user_id, body, created_at")
+        .select("id, event_id, author_user_id, body, created_at, attachments")
         .eq("event_id", eventId)
         .order("created_at", { ascending: true });
       const msgs = (data ?? []) as Msg[];
