@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -38,10 +38,46 @@ function RegisterPage() {
   const [signupRole, setSignupRole] = useState<SignupRole>(
     search.invite ? "player" : "club_admin"
   );
-  const [inviteToken, setInviteToken] = useState(search.invite ?? "");
+  const inviteToken = search.invite ?? "";
+  const hasInvite = inviteToken.length > 0;
+  // Member invite kind ("player" | "parent" | "member") if the token belongs to member_invites.
+  // Null while loading; "club" means token isn't found in member_invites and we'll fall back to club_invites.
+  const [inviteKind, setInviteKind] = useState<string | null>(null);
+  const [inviteEmailLocked, setInviteEmailLocked] = useState(false);
+  const [inviteLoading, setInviteLoading] = useState(hasInvite);
   const [busy, setBusy] = useState(false);
 
-  const needsInvite = signupRole === "player" || signupRole === "parent";
+  useEffect(() => {
+    if (!hasInvite) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.rpc("get_member_invite_info", {
+        _token: inviteToken,
+      });
+      if (cancelled) return;
+      const row = Array.isArray(data) ? data[0] : null;
+      if (error || !row) {
+        // Likely a club_invites token — keep player as default role
+        setInviteKind("club");
+        setInviteLoading(false);
+        return;
+      }
+      if (row.expired) toast.error(t("auth.inviteExpired") || "This invitation has expired.");
+      if (row.used) toast.error(t("auth.inviteUsed") || "This invitation has already been used.");
+      setInviteKind(row.kind);
+      if (row.kind === "parent") setSignupRole("parent");
+      else if (row.kind === "player") setSignupRole("player");
+      if (row.email) {
+        setEmail(row.email);
+        setInviteEmailLocked(true);
+      }
+      setInviteLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hasInvite, inviteToken, t]);
+
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   const passwordValid = passwordRegex.test(password);
   const passwordsMatch = password.length > 0 && password === confirm;
@@ -54,10 +90,6 @@ function RegisterPage() {
     }
     if (!passwordsMatch) {
       toast.error(t("auth.passwordsMustMatch"));
-      return;
-    }
-    if (needsInvite && !inviteToken.trim()) {
-      toast.error(t("auth.inviteRequired"));
       return;
     }
     setBusy(true);
@@ -73,7 +105,7 @@ function RegisterPage() {
           last_name: lastName.trim(),
           preferred_language: i18n.language?.slice(0, 2) || "en",
           signup_role: signupRole,
-          invite_token: needsInvite ? inviteToken.trim() : null,
+          invite_token: hasInvite ? inviteToken : null,
         },
       },
     });
@@ -83,10 +115,9 @@ function RegisterPage() {
       return;
     }
     // If session is immediately available (auto-confirm), redeem invite now
-    if (needsInvite) {
-      const { error: rErr } = await supabase.rpc("redeem_club_invite", {
-        _token: inviteToken.trim(),
-      });
+    if (hasInvite) {
+      const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
+      const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
       if (rErr) {
         setBusy(false);
         toast.error(rErr.message || t("auth.inviteInvalid"));
@@ -98,6 +129,9 @@ function RegisterPage() {
     navigate({ to: "/home" });
   }
 
+  // When invited, the role is fixed by the invitation — don't let the user change it.
+  const showRoleSelector = !hasInvite;
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
@@ -107,48 +141,45 @@ function RegisterPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <div className="space-y-2">
-            <Label>{t("auth.signupAs")}</Label>
-            <RadioGroup
-              value={signupRole}
-              onValueChange={(v) => setSignupRole(v as SignupRole)}
-              className="grid gap-2"
-            >
-              <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                <RadioGroupItem value="club_admin" id="r-admin" className="mt-0.5" />
-                <div className="text-sm">
-                  <div className="font-medium">{t("auth.roleClubAdmin")}</div>
-                  <div className="text-xs text-muted-foreground">{t("auth.roleClubAdminHint")}</div>
-                </div>
-              </label>
-              <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                <RadioGroupItem value="player" id="r-player" className="mt-0.5" />
-                <div className="text-sm">
-                  <div className="font-medium">{t("auth.rolePlayer")}</div>
-                  <div className="text-xs text-muted-foreground">{t("auth.rolePlayerHint")}</div>
-                </div>
-              </label>
-              <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                <RadioGroupItem value="parent" id="r-parent" className="mt-0.5" />
-                <div className="text-sm">
-                  <div className="font-medium">{t("auth.roleParent")}</div>
-                  <div className="text-xs text-muted-foreground">{t("auth.roleParentHint")}</div>
-                </div>
-              </label>
-            </RadioGroup>
-          </div>
-
-          {needsInvite && (
-            <div className="space-y-1.5">
-              <Label htmlFor="invite">{t("auth.inviteCode")}</Label>
-              <Input
-                id="invite"
-                required
-                value={inviteToken}
-                onChange={(e) => setInviteToken(e.target.value)}
-                placeholder="abcd-1234"
-              />
-              <p className="text-xs text-muted-foreground">{t("auth.inviteHint")}</p>
+          {showRoleSelector ? (
+            <div className="space-y-2">
+              <Label>{t("auth.signupAs")}</Label>
+              <RadioGroup
+                value={signupRole}
+                onValueChange={(v) => setSignupRole(v as SignupRole)}
+                className="grid gap-2"
+              >
+                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <RadioGroupItem value="club_admin" id="r-admin" className="mt-0.5" />
+                  <div className="text-sm">
+                    <div className="font-medium">{t("auth.roleClubAdmin")}</div>
+                    <div className="text-xs text-muted-foreground">{t("auth.roleClubAdminHint")}</div>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <RadioGroupItem value="player" id="r-player" className="mt-0.5" />
+                  <div className="text-sm">
+                    <div className="font-medium">{t("auth.rolePlayer")}</div>
+                    <div className="text-xs text-muted-foreground">{t("auth.rolePlayerHint")}</div>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                  <RadioGroupItem value="parent" id="r-parent" className="mt-0.5" />
+                  <div className="text-sm">
+                    <div className="font-medium">{t("auth.roleParent")}</div>
+                    <div className="text-xs text-muted-foreground">{t("auth.roleParentHint")}</div>
+                  </div>
+                </label>
+              </RadioGroup>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+              <div className="font-medium">
+                {signupRole === "parent" ? t("auth.roleParent") : t("auth.rolePlayer")}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {t("auth.invitedAsHint") || "You were invited — your role is set automatically."}
+              </div>
             </div>
           )}
 
@@ -171,7 +202,12 @@ function RegisterPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={inviteEmailLocked || inviteLoading}
+              className={inviteEmailLocked ? "bg-muted text-muted-foreground" : undefined}
             />
+            {inviteEmailLocked && (
+              <p className="text-xs text-muted-foreground">{t("auth.emailFromInvite") || "Email from your invitation."}</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="password">{t("auth.password")}</Label>
@@ -200,7 +236,7 @@ function RegisterPage() {
               <p className="text-xs text-destructive">{t("auth.passwordsMustMatch")}</p>
             )}
           </div>
-          <Button type="submit" className="w-full h-11" disabled={busy}>
+          <Button type="submit" className="w-full h-11" disabled={busy || inviteLoading}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.register")}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
