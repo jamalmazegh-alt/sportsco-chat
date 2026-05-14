@@ -7,7 +7,8 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
-import "@/lib/i18n";
+import i18n from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
 
@@ -59,8 +60,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const { i18n: i18nInstance } = useTranslation();
+  const lang = (i18nInstance.language || i18n.language || "en").slice(0, 2);
   return (
-    <html lang="en">
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

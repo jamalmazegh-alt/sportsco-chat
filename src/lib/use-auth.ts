@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import i18n from "@/lib/i18n";
@@ -51,6 +51,8 @@ export function useAuthState(): AuthState {
   const [activeClubId, setActiveClubIdState] = useState<string | null>(() =>
     typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CLUB_KEY) : null
   );
+  const activeClubIdRef = useRef(activeClubId);
+  activeClubIdRef.current = activeClubId;
 
   const setActiveClubId = useCallback((id: string | null) => {
     setActiveClubIdState(id);
@@ -66,7 +68,6 @@ export function useAuthState(): AuthState {
       setMemberships([]);
       return;
     }
-    // Sync preferred language from profile
     supabase
       .from("profiles")
       .select("preferred_language")
@@ -92,11 +93,12 @@ export function useAuthState(): AuthState {
       club: row.clubs,
     }));
     setMemberships(list);
-    if (list.length > 0 && !list.some((m) => m.club_id === activeClubId)) {
+    const current = activeClubIdRef.current;
+    if (list.length > 0 && !list.some((m) => m.club_id === current)) {
       setActiveClubId(list[0].club_id);
     }
     if (list.length === 0) setActiveClubId(null);
-  }, [activeClubId, setActiveClubId]);
+  }, [setActiveClubId]);
 
   useEffect(() => {
     // Set up listener BEFORE getSession
