@@ -176,53 +176,70 @@ function HomePage() {
         </div>
       )}
 
-      {/* For players/parents: unified list of their upcoming events with action-required highlight */}
-      {!isCoach && myConvocs && myConvocs.length > 0 && (
+      {/* For players/parents: unified list of upcoming events with action-required highlight on pending convocations */}
+      {!isCoach && (
         <section>
-          <h2 className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
-            {t("dashboard.myConvocations")}
-          </h2>
-          <ul className="space-y-2">
-            {myConvocs.map((c: any) => {
-              const actionRequired = c.status === "pending";
-              return (
-                <li key={c.id}>
-                  <Link
-                    to="/events/$eventId"
-                    params={{ eventId: c.event.id }}
-                    className={cn(
-                      "flex items-center justify-between rounded-2xl border p-4 active:scale-[0.99] transition-transform",
-                      actionRequired
-                        ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30"
-                        : "border-border bg-card",
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium truncate">{c.event.title}</p>
-                        {actionRequired && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
-                            {t("dashboard.actionRequired", { defaultValue: "Action required" })}
-                          </span>
-                        )}
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              {t("dashboard.myConvocations")}
+            </h2>
+            <Link to="/events" className="text-xs text-primary font-medium">
+              {t("dashboard.viewAll")}
+            </Link>
+          </div>
+          {!myEvents || myEvents.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {myEvents.map((e: any) => {
+                const actionRequired = e.convocation?.status === "pending";
+                return (
+                  <li key={e.id}>
+                    <Link
+                      to="/events/$eventId"
+                      params={{ eventId: e.id }}
+                      className={cn(
+                        "flex items-center justify-between rounded-2xl border p-4 active:scale-[0.99] transition-transform",
+                        actionRequired
+                          ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30"
+                          : "border-border bg-card",
+                      )}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium truncate">{e.title}</p>
+                          {actionRequired && (
+                            <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
+                              {t("dashboard.actionRequired", { defaultValue: "Action required" })}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+                          <Calendar className="h-3 w-3" />
+                          <span>{formatWhen(new Date(e.starts_at))}</span>
+                          {e.player && <span>· {e.player.first_name}</span>}
+                          {e.team_name && <span>· {e.team_name}</span>}
+                          {e.location && (
+                            <>
+                              <MapPin className="h-3 w-3" />
+                              <span className="truncate">{e.location}</span>
+                            </>
+                          )}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {formatWhen(new Date(c.event.starts_at))}
-                        {c.player ? ` · ${c.player.first_name}` : ""}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <AttendancePill status={c.status} />
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <Link to="/events" className="mt-3 inline-block text-xs text-primary font-medium">
-            {t("dashboard.viewAll")}
-          </Link>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {e.convocation && <AttendancePill status={e.convocation.status} />}
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       )}
 
@@ -271,16 +288,6 @@ function HomePage() {
               ))}
             </ul>
           )}
-        </section>
-      )}
-
-      {/* Empty state for parents/players with no convocations */}
-      {!isCoach && (!myConvocs || myConvocs.length === 0) && (
-        <section>
-          <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-            <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
-          </div>
         </section>
       )}
     </div>
