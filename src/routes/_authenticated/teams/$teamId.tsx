@@ -561,11 +561,11 @@ function TeamDetail() {
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <Label>{t("players.firstName")}</Label>
-                        <Input value={parentFirst} onChange={(e) => setParentFirst(e.target.value)} />
+                        <Input required={minor} value={parentFirst} onChange={(e) => setParentFirst(e.target.value)} />
                       </div>
                       <div className="space-y-1.5">
                         <Label>{t("players.lastName")}</Label>
-                        <Input value={parentLast} onChange={(e) => setParentLast(e.target.value)} />
+                        <Input required={minor} value={parentLast} onChange={(e) => setParentLast(e.target.value)} />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
