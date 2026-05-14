@@ -38,6 +38,7 @@ declare global {
       maps?: {
         places?: {
           AutocompleteService: new () => GoogleAutocompleteService;
+          AutocompleteSessionToken: new () => unknown;
         };
       };
     };
@@ -48,7 +49,7 @@ declare global {
 type GooglePlacePrediction = { description: string; place_id: string };
 type GoogleAutocompleteService = {
   getPlacePredictions: (
-    request: { input: string; types: string[] },
+    request: { input: string; types?: string[]; sessionToken?: unknown },
     callback: (items: GooglePlacePrediction[] | null) => void,
   ) => void;
 };
