@@ -477,6 +477,9 @@ function EventDetail() {
                         {p?.jersey_number ? (
                           <span className="text-muted-foreground"> · #{p.jersey_number}</span>
                         ) : null}
+                        {p?.preferred_position ? (
+                          <span className="text-muted-foreground"> · {p.preferred_position}</span>
+                        ) : null}
                       </span>
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
