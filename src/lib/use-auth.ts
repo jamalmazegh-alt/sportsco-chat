@@ -3,6 +3,26 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import i18n from "@/lib/i18n";
 
+async function redeemPendingInvite(session: Session) {
+  const token = (session.user?.user_metadata as any)?.invite_token as string | undefined;
+  if (!token) return;
+  try {
+    // Determine which RPC to use based on the invite source
+    const { data } = await supabase.rpc("get_member_invite_info", { _token: token });
+    const row = Array.isArray(data) ? data[0] : null;
+    const rpcName = row ? "redeem_member_invite" : "redeem_club_invite";
+    const { error } = await supabase.rpc(rpcName, { _token: token });
+    if (error) {
+      console.warn("Invite redemption failed:", error.message);
+      return;
+    }
+    // Clear token from metadata so we don't try again
+    await supabase.auth.updateUser({ data: { invite_token: null } });
+  } catch (e) {
+    console.warn("Invite redemption error:", e);
+  }
+}
+
 export type AppRole = "admin" | "coach" | "parent" | "player";
 
 export interface ClubMembership {
