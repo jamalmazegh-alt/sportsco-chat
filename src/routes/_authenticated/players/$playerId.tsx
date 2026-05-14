@@ -500,6 +500,7 @@ function PlayerProfile() {
           </form>
         )}
       </div>
+      )}
 
       <span className="sr-only">{activeClubId}</span>
 
