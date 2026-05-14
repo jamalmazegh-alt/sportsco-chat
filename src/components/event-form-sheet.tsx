@@ -273,33 +273,53 @@ function AddressField({
   const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>(
     [],
   );
+  const [open, setOpen] = useState(false);
   const [service, setService] = useState<GoogleAutocompleteService | null>(null);
+  const sessionTokenRef = useRef<unknown>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadGoogleMapsPlaces()
       ?.then(() => {
-        if (window.google?.maps?.places)
-          setService(new window.google.maps.places.AutocompleteService());
+        const places = window.google?.maps?.places;
+        if (places) {
+          setService(new places.AutocompleteService());
+          sessionTokenRef.current = new places.AutocompleteSessionToken();
+        }
       })
       .catch(() => undefined);
   }, []);
 
+  // Debounced predictions
   useEffect(() => {
     if (!service || value.trim().length < 3) {
       setSuggestions([]);
       return;
     }
-    service.getPlacePredictions(
-      { input: value, types: ["geocode", "establishment"] },
-      (items: GooglePlacePrediction[] | null) => {
-        setSuggestions(
-          (items ?? [])
-            .slice(0, 5)
-            .map((item) => ({ description: item.description, place_id: item.place_id })),
-        );
-      },
-    );
+    const handle = window.setTimeout(() => {
+      service.getPlacePredictions(
+        { input: value, types: ["geocode"], sessionToken: sessionTokenRef.current ?? undefined },
+        (items) => {
+          setSuggestions(
+            (items ?? [])
+              .slice(0, 5)
+              .map((item) => ({ description: item.description, place_id: item.place_id })),
+          );
+          setOpen(true);
+        },
+      );
+    }, 250);
+    return () => window.clearTimeout(handle);
   }, [service, value]);
+
+  // Close on outside click
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
 
   function selectPlace(suggestion: { description: string; place_id: string }) {
     onValueChange(suggestion.description);
@@ -307,10 +327,15 @@ function AddressField({
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suggestion.description)}&query_place_id=${suggestion.place_id}`,
     );
     setSuggestions([]);
+    setOpen(false);
+    // Rotate session token after a place selection (Google billing best practice)
+    if (window.google?.maps?.places) {
+      sessionTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+    }
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5" ref={containerRef}>
       <Label>{label}</Label>
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -319,11 +344,14 @@ function AddressField({
           onChange={(e) => {
             onValueChange(e.target.value);
             onPlaceUrl(null);
+            setOpen(true);
           }}
+          onFocus={() => suggestions.length > 0 && setOpen(true)}
           placeholder={placeholder}
           className="pl-9"
+          autoComplete="off"
         />
-        {suggestions.length > 0 && (
+        {open && suggestions.length > 0 && (
           <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
             {suggestions.map((suggestion) => (
               <button
