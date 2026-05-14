@@ -41,7 +41,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at")
+      .select("id, club_id, author_user_id, body, created_at, attachments")
       .eq("club_id", clubId)
       .order("created_at", { ascending: false })
       .limit(50);
