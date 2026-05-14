@@ -395,7 +395,7 @@ export function EventFormSheet({
   onSaved,
 }: Props) {
   const { t } = useTranslation();
-  const googlePlacesEnabled = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
+  
 
   const [teamId, setTeamId] = useState(initial?.team_id ?? "");
   const [type, setType] = useState<EventType>((initial?.type as EventType) ?? "training");
@@ -463,9 +463,11 @@ export function EventFormSheet({
   }, [availableCompetitionTypes, competitionType]);
 
   useEffect(() => {
-    if (!open || !googlePlacesEnabled) return;
-    loadGoogleMapsPlaces()?.catch(() => undefined);
-  }, [googlePlacesEnabled, open]);
+    if (!open) return;
+    fetchGoogleMapsKey().then((key) => {
+      loadGoogleMapsPlaces(key)?.catch(() => undefined);
+    });
+  }, [open]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
