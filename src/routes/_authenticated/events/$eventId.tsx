@@ -136,9 +136,11 @@ function EventDetail() {
     else refetch();
   }
 
-  async function cancelConvocation(convocationId: string) {
-    if (!confirm(t("attendance.confirmCancelConvocation"))) return;
-    const { error } = await supabase.from("convocations").delete().eq("id", convocationId);
+  async function confirmCancelConvocation() {
+    if (!cancelTargetId) return;
+    const id = cancelTargetId;
+    setCancelTargetId(null);
+    const { error } = await supabase.from("convocations").delete().eq("id", id);
     if (error) toast.error(error.message);
     else {
       toast.success(t("attendance.convocationCancelled"));
