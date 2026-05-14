@@ -3,6 +3,12 @@
     "name": "Clubero",
     "tagline": "Team coordination, made simple."
   },
+  "roles": {
+    "admin": "Club admin",
+    "coach": "Coach",
+    "player": "Player",
+    "parent": "Parent"
+  },
   "nav": {
     "home": "Home",
     "events": "Events",
