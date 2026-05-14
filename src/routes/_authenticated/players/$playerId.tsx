@@ -396,7 +396,8 @@ function PlayerProfile() {
         </div>
       )}
 
-      {/* PARENTS — separate card */}
+      {/* PARENTS — separate card (private) */}
+      {canSeePrivate && (
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
