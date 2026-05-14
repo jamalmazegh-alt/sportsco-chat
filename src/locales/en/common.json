@@ -25,7 +25,18 @@
     "signupSuccess": "Welcome aboard!",
     "checkEmail": "Check your email to confirm your account.",
     "loginError": "Invalid email or password.",
-    "weakPassword": "Use at least 8 characters."
+    "weakPassword": "Use at least 8 characters.",
+    "signupAs": "I'm signing up as…",
+    "roleClubAdmin": "Club manager",
+    "roleClubAdminHint": "Create and manage your club, teams and events.",
+    "rolePlayer": "Player",
+    "rolePlayerHint": "Join your club with an invitation link.",
+    "roleParent": "Parent",
+    "roleParentHint": "Respond to convocations for your child.",
+    "inviteCode": "Invitation code",
+    "inviteHint": "Ask your club admin for an invitation link or code.",
+    "inviteRequired": "An invitation code is required.",
+    "inviteInvalid": "This invitation is invalid or expired."
   },
   "common": {
     "save": "Save",
