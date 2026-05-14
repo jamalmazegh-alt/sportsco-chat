@@ -5,7 +5,9 @@ import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, MapPin, ChevronRight, Plus, Users } from "lucide-react";
-import { format, isToday, isTomorrow } from "date-fns";
+import { isToday, isTomorrow } from "date-fns";
+import { fmt } from "@/lib/date-locale";
+import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
@@ -15,10 +17,13 @@ export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({ meta: [{ title: "Home — Clubero" }] }),
 });
 
-function formatWhen(d: Date, locale?: string) {
-  const t = isToday(d) ? "Today" : isTomorrow(d) ? "Tomorrow" : format(d, "EEE d MMM");
-  return `${t} · ${format(d, "HH:mm")}`;
-  void locale;
+function formatWhen(d: Date) {
+  const label = isToday(d)
+    ? i18n.t("common.today")
+    : isTomorrow(d)
+      ? i18n.t("common.tomorrow")
+      : fmt(d, "EEE d MMM");
+  return `${label} · ${fmt(d, "HH:mm")}`;
 }
 
 function HomePage() {

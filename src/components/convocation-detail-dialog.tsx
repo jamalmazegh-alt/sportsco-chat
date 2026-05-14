@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
+import { fmt } from "@/lib/date-locale";
 import { Bell, Mail, MessageSquare, Smartphone, Send, X } from "lucide-react";
 import {
   Dialog,
