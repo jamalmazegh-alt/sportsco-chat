@@ -450,3 +450,45 @@ function TeamDetail() {
     </div>
   );
 }
+
+function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean; onUploaded: () => void }) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+
+  async function onPick(file: File) {
+    if (!team?.club_id) return;
+    setBusy(true);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${team.club_id}/${team.id}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("team-images")
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) { setBusy(false); toast.error(upErr.message); return; }
+    const { data: pub } = supabase.storage.from("team-images").getPublicUrl(path);
+    const { error: updErr } = await supabase.from("teams").update({ image_url: pub.publicUrl }).eq("id", team.id);
+    setBusy(false);
+    if (updErr) { toast.error(updErr.message); return; }
+    onUploaded();
+    toast.success(t("common.saved"));
+  }
+
+  const inner = team?.image_url ? (
+    <img src={team.image_url} alt={team?.name ?? ""} className="h-full w-full object-cover" />
+  ) : busy ? (
+    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+  ) : (
+    <Camera className="h-5 w-5 text-muted-foreground" />
+  );
+
+  if (!isCoach) {
+    return <div className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0">{inner}</div>;
+  }
+
+  return (
+    <label className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0 cursor-pointer relative group" title={t("teams.uploadImage")}>
+      {inner}
+      <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); }} />
+    </label>
+  );
+}
+
