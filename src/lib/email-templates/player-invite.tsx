@@ -20,14 +20,16 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
     </Preview>
     <Body style={main}>
       <Container style={container}>
-        {(clubLogoUrl || clubName) && (
-          <Section style={clubHeader}>
-            {clubLogoUrl && (
-              <Img src={clubLogoUrl} alt={clubName ?? "Club"} width="64" height="64" style={clubLogo} />
-            )}
-            {clubName && <Text style={clubLabel}>{clubName}</Text>}
-          </Section>
-        )}
+        <Section style={clubHeader}>
+          <Img
+            src={clubLogoUrl || "https://www.clubero.app/clubero-logo.png"}
+            alt={clubName ?? "Clubero"}
+            width="64"
+            height="64"
+            style={clubLogo}
+          />
+          {clubName && <Text style={clubLabel}>{clubName}</Text>}
+        </Section>
         <Heading style={h1}>
           {firstName ? `Welcome, ${firstName}!` : "You've been invited"}
         </Heading>
