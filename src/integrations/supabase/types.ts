@@ -1082,6 +1082,16 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_member_invite_info: {
+        Args: { _token: string }
+        Returns: {
+          email: string
+          expired: boolean
+          kind: string
+          role: Database["public"]["Enums"]["app_role"]
+          used: boolean
+        }[]
+      }
       has_club_role: {
         Args: {
           _club_id: string
