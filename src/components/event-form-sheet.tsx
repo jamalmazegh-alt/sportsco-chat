@@ -254,7 +254,7 @@ export function EventFormSheet({ open, onOpenChange, trigger, teams, initial, mo
 
   const [busy, setBusy] = useState(false);
   const selectedTeam = teams.find((tm) => tm.id === teamId);
-  const availableCompetitionTypes = competitionOptions(selectedTeam);
+  const availableCompetitionTypes = useMemo(() => competitionOptions(selectedTeam), [selectedTeam]);
 
   // When opening fresh, sync from initial
   useEffect(() => {
