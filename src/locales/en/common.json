@@ -220,6 +220,8 @@
     "sendConvocations": "Send convocations",
     "convocationsSent": "Convocations sent",
     "noEvents": "No events scheduled.",
+    "showPast": "Show past events ({{count}})",
+    "hidePast": "Hide past events",
     "location": "Location",
     "locationHint": "Address, stadium name, …",
     "locationAutoMaps": "A Google Maps link is created automatically.",
