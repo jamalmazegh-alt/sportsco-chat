@@ -226,7 +226,7 @@ function TeamDetail() {
             templateName: "player-invite",
             recipientEmail: target.email,
             idempotencyKey: `member-invite-${token}`,
-            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, inviteUrl },
+            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, clubLogoUrl, inviteUrl },
           });
           dispatched = true;
         } catch { /* fallthrough to sms */ }
