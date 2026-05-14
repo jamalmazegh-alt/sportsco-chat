@@ -167,6 +167,21 @@ function ProfilePage() {
         </div>
       )}
 
+      {isAdmin && (
+        <Link
+          to="/admin"
+          className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Settings2 className="h-5 w-5 text-primary" />
+            </div>
+            <span className="font-medium">{t("admin.openSettings")}</span>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </Link>
+      )}
+
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
