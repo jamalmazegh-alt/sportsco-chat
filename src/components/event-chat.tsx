@@ -58,7 +58,7 @@ export function EventChat({ eventId }: { eventId: string }) {
       setMessages(msgs);
     })();
     return () => { active = false; };
-  }, [eventId, clubId]);
+  }, [eventId]);
 
   // Realtime
   useEffect(() => {
