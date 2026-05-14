@@ -338,12 +338,14 @@
     "post": "Publier",
     "comment": "Répondre",
     "commentPlaceholder": "Écrire une réponse…",
-    "empty": "Aucune publication. Soyez le premier !"
+    "empty": "Aucune publication. Soyez le premier !",
+    "noClub": "Rejoignez ou créez un club pour voir le mur."
   },
   "chat": {
     "title": "Chat de l'événement",
     "empty": "Aucun message pour l'instant.",
     "placeholder": "Écrivez un message…",
-    "disabled": "Le chat est désactivé pour cet événement."
+    "disabled": "Le chat est désactivé pour cet événement.",
+    "you": "Vous"
   }
 }
