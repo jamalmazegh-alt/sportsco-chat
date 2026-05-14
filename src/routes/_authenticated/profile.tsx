@@ -242,6 +242,7 @@ function ProfilePage() {
         )}
       </div>
 
+      <Button
         variant="outline"
         className="w-full h-11"
         onClick={async () => {
