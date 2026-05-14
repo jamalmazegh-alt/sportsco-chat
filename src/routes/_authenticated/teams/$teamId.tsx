@@ -15,6 +15,8 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
 import { PhoneInput } from "@/components/phone-input";
+import { SportSelect } from "@/components/sport-select";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -198,6 +200,58 @@ function TeamDetail() {
       });
     }
 
+    // Auto-send invitations (player + parent) when an email is provided
+    const inviteTargets: Array<{
+      email: string;
+      role: "player" | "parent";
+      firstName?: string;
+    }> = [];
+    if (email) inviteTargets.push({ email, role: "player", firstName: first });
+    if (parentEmail) inviteTargets.push({ email: parentEmail, role: "parent", firstName: parentName || undefined });
+
+    if (inviteTargets.length > 0) {
+      const clubName = team?.name ? undefined : undefined;
+      const { data: clubRow } = await supabase
+        .from("clubs")
+        .select("name")
+        .eq("id", activeClubId)
+        .maybeSingle();
+
+      let anyFailed = false;
+      for (const target of inviteTargets) {
+        const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+        const { error: invErr } = await supabase.from("member_invites").insert({
+          club_id: activeClubId,
+          team_id: teamId,
+          player_id: target.role === "player" ? player.id : null,
+          parent_for_player_id: target.role === "parent" ? player.id : null,
+          role: target.role === "player" ? "player" : "parent",
+          email: target.email,
+          token,
+          created_by: user.id,
+        });
+        if (invErr) { anyFailed = true; continue; }
+        const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+        try {
+          await sendTransactionalEmail({
+            templateName: "player-invite",
+            recipientEmail: target.email,
+            idempotencyKey: `member-invite-${token}`,
+            templateData: {
+              firstName: target.firstName,
+              teamName: team?.name,
+              clubName: clubRow?.name ?? clubName,
+              inviteUrl,
+            },
+          });
+        } catch (e) {
+          anyFailed = true;
+        }
+      }
+      if (anyFailed) toast.error(t("players.inviteFailed"));
+      else toast.success(t("players.inviteSent"));
+    }
+
     setBusy(false);
     setOpen(false);
     reset();
@@ -269,13 +323,7 @@ function TeamDetail() {
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.sport")}</Label>
-                <Select value={editSport || undefined} onValueChange={setEditSport}>
-                  <SelectTrigger><SelectValue placeholder={t("teams.selectSport")} /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="football">{t("teams.sports.football")}</SelectItem>
-                    <SelectItem value="basketball">{t("teams.sports.basketball")}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <SportSelect value={editSport || undefined} onValueChange={setEditSport} />
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.season")}</Label>

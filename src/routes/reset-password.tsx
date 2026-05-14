@@ -39,10 +39,13 @@ function ResetPasswordPage() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  const passwordValid = passwordRegex.test(password);
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (password.length < 8) {
-      toast.error(t("auth.weakPassword"));
+    if (!passwordValid) {
+      toast.error(t("auth.passwordTooWeak"));
       return;
     }
     if (password !== confirm) {
@@ -80,6 +83,9 @@ function ResetPasswordPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <p className={`text-xs ${password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"}`}>
+              {t("auth.passwordRequirements")}
+            </p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>

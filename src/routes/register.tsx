@@ -33,6 +33,7 @@ function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [signupRole, setSignupRole] = useState<SignupRole>(
     search.invite ? "player" : "club_admin"
   );
@@ -40,11 +41,18 @@ function RegisterPage() {
   const [busy, setBusy] = useState(false);
 
   const needsInvite = signupRole === "player" || signupRole === "parent";
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+  const passwordValid = passwordRegex.test(password);
+  const passwordsMatch = password.length > 0 && password === confirm;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (password.length < 8) {
-      toast.error(t("auth.weakPassword"));
+    if (!passwordValid) {
+      toast.error(t("auth.passwordTooWeak"));
+      return;
+    }
+    if (!passwordsMatch) {
+      toast.error(t("auth.passwordsMustMatch"));
       return;
     }
     if (needsInvite && !inviteToken.trim()) {
@@ -175,6 +183,23 @@ function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <p className={`text-xs ${password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"}`}>
+              {t("auth.passwordRequirements")}
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm">{t("auth.confirmPassword")}</Label>
+            <Input
+              id="confirm"
+              type="password"
+              required
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+            {confirm.length > 0 && !passwordsMatch && (
+              <p className="text-xs text-destructive">{t("auth.passwordsMustMatch")}</p>
+            )}
           </div>
           <Button type="submit" className="w-full h-11" disabled={busy}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.register")}

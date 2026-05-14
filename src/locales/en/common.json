@@ -50,7 +50,10 @@
     "updatePassword": "Update password",
     "passwordMismatch": "Passwords don't match.",
     "passwordUpdated": "Password updated.",
-    "resetLinkRequired": "Open the email link to reset your password."
+    "resetLinkRequired": "Open the email link to reset your password.",
+    "passwordRequirements": "At least 8 characters, with an uppercase letter, a lowercase letter and a digit.",
+    "passwordTooWeak": "Password must include uppercase, lowercase and a digit.",
+    "passwordsMustMatch": "Passwords must match."
   },
   "common": {
     "save": "Save",
@@ -120,8 +123,27 @@
     "selectSport": "Select sport",
     "sports": {
       "football": "Football",
-      "basketball": "Basketball"
-    }
+      "basketball": "Basketball",
+      "handball": "Handball",
+      "volleyball": "Volleyball",
+      "rugby": "Rugby",
+      "futsal": "Futsal",
+      "field_hockey": "Field hockey",
+      "ice_hockey": "Ice hockey",
+      "water_polo": "Water polo",
+      "baseball": "Baseball",
+      "softball": "Softball",
+      "cricket": "Cricket",
+      "american_football": "American football",
+      "lacrosse": "Lacrosse",
+      "netball": "Netball",
+      "korfball": "Korfball",
+      "ultimate_frisbee": "Ultimate frisbee",
+      "rowing": "Rowing",
+      "cheerleading": "Cheerleading",
+      "esports": "Esports"
+    },
+    "sportsCollective": "Other collective sports"
   },
   "club": {
     "logo": "Club logo",
@@ -152,7 +174,9 @@
     "noPlayers": "No players yet.",
     "profile": "Player profile",
     "details": "Details",
-    "save": "Save player"
+    "save": "Save player",
+    "inviteSent": "Invitation email sent.",
+    "inviteFailed": "Player created, but invitation email could not be sent."
   },
   "events": {
     "title": "Events",

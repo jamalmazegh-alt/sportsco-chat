@@ -50,7 +50,10 @@
     "updatePassword": "Mettre à jour",
     "passwordMismatch": "Les mots de passe ne correspondent pas.",
     "passwordUpdated": "Mot de passe mis à jour.",
-    "resetLinkRequired": "Ouvrez le lien reçu par e-mail pour réinitialiser votre mot de passe."
+    "resetLinkRequired": "Ouvrez le lien reçu par e-mail pour réinitialiser votre mot de passe.",
+    "passwordRequirements": "Au moins 8 caractères, avec une majuscule, une minuscule et un chiffre.",
+    "passwordTooWeak": "Le mot de passe doit contenir une majuscule, une minuscule et un chiffre.",
+    "passwordsMustMatch": "Les mots de passe doivent correspondre."
   },
   "common": {
     "save": "Enregistrer",
@@ -120,8 +123,27 @@
     "selectSport": "Choisir un sport",
     "sports": {
       "football": "Football",
-      "basketball": "Basketball"
-    }
+      "basketball": "Basketball",
+      "handball": "Handball",
+      "volleyball": "Volley-ball",
+      "rugby": "Rugby",
+      "futsal": "Futsal",
+      "field_hockey": "Hockey sur gazon",
+      "ice_hockey": "Hockey sur glace",
+      "water_polo": "Water-polo",
+      "baseball": "Baseball",
+      "softball": "Softball",
+      "cricket": "Cricket",
+      "american_football": "Football américain",
+      "lacrosse": "Crosse",
+      "netball": "Netball",
+      "korfball": "Korfball",
+      "ultimate_frisbee": "Ultimate frisbee",
+      "rowing": "Aviron",
+      "cheerleading": "Cheerleading",
+      "esports": "Esports"
+    },
+    "sportsCollective": "Autres sports collectifs"
   },
   "club": {
     "logo": "Logo du club",
@@ -152,7 +174,9 @@
     "noPlayers": "Aucun joueur.",
     "profile": "Profil du joueur",
     "details": "Informations",
-    "save": "Enregistrer le joueur"
+    "save": "Enregistrer le joueur",
+    "inviteSent": "E-mail d'invitation envoyé.",
+    "inviteFailed": "Joueur créé, mais l'invitation n'a pas pu être envoyée."
   },
   "events": {
     "title": "Événements",
