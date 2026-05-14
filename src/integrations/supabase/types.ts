@@ -473,6 +473,7 @@ export type Database = {
           competitions: string[]
           created_at: string
           id: string
+          image_url: string | null
           name: string
           season: string | null
           sport: string | null
@@ -484,6 +485,7 @@ export type Database = {
           competitions?: string[]
           created_at?: string
           id?: string
+          image_url?: string | null
           name: string
           season?: string | null
           sport?: string | null
@@ -495,6 +497,7 @@ export type Database = {
           competitions?: string[]
           created_at?: string
           id?: string
+          image_url?: string | null
           name?: string
           season?: string | null
           sport?: string | null
