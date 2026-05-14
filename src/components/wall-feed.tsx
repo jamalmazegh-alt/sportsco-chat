@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare, Send, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
+import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
@@ -16,6 +17,7 @@ type Post = {
   author_user_id: string;
   body: string;
   created_at: string;
+  attachments: Attachment[];
   author?: Profile | null;
   comments?: Comment[];
 };
@@ -26,6 +28,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const role = useActiveRole();
   const [posts, setPosts] = useState<Post[]>([]);
   const [body, setBody] = useState("");
+  const [atts, setAtts] = useState<Attachment[]>([]);
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
@@ -38,7 +41,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at")
+      .select("id, club_id, author_user_id, body, created_at, attachments")
       .eq("club_id", clubId)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -91,14 +94,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
   }, [clubId]);
 
   async function submitPost() {
-    if (!body.trim() || !user) return;
+    if ((!body.trim() && atts.length === 0) || !user) return;
     setPosting(true);
     const { error } = await supabase
       .from("wall_posts")
-      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim() });
+      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never });
     setPosting(false);
     if (error) { toast.error(error.message); return; }
     setBody("");
+    setAtts([]);
   }
 
   async function deletePost(id: string) {
@@ -119,8 +123,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
           onChange={(e) => setBody(e.target.value)}
           placeholder={t("wall.placeholder")}
         />
+        <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
         <div className="flex justify-end">
-          <Button onClick={submitPost} disabled={posting || !body.trim()}>
+          <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0)}>
             {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
           </Button>
         </div>
@@ -144,7 +149,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
                 )}
               </header>
               <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>
-
+              {p.attachments?.length > 0 && (
+                <div className="mt-2"><AttachmentList items={p.attachments as Attachment[]} /></div>
+              )}
               {commentsEnabled && (
                 <CommentBlock post={p} currentUserId={user?.id ?? null} role={role} />
               )}

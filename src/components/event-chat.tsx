@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Send, MessageCircle, Lock } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
 type Msg = {
   id: string;
@@ -14,6 +15,7 @@ type Msg = {
   author_user_id: string;
   body: string;
   created_at: string;
+  attachments: Attachment[];
   author?: { full_name: string | null; avatar_url: string | null } | null;
 };
 
@@ -22,6 +24,7 @@ export function EventChat({ eventId }: { eventId: string }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [body, setBody] = useState("");
+  const [atts, setAtts] = useState<Attachment[]>([]);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -41,7 +44,7 @@ export function EventChat({ eventId }: { eventId: string }) {
       setEnabled(ec === undefined ? true : !!ec);
       const { data } = await supabase
         .from("event_messages")
-        .select("id, event_id, author_user_id, body, created_at")
+        .select("id, event_id, author_user_id, body, created_at, attachments")
         .eq("event_id", eventId)
         .order("created_at", { ascending: true });
       const msgs = (data ?? []) as Msg[];
@@ -79,16 +82,19 @@ export function EventChat({ eventId }: { eventId: string }) {
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length]);
 
   async function send() {
-    if (!body.trim() || !user) return;
+    if ((!body.trim() && atts.length === 0) || !user) return;
     setSending(true);
     const text = body.trim();
+    const attachmentsToSend = atts;
     setBody("");
+    setAtts([]);
     const { error } = await supabase
       .from("event_messages")
-      .insert({ event_id: eventId, author_user_id: user.id, body: text });
+      .insert({ event_id: eventId, author_user_id: user.id, body: text, attachments: attachmentsToSend as unknown as never });
     setSending(false);
     if (error) {
       setBody(text);
+      setAtts(attachmentsToSend);
     }
   }
 
@@ -123,7 +129,10 @@ export function EventChat({ eventId }: { eventId: string }) {
                 <p className={cn("text-[11px] font-medium mb-0.5", mine ? "opacity-90" : "text-foreground/80")}>
                   {mine ? t("chat.you") : (m.author?.full_name ?? "—")}
                 </p>
-                <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                {m.attachments?.length > 0 && (
+                  <div className="mt-1.5"><AttachmentList items={m.attachments as Attachment[]} /></div>
+                )}
                 <p className={cn("text-[10px] mt-0.5", mine ? "opacity-80" : "text-muted-foreground")}>
                   {format(new Date(m.created_at), "HH:mm")}
                 </p>
@@ -136,17 +145,20 @@ export function EventChat({ eventId }: { eventId: string }) {
 
       <form
         onSubmit={(e) => { e.preventDefault(); send(); }}
-        className="flex gap-2 p-3 border-t border-border"
+        className="p-3 border-t border-border space-y-2"
       >
-        <Input
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder={t("chat.placeholder")}
-          className="h-10"
-        />
-        <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || !body.trim()}>
-          <Send className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Input
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={t("chat.placeholder")}
+            className="h-10"
+          />
+          <Button type="submit" size="icon" className="h-10 w-10 shrink-0" disabled={sending || (!body.trim() && atts.length === 0)}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+        <AttachmentPicker value={atts} onChange={setAtts} prefix={`chat/${eventId}`} />
       </form>
     </section>
   );

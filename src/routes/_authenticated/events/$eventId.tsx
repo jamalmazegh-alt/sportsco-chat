@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
+import { AttachmentList, type Attachment } from "@/components/attachments";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments")
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -368,6 +369,12 @@ function EventDetail() {
             </p>
           )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
+          {(() => {
+            const list = (event.attachments as unknown as Attachment[] | null) ?? [];
+            return list.length > 0 ? (
+              <div className="pt-3"><AttachmentList items={list} /></div>
+            ) : null;
+          })()}
         </div>
       </div>
 

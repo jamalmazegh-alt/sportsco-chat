@@ -288,6 +288,7 @@ export type Database = {
       }
       event_messages: {
         Row: {
+          attachments: Json
           author_user_id: string
           body: string
           created_at: string
@@ -295,6 +296,7 @@ export type Database = {
           id: string
         }
         Insert: {
+          attachments?: Json
           author_user_id: string
           body: string
           created_at?: string
@@ -302,6 +304,7 @@ export type Database = {
           id?: string
         }
         Update: {
+          attachments?: Json
           author_user_id?: string
           body?: string
           created_at?: string
@@ -312,6 +315,7 @@ export type Database = {
       }
       events: {
         Row: {
+          attachments: Json
           competition_name: string | null
           competition_type: string | null
           convocation_time: string | null
@@ -334,6 +338,7 @@ export type Database = {
           type: Database["public"]["Enums"]["event_type"]
         }
         Insert: {
+          attachments?: Json
           competition_name?: string | null
           competition_type?: string | null
           convocation_time?: string | null
@@ -356,6 +361,7 @@ export type Database = {
           type?: Database["public"]["Enums"]["event_type"]
         }
         Update: {
+          attachments?: Json
           competition_name?: string | null
           competition_type?: string | null
           convocation_time?: string | null
@@ -851,6 +857,7 @@ export type Database = {
       }
       wall_posts: {
         Row: {
+          attachments: Json
           author_user_id: string
           body: string
           club_id: string
@@ -858,6 +865,7 @@ export type Database = {
           id: string
         }
         Insert: {
+          attachments?: Json
           author_user_id: string
           body: string
           club_id: string
@@ -865,6 +873,7 @@ export type Database = {
           id?: string
         }
         Update: {
+          attachments?: Json
           author_user_id?: string
           body?: string
           club_id?: string

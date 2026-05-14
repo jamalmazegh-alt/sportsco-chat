@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { CalendarIcon, Check, Loader2, MapPin, Search } from "lucide-react";
@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AttachmentPicker, type Attachment } from "@/components/attachments";
 
 const TRAINING_DEFAULT_DURATION_MIN = 90;
 
@@ -37,6 +38,7 @@ declare global {
       maps?: {
         places?: {
           AutocompleteService: new () => GoogleAutocompleteService;
+          AutocompleteSessionToken: new () => unknown;
         };
       };
     };
@@ -47,7 +49,7 @@ declare global {
 type GooglePlacePrediction = { description: string; place_id: string };
 type GoogleAutocompleteService = {
   getPlacePredictions: (
-    request: { input: string; types: string[] },
+    request: { input: string; types?: string[]; sessionToken?: unknown },
     callback: (items: GooglePlacePrediction[] | null) => void,
   ) => void;
 };
@@ -71,6 +73,7 @@ export type EventFormValues = {
   starts_at: string; // ISO
   ends_at: string | null;
   convocation_time: string | null;
+  attachments?: Attachment[] | null;
 };
 
 type Team = { id: string; name: string };
@@ -270,33 +273,53 @@ function AddressField({
   const [suggestions, setSuggestions] = useState<Array<{ description: string; place_id: string }>>(
     [],
   );
+  const [open, setOpen] = useState(false);
   const [service, setService] = useState<GoogleAutocompleteService | null>(null);
+  const sessionTokenRef = useRef<unknown>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadGoogleMapsPlaces()
       ?.then(() => {
-        if (window.google?.maps?.places)
-          setService(new window.google.maps.places.AutocompleteService());
+        const places = window.google?.maps?.places;
+        if (places) {
+          setService(new places.AutocompleteService());
+          sessionTokenRef.current = new places.AutocompleteSessionToken();
+        }
       })
       .catch(() => undefined);
   }, []);
 
+  // Debounced predictions
   useEffect(() => {
     if (!service || value.trim().length < 3) {
       setSuggestions([]);
       return;
     }
-    service.getPlacePredictions(
-      { input: value, types: ["geocode", "establishment"] },
-      (items: GooglePlacePrediction[] | null) => {
-        setSuggestions(
-          (items ?? [])
-            .slice(0, 5)
-            .map((item) => ({ description: item.description, place_id: item.place_id })),
-        );
-      },
-    );
+    const handle = window.setTimeout(() => {
+      service.getPlacePredictions(
+        { input: value, types: ["geocode"], sessionToken: sessionTokenRef.current ?? undefined },
+        (items) => {
+          setSuggestions(
+            (items ?? [])
+              .slice(0, 5)
+              .map((item) => ({ description: item.description, place_id: item.place_id })),
+          );
+          setOpen(true);
+        },
+      );
+    }, 250);
+    return () => window.clearTimeout(handle);
   }, [service, value]);
+
+  // Close on outside click
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
 
   function selectPlace(suggestion: { description: string; place_id: string }) {
     onValueChange(suggestion.description);
@@ -304,10 +327,15 @@ function AddressField({
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suggestion.description)}&query_place_id=${suggestion.place_id}`,
     );
     setSuggestions([]);
+    setOpen(false);
+    // Rotate session token after a place selection (Google billing best practice)
+    if (window.google?.maps?.places) {
+      sessionTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+    }
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5" ref={containerRef}>
       <Label>{label}</Label>
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -316,11 +344,14 @@ function AddressField({
           onChange={(e) => {
             onValueChange(e.target.value);
             onPlaceUrl(null);
+            setOpen(true);
           }}
+          onFocus={() => suggestions.length > 0 && setOpen(true)}
           placeholder={placeholder}
           className="pl-9"
+          autoComplete="off"
         />
-        {suggestions.length > 0 && (
+        {open && suggestions.length > 0 && (
           <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
             {suggestions.map((suggestion) => (
               <button
@@ -369,6 +400,7 @@ export function EventFormSheet({
     initial?.is_home === false ? "away" : "home",
   );
   const [meetingPoint, setMeetingPoint] = useState(initial?.meeting_point ?? "");
+  const [attachments, setAttachments] = useState<Attachment[]>((initial?.attachments as Attachment[] | undefined) ?? []);
 
   const startsInit = splitDateTime(initial?.starts_at);
   const endsInit = splitDateTime(initial?.ends_at);
@@ -399,6 +431,7 @@ export function EventFormSheet({
     setCompetitionName(initial?.competition_name ?? "");
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
+    setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
     const c = splitDateTime(initial?.convocation_time);
@@ -470,6 +503,7 @@ export function EventFormSheet({
       starts_at: startsIso,
       ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
       convocation_time: eventConvocationTime,
+      attachments: attachments as unknown as never,
     };
 
     if (mode === "create") {
@@ -706,6 +740,11 @@ export function EventFormSheet({
           <div className="space-y-1.5">
             <Label>{t("events.details")}</Label>
             <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>{t("events.attachments")}</Label>
+            <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
           </div>
 
           <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>

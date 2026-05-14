@@ -225,6 +225,7 @@
     "locationAutoMaps": "A Google Maps link is created automatically.",
     "locationUrl": "Google Maps link",
     "openInMaps": "Open in Maps",
+    "attachments": "Attachments",
     "meetingPoint": "Meeting point",
     "meetingPointHint": "Where to meet before leaving (e.g. club parking)",
     "venue": "Venue",
@@ -330,6 +331,10 @@
     "eventChatParents": "Parents can access event chats",
     "save": "Save settings",
     "saved": "Settings saved."
+  },
+  "attachments": {
+    "add": "Add file",
+    "tooLarge": "{{name}} exceeds 10 MB."
   },
   "wall": {
     "title": "Club wall",
