@@ -167,6 +167,18 @@ export function EventChat({ eventId }: { eventId: string }) {
       {open && (
         <>
           <div className="max-h-80 overflow-y-auto px-3 py-3 space-y-2 border-t border-border">
+            {hasMore && (
+              <div className="flex justify-center pb-1">
+                <button
+                  type="button"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="text-[11px] font-medium text-primary hover:underline disabled:opacity-50"
+                >
+                  {loadingMore ? t("common.loading", { defaultValue: "Loading…" }) : t("chat.loadMore", { defaultValue: "Load earlier messages" })}
+                </button>
+              </div>
+            )}
             {messages.length === 0 && (
               <p className="text-xs text-muted-foreground text-center py-6">{t("chat.empty")}</p>
             )}
