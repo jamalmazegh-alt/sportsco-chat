@@ -332,6 +332,10 @@
     "save": "Save settings",
     "saved": "Settings saved."
   },
+  "attachments": {
+    "add": "Add file",
+    "tooLarge": "{{name}} exceeds 10 MB."
+  },
   "wall": {
     "title": "Club wall",
     "subtitle": "Announcements and conversations.",
