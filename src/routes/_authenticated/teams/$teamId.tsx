@@ -35,7 +35,7 @@ function TeamDetail() {
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
-  const sendSmsFn = useServerFn(sendSms);
+  
 
   const { data: team } = useQuery({
     queryKey: ["team", teamId],
