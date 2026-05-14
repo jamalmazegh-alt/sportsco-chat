@@ -120,9 +120,9 @@ export function EventChat({ eventId }: { eventId: string }) {
                 "max-w-[78%] rounded-2xl px-3 py-2 text-sm",
                 mine ? "bg-primary text-primary-foreground" : "bg-muted"
               )}>
-                {!mine && (
-                  <p className="text-[10px] opacity-70 mb-0.5">{m.author?.full_name ?? "—"}</p>
-                )}
+                <p className={cn("text-[11px] font-medium mb-0.5", mine ? "opacity-90" : "text-foreground/80")}>
+                  {mine ? t("chat.you") : (m.author?.full_name ?? "—")}
+                </p>
                 <p className="whitespace-pre-wrap break-words">{m.body}</p>
                 <p className={cn("text-[10px] mt-0.5", mine ? "opacity-80" : "text-muted-foreground")}>
                   {format(new Date(m.created_at), "HH:mm")}
