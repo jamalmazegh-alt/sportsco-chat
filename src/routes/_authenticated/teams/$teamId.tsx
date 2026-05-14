@@ -199,8 +199,9 @@ function TeamDetail() {
 
     if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
 
-    const { data: clubRow } = await supabase.from("clubs").select("name").eq("id", activeClubId).maybeSingle();
+    const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
+    const clubLogoUrl = clubRow?.logo_url ?? undefined;
 
     let sent = 0; let failed = 0;
     for (const target of targets) {
@@ -225,7 +226,7 @@ function TeamDetail() {
             templateName: "player-invite",
             recipientEmail: target.email,
             idempotencyKey: `member-invite-${token}`,
-            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, inviteUrl },
+            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, clubLogoUrl, inviteUrl },
           });
           dispatched = true;
         } catch { /* fallthrough to sms */ }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {
-  Body, Button, Container, Head, Heading, Html, Preview, Text,
+  Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Text,
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
@@ -8,10 +8,11 @@ interface PlayerInviteProps {
   firstName?: string;
   teamName?: string;
   clubName?: string;
+  clubLogoUrl?: string;
   inviteUrl: string;
 }
 
-const PlayerInviteEmail = ({ firstName, teamName, clubName, inviteUrl }: PlayerInviteProps) => (
+const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl }: PlayerInviteProps) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
@@ -19,6 +20,14 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, inviteUrl }: PlayerI
     </Preview>
     <Body style={main}>
       <Container style={container}>
+        {(clubLogoUrl || clubName) && (
+          <Section style={clubHeader}>
+            {clubLogoUrl && (
+              <Img src={clubLogoUrl} alt={clubName ?? "Club"} width="64" height="64" style={clubLogo} />
+            )}
+            {clubName && <Text style={clubLabel}>{clubName}</Text>}
+          </Section>
+        )}
         <Heading style={h1}>
           {firstName ? `Welcome, ${firstName}!` : "You've been invited"}
         </Heading>
@@ -51,9 +60,11 @@ export const template = {
     firstName: "Alex",
     teamName: "U13 A",
     clubName: "AS Clubero",
+    clubLogoUrl: "https://www.clubero.app/clubero-logo.png",
     inviteUrl: "https://clubero.app/register?invite=sample-token",
   },
 } satisfies TemplateEntry;
+
 
 const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
 const container = { padding: "24px 28px", maxWidth: "560px" };
@@ -70,3 +81,6 @@ const button = {
 };
 const small = { fontSize: "12px", color: "#64748b", margin: "20px 0 0", lineHeight: "1.5" };
 const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };
+const clubHeader = { textAlign: "center" as const, margin: "0 0 20px" };
+const clubLogo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
+const clubLabel = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "8px 0 0", textAlign: "center" as const };
