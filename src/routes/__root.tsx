@@ -60,8 +60,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const { i18n: i18nInstance } = useTranslation();
+  const lang = (i18nInstance.language || i18n.language || "en").slice(0, 2);
   return (
-    <html lang="en">
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
