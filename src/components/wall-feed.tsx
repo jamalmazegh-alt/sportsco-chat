@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare, Send, Trash2 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { toast } from "sonner";
+import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
