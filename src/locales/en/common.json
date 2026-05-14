@@ -298,5 +298,21 @@
     "verifyNewNumber": "Verify new number",
     "codeSent": "Verification code sent.",
     "phoneVerified": "Phone verified."
+  },
+  "admin": {
+    "title": "Club settings",
+    "subtitle": "Global preferences for {{club}}.",
+    "openSettings": "Club settings",
+    "convocationChannels": "Default convocation channels",
+    "convocationChannelsHint": "Channels used by default when sending convocations and reminders.",
+    "communications": "Communications",
+    "wallComments": "Enable comments on the wall",
+    "wallCommentsHint": "Members can comment on posts and announcements.",
+    "eventChat": "Enable chat on each event",
+    "eventChatHint": "Open a discussion thread per event.",
+    "eventChatPlayers": "Players can access event chats",
+    "eventChatParents": "Parents can access event chats",
+    "save": "Save settings",
+    "saved": "Settings saved."
   }
 }
