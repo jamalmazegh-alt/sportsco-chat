@@ -7,7 +7,8 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
-import "@/lib/i18n";
+import i18n from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
 
