@@ -652,6 +652,21 @@ function EventDetail() {
         </section>
       )}
 
+      <ConvocationDetailDialog
+        open={!!detailConvocId}
+        onOpenChange={(o) => !o && setDetailConvocId(null)}
+        convocation={(convocations ?? []).find((c: any) => c.id === detailConvocId) ?? null}
+        eventConvocationsSentAt={null}
+        isCoach={isCoach}
+        onRemind={(id) => {
+          remind(id);
+        }}
+        onCancel={(id) => {
+          setDetailConvocId(null);
+          setCancelTargetId(id);
+        }}
+      />
+
       <AlertDialog open={!!cancelTargetId} onOpenChange={(o) => !o && setCancelTargetId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
