@@ -157,7 +157,7 @@ function HomePage() {
         </div>
       )}
 
-      {role === "admin" && activeClubId && <InviteCard clubId={activeClubId} />}
+      
 
       {/* My convocations (parents/players priority) */}
       {myConvocs && myConvocs.length > 0 && (
