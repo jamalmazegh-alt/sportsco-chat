@@ -45,7 +45,7 @@ function HomePage() {
   // Next event (any team in club user can see)
   const { data: upcoming } = useQuery({
     queryKey: ["upcoming", activeClubId],
-    enabled: !!activeClubId,
+    enabled: !!activeClubId && !!teams,
     queryFn: async () => {
       if (!teams || teams.length === 0) return [];
       const teamIds = teams.map((t) => t.id);
