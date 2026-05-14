@@ -285,6 +285,14 @@ function TeamDetail() {
   async function onAdd(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
+
+    // Validate: minor requires a parent with at least name + (email or phone)
+    const hasParentInfo = (parentFirst.trim() || parentLast.trim()) && (parentEmail.trim() || parentPhone.trim());
+    if (minor && !hasParentInfo) {
+      toast.error(t("players.parentRequiredForMinor"));
+      return;
+    }
+
     setBusy(true);
 
     const playerCanRespond = respondBy === "player" || respondBy === "both";
@@ -300,7 +308,10 @@ function TeamDetail() {
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
-        can_respond: playerCanRespond,
+        birth_date: birthDate || null,
+        // For minors, the player has no platform access by default — only the parent decides later.
+        can_respond: minor ? false : playerCanRespond,
+        child_platform_access: false,
       })
       .select("id")
       .single();
@@ -337,6 +348,17 @@ function TeamDetail() {
         can_respond: parentCanRespond,
       });
     }
+
+    // Auto-send invites: parent (always for minor); player too if adult and contactable.
+    try {
+      const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+      if (inviter?.phone_verified_at) {
+        const r = await sendInvitesForPlayer(player.id);
+        if (r.sent > 0) {
+          toast.success(minor ? t("players.autoInviteParentSent") : t("players.autoInviteSent"));
+        }
+      }
+    } catch { /* non-blocking */ }
 
     setBusy(false);
     setOpen(false);
