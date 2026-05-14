@@ -11,16 +11,16 @@ export const Route = createFileRoute("/demo")({
   component: DemoPage,
   head: () => ({
     meta: [
-      { title: "Request a demo — Clubero" },
+      { title: "Demander une démo — Clubero" },
       {
         name: "description",
         content:
-          "Book a 15-minute walkthrough of Clubero. We'll set up your first team with you.",
+          "Réservez une démo de 15 minutes de Clubero. Nous configurons votre première équipe avec vous.",
       },
-      { property: "og:title", content: "Request a demo — Clubero" },
+      { property: "og:title", content: "Demander une démo — Clubero" },
       {
         property: "og:description",
-        content: "Book a 15-minute walkthrough of Clubero.",
+        content: "Réservez une démo de 15 minutes de Clubero.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/demo" }],
@@ -37,18 +37,18 @@ function DemoPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const subject = `Demo request — ${club}`;
-    const body = `Club: ${club}\nContact: ${name} <${email}>\nRole: ${role}\nTeams: ${teams}\n\nNotes:\n${notes}`;
+    const subject = `Demande de démo — ${club}`;
+    const body = `Club : ${club}\nContact : ${name} <${email}>\nRôle : ${role}\nÉquipes : ${teams}\n\nNotes :\n${notes}`;
     window.location.href = `mailto:hello@clubero.app?subject=${encodeURIComponent(
       subject,
     )}&body=${encodeURIComponent(body)}`;
   }
 
   const PERKS = [
-    "15-minute personalized walkthrough",
-    "We set up your first team with you",
-    "Free trial, no credit card required",
-    "Migration help from your current tool",
+    "Démo personnalisée de 15 minutes",
+    "Nous configurons votre première équipe avec vous",
+    "Essai gratuit, sans carte bancaire",
+    "Aide à la migration depuis votre outil actuel",
   ];
 
   return (
@@ -57,14 +57,14 @@ function DemoPage() {
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-24">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
-              Demo
+              Démo
             </p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              See Clubero in action.
+              Voyez Clubero en action.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Tell us a bit about your club — we&apos;ll reach out within one
-              business day to schedule a walkthrough.
+              Parlez-nous un peu de votre club — nous revenons vers vous sous un
+              jour ouvré pour planifier une démo.
             </p>
             <ul className="mt-8 space-y-3">
               {PERKS.map((p) => (
@@ -81,7 +81,7 @@ function DemoPage() {
             className="rounded-3xl border border-border bg-card p-6 shadow-xl shadow-[color:var(--brand-blue)]/5 lg:p-8"
           >
             <div className="space-y-1.5">
-              <Label htmlFor="d-club">Club name</Label>
+              <Label htmlFor="d-club">Nom du club</Label>
               <Input
                 id="d-club"
                 required
@@ -92,7 +92,7 @@ function DemoPage() {
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-name">Your name</Label>
+                <Label htmlFor="d-name">Votre nom</Label>
                 <Input
                   id="d-name"
                   required
@@ -101,52 +101,52 @@ function DemoPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="d-email">Email</Label>
+                <Label htmlFor="d-email">E-mail</Label>
                 <Input
                   id="d-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@club.com"
+                  placeholder="vous@club.fr"
                 />
               </div>
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-role">Your role</Label>
+                <Label htmlFor="d-role">Votre rôle</Label>
                 <Input
                   id="d-role"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  placeholder="Coach, Admin…"
+                  placeholder="Coach, dirigeant…"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="d-teams">Number of teams</Label>
+                <Label htmlFor="d-teams">Nombre d&apos;équipes</Label>
                 <Input
                   id="d-teams"
                   value={teams}
                   onChange={(e) => setTeams(e.target.value)}
-                  placeholder="e.g. 6"
+                  placeholder="ex : 6"
                 />
               </div>
             </div>
             <div className="mt-4 space-y-1.5">
-              <Label htmlFor="d-notes">Anything we should know?</Label>
+              <Label htmlFor="d-notes">Quelque chose à savoir ?</Label>
               <Textarea
                 id="d-notes"
                 rows={4}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Current tool, biggest pain point…"
+                placeholder="Outil actuel, principal point de douleur…"
               />
             </div>
             <Button type="submit" size="lg" className="mt-6 w-full h-12">
-              Request a demo
+              Demander une démo
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              We&apos;ll never share your details. GDPR-compliant.
+              Nous ne partageons jamais vos coordonnées. Conforme RGPD.
             </p>
           </form>
         </div>

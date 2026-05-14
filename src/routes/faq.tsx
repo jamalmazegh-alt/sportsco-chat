@@ -8,6 +8,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
+const FAQS = [
+  {
+    q: "À qui s'adresse Clubero ?",
+    a: "Clubero est conçu pour les clubs sportifs amateurs — football, handball, basket, rugby et plus. Coachs, dirigeants, parents et joueurs ont chacun une expérience adaptée.",
+  },
+  {
+    q: "Y a-t-il une offre gratuite ?",
+    a: "Oui. Notre offre Découverte est gratuite à vie pour une équipe jusqu'à 25 membres. Vous pouvez passer au plan Club quand vous avez besoin de plus d'équipes ou de fonctionnalités.",
+  },
+  {
+    q: "Combien de temps pour mettre en place un club ?",
+    a: "La plupart des clubs sont opérationnels en moins d'une heure. Un accompagnement guidé est inclus avec les offres Club et Fédération.",
+  },
+  {
+    q: "Comment gérez-vous les mineurs et le consentement parental ?",
+    a: "Les joueurs de moins de 18 ans peuvent être liés à un ou plusieurs comptes parents. Par défaut, les parents contrôlent les réponses et la visibilité au nom de leur enfant.",
+  },
+  {
+    q: "Où sont stockées les données ?",
+    a: "Toutes les données du club sont hébergées sur une infrastructure européenne et Clubero est conforme au RGPD. Les membres peuvent demander un export ou une suppression à tout moment.",
+  },
+  {
+    q: "Puis-je importer mon effectif existant ?",
+    a: "Oui. Nous gérons l'import CSV pendant l'onboarding, et notre équipe peut vous aider à migrer depuis vos tableurs ou autres outils.",
+  },
+  {
+    q: "Clubero fonctionne-t-il sur mobile ?",
+    a: "Clubero est mobile-first. Il fonctionne dans tout navigateur moderne et peut être installé en PWA sur iOS et Android pour une expérience native.",
+  },
+  {
+    q: "Comment obtenir de l'aide ?",
+    a: "Le support par e-mail est inclus dans toutes les offres. Les plans Club et Fédération bénéficient d'un support prioritaire et d'un onboarding dédié.",
+  },
+];
+
 export const Route = createFileRoute("/faq")({
   component: FAQPage,
   head: () => ({
@@ -16,10 +51,10 @@ export const Route = createFileRoute("/faq")({
       {
         name: "description",
         content:
-          "Answers to common questions about Clubero — pricing, onboarding, GDPR, parental controls and more.",
+          "Réponses aux questions fréquentes sur Clubero — tarifs, mise en place, RGPD, contrôle parental et plus.",
       },
       { property: "og:title", content: "FAQ — Clubero" },
-      { property: "og:description", content: "Answers to common questions about Clubero." },
+      { property: "og:description", content: "Réponses aux questions fréquentes sur Clubero." },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/faq" }],
     scripts: [
@@ -39,41 +74,6 @@ export const Route = createFileRoute("/faq")({
   }),
 });
 
-const FAQS = [
-  {
-    q: "Who is Clubero for?",
-    a: "Clubero is built for grassroots sports clubs — football, handball, basketball, rugby and more. Coaches, club admins, parents and players each get a tailored experience.",
-  },
-  {
-    q: "Is there a free plan?",
-    a: "Yes. Our Starter plan is free forever for one team of up to 25 members. You can upgrade to the Club plan when you need more teams or features.",
-  },
-  {
-    q: "How long does it take to onboard a club?",
-    a: "Most clubs are up and running in under an hour. We provide guided setup for the Club and Federation plans.",
-  },
-  {
-    q: "How does Clubero handle minors and parental consent?",
-    a: "Players under 18 can be linked to one or more parent accounts. Parents control responses and visibility on behalf of their child by default.",
-  },
-  {
-    q: "Where is data stored?",
-    a: "All club data is hosted on EU infrastructure and Clubero is GDPR-compliant. Members can request exports or deletion at any time.",
-  },
-  {
-    q: "Can I import my existing roster?",
-    a: "Yes. We support CSV imports during onboarding, and our team can help you migrate from spreadsheets or other tools.",
-  },
-  {
-    q: "Does Clubero work on mobile?",
-    a: "Clubero is mobile-first. It works in any modern browser and can be installed as a PWA on iOS and Android for a native-app experience.",
-  },
-  {
-    q: "How do I get support?",
-    a: "Email support is included on all plans. Club and Federation plans get priority support and dedicated onboarding.",
-  },
-];
-
 function FAQPage() {
   return (
     <MarketingLayout>
@@ -83,10 +83,10 @@ function FAQPage() {
             FAQ
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Frequently asked questions
+            Questions fréquentes
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Can&apos;t find what you&apos;re looking for? Reach out — we&apos;re happy to help.
+            Vous ne trouvez pas votre réponse ? Contactez-nous, nous serons ravis d&apos;aider.
           </p>
         </div>
       </section>
@@ -108,10 +108,10 @@ function FAQPage() {
 
           <div className="mt-14 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="h-12 px-6">
-              <Link to="/contact">Contact us</Link>
+              <Link to="/contact">Nous contacter</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6">
-              <Link to="/demo">Request a demo</Link>
+              <Link to="/demo">Demander une démo</Link>
             </Button>
           </div>
         </div>

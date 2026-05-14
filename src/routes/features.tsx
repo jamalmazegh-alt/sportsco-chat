@@ -7,16 +7,16 @@ export const Route = createFileRoute("/features")({
   component: FeaturesPage,
   head: () => ({
     meta: [
-      { title: "Features — Clubero" },
+      { title: "Fonctionnalités — Clubero" },
       {
         name: "description",
         content:
-          "Convocations, attendance, communication, insights. Discover everything Clubero does for clubs, coaches, parents and players.",
+          "Convocations, présences, communication, statistiques. Découvrez tout ce que Clubero offre aux clubs, coachs, parents et joueurs.",
       },
-      { property: "og:title", content: "Features — Clubero" },
+      { property: "og:title", content: "Fonctionnalités — Clubero" },
       {
         property: "og:description",
-        content: "Everything your club needs. Nothing it doesn't.",
+        content: "Tout ce dont votre club a besoin. Rien de superflu.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/features" }],
@@ -26,79 +26,79 @@ export const Route = createFileRoute("/features")({
 const PILLARS = [
   {
     icon: CalendarCheck,
-    title: "Convocations & Events",
-    body: "Create matches, training and tournaments in seconds. Convocations reach the right players and parents instantly.",
+    title: "Convocations & Événements",
+    body: "Créez matchs, entraînements et tournois en quelques secondes. Les convocations atteignent les bons joueurs et parents instantanément.",
   },
   {
     icon: Users,
-    title: "Team & Roster",
-    body: "Manage players, jersey numbers, positions and parent links. Photo, birth date, contact — all in one card.",
+    title: "Équipe & Effectif",
+    body: "Gérez joueurs, numéros, postes et liens parents. Photo, date de naissance, contact — tout sur une seule fiche.",
   },
   {
     icon: Bell,
-    title: "Reminders",
-    body: "Automatic nudges follow up on missing responses so coaches don't have to.",
+    title: "Rappels",
+    body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
   },
   {
     icon: MessageSquareText,
     title: "Communication",
-    body: "Club-wide wall, team posts, and event-level chat keep conversation focused, not scattered.",
+    body: "Mur du club, posts d'équipe et chat par événement gardent la conversation focalisée, jamais éparpillée.",
   },
   {
     icon: BarChart3,
-    title: "Attendance Tracking",
-    body: "Mark presence in one tap. See trends per player and per team across the season.",
+    title: "Suivi des présences",
+    body: "Marquez les présences en un clic. Visualisez les tendances par joueur et par équipe sur toute la saison.",
   },
   {
     icon: ShieldCheck,
-    title: "Roles & Permissions",
-    body: "Admins, coaches, players and parents each see exactly what they need — and nothing more.",
+    title: "Rôles & Permissions",
+    body: "Admins, coachs, joueurs et parents voient exactement ce qu'il leur faut — et rien d'autre.",
   },
 ];
 
 const AUDIENCES = [
   {
-    title: "For Clubs",
+    title: "Pour les clubs",
     color: "var(--brand-blue-deep)",
     points: [
-      "Multi-team dashboard with key metrics",
-      "Member directory and role management",
-      "Centralized communication channel",
-      "Season-wide attendance reporting",
-      "GDPR-ready, EU data hosting",
+      "Tableau de bord multi-équipes",
+      "Annuaire des membres et gestion des rôles",
+      "Canal de communication centralisé",
+      "Rapports de présence sur toute la saison",
+      "Conforme RGPD, hébergement européen",
     ],
   },
   {
-    title: "For Coaches",
+    title: "Pour les coachs",
     color: "var(--brand-blue)",
     points: [
-      "Build a convocation in under a minute",
-      "Real-time attendance responses",
-      "Event-level chat with players & parents",
-      "Reusable templates for recurring training",
-      "Substitute management & jersey assignment",
+      "Convocation prête en moins d'une minute",
+      "Réponses de présence en temps réel",
+      "Chat par événement avec joueurs et parents",
+      "Modèles réutilisables pour les entraînements récurrents",
+      "Gestion des remplaçants et attribution des numéros",
     ],
   },
   {
-    title: "For Parents",
+    title: "Pour les parents",
     color: "var(--secondary)",
     points: [
-      "One tap to confirm or decline",
-      "Family calendar with all your kids' events",
-      "Zero spammy group chats",
-      "Direct messaging with the coach",
-      "Manage permissions on behalf of minors",
+      "Un clic pour confirmer ou décliner",
+      "Calendrier familial avec tous les événements de vos enfants",
+      "Zéro groupe WhatsApp envahissant",
+      "Messagerie directe avec le coach",
+      "Gestion des autorisations pour les mineurs",
     ],
   },
   {
-    title: "For Players",
+    title: "Pour les joueurs",
     color: "var(--primary)",
     points: [
-      "See your next match at a glance",
-      "Quick attendance confirmation",
-      "Team chat without the noise",
-      "Personal attendance history",
-      "Profile, photo and stats",
+      "Visualisez votre prochain match en un coup d'œil",
+      "Confirmation rapide de présence",
+      "Chat d'équipe sans bruit",
+      "Historique personnel des présences",
+      "Profil, photo et stats",
     ],
   },
 ];
@@ -109,14 +109,14 @@ function FeaturesPage() {
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-4xl px-5 py-16 text-center lg:px-8 lg:py-24">
           <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
-            Features
+            Fonctionnalités
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            One app for the whole season.
+            Une appli pour toute la saison.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            From the first convocation to the end-of-season report — Clubero
-            covers what matters for grassroots clubs.
+            De la première convocation au bilan de fin de saison — Clubero couvre
+            tout ce qui compte pour les clubs amateurs.
           </p>
         </div>
       </section>
@@ -141,10 +141,10 @@ function FeaturesPage() {
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Built for every role in the club.
+              Pensé pour chaque rôle dans le club.
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Each user gets a focused experience tailored to what they need.
+              Chaque utilisateur dispose d&apos;une expérience adaptée à ses besoins.
             </p>
           </div>
 
@@ -173,11 +173,11 @@ function FeaturesPage() {
           <div className="mt-16 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="h-12 px-6">
               <Link to="/demo">
-                Request a demo <ArrowRight className="ml-1.5 h-4 w-4" />
+                Demander une démo <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6">
-              <Link to="/pricing">See pricing</Link>
+              <Link to="/pricing">Voir les tarifs</Link>
             </Button>
           </div>
         </div>
