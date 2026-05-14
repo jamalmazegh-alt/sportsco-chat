@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
+import { AttachmentList, type Attachment } from "@/components/attachments";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
