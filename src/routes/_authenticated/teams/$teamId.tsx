@@ -94,7 +94,15 @@ function TeamDetail() {
   const [parentEmail, setParentEmail] = useState("");
   const [respondBy, setRespondBy] = useState<RespondBy>("both");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const minor = (() => {
+    if (!birthDate) return false;
+    const d = new Date(birthDate);
+    const age = (Date.now() - d.getTime()) / (365.25 * 24 * 3600 * 1000);
+    return age < 18;
+  })();
 
   // Edit team form state
   const [editOpen, setEditOpen] = useState(false);
@@ -144,7 +152,7 @@ function TeamDetail() {
 
   function reset() {
     setFirst(""); setLast(""); setJersey(""); setPosition("");
-    setPhone(""); setEmail("");
+    setPhone(""); setEmail(""); setBirthDate("");
     setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
   }
