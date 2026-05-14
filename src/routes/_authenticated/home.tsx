@@ -4,15 +4,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, Copy, UserPlus } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
