@@ -1,30 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/components/ui/sheet";
-import { Calendar, MapPin, Plus, ChevronRight, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { Calendar, MapPin, Plus, ChevronRight } from "lucide-react";
+import { EventFormSheet } from "@/components/event-form-sheet";
 
 export const Route = createFileRoute("/_authenticated/events")({
   component: EventsPage,
   head: () => ({ meta: [{ title: "Events — Squadly" }] }),
 });
-
-type EventType = "training" | "match" | "tournament" | "meeting" | "other";
-type CompetitionType = "friendly" | "championship" | "cup";
 
 function EventsPage() {
   const { t } = useTranslation();
@@ -65,190 +53,28 @@ function EventsPage() {
     },
   });
 
-  // Form state
-  const [teamId, setTeamId] = useState<string>("");
-  const [type, setType] = useState<EventType>("training");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [locationUrl, setLocationUrl] = useState("");
-  const [opponent, setOpponent] = useState("");
-  const [competitionType, setCompetitionType] = useState<CompetitionType>("friendly");
-  const [competitionName, setCompetitionName] = useState("");
-  const [startsAt, setStartsAt] = useState("");
-  const [endsAt, setEndsAt] = useState("");
-  const [convocationTime, setConvocationTime] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  function reset() {
-    setTitle(""); setDescription(""); setLocation(""); setLocationUrl("");
-    setOpponent(""); setCompetitionName(""); setCompetitionType("friendly");
-    setStartsAt(""); setEndsAt(""); setConvocationTime("");
-    setType("training");
-  }
-
-  async function onCreate(e: FormEvent) {
-    e.preventDefault();
-    if (!user || !teamId) return;
-    setBusy(true);
-
-    const finalTitle = type === "training"
-      ? (title.trim() || t("events.types.training"))
-      : type === "match"
-        ? (title.trim() || (opponent ? `vs ${opponent}` : t("events.types.match")))
-        : title.trim();
-
-    const { data: ev, error } = await supabase
-      .from("events")
-      .insert({
-        team_id: teamId,
-        type,
-        status: "published",
-        title: finalTitle,
-        description: description || null,
-        location: location || null,
-        location_url: locationUrl || null,
-        opponent: type === "match" ? (opponent || null) : null,
-        competition_type: type === "match" ? competitionType : null,
-        competition_name: type === "match" ? (competitionName || null) : null,
-        starts_at: new Date(startsAt).toISOString(),
-        ends_at: endsAt ? new Date(endsAt).toISOString() : null,
-        convocation_time: convocationTime ? new Date(convocationTime).toISOString() : null,
-        created_by: user.id,
-        convocations_sent: false,
-      })
-      .select("id")
-      .single();
-    if (error || !ev) {
-      setBusy(false);
-      toast.error(error?.message ?? "Failed");
-      return;
-    }
-    setBusy(false);
-    setOpen(false);
-    reset();
-    qc.invalidateQueries({ queryKey: ["events"] });
-    qc.invalidateQueries({ queryKey: ["upcoming"] });
-    toast.success(t("events.publish"));
-  }
-
   return (
     <div className="px-5 pt-8 space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t("events.title")}</h1>
-        {isCoach && (
-          <Sheet open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-            <SheetTrigger asChild>
+        {isCoach && user && (
+          <EventFormSheet
+            open={open}
+            onOpenChange={setOpen}
+            mode="create"
+            teams={teams ?? []}
+            userId={user.id}
+            onSaved={() => {
+              qc.invalidateQueries({ queryKey: ["events"] });
+              qc.invalidateQueries({ queryKey: ["upcoming"] });
+            }}
+            trigger={
               <Button size="sm" className="h-9">
                 <Plus className="h-4 w-4" />
                 {t("events.create")}
               </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>{t("events.create")}</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={onCreate} className="space-y-4 mt-4 pb-8">
-                <div className="space-y-1.5">
-                  <Label>{t("events.selectTeam")}</Label>
-                  <Select value={teamId} onValueChange={setTeamId} required>
-                    <SelectTrigger><SelectValue placeholder={t("events.selectTeam")} /></SelectTrigger>
-                    <SelectContent>
-                      {(teams ?? []).map((tm) => (
-                        <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>{t("events.type")}</Label>
-                  <Select value={type} onValueChange={(v) => setType(v as EventType)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
-                        <SelectItem key={k} value={k}>{t(`events.types.${k}`)}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {type !== "match" && (
-                  <div className="space-y-1.5">
-                    <Label htmlFor="title">{t("events.name")}</Label>
-                    <Input
-                      id="title"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder={type === "training" ? t("events.types.training") : ""}
-                      required={type !== "training"}
-                    />
-                  </div>
-                )}
-
-                {type === "match" && (
-                  <>
-                    <div className="space-y-1.5">
-                      <Label>{t("events.competitionType")}</Label>
-                      <Select value={competitionType} onValueChange={(v) => setCompetitionType(v as CompetitionType)}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {(["friendly", "championship", "cup"] as const).map((k) => (
-                            <SelectItem key={k} value={k}>{t(`events.competitionTypes.${k}`)}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {competitionType !== "friendly" && (
-                      <div className="space-y-1.5">
-                        <Label>{t("events.competitionName")}</Label>
-                        <Input value={competitionName} onChange={(e) => setCompetitionName(e.target.value)} />
-                      </div>
-                    )}
-                    <div className="space-y-1.5">
-                      <Label htmlFor="opp">{t("events.opponent")}</Label>
-                      <Input id="opp" required value={opponent} onChange={(e) => setOpponent(e.target.value)} />
-                    </div>
-                  </>
-                )}
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="conv">{t("events.convocationTime")}</Label>
-                    <Input id="conv" type="datetime-local" value={convocationTime} onChange={(e) => setConvocationTime(e.target.value)} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="starts">{t("events.startsAt")}</Label>
-                    <Input id="starts" type="datetime-local" required value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="ends">{t("events.endsAt")}</Label>
-                  <Input id="ends" type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="location">{t("events.location")}</Label>
-                  <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="locurl">
-                    {t("events.locationUrl")}{" "}
-                    <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
-                  </Label>
-                  <Input id="locurl" type="url" value={locationUrl} onChange={(e) => setLocationUrl(e.target.value)} placeholder="https://maps.google.com/..." />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="desc">{t("events.details")}</Label>
-                  <Textarea id="desc" value={description} onChange={(e) => setDescription(e.target.value)} />
-                </div>
-                <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("events.publish")}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+            }
+          />
         )}
       </div>
 
