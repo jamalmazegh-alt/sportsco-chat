@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/inbox")({
   component: InboxPage,
-  head: () => ({ meta: [{ title: "Inbox — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Inbox — Clubero" }] }),
 });
 
 function InboxPage() {

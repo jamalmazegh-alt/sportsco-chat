@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId")({
   component: PlayerProfile,
-  head: () => ({ meta: [{ title: "Player — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Player — Clubero" }] }),
 });
 
 function PlayerProfile() {

@@ -12,7 +12,7 @@ import { EventFormSheet } from "@/components/event-form-sheet";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
-  head: () => ({ meta: [{ title: "Home — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Home — Clubero" }] }),
 });
 
 function formatWhen(d: Date, locale?: string) {
@@ -106,13 +106,22 @@ function HomePage() {
 
   return (
     <div className="px-5 pt-8 space-y-6">
-      <header>
-        <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-          {club?.name}
-        </p>
-        <h1 className="text-2xl font-semibold mt-1">
-          {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
-        </h1>
+      <header className="flex items-center gap-3">
+        {club?.logo_url ? (
+          <img src={club.logo_url} alt={club.name} className="h-12 w-12 rounded-xl object-cover border border-border" />
+        ) : (
+          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center font-bold text-primary">
+            {club?.name?.[0] ?? "C"}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold truncate">
+            {club?.name}
+          </p>
+          <h1 className="text-2xl font-semibold mt-0.5">
+            {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
+          </h1>
+        </div>
       </header>
 
       {/* Quick actions */}

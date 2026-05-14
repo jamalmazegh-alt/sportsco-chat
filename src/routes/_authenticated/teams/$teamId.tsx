@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId")({
   component: TeamDetail,
-  head: () => ({ meta: [{ title: "Team — Squadly" }] }),
+  head: () => ({ meta: [{ title: "Team — Clubero" }] }),
 });
 
 type RespondBy = "player" | "parent" | "both";
@@ -38,7 +38,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, age_group, championship, competitions, sport, season")
+        .select("id, name, age_group, championship, competitions, sport, season, image_url, club_id")
         .eq("id", teamId)
         .single();
       return data;
@@ -208,20 +208,29 @@ function TeamDetail() {
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
 
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">{team?.name ?? ""}</h1>
-          {team && (
-            <p className="text-xs text-muted-foreground mt-1">
-              {[team.age_group, team.championship, team.sport, team.season].filter(Boolean).join(" · ")}
-            </p>
-          )}
+      <div className="flex items-start gap-4">
+        <TeamImage
+          team={team as any}
+          isCoach={isCoach}
+          onUploaded={() => qc.invalidateQueries({ queryKey: ["team", teamId] })}
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-semibold truncate">{team?.name ?? ""}</h1>
+              {team && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {[team.age_group, team.championship, team.sport, team.season].filter(Boolean).join(" · ")}
+                </p>
+              )}
+            </div>
+            {isCoach && team && (
+              <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={openEdit}>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
-        {isCoach && team && (
-          <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={openEdit}>
-            <Pencil className="h-4 w-4" />
-          </Button>
-        )}
       </div>
 
       {isCoach && (
@@ -441,3 +450,45 @@ function TeamDetail() {
     </div>
   );
 }
+
+function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean; onUploaded: () => void }) {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+
+  async function onPick(file: File) {
+    if (!team?.club_id) return;
+    setBusy(true);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${team.club_id}/${team.id}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("team-images")
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) { setBusy(false); toast.error(upErr.message); return; }
+    const { data: pub } = supabase.storage.from("team-images").getPublicUrl(path);
+    const { error: updErr } = await supabase.from("teams").update({ image_url: pub.publicUrl }).eq("id", team.id);
+    setBusy(false);
+    if (updErr) { toast.error(updErr.message); return; }
+    onUploaded();
+    toast.success(t("common.saved"));
+  }
+
+  const inner = team?.image_url ? (
+    <img src={team.image_url} alt={team?.name ?? ""} className="h-full w-full object-cover" />
+  ) : busy ? (
+    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+  ) : (
+    <Camera className="h-5 w-5 text-muted-foreground" />
+  );
+
+  if (!isCoach) {
+    return <div className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0">{inner}</div>;
+  }
+
+  return (
+    <label className="h-20 w-20 rounded-2xl bg-muted overflow-hidden flex items-center justify-center shrink-0 cursor-pointer relative group" title={t("teams.uploadImage")}>
+      {inner}
+      <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); }} />
+    </label>
+  );
+}
+
