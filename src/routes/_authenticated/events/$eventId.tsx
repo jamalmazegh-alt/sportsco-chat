@@ -4,12 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane,
 } from "lucide-react";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
+import { EventFormSheet } from "@/components/event-form-sheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -27,17 +28,27 @@ function EventDetail() {
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home")
         .eq("id", eventId)
         .single();
       if (error) throw error;
       return data;
+    },
+  });
+
+  const { data: teams } = useQuery({
+    queryKey: ["teams-min", event?.team_id],
+    enabled: !!event,
+    queryFn: async () => {
+      const { data } = await supabase.from("teams").select("id, name").eq("id", event!.team_id);
+      return data ?? [];
     },
   });
 
@@ -240,15 +251,28 @@ function EventDetail() {
       </Link>
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-            {t(`events.types.${event.type}`)}
-          </span>
-          {event.type === "match" && event.competition_type && (
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded">
-              {t(`events.competitionTypes.${event.competition_type}`)}
-              {event.competition_name ? ` · ${event.competition_name}` : ""}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+              {t(`events.types.${event.type}`)}
             </span>
+            {event.type === "match" && event.competition_type && (
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded">
+                {t(`events.competitionTypes.${event.competition_type}`)}
+                {event.competition_name ? ` · ${event.competition_name}` : ""}
+              </span>
+            )}
+            {event.type === "match" && event.is_home !== null && (
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded inline-flex items-center gap-1">
+                {event.is_home ? <Home className="h-2.5 w-2.5" /> : <Plane className="h-2.5 w-2.5" />}
+                {t(event.is_home ? "events.home" : "events.away")}
+              </span>
+            )}
+          </div>
+          {isCoach && teams && (
+            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
           )}
         </div>
         <h1 className="text-xl font-semibold mt-2">
@@ -281,9 +305,30 @@ function EventDetail() {
               )}
             </p>
           )}
+          {event.type === "match" && event.is_home === false && event.meeting_point && (
+            <p className="flex items-center gap-2">
+              <Plane className="h-4 w-4" />
+              {t("events.meetingPoint")}: {event.meeting_point}
+            </p>
+          )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
         </div>
       </div>
+
+      {isCoach && teams && (
+        <EventFormSheet
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          mode="edit"
+          teams={teams}
+          userId={user!.id}
+          initial={event as any}
+          onSaved={() => {
+            qc.invalidateQueries({ queryKey: ["event", eventId] });
+            qc.invalidateQueries({ queryKey: ["events"] });
+          }}
+        />
+      )}
 
       {/* Coach: send convocations */}
       {isCoach && !event.convocations_sent && (

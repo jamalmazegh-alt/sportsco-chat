@@ -156,6 +156,7 @@ export type Database = {
           description: string | null
           ends_at: string | null
           id: string
+          is_home: boolean | null
           location: string | null
           location_url: string | null
           meeting_point: string | null
@@ -177,6 +178,7 @@ export type Database = {
           description?: string | null
           ends_at?: string | null
           id?: string
+          is_home?: boolean | null
           location?: string | null
           location_url?: string | null
           meeting_point?: string | null
@@ -198,6 +200,7 @@ export type Database = {
           description?: string | null
           ends_at?: string | null
           id?: string
+          is_home?: boolean | null
           location?: string | null
           location_url?: string | null
           meeting_point?: string | null
