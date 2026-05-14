@@ -12,25 +12,25 @@ export function MarketingFooter() {
               <span className="font-display text-lg font-bold">Clubero</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
-              Team coordination for sports clubs, made simple.
+              La coordination d&apos;équipe, simplifiée pour les clubs sportifs.
             </p>
           </div>
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Product
+              Produit
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/features" className="hover:text-foreground">Features</Link></li>
-              <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
-              <li><Link to="/demo" className="hover:text-foreground">Request a demo</Link></li>
-              <li><Link to="/login" className="hover:text-foreground">Log in</Link></li>
+              <li><Link to="/features" className="hover:text-foreground">Fonctionnalités</Link></li>
+              <li><Link to="/pricing" className="hover:text-foreground">Tarifs</Link></li>
+              <li><Link to="/demo" className="hover:text-foreground">Demander une démo</Link></li>
+              <li><Link to="/login" className="hover:text-foreground">Connexion</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Company
+              Société
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
@@ -40,22 +40,22 @@ export function MarketingFooter() {
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Legal
+              Légal
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link to="/legal/$kind" params={{ kind: "terms" }} className="hover:text-foreground">
-                  Terms of Service
+                  Conditions d&apos;utilisation
                 </Link>
               </li>
               <li>
                 <Link to="/legal/$kind" params={{ kind: "privacy" }} className="hover:text-foreground">
-                  Privacy Policy
+                  Politique de confidentialité
                 </Link>
               </li>
               <li>
-                <Link to="/legal/$kind" params={{ kind: "legal-notice" }} className="hover:text-foreground">
-                  Legal Notice
+                <Link to="/legal/$kind" params={{ kind: "legal_notice" }} className="hover:text-foreground">
+                  Mentions légales
                 </Link>
               </li>
             </ul>
@@ -63,8 +63,8 @@ export function MarketingFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Clubero. All rights reserved.</p>
-          <p>Built for clubs, coaches, parents and players.</p>
+          <p>© {new Date().getFullYear()} Clubero. Tous droits réservés.</p>
+          <p>Pensé pour les clubs, coachs, parents et joueurs.</p>
         </div>
       </div>
     </footer>
