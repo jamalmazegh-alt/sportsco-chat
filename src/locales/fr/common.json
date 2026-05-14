@@ -377,7 +377,13 @@
     "eventChatPlayers": "Les joueurs peuvent accéder aux chats d'événement",
     "eventChatParents": "Les parents peuvent accéder aux chats d'événement",
     "save": "Enregistrer",
-    "saved": "Paramètres enregistrés."
+    "saved": "Paramètres enregistrés.",
+    "usersTitle": "Utilisateurs de la plateforme",
+    "usersSubtitle": "Tous les utilisateurs ayant accès à ce club, avec leur rôle et leur statut.",
+    "usersEmpty": "Aucun utilisateur.",
+    "openUsers": "Gérer les utilisateurs",
+    "statusActive": "Actif",
+    "statusPending": "En attente"
   },
   "attachments": {
     "add": "Ajouter un fichier",
