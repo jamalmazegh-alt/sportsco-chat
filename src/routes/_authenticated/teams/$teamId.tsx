@@ -93,6 +93,10 @@ function TeamDetail() {
     setEditOpen(true);
   }
 
+  function toggleEditCompetition(value: string, checked: boolean) {
+    setEditCompetitions((current) => checked ? Array.from(new Set([...current, value])) : current.filter((c) => c !== value));
+  }
+
   async function onSaveTeam(e: FormEvent) {
     e.preventDefault();
     setEditBusy(true);
@@ -238,6 +242,17 @@ function TeamDetail() {
               <div className="space-y-1.5">
                 <Label>{t("teams.championship")}</Label>
                 <Input value={editChamp} onChange={(e) => setEditChamp(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>{t("teams.competitions")}</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["friendly", "championship", "cup"] as const).map((key) => (
+                    <label key={key} className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm">
+                      <Checkbox checked={editCompetitions.includes(key)} onCheckedChange={(checked) => toggleEditCompetition(key, checked === true)} />
+                      {t(`events.competitionTypes.${key}`)}
+                    </label>
+                  ))}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.season")}</Label>
