@@ -65,6 +65,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         let idempotencyKey: string
         let messageId: string
         let templateData: Record<string, any> = {}
+        let fromName: string | undefined
         try {
           const body = await request.json()
           templateName = body.templateName || body.template_name
@@ -73,6 +74,9 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           idempotencyKey = body.idempotencyKey || body.idempotency_key || messageId
           if (body.templateData && typeof body.templateData === 'object') {
             templateData = body.templateData
+          }
+          if (typeof body.fromName === 'string' && body.fromName.trim()) {
+            fromName = body.fromName.trim().slice(0, 80).replace(/[\r\n<>"]/g, '')
           }
         } catch {
           return Response.json(
@@ -278,7 +282,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           payload: {
             message_id: messageId,
             to: effectiveRecipient,
-            from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+            from: `${fromName || SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
             subject: resolvedSubject,
             html,

@@ -5,6 +5,7 @@ interface SendTransactionalEmailParams {
   recipientEmail: string;
   idempotencyKey?: string;
   templateData?: Record<string, any>;
+  fromName?: string;
 }
 
 export async function sendTransactionalEmail(params: SendTransactionalEmailParams) {
@@ -21,6 +22,7 @@ export async function sendTransactionalEmail(params: SendTransactionalEmailParam
       recipientEmail: params.recipientEmail,
       idempotencyKey: params.idempotencyKey,
       templateData: params.templateData,
+      fromName: params.fromName,
     }),
   });
   if (!response.ok) {
