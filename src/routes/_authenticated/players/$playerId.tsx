@@ -284,7 +284,11 @@ function PlayerProfile() {
         </div>
         <div className="space-y-1.5">
           <Label>{t("players.phone")}</Label>
-          <PhoneInput value={phone} onChange={setPhone} disabled={!isCoach} />
+          {isCoach ? (
+            <PhoneInput value={phone} onChange={setPhone} />
+          ) : (
+            <Input value={phone} disabled />
+          )}
         </div>
         <div className="space-y-1.5">
           <Label>{t("players.email")}</Label>
