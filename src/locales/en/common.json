@@ -175,8 +175,9 @@
     "profile": "Player profile",
     "details": "Details",
     "save": "Save player",
-    "inviteSent": "Invitation email sent.",
-    "inviteFailed": "Player created, but invitation email could not be sent."
+    "inviteSent": "Invitation sent.",
+    "inviteFailed": "Player created, but invitation could not be sent.",
+    "inviterPhoneRequired": "Player created. Verify your phone number in your profile to send invitations."
   },
   "events": {
     "title": "Events",
@@ -268,6 +269,15 @@
     "preferredLanguage": "Preferred language",
     "english": "English",
     "french": "Français",
-    "languageSaved": "Language saved"
+    "languageSaved": "Language saved",
+    "phone": "Phone number",
+    "verified": "Verified",
+    "sendCode": "Send verification code",
+    "resendCode": "Resend code",
+    "enterCode": "Enter the 6-digit code",
+    "verify": "Verify",
+    "verifyNewNumber": "Verify new number",
+    "codeSent": "Verification code sent.",
+    "phoneVerified": "Phone verified."
   }
 }
