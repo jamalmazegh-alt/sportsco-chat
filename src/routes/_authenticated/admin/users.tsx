@@ -93,12 +93,6 @@ function AdminUsersPage() {
                       ))}
                     </div>
                   </div>
-                  <span className={cn(
-                    "text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
-                    verified ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-                  )}>
-                    {verified ? t("admin.statusActive") : t("admin.statusPending")}
-                  </span>
                 </Link>
               </li>
             );
