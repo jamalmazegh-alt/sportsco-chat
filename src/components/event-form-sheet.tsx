@@ -289,15 +289,17 @@ function AddressField({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadGoogleMapsPlaces()
-      ?.then(() => {
-        const places = window.google?.maps?.places;
-        if (places) {
-          setService(new places.AutocompleteService());
-          sessionTokenRef.current = new places.AutocompleteSessionToken();
-        }
-      })
-      .catch(() => undefined);
+    fetchGoogleMapsKey().then((key) => {
+      loadGoogleMapsPlaces(key)
+        ?.then(() => {
+          const places = window.google?.maps?.places;
+          if (places) {
+            setService(new places.AutocompleteService());
+            sessionTokenRef.current = new places.AutocompleteSessionToken();
+          }
+        })
+        .catch(() => undefined);
+    });
   }, []);
 
   // Debounced predictions
