@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,9 +15,15 @@ import { Plus, Users, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/teams")({
-  component: TeamsPage,
+  component: TeamsRoute,
   head: () => ({ meta: [{ title: "Teams — Squadly" }] }),
 });
+
+function TeamsRoute() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  if (pathname !== "/teams") return <Outlet />;
+  return <TeamsPage />;
+}
 
 function TeamsPage() {
   const { t } = useTranslation();
