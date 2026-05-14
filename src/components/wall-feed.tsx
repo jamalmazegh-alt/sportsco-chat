@@ -149,7 +149,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
                 )}
               </header>
               <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>
-
+              {p.attachments?.length > 0 && (
+                <div className="mt-2"><AttachmentList items={p.attachments as Attachment[]} /></div>
+              )}
               {commentsEnabled && (
                 <CommentBlock post={p} currentUserId={user?.id ?? null} role={role} />
               )}
