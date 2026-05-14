@@ -145,7 +145,7 @@ function TeamDetail() {
   function reset() {
     setFirst(""); setLast(""); setJersey(""); setPosition("");
     setPhone(""); setEmail("");
-    setParentName(""); setParentPhone(""); setParentEmail("");
+    setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
   }
 
@@ -161,6 +161,117 @@ function TeamDetail() {
     }
     const { data } = supabase.storage.from("player-photos").getPublicUrl(path);
     return data.publicUrl;
+  }
+
+  type InviteTarget = {
+    role: "player" | "parent";
+    firstName?: string;
+    email?: string;
+    phone?: string;
+    playerId: string;
+  };
+
+  // Send invitation(s) for a player (player + linked parents). Returns true if at least one invite was dispatched.
+  async function sendInvitesForPlayer(playerId: string): Promise<{ sent: number; failed: number; skipped: number }> {
+    if (!activeClubId || !user) return { sent: 0, failed: 0, skipped: 1 };
+
+    // Load player + parents
+    const [{ data: pl }, { data: parents }] = await Promise.all([
+      supabase.from("players").select("id, first_name, email, phone, user_id").eq("id", playerId).maybeSingle(),
+      supabase.from("player_parents").select("id, full_name, email, phone, parent_user_id").eq("player_id", playerId),
+    ]);
+
+    const targets: InviteTarget[] = [];
+    if (pl && !pl.user_id && (pl.email || pl.phone)) {
+      targets.push({ role: "player", firstName: pl.first_name ?? undefined, email: pl.email ?? undefined, phone: pl.phone ?? undefined, playerId });
+    }
+    for (const p of parents ?? []) {
+      if (!p.parent_user_id && (p.email || p.phone)) {
+        targets.push({ role: "parent", firstName: (p.full_name ?? "").split(" ")[0] || undefined, email: p.email ?? undefined, phone: p.phone ?? undefined, playerId });
+      }
+    }
+
+    if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
+
+    const { data: clubRow } = await supabase.from("clubs").select("name").eq("id", activeClubId).maybeSingle();
+    const clubLabel = clubRow?.name ?? "Clubero";
+
+    let sent = 0; let failed = 0;
+    for (const target of targets) {
+      const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+      const { error: invErr } = await supabase.from("member_invites").insert({
+        club_id: activeClubId,
+        team_id: teamId,
+        player_id: target.role === "player" ? target.playerId : null,
+        parent_for_player_id: target.role === "parent" ? target.playerId : null,
+        role: target.role === "player" ? "player" : "parent",
+        email: target.email ?? null,
+        phone: target.phone ?? null,
+        token,
+        created_by: user.id,
+      });
+      if (invErr) { failed += 1; continue; }
+      const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+      let dispatched = false;
+      if (target.email) {
+        try {
+          await sendTransactionalEmail({
+            templateName: "player-invite",
+            recipientEmail: target.email,
+            idempotencyKey: `member-invite-${token}`,
+            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, inviteUrl },
+          });
+          dispatched = true;
+        } catch { /* fallthrough to sms */ }
+      }
+      if (target.phone) {
+        try {
+          const greet = target.firstName ? `${target.firstName}, ` : "";
+          await sendSmsFn({ data: { to: target.phone, body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}` } });
+          dispatched = true;
+        } catch { /* ignore */ }
+      }
+      if (dispatched) sent += 1; else failed += 1;
+    }
+    return { sent, failed, skipped: 0 };
+  }
+
+  async function inviteOne(playerId: string) {
+    if (!user) return;
+    // Verify inviter has a verified phone
+    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+    if (!inviter?.phone_verified_at) {
+      toast.warning(t("players.inviterPhoneRequired"));
+      return;
+    }
+    setInviting(true);
+    const r = await sendInvitesForPlayer(playerId);
+    setInviting(false);
+    if (r.skipped) toast.warning(t("players.inviteNoContact"));
+    else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
+    else if (r.failed) toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
+    else toast.success(t("players.inviteSent"));
+  }
+
+  async function inviteSelected() {
+    if (!user || selectedIds.size === 0) return;
+    const { data: inviter } = await supabase.from("profiles").select("phone_verified_at").eq("id", user.id).maybeSingle();
+    if (!inviter?.phone_verified_at) {
+      toast.warning(t("players.inviterPhoneRequired"));
+      return;
+    }
+    setInviting(true);
+    let totalSent = 0; let totalFailed = 0; let totalSkipped = 0;
+    for (const id of selectedIds) {
+      const r = await sendInvitesForPlayer(id);
+      totalSent += r.sent; totalFailed += r.failed; totalSkipped += r.skipped;
+    }
+    setInviting(false);
+    setSelectMode(false);
+    setSelectedIds(new Set());
+    if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
+    else if (totalFailed) toast.warning(t("players.inviteBulkResult", { sent: totalSent, failed: totalFailed, skipped: totalSkipped }));
+    else toast.success(t("players.inviteBulkSent", { count: totalSent }));
   }
 
   async function onAdd(e: FormEvent) {
@@ -207,101 +318,16 @@ function TeamDetail() {
       return;
     }
 
-    if (parentName || parentPhone || parentEmail) {
+    const parentFullName = `${parentFirst.trim()} ${parentLast.trim()}`.trim();
+    if (parentFullName || parentPhone || parentEmail) {
       await supabase.from("player_parents").insert({
         player_id: player.id,
         parent_user_id: null,
-        full_name: parentName || null,
+        full_name: parentFullName || null,
         phone: parentPhone || null,
         email: parentEmail || null,
         can_respond: parentCanRespond,
       });
-    }
-
-    // Auto-send invitations (player + parent) when an email or phone is provided
-    type InviteTarget = {
-      role: "player" | "parent";
-      firstName?: string;
-      email?: string;
-      phone?: string;
-    };
-    const inviteTargets: InviteTarget[] = [];
-    if (email || phone) inviteTargets.push({ role: "player", firstName: first, email: email || undefined, phone: phone || undefined });
-    if (parentEmail || parentPhone) inviteTargets.push({ role: "parent", firstName: parentName || undefined, email: parentEmail || undefined, phone: parentPhone || undefined });
-
-    if (inviteTargets.length > 0) {
-      // Gate: inviter must have a verified phone before invites can be sent
-      const { data: inviter } = await supabase
-        .from("profiles")
-        .select("phone_verified_at")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (!inviter?.phone_verified_at) {
-        setBusy(false);
-        setOpen(false);
-        reset();
-        qc.invalidateQueries({ queryKey: ["team-players", teamId] });
-        toast.warning(t("players.inviterPhoneRequired"));
-        return;
-      }
-
-      const { data: clubRow } = await supabase
-        .from("clubs")
-        .select("name")
-        .eq("id", activeClubId)
-        .maybeSingle();
-
-      let anyFailed = false;
-      for (const target of inviteTargets) {
-        const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
-        const { error: invErr } = await supabase.from("member_invites").insert({
-          club_id: activeClubId,
-          team_id: teamId,
-          player_id: target.role === "player" ? player.id : null,
-          parent_for_player_id: target.role === "parent" ? player.id : null,
-          role: target.role === "player" ? "player" : "parent",
-          email: target.email ?? null,
-          phone: target.phone ?? null,
-          token,
-          created_by: user.id,
-        });
-        if (invErr) { anyFailed = true; continue; }
-        const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
-        const clubLabel = clubRow?.name ?? "Clubero";
-
-        if (target.email) {
-          try {
-            await sendTransactionalEmail({
-              templateName: "player-invite",
-              recipientEmail: target.email,
-              idempotencyKey: `member-invite-${token}`,
-              templateData: {
-                firstName: target.firstName,
-                teamName: team?.name,
-                clubName: clubLabel,
-                inviteUrl,
-              },
-            });
-          } catch (e) {
-            anyFailed = true;
-          }
-        }
-        if (target.phone) {
-          try {
-            const greet = target.firstName ? `${target.firstName}, ` : "";
-            await sendSmsFn({
-              data: {
-                to: target.phone,
-                body: `${greet}${clubLabel} invites you to join ${team?.name ?? "the team"} on Clubero: ${inviteUrl}`,
-              },
-            });
-          } catch (e) {
-            anyFailed = true;
-          }
-        }
-      }
-      if (anyFailed) toast.error(t("players.inviteFailed"));
-      else toast.success(t("players.inviteSent"));
     }
 
     setBusy(false);
