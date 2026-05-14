@@ -37,12 +37,53 @@ function ProfilePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, preferred_language")
+        .select("full_name, preferred_language, phone, phone_verified_at")
         .eq("id", user!.id)
         .single();
       return data;
     },
   });
+
+  const requestCode = useServerFn(requestPhoneCode);
+  const verifyCode = useServerFn(verifyPhoneCode);
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [phoneBusy, setPhoneBusy] = useState(false);
+
+  const isVerified = !!profile?.phone_verified_at;
+  const phoneToUse = phone || profile?.phone || "";
+
+  async function onSendCode() {
+    if (!phoneToUse) return;
+    setPhoneBusy(true);
+    try {
+      await requestCode({ data: { phone: phoneToUse } });
+      setCodeSent(true);
+      toast.success(t("profile.codeSent"));
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    } finally {
+      setPhoneBusy(false);
+    }
+  }
+
+  async function onVerifyCode() {
+    if (!phoneToUse || code.length !== 6) return;
+    setPhoneBusy(true);
+    try {
+      await verifyCode({ data: { phone: phoneToUse, code } });
+      toast.success(t("profile.phoneVerified"));
+      setCode("");
+      setCodeSent(false);
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Invalid code");
+    } finally {
+      setPhoneBusy(false);
+    }
+  }
+
 
   async function setLang(lang: string) {
     if (!user) return;
