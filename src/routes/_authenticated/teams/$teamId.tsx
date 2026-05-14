@@ -556,6 +556,9 @@ function TeamDetail() {
               </form>
             </SheetContent>
           </Sheet>
+              </>
+            )}
+          </div>
         )}
       </div>
 
