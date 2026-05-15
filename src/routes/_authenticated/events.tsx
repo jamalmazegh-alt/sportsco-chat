@@ -337,10 +337,22 @@ function EventsPage() {
                             )}
                           </div>
                           <p className="font-medium truncate leading-tight">
-                            {e.title}
-                            {e.opponent && (
-                              <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
-                            )}
+                            {(() => {
+                              if (e.type === "match" && e.opponent && e.team_name) {
+                                return `${e.team_name} vs ${e.opponent}`;
+                              }
+                              if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs ")) {
+                                return e.title;
+                              }
+                              return (
+                                <>
+                                  {e.title}
+                                  {e.opponent && (
+                                    <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </p>
                           {e.type === "match" && e.result && (() => {
                             const ourSide = e.is_home === false ? "away" : "home";
