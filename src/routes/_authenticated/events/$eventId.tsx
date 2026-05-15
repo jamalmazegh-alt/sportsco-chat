@@ -988,6 +988,34 @@ function EventDetail() {
               {t("attendance.reasonOptional")}
             </DialogDescription>
           </DialogHeader>
+          {respondTarget && (() => {
+            const presetsKey =
+              respondTarget.status === "absent"
+                ? "attendance.reasonsAbsent"
+                : "attendance.reasonsUncertain";
+            const presets = (t(presetsKey, { returnObjects: true }) as unknown);
+            const list = Array.isArray(presets) ? (presets as string[]) : [];
+            if (list.length === 0) return null;
+            return (
+              <div className="flex flex-wrap gap-1.5 -mb-1">
+                {list.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setRespondReason(p)}
+                    className={cn(
+                      "text-xs rounded-full border px-2.5 py-1 transition-colors",
+                      respondReason === p
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/40",
+                    )}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
           <Textarea
             value={respondReason}
             onChange={(e) => setRespondReason(e.target.value)}
