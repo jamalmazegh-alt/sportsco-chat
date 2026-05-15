@@ -46,7 +46,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
       .eq("club_id", clubId)
       .order("created_at", { ascending: false })
       .limit(50);
-    const ps = (rawPosts ?? []) as Post[];
+    // Dedupe by id (realtime + initial fetch sometimes overlap)
+    const seen = new Set<string>();
+    const ps = ((rawPosts ?? []) as Post[]).filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true)));
     if (ps.length) {
       const ids = ps.map((p) => p.id);
       const { data: rawComments } = await supabase
@@ -62,7 +64,10 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .from("profiles").select("id, full_name, avatar_url").in("id", allUserIds);
       const map = new Map((profs ?? []).map((p) => [p.id, p as Profile]));
       const cByPost = new Map<string, Comment[]>();
+      const seenComments = new Set<string>();
       (rawComments ?? []).forEach((c) => {
+        if (seenComments.has(c.id)) return;
+        seenComments.add(c.id);
         const cm = { ...c, author: map.get(c.author_user_id) ?? null } as Comment;
         const arr = cByPost.get(c.post_id) ?? [];
         arr.push(cm);
