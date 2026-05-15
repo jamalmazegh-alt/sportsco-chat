@@ -333,7 +333,11 @@
     "reasonPlaceholder": "E.g. family tournament, minor injury, unavailable…",
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
-    "coachNotified": "The coach has been notified."
+    "coachNotified": "The coach has been notified.",
+    "pendingCount": "{{count}} player hasn't replied yet",
+    "pendingCount_plural": "{{count}} players haven't replied yet",
+    "remindAllSent": "{{count}} reminder sent",
+    "remindAllSent_plural": "{{count}} reminders sent"
   },
   "stats": {
     "title": "Stats",
