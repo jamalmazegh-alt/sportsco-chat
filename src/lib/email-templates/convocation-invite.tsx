@@ -223,3 +223,4 @@ const squadCard = {
 };
 const squadTitle = { fontSize: "12px", fontWeight: "bold" as const, color: "#475569", margin: "0 0 6px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
 const squadText = { fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: 0 };
+const squadLine = { fontSize: "13px", color: "#334155", lineHeight: "1.6", margin: "0 0 2px" };
