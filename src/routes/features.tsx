@@ -148,10 +148,6 @@ function FeaturesPage() {
         </div>
       </section>
 
-      <section className="bg-muted/20">
-        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
       <section className="border-b border-border/60 bg-muted/20">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
