@@ -385,17 +385,20 @@ function CTA() {
     <section>
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl border border-border p-10 lg:p-16 text-center bg-gradient-cta shadow-elevated">
-          {/* Decorative court lines */}
+          {/* Decorative pitch lines (chalk on grass) */}
           <div
             aria-hidden
-            className="absolute inset-0 opacity-[0.08]"
+            className="absolute inset-0 opacity-[0.18]"
             style={{
               backgroundImage:
-                "radial-gradient(circle at 50% 50%, white 1px, transparent 2px), linear-gradient(to right, transparent 49.5%, white 49.5%, white 50.5%, transparent 50.5%)",
-              backgroundSize: "32px 32px, 100% 100%",
+                "radial-gradient(circle at 50% 50%, transparent 70px, rgba(255,255,255,0.6) 70px, rgba(255,255,255,0.6) 72px, transparent 73px), linear-gradient(to right, transparent calc(50% - 1px), rgba(255,255,255,0.5) calc(50% - 1px), rgba(255,255,255,0.5) calc(50% + 1px), transparent calc(50% + 1px))",
+              backgroundSize: "100% 100%",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
             }}
           />
-          <div aria-hidden className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[color:var(--energy)]/30 blur-3xl" />
+          <div aria-hidden className="absolute inset-0 opacity-[0.06] bg-jersey-stripes" />
+          <div aria-hidden className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[color:var(--primary)]/40 blur-3xl" />
 
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white backdrop-blur">
