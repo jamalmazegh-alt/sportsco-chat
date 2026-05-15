@@ -152,6 +152,41 @@ function FeaturesPage() {
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+      <section className="border-b border-border/60 bg-muted/20">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              Aperçu de l'application.
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Une expérience pensée pour chaque rôle, sur mobile en priorité.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {SCREENSHOTS.map((s) => (
+              <figure key={s.title} className="space-y-3">
+                <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+                  <img
+                    src={s.src}
+                    alt={s.title}
+                    className="aspect-[4/5] w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <figcaption>
+                  <p className="font-display text-sm font-semibold">{s.title}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{s.body}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-muted/20">
+        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
               Pensé pour chaque rôle dans le club.
             </h2>
             <p className="mt-4 text-muted-foreground">
