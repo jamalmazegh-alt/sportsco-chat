@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
+import { Eye, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ type Post = {
   attachments: Attachment[];
   author?: Profile | null;
   comments?: Comment[];
+  reads?: { user_id: string; read_at: string }[];
 };
 
 export function WallFeed({ clubId }: { clubId: string }) {
@@ -35,6 +36,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
+  const [memberCount, setMemberCount] = useState(0);
 
   async function load() {
     setLoading(true);
@@ -76,11 +78,40 @@ export function WallFeed({ clubId }: { clubId: string }) {
         arr.push(cm);
         cByPost.set(c.post_id, arr);
       });
+      // Read receipts
+      const { data: rawReads } = await supabase
+        .from("wall_post_reads")
+        .select("post_id, user_id, read_at")
+        .in("post_id", ids);
+      const rByPost = new Map<string, { user_id: string; read_at: string }[]>();
+      (rawReads ?? []).forEach((r) => {
+        const arr = rByPost.get(r.post_id) ?? [];
+        arr.push({ user_id: r.user_id, read_at: r.read_at });
+        rByPost.set(r.post_id, arr);
+      });
       ps.forEach((p) => {
         p.author = map.get(p.author_user_id) ?? null;
         p.comments = cByPost.get(p.id) ?? [];
+        p.reads = rByPost.get(p.id) ?? [];
       });
+
+      // Mark unread posts as read for current user (best-effort, ignore errors)
+      if (user) {
+        const unread = ps.filter((p) => !(p.reads ?? []).some((r) => r.user_id === user.id));
+        if (unread.length > 0) {
+          supabase
+            .from("wall_post_reads")
+            .insert(unread.map((p) => ({ post_id: p.id, user_id: user.id })))
+            .then(() => {});
+        }
+      }
     }
+    // Total club members (denominator for "Lu par X/Y")
+    const { count } = await supabase
+      .from("club_members")
+      .select("id", { count: "exact", head: true })
+      .eq("club_id", clubId);
+    setMemberCount(count ?? 0);
     setPosts(ps);
     setLoading(false);
   }
@@ -156,6 +187,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         role={role}
         commentsEnabled={commentsEnabled}
         canPin={canPost}
+        memberCount={memberCount}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
@@ -169,6 +201,7 @@ function WallGrouped({
   role,
   commentsEnabled,
   canPin,
+  memberCount,
   onDelete,
   onTogglePin,
 }: {
@@ -177,6 +210,7 @@ function WallGrouped({
   role: string | null;
   commentsEnabled: boolean;
   canPin: boolean;
+  memberCount: number;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
@@ -257,6 +291,23 @@ function WallGrouped({
               <AttachmentList items={p.attachments as Attachment[]} />
             </div>
           )}
+          {(p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
+            memberCount > 0 && (() => {
+              // Exclude the post author from the denominator: they don't need to "read" their own post
+              const denom = Math.max(memberCount - 1, 0);
+              const readers = (p.reads ?? []).filter((r) => r.user_id !== p.author_user_id).length;
+              const capped = Math.min(readers, denom);
+              return (
+                <p className="mt-2 text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  {t("wall.readBy", {
+                    defaultValue: "Lu par {{n}}/{{total}}",
+                    n: capped,
+                    total: denom,
+                  })}
+                </p>
+              );
+            })()}
           {commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} />
           )}
