@@ -112,6 +112,9 @@
   --brand-blue-soft: oklch(0.94 0.035 165);       /* emerald very light */
   --brand-blue-deep: oklch(0.30 0.10 255);        /* navy deep */
 
+  /* Logo accent blue — rappel du Kinetic-C (#2D6FF7) */
+  --logo-blue: oklch(0.60 0.20 260);
+
   /* Attendance */
   --present: oklch(0.60 0.13 165);
   --present-foreground: oklch(0.99 0.005 60);
