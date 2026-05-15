@@ -739,6 +739,27 @@ export function EventFormSheet({
                 />
                 <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
               </div>
+              {mode === "create" && (
+                <div className="space-y-1.5">
+                  <Label>{t("events.repeat")}</Label>
+                  <Select value={String(repeatWeeks)} onValueChange={(v) => setRepeatWeeks(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">{t("events.repeatNone")}</SelectItem>
+                      {[2, 4, 6, 8, 10, 12, 16, 20].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {t("events.repeatWeeks", { count: n })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {repeatWeeks > 1 && (
+                    <p className="text-[11px] text-muted-foreground">{t("events.repeatHint")}</p>
+                  )}
+                </div>
+              )}
             </>
           ) : (
             <>
