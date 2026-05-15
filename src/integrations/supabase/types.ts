@@ -49,6 +49,7 @@ export type Database = {
           action: string
           actor_user_id: string | null
           changes: Json | null
+          club_id: string | null
           created_at: string
           entity_id: string
           entity_type: string
@@ -58,6 +59,7 @@ export type Database = {
           action: string
           actor_user_id?: string | null
           changes?: Json | null
+          club_id?: string | null
           created_at?: string
           entity_id: string
           entity_type: string
@@ -67,6 +69,7 @@ export type Database = {
           action?: string
           actor_user_id?: string | null
           changes?: Json | null
+          club_id?: string | null
           created_at?: string
           entity_id?: string
           entity_type?: string
