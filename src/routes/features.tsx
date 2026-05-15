@@ -2,6 +2,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import coachShot from "@/assets/features/coach-attendance.png";
+import parentShot from "@/assets/features/parent-convocation.png";
+import clubShot from "@/assets/features/club-dashboard.png";
+import playerShot from "@/assets/features/player-home.png";
+
+const SCREENSHOTS = [
+  { src: coachShot, title: "Coach — Suivi des présences", body: "Vue consolidée des entraînements et matchs, par joueur et par période." },
+  { src: parentShot, title: "Parent — Convocation", body: "Réponse en un clic, motif facultatif, calendrier familial unifié." },
+  { src: clubShot, title: "Club — Tableau de bord", body: "Multi-équipes, membres, communication centralisée." },
+  { src: playerShot, title: "Joueur — Accueil", body: "Prochain événement, confirmation de présence, mur d'équipe." },
+];
 
 export const Route = createFileRoute("/features")({
   component: FeaturesPage,
