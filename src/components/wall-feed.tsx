@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Eye, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
+import { MentionInput, RenderWithMentions, parseMentions } from "@/components/mention-input";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
@@ -134,14 +134,36 @@ export function WallFeed({ clubId }: { clubId: string }) {
     // eslint-disable-next-line
   }, [clubId]);
 
+  async function notifyMentioned(ids: string[], link: string, snippet: string) {
+    if (!user || ids.length === 0) return;
+    const recipients = ids.filter((id) => id !== user.id);
+    if (recipients.length === 0) return;
+    const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
+    await supabase.from("notifications").insert(
+      recipients.map((uid) => ({
+        user_id: uid,
+        type: "wall_mention",
+        title: t("wall.mentionTitle", { defaultValue: "{{name}} vous a mentionné", name: authorName }),
+        body: snippet.slice(0, 140),
+        link,
+      })),
+    );
+  }
+
   async function submitPost() {
     if ((!body.trim() && atts.length === 0) || !user) return;
     setPosting(true);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("wall_posts")
-      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never });
+      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never })
+      .select("id")
+      .single();
     setPosting(false);
     if (error) { toast.error(error.message); return; }
+    const mentioned = parseMentions(body);
+    if (mentioned.length && data?.id) {
+      await notifyMentioned(mentioned, `/wall#${data.id}`, body.trim());
+    }
     setBody("");
     setAtts([]);
   }
@@ -166,11 +188,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
     <div className="space-y-4">
       {canPost && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
-          <Textarea
-            rows={3}
+          <MentionInput
+            clubId={clubId}
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={setBody}
             placeholder={t("wall.placeholder")}
+            rows={3}
           />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
           <div className="flex justify-end">
@@ -285,7 +308,7 @@ function WallGrouped({
               )}
             </div>
           </header>
-          {p.body && <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>}
+          {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
           {p.attachments?.length > 0 && (
             <div className="mt-2">
               <AttachmentList items={p.attachments as Attachment[]} />
@@ -309,7 +332,7 @@ function WallGrouped({
               );
             })()}
           {commentsEnabled && (
-            <CommentBlock post={p} currentUserId={currentUserId} role={role} />
+            <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
         </div>
       </li>
@@ -338,7 +361,7 @@ function WallGrouped({
   );
 }
 
-function CommentBlock({ post, currentUserId, role }: { post: Post; currentUserId: string | null; role: string | null }) {
+function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; currentUserId: string | null; role: string | null; clubId: string }) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -346,11 +369,26 @@ function CommentBlock({ post, currentUserId, role }: { post: Post; currentUserId
   async function add() {
     if (!text.trim() || !currentUserId) return;
     setBusy(true);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("wall_comments")
-      .insert({ post_id: post.id, author_user_id: currentUserId, body: text.trim() });
+      .insert({ post_id: post.id, author_user_id: currentUserId, body: text.trim() })
+      .select("id")
+      .single();
     setBusy(false);
     if (error) { toast.error(error.message); return; }
+    const mentioned = parseMentions(text).filter((id) => id !== currentUserId);
+    if (mentioned.length && data?.id) {
+      const authorName = (await supabase.from("profiles").select("full_name").eq("id", currentUserId).single()).data?.full_name ?? "—";
+      await supabase.from("notifications").insert(
+        mentioned.map((uid) => ({
+          user_id: uid,
+          type: "wall_mention",
+          title: t("wall.mentionTitle", { defaultValue: "{{name}} vous a mentionné", name: authorName }),
+          body: text.trim().slice(0, 140),
+          link: `/wall#${post.id}`,
+        })),
+      );
+    }
     setText("");
   }
 
@@ -367,7 +405,7 @@ function CommentBlock({ post, currentUserId, role }: { post: Post; currentUserId
           <div className="min-w-0 flex-1">
             <p>
               <span className="font-medium">{c.author?.full_name ?? "—"}</span>{" "}
-              <span className="whitespace-pre-wrap break-words">{c.body}</span>
+              <RenderWithMentions text={c.body} />
             </p>
             <p className="text-[10px] text-muted-foreground">
               {fmt(c.created_at, "d MMM HH:mm")}
@@ -381,12 +419,15 @@ function CommentBlock({ post, currentUserId, role }: { post: Post; currentUserId
         </div>
       ))}
       <form onSubmit={(e) => { e.preventDefault(); add(); }} className="flex gap-2">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={t("wall.commentPlaceholder")}
-          className="flex-1 h-9 rounded-md border border-border bg-background px-3 text-sm"
-        />
+        <div className="flex-1">
+          <MentionInput
+            clubId={clubId}
+            value={text}
+            onChange={setText}
+            placeholder={t("wall.commentPlaceholder")}
+            asInput
+          />
+        </div>
         <Button type="submit" size="sm" disabled={busy || !text.trim()}>
           {t("wall.comment")}
         </Button>
