@@ -39,11 +39,8 @@ export function OnboardingChecklist({
   const { data: counts } = useQuery({
     queryKey: ["onboarding-counts", clubId],
     queryFn: async () => {
-      const [teams, players, invites, events] = await Promise.all([
-        supabase
-          .from("teams")
-          .select("id", { count: "exact", head: true })
-          .eq("club_id", clubId),
+      const [teamsRes, players, invites] = await Promise.all([
+        supabase.from("teams").select("id").eq("club_id", clubId),
         supabase
           .from("players")
           .select("id", { count: "exact", head: true })
@@ -52,17 +49,22 @@ export function OnboardingChecklist({
           .from("member_invites")
           .select("id", { count: "exact", head: true })
           .eq("club_id", clubId),
-        supabase
-          .from("events")
-          .select("id, team:team_id!inner(club_id)", { count: "exact", head: true })
-          .eq("status", "published")
-          .eq("team.club_id", clubId),
       ]);
+      const teamIds = (teamsRes.data ?? []).map((r) => r.id);
+      let eventCount = 0;
+      if (teamIds.length > 0) {
+        const { count } = await supabase
+          .from("events")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "published")
+          .in("team_id", teamIds);
+        eventCount = count ?? 0;
+      }
       return {
-        teams: teams.count ?? 0,
+        teams: teamIds.length,
         players: players.count ?? 0,
         invites: invites.count ?? 0,
-        events: events.count ?? 0,
+        events: eventCount,
       };
     },
   });
