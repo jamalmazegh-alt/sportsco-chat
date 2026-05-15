@@ -29,6 +29,9 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();
+  const [legalKind, setLegalKind] = useState<
+    null | "terms" | "privacy" | "legal_notice" | "data_processing"
+  >(null);
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
