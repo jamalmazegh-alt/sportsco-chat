@@ -391,6 +391,7 @@ function PlayerProfile() {
       </form>
 
       {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
+      {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
 
       {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
       {minor && (isParentOfThisPlayer || isCoach) && (
