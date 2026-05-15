@@ -84,8 +84,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.24 0.08 255);
 
-  /* Clubero green (primary CTA) */
-  --primary: oklch(0.72 0.18 135);
+  /* Clubero electric blue (primary CTA) — matches logo Kinetic-C accent */
+  --primary: oklch(0.58 0.21 258);
   --primary-foreground: oklch(0.99 0.005 240);
 
   /* Clubero navy (secondary) — slightly bluer */
@@ -128,7 +128,7 @@
   --draw: oklch(0.65 0.01 240);
   --draw-foreground: oklch(0.3 0.04 255);
 
-  --chart-1: oklch(0.72 0.18 135);
+  --chart-1: oklch(0.58 0.21 258);
   --chart-2: oklch(0.32 0.09 255);
   --chart-3: oklch(0.6 0.16 240);
   --chart-4: oklch(0.78 0.15 75);
@@ -136,18 +136,18 @@
 
   --sidebar: oklch(0.99 0.003 240);
   --sidebar-foreground: oklch(0.26 0.07 255);
-  --sidebar-primary: oklch(0.72 0.18 135);
-  --sidebar-primary-foreground: oklch(0.18 0.05 140);
+  --sidebar-primary: oklch(0.58 0.21 258);
+  --sidebar-primary-foreground: oklch(0.99 0.005 240);
   --sidebar-accent: oklch(0.92 0.045 240);
   --sidebar-accent-foreground: oklch(0.30 0.10 252);
   --sidebar-border: oklch(0.90 0.025 240);
   --sidebar-ring: oklch(0.6 0.16 240);
 
-  /* Energy accent — electric lime (terrain / dossard fluo, sport visibility) */
-  --energy: oklch(0.88 0.22 130);
-  --energy-foreground: oklch(0.20 0.06 140);
-  /* Victory — court / referee whistle accent (cool cyan, no orange) */
-  --victory: oklch(0.78 0.13 200);
+  /* Energy accent — electric blue glow (matches logo) */
+  --energy: oklch(0.72 0.19 250);
+  --energy-foreground: oklch(0.99 0.005 240);
+  /* Victory — cool cyan accent */
+  --victory: oklch(0.78 0.13 220);
 
   /* Sporty gradients & shadows */
   --gradient-hero: radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--primary) 30%, transparent) 0%, transparent 60%),
@@ -176,22 +176,22 @@
   --card-foreground: oklch(0.97 0.005 240);
   --popover: oklch(0.22 0.05 255);
   --popover-foreground: oklch(0.97 0.005 240);
-  --primary: oklch(0.76 0.18 135);
-  --primary-foreground: oklch(0.18 0.05 140);
+  --primary: oklch(0.68 0.20 255);
+  --primary-foreground: oklch(0.99 0.005 240);
   --secondary: oklch(0.3 0.07 255);
   --secondary-foreground: oklch(0.97 0.005 240);
   --muted: oklch(0.26 0.04 255);
   --muted-foreground: oklch(0.72 0.02 240);
-  --accent: oklch(0.32 0.07 135);
+  --accent: oklch(0.32 0.10 255);
   --accent-foreground: oklch(0.97 0.005 240);
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.76 0.18 135);
-  --energy: oklch(0.90 0.22 130);
-  --energy-foreground: oklch(0.20 0.06 140);
-  --victory: oklch(0.80 0.13 200);
+  --ring: oklch(0.68 0.20 255);
+  --energy: oklch(0.74 0.19 250);
+  --energy-foreground: oklch(0.99 0.005 240);
+  --victory: oklch(0.80 0.13 220);
 
   /* Match outcomes dark */
   --defeat: oklch(0.60 0.24 18);
