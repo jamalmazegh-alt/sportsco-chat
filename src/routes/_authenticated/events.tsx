@@ -7,7 +7,7 @@ import { fr, enUS } from "date-fns/locale";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell } from "lucide-react";
+import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
@@ -102,6 +102,31 @@ function EventsPage() {
     }).length;
   }, [events]);
 
+  const { data: pendingFollowUps } = useQuery({
+    queryKey: ["follow-ups-count", activeClubId],
+    enabled: !!activeClubId && isCoach && !!teams,
+    queryFn: async () => {
+      const teamIds = (teams ?? []).map((t) => t.id);
+      if (teamIds.length === 0) return 0;
+      const { data: evs } = await supabase
+        .from("events")
+        .select("id")
+        .in("team_id", teamIds)
+        .eq("status", "published")
+        .gte("starts_at", new Date().toISOString())
+        .limit(50);
+      const evIds = (evs ?? []).map((e) => e.id);
+      if (evIds.length === 0) return 0;
+      const { count } = await supabase
+        .from("convocations")
+        .select("id", { count: "exact", head: true })
+        .in("event_id", evIds)
+        .eq("status", "pending");
+      return count ?? 0;
+    },
+    staleTime: 30_000,
+  });
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
@@ -153,6 +178,21 @@ function EventsPage() {
           </button>
         </div>
       )}
+
+      {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
+        <Link
+          to="/follow-ups"
+          className="flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 hover:border-amber-500/60 transition-colors"
+        >
+          <BellRing className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">{t("followUps.title")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("followUps.linkBadge", { count: pendingFollowUps })}
+            </p>
+          </div>
+        </Link>
+      ) : null}
 
       {isLoading ? (
         <div className="space-y-2">

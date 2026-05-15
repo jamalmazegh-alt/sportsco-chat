@@ -309,6 +309,13 @@
     "repeatHint": "Automatically creates the following sessions at the same time.",
     "repeatCreated": "{{count}} trainings created"
   },
+  "followUps": {
+    "title": "Follow-ups",
+    "subtitle": "Players who haven't replied to upcoming events.",
+    "empty": "Everyone replied 🎉",
+    "emptyHint": "No pending players on upcoming convocations.",
+    "linkBadge": "{{count}} to remind"
+  },
   "attendance": {
     "title": "Attendance",
     "present": "Present",
