@@ -49,6 +49,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
       .from("wall_posts")
       .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments")
       .eq("club_id", clubId)
+      .is("deleted_at", null)
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
@@ -61,6 +62,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .from("wall_comments")
         .select("id, post_id, author_user_id, body, created_at")
         .in("post_id", ids)
+        .is("deleted_at", null)
         .order("created_at", { ascending: true });
       const allUserIds = Array.from(new Set([
         ...ps.map((p) => p.author_user_id),
@@ -170,8 +172,18 @@ export function WallFeed({ clubId }: { clubId: string }) {
   }
 
   async function deletePost(id: string) {
-    const { error } = await supabase.from("wall_posts").delete().eq("id", id);
-    if (error) toast.error(error.message);
+    const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
+    if (error) { toast.error(error.message); return; }
+    toast(t("wall.postDeleted", { defaultValue: "Post deleted" }), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "wall_post", _id: id });
+          if (e2) toast.error(e2.message);
+          else load();
+        },
+      },
+    });
   }
 
   async function togglePin(id: string, next: boolean) {
@@ -394,8 +406,17 @@ function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; curre
   }
 
   async function del(id: string) {
-    const { error } = await supabase.from("wall_comments").delete().eq("id", id);
-    if (error) toast.error(error.message);
+    const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_comment", _id: id });
+    if (error) { toast.error(error.message); return; }
+    toast(t("wall.commentDeleted", { defaultValue: "Comment deleted" }), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "wall_comment", _id: id });
+          if (e2) toast.error(e2.message);
+        },
+      },
+    });
   }
 
   return (
