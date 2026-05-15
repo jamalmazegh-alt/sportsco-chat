@@ -45,6 +45,7 @@ function HomePage() {
         .from("teams")
         .select("id, name, competitions")
         .eq("club_id", activeClubId!)
+        .is("deleted_at", null)
         .order("name");
       return data ?? [];
     },
@@ -62,6 +63,7 @@ function HomePage() {
         .select("id, title, starts_at, location, type, status, team_id")
         .in("team_id", teamIds)
         .eq("status", "published")
+        .is("deleted_at", null)
         .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
         .limit(5);
