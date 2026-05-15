@@ -21,6 +21,7 @@ import {
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { MatchResultCard } from "@/components/match-result-card";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -657,6 +658,18 @@ function EventDetail() {
             </div>
           ))}
         </section>
+      )}
+
+      {/* Match result + scorers (matches only) */}
+      {event.type === "match" && (
+        <MatchResultCard
+          eventId={event.id}
+          teamId={event.team_id}
+          isHome={event.is_home}
+          opponent={event.opponent}
+          isCoach={isCoach}
+          startsAt={event.starts_at}
+        />
       )}
 
       {/* Attendance board (visible to all team viewers once convocations are sent) */}
