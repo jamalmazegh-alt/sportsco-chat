@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
+import { AttendanceHeatmap } from "@/components/attendance-heatmap";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -390,6 +391,7 @@ function PlayerProfile() {
       </form>
 
       {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
+      {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
 
       {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
       {minor && (isParentOfThisPlayer || isCoach) && (
