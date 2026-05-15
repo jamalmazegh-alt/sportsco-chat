@@ -187,6 +187,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         role={role}
         commentsEnabled={commentsEnabled}
         canPin={canPost}
+        memberCount={memberCount}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
