@@ -66,19 +66,21 @@ function Landing() {
 function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border/60 bg-gradient-hero">
-      {/* Decorative grid + halos */}
+      {/* Decorative pitch lines + halos */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 opacity-[0.18]"
+        className="absolute inset-0 -z-10 opacity-[0.22] bg-pitch"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, color-mix(in oklab, var(--brand-blue-deep) 30%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--brand-blue-deep) 30%, transparent) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-          maskImage: "radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%)",
+          maskImage: "radial-gradient(ellipse 75% 60% at 50% 35%, black 25%, transparent 80%)",
         }}
       />
-      <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--energy)]/30 blur-3xl animate-float" />
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 opacity-[0.10] bg-jersey-stripes"
+      />
+      <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/30 blur-3xl animate-float" />
       <div aria-hidden className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/30 blur-3xl" />
+
 
       <div className="mx-auto max-w-7xl px-5 pt-16 pb-14 lg:px-8 lg:pt-24 lg:pb-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10 lg:items-center">
