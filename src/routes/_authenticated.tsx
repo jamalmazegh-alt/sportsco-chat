@@ -50,9 +50,8 @@ function AuthLayout() {
       <div className="min-h-screen bg-background pb-24">
         <div className="mx-auto max-w-xl">
           <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
-            <div className="relative flex items-center justify-center gap-2 px-3 py-2.5">
-              <img src={logo} alt="Clubero" width={28} height={28} className="h-7 w-7 object-contain drop-shadow-sm" />
-              <span className="text-sm font-semibold tracking-tight text-foreground/85">Clubero</span>
+            <div className="relative flex items-center justify-center px-3 py-3">
+              <img src={logo} alt="Clubero" className="h-10 w-auto object-contain drop-shadow-sm" />
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
                 <GlobalSearch />
               </div>
