@@ -312,8 +312,8 @@ function EventDetail() {
     toast.success(t("events.convocationsSent"));
   }
 
-  async function remind(convocationId: string) {
-    if (!user) return;
+  async function remind(convocationId: string, opts?: { silent?: boolean }) {
+    if (!user) return false;
     const { data: recent } = await supabase
       .from("reminders")
       .select("id, sent_at")
@@ -321,8 +321,8 @@ function EventDetail() {
       .order("sent_at", { ascending: false })
       .limit(1);
     if (recent && recent[0] && Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000) {
-      toast.info(t("attendance.alreadyRemindedRecently"));
-      return;
+      if (!opts?.silent) toast.info(t("attendance.alreadyRemindedRecently"));
+      return false;
     }
     const c = convocations?.find((x: any) => x.id === convocationId) as any;
     const playerUserId = c?.players?.user_id;
@@ -352,7 +352,8 @@ function EventDetail() {
         }))
       );
     }
-    toast.success(t("attendance.remindSent"));
+    if (!opts?.silent) toast.success(t("attendance.remindSent"));
+    return true;
   }
 
   async function remindAllPending() {
@@ -361,14 +362,11 @@ function EventDetail() {
     if (pending.length === 0) return;
     let sent = 0;
     for (const c of pending) {
-      try {
-        await remind(c.id);
-        sent += 1;
-      } catch {
-        // best-effort
-      }
+      const ok = await remind(c.id, { silent: true });
+      if (ok) sent += 1;
     }
     if (sent > 0) toast.success(t("attendance.remindAllSent", { count: sent }));
+    else toast.info(t("attendance.alreadyRemindedRecently"));
   }
 
   async function toggleLock() {
