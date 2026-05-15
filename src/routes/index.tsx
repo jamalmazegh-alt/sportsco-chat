@@ -82,10 +82,13 @@ function Hero() {
       <div aria-hidden className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/30 blur-3xl" />
 
 
-      <div className="mx-auto max-w-7xl px-5 pt-16 pb-14 lg:px-8 lg:pt-24 lg:pb-24">
+        <div className="mx-auto max-w-7xl px-5 pt-12 pb-14 lg:px-8 lg:pt-16 lg:pb-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10 lg:items-center">
           <div className="lg:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--energy)]/30 bg-[color:var(--energy)]/10 px-3 py-1 text-xs font-semibold text-[color:var(--energy)] backdrop-blur">
+            <div className="flex items-center">
+              <img src="/clubero-logo.png" alt="Clubero" className="h-16 w-auto object-contain md:h-20" />
+            </div>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[color:var(--energy)]/30 bg-[color:var(--energy)]/10 px-3 py-1 text-xs font-semibold text-[color:var(--energy)] backdrop-blur">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 rounded-full bg-[color:var(--energy)] animate-ping opacity-75" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-[color:var(--energy)]" />
