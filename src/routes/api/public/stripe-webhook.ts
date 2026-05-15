@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 type SubStatus =
   | "trialing"
@@ -24,37 +25,83 @@ function planFromPriceId(priceId?: string | null): "monthly" | "yearly" | null {
   return null;
 }
 
+async function notifyAdmin(
+  eventType:
+    | "created"
+    | "trial_started"
+    | "canceled"
+    | "cancellation_scheduled"
+    | "reactivated"
+    | "payment_failed",
+  sub: Stripe.Subscription,
+  clubId: string | null,
+) {
+  try {
+    let clubName: string | null = null;
+    if (clubId) {
+      const { data: club } = await supabaseAdmin
+        .from("clubs")
+        .select("name")
+        .eq("id", clubId)
+        .maybeSingle();
+      clubName = club?.name ?? null;
+    }
+    const item = sub.items.data[0];
+    const priceId = item?.price?.id ?? null;
+    const customerEmail =
+      typeof sub.customer === "object" && sub.customer && "email" in sub.customer
+        ? (sub.customer as Stripe.Customer).email
+        : null;
+    await enqueueTransactionalEmailServer({
+      templateName: "subscription-admin-notification",
+      idempotencyKey: `sub-${eventType}-${sub.id}-${sub.canceled_at ?? sub.cancel_at ?? ""}`,
+      templateData: {
+        eventType,
+        clubId,
+        clubName,
+        plan: planFromPriceId(priceId),
+        status: sub.status,
+        customerEmail,
+        trialEnd: toIso(sub.trial_end),
+        currentPeriodEnd: toIso(item?.current_period_end),
+        cancelAt: toIso(sub.cancel_at),
+        stripeSubscriptionId: sub.id,
+      },
+    });
+  } catch (err) {
+    console.error("notifyAdmin failed:", err);
+  }
+}
+
 async function upsertSubscription(sub: Stripe.Subscription) {
   const clubId =
     (sub.metadata?.club_id as string | undefined) ??
-    ((sub.customer as Stripe.Customer | null)?.metadata?.club_id as
-      | string
-      | undefined);
+    ((sub.customer as Stripe.Customer | null)?.metadata?.club_id as string | undefined);
 
-  // Fallback: lookup by customer id
   let resolvedClubId = clubId ?? null;
-  if (!resolvedClubId) {
-    const customerId =
-      typeof sub.customer === "string" ? sub.customer : sub.customer?.id;
-    if (customerId) {
-      const { data } = await supabaseAdmin
-        .from("subscriptions")
-        .select("club_id")
-        .eq("stripe_customer_id", customerId)
-        .maybeSingle();
-      resolvedClubId = data?.club_id ?? null;
-    }
+  const customerId =
+    typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null;
+  if (!resolvedClubId && customerId) {
+    const { data } = await supabaseAdmin
+      .from("subscriptions")
+      .select("club_id")
+      .eq("stripe_customer_id", customerId)
+      .maybeSingle();
+    resolvedClubId = data?.club_id ?? null;
   }
   if (!resolvedClubId) {
     console.error("Stripe webhook: cannot resolve club_id for sub", sub.id);
-    return;
+    return { resolvedClubId: null, previous: null };
   }
+
+  const { data: previous } = await supabaseAdmin
+    .from("subscriptions")
+    .select("status, cancel_at_period_end, cancel_at, stripe_subscription_id")
+    .eq("club_id", resolvedClubId)
+    .maybeSingle();
 
   const item = sub.items.data[0];
   const priceId = item?.price?.id ?? null;
-
-  const customerId =
-    typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null;
 
   await supabaseAdmin.from("subscriptions").upsert(
     {
@@ -68,10 +115,13 @@ async function upsertSubscription(sub: Stripe.Subscription) {
       current_period_end: toIso(item?.current_period_end),
       trial_end: toIso(sub.trial_end),
       cancel_at_period_end: sub.cancel_at_period_end ?? false,
+      cancel_at: toIso(sub.cancel_at),
       canceled_at: toIso(sub.canceled_at),
     },
     { onConflict: "club_id" },
   );
+
+  return { resolvedClubId, previous };
 }
 
 export const Route = createFileRoute("/api/public/stripe-webhook")({
@@ -89,11 +139,7 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
 
         let event: Stripe.Event;
         try {
-          event = await stripe.webhooks.constructEventAsync(
-            body,
-            signature,
-            secret,
-          );
+          event = await stripe.webhooks.constructEventAsync(body, signature, secret);
         } catch (err) {
           console.error("Stripe webhook signature failed:", err);
           return new Response("Invalid signature", { status: 400 });
@@ -108,27 +154,53 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                   typeof session.subscription === "string"
                     ? session.subscription
                     : session.subscription.id;
-                const sub = await stripe.subscriptions.retrieve(subId);
-                // Ensure metadata.club_id is on the subscription
+                const sub = await stripe.subscriptions.retrieve(subId, { expand: ["customer"] });
                 if (!sub.metadata?.club_id && session.metadata?.club_id) {
                   await stripe.subscriptions.update(sub.id, {
-                    metadata: {
-                      ...sub.metadata,
-                      club_id: session.metadata.club_id,
-                    },
+                    metadata: { ...sub.metadata, club_id: session.metadata.club_id },
                   });
-                  sub.metadata = {
-                    ...sub.metadata,
-                    club_id: session.metadata.club_id,
-                  };
+                  sub.metadata = { ...sub.metadata, club_id: session.metadata.club_id };
                 }
-                await upsertSubscription(sub);
+                const { resolvedClubId, previous } = await upsertSubscription(sub);
+                if (resolvedClubId && !previous?.stripe_subscription_id) {
+                  await notifyAdmin("created", sub, resolvedClubId);
+                }
               }
               break;
             }
-            case "customer.subscription.created":
-            case "customer.subscription.updated":
-            case "customer.subscription.deleted":
+            case "customer.subscription.created": {
+              const sub = event.data.object as Stripe.Subscription;
+              const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
+              const { resolvedClubId, previous } = await upsertSubscription(fresh);
+              if (resolvedClubId && !previous?.stripe_subscription_id) {
+                await notifyAdmin("created", fresh, resolvedClubId);
+              }
+              break;
+            }
+            case "customer.subscription.updated": {
+              const sub = event.data.object as Stripe.Subscription;
+              const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
+              const { resolvedClubId, previous } = await upsertSubscription(fresh);
+              if (resolvedClubId && previous) {
+                const wasScheduled =
+                  previous.cancel_at_period_end === true || previous.cancel_at !== null;
+                const nowScheduled =
+                  fresh.cancel_at_period_end === true || fresh.cancel_at !== null;
+                if (!wasScheduled && nowScheduled) {
+                  await notifyAdmin("cancellation_scheduled", fresh, resolvedClubId);
+                } else if (wasScheduled && !nowScheduled && fresh.status !== "canceled") {
+                  await notifyAdmin("reactivated", fresh, resolvedClubId);
+                }
+              }
+              break;
+            }
+            case "customer.subscription.deleted": {
+              const sub = event.data.object as Stripe.Subscription;
+              const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
+              const { resolvedClubId } = await upsertSubscription(fresh);
+              if (resolvedClubId) await notifyAdmin("canceled", fresh, resolvedClubId);
+              break;
+            }
             case "customer.subscription.trial_will_end":
             case "customer.subscription.paused":
             case "customer.subscription.resumed": {
@@ -138,18 +210,18 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             case "invoice.payment_failed":
             case "invoice.payment_succeeded": {
               const invoice = event.data.object as Stripe.Invoice;
-              const subId =
-                typeof (invoice as unknown as { subscription?: string | Stripe.Subscription }).subscription === "string"
-                  ? ((invoice as unknown as { subscription: string }).subscription)
-                  : ((invoice as unknown as { subscription?: Stripe.Subscription }).subscription?.id);
+              const subRef = (invoice as unknown as { subscription?: string | Stripe.Subscription }).subscription;
+              const subId = typeof subRef === "string" ? subRef : subRef?.id;
               if (subId) {
-                const sub = await stripe.subscriptions.retrieve(subId);
-                await upsertSubscription(sub);
+                const sub = await stripe.subscriptions.retrieve(subId, { expand: ["customer"] });
+                const { resolvedClubId } = await upsertSubscription(sub);
+                if (event.type === "invoice.payment_failed" && resolvedClubId) {
+                  await notifyAdmin("payment_failed", sub, resolvedClubId);
+                }
               }
               break;
             }
             default:
-              // ignore
               break;
           }
         } catch (err) {
