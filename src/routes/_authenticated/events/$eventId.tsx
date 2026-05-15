@@ -469,11 +469,7 @@ function EventDetail() {
   }, [convocations]);
 
   if (!event) {
-    return (
-      <div className="flex justify-center pt-20">
-        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-      </div>
-    );
+    return <EventDetailSkeleton />;
   }
 
   const visibleMyConvocs = [...myConvocs, ...myChildConvocs];
