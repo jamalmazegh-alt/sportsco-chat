@@ -386,6 +386,14 @@ function EventDetail() {
     return c;
   }, [convocations]);
 
+  // Pending first, then uncertain, absent, present — keeps the "à relancer" rows at the top
+  const sortedConvocations = useMemo(() => {
+    const order: Record<string, number> = { pending: 0, uncertain: 1, absent: 2, present: 3 };
+    return [...(convocations ?? [])].sort(
+      (a: any, b: any) => (order[a.status] ?? 9) - (order[b.status] ?? 9),
+    );
+  }, [convocations]);
+
   if (!event) {
     return (
       <div className="flex justify-center pt-20">
@@ -395,9 +403,12 @@ function EventDetail() {
   }
 
   const visibleMyConvocs = [...myConvocs, ...myChildConvocs];
+  const hasPendingForMe =
+    !event.responses_locked &&
+    visibleMyConvocs.some((c: any) => c.status === "pending");
 
   return (
-    <div className="px-5 pt-6 pb-6 space-y-5">
+    <div className="px-5 pt-6 pb-24 md:pb-6 space-y-5">
       <Link to="/events" className="inline-flex items-center text-sm text-muted-foreground gap-1">
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
