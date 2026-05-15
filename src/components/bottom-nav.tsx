@@ -1,14 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Calendar, Users, Megaphone, User } from "lucide-react";
+import { Home, Calendar, Users, Megaphone, User, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { useWallUnread } from "@/lib/use-wall-unread";
 
 export function BottomNav() {
   const { t } = useTranslation();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { activeClubId } = useAuth();
+  const role = useActiveRole();
   const { count: wallUnread } = useWallUnread(activeClubId);
 
   const items = [
@@ -16,6 +17,9 @@ export function BottomNav() {
     { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
     { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
     { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
+    ...(role === "admin"
+      ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
+      : []),
     { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
   ];
 
