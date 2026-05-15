@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { AssistantFab } from "@/components/assistant-fab";
 import { ConsentGate } from "@/components/consent-gate";
+import { GlobalSearch } from "@/components/global-search";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,9 +49,12 @@ function AuthLayout() {
     <ConsentGate>
       <div className="min-h-screen bg-background pb-24">
         <div className="mx-auto max-w-xl">
-          <div className="flex items-center justify-center gap-2 pt-3 pb-1">
+          <div className="relative flex items-center justify-center gap-2 pt-3 pb-1">
             <img src={logo} alt="Clubero" width={28} height={28} className="h-7 w-7 object-contain" />
             <span className="text-sm font-semibold tracking-tight text-foreground/80">Clubero</span>
+            <div className="absolute right-3 top-2.5">
+              <GlobalSearch />
+            </div>
           </div>
           <Outlet />
         </div>
