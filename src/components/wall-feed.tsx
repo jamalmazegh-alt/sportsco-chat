@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Eye, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
+import { MentionInput, RenderWithMentions, parseMentions } from "@/components/mention-input";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
