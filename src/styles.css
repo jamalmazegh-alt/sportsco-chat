@@ -59,6 +59,11 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Sporty energy accents */
+  --color-energy: var(--energy);
+  --color-energy-foreground: var(--energy-foreground);
+  --color-victory: var(--victory);
 }
 
 :root {
@@ -125,6 +130,21 @@
   --sidebar-accent-foreground: oklch(0.30 0.10 252);
   --sidebar-border: oklch(0.90 0.025 240);
   --sidebar-ring: oklch(0.6 0.16 240);
+
+  /* Energy accent — vibrant orange (sport / motion) */
+  --energy: oklch(0.72 0.20 45);
+  --energy-foreground: oklch(0.99 0.005 60);
+  --victory: oklch(0.78 0.16 75);
+
+  /* Sporty gradients & shadows */
+  --gradient-hero: radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--energy) 28%, transparent) 0%, transparent 60%),
+                   radial-gradient(60% 60% at 10% 100%, color-mix(in oklab, var(--brand-blue) 28%, transparent) 0%, transparent 60%),
+                   linear-gradient(135deg, color-mix(in oklab, var(--primary) 10%, var(--background)), var(--background));
+  --gradient-cta: linear-gradient(135deg, color-mix(in oklab, var(--brand-blue-deep) 95%, black) 0%, color-mix(in oklab, var(--brand-blue) 70%, transparent) 55%, color-mix(in oklab, var(--energy) 80%, transparent) 100%);
+  --gradient-primary: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--brand-blue) 80%, var(--primary)));
+  --gradient-energy: linear-gradient(135deg, var(--energy), color-mix(in oklab, var(--energy) 60%, var(--primary)));
+  --shadow-elevated: 0 20px 50px -20px color-mix(in oklab, var(--brand-blue-deep) 40%, transparent);
+  --shadow-glow: 0 0 40px color-mix(in oklab, var(--primary) 35%, transparent);
 }
 
 .dark {
@@ -147,6 +167,9 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.76 0.18 135);
+  --energy: oklch(0.76 0.20 45);
+  --energy-foreground: oklch(0.18 0.05 30);
+  --victory: oklch(0.82 0.16 75);
 }
 
 @layer base {
@@ -162,8 +185,43 @@
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
+}
+
+/* Sporty motion utilities */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 50%, transparent); }
+  70% { box-shadow: 0 0 0 12px color-mix(in oklab, var(--primary) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 0%, transparent); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-pulse-ring { animation: pulse-ring 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+.animate-float { animation: float-slow 4s ease-in-out infinite; }
+.bg-gradient-hero { background: var(--gradient-hero); }
+.bg-gradient-cta { background: var(--gradient-cta); }
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-energy { background: var(--gradient-energy); }
+.shadow-elevated { box-shadow: var(--shadow-elevated); }
+.shadow-glow { box-shadow: var(--shadow-glow); }
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-energy {
+  background: var(--gradient-energy);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* react-phone-number-input overrides */
