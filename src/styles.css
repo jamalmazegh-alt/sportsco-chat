@@ -75,8 +75,8 @@
 :root {
   --radius: 0.875rem;
 
-  /* Clubero brand: navy #1f3a5f + green #7cc142 + blue family for surfaces */
-  --background: oklch(0.985 0.012 240);
+  /* Clubero brand: navy #0F1B3D + coral #FF7A6B + warm cream surfaces */
+  --background: oklch(0.985 0.008 60);
   --foreground: oklch(0.24 0.08 255);
 
   --card: oklch(1 0 0);
@@ -84,88 +84,88 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.24 0.08 255);
 
-  /* Clubero electric blue (primary CTA) — matches logo Kinetic-C accent */
-  --primary: oklch(0.58 0.21 258);
-  --primary-foreground: oklch(0.99 0.005 240);
+  /* Clubero coral (primary CTA) — chaleureux, communautaire */
+  --primary: oklch(0.72 0.17 28);
+  --primary-foreground: oklch(0.99 0.005 60);
 
-  /* Clubero navy (secondary) — slightly bluer */
-  --secondary: oklch(0.34 0.11 252);
-  --secondary-foreground: oklch(0.99 0.005 240);
+  /* Clubero navy (secondary) — du logo */
+  --secondary: oklch(0.30 0.10 255);
+  --secondary-foreground: oklch(0.99 0.005 60);
 
-  /* Soft blue surface */
-  --muted: oklch(0.955 0.022 240);
-  --muted-foreground: oklch(0.46 0.06 252);
+  /* Soft warm surface */
+  --muted: oklch(0.96 0.012 50);
+  --muted-foreground: oklch(0.46 0.05 40);
 
-  /* Blue accent (was tinted green) */
-  --accent: oklch(0.92 0.045 240);
-  --accent-foreground: oklch(0.30 0.10 252);
+  /* Warm coral-tinted accent */
+  --accent: oklch(0.94 0.04 30);
+  --accent-foreground: oklch(0.30 0.10 255);
 
-  --destructive: oklch(0.6 0.22 25);
+  --destructive: oklch(0.58 0.22 18);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.90 0.025 240);
-  --input: oklch(0.90 0.025 240);
-  --ring: oklch(0.6 0.16 240);
+  --border: oklch(0.91 0.018 50);
+  --input: oklch(0.91 0.018 50);
+  --ring: oklch(0.72 0.17 28);
 
-  /* Blue palette ramp */
-  --brand-blue: oklch(0.6 0.16 240);
-  --brand-blue-soft: oklch(0.94 0.04 240);
-  --brand-blue-deep: oklch(0.34 0.11 252);
+  /* Brand ramp — navy + coral (kept under brand-blue token names for compat) */
+  --brand-blue: oklch(0.72 0.17 28);              /* coral mid */
+  --brand-blue-soft: oklch(0.95 0.035 30);        /* coral very light */
+  --brand-blue-deep: oklch(0.30 0.10 255);        /* navy deep */
 
   /* Attendance */
-  --present: oklch(0.72 0.18 135);
+  --present: oklch(0.72 0.18 145);
   --present-foreground: oklch(0.18 0.05 140);
-  --absent: oklch(0.6 0.22 25);
+  --absent: oklch(0.58 0.22 18);
   --absent-foreground: oklch(0.99 0 0);
   --uncertain: oklch(0.78 0.15 75);
   --uncertain-foreground: oklch(0.22 0.05 60);
-  --pending: oklch(0.82 0.01 240);
-  --pending-foreground: oklch(0.3 0.04 255);
+  --pending: oklch(0.86 0.012 60);
+  --pending-foreground: oklch(0.30 0.05 50);
 
   /* Match outcomes */
   --defeat: oklch(0.52 0.22 18);
   --defeat-foreground: oklch(0.99 0 0);
-  --draw: oklch(0.65 0.01 240);
-  --draw-foreground: oklch(0.3 0.04 255);
+  --draw: oklch(0.70 0.012 60);
+  --draw-foreground: oklch(0.30 0.05 50);
 
-  --chart-1: oklch(0.58 0.21 258);
-  --chart-2: oklch(0.32 0.09 255);
-  --chart-3: oklch(0.6 0.16 240);
+  --chart-1: oklch(0.72 0.17 28);
+  --chart-2: oklch(0.30 0.10 255);
+  --chart-3: oklch(0.82 0.13 35);
   --chart-4: oklch(0.78 0.15 75);
-  --chart-5: oklch(0.6 0.22 25);
+  --chart-5: oklch(0.58 0.22 18);
 
-  --sidebar: oklch(0.99 0.003 240);
+  --sidebar: oklch(0.99 0.005 60);
   --sidebar-foreground: oklch(0.26 0.07 255);
-  --sidebar-primary: oklch(0.58 0.21 258);
-  --sidebar-primary-foreground: oklch(0.99 0.005 240);
-  --sidebar-accent: oklch(0.92 0.045 240);
-  --sidebar-accent-foreground: oklch(0.30 0.10 252);
-  --sidebar-border: oklch(0.90 0.025 240);
-  --sidebar-ring: oklch(0.6 0.16 240);
+  --sidebar-primary: oklch(0.72 0.17 28);
+  --sidebar-primary-foreground: oklch(0.99 0.005 60);
+  --sidebar-accent: oklch(0.94 0.04 30);
+  --sidebar-accent-foreground: oklch(0.30 0.10 255);
+  --sidebar-border: oklch(0.91 0.018 50);
+  --sidebar-ring: oklch(0.72 0.17 28);
 
-  /* Energy accent — electric blue glow (matches logo) */
-  --energy: oklch(0.72 0.19 250);
-  --energy-foreground: oklch(0.99 0.005 240);
-  /* Victory — cool cyan accent */
-  --victory: oklch(0.78 0.13 220);
+  /* Energy accent — coral chaud (vibe communauté/terrain) */
+  --energy: oklch(0.74 0.17 30);
+  --energy-foreground: oklch(0.99 0.005 60);
+  /* Victory — peach accent doux */
+  --victory: oklch(0.84 0.11 45);
 
   /* Sporty gradients & shadows */
-  --gradient-hero: radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--primary) 30%, transparent) 0%, transparent 60%),
-                   radial-gradient(60% 60% at 10% 100%, color-mix(in oklab, var(--brand-blue) 28%, transparent) 0%, transparent 60%),
-                   linear-gradient(135deg, color-mix(in oklab, var(--primary) 10%, var(--background)), var(--background));
-  --gradient-cta: linear-gradient(135deg, color-mix(in oklab, var(--brand-blue-deep) 96%, black) 0%, color-mix(in oklab, var(--brand-blue) 60%, var(--brand-blue-deep)) 55%, color-mix(in oklab, var(--primary) 70%, var(--brand-blue)) 100%);
-  --gradient-primary: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--brand-blue) 80%, var(--primary)));
-  --gradient-energy: linear-gradient(135deg, var(--energy), color-mix(in oklab, var(--primary) 70%, var(--energy)));
+  --gradient-hero: radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--primary) 28%, transparent) 0%, transparent 60%),
+                   radial-gradient(60% 60% at 10% 100%, color-mix(in oklab, var(--brand-blue-deep) 22%, transparent) 0%, transparent 60%),
+                   linear-gradient(135deg, color-mix(in oklab, var(--primary) 8%, var(--background)), var(--background));
+  --gradient-cta: linear-gradient(135deg, color-mix(in oklab, var(--brand-blue-deep) 96%, black) 0%, color-mix(in oklab, var(--brand-blue-deep) 70%, var(--primary)) 55%, color-mix(in oklab, var(--primary) 90%, white) 100%);
+  --gradient-primary: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--victory) 70%, var(--primary)));
+  --gradient-energy: linear-gradient(135deg, var(--energy), color-mix(in oklab, var(--victory) 60%, var(--energy)));
 
-  /* Sport pattern motifs — pitch / court lines (chalk on grass) */
-  --pitch-line: color-mix(in oklab, var(--brand-blue-deep) 22%, transparent);
+  /* Sport pattern motifs — pitch / court lines (chalk on cream) */
+  --pitch-line: color-mix(in oklab, var(--brand-blue-deep) 18%, transparent);
   --pattern-pitch:
     radial-gradient(circle at 50% 50%, transparent 58px, var(--pitch-line) 58px, var(--pitch-line) 60px, transparent 61px),
     linear-gradient(to right, transparent calc(50% - 1px), var(--pitch-line) calc(50% - 1px), var(--pitch-line) calc(50% + 1px), transparent calc(50% + 1px)),
     linear-gradient(to bottom, transparent calc(50% - 1px), var(--pitch-line) calc(50% - 1px), var(--pitch-line) calc(50% + 1px), transparent calc(50% + 1px));
-  --pattern-stripes: repeating-linear-gradient(135deg, color-mix(in oklab, var(--primary) 14%, transparent) 0 14px, transparent 14px 28px);
+  --pattern-stripes: repeating-linear-gradient(135deg, color-mix(in oklab, var(--primary) 12%, transparent) 0 14px, transparent 14px 28px);
   --pattern-court: repeating-linear-gradient(0deg, transparent 0 39px, var(--pitch-line) 39px 40px), repeating-linear-gradient(90deg, transparent 0 59px, var(--pitch-line) 59px 60px);
-  --shadow-elevated: 0 20px 50px -20px color-mix(in oklab, var(--brand-blue-deep) 40%, transparent);
+  --shadow-elevated: 0 20px 50px -20px color-mix(in oklab, var(--brand-blue-deep) 35%, transparent);
   --shadow-glow: 0 0 40px color-mix(in oklab, var(--primary) 35%, transparent);
 }
 
@@ -176,22 +176,22 @@
   --card-foreground: oklch(0.97 0.005 240);
   --popover: oklch(0.22 0.05 255);
   --popover-foreground: oklch(0.97 0.005 240);
-  --primary: oklch(0.68 0.20 255);
-  --primary-foreground: oklch(0.99 0.005 240);
-  --secondary: oklch(0.3 0.07 255);
-  --secondary-foreground: oklch(0.97 0.005 240);
+  --primary: oklch(0.74 0.17 28);
+  --primary-foreground: oklch(0.18 0.05 30);
+  --secondary: oklch(0.30 0.07 255);
+  --secondary-foreground: oklch(0.97 0.005 60);
   --muted: oklch(0.26 0.04 255);
-  --muted-foreground: oklch(0.72 0.02 240);
-  --accent: oklch(0.32 0.10 255);
-  --accent-foreground: oklch(0.97 0.005 240);
-  --destructive: oklch(0.65 0.22 25);
+  --muted-foreground: oklch(0.74 0.02 40);
+  --accent: oklch(0.34 0.10 28);
+  --accent-foreground: oklch(0.97 0.005 60);
+  --destructive: oklch(0.65 0.22 18);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.68 0.20 255);
-  --energy: oklch(0.74 0.19 250);
-  --energy-foreground: oklch(0.99 0.005 240);
-  --victory: oklch(0.80 0.13 220);
+  --ring: oklch(0.74 0.17 28);
+  --energy: oklch(0.78 0.17 30);
+  --energy-foreground: oklch(0.18 0.05 30);
+  --victory: oklch(0.84 0.11 45);
 
   /* Match outcomes dark */
   --defeat: oklch(0.60 0.24 18);
