@@ -36,6 +36,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
+  const [memberCount, setMemberCount] = useState(0);
 
   async function load() {
     setLoading(true);
