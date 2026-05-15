@@ -70,7 +70,8 @@ function AssistantPage() {
 
   const transport = new DefaultChatTransport({
     api: "/api/chat",
-    headers: () => (authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+    headers: () =>
+      authToken ? { Authorization: `Bearer ${authToken}` } : ({} as Record<string, string>),
   });
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
@@ -180,7 +181,7 @@ function AssistantPage() {
           ) : (
             messages.map((m) => (
               <Message key={m.id} from={m.role === "user" ? "user" : "assistant"}>
-                <MessageContent variant={m.role === "user" ? "contained" : "flat"}>
+                <MessageContent className={m.role === "assistant" ? "bg-transparent p-0" : undefined}>
                   {m.parts.map((part, idx) => {
                     if (part.type === "text") {
                       return m.role === "assistant" ? (
@@ -222,7 +223,7 @@ function AssistantPage() {
           )}
           {status === "submitted" && (
             <Message from="assistant">
-              <MessageContent variant="flat">
+              <MessageContent className="bg-transparent p-0">
                 <Shimmer>{t("assistant.thinking", { defaultValue: "Réflexion..." })}</Shimmer>
               </MessageContent>
             </Message>
