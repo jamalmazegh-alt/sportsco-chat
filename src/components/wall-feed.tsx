@@ -11,6 +11,7 @@ import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 import { MentionInput, RenderWithMentions, parseMentions } from "@/components/mention-input";
 import { WallFeedSkeleton } from "@/components/skeletons";
+import { cn } from "@/lib/utils";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
