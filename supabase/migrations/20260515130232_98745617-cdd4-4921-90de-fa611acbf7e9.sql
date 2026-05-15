@@ -1,0 +1,2 @@
+ALTER TABLE public.wall_posts ADD COLUMN IF NOT EXISTS is_pinned boolean NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_wall_posts_club_pinned ON public.wall_posts(club_id, is_pinned, created_at DESC);

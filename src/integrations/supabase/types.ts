@@ -1105,6 +1105,7 @@ export type Database = {
           club_id: string
           created_at: string
           id: string
+          is_pinned: boolean
         }
         Insert: {
           attachments?: Json
@@ -1113,6 +1114,7 @@ export type Database = {
           club_id: string
           created_at?: string
           id?: string
+          is_pinned?: boolean
         }
         Update: {
           attachments?: Json
@@ -1121,6 +1123,7 @@ export type Database = {
           club_id?: string
           created_at?: string
           id?: string
+          is_pinned?: boolean
         }
         Relationships: []
       }
