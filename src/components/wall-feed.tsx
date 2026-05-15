@@ -201,6 +201,7 @@ function WallGrouped({
   role,
   commentsEnabled,
   canPin,
+  memberCount,
   onDelete,
   onTogglePin,
 }: {
@@ -209,6 +210,7 @@ function WallGrouped({
   role: string | null;
   commentsEnabled: boolean;
   canPin: boolean;
+  memberCount: number;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
