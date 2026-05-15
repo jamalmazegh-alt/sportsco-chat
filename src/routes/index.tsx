@@ -143,15 +143,15 @@ function Hero() {
                 className="absolute -inset-8 -z-10 rounded-[2.5rem] opacity-60 blur-3xl"
                 style={{
                   background:
-                    "linear-gradient(135deg, color-mix(in oklab, var(--energy) 50%, transparent), color-mix(in oklab, var(--brand-blue) 50%, transparent))",
+                    "linear-gradient(135deg, color-mix(in oklab, var(--logo-blue) 55%, transparent), color-mix(in oklab, var(--energy) 45%, transparent))",
                 }}
               />
 
               {/* Floating live-match badge */}
               <div className="absolute -top-4 -left-4 z-10 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-elevated animate-float">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inset-0 rounded-full bg-destructive animate-ping opacity-75" />
-                  <span className="relative h-2 w-2 rounded-full bg-destructive" />
+                  <span className="absolute inset-0 rounded-full bg-[color:var(--logo-blue)] animate-ping opacity-75" />
+                  <span className="relative h-2 w-2 rounded-full bg-[color:var(--logo-blue)]" />
                 </span>
                 <span className="text-[11px] font-bold uppercase tracking-wider">Live · 2-1</span>
               </div>
