@@ -379,6 +379,39 @@ export type Database = {
         }
         Relationships: []
       }
+      event_goals: {
+        Row: {
+          assist_player_id: string | null
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          kind: string
+          minute: number | null
+          scorer_player_id: string
+        }
+        Insert: {
+          assist_player_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          kind?: string
+          minute?: number | null
+          scorer_player_id: string
+        }
+        Update: {
+          assist_player_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          kind?: string
+          minute?: number | null
+          scorer_player_id?: string
+        }
+        Relationships: []
+      }
       event_messages: {
         Row: {
           attachments: Json
@@ -485,6 +518,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      match_results: {
+        Row: {
+          away_score: number
+          created_at: string
+          event_id: string
+          home_score: number
+          id: string
+          notes: string | null
+          recorded_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          away_score?: number
+          created_at?: string
+          event_id: string
+          home_score?: number
+          id?: string
+          notes?: string | null
+          recorded_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          away_score?: number
+          created_at?: string
+          event_id?: string
+          home_score?: number
+          id?: string
+          notes?: string | null
+          recorded_by?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       member_invites: {
         Row: {
