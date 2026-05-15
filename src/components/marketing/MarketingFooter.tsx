@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import logo from "@/assets/clubero-logo.png";
 
 export function MarketingFooter() {
+  const { t } = useTranslation("marketing");
+
   return (
     <footer className="border-t border-border/60 bg-muted/30">
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
@@ -11,50 +14,50 @@ export function MarketingFooter() {
               <img src={logo} alt="Clubero" className="h-11 w-auto object-contain" />
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
-              La coordination d&apos;équipe, simplifiée pour les clubs sportifs.
+              {t("footer.tagline")}
             </p>
           </div>
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Produit
+              {t("footer.product")}
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/features" className="hover:text-foreground">Fonctionnalités</Link></li>
-              <li><Link to="/pricing" className="hover:text-foreground">Tarifs</Link></li>
-              <li><Link to="/demo" className="hover:text-foreground">Demander une démo</Link></li>
-              <li><Link to="/login" className="hover:text-foreground">Connexion</Link></li>
+              <li><Link to="/features" className="hover:text-foreground">{t("nav.features")}</Link></li>
+              <li><Link to="/pricing" className="hover:text-foreground">{t("nav.pricing")}</Link></li>
+              <li><Link to="/demo" className="hover:text-foreground">{t("nav.demo")}</Link></li>
+              <li><Link to="/login" className="hover:text-foreground">{t("nav.login")}</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Société
+              {t("footer.company")}
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/faq" className="hover:text-foreground">FAQ</Link></li>
-              <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
+              <li><Link to="/faq" className="hover:text-foreground">{t("nav.faq")}</Link></li>
+              <li><Link to="/contact" className="hover:text-foreground">{t("nav.contact")}</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Légal
+              {t("footer.legal")}
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
                 <Link to="/legal/$kind" params={{ kind: "terms" }} className="hover:text-foreground">
-                  Conditions d&apos;utilisation
+                  {t("footer.terms")}
                 </Link>
               </li>
               <li>
                 <Link to="/legal/$kind" params={{ kind: "privacy" }} className="hover:text-foreground">
-                  Politique de confidentialité
+                  {t("footer.privacy")}
                 </Link>
               </li>
               <li>
                 <Link to="/legal/$kind" params={{ kind: "legal_notice" }} className="hover:text-foreground">
-                  Mentions légales
+                  {t("footer.legalNotice")}
                 </Link>
               </li>
             </ul>
@@ -62,8 +65,8 @@ export function MarketingFooter() {
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Clubero. Tous droits réservés.</p>
-          <p>Pensé pour les clubs, coachs, parents et joueurs.</p>
+          <p>{t("footer.rights", { year: new Date().getFullYear() })}</p>
+          <p>{t("footer.tagline2")}</p>
         </div>
       </div>
     </footer>
