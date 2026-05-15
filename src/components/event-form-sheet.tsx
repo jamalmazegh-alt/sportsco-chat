@@ -455,6 +455,7 @@ export function EventFormSheet({
     setEndTime(e.time);
     setConvocDate(c.date);
     setConvocTime(c.time);
+    setRepeatWeeks(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
