@@ -501,7 +501,8 @@
     "comment": "Répondre",
     "commentPlaceholder": "Écrire une réponse…",
     "empty": "Aucune publication. Soyez le premier !",
-    "noClub": "Rejoignez ou créez un club pour voir le mur."
+    "noClub": "Rejoignez ou créez un club pour voir le mur.",
+    "mentionTitle": "{{name}} vous a mentionné"
   },
   "chat": {
     "title": "Chat de l'événement",
