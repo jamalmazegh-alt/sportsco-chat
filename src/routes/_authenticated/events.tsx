@@ -102,6 +102,31 @@ function EventsPage() {
     }).length;
   }, [events]);
 
+  const { data: pendingFollowUps } = useQuery({
+    queryKey: ["follow-ups-count", activeClubId],
+    enabled: !!activeClubId && isCoach && !!teams,
+    queryFn: async () => {
+      const teamIds = (teams ?? []).map((t) => t.id);
+      if (teamIds.length === 0) return 0;
+      const { data: evs } = await supabase
+        .from("events")
+        .select("id")
+        .in("team_id", teamIds)
+        .eq("status", "published")
+        .gte("starts_at", new Date().toISOString())
+        .limit(50);
+      const evIds = (evs ?? []).map((e) => e.id);
+      if (evIds.length === 0) return 0;
+      const { count } = await supabase
+        .from("convocations")
+        .select("id", { count: "exact", head: true })
+        .in("event_id", evIds)
+        .eq("status", "pending");
+      return count ?? 0;
+    },
+    staleTime: 30_000,
+  });
+
   const grouped = useMemo(() => {
     if (!visibleEvents) return [];
     const map = new Map<string, { label: string; items: typeof visibleEvents }>();
