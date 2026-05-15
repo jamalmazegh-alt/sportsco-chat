@@ -53,12 +53,32 @@ const PILLARS = [
   {
     icon: MessageSquareText,
     title: "Communication",
-    body: "Mur du club, posts d'équipe et chat par événement gardent la conversation focalisée, jamais éparpillée.",
+    body: "Mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes. Chat temps réel par événement.",
   },
   {
     icon: BarChart3,
     title: "Suivi des présences",
     body: "Marquez les présences en un clic. Visualisez les tendances par joueur et par équipe sur toute la saison.",
+  },
+  {
+    icon: Trophy,
+    title: "Résultats & stats par sport",
+    body: "Saisissez le score et les statistiques joueurs (buts, essais, paniers à 3 pts, arrêts…) adaptées au sport de chaque équipe.",
+  },
+  {
+    icon: Search,
+    title: "Recherche globale",
+    body: "Cmd/Ctrl + K pour sauter instantanément à un joueur, une équipe ou un événement.",
+  },
+  {
+    icon: Download,
+    title: "Exports CSV",
+    body: "Exportez l'effectif d'une équipe ou les présences d'un événement en un clic — prêt pour Excel.",
+  },
+  {
+    icon: Undo2,
+    title: "Corbeille 7 jours",
+    body: "Une suppression accidentelle ? Restaurez posts, événements et joueurs pendant 7 jours.",
   },
   {
     icon: ShieldCheck,
