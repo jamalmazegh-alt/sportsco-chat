@@ -142,35 +142,12 @@ function RegisterPage() {
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           {showRoleSelector ? (
-            <div className="space-y-2">
-              <Label>{t("auth.signupAs")}</Label>
-              <RadioGroup
-                value={signupRole}
-                onValueChange={(v) => setSignupRole(v as SignupRole)}
-                className="grid gap-2"
-              >
-                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <RadioGroupItem value="club_admin" id="r-admin" className="mt-0.5" />
-                  <div className="text-sm">
-                    <div className="font-medium">{t("auth.roleClubAdmin")}</div>
-                    <div className="text-xs text-muted-foreground">{t("auth.roleClubAdminHint")}</div>
-                  </div>
-                </label>
-                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <RadioGroupItem value="player" id="r-player" className="mt-0.5" />
-                  <div className="text-sm">
-                    <div className="font-medium">{t("auth.rolePlayer")}</div>
-                    <div className="text-xs text-muted-foreground">{t("auth.rolePlayerHint")}</div>
-                  </div>
-                </label>
-                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <RadioGroupItem value="parent" id="r-parent" className="mt-0.5" />
-                  <div className="text-sm">
-                    <div className="font-medium">{t("auth.roleParent")}</div>
-                    <div className="text-xs text-muted-foreground">{t("auth.roleParentHint")}</div>
-                  </div>
-                </label>
-              </RadioGroup>
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-1">
+              <div className="font-medium">{t("auth.roleClubAdmin")}</div>
+              <div className="text-xs text-muted-foreground">
+                {t("auth.publicSignupClubAdminOnly") ||
+                  "L'inscription publique est réservée aux dirigeants de club. Les joueurs et parents rejoignent Clubero uniquement via une invitation envoyée par leur club."}
+              </div>
             </div>
           ) : (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
