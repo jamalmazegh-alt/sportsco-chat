@@ -41,6 +41,8 @@
     "rolePlayerHint": "Rejoindre votre club via un lien d'invitation.",
     "roleParent": "Parent",
     "roleParentHint": "Répondre aux convocations de votre enfant.",
+    "publicSignupClubAdminOnly": "L'inscription publique est réservée aux dirigeants de club. Les joueurs et parents rejoignent Clubero uniquement via une invitation envoyée par leur club.",
+    "invitedAsHint": "Vous avez été invité — votre rôle est défini automatiquement.",
     "inviteCode": "Code d'invitation",
     "inviteHint": "Demandez à l'admin de votre club un lien ou code d'invitation.",
     "inviteRequired": "Un code d'invitation est requis.",
