@@ -19,6 +19,7 @@ type Post = {
   author_user_id: string;
   body: string;
   created_at: string;
+  is_pinned: boolean;
   attachments: Attachment[];
   author?: Profile | null;
   comments?: Comment[];
