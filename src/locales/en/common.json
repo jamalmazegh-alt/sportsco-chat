@@ -150,7 +150,15 @@
     "noConvocations": "You're all caught up.",
     "viewAll": "View all",
     "myStats": "My attendance stats",
-    "myStatsHint": "See my training attendance"
+    "myStatsHint": "See my training attendance",
+    "kpis": {
+      "title": "Overview",
+      "attendance30d": "Attendance 30d",
+      "playersAlert": "Players in alert",
+      "playersAlertHint": "≥ 3 absences in 30d",
+      "upcoming7d": "Upcoming (7d)",
+      "noData": "—"
+    }
   },
   "teams": {
     "title": "Teams",
@@ -333,7 +341,11 @@
     "reasonPlaceholder": "E.g. family tournament, minor injury, unavailable…",
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
-    "coachNotified": "The coach has been notified."
+    "coachNotified": "The coach has been notified.",
+    "pendingCount": "{{count}} player hasn't replied yet",
+    "pendingCount_plural": "{{count}} players haven't replied yet",
+    "remindAllSent": "{{count}} reminder sent",
+    "remindAllSent_plural": "{{count}} reminders sent"
   },
   "stats": {
     "title": "Stats",

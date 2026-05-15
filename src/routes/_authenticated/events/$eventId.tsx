@@ -312,8 +312,8 @@ function EventDetail() {
     toast.success(t("events.convocationsSent"));
   }
 
-  async function remind(convocationId: string) {
-    if (!user) return;
+  async function remind(convocationId: string, opts?: { silent?: boolean }) {
+    if (!user) return false;
     const { data: recent } = await supabase
       .from("reminders")
       .select("id, sent_at")
@@ -321,8 +321,8 @@ function EventDetail() {
       .order("sent_at", { ascending: false })
       .limit(1);
     if (recent && recent[0] && Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000) {
-      toast.info(t("attendance.alreadyRemindedRecently"));
-      return;
+      if (!opts?.silent) toast.info(t("attendance.alreadyRemindedRecently"));
+      return false;
     }
     const c = convocations?.find((x: any) => x.id === convocationId) as any;
     const playerUserId = c?.players?.user_id;
@@ -352,13 +352,21 @@ function EventDetail() {
         }))
       );
     }
-    toast.success(t("attendance.remindSent"));
+    if (!opts?.silent) toast.success(t("attendance.remindSent"));
+    return true;
   }
 
   async function remindAllPending() {
     if (!convocations) return;
     const pending = convocations.filter((c) => c.status === "pending");
-    for (const c of pending) await remind(c.id);
+    if (pending.length === 0) return;
+    let sent = 0;
+    for (const c of pending) {
+      const ok = await remind(c.id, { silent: true });
+      if (ok) sent += 1;
+    }
+    if (sent > 0) toast.success(t("attendance.remindAllSent", { count: sent }));
+    else toast.info(t("attendance.alreadyRemindedRecently"));
   }
 
   async function toggleLock() {
@@ -378,6 +386,14 @@ function EventDetail() {
     return c;
   }, [convocations]);
 
+  // Pending first, then uncertain, absent, present — keeps the "à relancer" rows at the top
+  const sortedConvocations = useMemo(() => {
+    const order: Record<string, number> = { pending: 0, uncertain: 1, absent: 2, present: 3 };
+    return [...(convocations ?? [])].sort(
+      (a: any, b: any) => (order[a.status] ?? 9) - (order[b.status] ?? 9),
+    );
+  }, [convocations]);
+
   if (!event) {
     return (
       <div className="flex justify-center pt-20">
@@ -387,9 +403,12 @@ function EventDetail() {
   }
 
   const visibleMyConvocs = [...myConvocs, ...myChildConvocs];
+  const hasPendingForMe =
+    !event.responses_locked &&
+    visibleMyConvocs.some((c: any) => c.status === "pending");
 
   return (
-    <div className="px-5 pt-6 pb-6 space-y-5">
+    <div className="px-5 pt-6 pb-24 md:pb-6 space-y-5">
       <Link to="/events" className="inline-flex items-center text-sm text-muted-foreground gap-1">
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
@@ -622,7 +641,7 @@ function EventDetail() {
 
       {/* My response (player/parent) */}
       {visibleMyConvocs.length > 0 && (
-        <section className="space-y-3">
+        <section id="my-response" className="space-y-3 scroll-mt-20">
           {visibleMyConvocs.map((c: any) => (
             <div key={c.id} className="rounded-2xl border border-border bg-card p-4">
               <p className="text-sm font-medium mb-3">
@@ -702,13 +721,24 @@ function EventDetail() {
             </div>
           )}
 
+          {isCoach && counts.pending > 0 && (
+            <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
+              <p className="text-xs font-medium text-pending-foreground">
+                {t("attendance.pendingCount", { count: counts.pending })}
+              </p>
+              <Button size="sm" className="h-8" onClick={remindAllPending}>
+                <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
+              </Button>
+            </div>
+          )}
+
           {convocations && convocations.length === 0 ? (
             <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
               {t("attendance.noConvokedPlayers")}
             </div>
           ) : (
             <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {(convocations ?? []).map((c: any) => (
+              {sortedConvocations.map((c: any) => (
                 <li
                   key={c.id}
                   className="flex items-center justify-between px-3 py-2"
@@ -850,6 +880,18 @@ function EventDetail() {
       </Dialog>
 
       <EventChat eventId={eventId} />
+
+      {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
+      {hasPendingForMe && (
+        <div className="md:hidden fixed bottom-16 inset-x-0 z-30 px-4 pb-3 pointer-events-none">
+          <a
+            href="#my-response"
+            className="pointer-events-auto block rounded-2xl bg-primary text-primary-foreground text-center font-semibold py-3.5 shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform"
+          >
+            {t("dashboard.respondNow")}
+          </a>
+        </div>
+      )}
     </div>
   );
 }

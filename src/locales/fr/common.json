@@ -150,7 +150,15 @@
     "noConvocations": "Tout est à jour.",
     "viewAll": "Voir tout",
     "myStats": "Mes statistiques de présence",
-    "myStatsHint": "Voir mes présences aux entraînements"
+    "myStatsHint": "Voir mes présences aux entraînements",
+    "kpis": {
+      "title": "Vue d'ensemble",
+      "attendance30d": "Présence 30j",
+      "playersAlert": "Joueurs en alerte",
+      "playersAlertHint": "≥ 3 absences sur 30j",
+      "upcoming7d": "À venir (7j)",
+      "noData": "—"
+    }
   },
   "teams": {
     "title": "Équipes",
@@ -333,7 +341,11 @@
     "reasonPlaceholder": "Ex : tournoi familial, blessure légère, indisponible…",
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
-    "coachNotified": "Le coach a été prévenu."
+    "coachNotified": "Le coach a été prévenu.",
+    "pendingCount": "{{count}} joueur n'a pas encore répondu",
+    "pendingCount_plural": "{{count}} joueurs n'ont pas encore répondu",
+    "remindAllSent": "{{count}} relance envoyée",
+    "remindAllSent_plural": "{{count}} relances envoyées"
   },
   "stats": {
     "title": "Statistiques",

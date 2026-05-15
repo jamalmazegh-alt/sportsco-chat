@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
+import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -143,6 +144,9 @@ function HomePage() {
           onCreateEvent={() => setCreateOpen(true)}
         />
       )}
+
+      {/* KPIs strip (admins/coaches) */}
+      {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
 
       {/* Quick actions */}
       {isCoach && (
