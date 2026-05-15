@@ -345,6 +345,24 @@
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu."
   },
+  "stats": {
+    "title": "Statistiques",
+    "teamTitle": "Présences de l'équipe",
+    "goals": "Buts",
+    "assists": "Passes décisives",
+    "empty": "Pas encore de données.",
+    "period": {
+      "30d": "30 j",
+      "90d": "90 j",
+      "season": "Saison",
+      "all": "Tout"
+    },
+    "type": {
+      "all": "Tous",
+      "training": "Entraînements",
+      "match": "Matchs"
+    }
+  },
   "channels": {
     "in_app": "in-app",
     "email": "email",

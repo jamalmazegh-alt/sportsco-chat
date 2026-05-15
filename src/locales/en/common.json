@@ -345,6 +345,24 @@
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified."
   },
+  "stats": {
+    "title": "Stats",
+    "teamTitle": "Team attendance",
+    "goals": "Goals",
+    "assists": "Assists",
+    "empty": "No data yet.",
+    "period": {
+      "30d": "30d",
+      "90d": "90d",
+      "season": "Season",
+      "all": "All"
+    },
+    "type": {
+      "all": "All",
+      "training": "Trainings",
+      "match": "Matches"
+    }
+  },
   "channels": {
     "in_app": "in-app",
     "email": "email",

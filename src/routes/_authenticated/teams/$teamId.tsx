@@ -18,6 +18,7 @@ import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare } from "lucide-react";
+import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -423,6 +424,8 @@ function TeamDetail() {
           </SheetContent>
         </Sheet>
       )}
+
+      {isCoach && <TeamAttendanceStats teamId={teamId} />}
 
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
