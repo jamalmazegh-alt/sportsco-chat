@@ -1100,6 +1100,27 @@ export type Database = {
           },
         ]
       }
+      wall_post_reads: {
+        Row: {
+          id: string
+          post_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          post_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          post_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       wall_posts: {
         Row: {
           attachments: Json
