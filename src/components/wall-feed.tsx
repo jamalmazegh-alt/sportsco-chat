@@ -308,7 +308,7 @@ function WallGrouped({
               )}
             </div>
           </header>
-          {p.body && <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>}
+          {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
           {p.attachments?.length > 0 && (
             <div className="mt-2">
               <AttachmentList items={p.attachments as Attachment[]} />
