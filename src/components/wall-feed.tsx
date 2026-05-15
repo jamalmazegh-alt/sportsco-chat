@@ -134,14 +134,36 @@ export function WallFeed({ clubId }: { clubId: string }) {
     // eslint-disable-next-line
   }, [clubId]);
 
+  async function notifyMentioned(ids: string[], link: string, snippet: string) {
+    if (!user || ids.length === 0) return;
+    const recipients = ids.filter((id) => id !== user.id);
+    if (recipients.length === 0) return;
+    const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
+    await supabase.from("notifications").insert(
+      recipients.map((uid) => ({
+        user_id: uid,
+        type: "wall_mention",
+        title: t("wall.mentionTitle", { defaultValue: "{{name}} vous a mentionné", name: authorName }),
+        body: snippet.slice(0, 140),
+        link,
+      })),
+    );
+  }
+
   async function submitPost() {
     if ((!body.trim() && atts.length === 0) || !user) return;
     setPosting(true);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("wall_posts")
-      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never });
+      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never })
+      .select("id")
+      .single();
     setPosting(false);
     if (error) { toast.error(error.message); return; }
+    const mentioned = parseMentions(body);
+    if (mentioned.length && data?.id) {
+      await notifyMentioned(mentioned, `/wall#${data.id}`, body.trim());
+    }
     setBody("");
     setAtts([]);
   }
@@ -166,11 +188,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
     <div className="space-y-4">
       {canPost && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
-          <Textarea
-            rows={3}
+          <MentionInput
+            clubId={clubId}
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={setBody}
             placeholder={t("wall.placeholder")}
+            rows={3}
           />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
           <div className="flex justify-end">
