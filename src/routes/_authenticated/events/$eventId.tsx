@@ -880,6 +880,18 @@ function EventDetail() {
       </Dialog>
 
       <EventChat eventId={eventId} />
+
+      {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
+      {hasPendingForMe && (
+        <div className="md:hidden fixed bottom-16 inset-x-0 z-30 px-4 pb-3 pointer-events-none">
+          <a
+            href="#my-response"
+            className="pointer-events-auto block rounded-2xl bg-primary text-primary-foreground text-center font-semibold py-3.5 shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform"
+          >
+            {t("dashboard.respondNow")}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
