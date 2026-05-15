@@ -580,10 +580,22 @@ function EventDetail() {
             </div>
           )}
           {event.type === "match" && event.is_home === false && event.meeting_point && (
-            <p className="flex items-center gap-2">
-              <Plane className="h-4 w-4" />
-              {t("events.meetingPoint")}: {event.meeting_point}
-            </p>
+            <div className="flex items-start gap-2 flex-wrap">
+              <Plane className="h-4 w-4 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p>
+                  <span className="font-medium">{t("events.meetingPoint")}:</span> {event.meeting_point}
+                </p>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary"
+                >
+                  {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
           )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
           {(() => {
