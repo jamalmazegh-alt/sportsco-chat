@@ -136,7 +136,9 @@ const ConvocationInviteEmail = ({
             <Text style={squadTitle}>
               Joueurs convoqués ({squadList.length})
             </Text>
-            <Text style={squadText}>{squadList.join(" · ")}</Text>
+            {squadList.map((name, i) => (
+              <Text key={i} style={squadLine}>• {name}</Text>
+            ))}
           </Section>
         ) : null}
 
