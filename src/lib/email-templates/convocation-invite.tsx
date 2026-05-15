@@ -82,6 +82,9 @@ const ConvocationInviteEmail = ({
           </Text>
           <Text style={cardTitle}>{eventTitle}</Text>
           {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
+          {convocationTime ? (
+            <Text style={cardMeta}>⏰ Heure de RDV : <strong>{convocationTime}</strong></Text>
+          ) : null}
           {eventLocation ? (
             <Text style={cardMeta}>
               📍 {eventLocation}
@@ -92,13 +95,18 @@ const ConvocationInviteEmail = ({
           ) : null}
           {meetingPoint ? (
             <Text style={cardMeta}>
-              🚌 RDV : {meetingPoint}
+              🚌 Point de RDV : {meetingPoint}
               {meetingPointMapsUrl ? (
                 <> — <a href={meetingPointMapsUrl} style={mapsLink}>Maps</a></>
               ) : null}
             </Text>
           ) : null}
           {coachName ? <Text style={cardMeta}>👤 Coach : {coachName}</Text> : null}
+          {eventDescription ? (
+            <Text style={{ ...cardMeta, marginTop: 10, whiteSpace: "pre-wrap" as const, color: "#0f172a" }}>
+              📝 {eventDescription}
+            </Text>
+          ) : null}
         </Section>
 
         <Text style={text}>Répondez en un clic :</Text>
