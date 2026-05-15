@@ -15,7 +15,8 @@
     "events": "Events",
     "teams": "Teams",
     "inbox": "Wall",
-    "profile": "Profile"
+    "profile": "Profile",
+    "admin": "Admin"
   },
   "auth": {
     "login": "Log in",
@@ -147,7 +148,9 @@
     "respondNow": "Respond now",
     "myConvocations": "Your invitations",
     "noConvocations": "You're all caught up.",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "myStats": "My attendance stats",
+    "myStatsHint": "See my training attendance"
   },
   "teams": {
     "title": "Teams",
@@ -419,7 +422,8 @@
     "phone": "Phone",
     "phoneVerified": "Phone verified",
     "phoneNotVerified": "Phone not verified",
-    "joined": "Joined"
+    "joined": "Joined",
+    "lastSignIn": "Last sign-in"
   },
   "attachments": {
     "add": "Add file",
