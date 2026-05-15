@@ -662,26 +662,45 @@ function TeamDetail() {
                     <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
                     {inner}
                   </button>
-                ) : (
-                  <div className={rowClass}>
-                    <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
-                      {inner}
-                    </Link>
-                    {isCoach && canInvite && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 shrink-0"
-                        title={t("players.invite")}
-                        disabled={inviting}
-                        onClick={() => inviteOne(p.id)}
-                      >
-                        <Send className="h-4 w-4 text-primary" />
-                      </Button>
-                    )}
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </div>
-                )}
+                ) : (() => {
+                  const rowContent = (
+                    <div className={rowClass}>
+                      <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
+                        {inner}
+                      </Link>
+                      {isCoach && canInvite && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          title={t("players.invite")}
+                          disabled={inviting}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); inviteOne(p.id); }}
+                        >
+                          <Send className="h-4 w-4 text-primary" />
+                        </Button>
+                      )}
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </div>
+                  );
+                  if (!isCoach) return rowContent;
+                  const actions = [
+                    ...(canInvite
+                      ? [{
+                          label: t("players.invite"),
+                          icon: <Send className="h-4 w-4" />,
+                          onClick: () => inviteOne(p.id),
+                        }]
+                      : []),
+                    {
+                      label: t("common.remove", { defaultValue: "Retirer" }),
+                      icon: <Trash2 className="h-4 w-4" />,
+                      variant: "destructive" as const,
+                      onClick: () => removeFromTeam(p.id, `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim()),
+                    },
+                  ];
+                  return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
+                })()}
               </li>
             );
           })}
