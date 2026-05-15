@@ -37,7 +37,9 @@
     "forEveryoneTitle": "One app, four perspectives.",
     "ctaTitle": "Ready to transform your club's coordination?",
     "ctaBody": "Join clubs that replace chaos with clarity.",
-    "ctaButton": "Request a demo"
+    "ctaButton": "Request a demo",
+    "ctaPricing": "See pricing",
+    "ctaSeason": "Kick off your season"
   },
   "pricing": {
     "badge": "Pricing",
