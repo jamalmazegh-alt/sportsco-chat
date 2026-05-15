@@ -385,6 +385,8 @@ function PlayerProfile() {
         )}
       </form>
 
+      {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
+
       {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
       {minor && (isParentOfThisPlayer || isCoach) && (
         <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
