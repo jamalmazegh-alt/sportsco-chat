@@ -267,24 +267,28 @@ function PlayerProfile() {
               {(player.first_name?.[0] ?? "") + (player.last_name?.[0] ?? "")}
             </div>
           )}
-          <span
-            className={cn(
-              "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
-              player.user_id ? "bg-present" : "bg-muted-foreground/40"
-            )}
-          />
+          {(isCoach || isSelf || isParentOfThisPlayer) && (
+            <span
+              className={cn(
+                "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
+                player.user_id ? "bg-present" : "bg-muted-foreground/40"
+              )}
+            />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold truncate">
             {player.first_name} {player.last_name}
           </h1>
           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <span className={cn(
-              "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
-              player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-            )}>
-              {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
-            </span>
+            {(isCoach || isSelf || isParentOfThisPlayer) && (
+              <span className={cn(
+                "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
+                player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
+              )}>
+                {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
+              </span>
+            )}
             {minor && (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-accent text-accent-foreground">
                 {t("players.minor")}

@@ -614,12 +614,14 @@ function TeamDetail() {
                       {(p.first_name?.[0] ?? "") + (p.last_name?.[0] ?? "")}
                     </div>
                   )}
-                  <span
-                    className={cn(
-                      "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
-                      p.user_id ? "bg-present" : "bg-muted-foreground/40",
-                    )}
-                  />
+                  {isCoach && (
+                    <span
+                      className={cn(
+                        "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
+                        p.user_id ? "bg-present" : "bg-muted-foreground/40",
+                      )}
+                    />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">
@@ -629,7 +631,7 @@ function TeamDetail() {
                     ) : null}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {p.preferred_position ?? (p.user_id ? t("players.accountActive") : t("players.accountInactive"))}
+                    {p.preferred_position ?? (isCoach ? (p.user_id ? t("players.accountActive") : t("players.accountInactive")) : "")}
                   </p>
                 </div>
               </>
