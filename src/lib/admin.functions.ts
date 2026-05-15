@@ -43,20 +43,15 @@ export const listClubUsers = createServerFn({ method: "POST" })
       .in("id", ids);
     const profById = new Map((profiles ?? []).map((p: any) => [p.id, p]));
 
-    // Fetch emails via auth admin API (paginated)
+    // Fetch emails directly from auth.users (scoped to club members only — O(N_club),
+    // not O(N_platform)). Uses service role to bypass RLS on auth schema.
     const emailById = new Map<string, string | null>();
-    let page = 1;
-    while (true) {
-      const { data: list, error: lErr } =
-        await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
-      if (lErr) break;
-      for (const u of list.users ?? []) {
-        if (ids.includes(u.id)) emailById.set(u.id, u.email ?? null);
-      }
-      if (!list.users || list.users.length < 1000) break;
-      page += 1;
-      if (page > 20) break;
-    }
+    const { data: authRows } = await (supabaseAdmin as any)
+      .schema("auth")
+      .from("users")
+      .select("id, email")
+      .in("id", ids);
+    for (const u of authRows ?? []) emailById.set(u.id, u.email ?? null);
 
     const grouped = new Map<
       string,
