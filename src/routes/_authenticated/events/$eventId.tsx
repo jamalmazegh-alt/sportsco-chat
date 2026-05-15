@@ -389,6 +389,10 @@ function EventDetail() {
             eventTitle: event.title,
             eventType: event.type,
             eventDate: eventDateLabel,
+            eventDescription: (event as any).description ?? undefined,
+            convocationTime: (event as any).convocation_time
+              ? fmt((event as any).convocation_time, "EEEE d MMMM 'à' HH'h'mm")
+              : undefined,
             eventLocation: event.location ?? undefined,
             locationMapsUrl,
             meetingPoint: (event as any).meeting_point ?? undefined,
