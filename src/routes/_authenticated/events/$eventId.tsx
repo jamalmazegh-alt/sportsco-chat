@@ -44,6 +44,7 @@ function EventDetail() {
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerStep, setPickerStep] = useState<"select" | "review">("select");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
