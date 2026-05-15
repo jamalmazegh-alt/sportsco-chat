@@ -182,30 +182,43 @@ export function ConvocationDetailDialog({
           </div>
         </div>
 
-        {isCoach && (
-          <DialogFooter className="gap-2 sm:gap-2">
-            {convocation.status === "pending" && onRemind && (
-              <Button
-                variant="outline"
-                onClick={() => onRemind(convocation.id)}
-                className="gap-2"
-              >
-                <Bell className="h-4 w-4" />
-                {t("attendance.remind")}
-              </Button>
-            )}
-            {onCancel && (
-              <Button
-                variant="outline"
-                onClick={() => onCancel(convocation.id)}
-                className="gap-2 text-destructive hover:text-destructive"
-              >
-                <X className="h-4 w-4" />
-                {t("attendance.cancelConvocation")}
-              </Button>
-            )}
-          </DialogFooter>
-        )}
+        {isCoach && (() => {
+          const lastReminderAt = meta?.reminders?.[0]?.sent_at
+            ? new Date(meta.reminders[0].sent_at).getTime()
+            : 0;
+          const cooldownMs = 30 * 60 * 1000;
+          const remainingMs = lastReminderAt ? cooldownMs - (Date.now() - lastReminderAt) : 0;
+          const inCooldown = remainingMs > 0;
+          const remainingMin = Math.ceil(remainingMs / 60000);
+          return (
+            <DialogFooter className="gap-2 sm:gap-2">
+              {convocation.status === "pending" && onRemind && (
+                <Button
+                  variant="outline"
+                  onClick={() => onRemind(convocation.id)}
+                  disabled={inCooldown}
+                  className="gap-2"
+                  title={inCooldown ? t("attendance.cooldownHint", { defaultValue: "Encore {{m}} min avant de pouvoir relancer", m: remainingMin }) : undefined}
+                >
+                  <Bell className="h-4 w-4" />
+                  {inCooldown
+                    ? t("attendance.remindIn", { defaultValue: "Relancer dans {{m}} min", m: remainingMin })
+                    : t("attendance.remind")}
+                </Button>
+              )}
+              {onCancel && (
+                <Button
+                  variant="outline"
+                  onClick={() => onCancel(convocation.id)}
+                  className="gap-2 text-destructive hover:text-destructive"
+                >
+                  <X className="h-4 w-4" />
+                  {t("attendance.cancelConvocation")}
+                </Button>
+              )}
+            </DialogFooter>
+          );
+        })()}
       </DialogContent>
     </Dialog>
   );
