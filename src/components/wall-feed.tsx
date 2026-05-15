@@ -168,18 +168,25 @@ function WallGrouped({
   currentUserId,
   role,
   commentsEnabled,
+  canPin,
   onDelete,
+  onTogglePin,
 }: {
   posts: Post[];
   currentUserId: string | null;
   role: string | null;
   commentsEnabled: boolean;
+  canPin: boolean;
   onDelete: (id: string) => void;
+  onTogglePin: (id: string, next: boolean) => void;
 }) {
   const { t } = useTranslation();
+  const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
+  const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, { label: string; items: Post[] }>();
-    for (const p of posts) {
+    for (const p of rest) {
       const d = new Date(p.created_at);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
       const label = format(d, "MMMM yyyy", { locale: dateLocale() });
@@ -187,10 +194,16 @@ function WallGrouped({
       map.get(key)!.items.push(p);
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
-  }, [posts]);
+  }, [rest]);
 
   if (posts.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-6">{t("wall.empty")}</p>;
+    return (
+      <EmptyState
+        icon={<MegaphoneIcon className="h-6 w-6" />}
+        title={t("wall.empty")}
+        description={t("wall.emptyHint", { defaultValue: "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici." })}
+      />
+    );
   }
 
   return (
