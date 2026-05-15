@@ -41,6 +41,19 @@ function EventsPage() {
   const [showPast, setShowPast] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
+  const { data: club } = useQuery({
+    queryKey: ["club", activeClubId],
+    enabled: !!activeClubId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("clubs")
+        .select("id, name, logo_url")
+        .eq("id", activeClubId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const { data: teams } = useQuery({
     queryKey: ["teams", activeClubId],
     enabled: !!activeClubId,
@@ -145,7 +158,12 @@ function EventsPage() {
   return (
     <div className="px-5 pt-8 pb-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("events.title")}</h1>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold leading-tight">{t("events.title")}</h1>
+          {club?.name && (
+            <p className="text-sm text-muted-foreground truncate mt-0.5">{club.name}</p>
+          )}
+        </div>
         {isCoach && user && (
           <EventFormSheet
             open={open}
@@ -319,10 +337,22 @@ function EventsPage() {
                             )}
                           </div>
                           <p className="font-medium truncate leading-tight">
-                            {e.title}
-                            {e.opponent && (
-                              <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
-                            )}
+                            {(() => {
+                              if (e.type === "match" && e.opponent && e.team_name) {
+                                return `${e.team_name} vs ${e.opponent}`;
+                              }
+                              if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs ")) {
+                                return e.title;
+                              }
+                              return (
+                                <>
+                                  {e.title}
+                                  {e.opponent && (
+                                    <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </p>
                           {e.type === "match" && e.result && (() => {
                             const ourSide = e.is_home === false ? "away" : "home";

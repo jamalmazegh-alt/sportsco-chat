@@ -10,6 +10,8 @@ interface Props {
   eventTitle: string;
   eventType?: string;
   eventDate?: string;
+  eventDescription?: string;
+  convocationTime?: string;
   eventLocation?: string;
   locationMapsUrl?: string;
   meetingPoint?: string;
@@ -29,6 +31,8 @@ const ConvocationInviteEmail = ({
   eventTitle,
   eventType,
   eventDate,
+  eventDescription,
+  convocationTime,
   eventLocation,
   locationMapsUrl,
   meetingPoint,
@@ -78,6 +82,9 @@ const ConvocationInviteEmail = ({
           </Text>
           <Text style={cardTitle}>{eventTitle}</Text>
           {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
+          {convocationTime ? (
+            <Text style={cardMeta}>⏰ Heure de RDV : <strong>{convocationTime}</strong></Text>
+          ) : null}
           {eventLocation ? (
             <Text style={cardMeta}>
               📍 {eventLocation}
@@ -88,13 +95,18 @@ const ConvocationInviteEmail = ({
           ) : null}
           {meetingPoint ? (
             <Text style={cardMeta}>
-              🚌 RDV : {meetingPoint}
+              🚌 Point de RDV : {meetingPoint}
               {meetingPointMapsUrl ? (
                 <> — <a href={meetingPointMapsUrl} style={mapsLink}>Maps</a></>
               ) : null}
             </Text>
           ) : null}
           {coachName ? <Text style={cardMeta}>👤 Coach : {coachName}</Text> : null}
+          {eventDescription ? (
+            <Text style={{ ...cardMeta, marginTop: 10, whiteSpace: "pre-wrap" as const, color: "#0f172a" }}>
+              📝 {eventDescription}
+            </Text>
+          ) : null}
         </Section>
 
         <Text style={text}>Répondez en un clic :</Text>
@@ -124,7 +136,9 @@ const ConvocationInviteEmail = ({
             <Text style={squadTitle}>
               Joueurs convoqués ({squadList.length})
             </Text>
-            <Text style={squadText}>{squadList.join(" · ")}</Text>
+            {squadList.map((name, i) => (
+              <Text key={i} style={squadLine}>• {name}</Text>
+            ))}
           </Section>
         ) : null}
 
@@ -209,3 +223,4 @@ const squadCard = {
 };
 const squadTitle = { fontSize: "12px", fontWeight: "bold" as const, color: "#475569", margin: "0 0 6px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
 const squadText = { fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: 0 };
+const squadLine = { fontSize: "13px", color: "#334155", lineHeight: "1.6", margin: "0 0 2px" };
