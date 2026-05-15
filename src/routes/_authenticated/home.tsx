@@ -128,7 +128,7 @@ function HomePage() {
               <img
                 src={club.logo_url}
                 alt={club.name}
-                className="relative h-24 w-24 rounded-3xl object-cover border-2 border-card shadow-elevated"
+                className="relative h-24 w-24 rounded-3xl object-cover border-2 border-card shadow-elevated bg-white"
               />
             </div>
           ) : (
