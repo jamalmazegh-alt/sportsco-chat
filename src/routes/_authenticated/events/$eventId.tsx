@@ -738,7 +738,7 @@ function EventDetail() {
             </div>
           ) : (
             <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {(convocations ?? []).map((c: any) => (
+              {sortedConvocations.map((c: any) => (
                 <li
                   key={c.id}
                   className="flex items-center justify-between px-3 py-2"
