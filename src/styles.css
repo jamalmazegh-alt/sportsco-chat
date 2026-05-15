@@ -77,12 +77,12 @@
 
   /* Clubero brand: navy #0F1B3D + emerald #0D7A5F + warm cream surfaces */
   --background: oklch(0.985 0.003 240);
-  --foreground: oklch(0.24 0.08 255);
+  --foreground: oklch(0.22 0.13 262);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.08 255);
+  --card-foreground: oklch(0.22 0.13 262);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.08 255);
+  --popover-foreground: oklch(0.22 0.13 262);
 
   /* Clubero emerald (primary CTA) — profond, premium, club */
   --primary: oklch(0.60 0.13 165);
