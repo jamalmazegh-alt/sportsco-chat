@@ -641,7 +641,7 @@ function EventDetail() {
 
       {/* My response (player/parent) */}
       {visibleMyConvocs.length > 0 && (
-        <section className="space-y-3">
+        <section id="my-response" className="space-y-3 scroll-mt-20">
           {visibleMyConvocs.map((c: any) => (
             <div key={c.id} className="rounded-2xl border border-border bg-card p-4">
               <p className="text-sm font-medium mb-3">
