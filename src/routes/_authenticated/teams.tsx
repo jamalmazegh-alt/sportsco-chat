@@ -40,6 +40,7 @@ function TeamsPage() {
         .from("teams")
         .select("id, name, season, sport, age_group, championship, competitions, image_url")
         .eq("club_id", activeClubId!)
+        .is("deleted_at", null)
         .order("name");
       if (!ts) return [];
       const { data: tm } = await supabase

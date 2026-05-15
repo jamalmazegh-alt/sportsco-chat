@@ -17,7 +17,8 @@ import {
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
+import { toCsv, downloadCsv } from "@/lib/csv";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { toast } from "sonner";
@@ -459,6 +460,39 @@ function TeamDetail() {
               </>
             ) : (
               <>
+                {isCoach && (players ?? []).length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9"
+                    onClick={() => {
+                      const csv = toCsv(
+                        (players ?? []).map((p: any) => ({
+                          last_name: p.last_name ?? "",
+                          first_name: p.first_name ?? "",
+                          jersey_number: p.jersey_number ?? "",
+                          position: p.preferred_position ?? "",
+                          email: p.email ?? "",
+                          phone: p.phone ?? "",
+                          account: p.user_id ? "active" : "inactive",
+                        })),
+                        [
+                          { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
+                          { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                          { key: "jersey_number", header: "#" },
+                          { key: "position", header: t("players.position", { defaultValue: "Position" }) },
+                          { key: "email", header: "Email" },
+                          { key: "phone", header: t("players.phone", { defaultValue: "Phone" }) },
+                          { key: "account", header: t("players.account", { defaultValue: "Account" }) },
+                        ],
+                      );
+                      downloadCsv(`${team?.name ?? "team"}-players`, csv);
+                    }}
+                    aria-label={t("common.exportCsv", { defaultValue: "Export CSV" })}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                )}
                 {(players ?? []).some((p: any) => !p.user_id && (p.email || p.phone)) && (
                   <Button size="sm" variant="outline" className="h-9" onClick={() => setSelectMode(true)}>
                     <CheckSquare className="h-4 w-4" />

@@ -454,6 +454,7 @@ export type Database = {
           convocations_sent: boolean
           created_at: string
           created_by: string
+          deleted_at: string | null
           description: string | null
           ends_at: string | null
           id: string
@@ -477,6 +478,7 @@ export type Database = {
           convocations_sent?: boolean
           created_at?: string
           created_by: string
+          deleted_at?: string | null
           description?: string | null
           ends_at?: string | null
           id?: string
@@ -500,6 +502,7 @@ export type Database = {
           convocations_sent?: boolean
           created_at?: string
           created_by?: string
+          deleted_at?: string | null
           description?: string | null
           ends_at?: string | null
           id?: string
@@ -719,6 +722,7 @@ export type Database = {
           child_platform_access: boolean
           club_id: string
           created_at: string
+          deleted_at: string | null
           email: string | null
           first_name: string
           id: string
@@ -737,6 +741,7 @@ export type Database = {
           child_platform_access?: boolean
           club_id: string
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           first_name: string
           id?: string
@@ -755,6 +760,7 @@ export type Database = {
           child_platform_access?: boolean
           club_id?: string
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           first_name?: string
           id?: string
@@ -945,6 +951,7 @@ export type Database = {
           club_id: string
           competitions: string[]
           created_at: string
+          deleted_at: string | null
           id: string
           image_url: string | null
           name: string
@@ -957,6 +964,7 @@ export type Database = {
           club_id: string
           competitions?: string[]
           created_at?: string
+          deleted_at?: string | null
           id?: string
           image_url?: string | null
           name: string
@@ -969,6 +977,7 @@ export type Database = {
           club_id?: string
           competitions?: string[]
           created_at?: string
+          deleted_at?: string | null
           id?: string
           image_url?: string | null
           name?: string
@@ -1073,6 +1082,7 @@ export type Database = {
           author_user_id: string
           body: string
           created_at: string
+          deleted_at: string | null
           id: string
           post_id: string
         }
@@ -1080,6 +1090,7 @@ export type Database = {
           author_user_id: string
           body: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           post_id: string
         }
@@ -1087,6 +1098,7 @@ export type Database = {
           author_user_id?: string
           body?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           post_id?: string
         }
@@ -1128,6 +1140,7 @@ export type Database = {
           body: string
           club_id: string
           created_at: string
+          deleted_at: string | null
           id: string
           is_pinned: boolean
         }
@@ -1137,6 +1150,7 @@ export type Database = {
           body: string
           club_id: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           is_pinned?: boolean
         }
@@ -1146,6 +1160,7 @@ export type Database = {
           body?: string
           club_id?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           is_pinned?: boolean
         }
@@ -1241,6 +1256,7 @@ export type Database = {
         Returns: number
       }
       player_is_minor: { Args: { _player_id: string }; Returns: boolean }
+      purge_soft_deleted: { Args: never; Returns: undefined }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -1258,6 +1274,14 @@ export type Database = {
           _token: string
         }
         Returns: string
+      }
+      restore_entity: {
+        Args: { _id: string; _kind: string }
+        Returns: undefined
+      }
+      soft_delete_entity: {
+        Args: { _id: string; _kind: string }
+        Returns: undefined
       }
     }
     Enums: {

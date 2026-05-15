@@ -49,6 +49,7 @@ function EventsPage() {
         .from("teams")
         .select("id, name, competitions")
         .eq("club_id", activeClubId!)
+        .is("deleted_at", null)
         .order("name");
       return data ?? [];
     },
@@ -64,6 +65,7 @@ function EventsPage() {
         .from("events")
         .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home")
         .in("team_id", teamIds)
+        .is("deleted_at", null)
         .order("starts_at", { ascending: true });
       const list = data ?? [];
       const matchIds = list.filter((e) => e.type === "match").map((e) => e.id);

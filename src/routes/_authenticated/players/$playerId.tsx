@@ -48,14 +48,19 @@ function PlayerProfile() {
   async function onDeletePlayer() {
     if (!player) return;
     setDeleting(true);
-    // Cascade-clean dependents we manage from the client. RLS allows admin/coach.
-    await supabase.from("player_parents").delete().eq("player_id", player.id);
-    await supabase.from("team_members").delete().eq("player_id", player.id);
-    await supabase.from("convocations").delete().eq("player_id", player.id);
-    const { error } = await supabase.from("players").delete().eq("id", player.id);
+    const { error } = await supabase.rpc("soft_delete_entity", { _kind: "player", _id: player.id });
     setDeleting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(t("players.deleted"));
+    toast(t("players.deleted"), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "player", _id: player.id });
+          if (e2) toast.error(e2.message);
+          else qc.invalidateQueries({ queryKey: ["team-players"] });
+        },
+      },
+    });
     qc.invalidateQueries({ queryKey: ["team-players"] });
     navigate({ to: "/teams" });
   }
