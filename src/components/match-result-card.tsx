@@ -38,6 +38,7 @@ type Player = {
 export function MatchResultCard({
   eventId,
   teamId,
+  teamName,
   isHome,
   opponent,
   isCoach,
@@ -45,6 +46,7 @@ export function MatchResultCard({
 }: {
   eventId: string;
   teamId: string;
+  teamName?: string | null;
   isHome: boolean | null;
   opponent: string | null;
   isCoach: boolean;
@@ -93,15 +95,14 @@ export function MatchResultCard({
     },
   });
 
-  // Players that can be selected as scorer/assist (team players)
+  // Players that can be selected as scorer/assist (convoqués of this event)
   const { data: players } = useQuery({
-    queryKey: ["team-players-min", teamId],
+    queryKey: ["event-convoqued-players", eventId],
     queryFn: async () => {
       const { data } = await supabase
-        .from("team_members")
+        .from("convocations")
         .select("players:player_id(id, first_name, last_name, jersey_number)")
-        .eq("team_id", teamId)
-        .eq("role", "player");
+        .eq("event_id", eventId);
       return ((data ?? [])
         .map((r: any) => r.players)
         .filter(Boolean)) as Player[];
@@ -224,22 +225,18 @@ export function MatchResultCard({
             outcome === "draw" && "bg-muted border-border"
           )}
         >
-          <div className="text-center flex-1">
-            <p className="text-xs uppercase text-muted-foreground tracking-wider">
-              {ourSide === "home" ? t("events.home") : t("events.away")}
+          <div className="text-center flex-1 min-w-0">
+            <p className="text-xs uppercase text-muted-foreground tracking-wider truncate">
+              {teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
             </p>
-            <p className="text-3xl font-bold tabular-nums">
-              {ourScore}
-            </p>
+            <p className="text-3xl font-bold tabular-nums">{ourScore}</p>
           </div>
           <span className="text-2xl text-muted-foreground">—</span>
-          <div className="text-center flex-1">
+          <div className="text-center flex-1 min-w-0">
             <p className="text-xs uppercase text-muted-foreground tracking-wider truncate">
               {opponent ?? t("events.opponent")}
             </p>
-            <p className="text-3xl font-bold tabular-nums">
-              {theirScore}
-            </p>
+            <p className="text-3xl font-bold tabular-nums">{theirScore}</p>
           </div>
         </div>
       )}
@@ -254,9 +251,9 @@ export function MatchResultCard({
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">
+              <Label className="text-xs truncate">
                 {ourSide === "home"
-                  ? t("events.home")
+                  ? teamName ?? t("events.home")
                   : opponent ?? t("events.home")}
               </Label>
               <Input
@@ -269,10 +266,10 @@ export function MatchResultCard({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">
+              <Label className="text-xs truncate">
                 {ourSide === "home"
                   ? opponent ?? t("events.away")
-                  : t("events.away")}
+                  : teamName ?? t("events.away")}
               </Label>
               <Input
                 type="number"
