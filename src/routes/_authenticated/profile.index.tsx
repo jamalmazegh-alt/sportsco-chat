@@ -125,7 +125,7 @@ function ProfilePage() {
           <div className="flex items-center gap-4">
             <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center overflow-hidden">
               {club.logo_url ? (
-                <img src={club.logo_url} alt={club.name} className="h-full w-full object-cover" />
+                <img src={club.logo_url} alt={club.name} className="h-full w-full object-cover bg-white" />
               ) : (
                 <Camera className="h-6 w-6 text-muted-foreground" />
               )}
