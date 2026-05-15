@@ -218,6 +218,9 @@
 .bg-gradient-hero { background: var(--gradient-hero); }
 .bg-gradient-cta { background: var(--gradient-cta); }
 .bg-gradient-primary { background: var(--gradient-primary); }
+.bg-pitch { background-image: var(--pattern-pitch); background-size: 320px 320px; background-position: center; background-repeat: no-repeat; }
+.bg-court { background-image: var(--pattern-court); }
+.bg-jersey-stripes { background-image: var(--pattern-stripes); }
 .bg-gradient-energy { background: var(--gradient-energy); }
 .shadow-elevated { box-shadow: var(--shadow-elevated); }
 .shadow-glow { box-shadow: var(--shadow-glow); }
