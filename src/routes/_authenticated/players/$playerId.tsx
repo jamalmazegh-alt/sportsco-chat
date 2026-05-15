@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { AttendanceHeatmap } from "@/components/attendance-heatmap";
+import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
@@ -245,11 +246,7 @@ function PlayerProfile() {
   }
 
   if (!player) {
-    return (
-      <div className="flex justify-center pt-20">
-        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-      </div>
-    );
+    return <PlayerDetailSkeleton />;
   }
 
   return (
