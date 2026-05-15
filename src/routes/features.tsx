@@ -94,8 +94,9 @@ const AUDIENCES = [
     points: [
       "Tableau de bord multi-équipes",
       "Annuaire des membres et gestion des rôles",
+      "Recherche globale (Cmd + K) sur tout le club",
+      "Exports CSV (effectifs, présences) prêts pour Excel",
       "Canal de communication centralisé",
-      "Rapports de présence sur toute la saison",
       "Conforme RGPD, hébergement européen",
     ],
   },
@@ -105,8 +106,9 @@ const AUDIENCES = [
     points: [
       "Convocation prête en moins d'une minute",
       "Réponses de présence en temps réel",
+      "Saisie des résultats de match avec stats joueurs adaptées au sport",
       "Chat par événement avec joueurs et parents",
-      "Modèles réutilisables pour les entraînements récurrents",
+      "@mentions et accusés de lecture sur le mur",
       "Gestion des remplaçants et attribution des numéros",
     ],
   },
