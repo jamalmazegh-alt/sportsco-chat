@@ -660,6 +660,18 @@ function EventDetail() {
         </section>
       )}
 
+      {/* Match result + scorers (matches only) */}
+      {event.type === "match" && (
+        <MatchResultCard
+          eventId={event.id}
+          teamId={event.team_id}
+          isHome={event.is_home}
+          opponent={event.opponent}
+          isCoach={isCoach}
+          startsAt={event.starts_at}
+        />
+      )}
+
       {/* Attendance board (visible to all team viewers once convocations are sent) */}
       {event.convocations_sent && (
         <section>
