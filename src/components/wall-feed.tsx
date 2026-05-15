@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
+import { Eye, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
