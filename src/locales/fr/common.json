@@ -301,7 +301,13 @@
       "friendly": "Amical",
       "championship": "Championnat",
       "cup": "Coupe"
-    }
+    },
+    "repeat": "Répéter",
+    "repeatNone": "Pas de répétition",
+    "repeatWeekly": "Chaque semaine",
+    "repeatWeeks": "Pendant {{count}} semaines",
+    "repeatHint": "Crée automatiquement les séances suivantes à la même heure.",
+    "repeatCreated": "{{count}} entraînements créés"
   },
   "attendance": {
     "title": "Présences",

@@ -301,7 +301,13 @@
       "friendly": "Friendly",
       "championship": "Championship",
       "cup": "Cup"
-    }
+    },
+    "repeat": "Repeat",
+    "repeatNone": "No repeat",
+    "repeatWeekly": "Every week",
+    "repeatWeeks": "For {{count}} weeks",
+    "repeatHint": "Automatically creates the following sessions at the same time.",
+    "repeatCreated": "{{count}} trainings created"
   },
   "attendance": {
     "title": "Attendance",

@@ -425,6 +425,8 @@ export function EventFormSheet({
   const [convocDate, setConvocDate] = useState<Date | undefined>(convocInit.date);
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
+  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
+
   const [busy, setBusy] = useState(false);
   const selectedTeam = teams.find((tm) => tm.id === teamId);
   const availableCompetitionTypes = useMemo(() => competitionOptions(selectedTeam), [selectedTeam]);
@@ -453,6 +455,7 @@ export function EventFormSheet({
     setEndTime(e.time);
     setConvocDate(c.date);
     setConvocTime(c.time);
+    setRepeatWeeks(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -521,6 +524,37 @@ export function EventFormSheet({
     };
 
     if (mode === "create") {
+      const shouldRepeat = type === "training" && repeatWeeks > 1;
+      if (shouldRepeat) {
+        const rows = [] as typeof payload[];
+        for (let i = 0; i < repeatWeeks; i++) {
+          const offsetMs = i * 7 * 24 * 60 * 60 * 1000;
+          const shifted = {
+            ...payload,
+            starts_at: new Date(new Date(payload.starts_at).getTime() + offsetMs).toISOString(),
+            ends_at: payload.ends_at
+              ? new Date(new Date(payload.ends_at).getTime() + offsetMs).toISOString()
+              : null,
+            convocation_time: payload.convocation_time
+              ? new Date(new Date(payload.convocation_time).getTime() + offsetMs).toISOString()
+              : null,
+          };
+          rows.push(shifted);
+        }
+        const { data, error } = await supabase
+          .from("events")
+          .insert(rows.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })))
+          .select("id");
+        setBusy(false);
+        if (error || !data || data.length === 0) {
+          toast.error(error?.message ?? "Failed");
+          return;
+        }
+        toast.success(t("events.repeatCreated", { count: data.length }));
+        onOpenChange(false);
+        onSaved(data[0].id);
+        return;
+      }
       const { data, error } = await supabase
         .from("events")
         .insert({ ...payload, status: "published", created_by: userId, convocations_sent: false })
@@ -705,6 +739,27 @@ export function EventFormSheet({
                 />
                 <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
               </div>
+              {mode === "create" && (
+                <div className="space-y-1.5">
+                  <Label>{t("events.repeat")}</Label>
+                  <Select value={String(repeatWeeks)} onValueChange={(v) => setRepeatWeeks(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">{t("events.repeatNone")}</SelectItem>
+                      {[2, 4, 6, 8, 10, 12, 16, 20].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {t("events.repeatWeeks", { count: n })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {repeatWeeks > 1 && (
+                    <p className="text-[11px] text-muted-foreground">{t("events.repeatHint")}</p>
+                  )}
+                </div>
+              )}
             </>
           ) : (
             <>

@@ -17,7 +17,8 @@ import {
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2 } from "lucide-react";
+import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -247,6 +248,19 @@ function TeamDetail() {
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed) toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
     else toast.success(t("players.inviteSent"));
+  }
+
+  async function removeFromTeam(playerId: string, fullName: string) {
+    if (!confirm(t("players.removeConfirm", { defaultValue: `Retirer ${fullName} de l'équipe ?`, name: fullName }))) return;
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("player_id", playerId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("players.removed", { defaultValue: "Joueur retiré de l'équipe" }));
+    qc.invalidateQueries({ queryKey: ["team-players", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
   }
 
   async function inviteSelected() {
@@ -648,26 +662,45 @@ function TeamDetail() {
                     <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
                     {inner}
                   </button>
-                ) : (
-                  <div className={rowClass}>
-                    <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
-                      {inner}
-                    </Link>
-                    {isCoach && canInvite && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 shrink-0"
-                        title={t("players.invite")}
-                        disabled={inviting}
-                        onClick={() => inviteOne(p.id)}
-                      >
-                        <Send className="h-4 w-4 text-primary" />
-                      </Button>
-                    )}
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </div>
-                )}
+                ) : (() => {
+                  const rowContent = (
+                    <div className={rowClass}>
+                      <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
+                        {inner}
+                      </Link>
+                      {isCoach && canInvite && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          title={t("players.invite")}
+                          disabled={inviting}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); inviteOne(p.id); }}
+                        >
+                          <Send className="h-4 w-4 text-primary" />
+                        </Button>
+                      )}
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </div>
+                  );
+                  if (!isCoach) return rowContent;
+                  const actions = [
+                    ...(canInvite
+                      ? [{
+                          label: t("players.invite"),
+                          icon: <Send className="h-4 w-4" />,
+                          onClick: () => inviteOne(p.id),
+                        }]
+                      : []),
+                    {
+                      label: t("common.remove", { defaultValue: "Retirer" }),
+                      icon: <Trash2 className="h-4 w-4" />,
+                      variant: "destructive" as const,
+                      onClick: () => removeFromTeam(p.id, `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim()),
+                    },
+                  ];
+                  return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
+                })()}
               </li>
             );
           })}
