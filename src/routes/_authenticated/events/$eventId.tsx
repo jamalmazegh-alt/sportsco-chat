@@ -44,6 +44,7 @@ function EventDetail() {
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerStep, setPickerStep] = useState<"select" | "review">("select");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
@@ -253,6 +254,7 @@ function EventDetail() {
       teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid))
     );
     setSelectedIds(preselect);
+    setPickerStep("select");
     setPickerOpen(true);
   }
 
@@ -322,6 +324,53 @@ function EventDetail() {
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
+      // Coach (first admin/coach) for the team — best-effort
+      let coachName: string | undefined;
+      try {
+        const { data: coachRows } = await supabase
+          .from("team_members")
+          .select("user_id, role")
+          .eq("team_id", event.team_id)
+          .in("role", ["coach", "admin"])
+          .limit(1);
+        const coachUserId = coachRows?.[0]?.user_id;
+        if (coachUserId) {
+          const { data: coachProfile } = await supabase
+            .from("profiles")
+            .select("full_name, first_name, last_name")
+            .eq("id", coachUserId)
+            .maybeSingle();
+          coachName =
+            (coachProfile as any)?.full_name ||
+            [(coachProfile as any)?.first_name, (coachProfile as any)?.last_name]
+              .filter(Boolean)
+              .join(" ") ||
+            undefined;
+        }
+      } catch {
+        // ignore
+      }
+
+      // Full squad list (names of all newly convoked players)
+      const squadList = toInsert
+        .map((pid) => {
+          const p = (playersInfo ?? []).find((pp: any) => pp.id === pid) as any;
+          return p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() : "";
+        })
+        .filter(Boolean);
+
+      const competitionLabel = (event as any).competition_name
+        || ((event as any).competition_type
+          ? t(`events.competitionTypes.${(event as any).competition_type}`)
+          : undefined);
+
+      const locationMapsUrl = event.location
+        ? (event.location_url ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
+        : undefined;
+      const meetingPointMapsUrl = (event as any).meeting_point
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
+        : undefined;
+
       const sendOne = async (
         token: string,
         toEmail: string,
@@ -341,6 +390,12 @@ function EventDetail() {
             eventType: event.type,
             eventDate: eventDateLabel,
             eventLocation: event.location ?? undefined,
+            locationMapsUrl,
+            meetingPoint: (event as any).meeting_point ?? undefined,
+            meetingPointMapsUrl,
+            competitionName: competitionLabel,
+            coachName,
+            squadList,
             teamName,
             clubName,
             clubLogoUrl,
@@ -644,13 +699,24 @@ function EventDetail() {
       )}
 
       {/* Player picker dialog */}
-      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+      <Dialog open={pickerOpen} onOpenChange={(o) => { setPickerOpen(o); if (!o) setPickerStep("select"); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{t("attendance.selectPlayers")}</DialogTitle>
-            <DialogDescription>{t("attendance.selectPlayersHint")}</DialogDescription>
+            <DialogTitle>
+              {pickerStep === "select"
+                ? t("attendance.selectPlayers")
+                : t("attendance.reviewBeforeSend", { defaultValue: "Vérifier avant envoi" })}
+            </DialogTitle>
+            <DialogDescription>
+              {pickerStep === "select"
+                ? t("attendance.selectPlayersHint")
+                : t("attendance.reviewBeforeSendHint", {
+                    defaultValue: "Vérifie les destinataires et les détails — l'envoi est définitif.",
+                    count: selectedIds.size,
+                  })}
+            </DialogDescription>
           </DialogHeader>
-          {teamPlayers && (
+          {teamPlayers && pickerStep === "select" && (
             <>
               <div className="flex items-center justify-between border-b pb-2">
                 <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
@@ -736,14 +802,71 @@ function EventDetail() {
               </div>
             </>
           )}
+          {teamPlayers && pickerStep === "review" && (
+            <div className="space-y-3">
+              <div className="rounded-xl border bg-muted/40 p-3 space-y-1 text-sm">
+                <p className="font-semibold">{event.title}</p>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {fmt(event.starts_at, "EEEE d MMMM · HH:mm")}
+                </p>
+                {event.location && (
+                  <p className="text-xs text-muted-foreground flex items-start gap-1">
+                    <MapPin className="h-3 w-3 mt-0.5 shrink-0" />
+                    <span className="truncate">{event.location}</span>
+                  </p>
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  {t("attendance.recipients", { defaultValue: "Destinataires" })} ({selectedIds.size})
+                </p>
+                <div className="max-h-48 overflow-y-auto rounded-xl border divide-y">
+                  {teamPlayers
+                    .filter((tp: any) => selectedIds.has(tp.player_id))
+                    .map((tp: any) => {
+                      const p = tp.players;
+                      return (
+                        <div key={tp.player_id} className="flex items-center gap-2 px-3 py-2 text-sm">
+                          <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
+                            {(p?.first_name?.[0] ?? "") + (p?.last_name?.[0] ?? "")}
+                          </span>
+                          <span className="truncate">
+                            {p?.first_name} {p?.last_name}
+                            {p?.jersey_number ? (
+                              <span className="text-muted-foreground"> · #{p.jersey_number}</span>
+                            ) : null}
+                          </span>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+          )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPickerOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button onClick={sendConvocations} disabled={sending || selectedIds.size === 0}>
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {t("events.sendConvocations")}
-            </Button>
+            {pickerStep === "select" ? (
+              <>
+                <Button variant="outline" onClick={() => setPickerOpen(false)}>
+                  {t("common.cancel")}
+                </Button>
+                <Button
+                  onClick={() => setPickerStep("review")}
+                  disabled={selectedIds.size === 0}
+                >
+                  {t("common.continue", { defaultValue: "Continuer" })} ({selectedIds.size})
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setPickerStep("select")} disabled={sending}>
+                  {t("common.back")}
+                </Button>
+                <Button onClick={sendConvocations} disabled={sending || selectedIds.size === 0}>
+                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {t("attendance.confirmSend", { defaultValue: "Confirmer l'envoi" })}
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
