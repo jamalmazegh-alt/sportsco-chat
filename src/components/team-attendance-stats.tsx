@@ -49,10 +49,13 @@ export function TeamAttendanceStats({ teamId }: { teamId: string }) {
         .select("id, type, starts_at")
         .eq("team_id", teamId);
 
-      const { data: convs } = await supabase
-        .from("convocations")
-        .select("player_id, status, event_id")
-        .in("event_id", (events ?? []).map((e: any) => e.id));
+      const eventIds = (events ?? []).map((e: any) => e.id);
+      const { data: convs } = eventIds.length
+        ? await supabase
+            .from("convocations")
+            .select("player_id, status, event_id")
+            .in("event_id", eventIds)
+        : { data: [] as any[] };
 
       return { players, events: events ?? [], convs: convs ?? [] };
     },
