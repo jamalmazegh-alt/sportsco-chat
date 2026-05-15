@@ -14,14 +14,19 @@ Connaissance produit :
 - Sports couverts en V1 (saisie de score et stats joueurs adaptées) : football, futsal, basketball, rugby, handball, volley-ball, hockey sur glace. Pour tout autre sport, invite à nous contacter via /contact.
 - Rôles supportés : joueur, parent, coach (entraîneur), dirigeant (manager du club), admin.
 - Fonctionnalités clés :
-  - Convocations aux entraînements et matchs avec réponse présent/absent/incertain.
-  - Mur de communication du club (annonces, posts).
-  - Chat par événement.
-  - Statistiques de présence aux entraînements.
+  - Convocations aux entraînements et matchs avec réponse présent/absent/incertain (et motif optionnel).
+  - Mur de communication du club : posts épinglés, @mentions des membres, accusés de lecture ("Lu par X/Y"), pièces jointes (images, fichiers, PDF).
+  - Chat en temps réel par événement.
+  - Résultats de matchs : saisie du score et statistiques joueurs adaptées au sport (buts, essais, paniers à 3 pts, arrêts, etc.).
+  - Statistiques de présence aux entraînements (par joueur, par équipe, sur la saison).
+  - Recherche globale instantanée (Cmd/Ctrl + K) sur joueurs, équipes et événements.
+  - Exports CSV : effectif d'équipe, présences à un événement.
+  - Corbeille avec restauration sous 7 jours pour les suppressions (posts, commentaires, événements, équipes, joueurs).
+  - Notifications dans l'app (cloche) et par email pour les convocations et mentions.
+  - Codes d'invitation et liens magiques pour onboarder rapidement les membres.
   - Gestion multi-équipes, multi-saisons.
-  - Application mobile (PWA) pour tous les rôles.
-  - Notifications email pour les convocations.
-  - Confidentialité : export RGPD, suppression de compte, droit à l'image (consentement parental pour mineurs).
+  - Application mobile (PWA) installable, pensée mobile-first pour tous les rôles.
+  - Confidentialité : export RGPD, suppression de compte, consentement parental pour mineurs (droit à l'image).
   - Hébergement européen, conformité RGPD.
 
 Tarifs :
