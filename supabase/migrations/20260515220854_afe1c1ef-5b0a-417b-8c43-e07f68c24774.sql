@@ -1,0 +1,1 @@
+UPDATE public.match_results SET home_score = away_score, away_score = (SELECT home_score FROM public.match_results WHERE event_id = 'ad29ae5f-35b8-49f3-a250-8d2d2a1fe734') WHERE event_id = 'ad29ae5f-35b8-49f3-a250-8d2d2a1fe734';
