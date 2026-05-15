@@ -130,7 +130,13 @@ export const Route = createFileRoute("/api/chat")({
             inputSchema: z.object({}),
             execute: async () => {
               const playerIds = await getMyPlayerIds();
-              if (playerIds.length === 0) return { players: [] };
+              if (playerIds.length === 0) {
+                return {
+                  players: [],
+                  note:
+                    "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Les statistiques de présence ne s'appliquent donc pas à ce profil — par exemple un dirigeant ou un coach sans enfant inscrit.",
+                };
+              }
               const { data: players } = await supabase
                 .from("players")
                 .select("id, first_name, last_name")
