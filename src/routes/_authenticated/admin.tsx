@@ -18,6 +18,7 @@ function AdminLayout() {
 
   const tabs = [
     { to: "/admin", icon: Settings2, label: t("admin.openSettings"), exact: true },
+    { to: "/admin/invites", icon: QrCode, label: t("admin.openInvites", { defaultValue: "Invitations QR" }), exact: false },
     { to: "/admin/users", icon: Users, label: t("admin.openUsers"), exact: false },
   ];
 
