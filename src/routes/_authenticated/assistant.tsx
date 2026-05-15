@@ -52,15 +52,20 @@ function AssistantPage() {
   const { user } = useAuth();
   const [initialMessages] = useState<UIMessage[]>(() => loadMessages());
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const authTokenRef = useRef<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (mounted) setAuthToken(data.session?.access_token ?? null);
+      const tok = data.session?.access_token ?? null;
+      authTokenRef.current = tok;
+      if (mounted) setAuthToken(tok);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setAuthToken(session?.access_token ?? null);
+      const tok = session?.access_token ?? null;
+      authTokenRef.current = tok;
+      setAuthToken(tok);
     });
     return () => {
       mounted = false;
@@ -68,11 +73,16 @@ function AssistantPage() {
     };
   }, []);
 
-  const transport = new DefaultChatTransport({
-    api: "/api/chat",
-    headers: () =>
-      authToken ? { Authorization: `Bearer ${authToken}` } : ({} as Record<string, string>),
-  });
+  const [transport] = useState(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        headers: () =>
+          authTokenRef.current
+            ? { Authorization: `Bearer ${authTokenRef.current}` }
+            : ({} as Record<string, string>),
+      })
+  );
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
     id: "clubero-assistant",
