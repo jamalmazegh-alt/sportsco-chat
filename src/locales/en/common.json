@@ -178,20 +178,7 @@
       "volleyball": "Volleyball",
       "rugby": "Rugby",
       "futsal": "Futsal",
-      "field_hockey": "Field hockey",
-      "ice_hockey": "Ice hockey",
-      "water_polo": "Water polo",
-      "baseball": "Baseball",
-      "softball": "Softball",
-      "cricket": "Cricket",
-      "american_football": "American football",
-      "lacrosse": "Lacrosse",
-      "netball": "Netball",
-      "korfball": "Korfball",
-      "ultimate_frisbee": "Ultimate frisbee",
-      "rowing": "Rowing",
-      "cheerleading": "Cheerleading",
-      "esports": "Esports"
+      "ice_hockey": "Ice hockey"
     },
     "sportsCollective": "Other collective sports"
   },
