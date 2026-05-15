@@ -122,6 +122,12 @@
   --pending: oklch(0.82 0.01 240);
   --pending-foreground: oklch(0.3 0.04 255);
 
+  /* Match outcomes */
+  --defeat: oklch(0.52 0.22 18);
+  --defeat-foreground: oklch(0.99 0 0);
+  --draw: oklch(0.65 0.01 240);
+  --draw-foreground: oklch(0.3 0.04 255);
+
   --chart-1: oklch(0.72 0.18 135);
   --chart-2: oklch(0.32 0.09 255);
   --chart-3: oklch(0.6 0.16 240);
