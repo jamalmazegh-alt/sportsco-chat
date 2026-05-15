@@ -480,38 +480,63 @@ function EventDetail() {
     visibleMyConvocs.some((c: any) => c.status === "pending");
 
   return (
-    <div className="px-5 pt-6 pb-24 md:pb-6 space-y-5">
-      <Link to="/events" className="inline-flex items-center text-sm text-muted-foreground gap-1">
+    <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
+      <Link
+        to="/events"
+        className="inline-flex items-center text-sm text-muted-foreground gap-1 hover:text-foreground transition-colors -ml-1 px-1 py-1 rounded-md"
+      >
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
 
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+      <div
+        className={cn(
+          "relative rounded-2xl border bg-card p-5 shadow-sm overflow-hidden",
+          "transition-shadow hover:shadow-md",
+          event.type === "match"
+            ? "border-primary/30 bg-gradient-to-br from-primary/8 via-card to-card"
+            : "border-border"
+        )}
+      >
+        {event.type === "match" && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-primary/15 blur-3xl"
+          />
+        )}
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/12 px-2 py-0.5 rounded-full ring-1 ring-primary/20">
               {t(`events.types.${event.type}`)}
             </span>
             {event.type === "match" && event.competition_type && (
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground/70 bg-muted px-2 py-0.5 rounded-full">
                 {t(`events.competitionTypes.${event.competition_type}`)}
                 {event.competition_name ? ` · ${event.competition_name}` : ""}
               </span>
             )}
             {event.type === "match" && event.is_home !== null && (
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground bg-muted px-1.5 py-0.5 rounded inline-flex items-center gap-1">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground/70 bg-muted px-2 py-0.5 rounded-full inline-flex items-center gap-1">
                 {event.is_home ? <Home className="h-2.5 w-2.5" /> : <Plane className="h-2.5 w-2.5" />}
                 {t(event.is_home ? "events.home" : "events.away")}
               </span>
             )}
           </div>
           {isCoach && teams && (
-            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditOpen(true)}>
+            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0 hover:bg-primary/10" onClick={() => setEditOpen(true)}>
               <Pencil className="h-4 w-4" />
             </Button>
           )}
         </div>
-        <h1 className="text-xl font-semibold mt-2">
-          {event.type === "match" && event.opponent ? `vs ${event.opponent}` : event.title}
+        <h1 className={cn(
+          "relative mt-3 font-bold tracking-tight",
+          event.type === "match" ? "text-2xl" : "text-xl font-semibold"
+        )}>
+          {event.type === "match" && event.opponent ? (
+            <span className="inline-flex items-baseline gap-2">
+              <span className="text-muted-foreground text-base font-medium">vs</span>
+              <span>{event.opponent}</span>
+            </span>
+          ) : event.title}
         </h1>
         <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
