@@ -23,6 +23,7 @@ type Post = {
   attachments: Attachment[];
   author?: Profile | null;
   comments?: Comment[];
+  reads?: { user_id: string; read_at: string }[];
 };
 
 export function WallFeed({ clubId }: { clubId: string }) {
