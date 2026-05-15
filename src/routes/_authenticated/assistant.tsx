@@ -51,16 +51,21 @@ function AssistantPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [initialMessages] = useState<UIMessage[]>(() => loadMessages());
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const authTokenRef = useRef<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (mounted) authTokenRef.current = data.session?.access_token ?? null;
+      const tok = data.session?.access_token ?? null;
+      authTokenRef.current = tok;
+      if (mounted) setAuthToken(tok);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      authTokenRef.current = session?.access_token ?? null;
+      const tok = session?.access_token ?? null;
+      authTokenRef.current = tok;
+      setAuthToken(tok);
     });
     return () => {
       mounted = false;
