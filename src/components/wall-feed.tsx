@@ -115,22 +115,26 @@ export function WallFeed({ clubId }: { clubId: string }) {
     return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
   }
 
+  const canPost = role === "admin" || role === "coach";
+
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
-        <Textarea
-          rows={3}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder={t("wall.placeholder")}
-        />
-        <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
-        <div className="flex justify-end">
-          <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0)}>
-            {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
-          </Button>
+      {canPost && (
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+          <Textarea
+            rows={3}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder={t("wall.placeholder")}
+          />
+          <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
+          <div className="flex justify-end">
+            <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0)}>
+              {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       <WallGrouped
         posts={posts}
