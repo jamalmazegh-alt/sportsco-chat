@@ -338,7 +338,12 @@
     "history": "Activité",
     "respondedAt": "Réponse",
     "reminderVia": "Relance par {{channel}}",
-    "noActivity": "Aucune activité pour le moment."
+    "noActivity": "Aucune activité pour le moment.",
+    "reasonOptional": "Motif (facultatif)",
+    "reasonPlaceholder": "Ex : tournoi familial, blessure légère, indisponible…",
+    "confirmResponse": "Confirmer ma réponse",
+    "responseRecorded": "Réponse enregistrée",
+    "coachNotified": "Le coach a été prévenu."
   },
   "channels": {
     "in_app": "in-app",
