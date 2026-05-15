@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { MarketingHeader } from "./MarketingHeader";
 import { MarketingFooter } from "./MarketingFooter";
+import { MarketingChatWidget } from "./MarketingChatWidget";
 
 export function MarketingLayout({ children }: { children: ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
       <MarketingHeader />
       <main className="flex-1">{children}</main>
       <MarketingFooter />
+      <MarketingChatWidget />
     </div>
   );
 }
