@@ -228,6 +228,7 @@ export type Database = {
           id: string
           player_id: string
           responded_at: string | null
+          response_token: string
           status: Database["public"]["Enums"]["attendance_status"]
         }
         Insert: {
@@ -237,6 +238,7 @@ export type Database = {
           id?: string
           player_id: string
           responded_at?: string | null
+          response_token?: string
           status?: Database["public"]["Enums"]["attendance_status"]
         }
         Update: {
@@ -246,6 +248,7 @@ export type Database = {
           id?: string
           player_id?: string
           responded_at?: string | null
+          response_token?: string
           status?: Database["public"]["Enums"]["attendance_status"]
         }
         Relationships: [
@@ -1157,6 +1160,25 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_convocation_by_token: {
+        Args: { _token: string }
+        Returns: {
+          club_name: string
+          comment: string
+          convocation_id: string
+          event_id: string
+          event_location: string
+          event_opponent: string
+          event_starts_at: string
+          event_title: string
+          event_type: string
+          player_first_name: string
+          player_last_name: string
+          responded_at: string
+          status: Database["public"]["Enums"]["attendance_status"]
+          team_name: string
+        }[]
+      }
       get_member_invite_info: {
         Args: { _token: string }
         Returns: {
@@ -1208,6 +1230,14 @@ export type Database = {
       }
       redeem_club_invite: { Args: { _token: string }; Returns: string }
       redeem_member_invite: { Args: { _token: string }; Returns: string }
+      respond_via_token: {
+        Args: {
+          _comment?: string
+          _status: Database["public"]["Enums"]["attendance_status"]
+          _token: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "coach" | "parent" | "player" | "dirigeant"
