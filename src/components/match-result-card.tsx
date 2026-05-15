@@ -331,10 +331,8 @@ export function MatchResultCard({
                 <Input
                   type="number"
                   min={0}
-                  value={ourSide === "home" ? home : away}
-                  onChange={(e) =>
-                    ourSide === "home" ? setHome(e.target.value) : setAway(e.target.value)
-                  }
+                  value={home}
+                  onChange={(e) => setHome(e.target.value)}
                 />
               </div>
               <div className="space-y-1.5">
@@ -346,10 +344,8 @@ export function MatchResultCard({
                 <Input
                   type="number"
                   min={0}
-                  value={ourSide === "home" ? away : home}
-                  onChange={(e) =>
-                    ourSide === "home" ? setAway(e.target.value) : setHome(e.target.value)
-                  }
+                  value={away}
+                  onChange={(e) => setAway(e.target.value)}
                 />
               </div>
             </div>
