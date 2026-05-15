@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { SportSelect } from "@/components/sport-select";
 import { Plus, Users, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/empty-state";
 
 export const Route = createFileRoute("/_authenticated/teams")({
   component: TeamsRoute,
@@ -182,10 +183,23 @@ function TeamsPage() {
           ))}
         </div>
       ) : !teams || teams.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-          <Users className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">{t("teams.noTeams")}</p>
-        </div>
+        <EmptyState
+          icon={<Users className="h-6 w-6" />}
+          title={t("teams.noTeams")}
+          description={
+            isAdmin
+              ? t("teams.emptyHintAdmin", { defaultValue: "Crée ta première équipe pour commencer à programmer entraînements et matchs." })
+              : t("teams.emptyHintMember", { defaultValue: "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter." })
+          }
+          action={
+            isAdmin ? (
+              <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" />
+                {t("teams.create")}
+              </Button>
+            ) : null
+          }
+        />
       ) : (
         <ul className="space-y-2">
           {teams.map((tm) => (

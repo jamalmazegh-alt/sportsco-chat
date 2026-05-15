@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, MessageSquare, Send, Trash2 } from "lucide-react";
+import { Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { dateLocale, fmt } from "@/lib/date-locale";
@@ -18,6 +19,7 @@ type Post = {
   author_user_id: string;
   body: string;
   created_at: string;
+  is_pinned: boolean;
   attachments: Attachment[];
   author?: Profile | null;
   comments?: Comment[];
@@ -42,8 +44,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at, attachments")
+      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments")
       .eq("club_id", clubId)
+      .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
     // Dedupe by id (realtime + initial fetch sometimes overlap)
@@ -117,6 +120,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if (error) toast.error(error.message);
   }
 
+  async function togglePin(id: string, next: boolean) {
+    const { error } = await supabase.from("wall_posts").update({ is_pinned: next }).eq("id", id);
+    if (error) toast.error(error.message);
+  }
+
   if (loading) {
     return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
   }
@@ -147,7 +155,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
         currentUserId={user?.id ?? null}
         role={role}
         commentsEnabled={commentsEnabled}
+        canPin={canPost}
         onDelete={deletePost}
+        onTogglePin={togglePin}
       />
     </div>
   );
@@ -158,18 +168,25 @@ function WallGrouped({
   currentUserId,
   role,
   commentsEnabled,
+  canPin,
   onDelete,
+  onTogglePin,
 }: {
   posts: Post[];
   currentUserId: string | null;
   role: string | null;
   commentsEnabled: boolean;
+  canPin: boolean;
   onDelete: (id: string) => void;
+  onTogglePin: (id: string, next: boolean) => void;
 }) {
   const { t } = useTranslation();
+  const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
+  const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, { label: string; items: Post[] }>();
-    for (const p of posts) {
+    for (const p of rest) {
       const d = new Date(p.created_at);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
       const label = format(d, "MMMM yyyy", { locale: dateLocale() });
@@ -177,62 +194,93 @@ function WallGrouped({
       map.get(key)!.items.push(p);
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
-  }, [posts]);
+  }, [rest]);
 
   if (posts.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-6">{t("wall.empty")}</p>;
+    return (
+      <EmptyState
+        icon={<MegaphoneIcon className="h-6 w-6" />}
+        title={t("wall.empty")}
+        description={t("wall.emptyHint", { defaultValue: "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici." })}
+      />
+    );
   }
+
+  const renderItem = (p: Post) => {
+    const d = new Date(p.created_at);
+    const canManage = p.author_user_id === currentUserId || role === "admin";
+    return (
+      <li
+        key={p.id}
+        className={
+          "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden " +
+          (p.is_pinned ? "border-primary/40 ring-1 ring-primary/20" : "border-border")
+        }
+      >
+        <div className={"flex flex-col items-center justify-center w-16 shrink-0 py-3 " + (p.is_pinned ? "bg-primary/15" : "bg-primary/8")}>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+            {fmt(d, "EEE")}
+          </span>
+          <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
+          <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
+        </div>
+        <div className="flex-1 min-w-0 py-3 pr-3">
+          <header className="flex items-start justify-between gap-2 mb-1.5">
+            <p className="text-sm font-semibold truncate flex items-center gap-1.5">
+              {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30" />}
+              {p.author?.full_name ?? "—"}
+            </p>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {canPin && (
+                <button
+                  onClick={() => onTogglePin(p.id, !p.is_pinned)}
+                  className="text-muted-foreground hover:text-primary"
+                  aria-label={p.is_pinned ? t("wall.unpin", { defaultValue: "Désépingler" }) : t("wall.pin", { defaultValue: "Épingler" })}
+                  title={p.is_pinned ? t("wall.unpin", { defaultValue: "Désépingler" }) : t("wall.pin", { defaultValue: "Épingler" })}
+                >
+                  {p.is_pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                </button>
+              )}
+              {canManage && (
+                <button
+                  onClick={() => onDelete(p.id)}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </header>
+          {p.body && <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>}
+          {p.attachments?.length > 0 && (
+            <div className="mt-2">
+              <AttachmentList items={p.attachments as Attachment[]} />
+            </div>
+          )}
+          {commentsEnabled && (
+            <CommentBlock post={p} currentUserId={currentUserId} role={role} />
+          )}
+        </div>
+      </li>
+    );
+  };
 
   return (
     <div className="space-y-7">
+      {pinned.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-primary flex items-center gap-1.5">
+            <Pin className="h-3 w-3" /> {t("wall.pinned", { defaultValue: "Épinglé" })}
+          </h2>
+          <ul className="space-y-2.5">{pinned.map(renderItem)}</ul>
+        </section>
+      )}
       {grouped.map((group) => (
         <section key={group.key} className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
             {group.label}
           </h2>
-          <ul className="space-y-2.5">
-            {group.items.map((p) => {
-              const d = new Date(p.created_at);
-              return (
-                <li
-                  key={p.id}
-                  className="flex items-stretch gap-3 rounded-2xl border border-border bg-card overflow-hidden"
-                >
-                  <div className="flex flex-col items-center justify-center w-16 shrink-0 py-3 bg-primary/8">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-                      {fmt(d, "EEE")}
-                    </span>
-                    <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
-                    <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
-                  </div>
-                  <div className="flex-1 min-w-0 py-3 pr-3">
-                    <header className="flex items-start justify-between gap-2 mb-1.5">
-                      <p className="text-sm font-semibold truncate">{p.author?.full_name ?? "—"}</p>
-                      {(p.author_user_id === currentUserId || role === "admin") && (
-                        <button
-                          onClick={() => onDelete(p.id)}
-                          className="text-muted-foreground hover:text-destructive shrink-0"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </header>
-                    {p.body && (
-                      <p className="text-sm whitespace-pre-wrap break-words">{p.body}</p>
-                    )}
-                    {p.attachments?.length > 0 && (
-                      <div className="mt-2">
-                        <AttachmentList items={p.attachments as Attachment[]} />
-                      </div>
-                    )}
-                    {commentsEnabled && (
-                      <CommentBlock post={p} currentUserId={currentUserId} role={role} />
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <ul className="space-y-2.5">{group.items.map(renderItem)}</ul>
         </section>
       ))}
     </div>
