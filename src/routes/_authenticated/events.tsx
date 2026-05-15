@@ -337,7 +337,7 @@ function EventsPage() {
                                 outcome === "draw" && "bg-draw/15 text-draw",
                               )}>
                                 <Trophy className="h-3 w-3" />
-                                {ours} — {theirs}
+                                {t(`match.${outcome}`)} {ours} — {theirs}
                               </p>
                             );
                           })()}
