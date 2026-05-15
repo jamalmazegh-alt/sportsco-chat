@@ -254,6 +254,7 @@ function EventDetail() {
       teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid))
     );
     setSelectedIds(preselect);
+    setPickerStep("select");
     setPickerOpen(true);
   }
 
