@@ -591,7 +591,8 @@ function EventDetail() {
           event.type === "match" ? "text-2xl" : "text-xl font-semibold"
         )}>
           {event.type === "match" && event.opponent ? (
-            <span className="inline-flex items-baseline gap-2">
+            <span className="inline-flex items-baseline gap-2 flex-wrap">
+              <span>{teams?.[0]?.name ?? event.title}</span>
               <span className="text-muted-foreground text-base font-medium">vs</span>
               <span>{event.opponent}</span>
             </span>
