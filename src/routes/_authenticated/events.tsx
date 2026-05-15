@@ -321,8 +321,8 @@ function EventsPage() {
                               <p className={cn(
                                 "text-xs font-bold tabular-nums inline-flex items-center gap-1.5 mt-0.5 w-fit px-1.5 py-0.5 rounded",
                                 outcome === "win" && "bg-present/15 text-present",
-                                outcome === "loss" && "bg-absent/15 text-absent",
-                                outcome === "draw" && "bg-muted text-foreground",
+                                outcome === "loss" && "bg-defeat/15 text-defeat",
+                                outcome === "draw" && "bg-draw/15 text-draw",
                               )}>
                                 <Trophy className="h-3 w-3" />
                                 {ours} — {theirs}

@@ -272,8 +272,8 @@ export function MatchResultCard({
           className={cn(
             "rounded-xl border p-4 space-y-2",
             outcome === "win" && "bg-present/10 border-present/30",
-            outcome === "loss" && "bg-absent/10 border-absent/30",
-            outcome === "draw" && "bg-muted border-border"
+            outcome === "loss" && "bg-defeat/10 border-defeat/30",
+            outcome === "draw" && "bg-draw/10 border-draw/30"
           )}
         >
           <div className="flex items-center justify-center gap-4">
