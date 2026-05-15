@@ -120,6 +120,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if (error) toast.error(error.message);
   }
 
+  async function togglePin(id: string, next: boolean) {
+    const { error } = await supabase.from("wall_posts").update({ is_pinned: next }).eq("id", id);
+    if (error) toast.error(error.message);
+  }
+
   if (loading) {
     return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
   }
