@@ -11,6 +11,7 @@ import { dateLocale, fmt } from "@/lib/date-locale";
 import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/attachments";
 import { MentionInput, RenderWithMentions, parseMentions } from "@/components/mention-input";
 import { WallFeedSkeleton } from "@/components/skeletons";
+import { cn } from "@/lib/utils";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
@@ -282,17 +283,22 @@ function WallGrouped({
     return (
       <li
         key={p.id}
-        className={
-          "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden " +
-          (p.is_pinned ? "border-primary/40 ring-1 ring-primary/20" : "border-border")
-        }
+        className={cn(
+          "group flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden",
+          "transition-all duration-200 hover:shadow-md hover:-translate-y-px",
+          "animate-in fade-in-0 slide-in-from-bottom-1 duration-300",
+          p.is_pinned ? "border-primary/40 ring-1 ring-primary/15 shadow-sm" : "border-border"
+        )}
       >
-        <div className={"flex flex-col items-center justify-center w-16 shrink-0 py-3 " + (p.is_pinned ? "bg-primary/15" : "bg-primary/8")}>
+        <div className={cn(
+          "flex flex-col items-center justify-center w-16 shrink-0 py-3 transition-colors",
+          p.is_pinned ? "bg-primary/15" : "bg-primary/8 group-hover:bg-primary/12"
+        )}>
           <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
             {fmt(d, "EEE")}
           </span>
-          <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
-          <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
+          <span className="text-2xl font-bold leading-none mt-0.5 tabular-nums">{format(d, "d")}</span>
+          <span className="text-[10px] text-muted-foreground mt-1 tabular-nums">{format(d, "HH:mm")}</span>
         </div>
         <div className="flex-1 min-w-0 py-3 pr-3">
           <header className="flex items-start justify-between gap-2 mb-1.5">
@@ -300,11 +306,11 @@ function WallGrouped({
               {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30" />}
               {p.author?.full_name ?? "—"}
             </p>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
               {canPin && (
                 <button
                   onClick={() => onTogglePin(p.id, !p.is_pinned)}
-                  className="text-muted-foreground hover:text-primary"
+                  className="text-muted-foreground hover:text-primary p-1 -m-1 rounded-md hover:bg-primary/10 transition-colors"
                   aria-label={p.is_pinned ? t("wall.unpin", { defaultValue: "Désépingler" }) : t("wall.pin", { defaultValue: "Épingler" })}
                   title={p.is_pinned ? t("wall.unpin", { defaultValue: "Désépingler" }) : t("wall.pin", { defaultValue: "Épingler" })}
                 >
@@ -314,7 +320,7 @@ function WallGrouped({
               {canManage && (
                 <button
                   onClick={() => onDelete(p.id)}
-                  className="text-muted-foreground hover:text-destructive"
+                  className="text-muted-foreground hover:text-destructive p-1 -m-1 rounded-md hover:bg-destructive/10 transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

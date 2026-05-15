@@ -49,14 +49,18 @@ function AuthLayout() {
     <ConsentGate>
       <div className="min-h-screen bg-background pb-24">
         <div className="mx-auto max-w-xl">
-          <div className="relative flex items-center justify-center gap-2 pt-3 pb-1">
-            <img src={logo} alt="Clubero" width={28} height={28} className="h-7 w-7 object-contain" />
-            <span className="text-sm font-semibold tracking-tight text-foreground/80">Clubero</span>
-            <div className="absolute right-3 top-2.5">
-              <GlobalSearch />
+          <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
+            <div className="relative flex items-center justify-center gap-2 px-3 py-2.5">
+              <img src={logo} alt="Clubero" width={28} height={28} className="h-7 w-7 object-contain drop-shadow-sm" />
+              <span className="text-sm font-semibold tracking-tight text-foreground/85">Clubero</span>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <GlobalSearch />
+              </div>
             </div>
           </div>
-          <Outlet />
+          <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+            <Outlet />
+          </div>
         </div>
         <AssistantFab />
         <BottomNav />
