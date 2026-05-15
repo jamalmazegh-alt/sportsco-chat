@@ -31,6 +31,8 @@ const ConvocationInviteEmail = ({
   eventTitle,
   eventType,
   eventDate,
+  eventDescription,
+  convocationTime,
   eventLocation,
   locationMapsUrl,
   meetingPoint,
