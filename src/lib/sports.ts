@@ -1,5 +1,5 @@
-// Collective / team sports list. Football and Basketball are pinned on top
-// (separated from the rest), per product requirement.
+// Supported sports in V1. Limited to the sports for which match scoring &
+// player stats are configured in `src/lib/sport-config.ts`.
 export const TOP_SPORTS = ["football", "basketball"] as const;
 
 export const COLLECTIVE_SPORTS = [
@@ -7,20 +7,7 @@ export const COLLECTIVE_SPORTS = [
   "volleyball",
   "rugby",
   "futsal",
-  "field_hockey",
   "ice_hockey",
-  "water_polo",
-  "baseball",
-  "softball",
-  "cricket",
-  "american_football",
-  "lacrosse",
-  "netball",
-  "korfball",
-  "ultimate_frisbee",
-  "rowing",
-  "cheerleading",
-  "esports",
 ] as const;
 
 export type SportKey = (typeof TOP_SPORTS)[number] | (typeof COLLECTIVE_SPORTS)[number];

@@ -179,6 +179,44 @@ function FeaturesPage() {
         </div>
       </section>
 
+      <section className="border-b border-border/60">
+        <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              Sports couverts en V1
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Saisie de score et stats joueurs adaptées au sport de chaque équipe.
+            </p>
+          </div>
+          <div className="mt-10 flex flex-wrap justify-center gap-2.5">
+            {[
+              "Football",
+              "Futsal",
+              "Basketball",
+              "Rugby",
+              "Handball",
+              "Volley-ball",
+              "Hockey sur glace",
+            ].map((s) => (
+              <span
+                key={s}
+                className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-foreground/80"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            Un autre sport vous intéresse ?{" "}
+            <Link to="/contact" className="underline underline-offset-2 hover:text-foreground">
+              Dites-le nous
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
       <section className="bg-muted/20">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
