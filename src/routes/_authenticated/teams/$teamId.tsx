@@ -250,6 +250,19 @@ function TeamDetail() {
     else toast.success(t("players.inviteSent"));
   }
 
+  async function removeFromTeam(playerId: string, fullName: string) {
+    if (!confirm(t("players.removeConfirm", { defaultValue: `Retirer ${fullName} de l'équipe ?`, name: fullName }))) return;
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("player_id", playerId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("players.removed", { defaultValue: "Joueur retiré de l'équipe" }));
+    qc.invalidateQueries({ queryKey: ["team-players", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
+  }
+
   async function inviteSelected() {
     if (!user || selectedIds.size === 0) return;
     setInviting(true);
