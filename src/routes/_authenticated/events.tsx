@@ -158,7 +158,12 @@ function EventsPage() {
   return (
     <div className="px-5 pt-8 pb-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("events.title")}</h1>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold leading-tight">{t("events.title")}</h1>
+          {club?.name && (
+            <p className="text-sm text-muted-foreground truncate mt-0.5">{club.name}</p>
+          )}
+        </div>
         {isCoach && user && (
           <EventFormSheet
             open={open}
