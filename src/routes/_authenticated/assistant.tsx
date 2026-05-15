@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useTranslation } from "react-i18next";
-import { Bot, Trash2, Wrench } from "lucide-react";
+import { Bot, Trash2, Wrench, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -147,11 +147,18 @@ function AssistantPage() {
             </p>
           </div>
         </div>
-        {messages.length > 0 && (
-          <Button variant="ghost" size="icon-sm" onClick={clearConversation} aria-label="Clear">
-            <Trash2 className="h-4 w-4" />
+        <div className="flex items-center gap-1">
+          {messages.length > 0 && (
+            <Button variant="ghost" size="icon-sm" onClick={clearConversation} aria-label="Clear">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+          <Button asChild variant="ghost" size="icon-sm" aria-label={t("assistant.close", { defaultValue: "Close" })}>
+            <Link to="/home">
+              <X className="h-4 w-4" />
+            </Link>
           </Button>
-        )}
+        </div>
       </header>
 
       <Conversation className="flex-1 min-h-0">

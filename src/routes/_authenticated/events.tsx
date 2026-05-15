@@ -61,12 +61,25 @@ function EventsPage() {
       if (teamIds.length === 0) return [];
       const { data } = await supabase
         .from("events")
-        .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name")
+        .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home")
         .in("team_id", teamIds)
         .order("starts_at", { ascending: true });
-      return (data ?? []).map((e) => ({
+      const list = data ?? [];
+      const matchIds = list.filter((e) => e.type === "match").map((e) => e.id);
+      let resultsById = new Map<string, { home_score: number; away_score: number }>();
+      if (matchIds.length > 0) {
+        const { data: results } = await supabase
+          .from("match_results")
+          .select("event_id, home_score, away_score")
+          .in("event_id", matchIds);
+        resultsById = new Map(
+          (results ?? []).map((r: any) => [r.event_id, { home_score: r.home_score, away_score: r.away_score }])
+        );
+      }
+      return list.map((e) => ({
         ...e,
         team_name: teams!.find((t) => t.id === e.team_id)?.name ?? "",
+        result: resultsById.get(e.id) ?? null,
       }));
     },
   });
@@ -226,6 +239,23 @@ function EventsPage() {
                               <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
                             )}
                           </p>
+                          {e.type === "match" && e.result && (() => {
+                            const ourSide = e.is_home === false ? "away" : "home";
+                            const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
+                            const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
+                            const outcome = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
+                            return (
+                              <p className={cn(
+                                "text-xs font-bold tabular-nums inline-flex items-center gap-1.5 mt-0.5 w-fit px-1.5 py-0.5 rounded",
+                                outcome === "win" && "bg-present/15 text-present",
+                                outcome === "loss" && "bg-absent/15 text-absent",
+                                outcome === "draw" && "bg-muted text-foreground",
+                              )}>
+                                <Trophy className="h-3 w-3" />
+                                {ours} — {theirs}
+                              </p>
+                            );
+                          })()}
                           {e.location && (
                             <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
                               <MapPin className="h-3 w-3 shrink-0" />

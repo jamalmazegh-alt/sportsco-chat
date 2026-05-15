@@ -1,11 +1,41 @@
 import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
-import { ChevronLeft, Loader2, UserCircle2, Mail, Phone, BadgeCheck } from "lucide-react";
+import {
+  ChevronLeft,
+  Loader2,
+  UserCircle2,
+  Mail,
+  Phone,
+  BadgeCheck,
+  Ban,
+  CheckCircle2,
+  KeyRound,
+  UserMinus,
+  ShieldAlert,
+} from "lucide-react";
 import { fmt } from "@/lib/date-locale";
-import { getClubUserDetail } from "@/lib/admin.functions";
+import {
+  getClubUserDetail,
+  setUserDisabled,
+  removeUserFromClub,
+  sendUserPasswordReset,
+} from "@/lib/admin.functions";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/users/$userId")({
   component: AdminUserDetailPage,
@@ -15,14 +45,24 @@ export const Route = createFileRoute("/_authenticated/admin/users/$userId")({
 function AdminUserDetailPage() {
   const { userId } = Route.useParams();
   const { t } = useTranslation();
-  const { activeClubId } = useAuth();
+  const { user, activeClubId } = useAuth();
   const role = useActiveRole();
-  const fetchDetail = useServerFn(getClubUserDetail);
+  const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const fetchDetail = useServerFn(getClubUserDetail);
+  const callSetDisabled = useServerFn(setUserDisabled);
+  const callRemove = useServerFn(removeUserFromClub);
+  const callReset = useServerFn(sendUserPasswordReset);
+
+  const [confirmDisable, setConfirmDisable] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const [acting, setActing] = useState<string | null>(null);
+
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-user-detail", userId, activeClubId],
     enabled: !!activeClubId && role === "admin",
-    queryFn: () => fetchDetail({ data: { club_id: activeClubId!, user_id: userId } }),
+    queryFn: () =>
+      fetchDetail({ data: { club_id: activeClubId!, user_id: userId } }),
   });
 
   if (role !== "admin") return <Navigate to="/profile" replace />;
@@ -37,6 +77,54 @@ function AdminUserDetailPage() {
   const p = data.profile;
   const name =
     p?.full_name ?? [p?.first_name, p?.last_name].filter(Boolean).join(" ") ?? data.email ?? "—";
+  const isSelf = user?.id === userId;
+
+  async function toggleDisabled(disabled: boolean) {
+    if (!activeClubId) return;
+    setActing(disabled ? "disable" : "enable");
+    try {
+      await callSetDisabled({
+        data: { club_id: activeClubId, user_id: userId, disabled },
+      });
+      toast.success(t(disabled ? "admin.userDisabled" : "admin.userEnabled"));
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setActing(null);
+      setConfirmDisable(false);
+    }
+  }
+
+  async function removeFromClub() {
+    if (!activeClubId) return;
+    setActing("remove");
+    try {
+      await callRemove({ data: { club_id: activeClubId, user_id: userId } });
+      toast.success(t("admin.removedFromClub"));
+      qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
+      // back to list
+      window.history.back();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setActing(null);
+      setConfirmRemove(false);
+    }
+  }
+
+  async function sendReset() {
+    if (!activeClubId) return;
+    setActing("reset");
+    try {
+      await callReset({ data: { club_id: activeClubId, user_id: userId } });
+      toast.success(t("admin.passwordResetSent"));
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setActing(null);
+    }
+  }
 
   return (
     <div className="px-5 pt-4 pb-10 space-y-5">
@@ -53,7 +141,15 @@ function AdminUserDetailPage() {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-semibold truncate">{name || "—"}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl font-semibold truncate">{name || "—"}</h1>
+            {data.is_disabled && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive">
+                <ShieldAlert className="h-3 w-3" />
+                {t("admin.statusDisabled")}
+              </span>
+            )}
+          </div>
           {data.email && (
             <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
               <Mail className="h-3 w-3" /> {data.email}
@@ -72,8 +168,7 @@ function AdminUserDetailPage() {
           )}
           {data.last_sign_in_at && (
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              {t("admin.lastSignIn", { defaultValue: "Last sign-in" })}:{" "}
-              {fmt(new Date(data.last_sign_in_at), "PP")}
+              {t("admin.lastSignIn")}: {fmt(new Date(data.last_sign_in_at), "PP")}
             </p>
           )}
         </div>
@@ -140,6 +235,102 @@ function AdminUserDetailPage() {
           </ul>
         )}
       </section>
+
+      {!isSelf && (
+        <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("admin.actions")}
+          </h2>
+
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={sendReset}
+              disabled={!data.email || acting === "reset"}
+            >
+              {acting === "reset" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <KeyRound className="h-4 w-4" />
+              )}
+              {t("admin.sendPasswordReset")}
+            </Button>
+
+            {data.is_disabled ? (
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => toggleDisabled(false)}
+                disabled={acting === "enable"}
+              >
+                {acting === "enable" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4 text-present" />
+                )}
+                {t("admin.enableUser")}
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="w-full justify-start text-destructive hover:text-destructive"
+                onClick={() => setConfirmDisable(true)}
+                disabled={acting === "disable"}
+              >
+                <Ban className="h-4 w-4" />
+                {t("admin.disableUser")}
+              </Button>
+            )}
+            <p className="text-[11px] text-muted-foreground px-1">
+              {t("admin.disableUserHint")}
+            </p>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start text-destructive hover:text-destructive mt-2"
+              onClick={() => setConfirmRemove(true)}
+              disabled={acting === "remove"}
+            >
+              <UserMinus className="h-4 w-4" />
+              {t("admin.removeFromClub")}
+            </Button>
+            <p className="text-[11px] text-muted-foreground px-1">
+              {t("admin.removeFromClubHint")}
+            </p>
+          </div>
+        </section>
+      )}
+
+      <AlertDialog open={confirmDisable} onOpenChange={setConfirmDisable}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("admin.confirmDisable")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("admin.disableUserHint")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => toggleDisabled(true)}>
+              {t("admin.disableUser")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmRemove} onOpenChange={setConfirmRemove}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("admin.confirmRemove")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("admin.removeFromClubHint")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={removeFromClub}>
+              {t("admin.removeFromClub")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

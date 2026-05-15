@@ -139,12 +139,129 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
         supabaseAdmin.auth.admin.getUserById(data.user_id),
       ]);
 
+    const u = authUser.data.user as any;
+    const bannedUntil: string | null = u?.banned_until ?? null;
+    const isDisabled = !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
+
     return {
       profile,
-      email: authUser.data.user?.email ?? null,
-      last_sign_in_at: authUser.data.user?.last_sign_in_at ?? null,
+      email: u?.email ?? null,
+      last_sign_in_at: u?.last_sign_in_at ?? null,
       memberships: memberships ?? [],
       linkedPlayers: linkedPlayers ?? [],
       parentLinks: parentLinks ?? [],
+      is_disabled: isDisabled,
+      banned_until: bannedUntil,
     };
+  });
+
+/**
+ * Helper: enforce caller is admin of the given club.
+ */
+async function assertCallerAdmin(
+  supabase: any,
+  clubId: string,
+  callerId: string
+) {
+  const { data } = await supabase
+    .from("club_members")
+    .select("role")
+    .eq("club_id", clubId)
+    .eq("user_id", callerId)
+    .eq("role", "admin")
+    .limit(1);
+  if (!data || data.length === 0) {
+    throw new Response("Forbidden", { status: 403 });
+  }
+}
+
+/**
+ * Admin-only: disable or re-enable a user account (auth-level).
+ */
+export const setUserDisabled = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: { club_id: string; user_id: string; disabled: boolean }) =>
+      z
+        .object({
+          club_id: z.string().uuid(),
+          user_id: z.string().uuid(),
+          disabled: z.boolean(),
+        })
+        .parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.user_id === userId) {
+      throw new Response("Cannot disable your own account", { status: 400 });
+    }
+    await assertCallerAdmin(supabase, data.club_id, userId);
+
+    // Confirm target shares the club
+    const { data: target } = await supabaseAdmin
+      .from("club_members")
+      .select("user_id")
+      .eq("club_id", data.club_id)
+      .eq("user_id", data.user_id)
+      .limit(1);
+    if (!target || target.length === 0) {
+      throw new Response("Not found", { status: 404 });
+    }
+
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+      data.user_id,
+      { ban_duration: data.disabled ? "876000h" : "none" } as any
+    );
+    if (error) throw new Response(error.message, { status: 500 });
+    return { ok: true, disabled: data.disabled };
+  });
+
+/**
+ * Admin-only: remove a user from the caller's club (deletes all of their
+ * club_members rows for that club). Does NOT delete the auth account.
+ */
+export const removeUserFromClub = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { club_id: string; user_id: string }) =>
+    z
+      .object({ club_id: z.string().uuid(), user_id: z.string().uuid() })
+      .parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.user_id === userId) {
+      throw new Response("Cannot remove yourself", { status: 400 });
+    }
+    await assertCallerAdmin(supabase, data.club_id, userId);
+    const { error } = await supabaseAdmin
+      .from("club_members")
+      .delete()
+      .eq("club_id", data.club_id)
+      .eq("user_id", data.user_id);
+    if (error) throw new Response(error.message, { status: 500 });
+    return { ok: true };
+  });
+
+/**
+ * Admin-only: trigger a password reset email for a user in the caller's club.
+ */
+export const sendUserPasswordReset = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { club_id: string; user_id: string }) =>
+    z
+      .object({ club_id: z.string().uuid(), user_id: z.string().uuid() })
+      .parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCallerAdmin(supabase, data.club_id, userId);
+    const { data: u } = await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    const email = u.user?.email;
+    if (!email) throw new Response("User has no email", { status: 400 });
+    const { error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+    });
+    if (error) throw new Response(error.message, { status: 500 });
+    return { ok: true };
   });

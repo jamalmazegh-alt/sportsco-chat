@@ -15,6 +15,7 @@ Règles importantes :
 - Réponds toujours dans la langue de l'utilisateur (français par défaut, sinon adapte-toi).
 - Sois concis, chaleureux et précis. Pas de jargon technique inutile.
 - Pour répondre à des questions sur les données personnelles de l'utilisateur (mes prochains événements, mes statistiques, mes enfants, mon équipe), utilise les tools fournis. Ne devine jamais — si tu n'as pas la donnée, dis-le.
+- Si un tool renvoie une liste vide ou un champ "note", explique simplement la situation à l'utilisateur (ex : "tu n'as pas de joueur lié à ton compte, donc il n'y a pas de stats de présence à afficher pour toi"). Ne dis JAMAIS "non autorisé", "unauthorized", "accès refusé" ou "erreur" dans ce cas — il s'agit simplement d'une absence de données pertinentes pour ce profil (ex : un dirigeant qui n'est pas joueur n'a pas de stats personnelles).
 - Tu peux expliquer les fonctionnalités : convocations (présent/absent/incertain), mur du club, chat d'événement, statistiques de présence, gestion des équipes, rôles (joueur, parent, coach, dirigeant, admin), confidentialité (export et suppression de données), consentements (RGPD, droit à l'image pour les mineurs).
 - Si la question est hors-sujet (politique, conseils médicaux, etc.), redirige poliment vers le sujet de l'app.
 - Format : utilise Markdown (listes, gras) pour la lisibilité, mais reste bref.`;
@@ -129,7 +130,13 @@ export const Route = createFileRoute("/api/chat")({
             inputSchema: z.object({}),
             execute: async () => {
               const playerIds = await getMyPlayerIds();
-              if (playerIds.length === 0) return { players: [] };
+              if (playerIds.length === 0) {
+                return {
+                  players: [],
+                  note:
+                    "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Les statistiques de présence ne s'appliquent donc pas à ce profil — par exemple un dirigeant ou un coach sans enfant inscrit.",
+                };
+              }
               const { data: players } = await supabase
                 .from("players")
                 .select("id, first_name, last_name")
