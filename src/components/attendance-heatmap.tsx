@@ -39,9 +39,20 @@ const STATUS_CLASS: Record<string, string> = {
   pending: "bg-pending hover:bg-pending/80",
 };
 
-export function AttendanceHeatmap({ convocations }: { convocations: Convoc[] }) {
+export function AttendanceHeatmap({ playerId }: { playerId: string }) {
   const { t } = useTranslation();
 
+  const { data: convocations = [] } = useQuery({
+    queryKey: ["player-convocs", playerId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("convocations")
+        .select("id, status, event_id, events:event_id(starts_at, type, title)")
+        .eq("player_id", playerId)
+        .order("created_at", { ascending: false });
+      return (data ?? []) as Convoc[];
+    },
+  });
   const { days, monthLabels } = useMemo(() => {
     const today = startOfDay(new Date());
     // Align end-of-grid to Saturday (so weeks render as columns)
