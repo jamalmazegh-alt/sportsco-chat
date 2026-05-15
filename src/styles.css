@@ -45,6 +45,12 @@
   --color-pending: var(--pending);
   --color-pending-foreground: var(--pending-foreground);
 
+  /* Match outcome tokens */
+  --color-defeat: var(--defeat);
+  --color-defeat-foreground: var(--defeat-foreground);
+  --color-draw: var(--draw);
+  --color-draw-foreground: var(--draw-foreground);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
