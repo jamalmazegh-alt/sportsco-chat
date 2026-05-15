@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { isAppHost } from "@/lib/host";
-import { Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
