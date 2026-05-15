@@ -10,6 +10,8 @@ interface Props {
   eventTitle: string;
   eventType?: string;
   eventDate?: string;
+  eventDescription?: string;
+  convocationTime?: string;
   eventLocation?: string;
   locationMapsUrl?: string;
   meetingPoint?: string;
