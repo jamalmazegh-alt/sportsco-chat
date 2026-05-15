@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { BarChart3, Target, Sparkles } from "lucide-react";
+import { BarChart3, Trophy, Square, AlertTriangle, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import type { StatKind } from "@/lib/sport-config";
 
 type Period = "30d" | "90d" | "season" | "all";
 type EventTypeFilter = "all" | "match" | "training";
@@ -13,7 +14,6 @@ function periodSince(p: Period): Date | null {
   if (p === "all") return null;
   if (p === "30d") return new Date(now.getTime() - 30 * 86400 * 1000);
   if (p === "90d") return new Date(now.getTime() - 90 * 86400 * 1000);
-  // season: aug 1 of current or previous year
   const year = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
   return new Date(year, 7, 1);
 }
@@ -35,17 +35,19 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
     },
   });
 
-  const { data: goalCount } = useQuery({
-    queryKey: ["player-goals-count", playerId],
+  // Aggregate scorer events for this player
+  const { data: scorerEvents } = useQuery({
+    queryKey: ["player-scorer-events", playerId],
     queryFn: async () => {
-      const { count } = await supabase
+      const { data } = await supabase
         .from("event_goals")
-        .select("id", { count: "exact", head: true })
+        .select("kind")
         .eq("scorer_player_id", playerId);
-      return count ?? 0;
+      return (data ?? []) as { kind: StatKind }[];
     },
   });
 
+  // Assists are tracked separately via assist_player_id
   const { data: assistCount } = useQuery({
     queryKey: ["player-assists-count", playerId],
     queryFn: async () => {
@@ -65,7 +67,6 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
       if (!ev) return false;
       if (typeFilter !== "all" && ev.type !== typeFilter) return false;
       if (since && new Date(ev.starts_at) < since) return false;
-      // Only count past events for attendance ratio
       return new Date(ev.starts_at).getTime() <= Date.now();
     });
   }, [convocs, period, typeFilter]);
@@ -79,8 +80,73 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
     return c;
   }, [filtered]);
 
+  // Per-kind tally; only show kinds that actually appear (sport-agnostic).
+  const kindCounts = useMemo(() => {
+    const m = new Map<StatKind, number>();
+    (scorerEvents ?? []).forEach((g) => {
+      m.set(g.kind, (m.get(g.kind) ?? 0) + 1);
+    });
+    return m;
+  }, [scorerEvents]);
+
   const total = counts.present + counts.absent + counts.uncertain + counts.pending;
   const pct = (n: number) => (total === 0 ? 0 : Math.round((n / total) * 100));
+
+  // Order in which kinds are displayed if present
+  const kindOrder: StatKind[] = [
+    "goal",
+    "point",
+    "try",
+    "assist",
+    "yellow_card",
+    "red_card",
+    "foul",
+    "penalty",
+    "own_goal",
+  ];
+
+  const performanceTiles: { key: string; label: string; value: number; cls: string; icon: React.ReactNode }[] = [];
+  // Inject assist count (computed separately) under "assist" key
+  const assistTotal = assistCount ?? 0;
+  kindOrder.forEach((k) => {
+    if (k === "assist") {
+      if (assistTotal > 0)
+        performanceTiles.push({
+          key: "assist",
+          label: t("match.kinds.assist"),
+          value: assistTotal,
+          cls: "bg-secondary/30 text-foreground border-border",
+          icon: <Sparkles className="h-3.5 w-3.5" />,
+        });
+      return;
+    }
+    const v = kindCounts.get(k) ?? 0;
+    if (v > 0) {
+      performanceTiles.push({
+        key: k,
+        label: t(`match.kinds.${k}`),
+        value: v,
+        cls:
+          k === "yellow_card"
+            ? "bg-yellow-400/15 text-yellow-700 dark:text-yellow-300 border-yellow-400/30"
+            : k === "red_card"
+              ? "bg-absent/10 text-absent border-absent/30"
+              : k === "foul" || k === "penalty" || k === "own_goal"
+                ? "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30"
+                : "bg-primary/10 text-primary border-primary/30",
+        icon:
+          k === "yellow_card" ? (
+            <Square className="h-3.5 w-3.5 fill-yellow-400 text-yellow-500" />
+          ) : k === "red_card" ? (
+            <Square className="h-3.5 w-3.5 fill-red-500 text-red-600" />
+          ) : k === "foul" || k === "penalty" || k === "own_goal" ? (
+            <AlertTriangle className="h-3.5 w-3.5" />
+          ) : (
+            <Trophy className="h-3.5 w-3.5" />
+          ),
+      });
+    }
+  });
 
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
@@ -151,23 +217,21 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
         />
       </div>
 
-      {/* Goals/assists */}
-      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
-        <Stat
-          label={t("stats.goals")}
-          value={String(goalCount ?? 0)}
-          sub=""
-          cls="bg-primary/10 text-primary border-primary/30"
-          icon={<Target className="h-3.5 w-3.5" />}
-        />
-        <Stat
-          label={t("stats.assists")}
-          value={String(assistCount ?? 0)}
-          sub=""
-          cls="bg-secondary/30 text-foreground border-border"
-          icon={<Sparkles className="h-3.5 w-3.5" />}
-        />
-      </div>
+      {/* Per-sport performance */}
+      {performanceTiles.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 border-t border-border">
+          {performanceTiles.map((tile) => (
+            <Stat
+              key={tile.key}
+              label={tile.label}
+              value={String(tile.value)}
+              sub=""
+              cls={tile.cls}
+              icon={tile.icon}
+            />
+          ))}
+        </div>
+      )}
 
       {total === 0 && (
         <p className="text-xs text-muted-foreground italic">{t("stats.empty")}</p>

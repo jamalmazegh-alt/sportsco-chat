@@ -1,72 +1,90 @@
-## Objectif
+# Match scoring & stats par sport (V1)
 
-Livrer les 2 sujets restants priorisés :
-1. **Module stats & scores** (coach/dirigeant) : stats de présence par joueur, saisie du score final, buteurs + passeurs.
-2. **Screenshots features** sur le site vitrine (`/features`) pour illustrer concrètement les modules.
+Objectif : adapter la saisie de score et de stats joueurs au sport de l'équipe, en restant volontairement simple. Sports supportés : football, futsal, basketball, rugby, handball, volleyball, ice_hockey.
 
 ---
 
-## 1. Stats de présence par joueur
+## 1. Sport config (front, pas de table)
 
-**Base de données** : aucune nouvelle table — on agrège la table `convocations` existante (statut `present` / `absent` / `uncertain` / `pending`).
+Nouveau fichier `src/lib/sport-config.ts` qui exporte, par clé sport :
 
-**UI** : nouvelle section dans la page joueur `players/$playerId` + une vue agrégée par équipe dans `teams/$teamId`.
+- `scoreLabel` : `goals` | `points` | `sets`
+- `statKinds` : sous-ensemble de `goal | assist | try | point | yellow_card | red_card | foul | penalty`
+- `assistsEnabled`, `cardsEnabled`, `setScoresEnabled`, `minuteEnabled`
+- `defaultStatKind` (ce qui s'ajoute en 1 clic)
 
-- Cartes : % présent / % absent / % incertain / total convocations
-- Filtre par période (saison en cours, 30 derniers jours, tout)
-- Filtre par type d'événement (entraînement, match, tous)
-- Liste des dernières convocations avec statut
+Mapping :
 
-**Visibilité** : coach + admin uniquement (pas les parents/joueurs sur la vue agrégée équipe ; le joueur voit ses propres stats sur sa fiche).
+| Sport       | Score | Stats joueur                                |
+|-------------|-------|---------------------------------------------|
+| football    | goals | goal, assist, yellow_card, red_card         |
+| futsal      | goals | goal, assist, yellow_card, red_card         |
+| basketball  | points| point, assist, foul                         |
+| rugby       | points| try, yellow_card, red_card                  |
+| handball    | goals | goal, yellow_card, red_card (assist opt.)   |
+| volleyball  | sets  | point (+ set scores)                        |
+| ice_hockey  | goals | goal, assist, penalty                       |
 
----
-
-## 2. Saisie score + buteurs
-
-**Schéma** :
-
-- `match_results` : `event_id` (unique), `home_score`, `away_score`, `notes`, `recorded_by`
-- `event_goals` : `event_id`, `scorer_player_id`, `assist_player_id` (nullable), `minute` (nullable), `kind` (`goal` / `own_goal` / `penalty`), `created_by`
-
-**RLS** :
-- Lecture : tout membre pouvant voir l'équipe (`can_view_team`)
-- Écriture : coach/admin de l'équipe uniquement (`is_team_coach`)
-
-**UI** : dans `events/$eventId`, pour les événements de type `match` après la date, un bloc "Résultat du match" pour le coach :
-- Inputs score domicile / extérieur (orientés selon `is_home`)
-- Liste des buteurs : sélecteur joueur (parmi les convoqués `present`), passeur optionnel, minute optionnelle, type (but / csc / penalty)
-- Bouton "Enregistrer"
-
-**Affichage public** (parents/joueurs) : carte résultat avec score final + liste des buteurs (lecture seule).
-
-**Stats joueur** : compteurs `buts` / `passes` agrégés depuis `event_goals` sur la fiche joueur.
+Tout sport non listé tombe en mode "score only" (home/away + notes).
 
 ---
 
-## 3. Screenshots site vitrine
+## 2. Migration DB
 
-Sur `/features`, ajouter pour chaque pilier (clubs, coachs, parents, joueurs) une capture d'écran illustrative.
+Renommer/élargir le modèle existant pour rester générique :
 
-**Approche** : générer 4 mockups SVG/PNG stylisés (pas de vraies captures pour éviter les données réelles) qui montrent :
-- **Coach** : tableau de présence avec pastilles + bouton "Relancer"
-- **Club** : tableau de bord équipes
-- **Parent** : convocation reçue avec boutons Présent / Absent / Incertain
-- **Joueur** : prochain événement + chat équipe
+- `match_results` : ajouter `score_details JSONB NULL` (utilisé pour les sets de volley : `{ "sets": [[25,22],[23,25],…] }`).
+- `event_goals` → garder le nom (déjà des données) mais :
+  - élargir la contrainte `kind` pour accepter : `goal`, `own_goal`, `penalty`, `assist`, `try`, `point`, `yellow_card`, `red_card`, `foul`.
+  - rendre `assist_player_id` toujours nullable (déjà le cas).
+  - garder `minute` nullable.
+  - Pas de renommage de table pour préserver les données.
 
-Génération via `imagegen--generate_image` en quality `premium` (texte lisible) puis import dans `features.tsx`.
+RLS inchangée (déjà coach-write / view-team-read).
 
 ---
 
-## Ordre d'exécution
+## 3. UI : `MatchResultCard`
 
-1. Migration DB : `match_results` + `event_goals` + RLS + index
-2. Composant "Résultat du match" dans `events/$eventId`
-3. Composant "Stats présence" dans `players/$playerId` + bloc équipe sur `teams/$teamId`
-4. Génération des 4 screenshots + intégration dans `/features`
-5. Traductions FR (clés `stats.*`, `match.score`, `match.scorers`, etc.)
+Refactor `src/components/match-result-card.tsx` :
 
-## Points techniques
+- Récupère le `sport` de l'équipe via `teams.sport`.
+- Résout `cfg = getSportConfig(sport)`.
+- Inputs score :
+  - `goals`/`points` → 2 inputs numériques (home/away) + label dynamique.
+  - `sets` (volley) → home/away = sets gagnés + bouton "Ajouter set" qui pousse `[home, away]` dans `score_details.sets[]`. Affichage : `3-2 (25-22, 23-25, 25-20…)`.
+- Liste d'événements joueurs (renommer "Scorers" en "Player events" / `match.playerEvents`) :
+  - Filtrer par `cfg.statKinds`.
+  - Form add : sélecteur `kind` limité à `cfg.statKinds`, sélecteur joueur (convoqués), `assist` masqué si `!cfg.assistsEnabled` ou si kind ∈ cards/foul/penalty, `minute` masqué si `!cfg.minuteEnabled`.
+  - Affichage : icône + couleur selon kind (carton jaune/rouge, but, etc.).
+- Outcome (win/loss/draw) :
+  - sports score-based (goals/points) → comparer scores.
+  - volley → comparer sets gagnés.
 
-- Toutes les requêtes via le client browser (RLS protège).
-- Pas de server function nécessaire — agrégations faites côté client en mémoire (volumes faibles).
-- Les screenshots sont générés en `1280×800` PNG avec fond solide (pas transparent), stockés dans `src/assets/features/`.
+---
+
+## 4. Stats joueur
+
+`src/components/player-attendance-stats.tsx` (ou son équivalent) :
+
+- Ajouter agrégats par `kind` selon le sport principal du joueur (déduit de l'équipe). Affiche compteurs des kinds pertinents seulement (ex : basketteur → points/assists/fouls ; rugbyman → tries/cards).
+- Calcul côté client à partir de `event_goals` filtré par `scorer_player_id = playerId`.
+
+---
+
+## 5. i18n
+
+Ajouter clés FR/EN dans `match.*` et `match.kinds.*` :
+`yellowCard`, `redCard`, `foul`, `try`, `point`, `assist`, `set`, `addSet`, `setsWon`, `playerEvents`, `addEvent`, `kind`, etc.
+
+---
+
+## 6. Ordre d'exécution
+
+1. Migration `match_results.score_details` + élargissement contrainte `event_goals.kind`.
+2. `src/lib/sport-config.ts`.
+3. Refactor `MatchResultCard`.
+4. Mise à jour stats joueur.
+5. i18n FR/EN.
+
+Pas d'impact sur l'IA assistant ni sur les autres écrans.

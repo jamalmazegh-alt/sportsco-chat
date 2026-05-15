@@ -65,7 +65,7 @@ function EventDetail() {
     queryKey: ["teams-min", event?.team_id],
     enabled: !!event,
     queryFn: async () => {
-      const { data } = await supabase.from("teams").select("id, name, competitions").eq("id", event!.team_id);
+      const { data } = await supabase.from("teams").select("id, name, competitions, sport").eq("id", event!.team_id);
       return data ?? [];
     },
   });
@@ -670,6 +670,7 @@ function EventDetail() {
           opponent={event.opponent}
           isCoach={isCoach}
           startsAt={event.starts_at}
+          sport={teams?.[0]?.sport ?? null}
         />
       )}
 
