@@ -155,7 +155,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
         currentUserId={user?.id ?? null}
         role={role}
         commentsEnabled={commentsEnabled}
+        canPin={canPost}
         onDelete={deletePost}
+        onTogglePin={togglePin}
       />
     </div>
   );
