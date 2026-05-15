@@ -1,8 +1,12 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { isAppHost } from "@/lib/host";
-import { Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame } from "lucide-react";
+import {
+  Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck,
+  MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
@@ -64,9 +68,10 @@ function Landing() {
 }
 
 function Hero() {
+  const { t } = useTranslation("marketing");
+
   return (
     <section className="relative overflow-hidden border-b border-border/60 bg-gradient-hero">
-      {/* Decorative pitch lines + halos */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 opacity-[0.22] bg-pitch"
@@ -81,8 +86,7 @@ function Hero() {
       <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/30 blur-3xl animate-float" />
       <div aria-hidden className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/30 blur-3xl" />
 
-
-        <div className="mx-auto max-w-7xl px-5 pt-12 pb-14 lg:px-8 lg:pt-16 lg:pb-24">
+      <div className="mx-auto max-w-7xl px-5 pt-12 pb-14 lg:px-8 lg:pt-16 lg:pb-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10 lg:items-center">
           <div className="lg:col-span-7">
             <div className="flex items-center">
@@ -93,39 +97,35 @@ function Hero() {
                 <span className="absolute inset-0 rounded-full bg-[color:var(--energy)] animate-ping opacity-75" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-[color:var(--energy)]" />
               </span>
-              La plateforme des clubs sportifs amateurs
+              {t("home.badge")}
             </div>
             <h1 className="mt-5 font-display text-[2.5rem] font-bold leading-[1.02] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              L&apos;énergie de votre club,{" "}
-              <span className="text-gradient-primary">enfin&nbsp;coordonnée.</span>
+              {t("home.title")}
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Convocations en un clic, présences en temps réel, communication claire.
-              Clubero remplace WhatsApp, les tableurs et les feuilles imprimées par
-              une vraie appli pensée pour les terrains.
+              {t("home.subtitle")}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 text-base shadow-elevated hover:shadow-glow transition-shadow">
                 <Link to="/demo">
-                  Demander une démo <ArrowRight className="ml-1.5 h-4 w-4" />
+                  {t("home.ctaDemo")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link to="/features">Voir les fonctionnalités</Link>
+                <Link to="/features">{t("home.ctaFeatures")}</Link>
               </Button>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> Essai gratuit</span>
-              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> Sans carte bancaire</span>
-              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> Données hébergées en Europe</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.freeTrial")}</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.noCard")}</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.hostedEU")}</span>
             </div>
 
-            {/* Stats strip */}
             <dl className="mt-10 grid grid-cols-3 gap-4 max-w-lg">
               {[
-                { v: "12s", l: "pour convoquer" },
-                { v: "+78%", l: "de réponses" },
-                { v: "0", l: "groupe WhatsApp" },
+                { v: "12s", l: t("home.statConvoke") },
+                { v: "+78%", l: t("home.statResponse") },
+                { v: "0", l: t("home.statWhatsApp") },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl border border-border/60 bg-card/60 backdrop-blur px-3 py-3">
                   <dt className="font-display text-2xl font-bold text-gradient-primary">{s.v}</dt>
@@ -137,7 +137,6 @@ function Hero() {
 
           <div className="relative lg:col-span-5">
             <div className="relative mx-auto max-w-sm">
-              {/* Glow halo */}
               <div
                 aria-hidden
                 className="absolute -inset-8 -z-10 rounded-[2.5rem] opacity-60 blur-3xl"
@@ -147,7 +146,6 @@ function Hero() {
                 }}
               />
 
-              {/* Floating live-match badge */}
               <div className="absolute -top-4 -left-4 z-10 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-elevated animate-float">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inset-0 rounded-full bg-[color:var(--logo-blue)] animate-ping opacity-75" />
@@ -156,7 +154,6 @@ function Hero() {
                 <span className="text-[11px] font-bold uppercase tracking-wider">Live · 2-1</span>
               </div>
 
-              {/* Floating stat badge */}
               <div className="absolute -bottom-4 -right-4 z-10 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-elevated">
                 <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-energy text-white">
                   <Flame className="h-4 w-4" />
@@ -276,6 +273,8 @@ const FEATURES = [
 ];
 
 function FeaturesGrid() {
+  const { t } = useTranslation("marketing");
+
   return (
     <section className="relative border-b border-border/60 overflow-hidden">
       <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--energy)]/40 to-transparent" />
@@ -286,13 +285,12 @@ function FeaturesGrid() {
             Pensé pour les terrains
           </div>
           <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-            Tout ce dont votre club a besoin.
+            {t("home.featuresTitle")}
             <br />
-            <span className="text-gradient-energy">Rien de superflu.</span>
+            <span className="text-gradient-energy">{t("home.featuresSubtitle")}</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Remplacez quatre groupes WhatsApp, deux tableurs et une feuille
-            imprimée par une appli mobile-first, simple et claire.
+            {t("home.featuresBody")}
           </p>
         </div>
 
@@ -343,15 +341,17 @@ const AUDIENCES = [
 ];
 
 function ForEveryone() {
+  const { t } = useTranslation("marketing");
+
   return (
     <section className="border-b border-border/60 bg-muted/20">
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-bold uppercase tracking-wider text-[color:var(--energy)]">
-            Pour tout le club
+            {t("home.forEveryone")}
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-            Une appli, <span className="text-gradient-primary">quatre points de vue.</span>
+            {t("home.forEveryoneTitle")}
           </h2>
         </div>
 
@@ -384,11 +384,12 @@ function ForEveryone() {
 }
 
 function CTA() {
+  const { t } = useTranslation("marketing");
+
   return (
     <section>
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl border border-border p-10 lg:p-16 text-center bg-gradient-cta shadow-elevated">
-          {/* Decorative pitch lines (chalk on grass) */}
           <div
             aria-hidden
             className="absolute inset-0 opacity-[0.18]"
@@ -405,20 +406,20 @@ function CTA() {
 
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white backdrop-blur">
-              <Flame className="h-3 w-3" /> Lancez votre saison
+              <Flame className="h-3 w-3" /> {t("home.ctaSeason")}
             </div>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-5xl">
-              Prêt à libérer l&apos;énergie de votre club ?
+              {t("home.ctaTitle")}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
-              Réservez une démo de 15 minutes. On configure votre première équipe avec vous.
+              {t("home.ctaBody")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 bg-white text-[color:var(--brand-blue-deep)] hover:bg-white/90 hover:scale-105 transition-transform shadow-lg">
-                <Link to="/demo">Demander une démo <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                <Link to="/demo">{t("home.ctaButton")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link to="/pricing">Voir les tarifs</Link>
+                <Link to="/pricing">{t("home.ctaPricing")}</Link>
               </Button>
             </div>
           </div>
