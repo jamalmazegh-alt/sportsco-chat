@@ -165,45 +165,27 @@ function EventDetail() {
     const coachIds = Array.from(
       new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
     );
-    if (coachIds.length === 0) return;
 
-    // In-app notifications
-    await supabase.from("notifications").insert(
-      coachIds.map((uid) => ({
-        user_id: uid,
-        type: "convocation_response",
-        title: `${playerName} : ${t(`attendance.${status}`)}`,
-        body: reason
-          ? `${event.title} — "${reason}"`
-          : event.title,
-        link: `/events/${event.id}`,
-      }))
-    );
-
-    // Email notifications (best-effort, don't block UI)
-    const { data: profs } = await supabase
-      .from("profiles")
-      .select("id, first_name, notifications_email")
-      .in("id", coachIds);
-    const eventDate = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
-    const baseUrl =
-      typeof window !== "undefined" ? window.location.origin : "https://app.clubero.app";
-    for (const p of profs ?? []) {
-      if ((p as any).notifications_email === false) continue;
-      // Resolve email via auth — we use profile id; backend/template uses it.
-      // We need an email. Fetch from auth via RPC isn't available client-side, so try profile email if exists.
-      // Fallback: skip silently if no email is reachable.
-      try {
-        // The send-transactional endpoint expects recipientEmail; we need email per coach.
-        // Look up via a separate query against player_parents/players is irrelevant.
-        // We use profile.id -> we cannot read auth.users. Skip if we have no email column.
-      } catch {}
+    if (coachIds.length > 0) {
+      // In-app notifications
+      await supabase.from("notifications").insert(
+        coachIds.map((uid) => ({
+          user_id: uid,
+          type: "convocation_response",
+          title: `${playerName} : ${t(`attendance.${status}`)}`,
+          body: reason ? `${event.title} — "${reason}"` : event.title,
+          link: `/events/${event.id}`,
+        }))
+      );
     }
 
-    // Direct fetch of coach emails through profiles isn't available (no email column).
-    // Use member_invites/club_members? Coaches' emails are in auth.users only.
-    // As a pragmatic path: the in-app notification is guaranteed; for email we
-    // rely on the profiles table extension if/when present. Skip silently otherwise.
+    // Email notifications via server function (looks up coach emails server-side)
+    try {
+      const { notifyCoachesEmail } = await import("@/lib/convocation-notify.functions");
+      await notifyCoachesEmail({ data: { convocationId } });
+    } catch {
+      // best-effort, non-blocking
+    }
   }
 
   async function submitResponse(
