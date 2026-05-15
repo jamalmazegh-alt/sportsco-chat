@@ -161,10 +161,40 @@ function EventsPage() {
           ))}
         </div>
       ) : !visibleEvents || visibleEvents.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-          <Calendar className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">{t("events.noEvents")}</p>
-        </div>
+        <EmptyState
+          icon={<Calendar className="h-6 w-6" />}
+          title={t("events.noEvents")}
+          description={
+            isCoach
+              ? t("events.emptyHintCoach", {
+                  defaultValue: "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+                })
+              : t("events.emptyHintPlayer", {
+                  defaultValue: "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
+                })
+          }
+          action={
+            isCoach && user ? (
+              <EventFormSheet
+                open={open}
+                onOpenChange={setOpen}
+                mode="create"
+                teams={teams ?? []}
+                userId={user.id}
+                onSaved={() => {
+                  qc.invalidateQueries({ queryKey: ["events"] });
+                  qc.invalidateQueries({ queryKey: ["upcoming"] });
+                }}
+                trigger={
+                  <Button size="sm" className="h-9">
+                    <Plus className="h-4 w-4" />
+                    {t("events.create")}
+                  </Button>
+                }
+              />
+            ) : null
+          }
+        />
       ) : (
         <div className="space-y-7">
           {grouped.map((group) => (
