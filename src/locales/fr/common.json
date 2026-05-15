@@ -15,7 +15,8 @@
     "events": "Événements",
     "teams": "Équipes",
     "inbox": "Mur",
-    "profile": "Profil"
+    "profile": "Profil",
+    "admin": "Admin"
   },
   "auth": {
     "login": "Se connecter",
@@ -147,7 +148,9 @@
     "respondNow": "Répondre",
     "myConvocations": "Vos convocations",
     "noConvocations": "Tout est à jour.",
-    "viewAll": "Voir tout"
+    "viewAll": "Voir tout",
+    "myStats": "Mes statistiques de présence",
+    "myStatsHint": "Voir mes présences aux entraînements"
   },
   "teams": {
     "title": "Équipes",
@@ -419,7 +422,8 @@
     "phone": "Téléphone",
     "phoneVerified": "Téléphone vérifié",
     "phoneNotVerified": "Téléphone non vérifié",
-    "joined": "Rejoint le"
+    "joined": "Rejoint le",
+    "lastSignIn": "Dernière connexion"
   },
   "attachments": {
     "add": "Ajouter un fichier",

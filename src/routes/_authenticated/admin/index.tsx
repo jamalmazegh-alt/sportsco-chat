@@ -106,10 +106,6 @@ function AdminSettingsPage() {
 
   return (
     <div className="px-5 py-4 space-y-5">
-      <header className="flex items-center gap-2">
-        <Settings2 className="h-5 w-5 text-primary" />
-        <h1 className="text-xl font-semibold">{t("admin.title")}</h1>
-      </header>
       <p className="text-sm text-muted-foreground">{t("admin.subtitle", { club: form.name })}</p>
 
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
