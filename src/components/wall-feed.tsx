@@ -179,7 +179,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
   }
 
   if (loading) {
-    return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+    return <WallFeedSkeleton />;
   }
 
   const canPost = role === "admin" || role === "coach";
