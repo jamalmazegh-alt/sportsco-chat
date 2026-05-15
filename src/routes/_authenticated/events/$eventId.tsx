@@ -538,7 +538,7 @@ function EventDetail() {
             </span>
           ) : event.title}
         </h1>
-        <div className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+        <div className="relative mt-3 space-y-1.5 text-sm text-muted-foreground">
           <p className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             <span className="capitalize">{fmt(event.starts_at, "EEEE d MMMM · HH:mm")}</span>
