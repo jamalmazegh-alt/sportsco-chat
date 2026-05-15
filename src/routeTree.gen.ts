@@ -40,6 +40,7 @@ import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authe
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedAdminInvitesRouteImport } from './routes/_authenticated/admin/invites'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -206,6 +207,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminInvitesRoute =
+  AuthenticatedAdminInvitesRouteImport.update({
+    id: '/invites',
+    path: '/invites',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -263,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/admin/invites': typeof AuthenticatedAdminInvitesRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
@@ -299,6 +307,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/admin/invites': typeof AuthenticatedAdminInvitesRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
@@ -339,6 +348,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/_authenticated/admin/invites': typeof AuthenticatedAdminInvitesRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/admin/invites'
     | '/admin/users'
     | '/events/$eventId'
     | '/players/$playerId'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/admin/invites'
     | '/admin/users'
     | '/events/$eventId'
     | '/players/$playerId'
@@ -454,6 +466,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/_authenticated/admin/invites'
     | '/_authenticated/admin/users'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/players/$playerId'
@@ -715,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/invites': {
+      id: '/_authenticated/admin/invites'
+      path: '/invites'
+      fullPath: '/admin/invites'
+      preLoaderRoute: typeof AuthenticatedAdminInvitesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -775,11 +795,13 @@ const AuthenticatedAdminUsersRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminInvitesRoute: typeof AuthenticatedAdminInvitesRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminInvitesRoute: AuthenticatedAdminInvitesRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
@@ -875,13 +897,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
