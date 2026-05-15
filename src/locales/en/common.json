@@ -338,7 +338,12 @@
     "history": "Activity",
     "respondedAt": "Responded",
     "reminderVia": "Reminder via {{channel}}",
-    "noActivity": "No activity yet."
+    "noActivity": "No activity yet.",
+    "reasonOptional": "Reason (optional)",
+    "reasonPlaceholder": "E.g. family tournament, minor injury, unavailable…",
+    "confirmResponse": "Confirm response",
+    "responseRecorded": "Response recorded",
+    "coachNotified": "The coach has been notified."
   },
   "channels": {
     "in_app": "in-app",

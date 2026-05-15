@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,9 @@ function EventDetail() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
+  const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
+  const [respondReason, setRespondReason] = useState("");
+  const [respondSubmitting, setRespondSubmitting] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
@@ -132,12 +136,94 @@ function EventDetail() {
   }, [convocations, childrenLinks]);
 
   async function respond(convocationId: string, status: AttendanceStatus) {
+    // For "absent" or "uncertain" → ask for optional reason via dialog
+    if (status === "absent" || status === "uncertain") {
+      const existing = (convocations ?? []).find((c: any) => c.id === convocationId);
+      setRespondReason((existing as any)?.comment ?? "");
+      setRespondTarget({ id: convocationId, status });
+      return;
+    }
+    await submitResponse(convocationId, status, null);
+  }
+
+  async function notifyCoachesOfResponse(
+    convocationId: string,
+    status: "absent" | "uncertain",
+    reason: string | null
+  ) {
+    if (!event) return;
+    const conv = (convocations ?? []).find((c: any) => c.id === convocationId) as any;
+    const playerName = `${conv?.players?.first_name ?? ""} ${conv?.players?.last_name ?? ""}`.trim() || "Un joueur";
+
+    // Find coaches/admins of this team
+    const { data: coaches } = await supabase
+      .from("team_members")
+      .select("user_id")
+      .eq("team_id", event.team_id)
+      .in("role", ["coach", "admin"]);
+    const coachIds = Array.from(
+      new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
+    );
+
+    if (coachIds.length > 0) {
+      // In-app notifications
+      await supabase.from("notifications").insert(
+        coachIds.map((uid) => ({
+          user_id: uid,
+          type: "convocation_response",
+          title: `${playerName} : ${t(`attendance.${status}`)}`,
+          body: reason ? `${event.title} — "${reason}"` : event.title,
+          link: `/events/${event.id}`,
+        }))
+      );
+    }
+
+    // Email notifications via server function (looks up coach emails server-side)
+    try {
+      const { notifyCoachesEmail } = await import("@/lib/convocation-notify.functions");
+      await notifyCoachesEmail({ data: { convocationId } });
+    } catch {
+      // best-effort, non-blocking
+    }
+  }
+
+  async function submitResponse(
+    convocationId: string,
+    status: AttendanceStatus,
+    reason: string | null
+  ) {
     const { error } = await supabase
       .from("convocations")
-      .update({ status, responded_at: new Date().toISOString() })
+      .update({
+        status,
+        comment: reason && reason.trim() ? reason.trim() : null,
+        responded_at: new Date().toISOString(),
+      })
       .eq("id", convocationId);
-    if (error) toast.error(error.message);
-    else refetch();
+    if (error) {
+      toast.error(error.message);
+      return false;
+    }
+    refetch();
+    if (status === "absent" || status === "uncertain") {
+      // fire-and-forget
+      notifyCoachesOfResponse(convocationId, status, reason && reason.trim() ? reason.trim() : null).catch(
+        () => {}
+      );
+    }
+    return true;
+  }
+
+  async function confirmRespond() {
+    if (!respondTarget) return;
+    setRespondSubmitting(true);
+    const ok = await submitResponse(respondTarget.id, respondTarget.status, respondReason);
+    setRespondSubmitting(false);
+    if (ok) {
+      toast.success(t("attendance.responseRecorded"));
+      setRespondTarget(null);
+      setRespondReason("");
+    }
   }
 
   async function confirmCancelConvocation() {
@@ -703,6 +789,49 @@ function EventDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={!!respondTarget}
+        onOpenChange={(o) => {
+          if (!o) {
+            setRespondTarget(null);
+            setRespondReason("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {respondTarget ? t(`attendance.${respondTarget.status}`) : ""}
+            </DialogTitle>
+            <DialogDescription>
+              {t("attendance.reasonOptional")}
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={respondReason}
+            onChange={(e) => setRespondReason(e.target.value)}
+            placeholder={t("attendance.reasonPlaceholder")}
+            rows={3}
+            maxLength={500}
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRespondTarget(null);
+                setRespondReason("");
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={confirmRespond} disabled={respondSubmitting}>
+              {respondSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {t("attendance.confirmResponse")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <EventChat eventId={eventId} />
     </div>
