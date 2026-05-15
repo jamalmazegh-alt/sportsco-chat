@@ -108,6 +108,22 @@ function AdminSettingsPage() {
     <div className="px-5 py-4 space-y-5">
       <p className="text-sm text-muted-foreground">{t("admin.subtitle", { club: form.name })}</p>
 
+      <Link
+        to="/admin/billing"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:border-primary transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <CreditCard className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="font-semibold">Abonnement</p>
+            <p className="text-xs text-muted-foreground">Gérer le plan Clubero du club</p>
+          </div>
+        </div>
+        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+      </Link>
+
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <div>
           <Label className="text-base">{t("admin.convocationChannels")}</Label>
