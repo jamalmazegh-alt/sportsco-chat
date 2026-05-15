@@ -431,7 +431,10 @@
     },
     "goal": "But",
     "penalty": "Penalty",
-    "ownGoal": "But contre son camp"
+    "ownGoal": "But contre son camp",
+    "win": "Victoire",
+    "loss": "Défaite",
+    "draw": "Nul"
   },
   "channels": {
     "in_app": "in-app",

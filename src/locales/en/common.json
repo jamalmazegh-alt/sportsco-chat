@@ -431,7 +431,10 @@
     },
     "goal": "Goal",
     "penalty": "Penalty",
-    "ownGoal": "Own goal"
+    "ownGoal": "Own goal",
+    "win": "Win",
+    "loss": "Loss",
+    "draw": "Draw"
   },
   "channels": {
     "in_app": "in-app",
