@@ -291,6 +291,23 @@ function WallGrouped({
               <AttachmentList items={p.attachments as Attachment[]} />
             </div>
           )}
+          {(p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
+            memberCount > 0 && (() => {
+              // Exclude the post author from the denominator: they don't need to "read" their own post
+              const denom = Math.max(memberCount - 1, 0);
+              const readers = (p.reads ?? []).filter((r) => r.user_id !== p.author_user_id).length;
+              const capped = Math.min(readers, denom);
+              return (
+                <p className="mt-2 text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  {t("wall.readBy", {
+                    defaultValue: "Lu par {{n}}/{{total}}",
+                    n: capped,
+                    total: denom,
+                  })}
+                </p>
+              );
+            })()}
           {commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} />
           )}
