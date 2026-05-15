@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MatchResultCard } from "@/components/match-result-card";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { sendTransactionalEmail } from "@/lib/email/send";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -262,18 +263,20 @@ function EventDetail() {
       return;
     }
     setSending(true);
-    const { error: convocationError } = await supabase.from("convocations").insert(
-      toInsert.map((pid) => ({ event_id: event.id, player_id: pid }))
-    );
+    // Insert convocations and get back their tokens
+    const { data: insertedConvs, error: convocationError } = await supabase
+      .from("convocations")
+      .insert(toInsert.map((pid) => ({ event_id: event.id, player_id: pid })))
+      .select("id, player_id, response_token");
     if (convocationError) {
       setSending(false);
       toast.error(convocationError.message);
       return;
     }
-    // notify
+    // notify in-app
     const { data: parents } = await supabase
       .from("player_parents")
-      .select("parent_user_id")
+      .select("parent_user_id, email, full_name, player_id")
       .in("player_id", toInsert);
     const playerUserIds = (teamPlayers ?? [])
       .filter((tp: any) => toInsert.includes(tp.player_id))
@@ -297,6 +300,77 @@ function EventDetail() {
       );
       if (notificationError) toast.error(notificationError.message);
     }
+
+    // 1-tap email invitations to player + parents (best-effort, non-blocking)
+    try {
+      const { data: playersInfo } = await supabase
+        .from("players")
+        .select("id, first_name, last_name, email")
+        .in("id", toInsert);
+      const { data: clubRow } = event.team_id
+        ? await supabase
+            .from("teams")
+            .select("name, clubs:club_id(name, logo_url)")
+            .eq("id", event.team_id)
+            .maybeSingle()
+        : { data: null };
+      const teamName = (clubRow as any)?.name as string | undefined;
+      const clubName = (clubRow as any)?.clubs?.name as string | undefined;
+      const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+      const sendOne = async (
+        token: string,
+        toEmail: string,
+        recipientFirstName: string | undefined,
+        playerName: string,
+        idemSuffix: string,
+      ) =>
+        sendTransactionalEmail({
+          templateName: "convocation-invite",
+          recipientEmail: toEmail,
+          fromName: `${clubName ?? "Clubero"} via Clubero`,
+          idempotencyKey: `convoc-invite-${event.id}-${idemSuffix}`,
+          templateData: {
+            recipientFirstName,
+            playerName,
+            eventTitle: event.title,
+            eventType: event.type,
+            eventDate: eventDateLabel,
+            eventLocation: event.location ?? undefined,
+            teamName,
+            clubName,
+            clubLogoUrl,
+            respondUrl: `${origin}/r/${token}`,
+          },
+        });
+
+      const sends: Promise<unknown>[] = [];
+      for (const conv of insertedConvs ?? []) {
+        const player = (playersInfo ?? []).find((p: any) => p.id === conv.player_id) as any;
+        if (!player) continue;
+        const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
+        // Player email
+        if (player.email) {
+          sends.push(
+            sendOne(conv.response_token!, player.email, player.first_name ?? undefined, playerName, `p-${conv.id}`).catch(() => undefined),
+          );
+        }
+        // Parent emails
+        for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
+          if (!parent.email) continue;
+          const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          sends.push(
+            sendOne(conv.response_token!, parent.email, parentFirst, playerName, `parent-${parent.player_id}-${conv.id}`).catch(() => undefined),
+          );
+        }
+      }
+      await Promise.allSettled(sends);
+    } catch {
+      // best-effort: in-app notif already sent
+    }
+
     if (!event.convocations_sent) {
       const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
       if (sentError) {

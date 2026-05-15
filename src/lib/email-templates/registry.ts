@@ -19,8 +19,10 @@ export interface TemplateEntry {
  */
 import { template as playerInviteTemplate } from './player-invite'
 import { template as convocationResponseTemplate } from './convocation-response'
+import { template as convocationInviteTemplate } from './convocation-invite'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'player-invite': playerInviteTemplate,
   'convocation-response': convocationResponseTemplate,
+  'convocation-invite': convocationInviteTemplate,
 }
