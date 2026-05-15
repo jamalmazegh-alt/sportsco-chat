@@ -11,6 +11,12 @@ interface Props {
   eventType?: string;
   eventDate?: string;
   eventLocation?: string;
+  locationMapsUrl?: string;
+  meetingPoint?: string;
+  meetingPointMapsUrl?: string;
+  competitionName?: string;
+  coachName?: string;
+  squadList?: string[];
   teamName?: string;
   clubName?: string;
   clubLogoUrl?: string;
@@ -24,6 +30,12 @@ const ConvocationInviteEmail = ({
   eventType,
   eventDate,
   eventLocation,
+  locationMapsUrl,
+  meetingPoint,
+  meetingPointMapsUrl,
+  competitionName,
+  coachName,
+  squadList,
   teamName,
   clubName,
   clubLogoUrl,
@@ -60,10 +72,29 @@ const ConvocationInviteEmail = ({
         </Text>
 
         <Section style={card}>
-          <Text style={cardKicker}>{eventType?.toUpperCase() ?? "ÉVÉNEMENT"}</Text>
+          <Text style={cardKicker}>
+            {(eventType?.toUpperCase() ?? "ÉVÉNEMENT")}
+            {competitionName ? ` · ${competitionName}` : ""}
+          </Text>
           <Text style={cardTitle}>{eventTitle}</Text>
           {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
-          {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
+          {eventLocation ? (
+            <Text style={cardMeta}>
+              📍 {eventLocation}
+              {locationMapsUrl ? (
+                <> — <a href={locationMapsUrl} style={mapsLink}>Voir sur Maps</a></>
+              ) : null}
+            </Text>
+          ) : null}
+          {meetingPoint ? (
+            <Text style={cardMeta}>
+              🚌 RDV : {meetingPoint}
+              {meetingPointMapsUrl ? (
+                <> — <a href={meetingPointMapsUrl} style={mapsLink}>Maps</a></>
+              ) : null}
+            </Text>
+          ) : null}
+          {coachName ? <Text style={cardMeta}>👤 Coach : {coachName}</Text> : null}
         </Section>
 
         <Text style={text}>Répondez en un clic :</Text>
@@ -87,6 +118,15 @@ const ConvocationInviteEmail = ({
             </Column>
           </Row>
         </Section>
+
+        {squadList && squadList.length > 0 ? (
+          <Section style={squadCard}>
+            <Text style={squadTitle}>
+              Joueurs convoqués ({squadList.length})
+            </Text>
+            <Text style={squadText}>{squadList.join(" · ")}</Text>
+          </Section>
+        ) : null}
 
         <Text style={smallText}>
           Pas besoin de vous connecter — votre réponse est enregistrée automatiquement et
@@ -113,6 +153,12 @@ export const template = {
     eventType: "Match",
     eventDate: "samedi 24 mai à 15h00",
     eventLocation: "Stade Municipal, Paris",
+    locationMapsUrl: "https://www.google.com/maps/search/?api=1&query=Stade+Municipal+Paris",
+    meetingPoint: "Parking du club à 14h",
+    meetingPointMapsUrl: "https://www.google.com/maps/search/?api=1&query=Parking+du+club",
+    competitionName: "Championnat U13",
+    coachName: "Marc Lefèvre",
+    squadList: ["Léo Dupont", "Hugo Martin", "Nathan Bernard", "Théo Petit"],
     teamName: "U13 Garçons",
     clubName: "AS Clubero",
     respondUrl: "https://app.clubero.app/r/sample-token",
@@ -154,3 +200,12 @@ const btnPresent = { ...btnBase, backgroundColor: "#16a34a", color: "#ffffff" };
 const btnUncertain = { ...btnBase, backgroundColor: "#f59e0b", color: "#ffffff" };
 const btnAbsent = { ...btnBase, backgroundColor: "#dc2626", color: "#ffffff" };
 const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0", textAlign: "center" as const };
+const mapsLink = { color: "#0ea5e9", textDecoration: "underline" };
+const squadCard = {
+  backgroundColor: "#f1f5f9",
+  borderRadius: "10px",
+  padding: "12px 14px",
+  margin: "0 0 16px",
+};
+const squadTitle = { fontSize: "12px", fontWeight: "bold" as const, color: "#475569", margin: "0 0 6px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
+const squadText = { fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: 0 };
