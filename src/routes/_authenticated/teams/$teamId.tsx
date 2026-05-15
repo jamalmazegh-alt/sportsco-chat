@@ -718,3 +718,21 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
   );
 }
 
+function CollapsibleTeamStats({ teamId }: { teamId: string }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/40"
+      >
+        <span>{t("stats.showAttendance", { defaultValue: "Voir les statistiques de présence" })}</span>
+        <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />
+      </button>
+      {open && <div className="px-3 pb-3"><TeamAttendanceStats teamId={teamId} /></div>}
+    </div>
+  );
+}
+
