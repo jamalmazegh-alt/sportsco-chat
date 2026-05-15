@@ -168,18 +168,28 @@ function BillingPage() {
           )}
         </div>
 
-        {sub?.current_period_end && (
-          <div className="text-sm text-muted-foreground">
-            {sub.cancel_at_period_end ? (
-              <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+        {(() => {
+          const cancelDate =
+            (sub as any)?.cancel_at ?? sub?.current_period_end ?? sub?.trial_end ?? null;
+          const scheduledCancel =
+            sub && (sub.cancel_at_period_end || (sub as any).cancel_at);
+          if (scheduledCancel && cancelDate) {
+            return (
+              <div className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
                 <AlertCircle className="h-4 w-4" />
-                Se termine le {new Date(sub.current_period_end).toLocaleDateString("fr-FR")}
-              </span>
-            ) : (
-              <>Prochain renouvellement le {new Date(sub.current_period_end).toLocaleDateString("fr-FR")}</>
-            )}
-          </div>
-        )}
+                Résilié — prend fin le {new Date(cancelDate).toLocaleDateString("fr-FR")} (pas de renouvellement)
+              </div>
+            );
+          }
+          if (sub?.current_period_end) {
+            return (
+              <div className="text-sm text-muted-foreground">
+                Prochain renouvellement le {new Date(sub.current_period_end).toLocaleDateString("fr-FR")}
+              </div>
+            );
+          }
+          return null;
+        })()}
 
         {isActive && (
           <Button onClick={openPortal} variant="outline" disabled={busy === "portal"} className="w-full">
