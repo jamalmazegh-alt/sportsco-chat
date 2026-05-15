@@ -145,6 +145,9 @@ function HomePage() {
         />
       )}
 
+      {/* KPIs strip (admins/coaches) */}
+      {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
+
       {/* Quick actions */}
       {isCoach && (
         <div className="flex gap-2">
