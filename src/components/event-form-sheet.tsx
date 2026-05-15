@@ -524,6 +524,37 @@ export function EventFormSheet({
     };
 
     if (mode === "create") {
+      const shouldRepeat = type === "training" && repeatWeeks > 1;
+      if (shouldRepeat) {
+        const rows = [] as typeof payload[];
+        for (let i = 0; i < repeatWeeks; i++) {
+          const offsetMs = i * 7 * 24 * 60 * 60 * 1000;
+          const shifted = {
+            ...payload,
+            starts_at: new Date(new Date(payload.starts_at).getTime() + offsetMs).toISOString(),
+            ends_at: payload.ends_at
+              ? new Date(new Date(payload.ends_at).getTime() + offsetMs).toISOString()
+              : null,
+            convocation_time: payload.convocation_time
+              ? new Date(new Date(payload.convocation_time).getTime() + offsetMs).toISOString()
+              : null,
+          };
+          rows.push(shifted);
+        }
+        const { data, error } = await supabase
+          .from("events")
+          .insert(rows.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })))
+          .select("id");
+        setBusy(false);
+        if (error || !data || data.length === 0) {
+          toast.error(error?.message ?? "Failed");
+          return;
+        }
+        toast.success(t("events.repeatCreated", { count: data.length }));
+        onOpenChange(false);
+        onSaved(data[0].id);
+        return;
+      }
       const { data, error } = await supabase
         .from("events")
         .insert({ ...payload, status: "published", created_by: userId, convocations_sent: false })
