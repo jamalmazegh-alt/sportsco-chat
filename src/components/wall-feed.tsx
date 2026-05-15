@@ -44,8 +44,9 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at, attachments")
+      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments")
       .eq("club_id", clubId)
+      .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
     // Dedupe by id (realtime + initial fetch sometimes overlap)
