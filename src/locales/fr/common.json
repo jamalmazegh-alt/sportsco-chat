@@ -309,7 +309,8 @@
     "repeatWeekly": "Chaque semaine",
     "repeatWeeks": "Pendant {{count}} semaines",
     "repeatHint": "Crée automatiquement les séances suivantes à la même heure.",
-    "repeatCreated": "{{count}} entraînements créés"
+    "repeatCreated": "{{count}} entraînements créés",
+    "openMeetingInMaps": "Ouvrir dans Maps"
   },
   "followUps": {
     "title": "À relancer",
@@ -360,7 +361,22 @@
     "pendingCount": "{{count}} joueur n'a pas encore répondu",
     "pendingCount_plural": "{{count}} joueurs n'ont pas encore répondu",
     "remindAllSent": "{{count}} relance envoyée",
-    "remindAllSent_plural": "{{count}} relances envoyées"
+    "remindAllSent_plural": "{{count}} relances envoyées",
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
+    "suggestedReasons": "Suggestions"
   },
   "stats": {
     "title": "Statistiques",
@@ -443,7 +459,15 @@
     "verify": "Vérifier",
     "verifyNewNumber": "Vérifier le nouveau numéro",
     "codeSent": "Code de vérification envoyé.",
-    "phoneVerified": "Téléphone vérifié."
+    "phoneVerified": "Téléphone vérifié.",
+    "visitWebsite": "Site Clubero",
+    "visitWebsiteSubtitle": "Découvrir les fonctionnalités et tarifs",
+    "legalDocs": "Mentions légales et CGU",
+    "legalDocsSubtitle": "Conditions, confidentialité et autres documents",
+    "legalTerms": "Conditions générales d'utilisation",
+    "legalPrivacy": "Politique de confidentialité",
+    "legalNotice": "Mentions légales",
+    "legalDataProcessing": "Traitement des données"
   },
   "admin": {
     "title": "Paramètres du club",

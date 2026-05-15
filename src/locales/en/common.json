@@ -309,7 +309,8 @@
     "repeatWeekly": "Every week",
     "repeatWeeks": "For {{count}} weeks",
     "repeatHint": "Automatically creates the following sessions at the same time.",
-    "repeatCreated": "{{count}} trainings created"
+    "repeatCreated": "{{count}} trainings created",
+    "openMeetingInMaps": "Open in Maps"
   },
   "followUps": {
     "title": "Follow-ups",
@@ -360,7 +361,22 @@
     "pendingCount": "{{count}} player hasn't replied yet",
     "pendingCount_plural": "{{count}} players haven't replied yet",
     "remindAllSent": "{{count}} reminder sent",
-    "remindAllSent_plural": "{{count}} reminders sent"
+    "remindAllSent_plural": "{{count}} reminders sent",
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
+    "suggestedReasons": "Suggestions"
   },
   "stats": {
     "title": "Stats",
@@ -443,7 +459,15 @@
     "verify": "Verify",
     "verifyNewNumber": "Verify new number",
     "codeSent": "Verification code sent.",
-    "phoneVerified": "Phone verified."
+    "phoneVerified": "Phone verified.",
+    "visitWebsite": "Clubero website",
+    "visitWebsiteSubtitle": "Discover features and pricing",
+    "legalDocs": "Legal & terms",
+    "legalDocsSubtitle": "Terms, privacy and other documents",
+    "legalTerms": "Terms of service",
+    "legalPrivacy": "Privacy policy",
+    "legalNotice": "Legal notice",
+    "legalDataProcessing": "Data processing"
   },
   "admin": {
     "title": "Club settings",

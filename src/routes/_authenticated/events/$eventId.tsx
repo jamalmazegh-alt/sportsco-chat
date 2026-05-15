@@ -580,10 +580,22 @@ function EventDetail() {
             </div>
           )}
           {event.type === "match" && event.is_home === false && event.meeting_point && (
-            <p className="flex items-center gap-2">
-              <Plane className="h-4 w-4" />
-              {t("events.meetingPoint")}: {event.meeting_point}
-            </p>
+            <div className="flex items-start gap-2 flex-wrap">
+              <Plane className="h-4 w-4 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p>
+                  <span className="font-medium">{t("events.meetingPoint")}:</span> {event.meeting_point}
+                </p>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary"
+                >
+                  {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
           )}
           {event.description && <p className="pt-2 text-foreground">{event.description}</p>}
           {(() => {
@@ -976,6 +988,34 @@ function EventDetail() {
               {t("attendance.reasonOptional")}
             </DialogDescription>
           </DialogHeader>
+          {respondTarget && (() => {
+            const presetsKey =
+              respondTarget.status === "absent"
+                ? "attendance.reasonsAbsent"
+                : "attendance.reasonsUncertain";
+            const presets = (t(presetsKey, { returnObjects: true }) as unknown);
+            const list = Array.isArray(presets) ? (presets as string[]) : [];
+            if (list.length === 0) return null;
+            return (
+              <div className="flex flex-wrap gap-1.5 -mb-1">
+                {list.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setRespondReason(p)}
+                    className={cn(
+                      "text-xs rounded-full border px-2.5 py-1 transition-colors",
+                      respondReason === p
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/40",
+                    )}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
           <Textarea
             value={respondReason}
             onChange={(e) => setRespondReason(e.target.value)}

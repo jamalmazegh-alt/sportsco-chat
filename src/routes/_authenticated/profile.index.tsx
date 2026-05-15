@@ -9,11 +9,12 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
 import { cn } from "@/lib/utils";
+import { LegalDialog } from "@/components/legal-dialog";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
@@ -28,6 +29,9 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();
+  const [legalKind, setLegalKind] = useState<
+    null | "terms" | "privacy" | "legal_notice" | "data_processing"
+  >(null);
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
@@ -158,13 +162,33 @@ function ProfilePage() {
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
-          <Select value={i18n.language?.slice(0, 2) ?? "en"} onValueChange={setLang}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="en">{t("profile.english")}</SelectItem>
-              <SelectItem value="fr">{t("profile.french")}</SelectItem>
-            </SelectContent>
-          </Select>
+          <div role="radiogroup" className="grid grid-cols-2 gap-2">
+            {([
+              { value: "fr", label: "Français", flag: "🇫🇷" },
+              { value: "en", label: "English", flag: "🇬🇧" },
+            ] as const).map((opt) => {
+              const current = i18n.language?.slice(0, 2) ?? "fr";
+              const active = current === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setLang(opt.value)}
+                  className={cn(
+                    "flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-colors",
+                    active
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-background text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <span className="text-base">{opt.flag}</span>
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-1.5">
@@ -245,6 +269,48 @@ function ProfilePage() {
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </Link>
 
+      <div className="rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
+        <div className="p-4 flex items-center gap-3">
+          <FileText className="h-5 w-5 text-primary shrink-0" />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium">{t("profile.legalDocs")}</div>
+            <p className="text-xs text-muted-foreground">{t("profile.legalDocsSubtitle")}</p>
+          </div>
+        </div>
+        {([
+          { kind: "terms" as const, label: t("profile.legalTerms") },
+          { kind: "privacy" as const, label: t("profile.legalPrivacy") },
+          { kind: "legal_notice" as const, label: t("profile.legalNotice") },
+          { kind: "data_processing" as const, label: t("profile.legalDataProcessing") },
+        ]).map((item) => (
+          <button
+            key={item.kind}
+            type="button"
+            onClick={() => setLegalKind(item.kind)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-accent/30 transition-colors text-left"
+          >
+            <span className="text-foreground/90">{item.label}</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+        ))}
+      </div>
+
+      <a
+        href="https://clubero.app"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <ExternalLink className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("profile.visitWebsite")}</div>
+            <p className="text-xs text-muted-foreground">{t("profile.visitWebsiteSubtitle")}</p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </a>
+
       <Button
         variant="outline"
         className="w-full h-11"
@@ -256,6 +322,12 @@ function ProfilePage() {
         <LogOut className="h-4 w-4" />
         {t("auth.logout")}
       </Button>
+
+      <LegalDialog
+        open={!!legalKind}
+        onOpenChange={(o) => !o && setLegalKind(null)}
+        kind={legalKind}
+      />
     </div>
   );
 }
