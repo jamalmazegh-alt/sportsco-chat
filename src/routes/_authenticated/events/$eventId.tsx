@@ -324,6 +324,53 @@ function EventDetail() {
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
+      // Coach (first admin/coach) for the team — best-effort
+      let coachName: string | undefined;
+      try {
+        const { data: coachRows } = await supabase
+          .from("team_members")
+          .select("user_id, role")
+          .eq("team_id", event.team_id)
+          .in("role", ["coach", "admin"])
+          .limit(1);
+        const coachUserId = coachRows?.[0]?.user_id;
+        if (coachUserId) {
+          const { data: coachProfile } = await supabase
+            .from("profiles")
+            .select("full_name, first_name, last_name")
+            .eq("id", coachUserId)
+            .maybeSingle();
+          coachName =
+            (coachProfile as any)?.full_name ||
+            [(coachProfile as any)?.first_name, (coachProfile as any)?.last_name]
+              .filter(Boolean)
+              .join(" ") ||
+            undefined;
+        }
+      } catch {
+        // ignore
+      }
+
+      // Full squad list (names of all newly convoked players)
+      const squadList = toInsert
+        .map((pid) => {
+          const p = (playersInfo ?? []).find((pp: any) => pp.id === pid) as any;
+          return p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() : "";
+        })
+        .filter(Boolean);
+
+      const competitionLabel = (event as any).competition_name
+        || ((event as any).competition_type
+          ? t(`events.competitionTypes.${(event as any).competition_type}`)
+          : undefined);
+
+      const locationMapsUrl = event.location
+        ? (event.location_url ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
+        : undefined;
+      const meetingPointMapsUrl = (event as any).meeting_point
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
+        : undefined;
+
       const sendOne = async (
         token: string,
         toEmail: string,
@@ -343,6 +390,12 @@ function EventDetail() {
             eventType: event.type,
             eventDate: eventDateLabel,
             eventLocation: event.location ?? undefined,
+            locationMapsUrl,
+            meetingPoint: (event as any).meeting_point ?? undefined,
+            meetingPointMapsUrl,
+            competitionName: competitionLabel,
+            coachName,
+            squadList,
             teamName,
             clubName,
             clubLogoUrl,
