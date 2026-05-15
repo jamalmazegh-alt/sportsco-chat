@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
+import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/events")({
