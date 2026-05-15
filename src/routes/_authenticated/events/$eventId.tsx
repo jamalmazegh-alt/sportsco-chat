@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MatchResultCard } from "@/components/match-result-card";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { sendTransactionalEmail } from "@/lib/email/send";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
