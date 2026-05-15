@@ -269,6 +269,48 @@ function ProfilePage() {
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </Link>
 
+      <div className="rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
+        <div className="p-4 flex items-center gap-3">
+          <FileText className="h-5 w-5 text-primary shrink-0" />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium">{t("profile.legalDocs")}</div>
+            <p className="text-xs text-muted-foreground">{t("profile.legalDocsSubtitle")}</p>
+          </div>
+        </div>
+        {([
+          { kind: "terms" as const, label: t("profile.legalTerms") },
+          { kind: "privacy" as const, label: t("profile.legalPrivacy") },
+          { kind: "legal_notice" as const, label: t("profile.legalNotice") },
+          { kind: "data_processing" as const, label: t("profile.legalDataProcessing") },
+        ]).map((item) => (
+          <button
+            key={item.kind}
+            type="button"
+            onClick={() => setLegalKind(item.kind)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-accent/30 transition-colors text-left"
+          >
+            <span className="text-foreground/90">{item.label}</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+        ))}
+      </div>
+
+      <a
+        href="https://clubero.app"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <ExternalLink className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("profile.visitWebsite")}</div>
+            <p className="text-xs text-muted-foreground">{t("profile.visitWebsiteSubtitle")}</p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </a>
+
       <Button
         variant="outline"
         className="w-full h-11"
@@ -280,6 +322,12 @@ function ProfilePage() {
         <LogOut className="h-4 w-4" />
         {t("auth.logout")}
       </Button>
+
+      <LegalDialog
+        open={!!legalKind}
+        onOpenChange={(o) => !o && setLegalKind(null)}
+        kind={legalKind}
+      />
     </div>
   );
 }
