@@ -358,7 +358,17 @@ function EventDetail() {
   async function remindAllPending() {
     if (!convocations) return;
     const pending = convocations.filter((c) => c.status === "pending");
-    for (const c of pending) await remind(c.id);
+    if (pending.length === 0) return;
+    let sent = 0;
+    for (const c of pending) {
+      try {
+        await remind(c.id);
+        sent += 1;
+      } catch {
+        // best-effort
+      }
+    }
+    if (sent > 0) toast.success(t("attendance.remindAllSent", { count: sent }));
   }
 
   async function toggleLock() {
