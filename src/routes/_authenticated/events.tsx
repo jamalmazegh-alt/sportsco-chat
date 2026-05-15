@@ -41,6 +41,19 @@ function EventsPage() {
   const [showPast, setShowPast] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
+  const { data: club } = useQuery({
+    queryKey: ["club", activeClubId],
+    enabled: !!activeClubId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("clubs")
+        .select("id, name, logo_url")
+        .eq("id", activeClubId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const { data: teams } = useQuery({
     queryKey: ["teams", activeClubId],
     enabled: !!activeClubId,
