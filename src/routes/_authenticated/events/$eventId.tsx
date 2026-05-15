@@ -44,6 +44,9 @@ function EventDetail() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
+  const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
+  const [respondReason, setRespondReason] = useState("");
+  const [respondSubmitting, setRespondSubmitting] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
