@@ -721,6 +721,17 @@ function EventDetail() {
             </div>
           )}
 
+          {isCoach && counts.pending > 0 && (
+            <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
+              <p className="text-xs font-medium text-pending-foreground">
+                {t("attendance.pendingCount", { count: counts.pending })}
+              </p>
+              <Button size="sm" className="h-8" onClick={remindAllPending}>
+                <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
+              </Button>
+            </div>
+          )}
+
           {convocations && convocations.length === 0 ? (
             <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
               {t("attendance.noConvokedPlayers")}
