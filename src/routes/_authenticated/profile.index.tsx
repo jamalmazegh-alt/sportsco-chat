@@ -162,13 +162,33 @@ function ProfilePage() {
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
-          <Select value={i18n.language?.slice(0, 2) ?? "en"} onValueChange={setLang}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="en">{t("profile.english")}</SelectItem>
-              <SelectItem value="fr">{t("profile.french")}</SelectItem>
-            </SelectContent>
-          </Select>
+          <div role="radiogroup" className="grid grid-cols-2 gap-2">
+            {([
+              { value: "fr", label: "Français", flag: "🇫🇷" },
+              { value: "en", label: "English", flag: "🇬🇧" },
+            ] as const).map((opt) => {
+              const current = i18n.language?.slice(0, 2) ?? "fr";
+              const active = current === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setLang(opt.value)}
+                  className={cn(
+                    "flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-colors",
+                    active
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-background text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <span className="text-base">{opt.flag}</span>
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="space-y-1.5">
