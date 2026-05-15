@@ -7,7 +7,7 @@ import { fr, enUS } from "date-fns/locale";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing } from "lucide-react";
+import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
@@ -323,6 +323,17 @@ function EventsPage() {
                                 e.competition_type === "cup" && "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
                               )}>
                                 {t(`events.competitionTypes.${e.competition_type}`)}
+                              </span>
+                            )}
+                            {e.type === "match" && e.is_home !== null && e.is_home !== undefined && (
+                              <span className={cn(
+                                "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
+                                e.is_home
+                                  ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
+                                  : "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300"
+                              )}>
+                                {e.is_home ? <Home className="h-3 w-3" /> : <Plane className="h-3 w-3" />}
+                                {e.is_home ? t("events.home") : t("events.away")}
                               </span>
                             )}
                             {e.type === "match" && e.competition_name && (
