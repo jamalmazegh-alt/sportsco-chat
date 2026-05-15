@@ -249,6 +249,14 @@ function EventsPage() {
                   const Icon = TYPE_ICONS[e.type] ?? Calendar;
                   const d = new Date(e.starts_at);
                   const past = isPast(d) && !isToday(d);
+                  let outcome: "win" | "loss" | "draw" | null = null;
+                  if (e.type === "match" && e.result) {
+                    const ourSide = e.is_home === false ? "away" : "home";
+                    const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
+                    const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
+                    outcome = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
+                  }
+                  const isLoss = outcome === "loss";
                   return (
                     <li key={e.id}>
                       <Link
@@ -256,13 +264,17 @@ function EventsPage() {
                         params={{ eventId: e.id }}
                         className={cn(
                           "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden active:scale-[0.99] transition-transform",
-                          past ? "border-border/60 opacity-70" : "border-border hover:border-primary/40",
+                          isLoss
+                            ? "border-defeat/50 bg-defeat/5 hover:border-defeat/70"
+                            : past
+                              ? "border-border/60 opacity-70"
+                              : "border-border hover:border-primary/40",
                         )}
                       >
                         {/* Date block */}
                         <div className={cn(
                           "flex flex-col items-center justify-center w-16 shrink-0 py-3",
-                          past ? "bg-muted/40" : "bg-primary/8",
+                          isLoss ? "bg-defeat/15" : past ? "bg-muted/40" : "bg-primary/8",
                         )}>
                           <span className={cn(
                             "text-[10px] font-semibold uppercase tracking-wider",
