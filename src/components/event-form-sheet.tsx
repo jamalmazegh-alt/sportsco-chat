@@ -425,6 +425,8 @@ export function EventFormSheet({
   const [convocDate, setConvocDate] = useState<Date | undefined>(convocInit.date);
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
+  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
+
   const [busy, setBusy] = useState(false);
   const selectedTeam = teams.find((tm) => tm.id === teamId);
   const availableCompetitionTypes = useMemo(() => competitionOptions(selectedTeam), [selectedTeam]);
