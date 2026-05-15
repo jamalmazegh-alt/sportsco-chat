@@ -445,5 +445,15 @@
     "placeholder": "Type a message…",
     "disabled": "Chat is disabled for this event.",
     "you": "You"
+  },
+  "assistant": {
+    "title": "Clubero Assistant",
+    "subtitle": "Ask anything about the app or your data",
+    "emptyTitle": "How can I help?",
+    "emptyHint": "I know your club, teams, and upcoming events.",
+    "placeholder": "Ask your question...",
+    "thinking": "Thinking...",
+    "error": "Something went wrong.",
+    "open": "Open assistant"
   }
 }

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
+import { AssistantFab } from "@/components/assistant-fab";
 import { ConsentGate } from "@/components/consent-gate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,6 +54,7 @@ function AuthLayout() {
           </div>
           <Outlet />
         </div>
+        <AssistantFab />
         <BottomNav />
       </div>
     </ConsentGate>

@@ -445,5 +445,15 @@
     "placeholder": "Écrivez un message…",
     "disabled": "Le chat est désactivé pour cet événement.",
     "you": "Vous"
+  },
+  "assistant": {
+    "title": "Assistant Clubero",
+    "subtitle": "Pose une question sur l'app ou tes données",
+    "emptyTitle": "Comment puis-je t'aider ?",
+    "emptyHint": "Je connais ton club, tes équipes et tes prochains événements.",
+    "placeholder": "Pose ta question...",
+    "thinking": "Réflexion...",
+    "error": "Une erreur est survenue.",
+    "open": "Ouvrir l'assistant"
   }
 }
