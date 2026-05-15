@@ -5,10 +5,12 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
+import { bootstrapTheme } from "@/lib/use-theme";
 
 import appCss from "../styles.css?url";
 
@@ -77,6 +79,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    bootstrapTheme();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

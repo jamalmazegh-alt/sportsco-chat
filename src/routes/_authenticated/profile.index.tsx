@@ -9,9 +9,11 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { useTheme, type ThemeMode } from "@/lib/use-theme";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
@@ -25,6 +27,7 @@ function ProfilePage() {
   const isAdmin = role === "admin";
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const { mode: themeMode, setTheme } = useTheme();
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
@@ -162,6 +165,40 @@ function ProfilePage() {
               <SelectItem value="fr">{t("profile.french")}</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>{t("profile.theme", { defaultValue: "Apparence" })}</Label>
+          <div role="radiogroup" className="grid grid-cols-3 gap-2">
+            {(
+              [
+                { value: "light", icon: Sun, label: t("profile.themeLight", { defaultValue: "Clair" }) },
+                { value: "dark", icon: Moon, label: t("profile.themeDark", { defaultValue: "Sombre" }) },
+                { value: "system", icon: Monitor, label: t("profile.themeSystem", { defaultValue: "Auto" }) },
+              ] as { value: ThemeMode; icon: typeof Sun; label: string }[]
+            ).map((opt) => {
+              const Icon = opt.icon;
+              const active = themeMode === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setTheme(opt.value)}
+                  className={cn(
+                    "flex flex-col items-center gap-1 rounded-xl border p-3 text-xs font-medium transition-colors",
+                    active
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-background text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {memberships.length > 1 && (
