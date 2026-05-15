@@ -23,6 +23,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
@@ -111,6 +112,11 @@ const LegalKindRoute = LegalKindRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -274,6 +281,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -311,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/profile'
     | '/teams'
+    | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
     | '/admin/users'
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/inbox'
     | '/teams'
+    | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
     | '/admin/users'
@@ -417,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox'
     | '/_authenticated/profile'
     | '/_authenticated/teams'
+    | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
     | '/_authenticated/admin/users'
@@ -448,6 +460,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   LegalKindRoute: typeof LegalKindRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/teams': {
@@ -800,6 +820,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   LegalKindRoute: LegalKindRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
@@ -812,13 +833,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
