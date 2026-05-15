@@ -21,6 +21,7 @@ import {
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { MatchResultCard } from "@/components/match-result-card";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
