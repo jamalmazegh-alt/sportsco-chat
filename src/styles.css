@@ -94,7 +94,7 @@
 
   /* Soft warm surface */
   --muted: oklch(0.96 0.012 50);
-  --muted-foreground: oklch(0.46 0.05 40);
+  --muted-foreground: oklch(0.46 0.05 262);
 
   /* Emerald-tinted accent */
   --accent: oklch(0.94 0.04 160);
