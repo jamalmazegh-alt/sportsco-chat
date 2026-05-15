@@ -17,11 +17,8 @@ export function MarketingHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="Clubero" className="h-8 w-8 rounded-lg" />
-          <span className="font-display text-lg font-bold tracking-tight text-foreground">
-            Clubero
-          </span>
+        <Link to="/" className="flex items-center" aria-label="Clubero">
+          <img src={logo} alt="Clubero" className="h-9 w-auto object-contain" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

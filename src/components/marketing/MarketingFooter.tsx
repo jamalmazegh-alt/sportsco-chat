@@ -7,9 +7,8 @@ export function MarketingFooter() {
       <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">
-            <Link to="/" className="flex items-center gap-2.5">
-              <img src={logo} alt="Clubero" className="h-8 w-8 rounded-lg" />
-              <span className="font-display text-lg font-bold">Clubero</span>
+            <Link to="/" className="flex items-center" aria-label="Clubero">
+              <img src={logo} alt="Clubero" className="h-9 w-auto object-contain" />
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
               La coordination d&apos;équipe, simplifiée pour les clubs sportifs.
