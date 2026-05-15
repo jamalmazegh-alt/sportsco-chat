@@ -4,8 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download,
 } from "lucide-react";
+import { toCsv, downloadCsv } from "@/lib/csv";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
 import { AttachmentList, type Attachment } from "@/components/attachments";
@@ -773,6 +774,31 @@ function EventDetail() {
             </h2>
             {isCoach && (
               <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8"
+                  onClick={() => {
+                    const rows = (convocations ?? []).map((c: any) => ({
+                      last_name: c.players?.last_name ?? "",
+                      first_name: c.players?.first_name ?? "",
+                      jersey_number: c.players?.jersey_number ?? "",
+                      status: c.status,
+                      comment: c.comment ?? "",
+                    }));
+                    const csv = toCsv(rows, [
+                      { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
+                      { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                      { key: "jersey_number", header: "#" },
+                      { key: "status", header: t("attendance.status", { defaultValue: "Status" }) },
+                      { key: "comment", header: t("common.comment", { defaultValue: "Comment" }) },
+                    ]);
+                    downloadCsv(`${event.title}-attendance`, csv);
+                  }}
+                  aria-label={t("common.exportCsv", { defaultValue: "Export CSV" })}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
                 <Button size="sm" variant="outline" className="h-8" onClick={remindAllPending}>
                   <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
                 </Button>
