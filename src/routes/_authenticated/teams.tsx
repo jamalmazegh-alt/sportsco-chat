@@ -56,6 +56,14 @@ function TeamsPage() {
     },
   });
 
+  // Auto-redirect non-admin users with exactly 1 team straight to its detail page.
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isAdmin && teams && teams.length === 1) {
+      navigate({ to: "/teams/$teamId", params: { teamId: teams[0].id }, replace: true });
+    }
+  }, [isAdmin, teams, navigate]);
+
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [ageGroup, setAgeGroup] = useState("");
