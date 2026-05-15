@@ -790,6 +790,49 @@ function EventDetail() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <Dialog
+        open={!!respondTarget}
+        onOpenChange={(o) => {
+          if (!o) {
+            setRespondTarget(null);
+            setRespondReason("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {respondTarget ? t(`attendance.${respondTarget.status}`) : ""}
+            </DialogTitle>
+            <DialogDescription>
+              {t("attendance.reasonOptional")}
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={respondReason}
+            onChange={(e) => setRespondReason(e.target.value)}
+            placeholder={t("attendance.reasonPlaceholder")}
+            rows={3}
+            maxLength={500}
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRespondTarget(null);
+                setRespondReason("");
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={confirmRespond} disabled={respondSubmitting}>
+              {respondSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {t("attendance.confirmResponse")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <EventChat eventId={eventId} />
     </div>
   );
