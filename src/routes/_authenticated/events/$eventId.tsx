@@ -22,7 +22,6 @@ import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { fmt as fmtDate } from "@/lib/date-locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
