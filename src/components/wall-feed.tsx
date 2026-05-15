@@ -78,11 +78,40 @@ export function WallFeed({ clubId }: { clubId: string }) {
         arr.push(cm);
         cByPost.set(c.post_id, arr);
       });
+      // Read receipts
+      const { data: rawReads } = await supabase
+        .from("wall_post_reads")
+        .select("post_id, user_id, read_at")
+        .in("post_id", ids);
+      const rByPost = new Map<string, { user_id: string; read_at: string }[]>();
+      (rawReads ?? []).forEach((r) => {
+        const arr = rByPost.get(r.post_id) ?? [];
+        arr.push({ user_id: r.user_id, read_at: r.read_at });
+        rByPost.set(r.post_id, arr);
+      });
       ps.forEach((p) => {
         p.author = map.get(p.author_user_id) ?? null;
         p.comments = cByPost.get(p.id) ?? [];
+        p.reads = rByPost.get(p.id) ?? [];
       });
+
+      // Mark unread posts as read for current user (best-effort, ignore errors)
+      if (user) {
+        const unread = ps.filter((p) => !(p.reads ?? []).some((r) => r.user_id === user.id));
+        if (unread.length > 0) {
+          supabase
+            .from("wall_post_reads")
+            .insert(unread.map((p) => ({ post_id: p.id, user_id: user.id })))
+            .then(() => {});
+        }
+      }
     }
+    // Total club members (denominator for "Lu par X/Y")
+    const { count } = await supabase
+      .from("club_members")
+      .select("id", { count: "exact", head: true })
+      .eq("club_id", clubId);
+    setMemberCount(count ?? 0);
     setPosts(ps);
     setLoading(false);
   }
