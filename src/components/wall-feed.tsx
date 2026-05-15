@@ -84,10 +84,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [clubId]);
 
-  // Realtime
+  // Realtime — unique channel suffix to prevent collisions if effect double-mounts.
   useEffect(() => {
+    const channelName = `wall:${clubId}:${Math.random().toString(36).slice(2)}`;
     const ch = supabase
-      .channel(`wall:${clubId}`)
+      .channel(channelName)
       .on("postgres_changes",
         { event: "*", schema: "public", table: "wall_posts", filter: `club_id=eq.${clubId}` },
         () => load())
