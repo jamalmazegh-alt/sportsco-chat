@@ -177,9 +177,9 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.76 0.18 135);
-  --energy: oklch(0.76 0.20 45);
-  --energy-foreground: oklch(0.18 0.05 30);
-  --victory: oklch(0.82 0.16 75);
+  --energy: oklch(0.90 0.22 130);
+  --energy-foreground: oklch(0.20 0.06 140);
+  --victory: oklch(0.80 0.13 200);
 }
 
 @layer base {
