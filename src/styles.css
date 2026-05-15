@@ -131,18 +131,28 @@
   --sidebar-border: oklch(0.90 0.025 240);
   --sidebar-ring: oklch(0.6 0.16 240);
 
-  /* Energy accent — vibrant orange (sport / motion) */
-  --energy: oklch(0.72 0.20 45);
-  --energy-foreground: oklch(0.99 0.005 60);
-  --victory: oklch(0.78 0.16 75);
+  /* Energy accent — electric lime (terrain / dossard fluo, sport visibility) */
+  --energy: oklch(0.88 0.22 130);
+  --energy-foreground: oklch(0.20 0.06 140);
+  /* Victory — court / referee whistle accent (cool cyan, no orange) */
+  --victory: oklch(0.78 0.13 200);
 
   /* Sporty gradients & shadows */
-  --gradient-hero: radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--energy) 28%, transparent) 0%, transparent 60%),
+  --gradient-hero: radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--primary) 30%, transparent) 0%, transparent 60%),
                    radial-gradient(60% 60% at 10% 100%, color-mix(in oklab, var(--brand-blue) 28%, transparent) 0%, transparent 60%),
                    linear-gradient(135deg, color-mix(in oklab, var(--primary) 10%, var(--background)), var(--background));
-  --gradient-cta: linear-gradient(135deg, color-mix(in oklab, var(--brand-blue-deep) 95%, black) 0%, color-mix(in oklab, var(--brand-blue) 70%, transparent) 55%, color-mix(in oklab, var(--energy) 80%, transparent) 100%);
+  --gradient-cta: linear-gradient(135deg, color-mix(in oklab, var(--brand-blue-deep) 96%, black) 0%, color-mix(in oklab, var(--brand-blue) 60%, var(--brand-blue-deep)) 55%, color-mix(in oklab, var(--primary) 70%, var(--brand-blue)) 100%);
   --gradient-primary: linear-gradient(135deg, var(--primary), color-mix(in oklab, var(--brand-blue) 80%, var(--primary)));
-  --gradient-energy: linear-gradient(135deg, var(--energy), color-mix(in oklab, var(--energy) 60%, var(--primary)));
+  --gradient-energy: linear-gradient(135deg, var(--energy), color-mix(in oklab, var(--primary) 70%, var(--energy)));
+
+  /* Sport pattern motifs — pitch / court lines (chalk on grass) */
+  --pitch-line: color-mix(in oklab, var(--brand-blue-deep) 22%, transparent);
+  --pattern-pitch:
+    radial-gradient(circle at 50% 50%, transparent 58px, var(--pitch-line) 58px, var(--pitch-line) 60px, transparent 61px),
+    linear-gradient(to right, transparent calc(50% - 1px), var(--pitch-line) calc(50% - 1px), var(--pitch-line) calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(to bottom, transparent calc(50% - 1px), var(--pitch-line) calc(50% - 1px), var(--pitch-line) calc(50% + 1px), transparent calc(50% + 1px));
+  --pattern-stripes: repeating-linear-gradient(135deg, color-mix(in oklab, var(--primary) 14%, transparent) 0 14px, transparent 14px 28px);
+  --pattern-court: repeating-linear-gradient(0deg, transparent 0 39px, var(--pitch-line) 39px 40px), repeating-linear-gradient(90deg, transparent 0 59px, var(--pitch-line) 59px 60px);
   --shadow-elevated: 0 20px 50px -20px color-mix(in oklab, var(--brand-blue-deep) 40%, transparent);
   --shadow-glow: 0 0 40px color-mix(in oklab, var(--primary) 35%, transparent);
 }
