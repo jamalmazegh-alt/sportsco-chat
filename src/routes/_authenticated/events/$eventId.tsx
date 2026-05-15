@@ -728,7 +728,7 @@ function EventDetail() {
                           <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
                         ) : null}
                       </p>
-                      {c.comment && (
+                      {c.comment && (isCoach || c.players?.user_id === user?.id) && (
                         <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
                       )}
                     </div>
@@ -776,6 +776,7 @@ function EventDetail() {
         convocation={(convocations ?? []).find((c: any) => c.id === detailConvocId) ?? null}
         eventConvocationsSentAt={null}
         isCoach={isCoach}
+        currentUserId={user?.id ?? null}
         onRemind={(id) => {
           remind(id);
         }}

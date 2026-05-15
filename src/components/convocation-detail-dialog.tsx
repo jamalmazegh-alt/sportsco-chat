@@ -25,6 +25,7 @@ type Convocation = {
     jersey_number?: number | null;
     photo_url?: string | null;
     preferred_position?: string | null;
+    user_id?: string | null;
   } | null;
 };
 
@@ -53,6 +54,7 @@ export function ConvocationDetailDialog({
   convocation,
   eventConvocationsSentAt,
   isCoach,
+  currentUserId,
   onRemind,
   onCancel,
 }: {
@@ -61,6 +63,7 @@ export function ConvocationDetailDialog({
   convocation: Convocation | null;
   eventConvocationsSentAt?: string | null;
   isCoach: boolean;
+  currentUserId?: string | null;
   onRemind?: (convocationId: string) => void;
   onCancel?: (convocationId: string) => void;
 }) {
@@ -126,7 +129,7 @@ export function ConvocationDetailDialog({
             <AttendancePill status={convocation.status as any} />
           </div>
 
-          {convocation.comment && (
+          {convocation.comment && (isCoach || (currentUserId && convocation.players?.user_id === currentUserId)) && (
             <div className="rounded-xl border bg-muted/50 p-3">
               <p className="text-xs text-muted-foreground mb-1">{t("attendance.comment")}</p>
               <p className="text-sm italic">"{convocation.comment}"</p>
