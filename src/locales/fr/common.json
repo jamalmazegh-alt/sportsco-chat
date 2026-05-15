@@ -366,6 +366,24 @@
       "match": "Matchs"
     }
   },
+  "match": {
+    "result": "Résultat du match",
+    "enterScore": "Saisir le score",
+    "noResultYet": "Pas de résultat enregistré pour l'instant.",
+    "resultSaved": "Résultat enregistré.",
+    "notesOptional": "Notes (optionnel)",
+    "scorers": "Buteurs et passeurs",
+    "addGoal": "Ajouter un but",
+    "selectPlayer": "Choisir un joueur",
+    "scorer": "Buteur",
+    "assistOptional": "Passe décisive (optionnel)",
+    "minuteOptional": "Minute (optionnel)",
+    "type": "Type",
+    "goal": "But",
+    "penalty": "Penalty",
+    "ownGoal": "But contre son camp",
+    "noScorers": "Aucun buteur enregistré."
+  },
   "channels": {
     "in_app": "in-app",
     "email": "email",
@@ -423,7 +441,22 @@
     "phoneVerified": "Téléphone vérifié",
     "phoneNotVerified": "Téléphone non vérifié",
     "joined": "Rejoint le",
-    "lastSignIn": "Dernière connexion"
+    "lastSignIn": "Dernière connexion",
+    "actions": "Actions",
+    "disableUser": "Désactiver le compte",
+    "disableUserHint": "L'utilisateur ne pourra plus se connecter jusqu'à réactivation.",
+    "enableUser": "Réactiver le compte",
+    "userDisabled": "Compte désactivé.",
+    "userEnabled": "Compte réactivé.",
+    "removeFromClub": "Retirer du club",
+    "removeFromClubHint": "Supprime tous les rôles de cet utilisateur dans ce club.",
+    "removedFromClub": "Utilisateur retiré du club.",
+    "sendPasswordReset": "Envoyer un lien de réinitialisation",
+    "passwordResetSent": "Lien de réinitialisation envoyé.",
+    "accountStatus": "Statut du compte",
+    "statusDisabled": "Désactivé",
+    "confirmDisable": "Désactiver ce compte ?",
+    "confirmRemove": "Retirer cet utilisateur du club ?"
   },
   "attachments": {
     "add": "Ajouter un fichier",
@@ -454,6 +487,8 @@
     "placeholder": "Pose ta question...",
     "thinking": "Réflexion...",
     "error": "Une erreur est survenue.",
-    "open": "Ouvrir l'assistant"
+    "open": "Ouvrir l'assistant",
+    "close": "Fermer l'assistant",
+    "noPlayerLinked": "Aucun joueur n'est associé à ton compte. Les statistiques de présence concernent uniquement les joueurs (et leurs parents)."
   }
 }

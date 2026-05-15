@@ -366,6 +366,24 @@
       "match": "Matches"
     }
   },
+  "match": {
+    "result": "Match result",
+    "enterScore": "Enter score",
+    "noResultYet": "No result recorded yet.",
+    "resultSaved": "Result saved.",
+    "notesOptional": "Notes (optional)",
+    "scorers": "Scorers & assists",
+    "addGoal": "Add goal",
+    "selectPlayer": "Select a player",
+    "scorer": "Scorer",
+    "assistOptional": "Assist (optional)",
+    "minuteOptional": "Minute (optional)",
+    "type": "Type",
+    "goal": "Goal",
+    "penalty": "Penalty",
+    "ownGoal": "Own goal",
+    "noScorers": "No scorers recorded."
+  },
   "channels": {
     "in_app": "in-app",
     "email": "email",
@@ -423,7 +441,22 @@
     "phoneVerified": "Phone verified",
     "phoneNotVerified": "Phone not verified",
     "joined": "Joined",
-    "lastSignIn": "Last sign-in"
+    "lastSignIn": "Last sign-in",
+    "actions": "Actions",
+    "disableUser": "Disable account",
+    "disableUserHint": "User won't be able to sign in until re-enabled.",
+    "enableUser": "Re-enable account",
+    "userDisabled": "Account disabled.",
+    "userEnabled": "Account re-enabled.",
+    "removeFromClub": "Remove from club",
+    "removeFromClubHint": "Removes all roles this user has in this club.",
+    "removedFromClub": "User removed from club.",
+    "sendPasswordReset": "Send password reset link",
+    "passwordResetSent": "Password reset link sent.",
+    "accountStatus": "Account status",
+    "statusDisabled": "Disabled",
+    "confirmDisable": "Disable this account?",
+    "confirmRemove": "Remove this user from the club?"
   },
   "attachments": {
     "add": "Add file",
@@ -454,6 +487,8 @@
     "placeholder": "Ask your question...",
     "thinking": "Thinking...",
     "error": "Something went wrong.",
-    "open": "Open assistant"
+    "open": "Open assistant",
+    "close": "Close assistant",
+    "noPlayerLinked": "No player is linked to your account. Attendance stats only exist for players (and their parents)."
   }
 }
