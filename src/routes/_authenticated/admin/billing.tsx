@@ -97,12 +97,27 @@ function BillingPage() {
   const sub = data?.subscription;
   const isActive = sub && ["trialing", "active", "past_due"].includes(sub.status);
 
+  function navigateExternal(url: string) {
+    // Break out of any preview iframe — Stripe sets X-Frame-Options: DENY
+    try {
+      if (window.top && window.top !== window.self) {
+        window.top.location.href = url;
+        return;
+      }
+    } catch {
+      // cross-origin top frame: fall back to new tab
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    window.location.href = url;
+  }
+
   async function startCheckout(plan: "monthly" | "yearly") {
     if (!activeClubId) return;
     setBusy(plan);
     try {
       const res = await checkout({ data: { clubId: activeClubId, plan } });
-      if (res.url) window.location.href = res.url;
+      if (res.url) navigateExternal(res.url);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erreur lors de l'ouverture du paiement");
       setBusy(null);
@@ -114,7 +129,7 @@ function BillingPage() {
     setBusy("portal");
     try {
       const res = await portal({ data: { clubId: activeClubId } });
-      if (res.url) window.location.href = res.url;
+      if (res.url) navigateExternal(res.url);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir le portail");
       setBusy(null);
