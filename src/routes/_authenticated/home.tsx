@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3 } from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
 import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
@@ -159,6 +159,45 @@ function HomePage() {
           </Button>
         </div>
       )}
+
+      {/* For players/parents: shortcut to own attendance stats */}
+      {!isCoach && myConvocs && myConvocs.length > 0 && (() => {
+        const seen = new Map<string, { id: string; first_name: string; last_name?: string }>();
+        for (const e of myConvocs as any[]) {
+          if (e.player && !seen.has(e.player.id)) seen.set(e.player.id, e.player);
+        }
+        const players = Array.from(seen.values());
+        if (players.length === 0) return null;
+        return (
+          <section className="space-y-2">
+            {players.map((p) => (
+              <Link
+                key={p.id}
+                to="/players/$playerId"
+                params={{ playerId: p.id }}
+                className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {players.length > 1
+                        ? `${t("dashboard.myStats")} · ${p.first_name}`
+                        : t("dashboard.myStats")}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {t("dashboard.myStatsHint")}
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+              </Link>
+            ))}
+          </section>
+        );
+      })()}
 
       {/* For players/parents: unified list of upcoming events with action-required highlight on pending convocations */}
       {!isCoach && (
