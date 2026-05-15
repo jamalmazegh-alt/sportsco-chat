@@ -501,7 +501,8 @@
     "comment": "Reply",
     "commentPlaceholder": "Write a reply…",
     "empty": "No posts yet. Be the first to share!",
-    "noClub": "Join or create a club to see the wall."
+    "noClub": "Join or create a club to see the wall.",
+    "mentionTitle": "{{name}} mentioned you"
   },
   "chat": {
     "title": "Event chat",
