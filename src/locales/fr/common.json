@@ -309,6 +309,13 @@
     "repeatHint": "Crée automatiquement les séances suivantes à la même heure.",
     "repeatCreated": "{{count}} entraînements créés"
   },
+  "followUps": {
+    "title": "À relancer",
+    "subtitle": "Joueurs sans réponse sur les prochains événements.",
+    "empty": "Tout le monde a répondu 🎉",
+    "emptyHint": "Aucun joueur en attente sur les prochaines convocations.",
+    "linkBadge": "{{count}} à relancer"
+  },
   "attendance": {
     "title": "Présences",
     "present": "Présent",
