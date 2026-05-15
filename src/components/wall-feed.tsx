@@ -332,7 +332,7 @@ function WallGrouped({
               );
             })()}
           {commentsEnabled && (
-            <CommentBlock post={p} currentUserId={currentUserId} role={role} />
+            <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
         </div>
       </li>
