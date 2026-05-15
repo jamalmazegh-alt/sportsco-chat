@@ -1,6 +1,6 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,6 +55,14 @@ function TeamsPage() {
       return ts.map((tm) => ({ ...tm, count: counts[tm.id] ?? 0 }));
     },
   });
+
+  // Auto-redirect non-admin users with exactly 1 team straight to its detail page.
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isAdmin && teams && teams.length === 1) {
+      navigate({ to: "/teams/$teamId", params: { teamId: teams[0].id }, replace: true });
+    }
+  }, [isAdmin, teams, navigate]);
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");

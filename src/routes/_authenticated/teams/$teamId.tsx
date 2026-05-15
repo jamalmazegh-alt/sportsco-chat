@@ -425,7 +425,7 @@ function TeamDetail() {
         </Sheet>
       )}
 
-      {isCoach && <TeamAttendanceStats teamId={teamId} />}
+      {isCoach && <CollapsibleTeamStats teamId={teamId} />}
 
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -614,12 +614,14 @@ function TeamDetail() {
                       {(p.first_name?.[0] ?? "") + (p.last_name?.[0] ?? "")}
                     </div>
                   )}
-                  <span
-                    className={cn(
-                      "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
-                      p.user_id ? "bg-present" : "bg-muted-foreground/40",
-                    )}
-                  />
+                  {isCoach && (
+                    <span
+                      className={cn(
+                        "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
+                        p.user_id ? "bg-present" : "bg-muted-foreground/40",
+                      )}
+                    />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">
@@ -629,7 +631,7 @@ function TeamDetail() {
                     ) : null}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {p.preferred_position ?? (p.user_id ? t("players.accountActive") : t("players.accountInactive"))}
+                    {p.preferred_position ?? (isCoach ? (p.user_id ? t("players.accountActive") : t("players.accountInactive")) : "")}
                   </p>
                 </div>
               </>
@@ -713,6 +715,24 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
       {inner}
       <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); }} />
     </label>
+  );
+}
+
+function CollapsibleTeamStats({ teamId }: { teamId: string }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/40"
+      >
+        <span>{t("stats.showAttendance", { defaultValue: "Voir les statistiques de présence" })}</span>
+        <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />
+      </button>
+      {open && <div className="px-3 pb-3"><TeamAttendanceStats teamId={teamId} /></div>}
+    </div>
   );
 }
 
