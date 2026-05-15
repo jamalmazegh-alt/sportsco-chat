@@ -76,7 +76,7 @@
   --radius: 0.875rem;
 
   /* Clubero brand: navy #0F1B3D + emerald #0D7A5F + warm cream surfaces */
-  --background: oklch(0.985 0.008 60);
+  --background: oklch(0.985 0.003 240);
   --foreground: oklch(0.24 0.08 255);
 
   --card: oklch(1 0 0);
