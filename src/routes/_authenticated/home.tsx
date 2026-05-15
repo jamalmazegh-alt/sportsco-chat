@@ -11,6 +11,7 @@ import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
+import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -133,6 +134,15 @@ function HomePage() {
           {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
         </h1>
       </header>
+
+      {/* Onboarding checklist (admins) */}
+      {isCoach && role === "admin" && activeClubId && (
+        <OnboardingChecklist
+          clubId={activeClubId}
+          hasLogo={!!club?.logo_url}
+          onCreateEvent={() => setCreateOpen(true)}
+        />
+      )}
 
       {/* Quick actions */}
       {isCoach && (
