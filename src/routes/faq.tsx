@@ -11,7 +11,11 @@ import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 const FAQS = [
   {
     q: "À qui s'adresse Clubero ?",
-    a: "Clubero est conçu pour les clubs sportifs amateurs — football, handball, basket, rugby et plus. Coachs, dirigeants, parents et joueurs ont chacun une expérience adaptée.",
+    a: "Clubero est conçu pour les clubs sportifs amateurs. Coachs, dirigeants, parents et joueurs ont chacun une expérience adaptée.",
+  },
+  {
+    q: "Quels sports sont couverts ?",
+    a: "En V1, Clubero couvre 7 sports collectifs avec une saisie de score et des statistiques joueurs adaptées au sport : football, futsal, basketball, rugby, handball, volley-ball et hockey sur glace. D'autres sports arriveront ensuite — dites-nous lequel vous manque.",
   },
   {
     q: "Y a-t-il une offre gratuite ?",
