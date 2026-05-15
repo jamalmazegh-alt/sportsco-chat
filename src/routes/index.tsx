@@ -66,19 +66,21 @@ function Landing() {
 function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-border/60 bg-gradient-hero">
-      {/* Decorative grid + halos */}
+      {/* Decorative pitch lines + halos */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 opacity-[0.18]"
+        className="absolute inset-0 -z-10 opacity-[0.22] bg-pitch"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, color-mix(in oklab, var(--brand-blue-deep) 30%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--brand-blue-deep) 30%, transparent) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-          maskImage: "radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%)",
+          maskImage: "radial-gradient(ellipse 75% 60% at 50% 35%, black 25%, transparent 80%)",
         }}
       />
-      <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--energy)]/30 blur-3xl animate-float" />
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 opacity-[0.10] bg-jersey-stripes"
+      />
+      <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/30 blur-3xl animate-float" />
       <div aria-hidden className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/30 blur-3xl" />
+
 
       <div className="mx-auto max-w-7xl px-5 pt-16 pb-14 lg:px-8 lg:pt-24 lg:pb-24">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10 lg:items-center">
@@ -383,17 +385,20 @@ function CTA() {
     <section>
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl border border-border p-10 lg:p-16 text-center bg-gradient-cta shadow-elevated">
-          {/* Decorative court lines */}
+          {/* Decorative pitch lines (chalk on grass) */}
           <div
             aria-hidden
-            className="absolute inset-0 opacity-[0.08]"
+            className="absolute inset-0 opacity-[0.18]"
             style={{
               backgroundImage:
-                "radial-gradient(circle at 50% 50%, white 1px, transparent 2px), linear-gradient(to right, transparent 49.5%, white 49.5%, white 50.5%, transparent 50.5%)",
-              backgroundSize: "32px 32px, 100% 100%",
+                "radial-gradient(circle at 50% 50%, transparent 70px, rgba(255,255,255,0.6) 70px, rgba(255,255,255,0.6) 72px, transparent 73px), linear-gradient(to right, transparent calc(50% - 1px), rgba(255,255,255,0.5) calc(50% - 1px), rgba(255,255,255,0.5) calc(50% + 1px), transparent calc(50% + 1px))",
+              backgroundSize: "100% 100%",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
             }}
           />
-          <div aria-hidden className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[color:var(--energy)]/30 blur-3xl" />
+          <div aria-hidden className="absolute inset-0 opacity-[0.06] bg-jersey-stripes" />
+          <div aria-hidden className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[color:var(--primary)]/40 blur-3xl" />
 
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white backdrop-blur">
