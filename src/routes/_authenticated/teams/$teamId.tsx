@@ -425,6 +425,8 @@ function TeamDetail() {
         </Sheet>
       )}
 
+      {isCoach && <TeamAttendanceStats teamId={teamId} />}
+
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("teams.players")}
