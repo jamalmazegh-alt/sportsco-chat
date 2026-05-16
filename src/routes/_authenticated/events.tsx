@@ -316,12 +316,7 @@ function EventsPage() {
                 </p>
               );
             })()}
-            {e.location && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-                <MapPin className="h-3 w-3 shrink-0" />
-                <span className="truncate">{e.location}</span>
-              </p>
-            )}
+            }
           </div>
         </Link>
       </li>
