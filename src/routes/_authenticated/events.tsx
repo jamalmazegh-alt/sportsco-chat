@@ -208,6 +208,7 @@ function EventsPage() {
     const Icon = TYPE_ICONS[e.type] ?? Calendar;
     const d = new Date(e.starts_at);
     const past = isPast(d) && !isToday(d);
+    const isCancelled = e.status === "cancelled";
     let outcome: "win" | "loss" | "draw" | null = null;
     if (e.type === "match" && e.result) {
       const ourSide = e.is_home === false ? "away" : "home";
@@ -223,20 +224,22 @@ function EventsPage() {
           params={{ eventId: e.id }}
           className={cn(
             "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden active:scale-[0.99] transition-transform",
-            isLoss
-              ? "border-defeat/50 bg-defeat/5 hover:border-defeat/70"
-              : past
-                ? "border-border/60 opacity-70"
-                : "border-border hover:border-primary/40",
+            isCancelled
+              ? "border-red-300/60 bg-red-50/30 opacity-60 hover:border-red-400/70"
+              : isLoss
+                ? "border-defeat/50 bg-defeat/5 hover:border-defeat/70"
+                : past
+                  ? "border-border/60 opacity-70"
+                  : "border-border hover:border-primary/40",
           )}
         >
           <div className={cn(
             "flex flex-col items-center justify-center w-16 shrink-0 py-3",
-            isLoss ? "bg-defeat/15" : past ? "bg-muted/40" : "bg-primary/8",
+            isCancelled ? "bg-red-100/40" : isLoss ? "bg-defeat/15" : past ? "bg-muted/40" : "bg-primary/8",
           )}>
             <span className={cn(
               "text-[10px] font-semibold uppercase tracking-wider",
-              past ? "text-muted-foreground" : "text-primary",
+              isCancelled ? "text-red-600" : past ? "text-muted-foreground" : "text-primary",
             )}>
               {format(d, "EEE", { locale: dateLocale })}
             </span>
@@ -249,6 +252,12 @@ function EventsPage() {
               <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
                 {t(`events.types.${e.type}`)}
               </span>
+              {isCancelled && (
+                <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300 inline-flex items-center gap-1">
+                  <Ban className="h-3 w-3" />
+                  {t("events.status.cancelled")}
+                </span>
+              )}
               {e.type === "match" && e.competition_type && (
                 <span className={cn(
                   "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border",
@@ -279,7 +288,7 @@ function EventsPage() {
                 <span className="text-[10px] text-muted-foreground truncate">· {e.team_name}</span>
               )}
             </div>
-            <p className="font-medium truncate leading-tight">
+            <p className={cn("font-medium truncate leading-tight", isCancelled && "line-through text-muted-foreground")}>
               {(() => {
                 if (e.type === "match" && e.opponent && e.team_name) return `${e.team_name} vs ${e.opponent}`;
                 if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs ")) return e.title;
