@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/demo")({
   component: DemoPage,
@@ -34,14 +35,29 @@ function DemoPage() {
   const [role, setRole] = useState("");
   const [teams, setTeams] = useState("");
   const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const subject = `Demande de démo — ${club}`;
-    const body = `Club : ${club}\nContact : ${name} <${email}>\nRôle : ${role}\nÉquipes : ${teams}\n\nNotes :\n${notes}`;
-    window.location.href = `mailto:hello@clubero.app?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/public/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "demo", name, email, club, role, teams, notes }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setSent(true);
+      setClub(""); setName(""); setEmail(""); setRole(""); setTeams(""); setNotes("");
+      toast.success("Demande envoyée. Nous revenons vers vous sous un jour ouvré.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Envoi impossible. Réessayez ou écrivez à hello@clubero.app.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const PERKS = [
@@ -142,8 +158,8 @@ function DemoPage() {
                 placeholder="Outil actuel, principal point de douleur…"
               />
             </div>
-            <Button type="submit" size="lg" className="mt-6 w-full h-12">
-              Demander une démo
+            <Button type="submit" size="lg" disabled={submitting} className="mt-6 w-full h-12">
+              {submitting ? "Envoi…" : sent ? "Demande envoyée ✓" : "Demander une démo"}
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               Nous ne partageons jamais vos coordonnées. Conforme RGPD.

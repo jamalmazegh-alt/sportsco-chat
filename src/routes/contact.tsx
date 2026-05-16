@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -24,14 +25,29 @@ function ContactPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const subject = `Contact Clubero — ${name}`;
-    const body = `De : ${name} <${email}>\n\n${message}`;
-    window.location.href = `mailto:hello@clubero.app?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/public/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "contact", name, email, message }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setSent(true);
+      setName(""); setEmail(""); setMessage("");
+      toast.success("Message envoyé. Nous revenons vers vous rapidement.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Envoi impossible. Réessayez ou écrivez à hello@clubero.app.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -116,8 +132,8 @@ function ContactPage() {
                 placeholder="Comment pouvons-nous aider ?"
               />
             </div>
-            <Button type="submit" size="lg" className="mt-6 w-full h-12">
-              Envoyer le message
+            <Button type="submit" size="lg" disabled={submitting} className="mt-6 w-full h-12">
+              {submitting ? "Envoi…" : sent ? "Message envoyé ✓" : "Envoyer le message"}
             </Button>
           </form>
         </div>
