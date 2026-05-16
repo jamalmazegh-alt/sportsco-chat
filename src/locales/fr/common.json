@@ -311,7 +311,18 @@
     "repeatWeeks": "Pendant {{count}} semaines",
     "repeatHint": "Crée automatiquement les séances suivantes à la même heure.",
     "repeatCreated": "{{count}} entraînements créés",
-    "openMeetingInMaps": "Ouvrir dans Maps"
+    "openMeetingInMaps": "Ouvrir dans Maps",
+    "cancelEvent": "Annuler l'événement",
+    "cancelEventTitle": "Annuler cet événement ?",
+    "cancelEventDescription": "Tous les convoqués recevront une notification avec la raison. Cette action est irréversible.",
+    "cancelEventReasonLabel": "Raison de l'annulation",
+    "cancelEventReasonPlaceholder": "Ex. terrain impraticable, adversaire forfait…",
+    "cancelEventReasonRequired": "Merci d'indiquer une raison.",
+    "cancelEventConfirm": "Annuler l'événement",
+    "eventCancelled": "Événement annulé",
+    "eventCancelledOn": "Annulé le {{date}}",
+    "cancellationReason": "Raison",
+    "cancelEventSuccess": "Événement annulé et convoqués notifiés"
   },
   "followUps": {
     "title": "À relancer",

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban,
 } from "lucide-react";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
@@ -51,13 +51,16 @@ function EventDetail() {
   const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
   const [respondReason, setRespondReason] = useState("");
   const [respondSubmitting, setRespondSubmitting] = useState(false);
+  const [cancelEventOpen, setCancelEventOpen] = useState(false);
+  const [cancelEventReason, setCancelEventReason] = useState("");
+  const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments, cancellation_reason, cancelled_at")
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -513,6 +516,68 @@ function EventDetail() {
     qc.invalidateQueries({ queryKey: ["event", eventId] });
   }
 
+  async function confirmCancelEvent() {
+    if (!event) return;
+    const reason = cancelEventReason.trim();
+    if (!reason) {
+      toast.error(t("events.cancelEventReasonRequired"));
+      return;
+    }
+    setCancelEventSubmitting(true);
+    const { error } = await supabase
+      .from("events")
+      .update({
+        status: "cancelled",
+        cancellation_reason: reason,
+        cancelled_at: new Date().toISOString(),
+        responses_locked: true,
+      })
+      .eq("id", event.id);
+    if (error) {
+      setCancelEventSubmitting(false);
+      toast.error(error.message);
+      return;
+    }
+
+    // Notify all convoked players + their parents
+    try {
+      const playerIds = (convocations ?? []).map((c: any) => c.player_id);
+      const playerUserIds = (convocations ?? [])
+        .map((c: any) => c.players?.user_id)
+        .filter(Boolean);
+      let parentIds: string[] = [];
+      if (playerIds.length > 0) {
+        const { data: parents } = await supabase
+          .from("player_parents")
+          .select("parent_user_id")
+          .in("player_id", playerIds);
+        parentIds = (parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean);
+      }
+      const recipients = Array.from(new Set([...playerUserIds, ...parentIds]));
+      if (recipients.length > 0) {
+        await supabase.from("notifications").insert(
+          recipients.map((uid) => ({
+            user_id: uid,
+            type: "event_cancelled",
+            title: `${t("events.eventCancelled")} — ${event.title}`,
+            body: reason,
+            link: `/events/${event.id}`,
+          })),
+        );
+      }
+    } catch {
+      // best-effort
+    }
+
+    setCancelEventSubmitting(false);
+    setCancelEventOpen(false);
+    setCancelEventReason("");
+    toast.success(t("events.cancelEventSuccess"));
+    qc.invalidateQueries({ queryKey: ["event", eventId] });
+    qc.invalidateQueries({ queryKey: ["events"] });
+  }
+
+
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
     (convocations ?? []).forEach((x) => {
@@ -665,6 +730,25 @@ function EventDetail() {
             ) : null;
           })()}
         </div>
+        {event.status === "cancelled" && (
+          <div className="relative mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
+            <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
+              <Ban className="h-4 w-4" />
+              {t("events.eventCancelled")}
+            </div>
+            {event.cancellation_reason && (
+              <p className="mt-1 text-sm text-foreground">
+                <span className="font-medium">{t("events.cancellationReason")} : </span>
+                {event.cancellation_reason}
+              </p>
+            )}
+            {event.cancelled_at && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {t("events.eventCancelledOn", { date: fmt(event.cancelled_at, "d MMM yyyy 'à' HH:mm") })}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {isCoach && teams && (
@@ -683,13 +767,13 @@ function EventDetail() {
       )}
 
       {/* Coach: send convocations */}
-      {isCoach && !event.convocations_sent && (
+      {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
         <Button onClick={openPicker} className="w-full h-11">
           <Send className="h-4 w-4" />
           {t("events.sendConvocations")}
         </Button>
       )}
-      {isCoach && event.convocations_sent && (
+      {isCoach && event.status !== "cancelled" && event.convocations_sent && (
         <div className="space-y-2">
           <p className="text-xs text-center text-muted-foreground">
             ✓ {t("events.convocationsSent")}
@@ -702,6 +786,67 @@ function EventDetail() {
           )}
         </div>
       )}
+
+      {/* Coach: cancel event */}
+      {isCoach && event.status !== "cancelled" && (
+        <Button
+          variant="outline"
+          onClick={() => setCancelEventOpen(true)}
+          className="w-full h-10 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+        >
+          <Ban className="h-4 w-4" />
+          {t("events.cancelEvent")}
+        </Button>
+      )}
+
+      <Dialog
+        open={cancelEventOpen}
+        onOpenChange={(o) => {
+          if (!o && !cancelEventSubmitting) {
+            setCancelEventOpen(false);
+            setCancelEventReason("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("events.cancelEventTitle")}</DialogTitle>
+            <DialogDescription>{t("events.cancelEventDescription")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("events.cancelEventReasonLabel")}</label>
+            <Textarea
+              value={cancelEventReason}
+              onChange={(e) => setCancelEventReason(e.target.value)}
+              placeholder={t("events.cancelEventReasonPlaceholder")}
+              rows={3}
+              maxLength={500}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCancelEventOpen(false);
+                setCancelEventReason("");
+              }}
+              disabled={cancelEventSubmitting}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={confirmCancelEvent}
+              disabled={cancelEventSubmitting || !cancelEventReason.trim()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelEventSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {t("events.cancelEventConfirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {/* Player picker dialog */}
       <Dialog open={pickerOpen} onOpenChange={(o) => { setPickerOpen(o); if (!o) setPickerStep("select"); }}>
