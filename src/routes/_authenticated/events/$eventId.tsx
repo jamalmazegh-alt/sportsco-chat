@@ -284,6 +284,10 @@ function EventDetail() {
       toast.error(t("attendance.noPlayersSelected"));
       return;
     }
+    const teamRow = teams?.[0] as any;
+    const commMode = (teamRow?.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
+    const useWhatsApp = commMode === "whatsapp" || commMode === "hybrid";
+    const useEmail = commMode !== "whatsapp";
     setSending(true);
     // Insert convocations and get back their tokens
     const { data: insertedConvs, error: convocationError } = await supabase
