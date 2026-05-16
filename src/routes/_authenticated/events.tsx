@@ -43,6 +43,7 @@ function EventsPage() {
   const [showPast, setShowPast] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
+  const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: club } = useQuery({
