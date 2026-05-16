@@ -12,7 +12,6 @@ import {
   buildCancellationMessage,
   buildRescheduleMessage,
   buildReminderMessage,
-  openWhatsAppShare,
   normalizeGroupUrl,
 } from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
@@ -284,6 +283,10 @@ function EventDetail() {
       toast.error(t("attendance.noPlayersSelected"));
       return;
     }
+    const teamRow = teams?.[0] as any;
+    const commMode = (teamRow?.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
+    const useWhatsApp = commMode === "whatsapp" || commMode === "hybrid";
+    const useEmail = commMode !== "whatsapp";
     setSending(true);
     // Insert convocations and get back their tokens
     const { data: insertedConvs, error: convocationError } = await supabase
@@ -324,7 +327,7 @@ function EventDetail() {
     }
 
     // 1-tap email invitations to player + parents (best-effort, non-blocking)
-    try {
+    if (useEmail) try {
       const { data: playersInfo } = await supabase
         .from("players")
         .select("id, first_name, last_name, email")
@@ -458,11 +461,19 @@ function EventDetail() {
         return;
       }
     }
+
+    // WhatsApp convocation: the coach shares via the WhatsApp card below
+    // (browsers block window.open after async awaits, so we don't auto-open).
+
     setSending(false);
     setPickerOpen(false);
     refetch();
     refetchEvent();
-    toast.success(t("events.convocationsSent"));
+    toast.success(
+      useWhatsApp
+        ? "Convocations créées — partagez maintenant via WhatsApp ci-dessous"
+        : t("events.convocationsSent")
+    );
   }
 
   async function remind(convocationId: string, opts?: { silent?: boolean }) {
