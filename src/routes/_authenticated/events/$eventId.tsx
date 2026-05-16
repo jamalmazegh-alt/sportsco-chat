@@ -516,6 +516,68 @@ function EventDetail() {
     qc.invalidateQueries({ queryKey: ["event", eventId] });
   }
 
+  async function confirmCancelEvent() {
+    if (!event) return;
+    const reason = cancelEventReason.trim();
+    if (!reason) {
+      toast.error(t("events.cancelEventReasonRequired"));
+      return;
+    }
+    setCancelEventSubmitting(true);
+    const { error } = await supabase
+      .from("events")
+      .update({
+        status: "cancelled",
+        cancellation_reason: reason,
+        cancelled_at: new Date().toISOString(),
+        responses_locked: true,
+      })
+      .eq("id", event.id);
+    if (error) {
+      setCancelEventSubmitting(false);
+      toast.error(error.message);
+      return;
+    }
+
+    // Notify all convoked players + their parents
+    try {
+      const playerIds = (convocations ?? []).map((c: any) => c.player_id);
+      const playerUserIds = (convocations ?? [])
+        .map((c: any) => c.players?.user_id)
+        .filter(Boolean);
+      let parentIds: string[] = [];
+      if (playerIds.length > 0) {
+        const { data: parents } = await supabase
+          .from("player_parents")
+          .select("parent_user_id")
+          .in("player_id", playerIds);
+        parentIds = (parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean);
+      }
+      const recipients = Array.from(new Set([...playerUserIds, ...parentIds]));
+      if (recipients.length > 0) {
+        await supabase.from("notifications").insert(
+          recipients.map((uid) => ({
+            user_id: uid,
+            type: "event_cancelled",
+            title: `${t("events.eventCancelled")} — ${event.title}`,
+            body: reason,
+            link: `/events/${event.id}`,
+          })),
+        );
+      }
+    } catch {
+      // best-effort
+    }
+
+    setCancelEventSubmitting(false);
+    setCancelEventOpen(false);
+    setCancelEventReason("");
+    toast.success(t("events.cancelEventSuccess"));
+    qc.invalidateQueries({ queryKey: ["event", eventId] });
+    qc.invalidateQueries({ queryKey: ["events"] });
+  }
+
+
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
     (convocations ?? []).forEach((x) => {
