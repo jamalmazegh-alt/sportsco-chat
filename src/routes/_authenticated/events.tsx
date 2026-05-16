@@ -284,9 +284,6 @@ function EventsPage() {
                   · {e.competition_name}
                 </span>
               )}
-              {e.team_name && (
-                <span className="text-[10px] text-muted-foreground truncate">· {e.team_name}</span>
-              )}
             </div>
             <p className={cn("font-medium truncate leading-tight", isCancelled && "line-through text-muted-foreground")}>
               {(() => {
