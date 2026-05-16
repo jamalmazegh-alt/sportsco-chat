@@ -882,6 +882,7 @@ export type Database = {
           stripe_price_id: string | null
           stripe_subscription_id: string | null
           trial_end: string | null
+          trial_reminders_sent: number[]
           updated_at: string
         }
         Insert: {
@@ -899,6 +900,7 @@ export type Database = {
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           trial_end?: string | null
+          trial_reminders_sent?: number[]
           updated_at?: string
         }
         Update: {
@@ -916,6 +918,7 @@ export type Database = {
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           trial_end?: string | null
+          trial_reminders_sent?: number[]
           updated_at?: string
         }
         Relationships: [
