@@ -425,6 +425,12 @@ const FEATURES = [
     accent: "from-[color:var(--primary)] to-[color:var(--victory)]",
   },
   {
+    icon: BrainCircuit,
+    title: "Assistant IA intégré",
+    body: "Posez vos questions en français — l'assistant connaît votre club, vos équipes, vos stats et vos prochains événements.",
+    accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]",
+  },
+  {
     icon: Activity,
     title: "Activité du club en direct",
     body: "Mur, mentions, accusés de lecture, fichiers — toute la vie du club au même endroit.",
