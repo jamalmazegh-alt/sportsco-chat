@@ -51,6 +51,11 @@ const PILLARS = [
     body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
   },
   {
+    icon: BrainCircuit,
+    title: "Assistant IA intégré",
+    body: "Un assistant en français, connecté à vos données de club. Posez vos questions sur les présences, les convocations, les stats. Réponses instantanées, respect des rôles, hébergé en Europe.",
+  },
+  {
     icon: MessageCircle,
     title: "Compatible WhatsApp (hybride)",
     body: "Gardez votre groupe WhatsApp. Envoyez les convocations groupées formatées directement dedans, en un clic — sans abandonner le suivi des présences dans l'appli.",
