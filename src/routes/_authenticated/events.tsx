@@ -160,9 +160,45 @@ function EventsPage() {
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
   }, [visibleEvents, dateLocale]);
 
-  const eventDates = useMemo(() => {
-    return (events ?? []).map((e) => startOfDay(new Date(e.starts_at)));
+  const typePriority: Record<string, number> = { match: 0, tournament: 1, training: 2, meeting: 3, other: 4 };
+
+  const eventTypesByDate = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const e of events ?? []) {
+      const ts = startOfDay(new Date(e.starts_at)).getTime();
+      const existing = map.get(ts);
+      if (existing === undefined || typePriority[e.type] < typePriority[existing]) {
+        map.set(ts, e.type);
+      }
+    }
+    return map;
   }, [events]);
+
+  const matchDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "match") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const tournamentDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "tournament") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const trainingDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "training") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const meetingDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "meeting") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const otherDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "other") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
 
   const selectedDayEvents = useMemo(() => {
     return (events ?? []).filter((e) => isSameDay(new Date(e.starts_at), selectedDay));
@@ -421,10 +457,24 @@ function EventsPage() {
                 if (hasEvents) setDayDialogOpen(true);
               }}
               locale={dateLocale}
-              modifiers={{ hasEvent: eventDates }}
+              modifiers={{
+                matchDay: matchDates,
+                tournamentDay: tournamentDates,
+                trainingDay: trainingDates,
+                meetingDay: meetingDates,
+                otherDay: otherDates,
+              }}
               modifiersClassNames={{
-                hasEvent:
-                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-primary after:shadow-[0_0_8px_hsl(var(--primary)/0.6)] data-[selected-single=true]:after:bg-primary-foreground data-[selected-single=true]:after:shadow-none",
+                matchDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-red-500 after:shadow-[0_0_8px_rgba(239,68,68,0.6)] data-[selected-single=true]:after:bg-red-500",
+                tournamentDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-amber-500 after:shadow-[0_0_8px_rgba(245,158,11,0.6)] data-[selected-single=true]:after:bg-amber-500",
+                trainingDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-blue-500 after:shadow-[0_0_8px_rgba(59,130,246,0.6)] data-[selected-single=true]:after:bg-blue-500",
+                meetingDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-violet-500 after:shadow-[0_0_8px_rgba(139,92,246,0.6)] data-[selected-single=true]:after:bg-violet-500",
+                otherDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-muted-foreground after:shadow-[0_0_8px_rgba(100,116,139,0.5)] data-[selected-single=true]:after:bg-muted-foreground",
               }}
               className="p-3 pointer-events-auto [--cell-size:2.5rem]"
             />
@@ -432,6 +482,29 @@ function EventsPage() {
           <p className="text-xs text-center text-muted-foreground pt-2">
             {t("events.calendarHint", { defaultValue: "Touche un jour avec une pastille pour voir les événements." })}
           </p>
+
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-1">
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-red-500 inline-block" />
+              {t("events.types.match")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-amber-500 inline-block" />
+              {t("events.types.tournament")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-blue-500 inline-block" />
+              {t("events.types.training")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-violet-500 inline-block" />
+              {t("events.types.meeting")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-muted-foreground inline-block" />
+              {t("events.types.other")}
+            </span>
+          </div>
 
           <Dialog open={dayDialogOpen} onOpenChange={setDayDialogOpen}>
             <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
