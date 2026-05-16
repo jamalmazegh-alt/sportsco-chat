@@ -322,7 +322,20 @@
     "eventCancelled": "Événement annulé",
     "eventCancelledOn": "Annulé le {{date}}",
     "cancellationReason": "Raison",
-    "cancelEventSuccess": "Événement annulé et convoqués notifiés"
+    "cancelEventSuccess": "Événement annulé et convoqués notifiés",
+    "reschedule": "Reporter",
+    "rescheduleTitle": "Reporter cet événement",
+    "rescheduleDescription": "Choisissez la nouvelle date. Tous les convoqués seront notifiés (notification, email, mur du club).",
+    "rescheduleNewDateLabel": "Nouvelle date et heure",
+    "rescheduleReasonLabel": "Raison du report (optionnel)",
+    "rescheduleReasonPlaceholder": "Ex. terrain indisponible, météo…",
+    "rescheduleConfirm": "Reporter et notifier",
+    "rescheduleSuccess": "Événement reporté et convoqués notifiés",
+    "rescheduleInvalidDate": "Merci de choisir une date valide.",
+    "rescheduleSameDate": "La nouvelle date doit être différente de l'actuelle.",
+    "eventRescheduled": "Événement reporté",
+    "previousDate": "Date précédente",
+    "newDate": "Nouvelle date"
   },
   "followUps": {
     "title": "À relancer",
