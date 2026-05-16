@@ -30,7 +30,7 @@ Connaissance produit :
   - Hébergement européen, conformité RGPD.
 
 Tarifs :
-- Découverte : gratuit à vie, 1 équipe, jusqu'à 25 membres.
+- Découverte : essai gratuit de 30 jours sans carte bancaire, 1 équipe, jusqu'à 25 membres.
 - Club : 39 €/mois, équipes et membres illimités, mur, stats, exports, support prioritaire.
 - Fédération : sur mesure (multi-clubs, SSO, onboarding dédié, SLA).
 
