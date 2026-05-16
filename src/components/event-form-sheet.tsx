@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -582,13 +582,13 @@ export function EventFormSheet({
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-      <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{mode === "create" ? t("events.create") : t("common.edit")}</SheetTitle>
-        </SheetHeader>
-        <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-8">
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      trigger={trigger}
+      title={mode === "create" ? t("events.create") : t("common.edit")}
+    >
+      <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-8">
           <div className="space-y-1.5">
             <Label>{t("events.selectTeam")}</Label>
             <Select value={teamId} onValueChange={setTeamId} required>
@@ -808,8 +808,7 @@ export function EventFormSheet({
               t("common.save")
             )}
           </Button>
-        </form>
-      </SheetContent>
-    </Sheet>
+      </form>
+    </ResponsiveFormDialog>
   );
 }
