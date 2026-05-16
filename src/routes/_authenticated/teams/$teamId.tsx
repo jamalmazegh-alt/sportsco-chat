@@ -145,7 +145,9 @@ function TeamDetail() {
         competitions: editCompetitions,
         season: editSeason || null,
         sport: editSport || null,
-      })
+        whatsapp_group_url: editWhatsappUrl.trim() || null,
+        communication_mode: editCommMode,
+      } as any)
       .eq("id", teamId);
     setEditBusy(false);
     if (error) { toast.error(error.message); return; }
