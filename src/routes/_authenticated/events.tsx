@@ -160,9 +160,45 @@ function EventsPage() {
     return Array.from(map.entries()).map(([key, v]) => ({ key, ...v }));
   }, [visibleEvents, dateLocale]);
 
-  const eventDates = useMemo(() => {
-    return (events ?? []).map((e) => startOfDay(new Date(e.starts_at)));
+  const typePriority: Record<string, number> = { match: 0, tournament: 1, training: 2, meeting: 3, other: 4 };
+
+  const eventTypesByDate = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const e of events ?? []) {
+      const ts = startOfDay(new Date(e.starts_at)).getTime();
+      const existing = map.get(ts);
+      if (existing === undefined || typePriority[e.type] < typePriority[existing]) {
+        map.set(ts, e.type);
+      }
+    }
+    return map;
   }, [events]);
+
+  const matchDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "match") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const tournamentDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "tournament") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const trainingDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "training") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const meetingDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "meeting") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
+  const otherDates = useMemo(() => {
+    const arr: Date[] = [];
+    eventTypesByDate.forEach((type, ts) => { if (type === "other") arr.push(new Date(ts)); });
+    return arr;
+  }, [eventTypesByDate]);
 
   const selectedDayEvents = useMemo(() => {
     return (events ?? []).filter((e) => isSameDay(new Date(e.starts_at), selectedDay));
