@@ -767,13 +767,13 @@ function EventDetail() {
       )}
 
       {/* Coach: send convocations */}
-      {isCoach && !event.convocations_sent && (
+      {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
         <Button onClick={openPicker} className="w-full h-11">
           <Send className="h-4 w-4" />
           {t("events.sendConvocations")}
         </Button>
       )}
-      {isCoach && event.convocations_sent && (
+      {isCoach && event.status !== "cancelled" && event.convocations_sent && (
         <div className="space-y-2">
           <p className="text-xs text-center text-muted-foreground">
             ✓ {t("events.convocationsSent")}
@@ -786,6 +786,67 @@ function EventDetail() {
           )}
         </div>
       )}
+
+      {/* Coach: cancel event */}
+      {isCoach && event.status !== "cancelled" && (
+        <Button
+          variant="outline"
+          onClick={() => setCancelEventOpen(true)}
+          className="w-full h-10 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+        >
+          <Ban className="h-4 w-4" />
+          {t("events.cancelEvent")}
+        </Button>
+      )}
+
+      <Dialog
+        open={cancelEventOpen}
+        onOpenChange={(o) => {
+          if (!o && !cancelEventSubmitting) {
+            setCancelEventOpen(false);
+            setCancelEventReason("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("events.cancelEventTitle")}</DialogTitle>
+            <DialogDescription>{t("events.cancelEventDescription")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t("events.cancelEventReasonLabel")}</label>
+            <Textarea
+              value={cancelEventReason}
+              onChange={(e) => setCancelEventReason(e.target.value)}
+              placeholder={t("events.cancelEventReasonPlaceholder")}
+              rows={3}
+              maxLength={500}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCancelEventOpen(false);
+                setCancelEventReason("");
+              }}
+              disabled={cancelEventSubmitting}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={confirmCancelEvent}
+              disabled={cancelEventSubmitting || !cancelEventReason.trim()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelEventSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {t("events.cancelEventConfirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {/* Player picker dialog */}
       <Dialog open={pickerOpen} onOpenChange={(o) => { setPickerOpen(o); if (!o) setPickerStep("select"); }}>
