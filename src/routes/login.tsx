@@ -65,7 +65,7 @@ function LoginPage() {
           })}
         </div>
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={176} height={176} className="mx-auto mb-3 h-40 w-40 object-contain drop-shadow-sm dark:bg-white dark:rounded-lg dark:px-2 dark:py-1" />
+          <img src={logo} alt="Clubero" width={176} height={88} className="mx-auto mb-3 h-20 w-44 object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-2" />
           <p className="mt-1 text-sm text-muted-foreground">{t("app.tagline")}</p>
         </div>
 
