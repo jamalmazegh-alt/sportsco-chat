@@ -576,5 +576,27 @@
     "open": "Open assistant",
     "close": "Close assistant",
     "noPlayerLinked": "No player is linked to your account. Attendance stats only exist for players (and their parents)."
+  },
+  "cookie": {
+    "title": "Cookie settings",
+    "description": "We use cookies to improve your experience, analyse traffic and personalise content. You can choose what you accept.",
+    "showDetails": "Customise",
+    "hideDetails": "Hide details",
+    "acceptAll": "Accept all",
+    "reject": "Reject all",
+    "save": "Save",
+    "close": "Close",
+    "necessary": {
+      "title": "Necessary",
+      "description": "Essential for the site to work (login, security, preferences)."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Help us understand how you use the site so we can improve it."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "description": "Used to show you personalised content and offers."
+    }
   }
 }

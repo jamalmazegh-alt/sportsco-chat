@@ -11,6 +11,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { bootstrapTheme } from "@/lib/use-theme";
+import { CookieConsentBanner } from "@/components/cookie-consent";
 
 import appCss from "../styles.css?url";
 
@@ -87,6 +88,7 @@ function RootComponent() {
       <AuthProvider>
         <Outlet />
         <Toaster position="top-center" />
+        <CookieConsentBanner />
       </AuthProvider>
     </QueryClientProvider>
   );
