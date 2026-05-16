@@ -653,6 +653,162 @@ function EventDetail() {
     qc.invalidateQueries({ queryKey: ["events"] });
   }
 
+  function openReschedule() {
+    if (!event) return;
+    const d = new Date(event.starts_at);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const local = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    setRescheduleNewDate(local);
+    setRescheduleReason("");
+    setRescheduleOpen(true);
+  }
+
+  async function confirmReschedule() {
+    if (!event) return;
+    if (!rescheduleNewDate) {
+      toast.error(t("events.rescheduleInvalidDate"));
+      return;
+    }
+    const newDate = new Date(rescheduleNewDate);
+    if (isNaN(newDate.getTime())) {
+      toast.error(t("events.rescheduleInvalidDate"));
+      return;
+    }
+    const previousStart = new Date(event.starts_at);
+    if (newDate.getTime() === previousStart.getTime()) {
+      toast.error(t("events.rescheduleSameDate"));
+      return;
+    }
+    setRescheduleSubmitting(true);
+
+    const updates: Record<string, unknown> = { starts_at: newDate.toISOString() };
+    if (event.ends_at) {
+      const offsetMs = new Date(event.ends_at).getTime() - previousStart.getTime();
+      updates.ends_at = new Date(newDate.getTime() + offsetMs).toISOString();
+    }
+    if (event.convocation_time) {
+      const deltaMs = newDate.getTime() - previousStart.getTime();
+      updates.convocation_time = new Date(new Date(event.convocation_time).getTime() + deltaMs).toISOString();
+    }
+
+    const { error } = await supabase.from("events").update(updates).eq("id", event.id);
+    if (error) {
+      setRescheduleSubmitting(false);
+      toast.error(error.message);
+      return;
+    }
+
+    const reason = rescheduleReason.trim();
+    const previousDateLabel = fmt(previousStart.toISOString(), "EEEE d MMMM 'à' HH'h'mm");
+    const newDateLabel = fmt(newDate.toISOString(), "EEEE d MMMM 'à' HH'h'mm");
+
+    try {
+      const playerIds = (convocations ?? []).map((c: any) => c.player_id);
+      const playerUserIds = (convocations ?? [])
+        .map((c: any) => c.players?.user_id)
+        .filter(Boolean);
+      let parents: Array<{ parent_user_id: string | null; email: string | null; full_name: string | null; player_id: string }> = [];
+      if (playerIds.length > 0) {
+        const { data: parentsData } = await supabase
+          .from("player_parents")
+          .select("parent_user_id, email, full_name, player_id")
+          .in("player_id", playerIds);
+        parents = (parentsData ?? []) as any;
+      }
+      const parentIds = parents.map((p) => p.parent_user_id).filter(Boolean) as string[];
+      const recipients = Array.from(new Set([...playerUserIds, ...parentIds]));
+      if (recipients.length > 0) {
+        await supabase.from("notifications").insert(
+          recipients.map((uid) => ({
+            user_id: uid,
+            type: "event_rescheduled",
+            title: `${t("events.eventRescheduled")} — ${event.title}`,
+            body: `${previousDateLabel} → ${newDateLabel}${reason ? `\n${reason}` : ""}`,
+            link: `/events/${event.id}`,
+          })),
+        );
+      }
+
+      const { data: teamRow } = await supabase
+        .from("teams")
+        .select("name, club_id, clubs:club_id(name, logo_url)")
+        .eq("id", event.team_id)
+        .maybeSingle();
+      const teamName = (teamRow as any)?.name as string | undefined;
+      const clubId = (teamRow as any)?.club_id as string | undefined;
+      const clubName = (teamRow as any)?.clubs?.name as string | undefined;
+      const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
+
+      const { data: playersInfo } = playerIds.length > 0
+        ? await supabase
+            .from("players")
+            .select("id, first_name, last_name, email")
+            .in("id", playerIds)
+        : { data: [] as any[] };
+
+      const idemBase = newDate.getTime();
+      const sendOne = (
+        toEmail: string,
+        recipientFirstName: string | undefined,
+        playerName: string | undefined,
+        idemSuffix: string,
+      ) =>
+        sendTransactionalEmail({
+          templateName: "event-rescheduled",
+          recipientEmail: toEmail,
+          fromName: `${clubName ?? "Clubero"} via Clubero`,
+          idempotencyKey: `event-rescheduled-${event.id}-${idemBase}-${idemSuffix}`,
+          templateData: {
+            recipientFirstName,
+            playerName,
+            eventTitle: event.title,
+            previousDate: previousDateLabel,
+            newDate: newDateLabel,
+            eventLocation: event.location ?? undefined,
+            reason: reason || undefined,
+            teamName,
+            clubName,
+            clubLogoUrl,
+          },
+        }).catch(() => undefined);
+
+      const sends: Promise<unknown>[] = [];
+      for (const c of (convocations ?? []) as any[]) {
+        const player = (playersInfo ?? []).find((p: any) => p.id === c.player_id) as any;
+        const playerName = player
+          ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
+          : undefined;
+        if (player?.email) {
+          sends.push(sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+        }
+        for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
+          if (!parent.email) continue;
+          const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          sends.push(sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+        }
+      }
+      await Promise.allSettled(sends);
+
+      if (clubId && user) {
+        const wallBody = `🔁 ${t("events.eventRescheduled")} — ${event.title}${teamName ? ` (${teamName})` : ""}\n${t("events.previousDate")} : ${previousDateLabel}\n${t("events.newDate")} : ${newDateLabel}${reason ? `\n\n${reason}` : ""}`;
+        await supabase.from("wall_posts").insert({
+          club_id: clubId,
+          author_user_id: user.id,
+          body: wallBody,
+        });
+      }
+    } catch {
+      // best-effort
+    }
+
+    setRescheduleSubmitting(false);
+    setRescheduleOpen(false);
+    setRescheduleReason("");
+    toast.success(t("events.rescheduleSuccess"));
+    qc.invalidateQueries({ queryKey: ["event", eventId] });
+    qc.invalidateQueries({ queryKey: ["events"] });
+  }
+
 
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
