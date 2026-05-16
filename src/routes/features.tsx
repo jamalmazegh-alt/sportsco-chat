@@ -123,7 +123,7 @@ const AUDIENCES = [
     points: [
       "Un clic pour confirmer ou décliner",
       "Calendrier familial avec tous les événements de vos enfants",
-      "Zéro groupe WhatsApp envahissant",
+      "Recevez les convocations dans WhatsApp ou par email — comme votre club préfère",
       "Messagerie directe avec le coach",
       "Gestion des autorisations pour les mineurs",
     ],
