@@ -310,7 +310,7 @@ function AddressField({
     }
     const handle = window.setTimeout(() => {
       service.getPlacePredictions(
-        { input: value, types: ["geocode"], sessionToken: sessionTokenRef.current ?? undefined },
+        { input: value, sessionToken: sessionTokenRef.current ?? undefined },
         (items) => {
           setSuggestions(
             (items ?? [])
