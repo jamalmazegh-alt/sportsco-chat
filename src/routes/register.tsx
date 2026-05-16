@@ -136,7 +136,7 @@ function RegisterPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={144} height={144} className="mx-auto mb-3 h-32 w-32 object-contain drop-shadow-sm" />
+          <img src={logo} alt="Clubero" width={144} height={144} className="mx-auto mb-3 h-32 w-32 object-contain drop-shadow-sm dark:bg-white dark:rounded-2xl dark:p-3" />
           <h1 className="text-2xl font-semibold">{t("auth.register")}</h1>
         </div>
 
