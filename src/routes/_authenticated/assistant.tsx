@@ -210,26 +210,20 @@ function AssistantPage() {
                       );
                     }
                     if (part.type?.startsWith("tool-")) {
-                      const toolName = part.type.replace("tool-", "");
                       const state = (part as any).state;
+                      if (state === "output-available") return null;
+                      if (state === "output-error") {
+                        return (
+                          <p key={idx} className="my-1 text-xs text-destructive/80">
+                            {t("assistant.toolError", { defaultValue: "Une action a échoué." })}
+                          </p>
+                        );
+                      }
                       return (
-                        <details
-                          key={idx}
-                          className="my-2 rounded-lg border border-border bg-muted/30 text-xs"
-                        >
-                          <summary className="cursor-pointer px-3 py-1.5 flex items-center gap-1.5 text-muted-foreground">
-                            <Wrench className="h-3 w-3" />
-                            <span className="font-medium">{toolName}</span>
-                            <span className="text-[10px] opacity-70">· {state}</span>
-                          </summary>
-                          <pre className="px-3 py-2 overflow-auto text-[11px] leading-snug">
-                            {JSON.stringify(
-                              { input: (part as any).input, output: (part as any).output },
-                              null,
-                              2,
-                            )}
-                          </pre>
-                        </details>
+                        <div key={idx} className="my-1 flex items-center gap-2 text-xs text-muted-foreground">
+                          <Wrench className="h-3 w-3 animate-pulse" />
+                          <Shimmer>{t("assistant.searching", { defaultValue: "Recherche..." })}</Shimmer>
+                        </div>
                       );
                     }
                     return null;
