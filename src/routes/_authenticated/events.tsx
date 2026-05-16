@@ -429,7 +429,7 @@ function EventsPage() {
               className="p-3 pointer-events-auto w-full [--cell-size:2.6rem]"
             />
           </div>
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-xs text-center text-muted-foreground mt-2">
             {t("events.calendarHint", { defaultValue: "Touche un jour avec une pastille pour voir les événements." })}
           </p>
 
