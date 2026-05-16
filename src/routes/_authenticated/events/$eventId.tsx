@@ -539,20 +539,21 @@ function EventDetail() {
       return;
     }
 
-    // Notify all convoked players + their parents
+    // Notify all convoked players + their parents (in-app + email) and post on the wall
     try {
       const playerIds = (convocations ?? []).map((c: any) => c.player_id);
       const playerUserIds = (convocations ?? [])
         .map((c: any) => c.players?.user_id)
         .filter(Boolean);
-      let parentIds: string[] = [];
+      let parents: Array<{ parent_user_id: string | null; email: string | null; full_name: string | null; player_id: string }> = [];
       if (playerIds.length > 0) {
-        const { data: parents } = await supabase
+        const { data: parentsData } = await supabase
           .from("player_parents")
-          .select("parent_user_id")
+          .select("parent_user_id, email, full_name, player_id")
           .in("player_id", playerIds);
-        parentIds = (parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean);
+        parents = (parentsData ?? []) as any;
       }
+      const parentIds = parents.map((p) => p.parent_user_id).filter(Boolean) as string[];
       const recipients = Array.from(new Set([...playerUserIds, ...parentIds]));
       if (recipients.length > 0) {
         await supabase.from("notifications").insert(
@@ -564,6 +565,77 @@ function EventDetail() {
             link: `/events/${event.id}`,
           })),
         );
+      }
+
+      // Club + team info for email branding & wall post
+      const { data: teamRow } = await supabase
+        .from("teams")
+        .select("name, club_id, clubs:club_id(name, logo_url)")
+        .eq("id", event.team_id)
+        .maybeSingle();
+      const teamName = (teamRow as any)?.name as string | undefined;
+      const clubId = (teamRow as any)?.club_id as string | undefined;
+      const clubName = (teamRow as any)?.clubs?.name as string | undefined;
+      const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
+      const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+
+      // Player emails
+      const { data: playersInfo } = playerIds.length > 0
+        ? await supabase
+            .from("players")
+            .select("id, first_name, last_name, email")
+            .in("id", playerIds)
+        : { data: [] as any[] };
+
+      const sendOne = (
+        toEmail: string,
+        recipientFirstName: string | undefined,
+        playerName: string | undefined,
+        idemSuffix: string,
+      ) =>
+        sendTransactionalEmail({
+          templateName: "event-cancelled",
+          recipientEmail: toEmail,
+          fromName: `${clubName ?? "Clubero"} via Clubero`,
+          idempotencyKey: `event-cancelled-${event.id}-${idemSuffix}`,
+          templateData: {
+            recipientFirstName,
+            playerName,
+            eventTitle: event.title,
+            eventDate: eventDateLabel,
+            eventLocation: event.location ?? undefined,
+            reason,
+            teamName,
+            clubName,
+            clubLogoUrl,
+          },
+        }).catch(() => undefined);
+
+      const sends: Promise<unknown>[] = [];
+      for (const c of (convocations ?? []) as any[]) {
+        const player = (playersInfo ?? []).find((p: any) => p.id === c.player_id) as any;
+        const playerName = player
+          ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
+          : undefined;
+        if (player?.email) {
+          sends.push(sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+        }
+        for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
+          if (!parent.email) continue;
+          const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          sends.push(sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+        }
+      }
+      await Promise.allSettled(sends);
+
+      // Post on the club wall (best-effort)
+      if (clubId && user) {
+        const wallBody = `❌ ${t("events.eventCancelled")} — ${event.title}${teamName ? ` (${teamName})` : ""}\n📅 ${eventDateLabel}\n\n${t("events.cancellationReason")} : ${reason}`;
+        await supabase.from("wall_posts").insert({
+          club_id: clubId,
+          author_user_id: user.id,
+          body: wallBody,
+        });
       }
     } catch {
       // best-effort
