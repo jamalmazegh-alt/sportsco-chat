@@ -316,7 +316,6 @@ function EventsPage() {
                 </p>
               );
             })()}
-            }
           </div>
         </Link>
       </li>
