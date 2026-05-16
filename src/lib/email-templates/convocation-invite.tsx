@@ -88,17 +88,19 @@ const ConvocationInviteEmail = ({
           {eventLocation ? (
             <Text style={cardMeta}>
               📍 {eventLocation}
-              {locationMapsUrl ? (
-                <> — <a href={locationMapsUrl} style={mapsLink}>Voir sur Maps</a></>
-              ) : null}
+              <br />
+              <a href={locationMapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventLocation)}`} style={mapsLink}>🗺️ Google Maps</a>
+              {" · "}
+              <a href={`https://www.waze.com/ul?q=${encodeURIComponent(eventLocation)}&navigate=yes`} style={mapsLink}>🚗 Waze</a>
             </Text>
           ) : null}
           {meetingPoint ? (
             <Text style={cardMeta}>
               🚌 Point de RDV : {meetingPoint}
-              {meetingPointMapsUrl ? (
-                <> — <a href={meetingPointMapsUrl} style={mapsLink}>Maps</a></>
-              ) : null}
+              <br />
+              <a href={meetingPointMapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingPoint)}`} style={mapsLink}>🗺️ Google Maps</a>
+              {" · "}
+              <a href={`https://www.waze.com/ul?q=${encodeURIComponent(meetingPoint)}&navigate=yes`} style={mapsLink}>🚗 Waze</a>
             </Text>
           ) : null}
           {coachName ? <Text style={cardMeta}>👤 Coach : {coachName}</Text> : null}
