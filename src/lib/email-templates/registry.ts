@@ -22,6 +22,7 @@ import { template as convocationResponseTemplate } from './convocation-response'
 import { template as convocationInviteTemplate } from './convocation-invite'
 import { template as subscriptionAdminNotificationTemplate } from './subscription-admin-notification'
 import { template as eventCancelledTemplate } from './event-cancelled'
+import { template as eventRescheduledTemplate } from './event-rescheduled'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'player-invite': playerInviteTemplate,
@@ -29,4 +30,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'convocation-invite': convocationInviteTemplate,
   'subscription-admin-notification': subscriptionAdminNotificationTemplate,
   'event-cancelled': eventCancelledTemplate,
+  'event-rescheduled': eventRescheduledTemplate,
 }
