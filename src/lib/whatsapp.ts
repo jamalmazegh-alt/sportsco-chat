@@ -97,8 +97,7 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
 
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    const m = mapsUrlFor(input.location, input.locationUrl);
-    if (m) lines.push(m);
+    pushNavLinks(lines, input.location, input.locationUrl);
   }
   if (input.meetingPoint) {
     lines.push(`🚌 RDV : ${input.meetingPoint}`);
@@ -155,7 +154,10 @@ export function buildRescheduleMessage(input: WhatsAppEventInput): string {
   const next = fmtDate(input.startsAt);
   if (prev) lines.push(`Ancienne date : ${prev}`);
   if (next) lines.push(`Nouvelle date : ${next}`);
-  if (input.location) lines.push(`📍 ${input.location}`);
+  if (input.location) {
+    lines.push(`📍 ${input.location}`);
+    pushNavLinks(lines, input.location, input.locationUrl);
+  }
   if (input.cancellationReason) {
     lines.push("");
     lines.push(input.cancellationReason);
@@ -174,8 +176,7 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
   if (convoc) lines.push(`⏰ Convocation : ${convoc}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
-    const m = mapsUrlFor(input.location, input.locationUrl);
-    if (m) lines.push(m);
+    pushNavLinks(lines, input.location, input.locationUrl);
   }
   lines.push("");
   lines.push("Merci de confirmer votre présence 🙏");
