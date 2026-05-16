@@ -121,40 +121,46 @@ function ProfilePage() {
 
       {club && (
         <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-          <Label>{t("club.logo")}</Label>
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center overflow-hidden">
+            <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center overflow-hidden ring-1 ring-border shrink-0">
               {club.logo_url ? (
                 <img src={club.logo_url} alt={club.name} className="h-full w-full object-cover bg-white" />
               ) : (
-                <Camera className="h-6 w-6 text-muted-foreground" />
+                <Camera className="h-7 w-7 text-muted-foreground" />
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-medium truncate">{club.name}</p>
+              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+                {t("club.logo")}
+              </p>
+              <p className="font-semibold truncate mt-0.5">{club.name}</p>
               {role && (
-                <span className="inline-flex items-center mt-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
+                <span className="inline-flex items-center mt-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
                   {t(`roles.${role}`, { defaultValue: role })}
                 </span>
               )}
-              {isAdmin && (
-                <label className="mt-2 inline-flex items-center gap-2 text-sm text-primary font-medium cursor-pointer">
-                  {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                  {t("club.uploadLogo")}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    disabled={uploadingLogo}
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) onUploadClubLogo(f);
-                    }}
-                  />
-                </label>
-              )}
             </div>
           </div>
+          {isAdmin && (
+            <label className="flex items-center justify-center gap-2 w-full h-10 rounded-xl border border-dashed border-primary/40 bg-primary/5 text-sm text-primary font-medium cursor-pointer hover:bg-primary/10 transition-colors">
+              {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+              {uploadingLogo
+                ? t("common.loading", { defaultValue: "Chargement..." })
+                : club.logo_url
+                  ? t("club.changeLogo")
+                  : t("club.uploadLogo")}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={uploadingLogo}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onUploadClubLogo(f);
+                }}
+              />
+            </label>
+          )}
         </div>
       )}
 
