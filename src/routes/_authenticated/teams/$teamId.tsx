@@ -438,6 +438,32 @@ function TeamDetail() {
                 <Label>{t("teams.season")}</Label>
                 <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
               </div>
+              <div className="space-y-1.5 pt-2 border-t border-border/60">
+                <Label>WhatsApp — lien du groupe d'équipe</Label>
+                <Input
+                  type="url"
+                  placeholder="https://chat.whatsapp.com/..."
+                  value={editWhatsappUrl}
+                  onChange={(e) => setEditWhatsappUrl(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Coller le lien d'invitation du groupe WhatsApp de l'équipe. Utilisé pour partager rapidement les convocations.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Mode de communication</Label>
+                <Select value={editCommMode} onValueChange={(v) => setEditCommMode(v as any)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="app">Clubero uniquement (suivi des présences dans l'app)</SelectItem>
+                    <SelectItem value="hybrid">Hybride (WhatsApp + suivi des présences dans Clubero)</SelectItem>
+                    <SelectItem value="whatsapp">WhatsApp uniquement (pas de suivi de présence)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  En mode WhatsApp uniquement, vous partagez les événements sans demander de réponses dans l'app.
+                </p>
+              </div>
               <Button type="submit" className="w-full h-11" disabled={editBusy}>
                 {editBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
               </Button>
