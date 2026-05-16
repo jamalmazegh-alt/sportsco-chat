@@ -51,7 +51,7 @@ function AuthLayout() {
         <div className="mx-auto max-w-xl">
           <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
             <div className="relative flex items-center justify-center px-3 py-3">
-              <img src={logo} alt="Clubero" className="h-10 w-auto object-contain drop-shadow-sm" />
+              <img src={logo} alt="Clubero" className="h-10 w-auto object-contain drop-shadow-sm dark:bg-white dark:rounded-lg dark:px-2 dark:py-1" />
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
                 <GlobalSearch />
               </div>
