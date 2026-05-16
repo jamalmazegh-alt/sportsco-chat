@@ -681,7 +681,7 @@ function EventDetail() {
     }
     setRescheduleSubmitting(true);
 
-    const updates: Record<string, unknown> = { starts_at: newDate.toISOString() };
+    const updates: { starts_at: string; ends_at?: string; convocation_time?: string } = { starts_at: newDate.toISOString() };
     if (event.ends_at) {
       const offsetMs = new Date(event.ends_at).getTime() - previousStart.getTime();
       updates.ends_at = new Date(newDate.getTime() + offsetMs).toISOString();
