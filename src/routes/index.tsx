@@ -18,12 +18,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Clubero remplace le chaos WhatsApp par une appli claire pour les convocations, présences et communication de club. Pour clubs, coachs, parents et joueurs.",
+          "Clubero structure vos convocations, présences et communication de club — et s'intègre à votre groupe WhatsApp existant en mode hybride. Pour clubs, coachs, parents et joueurs.",
       },
       { property: "og:title", content: "Clubero — La coordination d'équipe pour clubs sportifs" },
       {
         property: "og:description",
-        content: "Convocations, présences, rappels. En un clic. Zéro chaos.",
+        content: "Convocations, présences, rappels — en gardant votre groupe WhatsApp. En un clic.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/" }],
