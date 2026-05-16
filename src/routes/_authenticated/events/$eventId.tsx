@@ -12,7 +12,6 @@ import {
   buildCancellationMessage,
   buildRescheduleMessage,
   buildReminderMessage,
-  openWhatsAppShare,
   normalizeGroupUrl,
 } from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
