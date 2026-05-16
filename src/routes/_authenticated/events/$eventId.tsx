@@ -51,6 +51,9 @@ function EventDetail() {
   const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
   const [respondReason, setRespondReason] = useState("");
   const [respondSubmitting, setRespondSubmitting] = useState(false);
+  const [cancelEventOpen, setCancelEventOpen] = useState(false);
+  const [cancelEventReason, setCancelEventReason] = useState("");
+  const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
