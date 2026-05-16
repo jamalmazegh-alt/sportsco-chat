@@ -4,9 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle,
 } from "lucide-react";
 import { toCsv, downloadCsv } from "@/lib/csv";
+import {
+  buildConvocationMessage,
+  buildCancellationMessage,
+  buildRescheduleMessage,
+  buildReminderMessage,
+  openWhatsAppShare,
+  normalizeGroupUrl,
+} from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
 import { AttachmentList, type Attachment } from "@/components/attachments";
