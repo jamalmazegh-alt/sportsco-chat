@@ -463,43 +463,8 @@ function EventDetail() {
       }
     }
 
-    // WhatsApp convocation: open share-sheet with prefilled message for the
-    // newly convoked players. The coach picks the team group and taps Send.
-    if (useWhatsApp) {
-      try {
-        const { data: playersForWa } = await supabase
-          .from("players")
-          .select("id, first_name, last_name")
-          .in("id", toInsert);
-        const competitionLabel = (event as any).competition_name
-          || ((event as any).competition_type
-            ? t(`events.competitionTypes.${(event as any).competition_type}`)
-            : undefined);
-        const waMsg = buildConvocationMessage({
-          clubName: teamRow?.clubs?.name,
-          teamName: teamRow?.name,
-          type: event.type,
-          title: event.title,
-          opponent: event.opponent,
-          isHome: event.is_home,
-          competitionLabel,
-          startsAt: event.starts_at,
-          endsAt: event.ends_at,
-          convocationTime: (event as any).convocation_time,
-          location: event.location,
-          locationUrl: (event as any).location_url,
-          meetingPoint: (event as any).meeting_point,
-          description: event.description,
-          attachments: (event.attachments as any) ?? [],
-          selectedPlayers: (playersForWa ?? []).map(
-            (p: any) => `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim()
-          ).filter(Boolean),
-        });
-        openWhatsAppShare(waMsg);
-      } catch {
-        // best-effort
-      }
-    }
+    // WhatsApp convocation: the coach shares via the WhatsApp card below
+    // (browsers block window.open after async awaits, so we don't auto-open).
 
     setSending(false);
     setPickerOpen(false);
