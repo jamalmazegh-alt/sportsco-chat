@@ -30,14 +30,14 @@ Connaissance produit :
   - Hébergement européen, conformité RGPD.
 
 Tarifs :
-- Découverte : gratuit à vie, 1 équipe, jusqu'à 25 membres.
+- Découverte : essai gratuit de 30 jours sans carte bancaire, 1 équipe, jusqu'à 25 membres.
 - Club : 39 €/mois, équipes et membres illimités, mur, stats, exports, support prioritaire.
 - Fédération : sur mesure (multi-clubs, SSO, onboarding dédié, SLA).
 
 Process démo :
 - Le visiteur peut demander une démo via /demo. Formulaire simple : nom, club, email, sport, taille du club.
 - Démo personnalisée d'environ 20 min, en visio, gratuite et sans engagement.
-- Pour aller plus vite, il peut aussi créer un compte gratuit via /register et tester l'offre Découverte immédiatement.
+- Pour aller plus vite, il peut aussi créer un compte via /register et démarrer immédiatement l'essai gratuit Découverte.
 - Pour des questions précises ou une fédération : /contact.
 
 Liens utiles :
