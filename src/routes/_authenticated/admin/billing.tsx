@@ -429,7 +429,15 @@ function BillingPage() {
         </section>
       )}
 
+      <UpdateCardDialog
+        open={updateCardOpen}
+        onOpenChange={setUpdateCardOpen}
+        clubId={activeClubId}
+        onSuccess={() => refetch()}
+      />
+
       <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Résilier l'abonnement&nbsp;?</AlertDialogTitle>
