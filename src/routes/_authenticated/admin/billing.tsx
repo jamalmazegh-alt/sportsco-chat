@@ -9,9 +9,9 @@ import {
   createPortalSession,
   cancelSubscriptionAtPeriodEnd,
   reactivateSubscription,
-  createUpdatePaymentMethodSession,
   listClubInvoices,
 } from "@/lib/billing.functions";
+import { UpdateCardDialog } from "@/components/billing/update-card-dialog";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -101,11 +101,11 @@ function BillingPage() {
   const portal = useServerFn(createPortalSession);
   const cancelSub = useServerFn(cancelSubscriptionAtPeriodEnd);
   const reactivate = useServerFn(reactivateSubscription);
-  const updateCard = useServerFn(createUpdatePaymentMethodSession);
   const fetchInvoices = useServerFn(listClubInvoices);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [updateCardOpen, setUpdateCardOpen] = useState(false);
 
   useEffect(() => {
     if (search.billing === "success") {
@@ -208,16 +208,9 @@ function BillingPage() {
     }
   }
 
-  async function onUpdateCard() {
+  function onUpdateCard() {
     if (!activeClubId) return;
-    setBusy("card");
-    try {
-      const res = await updateCard({ data: { clubId: activeClubId } });
-      if (res.url) navigateExternal(res.url);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir la mise à jour");
-      setBusy(null);
-    }
+    setUpdateCardOpen(true);
   }
 
   const cancelDate =
