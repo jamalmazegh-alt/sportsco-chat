@@ -15,6 +15,9 @@ Connaissance produit :
 - Rôles supportés : joueur, parent, coach (entraîneur), dirigeant (manager du club), admin.
 - Fonctionnalités clés :
   - Convocations aux entraînements et matchs avec réponse présent/absent/incertain (et motif optionnel).
+  - **Compatible WhatsApp — mode hybride** : Clubero ne remplace pas WhatsApp, il s'ajoute par-dessus. Le coach prépare la convocation dans Clubero, clique "Partager sur WhatsApp" et choisit son groupe existant. Le message formaté part avec un lien de réponse, et les réponses (présent/absent) restent centralisées et suivies dans Clubero. Les clubs gardent leur groupe WhatsApp habituel, zéro changement d'habitude pour les parents.
+  - Choix du canal de diffusion des convocations : email, notifications in-app, WhatsApp — ou tout en même temps.
+  - **Assistant IA intégré (c'est moi côté visiteurs ; côté membres, un assistant connecté aux données du club)** : répond aux questions ("Qui n'a pas encore répondu pour samedi ?", "Mes stats de présence ?"), respecte les rôles et permissions, hébergé en Europe, ne sert pas à entraîner de modèles.
   - Mur de communication du club : posts épinglés, @mentions des membres, accusés de lecture ("Lu par X/Y"), pièces jointes (images, fichiers, PDF).
   - Chat en temps réel par événement.
   - Résultats de matchs : saisie du score et statistiques joueurs adaptées au sport (buts, essais, paniers à 3 pts, arrêts, etc.).
@@ -22,7 +25,7 @@ Connaissance produit :
   - Recherche globale instantanée (Cmd/Ctrl + K) sur joueurs, équipes et événements.
   - Exports CSV : effectif d'équipe, présences à un événement.
   - Corbeille avec restauration sous 7 jours pour les suppressions (posts, commentaires, événements, équipes, joueurs).
-  - Notifications dans l'app (cloche) et par email pour les convocations et mentions.
+  - Notifications dans l'app (cloche), par email et via WhatsApp pour les convocations et mentions.
   - Codes d'invitation et liens magiques pour onboarder rapidement les membres.
   - Gestion multi-équipes, multi-saisons.
   - Application mobile (PWA) installable, pensée mobile-first pour tous les rôles.
