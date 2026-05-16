@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
+import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
@@ -198,6 +199,11 @@ const ApiPublicMarketingChatRoute = ApiPublicMarketingChatRouteImport.update({
   path: '/api/public/marketing-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicInquiryRoute = ApiPublicInquiryRouteImport.update({
+  id: '/api/public/inquiry',
+  path: '/api/public/inquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTeamsTeamIdRoute =
   AuthenticatedTeamsTeamIdRouteImport.update({
     id: '/$teamId',
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -353,6 +360,7 @@ export interface FileRoutesByTo {
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -399,6 +407,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -445,6 +454,7 @@ export interface FileRouteTypes {
     | '/profile/password'
     | '/profile/privacy'
     | '/teams/$teamId'
+    | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
     | '/lovable/email/suppression'
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/profile/password'
     | '/profile/privacy'
     | '/teams/$teamId'
+    | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
     | '/lovable/email/suppression'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/teams/$teamId'
+    | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
     | '/lovable/email/suppression'
@@ -563,6 +575,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   LegalKindRoute: typeof LegalKindRoute
   RTokenRoute: typeof RTokenRoute
+  ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -779,6 +792,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMarketingChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/inquiry': {
+      id: '/api/public/inquiry'
+      path: '/api/public/inquiry'
+      fullPath: '/api/public/inquiry'
+      preLoaderRoute: typeof ApiPublicInquiryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/teams/$teamId': {
       id: '/_authenticated/teams/$teamId'
       path: '/$teamId'
@@ -991,6 +1011,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   LegalKindRoute: LegalKindRoute,
   RTokenRoute: RTokenRoute,
+  ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
