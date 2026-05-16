@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2 } from "lucide-react";
+import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import coachShot from "@/assets/features/coach-attendance.png";
@@ -51,8 +51,13 @@ const PILLARS = [
     body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
   },
   {
+    icon: MessageCircle,
+    title: "Compatible WhatsApp (hybride)",
+    body: "Gardez votre groupe WhatsApp. Envoyez les convocations groupées formatées directement dedans, en un clic — sans abandonner le suivi des présences dans l'appli.",
+  },
+  {
     icon: MessageSquareText,
-    title: "Communication",
+    title: "Communication interne",
     body: "Mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes. Chat temps réel par événement.",
   },
   {
@@ -118,7 +123,7 @@ const AUDIENCES = [
     points: [
       "Un clic pour confirmer ou décliner",
       "Calendrier familial avec tous les événements de vos enfants",
-      "Zéro groupe WhatsApp envahissant",
+      "Recevez les convocations dans WhatsApp ou par email — comme votre club préfère",
       "Messagerie directe avec le coach",
       "Gestion des autorisations pour les mineurs",
     ],
