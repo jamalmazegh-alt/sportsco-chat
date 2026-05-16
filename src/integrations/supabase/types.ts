@@ -1020,6 +1020,7 @@ export type Database = {
           age_group: string | null
           championship: string | null
           club_id: string
+          communication_mode: string
           competitions: string[]
           created_at: string
           deleted_at: string | null
@@ -1028,11 +1029,13 @@ export type Database = {
           name: string
           season: string | null
           sport: string | null
+          whatsapp_group_url: string | null
         }
         Insert: {
           age_group?: string | null
           championship?: string | null
           club_id: string
+          communication_mode?: string
           competitions?: string[]
           created_at?: string
           deleted_at?: string | null
@@ -1041,11 +1044,13 @@ export type Database = {
           name: string
           season?: string | null
           sport?: string | null
+          whatsapp_group_url?: string | null
         }
         Update: {
           age_group?: string | null
           championship?: string | null
           club_id?: string
+          communication_mode?: string
           competitions?: string[]
           created_at?: string
           deleted_at?: string | null
@@ -1054,6 +1059,7 @@ export type Database = {
           name?: string
           season?: string | null
           sport?: string | null
+          whatsapp_group_url?: string | null
         }
         Relationships: [
           {

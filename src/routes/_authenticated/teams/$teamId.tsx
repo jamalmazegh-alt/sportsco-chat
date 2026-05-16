@@ -113,6 +113,8 @@ function TeamDetail() {
   const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editSport, setEditSport] = useState("");
+  const [editWhatsappUrl, setEditWhatsappUrl] = useState("");
+  const [editCommMode, setEditCommMode] = useState<"app" | "whatsapp" | "hybrid">("app");
   const [editBusy, setEditBusy] = useState(false);
 
   function openEdit() {
@@ -122,6 +124,8 @@ function TeamDetail() {
     setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditSport(team?.sport ?? "");
+    setEditWhatsappUrl((team as any)?.whatsapp_group_url ?? "");
+    setEditCommMode(((team as any)?.communication_mode as any) ?? "app");
     setEditOpen(true);
   }
 
@@ -141,7 +145,9 @@ function TeamDetail() {
         competitions: editCompetitions,
         season: editSeason || null,
         sport: editSport || null,
-      })
+        whatsapp_group_url: editWhatsappUrl.trim() || null,
+        communication_mode: editCommMode,
+      } as any)
       .eq("id", teamId);
     setEditBusy(false);
     if (error) { toast.error(error.message); return; }
@@ -431,6 +437,32 @@ function TeamDetail() {
               <div className="space-y-1.5">
                 <Label>{t("teams.season")}</Label>
                 <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
+              </div>
+              <div className="space-y-1.5 pt-2 border-t border-border/60">
+                <Label>WhatsApp — lien du groupe d'équipe</Label>
+                <Input
+                  type="url"
+                  placeholder="https://chat.whatsapp.com/..."
+                  value={editWhatsappUrl}
+                  onChange={(e) => setEditWhatsappUrl(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Coller le lien d'invitation du groupe WhatsApp de l'équipe. Utilisé pour partager rapidement les convocations.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Mode de communication</Label>
+                <Select value={editCommMode} onValueChange={(v) => setEditCommMode(v as any)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="app">Clubero uniquement (suivi des présences dans l'app)</SelectItem>
+                    <SelectItem value="hybrid">Hybride (WhatsApp + suivi des présences dans Clubero)</SelectItem>
+                    <SelectItem value="whatsapp">WhatsApp uniquement (pas de suivi de présence)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  En mode WhatsApp uniquement, vous partagez les événements sans demander de réponses dans l'app.
+                </p>
               </div>
               <Button type="submit" className="w-full h-11" disabled={editBusy}>
                 {editBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}

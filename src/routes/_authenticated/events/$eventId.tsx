@@ -4,9 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle,
 } from "lucide-react";
 import { toCsv, downloadCsv } from "@/lib/csv";
+import {
+  buildConvocationMessage,
+  buildCancellationMessage,
+  buildRescheduleMessage,
+  buildReminderMessage,
+  openWhatsAppShare,
+  normalizeGroupUrl,
+} from "@/lib/whatsapp";
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
 import { AttachmentList, type Attachment } from "@/components/attachments";
@@ -76,7 +84,10 @@ function EventDetail() {
     queryKey: ["teams-min", event?.team_id],
     enabled: !!event,
     queryFn: async () => {
-      const { data } = await supabase.from("teams").select("id, name, competitions, sport").eq("id", event!.team_id);
+      const { data } = await supabase
+        .from("teams")
+        .select("id, name, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name)")
+        .eq("id", event!.team_id);
       return data ?? [];
     },
   });
@@ -1096,6 +1107,87 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
+      {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
+      {isCoach && (() => {
+        const team = teams?.[0] as any;
+        if (!team) return null;
+        const mode = (team.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
+        if (mode === "app") return null;
+        const groupUrl = normalizeGroupUrl(team.whatsapp_group_url);
+        const clubName = team.clubs?.name ?? undefined;
+        const teamName = team.name ?? undefined;
+        const competitionLabel = (event as any).competition_name
+          || ((event as any).competition_type ? t(`events.competitionTypes.${(event as any).competition_type}`) : undefined);
+        const selectedPlayers = (convocations ?? [])
+          .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
+          .filter(Boolean);
+        const base = {
+          clubName,
+          teamName,
+          type: event.type,
+          title: event.title,
+          opponent: event.opponent,
+          isHome: event.is_home,
+          competitionLabel,
+          startsAt: event.starts_at,
+          endsAt: event.ends_at,
+          convocationTime: (event as any).convocation_time,
+          location: event.location,
+          locationUrl: (event as any).location_url,
+          meetingPoint: (event as any).meeting_point,
+          description: event.description,
+          attachments: (event.attachments as any) ?? [],
+          selectedPlayers,
+          cancellationReason: event.cancellation_reason,
+        };
+        const isCancelled = event.status === "cancelled";
+        const msg = isCancelled
+          ? buildCancellationMessage(base)
+          : buildConvocationMessage(base);
+        return (
+          <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <MessageCircle className="h-4 w-4 text-[#25D366]" />
+                <span>WhatsApp</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                  {mode === "whatsapp" ? "WhatsApp uniquement" : "Hybride"}
+                </span>
+              </div>
+              {groupUrl && (
+                <a
+                  href={groupUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-medium text-[#075E54] inline-flex items-center gap-1"
+                >
+                  Ouvrir le groupe <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </div>
+            <Button
+              onClick={() => openWhatsAppShare(msg)}
+              className="w-full h-11 bg-[#25D366] text-white hover:bg-[#1ebe5b]"
+            >
+              <MessageCircle className="h-4 w-4" />
+              {isCancelled ? "Partager l'annulation sur WhatsApp" : "Envoyer via WhatsApp"}
+            </Button>
+            {!isCancelled && (
+              <Button
+                variant="outline"
+                onClick={() => openWhatsAppShare(buildReminderMessage(base))}
+                className="w-full h-9"
+              >
+                <Bell className="h-4 w-4" />
+                Envoyer un rappel WhatsApp
+              </Button>
+            )}
+            <p className="text-[11px] text-muted-foreground">
+              WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer.
+            </p>
+          </div>
+        );
+      })()}
 
       <Dialog
         open={cancelEventOpen}
