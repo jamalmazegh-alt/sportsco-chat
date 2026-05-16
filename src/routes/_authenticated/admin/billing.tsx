@@ -386,9 +386,10 @@ function BillingPage() {
           </div>
 
           <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-sm">
-            <p className="font-medium text-primary">🎁 30 jours d'essai gratuit</p>
+            <p className="font-medium text-primary">🎁 30 jours d'essai gratuit — sans carte bancaire</p>
             <p className="text-muted-foreground mt-1">
-              Carte bancaire requise, mais aucun débit avant la fin de l'essai. Annulable à tout moment.
+              Profitez de toutes les fonctionnalités pendant 30 jours. Aucune carte requise pendant l'essai.
+              Vous pourrez activer votre abonnement à tout moment ci-dessous pour continuer après l'essai.
             </p>
           </div>
 
