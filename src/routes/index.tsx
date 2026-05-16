@@ -242,9 +242,9 @@ const FEATURES = [
   },
   {
     icon: MessageSquareText,
-    title: "Communication de club",
-    body: "Un mur propre et un chat par événement remplacent les groupes WhatsApp.",
-    accent: "from-[color:var(--secondary)] to-[color:var(--brand-blue)]",
+    title: "Compatible WhatsApp",
+    body: "Gardez votre groupe WhatsApp pour discuter. Clubero envoie les convocations groupées directement dedans, en un clic.",
+    accent: "from-[#25D366] to-[#075E54]",
   },
   {
     icon: Trophy,
