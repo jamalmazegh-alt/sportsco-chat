@@ -314,19 +314,43 @@ function EventsPage() {
         )}
       </div>
 
-      {pastCount > 0 && (
-        <div className="flex justify-end">
+      <div className="flex items-center justify-between gap-2">
+        <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+          <button
+            type="button"
+            onClick={() => setView("list")}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+              view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+            aria-pressed={view === "list"}
+          >
+            <List className="h-3.5 w-3.5" />
+            {t("events.viewList", { defaultValue: "Liste" })}
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("calendar")}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+              view === "calendar" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+            aria-pressed={view === "calendar"}
+          >
+            <CalendarDays className="h-3.5 w-3.5" />
+            {t("events.viewCalendar", { defaultValue: "Calendrier" })}
+          </button>
+        </div>
+        {view === "list" && pastCount > 0 && (
           <button
             type="button"
             onClick={() => setShowPast((s) => !s)}
             className="text-xs font-medium text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
           >
-            {showPast
-              ? t("events.hidePast")
-              : t("events.showPast", { count: pastCount })}
+            {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">
