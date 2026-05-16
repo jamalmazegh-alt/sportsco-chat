@@ -76,6 +76,9 @@ export function MarketingHeader() {
           <Button asChild variant="ghost" size="sm" className="h-9">
             <Link to="/login">{t("nav.login")}</Link>
           </Button>
+          <Button asChild variant="outline" size="sm" className="h-9">
+            <Link to="/register">{t("nav.signup")}</Link>
+          </Button>
           <Button asChild size="sm" className="h-9">
             <Link to="/demo">{t("nav.demo")}</Link>
           </Button>
@@ -130,11 +133,14 @@ export function MarketingHeader() {
                 );
               })}
             </div>
-            <div className="mt-2 flex gap-2 px-1">
-              <Button asChild variant="outline" className="flex-1" onClick={() => setOpen(false)}>
+            <div className="mt-2 flex flex-col gap-2 px-1">
+              <Button asChild variant="outline" onClick={() => setOpen(false)}>
                 <Link to="/login">{t("nav.login")}</Link>
               </Button>
-              <Button asChild className="flex-1" onClick={() => setOpen(false)}>
+              <Button asChild variant="outline" onClick={() => setOpen(false)}>
+                <Link to="/register">{t("nav.signup")}</Link>
+              </Button>
+              <Button asChild onClick={() => setOpen(false)}>
                 <Link to="/demo">{t("nav.demo")}</Link>
               </Button>
             </div>
