@@ -172,3 +172,137 @@ export const getClubSubscription = createServerFn({ method: "GET" })
 
     return { subscription: sub };
   });
+
+/**
+ * Helper: verify user is admin of the club and return its stripe customer + subscription ids.
+ */
+async function getAdminClubStripeIds(
+  clubId: string,
+  userId: string,
+  supabase: any,
+): Promise<{ customerId: string; subscriptionId: string | null }> {
+  const { data: membership } = await supabase
+    .from("club_members")
+    .select("role")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!membership || membership.role !== "admin") {
+    throw new Error("Only club admins can manage subscriptions");
+  }
+  const { data: sub } = await supabaseAdmin
+    .from("subscriptions")
+    .select("stripe_customer_id, stripe_subscription_id")
+    .eq("club_id", clubId)
+    .maybeSingle();
+  if (!sub?.stripe_customer_id) throw new Error("No subscription found");
+  return {
+    customerId: sub.stripe_customer_id,
+    subscriptionId: sub.stripe_subscription_id ?? null,
+  };
+}
+
+/**
+ * Cancel the subscription at the end of the current billing period.
+ */
+export const cancelSubscriptionAtPeriodEnd = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { subscriptionId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
+    if (!subscriptionId) throw new Error("No active subscription");
+    const stripe = getStripe();
+    const updated = await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: true,
+    });
+    await supabaseAdmin
+      .from("subscriptions")
+      .update({
+        cancel_at_period_end: true,
+        cancel_at: updated.cancel_at ? new Date(updated.cancel_at * 1000).toISOString() : null,
+      })
+      .eq("club_id", data.clubId);
+    return { ok: true };
+  });
+
+/**
+ * Reactivate a subscription scheduled for cancellation.
+ */
+export const reactivateSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { subscriptionId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
+    if (!subscriptionId) throw new Error("No subscription");
+    const stripe = getStripe();
+    await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: false,
+    });
+    await supabaseAdmin
+      .from("subscriptions")
+      .update({ cancel_at_period_end: false, cancel_at: null })
+      .eq("club_id", data.clubId);
+    return { ok: true };
+  });
+
+/**
+ * Create a Stripe Checkout session in setup mode to let the user
+ * update / add a payment method. Returns a URL that opens just the
+ * card form (no full billing portal).
+ */
+export const createUpdatePaymentMethodSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { customerId, subscriptionId } = await getAdminClubStripeIds(
+      data.clubId,
+      userId,
+      supabase,
+    );
+    const stripe = getStripe();
+    const origin = getOrigin();
+    const session = await stripe.checkout.sessions.create({
+      mode: "setup",
+      customer: customerId,
+      payment_method_types: ["card"],
+      setup_intent_data: {
+        metadata: {
+          club_id: data.clubId,
+          subscription_id: subscriptionId ?? "",
+          purpose: "update_payment_method",
+        },
+      },
+      success_url: `${origin}/admin/billing?card=updated`,
+      cancel_url: `${origin}/admin/billing`,
+    });
+    return { url: session.url };
+  });
+
+/**
+ * List recent invoices for the club's Stripe customer.
+ */
+export const listClubInvoices = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { customerId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
+    const stripe = getStripe();
+    const invoices = await stripe.invoices.list({ customer: customerId, limit: 12 });
+    return {
+      invoices: invoices.data.map((inv) => ({
+        id: inv.id,
+        number: inv.number,
+        status: inv.status,
+        amount_paid: inv.amount_paid,
+        amount_due: inv.amount_due,
+        currency: inv.currency,
+        created: inv.created,
+        hosted_invoice_url: inv.hosted_invoice_url,
+        invoice_pdf: inv.invoice_pdf,
+      })),
+    };
+  });
