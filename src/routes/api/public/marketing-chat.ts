@@ -37,7 +37,7 @@ Tarifs :
 Process démo :
 - Le visiteur peut demander une démo via /demo. Formulaire simple : nom, club, email, sport, taille du club.
 - Démo personnalisée d'environ 20 min, en visio, gratuite et sans engagement.
-- Pour aller plus vite, il peut aussi créer un compte gratuit via /register et tester l'offre Découverte immédiatement.
+- Pour aller plus vite, il peut aussi créer un compte via /register et démarrer immédiatement l'essai gratuit Découverte.
 - Pour des questions précises ou une fédération : /contact.
 
 Liens utiles :
