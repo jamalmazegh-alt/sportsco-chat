@@ -576,5 +576,27 @@
     "open": "Ouvrir l'assistant",
     "close": "Fermer l'assistant",
     "noPlayerLinked": "Aucun joueur n'est associé à ton compte. Les statistiques de présence concernent uniquement les joueurs (et leurs parents)."
+  },
+  "cookie": {
+    "title": "Paramètres des cookies",
+    "description": "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser les contenus. Vous pouvez choisir ce que vous acceptez.",
+    "showDetails": "Personnaliser",
+    "hideDetails": "Masquer les détails",
+    "acceptAll": "Accepter tout",
+    "reject": "Refuser tout",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "necessary": {
+      "title": "Nécessaires",
+      "description": "Indispensables au fonctionnement du site (connexion, sécurité, préférences)."
+    },
+    "analytics": {
+      "title": "Analytiques",
+      "description": "Nous aident à comprendre comment vous utilisez le site pour l'améliorer."
+    },
+    "marketing": {
+      "title": "Marketing",
+      "description": "Utilisés pour vous proposer des contenus et offres personnalisées."
+    }
   }
 }
