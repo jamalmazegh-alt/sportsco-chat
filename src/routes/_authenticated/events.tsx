@@ -2,12 +2,13 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { format, isPast, isToday } from "date-fns";
+import { format, isPast, isToday, isSameDay, startOfDay } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane } from "lucide-react";
+import { Calendar as CalendarUI } from "@/components/ui/calendar";
+import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
