@@ -381,6 +381,35 @@ function EventsPage() {
             ) : null
           }
         />
+      ) : view === "calendar" ? (
+        <div className="space-y-5">
+          <div className="flex justify-center">
+            <CalendarUI
+              mode="single"
+              selected={selectedDay}
+              onSelect={(d) => d && setSelectedDay(startOfDay(d))}
+              locale={dateLocale}
+              modifiers={{ hasEvent: eventDates }}
+              modifiersClassNames={{
+                hasEvent:
+                  "relative after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary data-[selected-single=true]:after:bg-primary-foreground",
+              }}
+              className="p-3 pointer-events-auto w-full [--cell-size:2.4rem]"
+            />
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              {format(selectedDay, "EEEE d MMMM", { locale: dateLocale })}
+            </h2>
+            {selectedDayEvents.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-6 text-center">
+                {t("events.noEventsThisDay", { defaultValue: "Aucun événement ce jour." })}
+              </p>
+            ) : (
+              <ul className="space-y-2.5">{selectedDayEvents.map(renderEventItem)}</ul>
+            )}
+          </div>
+        </div>
       ) : (
         <div className="space-y-7">
           {grouped.map((group) => (
@@ -388,138 +417,7 @@ function EventsPage() {
               <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sticky top-0 bg-background/80 backdrop-blur py-1 -mx-5 px-5">
                 {group.label}
               </h2>
-              <ul className="space-y-2.5">
-                {group.items.map((e) => {
-                  const Icon = TYPE_ICONS[e.type] ?? Calendar;
-                  const d = new Date(e.starts_at);
-                  const past = isPast(d) && !isToday(d);
-                  let outcome: "win" | "loss" | "draw" | null = null;
-                  if (e.type === "match" && e.result) {
-                    const ourSide = e.is_home === false ? "away" : "home";
-                    const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
-                    const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
-                    outcome = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
-                  }
-                  const isLoss = outcome === "loss";
-                  return (
-                    <li key={e.id}>
-                      <Link
-                        to="/events/$eventId"
-                        params={{ eventId: e.id }}
-                        className={cn(
-                          "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden active:scale-[0.99] transition-transform",
-                          isLoss
-                            ? "border-defeat/50 bg-defeat/5 hover:border-defeat/70"
-                            : past
-                              ? "border-border/60 opacity-70"
-                              : "border-border hover:border-primary/40",
-                        )}
-                      >
-                        {/* Date block */}
-                        <div className={cn(
-                          "flex flex-col items-center justify-center w-16 shrink-0 py-3",
-                          isLoss ? "bg-defeat/15" : past ? "bg-muted/40" : "bg-primary/8",
-                        )}>
-                          <span className={cn(
-                            "text-[10px] font-semibold uppercase tracking-wider",
-                            past ? "text-muted-foreground" : "text-primary",
-                          )}>
-                            {format(d, "EEE", { locale: dateLocale })}
-                          </span>
-                          <span className="text-2xl font-bold leading-none mt-0.5">
-                            {format(d, "d")}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground mt-1">
-                            {format(d, "HH:mm")}
-                          </span>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-                              {t(`events.types.${e.type}`)}
-                            </span>
-                            {e.type === "match" && e.competition_type && (
-                              <span className={cn(
-                                "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border",
-                                e.competition_type === "friendly" && "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-300",
-                                e.competition_type === "championship" && "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
-                                e.competition_type === "cup" && "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
-                              )}>
-                                {t(`events.competitionTypes.${e.competition_type}`)}
-                              </span>
-                            )}
-                            {e.type === "match" && e.is_home !== null && e.is_home !== undefined && (
-                              <span className={cn(
-                                "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
-                                e.is_home
-                                  ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
-                                  : "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300"
-                              )}>
-                                {e.is_home ? <Home className="h-3 w-3" /> : <Plane className="h-3 w-3" />}
-                                {e.is_home ? t("events.home") : t("events.away")}
-                              </span>
-                            )}
-                            {e.type === "match" && e.competition_name && (
-                              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground truncate">
-                                · {e.competition_name}
-                              </span>
-                            )}
-                            {e.team_name && (
-                              <span className="text-[10px] text-muted-foreground truncate">
-                                · {e.team_name}
-                              </span>
-                            )}
-                          </div>
-                          <p className="font-medium truncate leading-tight">
-                            {(() => {
-                              if (e.type === "match" && e.opponent && e.team_name) {
-                                return `${e.team_name} vs ${e.opponent}`;
-                              }
-                              if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs ")) {
-                                return e.title;
-                              }
-                              return (
-                                <>
-                                  {e.title}
-                                  {e.opponent && (
-                                    <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </p>
-                          {e.type === "match" && e.result && (() => {
-                            const ourSide = e.is_home === false ? "away" : "home";
-                            const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
-                            const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
-                            const outcome = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
-                            return (
-                              <p className={cn(
-                                "text-xs font-bold tabular-nums inline-flex items-center gap-1.5 mt-0.5 w-fit px-1.5 py-0.5 rounded",
-                                outcome === "win" && "bg-present/15 text-present",
-                                outcome === "loss" && "bg-defeat/15 text-defeat",
-                                outcome === "draw" && "bg-draw/15 text-draw",
-                              )}>
-                                <Trophy className="h-3 w-3" />
-                                {t(`match.${outcome}`)} {ours} — {theirs}
-                              </p>
-                            );
-                          })()}
-                          {e.location && (
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-                              <MapPin className="h-3 w-3 shrink-0" />
-                              <span className="truncate">{e.location}</span>
-                            </p>
-                          )}
-                        </div>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+              <ul className="space-y-2.5">{group.items.map(renderEventItem)}</ul>
             </section>
           ))}
         </div>
