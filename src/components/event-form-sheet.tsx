@@ -682,14 +682,14 @@ export function EventFormSheet({
                 </div>
               </div>
               {isHome === "away" && (
-                <div className="space-y-1.5">
-                  <Label>{t("events.meetingPoint")}</Label>
-                  <Input
-                    value={meetingPoint ?? ""}
-                    onChange={(e) => setMeetingPoint(e.target.value)}
-                    placeholder={t("events.meetingPointHint")}
-                  />
-                </div>
+                <AddressField
+                  label={t("events.meetingPoint")}
+                  value={meetingPoint ?? ""}
+                  onValueChange={setMeetingPoint}
+                  onPlaceUrl={() => undefined}
+                  placeholder={t("events.meetingPointHint")}
+                  helper={t("events.locationGoogleHelper")}
+                />
               )}
             </>
           )}
