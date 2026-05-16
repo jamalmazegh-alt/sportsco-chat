@@ -448,6 +448,8 @@ export type Database = {
       events: {
         Row: {
           attachments: Json
+          cancellation_reason: string | null
+          cancelled_at: string | null
           competition_name: string | null
           competition_type: string | null
           convocation_time: string | null
@@ -472,6 +474,8 @@ export type Database = {
         }
         Insert: {
           attachments?: Json
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           competition_name?: string | null
           competition_type?: string | null
           convocation_time?: string | null
@@ -496,6 +500,8 @@ export type Database = {
         }
         Update: {
           attachments?: Json
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
           competition_name?: string | null
           competition_type?: string | null
           convocation_time?: string | null
