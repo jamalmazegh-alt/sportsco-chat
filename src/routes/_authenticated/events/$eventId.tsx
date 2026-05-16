@@ -76,7 +76,10 @@ function EventDetail() {
     queryKey: ["teams-min", event?.team_id],
     enabled: !!event,
     queryFn: async () => {
-      const { data } = await supabase.from("teams").select("id, name, competitions, sport").eq("id", event!.team_id);
+      const { data } = await supabase
+        .from("teams")
+        .select("id, name, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name)")
+        .eq("id", event!.team_id);
       return data ?? [];
     },
   });
