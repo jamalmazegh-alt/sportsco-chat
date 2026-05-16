@@ -19,7 +19,7 @@ const FAQS = [
   },
   {
     q: "Y a-t-il une offre gratuite ?",
-    a: "Oui. Notre offre Découverte est gratuite à vie pour une équipe jusqu'à 25 membres. Vous pouvez passer au plan Club quand vous avez besoin de plus d'équipes ou de fonctionnalités.",
+    a: "Oui. Notre offre Découverte propose une période d'essai gratuit de 30 jours sans carte bancaire, pour une équipe jusqu'à 25 membres. Vous pouvez passer au plan Club quand vous avez besoin de plus d'équipes ou de fonctionnalités.",
   },
   {
     q: "Combien de temps pour mettre en place un club ?",
