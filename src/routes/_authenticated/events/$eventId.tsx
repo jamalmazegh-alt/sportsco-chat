@@ -328,7 +328,7 @@ function EventDetail() {
     }
 
     // 1-tap email invitations to player + parents (best-effort, non-blocking)
-    try {
+    if (useEmail) try {
       const { data: playersInfo } = await supabase
         .from("players")
         .select("id, first_name, last_name, email")
