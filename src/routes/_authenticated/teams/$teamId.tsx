@@ -113,6 +113,8 @@ function TeamDetail() {
   const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editSport, setEditSport] = useState("");
+  const [editWhatsappUrl, setEditWhatsappUrl] = useState("");
+  const [editCommMode, setEditCommMode] = useState<"app" | "whatsapp" | "hybrid">("app");
   const [editBusy, setEditBusy] = useState(false);
 
   function openEdit() {
@@ -122,6 +124,8 @@ function TeamDetail() {
     setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditSport(team?.sport ?? "");
+    setEditWhatsappUrl((team as any)?.whatsapp_group_url ?? "");
+    setEditCommMode(((team as any)?.communication_mode as any) ?? "app");
     setEditOpen(true);
   }
 
