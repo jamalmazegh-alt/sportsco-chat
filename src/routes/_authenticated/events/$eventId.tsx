@@ -1019,6 +1019,18 @@ function EventDetail() {
         </div>
       )}
 
+      {/* Coach: reschedule event */}
+      {isCoach && event.status !== "cancelled" && (
+        <Button
+          variant="outline"
+          onClick={openReschedule}
+          className="w-full h-10"
+        >
+          <CalendarClock className="h-4 w-4" />
+          {t("events.reschedule")}
+        </Button>
+      )}
+
       {/* Coach: cancel event */}
       {isCoach && event.status !== "cancelled" && (
         <Button
@@ -1030,6 +1042,60 @@ function EventDetail() {
           {t("events.cancelEvent")}
         </Button>
       )}
+
+      <Dialog
+        open={rescheduleOpen}
+        onOpenChange={(o) => {
+          if (!o && !rescheduleSubmitting) {
+            setRescheduleOpen(false);
+          }
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("events.rescheduleTitle")}</DialogTitle>
+            <DialogDescription>{t("events.rescheduleDescription")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">{t("events.rescheduleNewDateLabel")}</label>
+              <input
+                type="datetime-local"
+                value={rescheduleNewDate}
+                onChange={(e) => setRescheduleNewDate(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium">{t("events.rescheduleReasonLabel")}</label>
+              <Textarea
+                value={rescheduleReason}
+                onChange={(e) => setRescheduleReason(e.target.value)}
+                placeholder={t("events.rescheduleReasonPlaceholder")}
+                rows={3}
+                maxLength={500}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRescheduleOpen(false)}
+              disabled={rescheduleSubmitting}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={confirmReschedule}
+              disabled={rescheduleSubmitting || !rescheduleNewDate}
+            >
+              {rescheduleSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {t("events.rescheduleConfirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       <Dialog
         open={cancelEventOpen}
