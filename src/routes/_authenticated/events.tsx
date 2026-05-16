@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban } from "lucide-react";
+import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
@@ -284,9 +284,6 @@ function EventsPage() {
                   · {e.competition_name}
                 </span>
               )}
-              {e.team_name && (
-                <span className="text-[10px] text-muted-foreground truncate">· {e.team_name}</span>
-              )}
             </div>
             <p className={cn("font-medium truncate leading-tight", isCancelled && "line-through text-muted-foreground")}>
               {(() => {
@@ -319,12 +316,6 @@ function EventsPage() {
                 </p>
               );
             })()}
-            {e.location && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-                <MapPin className="h-3 w-3 shrink-0" />
-                <span className="truncate">{e.location}</span>
-              </p>
-            )}
           </div>
         </Link>
       </li>
