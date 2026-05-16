@@ -311,7 +311,18 @@
     "repeatWeeks": "For {{count}} weeks",
     "repeatHint": "Automatically creates the following sessions at the same time.",
     "repeatCreated": "{{count}} trainings created",
-    "openMeetingInMaps": "Open in Maps"
+    "openMeetingInMaps": "Open in Maps",
+    "cancelEvent": "Cancel event",
+    "cancelEventTitle": "Cancel this event?",
+    "cancelEventDescription": "All convoked players will receive a notification with the reason. This action cannot be undone.",
+    "cancelEventReasonLabel": "Cancellation reason",
+    "cancelEventReasonPlaceholder": "E.g. pitch unplayable, opponent forfeit…",
+    "cancelEventReasonRequired": "Please provide a reason.",
+    "cancelEventConfirm": "Cancel event",
+    "eventCancelled": "Event cancelled",
+    "eventCancelledOn": "Cancelled on {{date}}",
+    "cancellationReason": "Reason",
+    "cancelEventSuccess": "Event cancelled and players notified"
   },
   "followUps": {
     "title": "Follow-ups",
