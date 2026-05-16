@@ -62,6 +62,7 @@ function Landing() {
       <Hero />
       <FeaturesGrid />
       <WhatsAppHybrid />
+      <AIAssistantSection />
       <ForEveryone />
       <CTA />
     </MarketingLayout>
