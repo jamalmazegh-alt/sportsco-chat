@@ -322,7 +322,20 @@
     "eventCancelled": "Event cancelled",
     "eventCancelledOn": "Cancelled on {{date}}",
     "cancellationReason": "Reason",
-    "cancelEventSuccess": "Event cancelled and players notified"
+    "cancelEventSuccess": "Event cancelled and players notified",
+    "reschedule": "Reschedule",
+    "rescheduleTitle": "Reschedule this event",
+    "rescheduleDescription": "Pick a new date. All convoked players will be notified (in-app, email, club wall).",
+    "rescheduleNewDateLabel": "New date and time",
+    "rescheduleReasonLabel": "Reason (optional)",
+    "rescheduleReasonPlaceholder": "E.g. pitch unavailable, weather…",
+    "rescheduleConfirm": "Reschedule and notify",
+    "rescheduleSuccess": "Event rescheduled and players notified",
+    "rescheduleInvalidDate": "Please choose a valid date.",
+    "rescheduleSameDate": "The new date must differ from the current one.",
+    "eventRescheduled": "Event rescheduled",
+    "previousDate": "Previous date",
+    "newDate": "New date"
   },
   "followUps": {
     "title": "Follow-ups",
