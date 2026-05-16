@@ -40,6 +40,7 @@ import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
+import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
@@ -209,6 +210,12 @@ const AuthenticatedProfilePrivacyRoute =
     path: '/privacy',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedProfilePasswordRoute =
+  AuthenticatedProfilePasswordRouteImport.update({
+    id: '/password',
+    path: '/password',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedPlayersPlayerIdRoute =
   AuthenticatedPlayersPlayerIdRouteImport.update({
     id: '/players/$playerId',
@@ -301,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
@@ -342,6 +350,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
@@ -387,6 +396,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/events/$eventId'
     | '/players/$playerId'
+    | '/profile/password'
     | '/profile/privacy'
     | '/teams/$teamId'
     | '/api/public/marketing-chat'
@@ -473,6 +484,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/events/$eventId'
     | '/players/$playerId'
+    | '/profile/password'
     | '/profile/privacy'
     | '/teams/$teamId'
     | '/api/public/marketing-chat'
@@ -517,6 +529,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/players/$playerId'
+    | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/teams/$teamId'
     | '/api/public/marketing-chat'
@@ -780,6 +793,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/profile/password': {
+      id: '/_authenticated/profile/password'
+      path: '/password'
+      fullPath: '/profile/password'
+      preLoaderRoute: typeof AuthenticatedProfilePasswordRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/players/$playerId': {
       id: '/_authenticated/players/$playerId'
       path: '/players/$playerId'
@@ -901,11 +921,13 @@ const AuthenticatedEventsRouteWithChildren =
   AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
 interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfilePasswordRoute: typeof AuthenticatedProfilePasswordRoute
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfilePasswordRoute: AuthenticatedProfilePasswordRoute,
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
 }
