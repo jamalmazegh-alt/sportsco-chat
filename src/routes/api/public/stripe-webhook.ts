@@ -221,6 +221,23 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
               }
               break;
             }
+            case "setup_intent.succeeded": {
+              const si = event.data.object as Stripe.SetupIntent;
+              if (si.metadata?.purpose === "update_payment_method") {
+                const pm = typeof si.payment_method === "string" ? si.payment_method : si.payment_method?.id;
+                const customerId = typeof si.customer === "string" ? si.customer : si.customer?.id;
+                const subId = si.metadata.subscription_id;
+                if (pm && customerId) {
+                  await stripe.customers.update(customerId, {
+                    invoice_settings: { default_payment_method: pm },
+                  });
+                  if (subId) {
+                    await stripe.subscriptions.update(subId, { default_payment_method: pm });
+                  }
+                }
+              }
+              break;
+            }
             default:
               break;
           }
