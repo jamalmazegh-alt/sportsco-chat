@@ -471,11 +471,9 @@ function EventDetail() {
     refetch();
     refetchEvent();
     toast.success(
-      commMode === "whatsapp"
-        ? "Convocations créées — partagez le message WhatsApp"
-        : commMode === "hybrid"
-          ? "Convocations envoyées — WhatsApp s'ouvre pour partager"
-          : t("events.convocationsSent")
+      useWhatsApp
+        ? "Convocations créées — partagez maintenant via WhatsApp ci-dessous"
+        : t("events.convocationsSent")
     );
   }
 
