@@ -483,6 +483,29 @@ function EventsPage() {
             {t("events.calendarHint", { defaultValue: "Touche un jour avec une pastille pour voir les événements." })}
           </p>
 
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-1">
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-red-500 inline-block" />
+              {t("events.types.match")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-amber-500 inline-block" />
+              {t("events.types.tournament")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-blue-500 inline-block" />
+              {t("events.types.training")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-violet-500 inline-block" />
+              {t("events.types.meeting")}
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
+              <span className="h-[3px] w-3.5 rounded-full bg-muted-foreground inline-block" />
+              {t("events.types.other")}
+            </span>
+          </div>
+
           <Dialog open={dayDialogOpen} onOpenChange={setDayDialogOpen}>
             <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
               <DialogHeader className="px-5 pt-5 pb-3 border-b">
