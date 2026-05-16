@@ -51,8 +51,13 @@ const PILLARS = [
     body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
   },
   {
+    icon: MessageCircle,
+    title: "Compatible WhatsApp (hybride)",
+    body: "Gardez votre groupe WhatsApp. Envoyez les convocations groupées formatées directement dedans, en un clic — sans abandonner le suivi des présences dans l'appli.",
+  },
+  {
     icon: MessageSquareText,
-    title: "Communication",
+    title: "Communication interne",
     body: "Mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes. Chat temps réel par événement.",
   },
   {
