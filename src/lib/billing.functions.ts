@@ -282,6 +282,41 @@ export const createUpdatePaymentMethodSession = createServerFn({ method: "POST" 
   });
 
 /**
+ * Create a SetupIntent for in-app card update via Stripe Elements (PaymentElement).
+ * Returns clientSecret + publishable key so the client can mount Elements.
+ * The webhook `setup_intent.succeeded` updates the customer & subscription default PM.
+ */
+export const createCardSetupIntent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { customerId, subscriptionId } = await getAdminClubStripeIds(
+      data.clubId,
+      userId,
+      supabase,
+    );
+    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
+    if (!publishableKey) throw new Error("STRIPE_PUBLISHABLE_KEY is not configured");
+    const stripe = getStripe();
+    const setupIntent = await stripe.setupIntents.create({
+      customer: customerId,
+      automatic_payment_methods: { enabled: true },
+      usage: "off_session",
+      metadata: {
+        club_id: data.clubId,
+        subscription_id: subscriptionId ?? "",
+        purpose: "update_payment_method",
+      },
+    });
+    return {
+      clientSecret: setupIntent.client_secret!,
+      publishableKey,
+      customerId,
+    };
+  });
+
+/**
  * List recent invoices for the club's Stripe customer.
  */
 export const listClubInvoices = createServerFn({ method: "POST" })
