@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle } from "lucide-react";
+import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import coachShot from "@/assets/features/coach-attendance.png";
@@ -49,6 +49,11 @@ const PILLARS = [
     icon: Bell,
     title: "Rappels",
     body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
+  },
+  {
+    icon: BrainCircuit,
+    title: "Assistant IA intégré",
+    body: "Un assistant en français, connecté à vos données de club. Posez vos questions sur les présences, les convocations, les stats. Réponses instantanées, respect des rôles, hébergé en Europe.",
   },
   {
     icon: MessageCircle,
