@@ -112,68 +112,67 @@ function TeamsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t("teams.title")}</h1>
         {isAdmin && (
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
+          <ResponsiveFormDialog
+            open={open}
+            onOpenChange={setOpen}
+            trigger={
               <Button size="sm" className="h-9">
                 <Plus className="h-4 w-4" />
                 {t("teams.create")}
               </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-3xl">
-              <SheetHeader>
-                <SheetTitle>{t("teams.create")}</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={onCreate} className="space-y-4 mt-4 pb-6">
-                <div className="space-y-1.5">
-                  <Label>{t("teams.name")}</Label>
-                  <Input required value={name} onChange={(e) => setName(e.target.value)} />
+            }
+            title={t("teams.create")}
+          >
+            <form onSubmit={onCreate} className="space-y-4 mt-4 pb-6">
+              <div className="space-y-1.5">
+                <Label>{t("teams.name")}</Label>
+                <Input required value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.sport")}</Label>
+                <SportSelect value={sport} onValueChange={setSport} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.ageGroup")}</Label>
+                <Input
+                  value={ageGroup}
+                  onChange={(e) => setAgeGroup(e.target.value)}
+                  placeholder="U13"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>
+                  {t("teams.championship")}{" "}
+                  <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
+                </Label>
+                <Input
+                  value={championship}
+                  onChange={(e) => setChampionship(e.target.value)}
+                  placeholder="District D2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t("teams.competitions")}</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["friendly", "championship", "cup"] as const).map((key) => (
+                    <label
+                      key={key}
+                      className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                    >
+                      <Checkbox
+                        checked={competitions.includes(key)}
+                        onCheckedChange={(checked) => toggleCompetition(key, checked === true)}
+                      />
+                      {t(`events.competitionTypes.${key}`)}
+                    </label>
+                  ))}
                 </div>
-                <div className="space-y-1.5">
-                  <Label>{t("teams.sport")}</Label>
-                  <SportSelect value={sport} onValueChange={setSport} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>{t("teams.ageGroup")}</Label>
-                  <Input
-                    value={ageGroup}
-                    onChange={(e) => setAgeGroup(e.target.value)}
-                    placeholder="U13"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>
-                    {t("teams.championship")}{" "}
-                    <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
-                  </Label>
-                  <Input
-                    value={championship}
-                    onChange={(e) => setChampionship(e.target.value)}
-                    placeholder="District D2"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("teams.competitions")}</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["friendly", "championship", "cup"] as const).map((key) => (
-                      <label
-                        key={key}
-                        className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm"
-                      >
-                        <Checkbox
-                          checked={competitions.includes(key)}
-                          onCheckedChange={(checked) => toggleCompetition(key, checked === true)}
-                        />
-                        {t(`events.competitionTypes.${key}`)}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <Button type="submit" className="w-full h-11" disabled={busy}>
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+              </div>
+              <Button type="submit" className="w-full h-11" disabled={busy}>
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
+              </Button>
+            </form>
+          </ResponsiveFormDialog>
         )}
       </div>
 
