@@ -115,9 +115,11 @@ export function useAuthState(): AuthState {
       }
     });
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
-      if (data.session) refreshMemberships();
+      if (data.session) {
+        await refreshMemberships();
+      }
       setLoading(false);
     });
 
