@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { isAppHost } from "@/lib/host";
 import {
   Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck,
-  MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame,
+  MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
