@@ -426,10 +426,10 @@ function EventsPage() {
                 hasEvent:
                   "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-primary after:shadow-[0_0_8px_hsl(var(--primary)/0.6)] data-[selected-single=true]:after:bg-primary-foreground data-[selected-single=true]:after:shadow-none",
               }}
-              className="p-3 pointer-events-auto w-full [--cell-size:2.6rem]"
+              className="p-3 pointer-events-auto [--cell-size:2.5rem]"
             />
           </div>
-          <p className="text-xs text-center text-muted-foreground mt-2">
+          <p className="text-xs text-center text-muted-foreground pt-2">
             {t("events.calendarHint", { defaultValue: "Touche un jour avec une pastille pour voir les événements." })}
           </p>
 
