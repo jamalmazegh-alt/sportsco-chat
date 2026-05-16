@@ -808,8 +808,7 @@ export function EventFormSheet({
               t("common.save")
             )}
           </Button>
-        </form>
-      </SheetContent>
-    </Sheet>
+      </form>
+    </ResponsiveFormDialog>
   );
 }
