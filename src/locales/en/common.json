@@ -195,6 +195,7 @@
   "club": {
     "logo": "Club logo",
     "uploadLogo": "Upload club logo",
+    "changeLogo": "Change logo",
     "logoUpdated": "Club logo updated"
   },
   "players": {

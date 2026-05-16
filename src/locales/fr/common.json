@@ -195,6 +195,7 @@
   "club": {
     "logo": "Logo du club",
     "uploadLogo": "Ajouter le logo",
+    "changeLogo": "Changer le logo",
     "logoUpdated": "Logo du club mis à jour"
   },
   "players": {
