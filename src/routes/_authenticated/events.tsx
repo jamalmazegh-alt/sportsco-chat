@@ -457,10 +457,24 @@ function EventsPage() {
                 if (hasEvents) setDayDialogOpen(true);
               }}
               locale={dateLocale}
-              modifiers={{ hasEvent: eventDates }}
+              modifiers={{
+                matchDay: matchDates,
+                tournamentDay: tournamentDates,
+                trainingDay: trainingDates,
+                meetingDay: meetingDates,
+                otherDay: otherDates,
+              }}
               modifiersClassNames={{
-                hasEvent:
-                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-primary after:shadow-[0_0_8px_hsl(var(--primary)/0.6)] data-[selected-single=true]:after:bg-primary-foreground data-[selected-single=true]:after:shadow-none",
+                matchDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-red-500 after:shadow-[0_0_8px_rgba(239,68,68,0.6)] data-[selected-single=true]:after:bg-red-500",
+                tournamentDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-amber-500 after:shadow-[0_0_8px_rgba(245,158,11,0.6)] data-[selected-single=true]:after:bg-amber-500",
+                trainingDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-blue-500 after:shadow-[0_0_8px_rgba(59,130,246,0.6)] data-[selected-single=true]:after:bg-blue-500",
+                meetingDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-violet-500 after:shadow-[0_0_8px_rgba(139,92,246,0.6)] data-[selected-single=true]:after:bg-violet-500",
+                otherDay:
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-muted-foreground after:shadow-[0_0_8px_rgba(100,116,139,0.5)] data-[selected-single=true]:after:bg-muted-foreground",
               }}
               className="p-3 pointer-events-auto [--cell-size:2.5rem]"
             />
