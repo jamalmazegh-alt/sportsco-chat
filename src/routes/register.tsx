@@ -94,11 +94,11 @@ function RegisterPage() {
     }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/home`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
@@ -114,19 +114,26 @@ function RegisterPage() {
       toast.error(error.message);
       return;
     }
-    // If session is immediately available (auto-confirm), redeem invite now
-    if (hasInvite) {
-      const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
-      const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
-      if (rErr) {
-        setBusy(false);
-        toast.error(rErr.message || t("auth.inviteInvalid"));
-        return;
+    // If session is immediately available (auto-confirm), redeem invite + go home.
+    // Otherwise, show "check your email" message and send to login.
+    if (signUpData.session) {
+      if (hasInvite) {
+        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
+        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
+        if (rErr) {
+          setBusy(false);
+          toast.error(rErr.message || t("auth.inviteInvalid"));
+          return;
+        }
       }
+      setBusy(false);
+      toast.success(t("auth.signupSuccess"));
+      navigate({ to: "/home" });
+      return;
     }
     setBusy(false);
-    toast.success(t("auth.signupSuccess"));
-    navigate({ to: "/home" });
+    toast.success(t("auth.checkEmail"), { duration: 8000 });
+    navigate({ to: "/login" });
   }
 
   // When invited, the role is fixed by the invitation — don't let the user change it.
