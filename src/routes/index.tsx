@@ -61,9 +61,175 @@ function Landing() {
     <MarketingLayout>
       <Hero />
       <FeaturesGrid />
+      <WhatsAppHybrid />
       <ForEveryone />
       <CTA />
     </MarketingLayout>
+  );
+}
+
+function WhatsAppHybrid() {
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[#25D366]/5 via-background to-[#075E54]/5">
+      <div
+        aria-hidden
+        className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#25D366]/15 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#075E54]/15 blur-3xl"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+          <div className="lg:col-span-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#25D366]/30 bg-[#25D366]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#075E54]">
+              <MessageCircle className="h-3.5 w-3.5" />
+              Mode hybride
+            </div>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+              Vos joueurs sont déjà sur{" "}
+              <span className="text-[#25D366]">WhatsApp</span>.
+              <br />
+              On s'y branche.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+              Clubero ne vous demande pas de quitter votre groupe WhatsApp.
+              Au contraire — il s'en sert. Composez votre convocation dans l'appli,
+              et envoyez le message formaté directement dans le groupe en un clic.
+            </p>
+
+            <ul className="mt-7 space-y-3">
+              {[
+                {
+                  t: "Convocations groupées",
+                  d: "Sélectionnez les joueurs, Clubero formate un message propre prêt à partager dans le groupe.",
+                },
+                {
+                  t: "Présences trackées en parallèle",
+                  d: "Chaque convocation reste suivie dans l'appli — qui a répondu présent, absent, peut-être.",
+                },
+                {
+                  t: "Annulations & rappels en un clic",
+                  d: "Match déplacé ? Pluie ? Un bouton, un message WhatsApp prêt à envoyer.",
+                },
+                {
+                  t: "Aucune API, aucun numéro à configurer",
+                  d: "Ça utilise WhatsApp Web/Mobile via le partage natif. Rien à installer.",
+                },
+              ].map((p) => (
+                <li key={p.t} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                    <p className="text-sm text-muted-foreground">{p.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button
+                asChild
+                size="lg"
+                className="h-12 px-6 bg-[#25D366] text-white hover:bg-[#1ebe5b] shadow-elevated"
+              >
+                <Link to="/demo">
+                  Voir la démo <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                3 modes au choix : Clubero seul · WhatsApp seul · Hybride
+              </span>
+            </div>
+          </div>
+
+          {/* WhatsApp preview mock */}
+          <div className="lg:col-span-6">
+            <div className="relative mx-auto max-w-md">
+              <div
+                aria-hidden
+                className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-50 blur-3xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #25D36680, #075E5460)",
+                }}
+              />
+              <div className="rounded-3xl border border-border bg-card shadow-elevated overflow-hidden">
+                {/* WhatsApp-like header */}
+                <div className="flex items-center gap-3 bg-[#075E54] px-4 py-3 text-white">
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20 text-sm font-bold">
+                    U13
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">U13 — Saison 25/26</p>
+                    <p className="text-[11px] text-white/70">Coach, 14 joueurs, 9 parents</p>
+                  </div>
+                  <MessageCircle className="h-4 w-4 text-white/80" />
+                </div>
+
+                {/* Message bubble */}
+                <div className="bg-[#ECE5DD] px-4 py-5">
+                  <div className="ml-auto max-w-[88%] rounded-2xl rounded-tr-sm bg-[#DCF8C6] px-3 py-2.5 shadow-sm">
+                    <p className="text-[13px] leading-relaxed text-[#111]">
+                      ⚽ <strong>U13 vs FC Riverside</strong>
+                      <br />
+                      <em className="text-[12px] text-[#333]">FC Clubero · U13</em>
+                      <br />
+                      🏅 Championnat · 🏠 Domicile
+                      <br />
+                      <br />
+                      📅 samedi 24 mai à 14h30
+                      <br />
+                      ⏰ Convocation : 13h45
+                      <br />
+                      📍 Stade Municipal
+                      <br />
+                      <br />
+                      👥 <strong>Convoqués (12)</strong>
+                      <br />
+                      • Lucas M. • Emma D. • Noah B.
+                      <br />
+                      • Léa S. • Adam K. • Hugo P.
+                      <br />
+                      <span className="text-[#555]">+ 6 autres</span>
+                      <br />
+                      <br />
+                      <span className="text-[11px] text-[#666]">— envoyé via Clubero</span>
+                    </p>
+                    <p className="mt-1 text-right text-[10px] text-[#888]">14:32 ✓✓</p>
+                  </div>
+                </div>
+
+                {/* "From Clubero" footer strip */}
+                <div className="flex items-center justify-between border-t border-border bg-card px-4 py-2.5">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <Zap className="h-3 w-3 text-[color:var(--energy)]" />
+                    Envoyé en 12s depuis Clubero
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#25D366]">
+                    WhatsApp
+                  </span>
+                </div>
+              </div>
+
+              {/* Floating "tracking" pill */}
+              <div className="absolute -bottom-4 -left-4 z-10 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-elevated">
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-primary text-white">
+                  <BarChart3 className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Présences suivies
+                  </p>
+                  <p className="text-sm font-bold tabular-nums">11 / 12</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
