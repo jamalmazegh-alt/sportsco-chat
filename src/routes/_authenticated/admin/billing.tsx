@@ -7,14 +7,39 @@ import {
   getClubSubscription,
   createCheckoutSession,
   createPortalSession,
+  cancelSubscriptionAtPeriodEnd,
+  reactivateSubscription,
+  createUpdatePaymentMethodSession,
+  listClubInvoices,
 } from "@/lib/billing.functions";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles, Check, ExternalLink, AlertCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Loader2,
+  Sparkles,
+  Check,
+  ExternalLink,
+  AlertCircle,
+  CreditCard,
+  FileText,
+  XCircle,
+  RotateCcw,
+} from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const searchSchema = z.object({
   billing: z.enum(["success", "canceled"]).optional(),
+  card: z.literal("updated").optional(),
 });
 
 export const Route = createFileRoute("/_authenticated/admin/billing")({
@@ -59,6 +84,13 @@ function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | 
   );
 }
 
+function formatAmount(cents: number, currency: string) {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(cents / 100);
+}
+
 function BillingPage() {
   const { activeClubId } = useAuth();
   const role = useActiveRole();
@@ -67,21 +99,37 @@ function BillingPage() {
   const fetchSub = useServerFn(getClubSubscription);
   const checkout = useServerFn(createCheckoutSession);
   const portal = useServerFn(createPortalSession);
+  const cancelSub = useServerFn(cancelSubscriptionAtPeriodEnd);
+  const reactivate = useServerFn(reactivateSubscription);
+  const updateCard = useServerFn(createUpdatePaymentMethodSession);
+  const fetchInvoices = useServerFn(listClubInvoices);
 
   const [busy, setBusy] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   useEffect(() => {
     if (search.billing === "success") {
       toast.success("Abonnement activé. Bienvenue dans Clubero !");
     } else if (search.billing === "canceled") {
       toast.info("Paiement annulé.");
+    } else if (search.card === "updated") {
+      toast.success("Carte bancaire mise à jour.");
     }
-  }, [search.billing]);
+  }, [search.billing, search.card]);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["club-subscription", activeClubId],
     enabled: !!activeClubId,
     queryFn: () => fetchSub({ data: { clubId: activeClubId! } }),
+  });
+
+  const sub = data?.subscription;
+  const isActive = sub && ["trialing", "active", "past_due"].includes(sub.status);
+
+  const { data: invoicesData } = useQuery({
+    queryKey: ["club-invoices", activeClubId],
+    enabled: !!activeClubId && !!isActive,
+    queryFn: () => fetchInvoices({ data: { clubId: activeClubId! } }),
   });
 
   if (role !== "admin") return <Navigate to="/profile" replace />;
@@ -94,18 +142,13 @@ function BillingPage() {
     );
   }
 
-  const sub = data?.subscription;
-  const isActive = sub && ["trialing", "active", "past_due"].includes(sub.status);
-
   function navigateExternal(url: string) {
-    // Break out of any preview iframe — Stripe sets X-Frame-Options: DENY
     try {
       if (window.top && window.top !== window.self) {
         window.top.location.href = url;
         return;
       }
     } catch {
-      // cross-origin top frame: fall back to new tab
       window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
@@ -135,6 +178,51 @@ function BillingPage() {
       setBusy(null);
     }
   }
+
+  async function onCancel() {
+    if (!activeClubId) return;
+    setBusy("cancel");
+    try {
+      await cancelSub({ data: { clubId: activeClubId } });
+      toast.success("Abonnement résilié. Accès maintenu jusqu'à la fin de la période en cours.");
+      await refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la résiliation");
+    } finally {
+      setBusy(null);
+      setConfirmCancel(false);
+    }
+  }
+
+  async function onReactivate() {
+    if (!activeClubId) return;
+    setBusy("reactivate");
+    try {
+      await reactivate({ data: { clubId: activeClubId } });
+      toast.success("Abonnement réactivé.");
+      await refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erreur lors de la réactivation");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function onUpdateCard() {
+    if (!activeClubId) return;
+    setBusy("card");
+    try {
+      const res = await updateCard({ data: { clubId: activeClubId } });
+      if (res.url) navigateExternal(res.url);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir la mise à jour");
+      setBusy(null);
+    }
+  }
+
+  const cancelDate =
+    (sub as any)?.cancel_at ?? sub?.current_period_end ?? sub?.trial_end ?? null;
+  const scheduledCancel = sub && (sub.cancel_at_period_end || (sub as any).cancel_at);
 
   return (
     <div className="px-5 py-4 space-y-5">
@@ -168,41 +256,128 @@ function BillingPage() {
           )}
         </div>
 
-        {(() => {
-          const cancelDate =
-            (sub as any)?.cancel_at ?? sub?.current_period_end ?? sub?.trial_end ?? null;
-          const scheduledCancel =
-            sub && (sub.cancel_at_period_end || (sub as any).cancel_at);
-          if (scheduledCancel && cancelDate) {
-            return (
-              <div className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                <AlertCircle className="h-4 w-4" />
-                Résilié — prend fin le {new Date(cancelDate).toLocaleDateString("fr-FR")} (pas de renouvellement)
-              </div>
-            );
-          }
-          if (sub?.current_period_end) {
-            return (
-              <div className="text-sm text-muted-foreground">
-                Prochain renouvellement le {new Date(sub.current_period_end).toLocaleDateString("fr-FR")}
-              </div>
-            );
-          }
-          return null;
-        })()}
+        {scheduledCancel && cancelDate ? (
+          <div className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+            <AlertCircle className="h-4 w-4" />
+            Résilié — prend fin le {new Date(cancelDate).toLocaleDateString("fr-FR")} (pas de
+            renouvellement)
+          </div>
+        ) : sub?.current_period_end ? (
+          <div className="text-sm text-muted-foreground">
+            Prochain renouvellement le{" "}
+            {new Date(sub.current_period_end).toLocaleDateString("fr-FR")}
+          </div>
+        ) : null}
 
         {isActive && (
-          <Button onClick={openPortal} variant="outline" disabled={busy === "portal"} className="w-full">
+          <div className="grid gap-2 sm:grid-cols-2 pt-1">
+            <Button
+              onClick={onUpdateCard}
+              variant="outline"
+              disabled={busy === "card"}
+              className="w-full"
+            >
+              {busy === "card" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <CreditCard className="h-4 w-4" />
+                  Changer la carte
+                </>
+              )}
+            </Button>
+
+            {scheduledCancel ? (
+              <Button
+                onClick={onReactivate}
+                variant="outline"
+                disabled={busy === "reactivate"}
+                className="w-full"
+              >
+                {busy === "reactivate" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <RotateCcw className="h-4 w-4" />
+                    Réactiver l'abonnement
+                  </>
+                )}
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setConfirmCancel(true)}
+                variant="outline"
+                disabled={busy === "cancel"}
+                className="w-full text-destructive hover:text-destructive"
+              >
+                <XCircle className="h-4 w-4" />
+                Résilier l'abonnement
+              </Button>
+            )}
+          </div>
+        )}
+
+        {isActive && (
+          <button
+            onClick={openPortal}
+            disabled={busy === "portal"}
+            className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline inline-flex items-center gap-1"
+          >
             {busy === "portal" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3 w-3 animate-spin" />
             ) : (
               <>
-                Gérer mon abonnement <ExternalLink className="h-4 w-4 ml-1" />
+                Options avancées (portail Stripe) <ExternalLink className="h-3 w-3" />
               </>
             )}
-          </Button>
+          </button>
         )}
       </section>
+
+      {/* Invoices */}
+      {isActive && invoicesData?.invoices && invoicesData.invoices.length > 0 && (
+        <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-primary" />
+            <h2 className="font-semibold">Factures</h2>
+          </div>
+          <ul className="divide-y divide-border">
+            {invoicesData.invoices.map((inv) => (
+              <li key={inv.id} className="py-2.5 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {inv.number ?? inv.id}
+                    {inv.status === "paid" && (
+                      <span className="ml-2 text-xs text-emerald-600 dark:text-emerald-400">
+                        payée
+                      </span>
+                    )}
+                    {inv.status === "open" && (
+                      <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">
+                        à payer
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(inv.created * 1000).toLocaleDateString("fr-FR")} ·{" "}
+                    {formatAmount(inv.amount_paid || inv.amount_due, inv.currency)}
+                  </p>
+                </div>
+                {inv.invoice_pdf && (
+                  <a
+                    href={inv.invoice_pdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+                  >
+                    PDF <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Plans (when not active) */}
       {!isActive && (
@@ -260,6 +435,32 @@ function BillingPage() {
           </ul>
         </section>
       )}
+
+      <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Résilier l'abonnement&nbsp;?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Votre accès reste actif jusqu'au{" "}
+              {cancelDate ? new Date(cancelDate).toLocaleDateString("fr-FR") : "terme de la période en cours"}.
+              Aucun nouveau prélèvement ne sera effectué. Vous pourrez réactiver à tout moment avant cette date.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy === "cancel"}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                onCancel();
+              }}
+              disabled={busy === "cancel"}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {busy === "cancel" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Résilier"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
