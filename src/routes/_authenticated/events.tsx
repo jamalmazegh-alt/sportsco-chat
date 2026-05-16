@@ -8,6 +8,7 @@ import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar, MapPin, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
@@ -42,6 +43,7 @@ function EventsPage() {
   const [showPast, setShowPast] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
+  const [dayDialogOpen, setDayDialogOpen] = useState(false);
   const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   const { data: club } = useQuery({
@@ -411,28 +413,46 @@ function EventsPage() {
             <CalendarUI
               mode="single"
               selected={selectedDay}
-              onSelect={(d) => d && setSelectedDay(startOfDay(d))}
+              onSelect={(d) => {
+                if (!d) return;
+                const day = startOfDay(d);
+                setSelectedDay(day);
+                const hasEvents = (events ?? []).some((e) => isSameDay(new Date(e.starts_at), day));
+                if (hasEvents) setDayDialogOpen(true);
+              }}
               locale={dateLocale}
               modifiers={{ hasEvent: eventDates }}
               modifiersClassNames={{
                 hasEvent:
-                  "relative after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary data-[selected-single=true]:after:bg-primary-foreground",
+                  "relative font-semibold after:content-[''] after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:w-5 after:rounded-full after:bg-primary after:shadow-[0_0_8px_hsl(var(--primary)/0.6)] data-[selected-single=true]:after:bg-primary-foreground data-[selected-single=true]:after:shadow-none",
               }}
-              className="p-3 pointer-events-auto w-full [--cell-size:2.4rem]"
+              className="p-3 pointer-events-auto w-full [--cell-size:2.6rem]"
             />
           </div>
-          <div className="space-y-3">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              {format(selectedDay, "EEEE d MMMM", { locale: dateLocale })}
-            </h2>
-            {selectedDayEvents.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">
-                {t("events.noEventsThisDay", { defaultValue: "Aucun événement ce jour." })}
-              </p>
-            ) : (
-              <ul className="space-y-2.5">{selectedDayEvents.map(renderEventItem)}</ul>
-            )}
-          </div>
+          <p className="text-xs text-center text-muted-foreground">
+            {t("events.calendarHint", { defaultValue: "Touche un jour avec une pastille pour voir les événements." })}
+          </p>
+
+          <Dialog open={dayDialogOpen} onOpenChange={setDayDialogOpen}>
+            <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+              <DialogHeader className="px-5 pt-5 pb-3 border-b">
+                <DialogTitle className="text-base capitalize">
+                  {format(selectedDay, "EEEE d MMMM", { locale: dateLocale })}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="px-5 py-4 max-h-[70vh] overflow-y-auto">
+                {selectedDayEvents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-6 text-center">
+                    {t("events.noEventsThisDay", { defaultValue: "Aucun événement ce jour." })}
+                  </p>
+                ) : (
+                  <ul className="space-y-2.5" onClick={() => setDayDialogOpen(false)}>
+                    {selectedDayEvents.map(renderEventItem)}
+                  </ul>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       ) : (
         <div className="space-y-7">
