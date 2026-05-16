@@ -48,11 +48,11 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     const { data: existingSub } = await supabaseAdmin
       .from("subscriptions")
-      .select("stripe_customer_id, stripe_subscription_id, status")
+      .select("stripe_customer_id, stripe_subscription_id, status, trial_end")
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    // If already active/trialing, route to portal instead
+    // If already active/trialing on Stripe (has a subscription id), route to portal instead
     if (
       existingSub?.stripe_subscription_id &&
       ["active", "trialing", "past_due"].includes(existingSub.status ?? "")
@@ -73,17 +73,28 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       });
       customerId = customer.id;
 
-      // Persist customer id immediately
+      // Persist customer id immediately (preserve trial_end / status if it exists)
       await supabaseAdmin
         .from("subscriptions")
         .upsert(
           {
             club_id: club.id,
             stripe_customer_id: customerId,
-            status: "incomplete",
+            status: existingSub?.status ?? "incomplete",
+            trial_end: existingSub?.trial_end ?? null,
           },
           { onConflict: "club_id" },
         );
+    }
+
+    // Honour remaining in-app trial: if trial_end is still in the future,
+    // give Stripe the remaining days so the user isn't billed immediately.
+    // Otherwise (trial expired or no trial), bill right away — no Stripe trial.
+    let trialPeriodDays: number | undefined = undefined;
+    if (existingSub?.trial_end) {
+      const remainingMs = new Date(existingSub.trial_end).getTime() - Date.now();
+      const remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
+      if (remainingDays > 0) trialPeriodDays = Math.min(remainingDays, 30);
     }
 
     const origin = getOrigin();
@@ -92,7 +103,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       customer: customerId,
       line_items: [{ price: getPriceId(data.plan), quantity: 1 }],
       subscription_data: {
-        trial_period_days: 30,
+        ...(trialPeriodDays ? { trial_period_days: trialPeriodDays } : {}),
         metadata: { club_id: club.id, plan: data.plan },
       },
       billing_address_collection: "auto",
