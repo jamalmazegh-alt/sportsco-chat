@@ -94,11 +94,11 @@ function RegisterPage() {
     }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/home`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
