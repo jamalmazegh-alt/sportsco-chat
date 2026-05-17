@@ -187,6 +187,46 @@ function AdminSettingsPage() {
         )}
       </section>
 
+      <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
+        <div>
+          <Label className="text-base">Relances automatiques avant événement</Label>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Envoie un email aux joueurs et parents qui n'ont pas encore répondu à la convocation.
+          </p>
+        </div>
+        <Row
+          label="Activer les relances auto"
+          checked={form.auto_reminders_enabled}
+          onChange={(v) => setForm({ ...form, auto_reminders_enabled: v })}
+        />
+        {form.auto_reminders_enabled && (
+          <div className="space-y-2">
+            <Label className="text-sm">Quand envoyer ?</Label>
+            <div className="space-y-2">
+              {REMINDER_PRESETS.map((preset) => {
+                const selected =
+                  preset.value.length === form.auto_reminder_hours_before.length &&
+                  preset.value.every((v) => form.auto_reminder_hours_before.includes(v));
+                return (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setForm({ ...form, auto_reminder_hours_before: preset.value })}
+                    className={`w-full text-left rounded-lg border px-3 py-2 text-sm transition-colors ${
+                      selected
+                        ? "border-primary bg-primary/5 font-medium"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </section>
+
       <Button className="w-full h-11" onClick={save} disabled={saving}>
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.save")}
       </Button>
