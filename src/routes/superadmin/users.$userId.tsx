@@ -5,9 +5,19 @@ import {
   disableUser,
   reactivateUser,
   generatePasswordResetLink,
+  generateImpersonationLink,
 } from "@/lib/superadmin.functions";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2, ShieldOff, ShieldCheck, KeyRound, Copy, Check } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { ArrowLeft, Loader2, ShieldOff, ShieldCheck, KeyRound, Copy, Check, UserCog } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/superadmin/users/$userId")({
