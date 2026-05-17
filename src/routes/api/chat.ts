@@ -517,7 +517,73 @@ export const Route = createFileRoute("/api/chat")({
               };
             },
           }),
-        };
+          updateEvent: tool({
+            description:
+              "Pour coachs/admins uniquement : met à jour les champs d'un événement existant (de préférence en brouillon, mais aussi publié). Utilise-le quand l'utilisateur veut corriger un champ (heure de RDV, lieu, point de ralliement, titre, date, etc.) après création. Ne touche que les champs fournis. **Demande confirmation explicite avant l'appel** en récapitulant l'événement ciblé et les changements.",
+            inputSchema: z.object({
+              eventId: z.string().uuid().describe("ID de l'événement à mettre à jour."),
+              title: z.string().min(1).max(200).optional(),
+              startsAt: z.string().optional().describe("ISO 8601 avec fuseau."),
+              endsAt: z.string().optional().describe("ISO 8601 avec fuseau."),
+              convocationTime: z.string().optional().describe("Heure de RDV, ISO 8601 avec fuseau."),
+              location: z.string().max(200).optional(),
+              meetingPoint: z.string().max(200).optional(),
+              opponent: z.string().max(200).optional(),
+              description: z.string().max(1000).optional(),
+            }),
+            execute: async ({ eventId, title, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
+              const { data: ev, error: evErr } = await supabase
+                .from("events")
+                .select("id, team_id, title, team:team_id(name)")
+                .eq("id", eventId)
+                .maybeSingle();
+              if (evErr || !ev) {
+                return { updated: false, note: "Événement introuvable ou non accessible." };
+              }
+              const managedTeamIds = await getManagedTeamIds();
+              if (!managedTeamIds.includes(ev.team_id)) {
+                return { updated: false, note: "L'utilisateur n'encadre pas l'équipe de cet événement." };
+              }
+              const patch: Record<string, unknown> = {};
+              if (title !== undefined) patch.title = title;
+              if (startsAt !== undefined) {
+                const d = new Date(startsAt);
+                if (Number.isNaN(d.getTime())) return { updated: false, note: "startsAt invalide." };
+                patch.starts_at = d.toISOString();
+              }
+              if (endsAt !== undefined) {
+                const d = new Date(endsAt);
+                if (Number.isNaN(d.getTime())) return { updated: false, note: "endsAt invalide." };
+                patch.ends_at = d.toISOString();
+              }
+              if (convocationTime !== undefined) {
+                const d = new Date(convocationTime);
+                if (Number.isNaN(d.getTime())) return { updated: false, note: "convocationTime invalide." };
+                patch.convocation_time = d.toISOString();
+              }
+              if (location !== undefined) patch.location = location;
+              if (meetingPoint !== undefined) patch.meeting_point = meetingPoint;
+              if (opponent !== undefined) patch.opponent = opponent;
+              if (description !== undefined) patch.description = description;
+              if (Object.keys(patch).length === 0) {
+                return { updated: false, note: "Aucun champ à mettre à jour." };
+              }
+              const { data: updated, error } = await supabase
+                .from("events")
+                .update(patch)
+                .eq("id", eventId)
+                .select("id, title, starts_at, convocation_time, location, meeting_point, status")
+                .single();
+              if (error || !updated) {
+                return { updated: false, note: `Échec de la mise à jour : ${error?.message ?? "erreur inconnue"}.` };
+              }
+              return {
+                updated: true,
+                event: { ...updated, edit_link: `/events/${updated.id}` },
+                updated_fields: Object.keys(patch),
+              };
+            },
+          }),
 
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
