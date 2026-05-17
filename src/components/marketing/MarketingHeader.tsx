@@ -103,6 +103,7 @@ export function MarketingHeader() {
                 to={item.to}
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                activeProps={{ className: "bg-primary/10 text-primary font-semibold" }}
               >
                 {t(`nav.${item.key}`)}
               </Link>
