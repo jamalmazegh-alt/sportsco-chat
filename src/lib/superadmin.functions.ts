@@ -1391,7 +1391,7 @@ export const getClubFinancials = createServerFn({ method: "POST" })
       };
     }
 
-    let invoices: Array<{
+    type InvoiceItem = {
       id: string;
       number: string | null;
       status: string | null;
@@ -1401,7 +1401,8 @@ export const getClubFinancials = createServerFn({ method: "POST" })
       created: number;
       hosted_invoice_url: string | null;
       invoice_pdf: string | null;
-    }> = [];
+    };
+    let invoices: InvoiceItem[] = [];
     let lifetimePaid = 0;
     let currency = "eur";
     let paymentMethod: null | { brand: string; last4: string; exp: string } = null;
