@@ -79,7 +79,7 @@ export const listAllClubs = createServerFn({ method: "POST" })
 
     let query = supabaseAdmin
       .from("clubs")
-      .select("id, name, created_at, created_by, logo_url", { count: "exact" })
+      .select("id, name, created_at, created_by, logo_url, archived_at", { count: "exact" })
       .order("created_at", { ascending: false })
       .range(data.offset, data.offset + data.limit - 1);
 
