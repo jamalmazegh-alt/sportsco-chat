@@ -9,6 +9,7 @@ import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
 import { TrialBanner } from "@/components/trial-banner";
 import { OnboardingWizard } from "@/components/onboarding-wizard";
+import { ClubSelector } from "@/components/club-selector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
