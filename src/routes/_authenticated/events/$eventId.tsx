@@ -491,13 +491,23 @@ function EventDetail() {
       // best-effort: in-app notif already sent
     }
 
+    // Save snapshot of values just sent so we can diff later for "resend with changes"
+    const snapshot = buildConvocSnapshot(event);
     if (!event.convocations_sent) {
-      const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+      const { error: sentError } = await supabase
+        .from("events")
+        .update({ convocations_sent: true, convocation_sent_snapshot: snapshot, convocation_last_sent_at: new Date().toISOString() })
+        .eq("id", event.id);
       if (sentError) {
         setSending(false);
         toast.error(sentError.message);
         return;
       }
+    } else {
+      await supabase
+        .from("events")
+        .update({ convocation_sent_snapshot: snapshot, convocation_last_sent_at: new Date().toISOString() })
+        .eq("id", event.id);
     }
 
     // WhatsApp convocation: the coach shares via the WhatsApp card below
