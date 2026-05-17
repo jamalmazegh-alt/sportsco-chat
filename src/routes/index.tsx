@@ -18,12 +18,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Clubero structure vos convocations, présences et communication de club — et s'intègre à votre groupe WhatsApp existant en mode hybride. Pour clubs, coachs, parents et joueurs.",
+          "Clubero structure vos convocations, présences et communication de club en un seul outil. Pour clubs, coachs, parents et joueurs. WhatsApp reste disponible en option si besoin.",
       },
       { property: "og:title", content: "Clubero — La coordination d'équipe pour clubs sportifs" },
       {
         property: "og:description",
-        content: "Convocations, présences, rappels — en gardant votre groupe WhatsApp. En un clic.",
+        content: "Convocations, présences, rappels — tout dans un seul outil. En un clic.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/" }],
@@ -71,56 +71,55 @@ function Landing() {
 
 function WhatsAppHybrid() {
   return (
-    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[#25D366]/5 via-background to-[#075E54]/5">
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div
         aria-hidden
-        className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#25D366]/15 blur-3xl"
+        className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl"
       />
       <div
         aria-hidden
-        className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#075E54]/15 blur-3xl"
+        className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-secondary/10 blur-3xl"
       />
 
       <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
           <div className="lg:col-span-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#25D366]/30 bg-[#25D366]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#075E54]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
               <MessageCircle className="h-3.5 w-3.5" />
-              Mode hybride
+              Communication flexible
             </div>
             <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-              Vos joueurs sont déjà sur{" "}
-              <span className="text-[#25D366]">WhatsApp</span>.
+              Tout le monde reçoit.
               <br />
-              On s'y branche.
+              Même ceux qui préfèrent <span className="text-[#25D366]">WhatsApp</span>.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Clubero ne vous demande pas de quitter votre groupe WhatsApp.
-              Au contraire — il s'en sert. Composez votre convocation dans l'appli,
-              et envoyez le message formaté directement dans le groupe en un clic.
+              Clubero centralise vos convocations, présences et rappels dans un seul outil.
+              Si certains parents ou joueurs préfèrent rester sur WhatsApp, vous pouvez
+              partager le message formaté directement dans le groupe en un clic.
             </p>
 
             <ul className="mt-7 space-y-3">
               {[
                 {
-                  t: "Convocations groupées",
-                  d: "Sélectionnez les joueurs, Clubero formate un message propre prêt à partager dans le groupe.",
+                  t: "Convocations centralisées dans Clubero",
+                  d: "C'est dans l'appli que tout se passe : convocations, réponses de présence, rappels et chat par événement.",
                 },
                 {
-                  t: "Présences trackées en parallèle",
-                  d: "Chaque convocation reste suivie dans l'appli — qui a répondu présent, absent, peut-être.",
+                  t: "WhatsApp en option",
+                  d: "Besoin de toucher ceux qui n'utilisent pas encore l'appli ? Un bouton copie le message formaté prêt à partager dans WhatsApp.",
                 },
                 {
-                  t: "Annulations & rappels en un clic",
-                  d: "Match déplacé ? Pluie ? Un bouton, un message WhatsApp prêt à envoyer.",
+                  t: "Email pour les résistants au téléphone",
+                  d: "Les convocations peuvent aussi partir par email. Vous couvrez tous les canaux sans effort.",
                 },
                 {
                   t: "Aucune API, aucun numéro à configurer",
-                  d: "Ça utilise WhatsApp Web/Mobile via le partage natif. Rien à installer.",
+                  d: "Le partage WhatsApp utilise le natif du téléphone. Rien à installer côté club.",
                 },
               ].map((p) => (
                 <li key={p.t} className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#25D366]" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
                     <p className="text-sm font-semibold text-foreground">{p.t}</p>
                     <p className="text-sm text-muted-foreground">{p.d}</p>
@@ -133,14 +132,14 @@ function WhatsAppHybrid() {
               <Button
                 asChild
                 size="lg"
-                className="h-12 px-6 bg-[#25D366] text-white hover:bg-[#1ebe5b] shadow-elevated"
+                className="h-12 px-6 shadow-elevated"
               >
                 <Link to="/demo">
                   Voir la démo <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <span className="text-xs text-muted-foreground">
-                3 modes au choix : Clubero seul · WhatsApp seul · Hybride
+                Clubero en priorité — WhatsApp et email en option
               </span>
             </div>
           </div>
@@ -402,7 +401,7 @@ function Hero() {
               {[
                 { v: "12s", l: t("home.statConvoke") },
                 { v: "+78%", l: t("home.statResponse") },
-                { v: "0", l: t("home.statWhatsApp") },
+                { v: "3", l: t("home.statChannels") },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl border border-border/60 bg-card/60 backdrop-blur px-3 py-3">
                   <dt className="font-display text-2xl font-bold text-gradient-primary">{s.v}</dt>
@@ -519,9 +518,9 @@ const FEATURES = [
   },
   {
     icon: MessageSquareText,
-    title: "Compatible WhatsApp",
-    body: "Gardez votre groupe WhatsApp pour discuter. Clubero envoie les convocations groupées directement dedans, en un clic.",
-    accent: "from-[#25D366] to-[#075E54]",
+    title: "WhatsApp & email en option",
+    body: "Clubero est votre canal principal. Si certains membres préfèrent rester sur WhatsApp ou email, partagez le message formaté en un clic.",
+    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
   },
   {
     icon: Trophy,
