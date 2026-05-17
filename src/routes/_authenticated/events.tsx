@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban } from "lucide-react";
+import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban, Eye, EyeOff, Clock } from "lucide-react";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
@@ -231,29 +231,38 @@ function EventsPage() {
               : isLoss
                 ? "border-defeat/50 bg-defeat/5 hover:border-defeat/70"
                 : past
-                  ? "border-border/60 opacity-70"
+                  ? "border-amber-200/60 bg-amber-50/20 hover:border-amber-300/80 dark:border-amber-900/40 dark:bg-amber-950/10"
                   : "border-border hover:border-primary/40",
           )}
         >
           <div className={cn(
             "flex flex-col items-center justify-center w-16 shrink-0 py-3",
-            isCancelled ? "bg-red-100/40" : isLoss ? "bg-defeat/15" : past ? "bg-muted/40" : "bg-primary/8",
+            isCancelled ? "bg-red-100/40" : isLoss ? "bg-defeat/15" : past ? "bg-amber-100/40 dark:bg-amber-900/30" : "bg-primary/8",
           )}>
             <span className={cn(
               "text-[10px] font-semibold uppercase tracking-wider",
-              isCancelled ? "text-red-600" : past ? "text-muted-foreground" : "text-primary",
+              isCancelled ? "text-red-600" : past ? "text-amber-700 dark:text-amber-400" : "text-primary",
             )}>
               {format(d, "EEE", { locale: dateLocale })}
             </span>
-            <span className="text-2xl font-bold leading-none mt-0.5">{format(d, "d")}</span>
+            <span className={cn("text-2xl font-bold leading-none mt-0.5", past && "text-amber-800 dark:text-amber-300")}>{format(d, "d")}</span>
             <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
           </div>
           <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+              <Icon className={cn("h-3.5 w-3.5 shrink-0", past ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")} />
+              <span className={cn(
+                "text-[10px] uppercase tracking-wider font-semibold",
+                past ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground",
+              )}>
                 {t(`events.types.${e.type}`)}
               </span>
+              {past && (
+                <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300 inline-flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {t("events.pastBadge", { defaultValue: "Passé" })}
+                </span>
+              )}
               {isCancelled && (
                 <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300 inline-flex items-center gap-1">
                   <Ban className="h-3 w-3" />
@@ -385,8 +394,14 @@ function EventsPage() {
           <button
             type="button"
             onClick={() => setShowPast((s) => !s)}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+              showPast
+                ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+            )}
           >
+            {showPast ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
           </button>
         )}
