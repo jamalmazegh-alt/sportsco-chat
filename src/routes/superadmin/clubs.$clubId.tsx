@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { getClubDetail } from "@/lib/superadmin.functions";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getClubDetail,
+  archiveClub,
+  unarchiveClub,
+} from "@/lib/superadmin.functions";
+import { Button } from "@/components/ui/button";
+import { Loader2, ArrowLeft, Archive, ArchiveRestore } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
