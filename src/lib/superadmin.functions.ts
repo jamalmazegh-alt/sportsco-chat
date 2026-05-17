@@ -1379,39 +1379,23 @@ export const getFinanceOverview = createServerFn({ method: "GET" })
         ? (convertedFromTrial.length / oldTrialCreated.length) * 100
         : 0;
 
-    // ---- Stripe MRR computation --------------------------------------------
+    // ---- Stripe MRR computation (cached, TTL 10 min) -----------------------
     let mrrCents = 0;
     let stripeActive = 0;
     let avgRevenuePerClubCents = 0;
     let currency = "eur";
+    let stripe_cached_at: string | null = null;
+    let stripe_stale = false;
     try {
-      const stripe = getStripe();
-      // pull active subscriptions; up to 100 (page if you grow past that)
-      const stripeSubs = await stripe.subscriptions.list({
-        status: "active",
-        limit: 100,
-        expand: ["data.items.data.price"],
-      });
-      stripeActive = stripeSubs.data.length;
-      for (const s of stripeSubs.data) {
-        for (const item of s.items.data) {
-          const price = item.price;
-          if (!price?.unit_amount) continue;
-          currency = price.currency || currency;
-          const interval = price.recurring?.interval ?? "month";
-          const intervalCount = price.recurring?.interval_count ?? 1;
-          const monthly =
-            interval === "year"
-              ? price.unit_amount / (12 * intervalCount)
-              : interval === "week"
-                ? (price.unit_amount * 52) / 12 / intervalCount
-                : interval === "day"
-                  ? (price.unit_amount * 30) / intervalCount
-                  : price.unit_amount / intervalCount;
-          mrrCents += monthly * (item.quantity ?? 1);
-        }
+      const cached = await getStripeOverviewCached();
+      if (cached) {
+        mrrCents = cached.mrrCents;
+        stripeActive = cached.stripeActive;
+        avgRevenuePerClubCents = cached.avgRevenuePerClubCents;
+        currency = cached.currency;
+        stripe_cached_at = new Date(cached.fetched_at).toISOString();
+        stripe_stale = Date.now() - cached.fetched_at > STRIPE_OVERVIEW_TTL_MS;
       }
-      avgRevenuePerClubCents = stripeActive > 0 ? mrrCents / stripeActive : 0;
     } catch (err) {
       console.error("[superadmin] Stripe MRR fetch failed", err);
     }
