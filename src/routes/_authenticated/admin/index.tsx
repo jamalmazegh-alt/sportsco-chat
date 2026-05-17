@@ -48,7 +48,7 @@ function AdminSettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clubs")
-        .select("id, name, convocation_channels, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled")
+        .select("id, name, convocation_channels, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, auto_reminders_enabled, auto_reminder_hours_before")
         .eq("id", activeClubId!)
         .single();
       if (error) throw error;
@@ -66,6 +66,9 @@ function AdminSettingsPage() {
         convocation_channels: Array.isArray(data.convocation_channels)
           ? data.convocation_channels
           : ["email", "in_app"],
+        auto_reminder_hours_before: Array.isArray(data.auto_reminder_hours_before)
+          ? data.auto_reminder_hours_before
+          : [48, 3],
       });
     }
   }, [data]);
