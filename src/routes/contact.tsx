@@ -44,6 +44,7 @@ function ContactPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
+  const [club, setClub] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -56,11 +57,11 @@ function ContactPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, message }),
+        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, club, message }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setMessage("");
+      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setClub(""); setMessage("");
       toast.success("Message envoyé. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
