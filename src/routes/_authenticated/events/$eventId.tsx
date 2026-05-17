@@ -85,7 +85,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name)")
+        .select("id, name, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
         .eq("id", event!.team_id);
       return data ?? [];
     },
@@ -285,8 +285,12 @@ function EventDetail() {
     }
     const teamRow = teams?.[0] as any;
     const commMode = (teamRow?.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
+    const clubChannelsRaw = teamRow?.clubs?.convocation_channels;
+    const clubChannels: string[] = Array.isArray(clubChannelsRaw) ? clubChannelsRaw : ["in_app", "email"];
+    const useInApp = clubChannels.includes("in_app");
+    // Team-level override: whatsapp mode disables email entirely
+    const useEmail = clubChannels.includes("email") && commMode !== "whatsapp";
     const useWhatsApp = commMode === "whatsapp" || commMode === "hybrid";
-    const useEmail = commMode !== "whatsapp";
     setSending(true);
     // Insert convocations and get back their tokens
     const { data: insertedConvs, error: convocationError } = await supabase
@@ -313,7 +317,7 @@ function EventDetail() {
         ...playerUserIds,
       ])
     );
-    if (recipients.length > 0) {
+    if (useInApp && recipients.length > 0) {
       const { error: notificationError } = await supabase.from("notifications").insert(
         recipients.map((uid) => ({
           user_id: uid,
