@@ -31,6 +31,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Clubero is a fast, mobile-first app for sports clubs to coordinate events, convocations and attendance in seconds.",
       },
       { name: "theme-color", content: "#7cc142" },
+      { property: "og:site_name", content: "Clubero" },
       { property: "og:title", content: "Clubero — Team coordination, made simple" },
       {
         property: "og:description",
@@ -41,8 +42,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Clubero — Team coordination, made simple" },
       { name: "twitter:description", content: "Stop chasing parents in WhatsApp. Convocations, attendance, and reminders in one tap." },
-      { property: "og:image", content: "/clubero-logo.png" },
-      { name: "twitter:image", content: "/clubero-logo.png" },
+      { property: "og:image", content: "https://clubero.app/clubero-logo.png" },
+      { name: "twitter:image", content: "https://clubero.app/clubero-logo.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -55,6 +56,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Clubero",
+          url: "https://clubero.app",
+          logo: "https://clubero.app/clubero-logo.png",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Clubero",
+          url: "https://clubero.app",
+        }),
       },
     ],
   }),
