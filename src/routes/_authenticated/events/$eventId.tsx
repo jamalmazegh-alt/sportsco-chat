@@ -369,16 +369,19 @@ function EventDetail() {
     }
   }
 
-  function openPicker() {
+  function openPicker(opts?: { preselectAll?: boolean }) {
     if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
       return;
     }
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
-    // pre-select players that don't already have a convocation
-    const preselect = new Set(
-      teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid))
-    );
+    const preselect = opts?.preselectAll
+      ? new Set<string>(
+          teamPlayers
+            .map((tp: any) => tp.player_id)
+            .filter((pid: string) => !existing.has(pid)),
+        )
+      : new Set<string>();
     setSelectedIds(preselect);
     setPickerStep("select");
     setPickerOpen(true);
@@ -392,7 +395,7 @@ function EventDetail() {
     if (!event || (event as any).convocations_sent) return;
     if (!teamPlayers) return;
     setAutoSendConsumed(true);
-    openPicker();
+    openPicker(); // no preselection — coach picks who to call up
     navigate({
       to: "/events/$eventId",
       params: { eventId },
