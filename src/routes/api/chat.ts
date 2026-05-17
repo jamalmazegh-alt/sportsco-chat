@@ -430,15 +430,16 @@ export const Route = createFileRoute("/api/chat")({
               description: z.string().max(1000).optional(),
             }),
             execute: async ({ teamName, title, type, startsAt, endsAt, location, opponent, description }) => {
-              // Resolve coached teams
-              const { data: tm } = await supabase
-                .from("team_members")
-                .select("team_id, team:team_id(id, name)")
-                .eq("user_id", userId)
-                .in("role", ["coach", "admin"]);
-              const coached = (tm ?? [])
-                .map((t: any) => t.team)
-                .filter(Boolean) as Array<{ id: string; name: string }>;
+              // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
+              const managedTeamIds = await getManagedTeamIds();
+              let coached: Array<{ id: string; name: string }> = [];
+              if (managedTeamIds.length > 0) {
+                const { data: teamRows } = await supabase
+                  .from("teams")
+                  .select("id, name")
+                  .in("id", managedTeamIds);
+                coached = (teamRows ?? []) as Array<{ id: string; name: string }>;
+              }
               if (coached.length === 0) {
                 return {
                   created: false,
