@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Loader2, ShieldCheck, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { LegalDialog } from "@/components/legal-dialog";
 
 /**
  * Blocks the app shell with a modal until the user has accepted all
@@ -52,6 +53,7 @@ function ConsentModal({ items }: { items: Item[] }) {
   const qc = useQueryClient();
   const record = useServerFn(recordConsent);
   const [busy, setBusy] = useState(false);
+  const [viewKind, setViewKind] = useState<string | null>(null);
   // Prefill checked = currently granted
   const [checked, setChecked] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(items.map((i) => [i.kind, i.granted]))
@@ -89,58 +91,74 @@ function ConsentModal({ items }: { items: Item[] }) {
   }
 
   return (
-    <Dialog open modal>
-      <DialogContent
-        className="max-w-lg"
-        onEscapeKeyDown={(e) => e.preventDefault()}
-        onPointerDownOutside={(e) => e.preventDefault()}
-      >
-        <DialogHeader>
-          <div className="mx-auto mb-2 grid h-10 w-10 place-content-center rounded-full bg-primary/10 text-primary">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <DialogTitle className="text-center">{t("privacy.gateTitle")}</DialogTitle>
-          <DialogDescription className="text-center">
-            {t("privacy.gateSubtitle")}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open modal>
+        <DialogContent
+          className="max-w-lg"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <div className="mx-auto mb-2 grid h-10 w-10 place-content-center rounded-full bg-primary/10 text-primary">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <DialogTitle className="text-center">{t("privacy.gateTitle")}</DialogTitle>
+            <DialogDescription className="text-center">
+              {t("privacy.gateSubtitle")}
+            </DialogDescription>
+          </DialogHeader>
 
-        <ScrollArea className="max-h-[50vh] pr-2">
-          <div className="space-y-3">
-            {items.map((i) => (
-              <label
-                key={i.kind}
-                className="flex items-start gap-3 rounded-lg border border-border p-3"
-              >
-                <Checkbox
-                  checked={!!checked[i.kind]}
-                  onCheckedChange={(v) =>
-                    setChecked((c) => ({ ...c, [i.kind]: !!v }))
-                  }
-                  className="mt-0.5"
-                />
-                <div className="text-sm">
-                  <div className="font-medium">
-                    {i.title}
-                    {i.required && (
-                      <span className="ml-2 text-xs text-destructive">
-                        {t("privacy.required")}
-                      </span>
-                    )}
+          <ScrollArea className="max-h-[50vh] pr-2">
+            <div className="space-y-3">
+              {items.map((i) => (
+                <label
+                  key={i.kind}
+                  className="flex items-start gap-3 rounded-lg border border-border p-3"
+                >
+                  <Checkbox
+                    checked={!!checked[i.kind]}
+                    onCheckedChange={(v) =>
+                      setChecked((c) => ({ ...c, [i.kind]: !!v }))
+                    }
+                    className="mt-0.5"
+                  />
+                  <div className="text-sm flex-1 min-w-0">
+                    <div className="font-medium">
+                      {i.title}
+                      {i.required && (
+                        <span className="ml-2 text-xs text-destructive">
+                          {t("privacy.required")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground line-clamp-3 whitespace-pre-line">
+                      {i.content_md.replace(/^#+\s.*\n/, "")}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setViewKind(i.kind)}
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    >
+                      <FileText className="h-3 w-3" />
+                      {t("privacy.viewDocument", { defaultValue: "Revoir ce document" })}
+                    </button>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-3 whitespace-pre-line">
-                    {i.content_md.replace(/^#+\s.*\n/, "")}
-                  </p>
-                </div>
-              </label>
-            ))}
-          </div>
-        </ScrollArea>
+                </label>
+              ))}
+            </div>
+          </ScrollArea>
 
-        <Button onClick={submit} disabled={!requiredOk || busy} className="w-full h-11 mt-2">
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("privacy.acceptAndContinue")}
-        </Button>
-      </DialogContent>
-    </Dialog>
+          <Button onClick={submit} disabled={!requiredOk || busy} className="w-full h-11 mt-2">
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("privacy.acceptAndContinue")}
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      <LegalDialog
+        open={!!viewKind}
+        onOpenChange={(o) => !o && setViewKind(null)}
+        kind={viewKind as any}
+      />
+    </>
   );
 }
