@@ -23,6 +23,8 @@ interface Props {
   clubName?: string;
   clubLogoUrl?: string;
   respondUrl: string; // base url for /r/<token>
+  isReminder?: boolean;
+  reminderHoursBefore?: number;
 }
 
 const ConvocationInviteEmail = ({
