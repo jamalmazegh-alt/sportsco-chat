@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   getClubDetailExtended,
+  getClubFinancials,
   archiveClub,
   unarchiveClub,
 } from "@/lib/superadmin.functions";
@@ -15,9 +16,12 @@ import {
   Calendar,
   Users,
   Trophy,
+  Receipt,
+  CreditCard,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { StatusBadge, subTone, roleTone, Avatar, trialCountdown } from "@/lib/superadmin/ui";
+import { StatusBadge, subTone, roleTone, Avatar, trialCountdown, formatMoney } from "@/lib/superadmin/ui";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
@@ -26,6 +30,7 @@ export const Route = createFileRoute("/superadmin/clubs/$clubId")({
 function ClubDetail() {
   const { clubId } = Route.useParams();
   const [data, setData] = useState<Awaited<ReturnType<typeof getClubDetailExtended>> | null>(null);
+  const [fin, setFin] = useState<Awaited<ReturnType<typeof getClubFinancials>> | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -34,6 +39,9 @@ function ClubDetail() {
     getClubDetailExtended({ data: { club_id: clubId } })
       .then(setData)
       .catch((e) => setErr(e instanceof Error ? e.message : "Failed"));
+    getClubFinancials({ data: { club_id: clubId } })
+      .then(setFin)
+      .catch((e) => console.error("financials", e));
   }, [clubId]);
 
   useEffect(refresh, [refresh]);
@@ -126,6 +134,116 @@ function ClubDetail() {
           label="WhatsApp teams"
           value={`${whatsapp_configured_count}/${teams.length}`}
         />
+      </section>
+
+      {/* ============== Financials ============== */}
+      <section className="mb-6">
+        <div className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+              <Receipt className="h-4 w-4" /> Financials
+            </h2>
+            {fin?.has_stripe === false && (
+              <StatusBadge tone="muted">No Stripe customer</StatusBadge>
+            )}
+          </div>
+          {!fin ? (
+            <div className="text-sm text-muted-foreground flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading invoices…
+            </div>
+          ) : (
+            <>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                <KPI
+                  icon={<Receipt className="h-4 w-4" />}
+                  label="Lifetime paid"
+                  value={formatMoney(fin.lifetime_paid_cents, fin.currency)}
+                />
+                <KPI
+                  icon={<Receipt className="h-4 w-4" />}
+                  label="Invoices"
+                  value={fin.invoices.length}
+                />
+                <KPI
+                  icon={<Calendar className="h-4 w-4" />}
+                  label="Next charge"
+                  value={
+                    fin.upcoming_amount_cents != null
+                      ? formatMoney(fin.upcoming_amount_cents, fin.currency)
+                      : "—"
+                  }
+                />
+                <KPI
+                  icon={<CreditCard className="h-4 w-4" />}
+                  label="Card"
+                  value={
+                    fin.payment_method
+                      ? `${fin.payment_method.brand} ··${fin.payment_method.last4}`
+                      : "—"
+                  }
+                />
+              </div>
+
+              {fin.invoices.length > 0 ? (
+                <div className="rounded-lg border border-border overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/40 text-xs text-muted-foreground">
+                      <tr>
+                        <th className="text-left font-medium px-3 py-2">Date</th>
+                        <th className="text-left font-medium px-3 py-2">Number</th>
+                        <th className="text-left font-medium px-3 py-2">Status</th>
+                        <th className="text-right font-medium px-3 py-2">Amount</th>
+                        <th className="px-3 py-2"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fin.invoices.map((inv) => (
+                        <tr key={inv.id} className="border-t border-border">
+                          <td className="px-3 py-2 text-muted-foreground">
+                            {new Date(inv.created * 1000).toLocaleDateString()}
+                          </td>
+                          <td className="px-3 py-2 font-mono text-xs">{inv.number ?? inv.id.slice(0, 10)}</td>
+                          <td className="px-3 py-2">
+                            <StatusBadge
+                              tone={
+                                inv.status === "paid"
+                                  ? "success"
+                                  : inv.status === "open"
+                                    ? "warn"
+                                    : inv.status === "uncollectible" || inv.status === "void"
+                                      ? "danger"
+                                      : "muted"
+                              }
+                            >
+                              {inv.status ?? "—"}
+                            </StatusBadge>
+                          </td>
+                          <td className="px-3 py-2 text-right tabular-nums">
+                            {formatMoney(inv.amount_paid || inv.amount_due, inv.currency)}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {inv.hosted_invoice_url && (
+                              <a
+                                href={inv.hosted_invoice_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                              >
+                                View <ExternalLink className="h-3 w-3" />
+                              </a>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">No invoices yet.</div>
+              )}
+            </>
+          )}
+        </div>
       </section>
 
       <section className="grid lg:grid-cols-2 gap-4 mb-6">

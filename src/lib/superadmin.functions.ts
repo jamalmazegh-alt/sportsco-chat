@@ -1236,3 +1236,239 @@ export const listSuperadminLogsEnriched = createServerFn({ method: "POST" })
       })),
     };
   });
+
+// ============================================================================
+// BUSINESS & FINANCE
+// ============================================================================
+import { getStripe } from "./stripe.server";
+
+/**
+ * Platform-wide financial snapshot.
+ * Computes MRR/ARR from live Stripe subscriptions for accuracy, plus growth
+ * & churn from the local subscriptions table.
+ */
+export const getFinanceOverview = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertSuperAdmin(context.userId);
+
+    // ---- Local DB metrics ---------------------------------------------------
+    const since30 = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+    const since7 = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+    const in7 = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+
+    const [
+      { data: allSubs },
+      { count: newSubs30 },
+      { count: canceled30 },
+      { count: trialsEnding7d },
+      { count: pastDue },
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("subscriptions")
+        .select("id, status, plan, trial_end, current_period_end, canceled_at, created_at, stripe_subscription_id"),
+      supabaseAdmin
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since30)
+        .in("status", ["active", "trialing"]),
+      supabaseAdmin
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .gte("canceled_at", since30),
+      supabaseAdmin
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "trialing")
+        .gte("trial_end", new Date().toISOString())
+        .lte("trial_end", in7),
+      supabaseAdmin
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "past_due"),
+    ]);
+
+    const subs = allSubs ?? [];
+    const active = subs.filter((s) => s.status === "active" || s.status === "past_due");
+    const trialing = subs.filter((s) => s.status === "trialing");
+    const total = subs.length || 1;
+    const churnRate30d = canceled30 != null ? (canceled30 / total) * 100 : 0;
+
+    // Trial conversion: trials created >30d ago that are now active
+    const oldTrialCreated = subs.filter(
+      (s) => s.created_at < since30 && (s.status === "active" || s.status === "trialing" || s.status === "canceled"),
+    );
+    const convertedFromTrial = subs.filter(
+      (s) => s.status === "active" && s.created_at < since30,
+    );
+    const trialConvRate =
+      oldTrialCreated.length > 0
+        ? (convertedFromTrial.length / oldTrialCreated.length) * 100
+        : 0;
+
+    // ---- Stripe MRR computation --------------------------------------------
+    let mrrCents = 0;
+    let stripeActive = 0;
+    let avgRevenuePerClubCents = 0;
+    let currency = "eur";
+    try {
+      const stripe = getStripe();
+      // pull active subscriptions; up to 100 (page if you grow past that)
+      const stripeSubs = await stripe.subscriptions.list({
+        status: "active",
+        limit: 100,
+        expand: ["data.items.data.price"],
+      });
+      stripeActive = stripeSubs.data.length;
+      for (const s of stripeSubs.data) {
+        for (const item of s.items.data) {
+          const price = item.price;
+          if (!price?.unit_amount) continue;
+          currency = price.currency || currency;
+          const interval = price.recurring?.interval ?? "month";
+          const intervalCount = price.recurring?.interval_count ?? 1;
+          const monthly =
+            interval === "year"
+              ? price.unit_amount / (12 * intervalCount)
+              : interval === "week"
+                ? (price.unit_amount * 52) / 12 / intervalCount
+                : interval === "day"
+                  ? (price.unit_amount * 30) / intervalCount
+                  : price.unit_amount / intervalCount;
+          mrrCents += monthly * (item.quantity ?? 1);
+        }
+      }
+      avgRevenuePerClubCents = stripeActive > 0 ? mrrCents / stripeActive : 0;
+    } catch (err) {
+      console.error("[superadmin] Stripe MRR fetch failed", err);
+    }
+
+    return {
+      currency,
+      mrr_cents: Math.round(mrrCents),
+      arr_cents: Math.round(mrrCents * 12),
+      arpu_cents: Math.round(avgRevenuePerClubCents),
+      paying_clubs: stripeActive,
+      active_subs_db: active.length,
+      trialing: trialing.length,
+      trials_ending_7d: trialsEnding7d ?? 0,
+      new_subs_30d: newSubs30 ?? 0,
+      churned_30d: canceled30 ?? 0,
+      churn_rate_30d: Math.round(churnRate30d * 10) / 10,
+      trial_conversion_rate: Math.round(trialConvRate * 10) / 10,
+      past_due: pastDue ?? 0,
+      generated_at: new Date().toISOString(),
+    };
+  });
+
+/**
+ * Per-club financial dossier.
+ * Returns lifetime revenue, invoice history, payment method, and key dates.
+ */
+export const getClubFinancials = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ club_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+
+    const { data: sub } = await supabaseAdmin
+      .from("subscriptions")
+      .select(
+        "stripe_customer_id, stripe_subscription_id, plan, status, current_period_end, trial_end, cancel_at_period_end, canceled_at",
+      )
+      .eq("club_id", data.club_id)
+      .maybeSingle();
+
+    if (!sub?.stripe_customer_id) {
+      return {
+        has_stripe: false,
+        subscription: sub ?? null,
+        invoices: [] as InvoiceItem[],
+        lifetime_paid_cents: 0,
+        currency: "eur",
+        payment_method: null as null | { brand: string; last4: string; exp: string },
+        upcoming_amount_cents: null as number | null,
+      };
+    }
+
+    type InvoiceItem = {
+      id: string;
+      number: string | null;
+      status: string | null;
+      amount_paid: number;
+      amount_due: number;
+      currency: string;
+      created: number;
+      hosted_invoice_url: string | null | undefined;
+      invoice_pdf: string | null | undefined;
+    };
+    let invoices: InvoiceItem[] = [];
+    let lifetimePaid = 0;
+    let currency = "eur";
+    let paymentMethod: null | { brand: string; last4: string; exp: string } = null;
+    let upcomingAmount: number | null = null;
+
+    try {
+      const stripe = getStripe();
+      const [invList, customer] = await Promise.all([
+        stripe.invoices.list({ customer: sub.stripe_customer_id, limit: 24 }),
+        stripe.customers.retrieve(sub.stripe_customer_id, {
+          expand: ["invoice_settings.default_payment_method"],
+        }),
+      ]);
+
+      invoices = invList.data.map((inv) => ({
+        id: inv.id,
+        number: inv.number,
+        status: inv.status,
+        amount_paid: inv.amount_paid,
+        amount_due: inv.amount_due,
+        currency: inv.currency,
+        created: inv.created,
+        hosted_invoice_url: inv.hosted_invoice_url,
+        invoice_pdf: inv.invoice_pdf,
+      }));
+
+      for (const inv of invList.data) {
+        lifetimePaid += inv.amount_paid;
+        currency = inv.currency || currency;
+      }
+
+      if (!("deleted" in customer) || !customer.deleted) {
+        const pm =
+          (customer as { invoice_settings?: { default_payment_method?: unknown } })
+            .invoice_settings?.default_payment_method;
+        if (pm && typeof pm === "object" && "card" in pm && (pm as { card?: { brand: string; last4: string; exp_month: number; exp_year: number } }).card) {
+          const card = (pm as { card: { brand: string; last4: string; exp_month: number; exp_year: number } }).card;
+          paymentMethod = {
+            brand: card.brand,
+            last4: card.last4,
+            exp: `${String(card.exp_month).padStart(2, "0")}/${String(card.exp_year).slice(-2)}`,
+          };
+        }
+      }
+
+      if (sub.stripe_subscription_id) {
+        try {
+          const upcoming = await (stripe.invoices as unknown as {
+            retrieveUpcoming: (p: { customer: string }) => Promise<{ amount_due: number }>;
+          }).retrieveUpcoming({ customer: sub.stripe_customer_id });
+          upcomingAmount = upcoming.amount_due;
+        } catch {
+          // no upcoming invoice (e.g. canceled or unsupported on this api version)
+        }
+      }
+    } catch (err) {
+      console.error("[superadmin] Stripe customer/invoices fetch failed", err);
+    }
+
+    return {
+      has_stripe: true,
+      subscription: sub,
+      invoices,
+      lifetime_paid_cents: lifetimePaid,
+      currency,
+      payment_method: paymentMethod,
+      upcoming_amount_cents: upcomingAmount,
+    };
+  });
