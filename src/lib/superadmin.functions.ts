@@ -57,7 +57,7 @@ export const getPlatformStats = createServerFn({ method: "GET" })
     await assertSuperAdmin(context.userId);
     const { data, error } = await supabaseAdmin.rpc("get_platform_stats");
     if (error) throw new Error(error.message);
-    return data as Record<string, unknown>;
+    return { stats: (data ?? {}) as Record<string, number | string> };
   });
 
 /** Paginated list of clubs with subscription + owner info. */
