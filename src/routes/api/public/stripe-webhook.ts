@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { notifySubscriptionAdmin } from "@/lib/subscription-notify.server";
 
 type SubStatus =
   | "trialing"
