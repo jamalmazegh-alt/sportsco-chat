@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -99,13 +99,17 @@ function diffSnapshot(prev: Record<string, any> | null | undefined, current: any
   return out;
 }
 
-
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    send: s.send === 1 || s.send === "1" ? 1 : undefined,
+  }),
   component: EventDetail,
 });
 
 function EventDetail() {
   const { eventId } = Route.useParams();
+  const search = Route.useSearch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
@@ -113,6 +117,7 @@ function EventDetail() {
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [autoSendConsumed, setAutoSendConsumed] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerStep, setPickerStep] = useState<"select" | "review">("select");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -371,6 +376,24 @@ function EventDetail() {
     setPickerStep("select");
     setPickerOpen(true);
   }
+
+  // Auto-open the convocation picker when arriving from event creation with ?send=1
+  useEffect(() => {
+    if (autoSendConsumed) return;
+    if (search.send !== 1) return;
+    if (!isCoach) return;
+    if (!event || (event as any).convocations_sent) return;
+    if (!teamPlayers) return;
+    setAutoSendConsumed(true);
+    openPicker();
+    navigate({
+      to: "/events/$eventId",
+      params: { eventId },
+      search: {} as any,
+      replace: true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.send, isCoach, event, teamPlayers, autoSendConsumed]);
 
   async function sendConvocations() {
     if (!event || !user) return;

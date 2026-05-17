@@ -21,7 +21,9 @@ import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { Checkbox } from "@/components/ui/checkbox";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
+import { useNavigate } from "@tanstack/react-router";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -426,8 +428,10 @@ export function EventFormSheet({
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
   const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
+  const [sendNow, setSendNow] = useState<boolean>(true);
 
   const [busy, setBusy] = useState(false);
+  const navigate = useNavigate();
   const selectedTeam = teams.find((tm) => tm.id === teamId);
   const availableCompetitionTypes = useMemo(() => competitionOptions(selectedTeam), [selectedTeam]);
 
@@ -456,6 +460,7 @@ export function EventFormSheet({
     setConvocDate(c.date);
     setConvocTime(c.time);
     setRepeatWeeks(1);
+    setSendNow(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -600,6 +605,9 @@ export function EventFormSheet({
       toast.success(t("events.publish"));
       onOpenChange(false);
       onSaved(data.id);
+      if (sendNow && type !== "other" && type !== "meeting") {
+        navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
+      }
     } else {
       const { error } = await supabase.from("events").update(payload).eq("id", initial!.id!);
       setBusy(false);
@@ -830,6 +838,24 @@ export function EventFormSheet({
             <Label>{t("events.attachments")}</Label>
             <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
           </div>
+
+          {mode === "create" && type !== "other" && type !== "meeting" && (
+            <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
+              <Checkbox
+                checked={sendNow}
+                onCheckedChange={(v) => setSendNow(v === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-0.5">
+                <div className="text-sm font-medium">
+                  {t("events.sendConvocationsNow", { defaultValue: "Convoquer toute l'équipe maintenant" })}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {t("events.sendConvocationsNowHint", { defaultValue: "Tu pourras ajuster la liste juste après la création." })}
+                </div>
+              </div>
+            </label>
+          )}
 
           <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
             {busy ? (
