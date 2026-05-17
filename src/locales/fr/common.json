@@ -197,7 +197,8 @@
       "volleyball": "Volley-ball",
       "rugby": "Rugby",
       "futsal": "Futsal",
-      "ice_hockey": "Hockey sur glace"
+      "ice_hockey": "Hockey sur glace",
+      "field_hockey": "Hockey sur gazon"
     },
     "sportsCollective": "Autres sports collectifs"
   },
