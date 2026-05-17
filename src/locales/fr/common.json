@@ -95,6 +95,7 @@
     "gateTitle": "Votre vie privée",
     "gateSubtitle": "Veuillez consulter et accepter les éléments ci-dessous pour continuer.",
     "required": "obligatoire",
+    "viewDocument": "Revoir ce document",
     "acceptAndContinue": "Accepter et continuer",
     "consentSaved": "Consentement enregistré",
     "yourConsents": "Vos consentements",
