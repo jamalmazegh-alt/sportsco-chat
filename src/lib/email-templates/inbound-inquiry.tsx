@@ -32,12 +32,15 @@ const InboundInquiryEmail = (props: Props) => {
   return (
     <Html lang="fr" dir="ltr">
       <Head />
-      <Preview>{label} — {props.name || props.email}</Preview>
+      <Preview>{label} — {props.firstName || props.name || props.email}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={h1}>{label}</Heading>
           <Section style={card}>
-            <Row k="Nom" v={props.name || "—"} />
+            {props.firstName && <Row k="Prénom" v={props.firstName} />}
+            {(props.lastName || props.name) && (
+              <Row k="Nom" v={props.lastName || props.name || "—"} />
+            )}
             <Row k="E-mail" v={props.email || "—"} />
             {props.phone && <Row k="Téléphone" v={props.phone} />}
             {props.role && <Row k="Rôle" v={props.role} />}
