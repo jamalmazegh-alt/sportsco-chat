@@ -43,39 +43,44 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         .lte("starts_at", nowIso);
       const pastEventIds = (pastEvents ?? []).map((e) => e.id);
 
-      // Convocations on those events
+      // Attendance % over last 30d
       let attendancePct: number | null = null;
-      const playerAbsenceCount = new Map<string, number>();
       if (pastEventIds.length > 0) {
         const { data: convocs } = await supabase
           .from("convocations")
-          .select("status, player_id")
+          .select("status")
           .in("event_id", pastEventIds);
         const list = convocs ?? [];
         const replied = list.filter((c) => c.status !== "pending").length;
         const present = list.filter((c) => c.status === "present").length;
         attendancePct = replied > 0 ? Math.round((present / replied) * 100) : null;
-        list.forEach((c) => {
-          if (c.status === "absent") {
-            playerAbsenceCount.set(c.player_id, (playerAbsenceCount.get(c.player_id) ?? 0) + 1);
-          }
-        });
       }
-      const playersAlert = Array.from(playerAbsenceCount.values()).filter((n) => n >= 3).length;
 
       // Upcoming 7d events
-      const { count: upcomingCount } = await supabase
+      const { data: upcomingEvents } = await supabase
         .from("events")
-        .select("id", { count: "exact", head: true })
+        .select("id")
         .in("team_id", teamIds)
         .eq("status", "published")
         .gte("starts_at", nowIso)
         .lte("starts_at", next7);
+      const upcomingIds = (upcomingEvents ?? []).map((e) => e.id);
+
+      // Pending responses on upcoming events
+      let pendingResponses = 0;
+      if (upcomingIds.length > 0) {
+        const { count } = await supabase
+          .from("convocations")
+          .select("id", { count: "exact", head: true })
+          .in("event_id", upcomingIds)
+          .eq("status", "pending");
+        pendingResponses = count ?? 0;
+      }
 
       return {
         attendancePct,
-        playersAlert,
-        upcoming7d: upcomingCount ?? 0,
+        pendingResponses,
+        upcoming7d: upcomingIds.length,
       };
     },
     staleTime: 60_000,
