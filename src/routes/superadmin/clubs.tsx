@@ -118,6 +118,11 @@ function SuperAdminClubs() {
                       >
                         {c.name}
                       </Link>
+                      {c.archived_at && (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[10px]">
+                          archived
+                        </span>
+                      )}
                       <div className="text-[10px] font-mono text-muted-foreground/70">
                         {c.id.slice(0, 8)}
                       </div>
