@@ -95,6 +95,7 @@
     "gateTitle": "Your privacy",
     "gateSubtitle": "Please review and accept the items below to continue using Clubero.",
     "required": "required",
+    "viewDocument": "Review this document",
     "acceptAndContinue": "Accept and continue",
     "consentSaved": "Consent saved",
     "yourConsents": "Your consents",
