@@ -74,17 +74,19 @@ function EventsPage() {
   });
 
   const { data: events, isLoading } = useQuery({
-    queryKey: ["events", activeClubId],
+    queryKey: ["events", activeClubId, isCoach],
     enabled: !!activeClubId && !!teams,
     queryFn: async () => {
       const teamIds = (teams ?? []).map((t) => t.id);
       if (teamIds.length === 0) return [];
-      const { data } = await supabase
+      let q = supabase
         .from("events")
         .select("id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home")
         .in("team_id", teamIds)
         .is("deleted_at", null)
         .order("starts_at", { ascending: true });
+      if (!isCoach) q = q.eq("status", "published");
+      const { data } = await q;
       const list = data ?? [];
       const matchIds = list.filter((e) => e.type === "match").map((e) => e.id);
       let resultsById = new Map<string, { home_score: number; away_score: number }>();
