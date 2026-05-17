@@ -467,6 +467,7 @@
       "point": "Point",
       "yellow_card": "Carton jaune",
       "red_card": "Carton rouge",
+      "white_card": "Carton blanc",
       "foul": "Faute"
     },
     "goal": "But",
