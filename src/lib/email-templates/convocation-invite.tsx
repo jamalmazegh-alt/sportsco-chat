@@ -50,11 +50,13 @@ const ConvocationInviteEmail = ({
   respondUrl,
   isReminder,
   reminderHoursBefore,
+  isUpdate,
+  changes,
 }: Props) => (
   <Html lang="fr" dir="ltr">
     <Head />
     <Preview>
-      {isReminder ? "Rappel — " : ""}Convocation : {eventTitle}
+      {isUpdate ? "Mise à jour — " : isReminder ? "Rappel — " : ""}Convocation : {eventTitle}
       {eventDate ? ` — ${eventDate}` : ""}
     </Preview>
     <Body style={main}>
@@ -72,13 +74,29 @@ const ConvocationInviteEmail = ({
         ) : null}
 
         <Heading style={h1}>
-          {isReminder
+          {isUpdate
+            ? `🔄 Mise à jour de la convocation`
+            : isReminder
             ? `⏰ Rappel — réponse attendue${reminderHoursBefore ? ` (${reminderHoursBefore}h avant)` : ""}`
             : recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
         </Heading>
 
+        {isUpdate && changes && changes.length > 0 ? (
+          <Section style={changesCard}>
+            <Text style={changesTitle}>⚠️ Ce qui a changé</Text>
+            {changes.map((c, i) => (
+              <Text key={i} style={changesLine}>
+                <strong>{c.label} :</strong>{" "}
+                {c.previous ? <span style={oldValue}>{c.previous}</span> : <em style={{ color: "#94a3b8" }}>—</em>}
+                {" → "}
+                <span style={newValue}>{c.current ?? "—"}</span>
+              </Text>
+            ))}
+          </Section>
+        ) : null}
+
         <Text style={text}>
-          {playerName ? <strong>{playerName}</strong> : "Votre joueur"} {isReminder ? "n'a pas encore répondu à la convocation" : "est convoqué·e"}
+          {playerName ? <strong>{playerName}</strong> : "Votre joueur"} {isUpdate ? "— les informations de la convocation ont été mises à jour. Merci de vérifier et de confirmer votre réponse." : isReminder ? "n'a pas encore répondu à la convocation" : "est convoqué·e"}
           {teamName ? <> avec <strong>{teamName}</strong></> : null}
           {clubName ? <> ({clubName})</> : null}.
         </Text>
