@@ -42,15 +42,28 @@ export interface AuthState {
   signOut: () => Promise<void>;
 }
 
-const ACTIVE_CLUB_KEY = "squadly:active_club_id";
+const ACTIVE_CLUB_KEY = "clubero:active_club_id";
+const LEGACY_ACTIVE_CLUB_KEY = "squadly:active_club_id";
+
+function readActiveClubKey(): string | null {
+  if (typeof window === "undefined") return null;
+  const current = localStorage.getItem(ACTIVE_CLUB_KEY);
+  if (current) return current;
+  // Migrate one-shot from the old "squadly:" key (pre-rebrand).
+  const legacy = localStorage.getItem(LEGACY_ACTIVE_CLUB_KEY);
+  if (legacy) {
+    localStorage.setItem(ACTIVE_CLUB_KEY, legacy);
+    localStorage.removeItem(LEGACY_ACTIVE_CLUB_KEY);
+    return legacy;
+  }
+  return null;
+}
 
 export function useAuthState(): AuthState {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [memberships, setMemberships] = useState<ClubMembership[]>([]);
-  const [activeClubId, setActiveClubIdState] = useState<string | null>(() =>
-    typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CLUB_KEY) : null
-  );
+  const [activeClubId, setActiveClubIdState] = useState<string | null>(readActiveClubKey);
   const activeClubIdRef = useRef(activeClubId);
   activeClubIdRef.current = activeClubId;
 
