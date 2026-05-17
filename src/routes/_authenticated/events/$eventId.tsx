@@ -252,11 +252,43 @@ function EventDetail() {
     if (!cancelTargetId) return;
     const id = cancelTargetId;
     setCancelTargetId(null);
+    const conv = (convocations ?? []).find((c: any) => c.id === id) as any;
+    const playerId: string | undefined = conv?.player_id;
+    const playerUserId: string | undefined = conv?.players?.user_id ?? undefined;
     const { error } = await supabase.from("convocations").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else {
-      toast.success(t("attendance.convocationCancelled"));
-      refetch();
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(t("attendance.convocationCancelled"));
+    refetch();
+
+    // Notify the player + parents that their call-up was cancelled
+    try {
+      const recipientIds = new Set<string>();
+      if (playerUserId) recipientIds.add(playerUserId);
+      if (playerId) {
+        const { data: parents } = await supabase
+          .from("player_parents")
+          .select("parent_user_id")
+          .eq("player_id", playerId);
+        (parents ?? []).forEach((p: any) => {
+          if (p.parent_user_id) recipientIds.add(p.parent_user_id);
+        });
+      }
+      if (recipientIds.size > 0 && event) {
+        await supabase.from("notifications").insert(
+          Array.from(recipientIds).map((uid) => ({
+            user_id: uid,
+            type: "convocation_cancelled",
+            title: `${t("attendance.convocationCancelled")} — ${event.title}`,
+            body: fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm"),
+            link: `/events/${event.id}`,
+          })),
+        );
+      }
+    } catch {
+      // best-effort
     }
   }
 
