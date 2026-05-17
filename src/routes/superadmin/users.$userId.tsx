@@ -168,6 +168,18 @@ function UserDetail() {
               >
                 <KeyRound className="h-4 w-4 mr-1.5" /> Password reset link
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={busy || !status.email}
+                onClick={() => {
+                  setImpLink(null);
+                  setImpReason("");
+                  setImpersonateOpen(true);
+                }}
+              >
+                <UserCog className="h-4 w-4 mr-1.5" /> Impersonate
+              </Button>
             </div>
 
             {resetLink && (
