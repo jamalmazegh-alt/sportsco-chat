@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, Link, notFound, useLocation, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, notFound, useLocation, useNavigate, isRedirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { checkSuperAdmin } from "@/lib/superadmin.functions";
 import { useAuth } from "@/lib/auth-context";
@@ -18,6 +18,27 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/superadmin")({
+  // Server-side guard: blocks the route before any UI renders.
+  // The loader runs on the server during SSR / direct URL hits, and on the client
+  // during in-app navigation. If the caller is not a super admin, we return 404
+  // (we never reveal the area exists). If the loader can't authenticate yet
+  // (SSR with no bearer token), we fall back to the in-component check.
+  loader: async () => {
+    try {
+      const res = await checkSuperAdmin();
+      if (!res.isSuperAdmin) throw notFound();
+      return { verified: true as const };
+    } catch (err) {
+      if (isRedirect(err)) throw err;
+      // notFound() throws an object with a specific shape — re-throw it.
+      if (err && typeof err === "object" && "isNotFound" in (err as object)) {
+        throw err;
+      }
+      // Likely "Unauthorized" during SSR before auth header is attached.
+      // Defer to the client-side useEffect check below.
+      return { verified: false as const };
+    }
+  },
   component: SuperAdminLayout,
 });
 
@@ -34,11 +55,17 @@ const NAV: NavItem[] = [
 
 function SuperAdminLayout() {
   const { session, loading } = useAuth();
-  const [state, setState] = useState<"checking" | "ok" | "denied">("checking");
+  const { verified } = Route.useLoaderData();
+  // If the server loader verified, we skip the client re-check (no spinner flash).
+  const [state, setState] = useState<"checking" | "ok" | "denied">(
+    verified ? "ok" : "checking",
+  );
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Already verified server-side — skip the client roundtrip.
+    if (verified) return;
     let cancelled = false;
     if (loading) return;
     if (!session) {
@@ -57,7 +84,7 @@ function SuperAdminLayout() {
     return () => {
       cancelled = true;
     };
-  }, [session, loading, location.href, navigate]);
+  }, [verified, session, loading, location.href, navigate]);
 
   if (loading || state === "checking") {
     return (
