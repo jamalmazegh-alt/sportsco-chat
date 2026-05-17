@@ -544,7 +544,7 @@ export const Route = createFileRoute("/api/chat")({
               if (!managedTeamIds.includes(ev.team_id)) {
                 return { updated: false, note: "L'utilisateur n'encadre pas l'équipe de cet événement." };
               }
-              const patch: Record<string, unknown> = {};
+              const patch: Database["public"]["Tables"]["events"]["Update"] = {};
               if (title !== undefined) patch.title = title;
               if (startsAt !== undefined) {
                 const d = new Date(startsAt);
