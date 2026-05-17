@@ -31,9 +31,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2 } from "lucide-react";
+import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { LegalDialog } from "@/components/legal-dialog";
 
 export const Route = createFileRoute("/_authenticated/profile/privacy")({
   component: PrivacyPage,
@@ -88,6 +89,9 @@ function PrivacyPage() {
 
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [legalKind, setLegalKind] = useState<
+    null | "terms" | "privacy" | "data_processing" | "media" | "notifications" | "legal_notice" | "parental_consent"
+  >(null);
 
   async function toggleConsent(kind: string, version_id: string, currentlyGranted: boolean) {
     setBusy(true);
@@ -224,14 +228,14 @@ function PrivacyPage() {
         <ul className="grid grid-cols-1 gap-1.5 pt-1">
           {(["terms", "privacy", "data_processing", "media", "notifications"] as const).map((k) => (
             <li key={k}>
-              <Link
-                to="/legal/$kind"
-                params={{ kind: k }}
-                className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/40"
+              <button
+                type="button"
+                onClick={() => setLegalKind(k)}
+                className="w-full flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/40 text-left"
               >
                 <span>{t(`privacy.legal.${k}`, { defaultValue: k })}</span>
-                <ChevronLeft className="h-4 w-4 rotate-180 text-muted-foreground" />
-              </Link>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
             </li>
           ))}
         </ul>
@@ -322,6 +326,12 @@ function PrivacyPage() {
           ))}
         </div>
       </section>
+
+      <LegalDialog
+        open={!!legalKind}
+        onOpenChange={(o) => !o && setLegalKind(null)}
+        kind={legalKind}
+      />
     </div>
   );
 }
