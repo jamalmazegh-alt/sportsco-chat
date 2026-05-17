@@ -230,6 +230,7 @@ function FeaturesPage() {
               "Handball",
               "Volley-ball",
               "Hockey sur glace",
+              "Hockey sur gazon",
             ].map((s) => (
               <span
                 key={s}
