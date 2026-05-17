@@ -148,14 +148,30 @@ function DemoPage() {
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-role">Votre rôle</Label>
+                <Label htmlFor="d-phone">Téléphone</Label>
                 <Input
-                  id="d-role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  placeholder="Coach, dirigeant…"
+                  id="d-phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+33 6 12 34 56 78"
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="d-role">Votre rôle</Label>
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger id="d-role">
+                    <SelectValue placeholder="Sélectionnez un rôle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="d-teams">Nombre d&apos;équipes</Label>
                 <Input
