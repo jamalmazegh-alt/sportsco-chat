@@ -425,11 +425,13 @@ export const Route = createFileRoute("/api/chat")({
               type: z.enum(["training", "match", "tournament", "meeting", "other"]),
               startsAt: z.string().describe("Date/heure de début au format ISO 8601 avec fuseau (ex : '2025-05-24T14:30:00+02:00'). Convertis toujours les indications relatives (samedi prochain 14h30) en ISO complet AVANT d'appeler."),
               endsAt: z.string().optional().describe("Date/heure de fin ISO 8601 (optionnel)."),
-              location: z.string().max(200).optional(),
+              convocationTime: z.string().optional().describe("Heure du rendez-vous (convocation) au format ISO 8601 avec fuseau. Renseigne-la dès que l'utilisateur mentionne une heure de RDV distincte (ex : RDV 11h00 pour un match à 12h30)."),
+              location: z.string().max(200).optional().describe("Lieu de l'événement (ex : stade, gymnase)."),
+              meetingPoint: z.string().max(200).optional().describe("Lieu du rendez-vous / point de ralliement (ex : 'Parking du club', 'Devant le vestiaire'). Distinct du lieu de l'événement."),
               opponent: z.string().max(200).optional().describe("Pour les matchs uniquement."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ teamName, title, type, startsAt, endsAt, location, opponent, description }) => {
+            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
               // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
               const managedTeamIds = await getManagedTeamIds();
               let coached: Array<{ id: string; name: string }> = [];
