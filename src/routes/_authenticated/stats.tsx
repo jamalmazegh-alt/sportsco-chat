@@ -312,13 +312,18 @@ function TeamMatchRecord({ teamId }: { teamId: string }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      {cards.map((c) => (
-        <div key={c.label} className="rounded-xl border bg-card p-4">
-          <div className="text-xs text-muted-foreground">{c.label}</div>
-          <div className={cn("mt-1 text-2xl font-bold", c.tone)}>{c.value}</div>
-        </div>
-      ))}
+    <div className="space-y-3">
+      <div className="text-xs text-muted-foreground">
+        {t("stats.currentSeason", { defaultValue: "Saison en cours" })} · {season.label}
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {cards.map((c) => (
+          <div key={c.label} className="rounded-xl border bg-card p-4">
+            <div className="text-xs text-muted-foreground">{c.label}</div>
+            <div className={cn("mt-1 text-2xl font-bold", c.tone)}>{c.value}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
