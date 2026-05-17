@@ -129,3 +129,17 @@ export function trialCountdown(trial_end?: string | null): string | null {
   const days = Math.ceil(ms / (24 * 3600 * 1000));
   return `${days} day${days === 1 ? "" : "s"} left`;
 }
+
+export function formatMoney(cents: number | null | undefined, currency = "eur"): string {
+  if (cents == null) return "—";
+  const amount = cents / 100;
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      maximumFractionDigits: amount >= 100 ? 0 : 2,
+    }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
