@@ -291,7 +291,7 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
   const selectedTeam = teams?.find((tm: any) => tm.id === teamId) ?? null;
   const selectedSport: string | null = (selectedTeam as any)?.sport ?? null;
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">{t("common.loading", { defaultValue: "Chargement…" })}</p>;
+  if (isLoading) return <StaffSkeleton />;
   if (!teams || teams.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
