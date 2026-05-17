@@ -114,6 +114,7 @@ export function getSportConfig(sport: string | null | undefined): SportConfig {
 export const SOLO_STAT_KINDS: StatKind[] = [
   "yellow_card",
   "red_card",
+  "white_card",
   "foul",
   "penalty",
   "own_goal",
