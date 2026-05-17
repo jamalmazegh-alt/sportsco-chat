@@ -30,6 +30,7 @@ export const Route = createFileRoute("/superadmin/clubs/$clubId")({
 function ClubDetail() {
   const { clubId } = Route.useParams();
   const [data, setData] = useState<Awaited<ReturnType<typeof getClubDetailExtended>> | null>(null);
+  const [fin, setFin] = useState<Awaited<ReturnType<typeof getClubFinancials>> | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -38,6 +39,9 @@ function ClubDetail() {
     getClubDetailExtended({ data: { club_id: clubId } })
       .then(setData)
       .catch((e) => setErr(e instanceof Error ? e.message : "Failed"));
+    getClubFinancials({ data: { club_id: clubId } })
+      .then(setFin)
+      .catch((e) => console.error("financials", e));
   }, [clubId]);
 
   useEffect(refresh, [refresh]);
