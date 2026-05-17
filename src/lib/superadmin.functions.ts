@@ -629,3 +629,610 @@ export const getClubSupportSummary = createServerFn({ method: "POST" })
       recent_events: recentEvents ?? [],
     };
   });
+
+// ============================================================================
+// Phase 5: rich operational endpoints
+// ============================================================================
+
+/** Rich user list: profile + email + last sign-in + clubs + roles + subscriptions. */
+export const listAllUsers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        search: z.string().trim().max(120).optional(),
+        limit: z.number().int().min(1).max(100).default(50),
+        page: z.number().int().min(1).max(50).default(1),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+
+    // Pull a page of auth users (we need email + last_sign_in_at + banned_until).
+    const { data: authPage, error: authErr } =
+      await supabaseAdmin.auth.admin.listUsers({
+        page: data.page,
+        perPage: data.limit,
+      });
+    if (authErr) throw new Error(authErr.message);
+    const authUsers = authPage?.users ?? [];
+
+    let candidateIds = authUsers.map((u) => u.id);
+
+    // Optional search: filter via profiles (name/phone) OR auth email match.
+    if (data.search) {
+      const s = `%${data.search}%`;
+      const { data: matches } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .or(
+          `full_name.ilike.${s},first_name.ilike.${s},last_name.ilike.${s},phone.ilike.${s}`,
+        )
+        .limit(200);
+      const matchIds = new Set((matches ?? []).map((m) => m.id));
+      const emailMatch = data.search.toLowerCase();
+      candidateIds = authUsers
+        .filter(
+          (u) =>
+            matchIds.has(u.id) ||
+            (u.email ?? "").toLowerCase().includes(emailMatch),
+        )
+        .map((u) => u.id);
+    }
+
+    if (candidateIds.length === 0) {
+      return { items: [], total: authPage?.total ?? 0, page: data.page };
+    }
+
+    const [{ data: profiles }, { data: memberships }, { data: teamMembers }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("profiles")
+          .select(
+            "id, full_name, first_name, last_name, phone, avatar_url, preferred_language, created_at",
+          )
+          .in("id", candidateIds),
+        supabaseAdmin
+          .from("club_members")
+          .select("user_id, club_id, role")
+          .in("user_id", candidateIds),
+        supabaseAdmin
+          .from("team_members")
+          .select("user_id, team_id, role")
+          .in("user_id", candidateIds),
+      ]);
+
+    const clubIds = Array.from(
+      new Set((memberships ?? []).map((m) => m.club_id)),
+    );
+    const teamIds = Array.from(
+      new Set((teamMembers ?? []).map((m) => m.team_id)),
+    );
+
+    const [{ data: clubs }, { data: teams }, { data: subs }] = await Promise.all([
+      clubIds.length
+        ? supabaseAdmin
+            .from("clubs")
+            .select("id, name, logo_url, archived_at")
+            .in("id", clubIds)
+        : Promise.resolve({ data: [] as never[] }),
+      teamIds.length
+        ? supabaseAdmin
+            .from("teams")
+            .select("id, name, club_id")
+            .in("id", teamIds)
+        : Promise.resolve({ data: [] as never[] }),
+      clubIds.length
+        ? supabaseAdmin
+            .from("subscriptions")
+            .select("club_id, status, plan, trial_end, current_period_end")
+            .in("club_id", clubIds)
+        : Promise.resolve({ data: [] as never[] }),
+    ]);
+
+    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const clubMap = new Map((clubs ?? []).map((c) => [c.id, c]));
+    const teamMap = new Map((teams ?? []).map((t) => [t.id, t]));
+    const subByClub = new Map((subs ?? []).map((s) => [s.club_id, s]));
+
+    const membershipsByUser = new Map<
+      string,
+      Array<{ club_id: string; role: string }>
+    >();
+    (memberships ?? []).forEach((m) => {
+      const arr = membershipsByUser.get(m.user_id) ?? [];
+      arr.push({ club_id: m.club_id, role: m.role });
+      membershipsByUser.set(m.user_id, arr);
+    });
+    const teamsByUser = new Map<string, Array<{ team_id: string; role: string }>>();
+    (teamMembers ?? []).forEach((tm) => {
+      if (!tm.user_id) return;
+      const arr = teamsByUser.get(tm.user_id) ?? [];
+      arr.push({ team_id: tm.team_id, role: tm.role });
+      teamsByUser.set(tm.user_id, arr);
+    });
+
+    const items = authUsers
+      .filter((u) => candidateIds.includes(u.id))
+      .map((u) => {
+        const profile = profileMap.get(u.id) ?? null;
+        const memberRows = membershipsByUser.get(u.id) ?? [];
+        const teamRows = teamsByUser.get(u.id) ?? [];
+        const clubsForUser = memberRows.map((m) => ({
+          club_id: m.club_id,
+          role: m.role,
+          name: clubMap.get(m.club_id)?.name ?? null,
+          logo_url: clubMap.get(m.club_id)?.logo_url ?? null,
+          subscription_status:
+            subByClub.get(m.club_id)?.status ?? null,
+        }));
+        const teamsForUser = teamRows.map((t) => ({
+          team_id: t.team_id,
+          role: t.role,
+          name: teamMap.get(t.team_id)?.name ?? null,
+          club_id: teamMap.get(t.team_id)?.club_id ?? null,
+        }));
+        const banned_until =
+          (u as { banned_until?: string | null }).banned_until ?? null;
+        return {
+          id: u.id,
+          email: u.email ?? null,
+          phone: profile?.phone ?? null,
+          full_name: profile?.full_name ?? null,
+          avatar_url: profile?.avatar_url ?? null,
+          preferred_language: profile?.preferred_language ?? null,
+          created_at: u.created_at,
+          last_sign_in_at: u.last_sign_in_at ?? null,
+          email_confirmed_at: u.email_confirmed_at ?? null,
+          is_banned: banned_until
+            ? new Date(banned_until).getTime() > Date.now()
+            : false,
+          clubs: clubsForUser,
+          teams: teamsForUser,
+          primary_role: clubsForUser[0]?.role ?? teamsForUser[0]?.role ?? null,
+          primary_club_name: clubsForUser[0]?.name ?? null,
+        };
+      });
+
+    return { items, total: authPage?.total ?? items.length, page: data.page };
+  });
+
+/** Detailed view of a single user: profile, auth, clubs, teams, players, recent activity. */
+export const getUserDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    await logAction({
+      actor: context.userId,
+      action: "view_user_detail",
+      target_type: "user",
+      target_id: data.user_id,
+    });
+
+    const [
+      { data: authRes },
+      { data: profile },
+      { data: memberships },
+      { data: teamRoles },
+      { data: playerSelf },
+      { data: parentLinks },
+      { data: recentLogs },
+    ] = await Promise.all([
+      supabaseAdmin.auth.admin.getUserById(data.user_id),
+      supabaseAdmin
+        .from("profiles")
+        .select("*")
+        .eq("id", data.user_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("club_members")
+        .select("club_id, role, created_at")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("team_members")
+        .select("team_id, role, player_id, created_at")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("players")
+        .select("id, first_name, last_name, club_id, jersey_number")
+        .eq("user_id", data.user_id),
+      supabaseAdmin
+        .from("player_parents")
+        .select("player_id, can_respond")
+        .eq("parent_user_id", data.user_id),
+      supabaseAdmin
+        .from("superadmin_audit_logs")
+        .select("id, action, created_at, actor_user_id, metadata")
+        .eq("target_id", data.user_id)
+        .order("created_at", { ascending: false })
+        .limit(20),
+    ]);
+
+    const clubIds = Array.from(
+      new Set([
+        ...(memberships ?? []).map((m) => m.club_id),
+        ...(playerSelf ?? []).map((p) => p.club_id),
+      ]),
+    );
+    const teamIds = Array.from(new Set((teamRoles ?? []).map((t) => t.team_id)));
+    const [{ data: clubs }, { data: teams }, { data: subs }] = await Promise.all([
+      clubIds.length
+        ? supabaseAdmin
+            .from("clubs")
+            .select("id, name, logo_url, archived_at")
+            .in("id", clubIds)
+        : Promise.resolve({ data: [] as never[] }),
+      teamIds.length
+        ? supabaseAdmin
+            .from("teams")
+            .select("id, name, club_id, sport")
+            .in("id", teamIds)
+        : Promise.resolve({ data: [] as never[] }),
+      clubIds.length
+        ? supabaseAdmin
+            .from("subscriptions")
+            .select("club_id, status, plan, trial_end, current_period_end")
+            .in("club_id", clubIds)
+        : Promise.resolve({ data: [] as never[] }),
+    ]);
+
+    const clubMap = new Map((clubs ?? []).map((c) => [c.id, c]));
+    const teamMap = new Map((teams ?? []).map((t) => [t.id, t]));
+    const subByClub = new Map((subs ?? []).map((s) => [s.club_id, s]));
+
+    // Convocations received via player profiles
+    const playerIds = (playerSelf ?? []).map((p) => p.id);
+    const { data: convos } = playerIds.length
+      ? await supabaseAdmin
+          .from("convocations")
+          .select("id, event_id, status, responded_at, created_at")
+          .in("player_id", playerIds)
+          .order("created_at", { ascending: false })
+          .limit(10)
+      : { data: [] as never[] };
+
+    const eventIds = Array.from(
+      new Set((convos ?? []).map((c) => c.event_id)),
+    );
+    const { data: events } = eventIds.length
+      ? await supabaseAdmin
+          .from("events")
+          .select("id, title, type, starts_at, team_id")
+          .in("id", eventIds)
+      : { data: [] as never[] };
+    const eventMap = new Map((events ?? []).map((e) => [e.id, e]));
+
+    const authUser = authRes?.user ?? null;
+    const banned_until =
+      (authUser as { banned_until?: string | null } | null)?.banned_until ?? null;
+
+    return {
+      profile: profile ?? null,
+      auth: {
+        email: authUser?.email ?? null,
+        phone: authUser?.phone ?? null,
+        last_sign_in_at: authUser?.last_sign_in_at ?? null,
+        email_confirmed_at: authUser?.email_confirmed_at ?? null,
+        created_at: authUser?.created_at ?? null,
+        is_banned: banned_until
+          ? new Date(banned_until).getTime() > Date.now()
+          : false,
+        banned_until,
+      },
+      clubs: (memberships ?? []).map((m) => ({
+        club_id: m.club_id,
+        role: m.role,
+        joined_at: m.created_at,
+        club: clubMap.get(m.club_id) ?? null,
+        subscription: subByClub.get(m.club_id) ?? null,
+      })),
+      teams: (teamRoles ?? []).map((t) => ({
+        team_id: t.team_id,
+        role: t.role,
+        joined_at: t.created_at,
+        team: teamMap.get(t.team_id) ?? null,
+      })),
+      players: playerSelf ?? [],
+      parent_of: parentLinks ?? [],
+      recent_convocations: (convos ?? []).map((c) => ({
+        ...c,
+        event: eventMap.get(c.event_id) ?? null,
+      })),
+      recent_admin_actions: recentLogs ?? [],
+    };
+  });
+
+/** Triggers Supabase's built-in password reset email (no link returned). */
+export const sendPasswordResetEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { data: u, error: ue } =
+      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    if (ue || !u?.user?.email) throw new Error("User has no email on file.");
+
+    // Generate a recovery link — the auth-email-hook will turn it into a branded email.
+    const { error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email: u.user.email,
+    });
+    if (error) throw new Error(error.message);
+
+    await logAction({
+      actor: context.userId,
+      action: "send_password_reset_email",
+      target_type: "user",
+      target_id: data.user_id,
+      metadata: { email: u.user.email },
+    });
+    return { ok: true, email: u.user.email };
+  });
+
+/** Re-sends an onboarding magic-link email to a user. */
+export const resendOnboardingEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { data: u, error: ue } =
+      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    if (ue || !u?.user?.email) throw new Error("User has no email on file.");
+
+    const { error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "magiclink",
+      email: u.user.email,
+    });
+    if (error) throw new Error(error.message);
+
+    await logAction({
+      actor: context.userId,
+      action: "resend_onboarding_email",
+      target_type: "user",
+      target_id: data.user_id,
+      metadata: { email: u.user.email },
+    });
+    return { ok: true, email: u.user.email };
+  });
+
+/** Extended club detail: + recent events, recent convocations, WhatsApp config, billing badges. */
+export const getClubDetailExtended = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ club_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+
+    const [{ data: club }, { data: sub }, { data: teams }, { data: members }] =
+      await Promise.all([
+        supabaseAdmin.from("clubs").select("*").eq("id", data.club_id).maybeSingle(),
+        supabaseAdmin
+          .from("subscriptions")
+          .select("*")
+          .eq("club_id", data.club_id)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("teams")
+          .select("id, name, sport, championship, age_group, communication_mode, whatsapp_group_url, image_url, deleted_at, created_at")
+          .eq("club_id", data.club_id),
+        supabaseAdmin
+          .from("club_members")
+          .select("user_id, role, created_at")
+          .eq("club_id", data.club_id),
+      ]);
+
+    const teamIds = (teams ?? []).map((t) => t.id);
+    const userIds = (members ?? []).map((m) => m.user_id);
+
+    const [
+      { data: profiles },
+      { data: recentEvents },
+      { data: recentConvos },
+    ] = await Promise.all([
+      userIds.length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id, full_name, first_name, last_name, phone, avatar_url")
+            .in("id", userIds)
+        : Promise.resolve({ data: [] as never[] }),
+      teamIds.length
+        ? supabaseAdmin
+            .from("events")
+            .select("id, title, type, starts_at, team_id, deleted_at, cancelled_at")
+            .in("team_id", teamIds)
+            .order("starts_at", { ascending: false })
+            .limit(8)
+        : Promise.resolve({ data: [] as never[] }),
+      teamIds.length
+        ? supabaseAdmin
+            .from("convocations")
+            .select("id, status, created_at, event_id")
+            .order("created_at", { ascending: false })
+            .limit(150)
+        : Promise.resolve({ data: [] as never[] }),
+    ]);
+
+    // Filter convos to events of this club via recent events list (cheap heuristic).
+    const eventIds = new Set((recentEvents ?? []).map((e) => e.id));
+    const clubConvos = (recentConvos ?? []).filter((c) =>
+      eventIds.has(c.event_id),
+    );
+
+    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+
+    return {
+      club,
+      subscription: sub,
+      teams: teams ?? [],
+      members: (members ?? []).map((m) => ({
+        ...m,
+        profile: profileMap.get(m.user_id) ?? null,
+      })),
+      recent_events: recentEvents ?? [],
+      recent_convocations: clubConvos,
+      whatsapp_configured_count: (teams ?? []).filter(
+        (t) => !!t.whatsapp_group_url,
+      ).length,
+    };
+  });
+
+/** Suspends a club (alias for archive with a reason). */
+export const suspendClub = archiveClub;
+
+/** Operational alerts surfaced on the Support hub. */
+export const getSupportAlerts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertSuperAdmin(context.userId);
+    const now = new Date();
+    const in7d = new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString();
+    const past30d = new Date(
+      now.getTime() - 30 * 24 * 3600 * 1000,
+    ).toISOString();
+
+    const [
+      { data: trialsEnding },
+      { data: pastDue },
+      { data: pendingInvites },
+      { data: dlqEmails },
+    ] = await Promise.all([
+      supabaseAdmin
+        .from("subscriptions")
+        .select("club_id, trial_end, status")
+        .eq("status", "trialing")
+        .lt("trial_end", in7d)
+        .gt("trial_end", now.toISOString())
+        .limit(20),
+      supabaseAdmin
+        .from("subscriptions")
+        .select("club_id, status, current_period_end")
+        .in("status", ["past_due", "incomplete"])
+        .limit(20),
+      supabaseAdmin
+        .from("member_invites")
+        .select("id, club_id, email, created_at")
+        .is("used_at", null)
+        .lt("created_at", past30d)
+        .limit(20),
+      supabaseAdmin
+        .from("email_send_log")
+        .select("id, recipient_email, status, created_at, error_message")
+        .in("status", ["failed", "dlq", "bounced"])
+        .order("created_at", { ascending: false })
+        .limit(20),
+    ]);
+
+    const clubIds = Array.from(
+      new Set([
+        ...(trialsEnding ?? []).map((s) => s.club_id),
+        ...(pastDue ?? []).map((s) => s.club_id),
+        ...(pendingInvites ?? []).map((i) => i.club_id),
+      ]),
+    );
+    const { data: clubs } = clubIds.length
+      ? await supabaseAdmin
+          .from("clubs")
+          .select("id, name")
+          .in("id", clubIds)
+      : { data: [] as never[] };
+    const clubMap = new Map((clubs ?? []).map((c) => [c.id, c.name]));
+
+    return {
+      trials_ending: (trialsEnding ?? []).map((s) => ({
+        ...s,
+        club_name: clubMap.get(s.club_id) ?? "—",
+      })),
+      past_due: (pastDue ?? []).map((s) => ({
+        ...s,
+        club_name: clubMap.get(s.club_id) ?? "—",
+      })),
+      stale_invites: (pendingInvites ?? []).map((i) => ({
+        ...i,
+        club_name: clubMap.get(i.club_id) ?? "—",
+      })),
+      email_failures: dlqEmails ?? [],
+    };
+  });
+
+/** Enriched activity logs with actor/target profiles + category/severity hints. */
+export const listSuperadminLogsEnriched = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        limit: z.number().int().min(1).max(200).default(80),
+        category: z.string().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { data: rows, error } = await supabaseAdmin
+      .from("superadmin_audit_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (error) throw new Error(error.message);
+
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r) => r.actor_user_id).filter(Boolean)),
+    );
+    const targetUserIds = Array.from(
+      new Set(
+        (rows ?? [])
+          .filter((r) => r.target_type === "user" && r.target_id)
+          .map((r) => r.target_id as string),
+      ),
+    );
+    const clubTargetIds = Array.from(
+      new Set(
+        (rows ?? [])
+          .map((r) => r.club_id ?? (r.target_type === "club" ? r.target_id : null))
+          .filter(Boolean) as string[],
+      ),
+    );
+
+    const [{ data: profiles }, { data: clubs }] = await Promise.all([
+      [...actorIds, ...targetUserIds].length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id, full_name, avatar_url")
+            .in("id", [...new Set([...actorIds, ...targetUserIds])])
+        : Promise.resolve({ data: [] as never[] }),
+      clubTargetIds.length
+        ? supabaseAdmin
+            .from("clubs")
+            .select("id, name")
+            .in("id", clubTargetIds)
+        : Promise.resolve({ data: [] as never[] }),
+    ]);
+
+    const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const clubMap = new Map((clubs ?? []).map((c) => [c.id, c]));
+
+    return {
+      items: (rows ?? []).map((r) => ({
+        ...r,
+        actor_profile: profileMap.get(r.actor_user_id) ?? null,
+        target_user_profile:
+          r.target_type === "user" && r.target_id
+            ? profileMap.get(r.target_id) ?? null
+            : null,
+        target_club:
+          r.club_id
+            ? clubMap.get(r.club_id) ?? null
+            : r.target_type === "club" && r.target_id
+              ? clubMap.get(r.target_id) ?? null
+              : null,
+      })),
+    };
+  });
