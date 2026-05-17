@@ -87,9 +87,13 @@ function HomePage() {
           .select("player_id, players:player_id(id, first_name, last_name)")
           .eq("parent_user_id", user!.id),
       ]);
+      const ownIds = new Set((own ?? []).map((p: any) => p.id));
       const players = [
-        ...(own ?? []),
-        ...((children ?? []).map((c: any) => c.players).filter(Boolean) as any[]),
+        ...(own ?? []).map((p: any) => ({ ...p, isOwn: true })),
+        ...((children ?? [])
+          .map((c: any) => c.players)
+          .filter(Boolean)
+          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) }))),
       ];
       const playerIds = players.map((p) => p.id);
       if (playerIds.length === 0) return [];
@@ -110,6 +114,45 @@ function HomePage() {
           player: players.find((p) => p.id === c.player_id) ?? null,
         }))
         .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
+    },
+  });
+
+  // Teams the user (or their children) belong to — for player/parent quick access
+  const { data: myTeams } = useQuery({
+    queryKey: ["my-teams-home", user?.id, activeClubId],
+    enabled: !!user && !!activeClubId,
+    queryFn: async () => {
+      const [{ data: own }, { data: children }] = await Promise.all([
+        supabase.from("players").select("id, first_name, last_name").eq("user_id", user!.id),
+        supabase
+          .from("player_parents")
+          .select("player_id, players:player_id(id, first_name, last_name)")
+          .eq("parent_user_id", user!.id),
+      ]);
+      const ownIds = new Set((own ?? []).map((p: any) => p.id));
+      const players = [
+        ...(own ?? []).map((p: any) => ({ ...p, isOwn: true })),
+        ...((children ?? [])
+          .map((c: any) => c.players)
+          .filter(Boolean)
+          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) }))),
+      ];
+      if (players.length === 0) return [] as any[];
+      const playerIds = players.map((p) => p.id);
+      const { data: tms } = await supabase
+        .from("team_members")
+        .select("team_id, player_id, teams:team_id(id, name, image_url, deleted_at)")
+        .in("player_id", playerIds);
+      const seen = new Map<string, { team: any; player: any }>();
+      for (const tm of (tms ?? []) as any[]) {
+        const team = tm.teams;
+        if (!team || team.deleted_at) continue;
+        const player = players.find((p) => p.id === tm.player_id);
+        if (!player) continue;
+        const key = `${team.id}:${player.id}`;
+        if (!seen.has(key)) seen.set(key, { team, player });
+      }
+      return Array.from(seen.values());
     },
   });
 
