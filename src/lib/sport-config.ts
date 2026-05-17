@@ -12,6 +12,7 @@ export type StatKind =
   | "point"
   | "yellow_card"
   | "red_card"
+  | "white_card"
   | "foul";
 
 export interface SportConfig {
