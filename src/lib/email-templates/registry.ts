@@ -20,6 +20,7 @@ export interface TemplateEntry {
 import { template as playerInviteTemplate } from './player-invite'
 import { template as convocationResponseTemplate } from './convocation-response'
 import { template as convocationInviteTemplate } from './convocation-invite'
+import { template as convocationCancelledTemplate } from './convocation-cancelled'
 import { template as subscriptionAdminNotificationTemplate } from './subscription-admin-notification'
 import { template as eventCancelledTemplate } from './event-cancelled'
 import { template as eventRescheduledTemplate } from './event-rescheduled'
