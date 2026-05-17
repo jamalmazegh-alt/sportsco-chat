@@ -30,13 +30,13 @@ export function MarketingHeader() {
           <img src={logo} alt="Clubero" className="h-14 w-auto object-contain" />
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-1 md:flex">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "text-foreground" }}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "bg-primary/10 text-primary font-semibold" }}
             >
               {t(`nav.${item.key}`)}
             </Link>
