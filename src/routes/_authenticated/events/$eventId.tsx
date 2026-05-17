@@ -285,8 +285,12 @@ function EventDetail() {
     }
     const teamRow = teams?.[0] as any;
     const commMode = (teamRow?.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
+    const clubChannelsRaw = teamRow?.clubs?.convocation_channels;
+    const clubChannels: string[] = Array.isArray(clubChannelsRaw) ? clubChannelsRaw : ["in_app", "email"];
+    const useInApp = clubChannels.includes("in_app");
+    // Team-level override: whatsapp mode disables email entirely
+    const useEmail = clubChannels.includes("email") && commMode !== "whatsapp";
     const useWhatsApp = commMode === "whatsapp" || commMode === "hybrid";
-    const useEmail = commMode !== "whatsapp";
     setSending(true);
     // Insert convocations and get back their tokens
     const { data: insertedConvs, error: convocationError } = await supabase
