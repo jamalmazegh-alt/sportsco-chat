@@ -51,7 +51,7 @@ function DemoPage() {
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
       setClub(""); setName(""); setEmail(""); setRole(""); setTeams(""); setNotes("");
-      toast.success("Demande envoyée. Nous revenons vers vous sous un jour ouvré.");
+      toast.success("Demande envoyée. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
       toast.error("Envoi impossible. Réessayez ou écrivez à hello@clubero.app.");
@@ -79,8 +79,8 @@ function DemoPage() {
               Voyez Clubero en action.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Parlez-nous un peu de votre club — nous revenons vers vous sous un
-              jour ouvré pour planifier une démo.
+              Parlez-nous un peu de votre club — nous revenons vers vous sous
+              <strong> 48h ouvrées</strong> pour planifier une démo.
             </p>
             <ul className="mt-8 space-y-3">
               {PERKS.map((p) => (
