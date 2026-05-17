@@ -248,25 +248,8 @@ function PrivacyPage() {
         </section>
       )}
 
-      {/* Legal docs */}
-      <section className="rounded-2xl border border-border bg-card p-4 space-y-2">
-        <h2 className="text-sm font-semibold">{t("privacy.legalDocs", { defaultValue: "Documents légaux" })}</h2>
-        <p className="text-xs text-muted-foreground">{t("privacy.legalDocsHint", { defaultValue: "Consulte les conditions et politiques en vigueur." })}</p>
-        <ul className="grid grid-cols-1 gap-1.5 pt-1">
-          {(["terms", "privacy", "data_processing", "media", "notifications"] as const).map((k) => (
-            <li key={k}>
-              <button
-                type="button"
-                onClick={() => setLegalKind(k)}
-                className="w-full flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/40 text-left"
-              >
-                <span>{t(`privacy.legal.${k}`, { defaultValue: k })}</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* Legal docs section removed — each consent above opens its document. */}
+
 
       {/* GDPR rights */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
