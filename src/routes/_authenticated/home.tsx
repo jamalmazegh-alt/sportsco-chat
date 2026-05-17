@@ -380,7 +380,8 @@ function HomePage() {
             </ul>
           )}
         </section>
-      )}
+        );
+      })()}
 
       {/* For coaches/admins: upcoming events for all teams */}
       {isCoach && (
