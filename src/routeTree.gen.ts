@@ -27,7 +27,6 @@ import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
-import { Route as SuperadminClubsRouteImport } from './routes/superadmin/clubs'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
@@ -41,6 +40,7 @@ import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
@@ -153,11 +153,6 @@ const SuperadminLogsRoute = SuperadminLogsRouteImport.update({
   path: '/logs',
   getParentRoute: () => SuperadminRoute,
 } as any)
-const SuperadminClubsRoute = SuperadminClubsRouteImport.update({
-  id: '/clubs',
-  path: '/clubs',
-  getParentRoute: () => SuperadminRoute,
-} as any)
 const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -223,6 +218,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const SuperadminClubsIndexRoute = SuperadminClubsIndexRouteImport.update({
+  id: '/clubs/',
+  path: '/clubs/',
+  getParentRoute: () => SuperadminRoute,
+} as any)
 const AuthenticatedProfileIndexRoute =
   AuthenticatedProfileIndexRouteImport.update({
     id: '/',
@@ -240,9 +240,9 @@ const SuperadminUsersUserIdRoute = SuperadminUsersUserIdRouteImport.update({
   getParentRoute: () => SuperadminUsersRoute,
 } as any)
 const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
-  id: '/$clubId',
-  path: '/$clubId',
-  getParentRoute: () => SuperadminClubsRoute,
+  id: '/clubs/$clubId',
+  path: '/clubs/$clubId',
+  getParentRoute: () => SuperadminRoute,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -372,7 +372,6 @@ export interface FileRoutesByFullPath {
   '/legal/$kind': typeof LegalKindRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
-  '/superadmin/clubs': typeof SuperadminClubsRouteWithChildren
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -393,6 +392,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -424,7 +424,6 @@ export interface FileRoutesByTo {
   '/legal/$kind': typeof LegalKindRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
-  '/superadmin/clubs': typeof SuperadminClubsRouteWithChildren
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -445,6 +444,7 @@ export interface FileRoutesByTo {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
+  '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -481,7 +481,6 @@ export interface FileRoutesById {
   '/legal/$kind': typeof LegalKindRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
-  '/superadmin/clubs': typeof SuperadminClubsRouteWithChildren
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
@@ -502,6 +501,7 @@ export interface FileRoutesById {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -538,7 +538,6 @@ export interface FileRouteTypes {
     | '/legal/$kind'
     | '/r/$token'
     | '/superadmin/billing'
-    | '/superadmin/clubs'
     | '/superadmin/logs'
     | '/superadmin/settings'
     | '/superadmin/support'
@@ -559,6 +558,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/admin/'
     | '/profile/'
+    | '/superadmin/clubs/'
     | '/admin/users/$userId'
     | '/api/public/hooks/trial-reminders'
     | '/lovable/email/auth/preview'
@@ -590,7 +590,6 @@ export interface FileRouteTypes {
     | '/legal/$kind'
     | '/r/$token'
     | '/superadmin/billing'
-    | '/superadmin/clubs'
     | '/superadmin/logs'
     | '/superadmin/settings'
     | '/superadmin/support'
@@ -611,6 +610,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/admin'
     | '/profile'
+    | '/superadmin/clubs'
     | '/admin/users/$userId'
     | '/api/public/hooks/trial-reminders'
     | '/lovable/email/auth/preview'
@@ -646,7 +646,6 @@ export interface FileRouteTypes {
     | '/legal/$kind'
     | '/r/$token'
     | '/superadmin/billing'
-    | '/superadmin/clubs'
     | '/superadmin/logs'
     | '/superadmin/settings'
     | '/superadmin/support'
@@ -667,6 +666,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
+    | '/superadmin/clubs/'
     | '/_authenticated/admin/users/$userId'
     | '/api/public/hooks/trial-reminders'
     | '/lovable/email/auth/preview'
@@ -834,13 +834,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminLogsRouteImport
       parentRoute: typeof SuperadminRoute
     }
-    '/superadmin/clubs': {
-      id: '/superadmin/clubs'
-      path: '/clubs'
-      fullPath: '/superadmin/clubs'
-      preLoaderRoute: typeof SuperadminClubsRouteImport
-      parentRoute: typeof SuperadminRoute
-    }
     '/superadmin/billing': {
       id: '/superadmin/billing'
       path: '/billing'
@@ -932,6 +925,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/superadmin/clubs/': {
+      id: '/superadmin/clubs/'
+      path: '/clubs'
+      fullPath: '/superadmin/clubs/'
+      preLoaderRoute: typeof SuperadminClubsIndexRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/_authenticated/profile/': {
       id: '/_authenticated/profile/'
       path: '/'
@@ -955,10 +955,10 @@ declare module '@tanstack/react-router' {
     }
     '/superadmin/clubs/$clubId': {
       id: '/superadmin/clubs/$clubId'
-      path: '/$clubId'
+      path: '/clubs/$clubId'
       fullPath: '/superadmin/clubs/$clubId'
       preLoaderRoute: typeof SuperadminClubsClubIdRouteImport
-      parentRoute: typeof SuperadminClubsRoute
+      parentRoute: typeof SuperadminRoute
     }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
@@ -1183,18 +1183,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface SuperadminClubsRouteChildren {
-  SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
-}
-
-const SuperadminClubsRouteChildren: SuperadminClubsRouteChildren = {
-  SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
-}
-
-const SuperadminClubsRouteWithChildren = SuperadminClubsRoute._addFileChildren(
-  SuperadminClubsRouteChildren,
-)
-
 interface SuperadminUsersRouteChildren {
   SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
 }
@@ -1209,22 +1197,24 @@ const SuperadminUsersRouteWithChildren = SuperadminUsersRoute._addFileChildren(
 
 interface SuperadminRouteChildren {
   SuperadminBillingRoute: typeof SuperadminBillingRoute
-  SuperadminClubsRoute: typeof SuperadminClubsRouteWithChildren
   SuperadminLogsRoute: typeof SuperadminLogsRoute
   SuperadminSettingsRoute: typeof SuperadminSettingsRoute
   SuperadminSupportRoute: typeof SuperadminSupportRoute
   SuperadminUsersRoute: typeof SuperadminUsersRouteWithChildren
   SuperadminIndexRoute: typeof SuperadminIndexRoute
+  SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
+  SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
 }
 
 const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminBillingRoute: SuperadminBillingRoute,
-  SuperadminClubsRoute: SuperadminClubsRouteWithChildren,
   SuperadminLogsRoute: SuperadminLogsRoute,
   SuperadminSettingsRoute: SuperadminSettingsRoute,
   SuperadminSupportRoute: SuperadminSupportRoute,
   SuperadminUsersRoute: SuperadminUsersRouteWithChildren,
   SuperadminIndexRoute: SuperadminIndexRoute,
+  SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
+  SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
 }
 
 const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
