@@ -427,6 +427,33 @@ function BillingPage() {
             {t("billing.taxNotice")}
           </p>
 
+          <p className="text-xs text-muted-foreground text-center">
+            <Trans
+              i18nKey="billing.termsNotice"
+              t={t}
+              components={{
+                1: (
+                  <Link
+                    to="/legal/$kind"
+                    params={{ kind: "terms" }}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-foreground"
+                  />
+                ),
+                3: (
+                  <Link
+                    to="/legal/$kind"
+                    params={{ kind: "privacy" }}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-foreground"
+                  />
+                ),
+              }}
+            />
+          </p>
+
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-border">
             {FEATURES.map((f) => (
               <li key={f} className="flex items-start gap-2 text-sm">
