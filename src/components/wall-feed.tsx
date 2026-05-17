@@ -168,6 +168,28 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if (mentioned.length && data?.id) {
       await notifyMentioned(mentioned, `/wall#${data.id}`, body.trim());
     }
+    if (data?.id) {
+      const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
+      const { data: members } = await supabase
+        .from("club_members")
+        .select("user_id")
+        .eq("club_id", clubId);
+      const recipients = (members ?? [])
+        .map((m) => m.user_id)
+        .filter((uid) => uid !== user.id && !mentioned.includes(uid));
+      if (recipients.length) {
+        const snippet = body.trim() || t("wall.newAttachment", { defaultValue: "Nouvelle pièce jointe" });
+        await supabase.from("notifications").insert(
+          recipients.map((uid) => ({
+            user_id: uid,
+            type: "wall_post",
+            title: t("wall.newPostTitle", { defaultValue: "{{name}} a publié sur le mur", name: authorName }),
+            body: snippet.slice(0, 140),
+            link: `/wall#${data.id}`,
+          })),
+        );
+      }
+    }
     setBody("");
     setAtts([]);
   }
