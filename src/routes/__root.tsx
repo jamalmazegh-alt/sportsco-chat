@@ -44,6 +44,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Stop chasing parents in WhatsApp. Convocations, attendance, and reminders in one tap." },
       { property: "og:image", content: "https://clubero.app/clubero-logo.png" },
       { name: "twitter:image", content: "https://clubero.app/clubero-logo.png" },
+      { name: "google-site-verification", content: "pCAoyuO5oORg-h3Q624Cs7_f9S7LLtOlnD1hMY3xE_4" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
