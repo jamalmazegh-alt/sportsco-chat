@@ -38,7 +38,7 @@ function HomePage() {
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: teams } = useQuery({
+  const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
     enabled: !!activeClubId,
     queryFn: async () => {
