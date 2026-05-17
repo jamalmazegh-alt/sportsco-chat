@@ -154,6 +154,11 @@
     "viewAll": "Voir tout",
     "myStats": "Mes statistiques de présence",
     "myStatsHint": "Voir mes présences aux entraînements",
+    "childStats": "Statistiques de {{name}}",
+    "childStatsHint": "Voir les présences de {{name}} aux entraînements",
+    "myTeam": "Mon équipe",
+    "childTeam": "L'équipe de {{name}}",
+    "teamHint": "Voir l'équipe et les coéquipiers",
     "kpis": {
       "title": "Vue d'ensemble",
       "attendance30d": "Présence 30j",
