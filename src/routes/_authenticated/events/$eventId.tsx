@@ -101,6 +101,9 @@ function diffSnapshot(prev: Record<string, any> | null | undefined, current: any
 
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    send: s.send === 1 || s.send === "1" ? 1 : undefined,
+  }),
   component: EventDetail,
 });
 
