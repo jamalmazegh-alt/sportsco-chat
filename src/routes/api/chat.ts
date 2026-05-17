@@ -490,6 +490,7 @@ export const Route = createFileRoute("/api/chat")({
                   location: location ?? null,
                   meeting_point: meetingPoint ?? null,
                   opponent: opponent ?? null,
+                  is_home: isHome ?? null,
                   description: description ?? null,
                   status: "draft",
                   convocations_sent: false,
