@@ -85,7 +85,7 @@ const CONFIGS: Record<string, SportConfig> = {
   },
   field_hockey: {
     scoreUnit: "goals",
-    statKinds: ["goal", "assist", "yellow_card", "red_card"],
+    statKinds: ["goal", "assist", "yellow_card", "red_card", "white_card"],
     assistsEnabled: true,
     cardsEnabled: true,
     setScoresEnabled: false,
