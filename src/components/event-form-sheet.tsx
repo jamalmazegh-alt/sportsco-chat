@@ -839,6 +839,24 @@ export function EventFormSheet({
             <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
           </div>
 
+          {mode === "create" && type !== "other" && type !== "meeting" && (
+            <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
+              <Checkbox
+                checked={sendNow}
+                onCheckedChange={(v) => setSendNow(v === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-0.5">
+                <div className="text-sm font-medium">
+                  {t("events.sendConvocationsNow", { defaultValue: "Convoquer toute l'équipe maintenant" })}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {t("events.sendConvocationsNowHint", { defaultValue: "Tu pourras ajuster la liste juste après la création." })}
+                </div>
+              </div>
+            </label>
+          )}
+
           <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
