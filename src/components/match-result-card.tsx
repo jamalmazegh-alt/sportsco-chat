@@ -385,7 +385,7 @@ export function MatchResultCard({
       )}
 
       {/* Player events */}
-      {cfg.statKinds.length > 0 && (result || (goals && goals.length > 0)) && (
+      {cfg.statKinds.length > 0 && (isCoach || result || (goals && goals.length > 0)) && (
         <div className="space-y-2 pt-2 border-t border-border">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
