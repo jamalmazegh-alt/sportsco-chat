@@ -212,7 +212,7 @@ export const Route = createFileRoute("/api/chat")({
               const { data } = await supabase
                 .from("team_members")
                 .select("role, team:team_id(id, name, sport, age_group, season)")
-                .or(`user_id.eq.${userId}`);
+                .eq("user_id", userId);
               const playerIds = await getMyPlayerIds();
               let extra: any[] = [];
               if (playerIds.length > 0) {
@@ -621,6 +621,9 @@ export const Route = createFileRoute("/api/chat")({
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
 
+        // 60s hard timeout on the upstream model call to avoid hung connections
+        const abortController = new AbortController();
+        const timeoutId = setTimeout(() => abortController.abort(), 60_000);
         try {
           const result = streamText({
             model,
@@ -639,6 +642,8 @@ export const Route = createFileRoute("/api/chat")({
             tools,
             stopWhen: stepCountIs(50),
             messages: await convertToModelMessages(messages as UIMessage[]),
+            abortSignal: AbortSignal.any([request.signal, abortController.signal]),
+            onFinish: () => clearTimeout(timeoutId),
           });
           return result.toUIMessageStreamResponse({
             originalMessages: messages as UIMessage[],

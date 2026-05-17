@@ -10,8 +10,12 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-export const STRIPE_PRICE_MONTHLY = "price_1TXT6NH9mBVlmKXfZBVjgvnb";
-export const STRIPE_PRICE_YEARLY = "price_1TXT6NH9mBVlmKXfZxGQJz3R";
+// Stripe price IDs are configurable via env so plan changes don't require a redeploy.
+// Defaults remain the current production prices.
+export const STRIPE_PRICE_MONTHLY =
+  process.env.STRIPE_PRICE_MONTHLY || "price_1TXT6NH9mBVlmKXfZBVjgvnb";
+export const STRIPE_PRICE_YEARLY =
+  process.env.STRIPE_PRICE_YEARLY || "price_1TXT6NH9mBVlmKXfZxGQJz3R";
 
 export function getPriceId(plan: "monthly" | "yearly"): string {
   return plan === "yearly" ? STRIPE_PRICE_YEARLY : STRIPE_PRICE_MONTHLY;

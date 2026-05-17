@@ -210,7 +210,13 @@ function BillingPage() {
 
   function onUpdateCard() {
     if (!activeClubId) return;
+    setBusy("card");
     setUpdateCardOpen(true);
+  }
+
+  function onUpdateCardDialogChange(open: boolean) {
+    setUpdateCardOpen(open);
+    if (!open) setBusy((b) => (b === "card" ? null : b));
   }
 
   const cancelDate =
@@ -401,7 +407,7 @@ function BillingPage() {
             >
               <p className="text-sm text-muted-foreground">Mensuel</p>
               <p className="font-display text-2xl font-bold mt-1">39 €</p>
-              <p className="text-xs text-muted-foreground">/ mois</p>
+              <p className="text-xs text-muted-foreground">/ mois · TTC</p>
               {busy === "monthly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
             </button>
             <button
@@ -414,10 +420,14 @@ function BillingPage() {
               </span>
               <p className="text-sm text-muted-foreground">Annuel</p>
               <p className="font-display text-2xl font-bold mt-1">390 €</p>
-              <p className="text-xs text-muted-foreground">/ an</p>
+              <p className="text-xs text-muted-foreground">/ an · TTC</p>
               {busy === "yearly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
             </button>
           </div>
+
+          <p className="text-xs text-muted-foreground text-center -mt-1">
+            Prix TTC, TVA française incluse (20 %). Facturation en euros depuis la France.
+          </p>
 
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-border">
             {FEATURES.map((f) => (
@@ -432,7 +442,7 @@ function BillingPage() {
 
       <UpdateCardDialog
         open={updateCardOpen}
-        onOpenChange={setUpdateCardOpen}
+        onOpenChange={onUpdateCardDialogChange}
         clubId={activeClubId}
         onSuccess={() => refetch()}
       />
