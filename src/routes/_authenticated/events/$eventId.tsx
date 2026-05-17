@@ -97,8 +97,25 @@ function diffSnapshot(prev: Record<string, any> | null | undefined, current: any
     }
   }
   return out;
-}
+  }
 
+  // Auto-open the picker when arriving from event creation with ?send=1
+  useEffect(() => {
+    if (autoSendConsumed) return;
+    if (search.send !== 1) return;
+    if (!isCoach) return;
+    if (!event || event.convocations_sent) return;
+    if (!teamPlayers) return;
+    setAutoSendConsumed(true);
+    openPicker();
+    navigate({
+      to: "/events/$eventId",
+      params: { eventId },
+      search: {} as any,
+      replace: true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.send, isCoach, event, teamPlayers, autoSendConsumed]);
 
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   validateSearch: (s: Record<string, unknown>) => ({
