@@ -164,7 +164,7 @@ function PrivacyPage() {
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h2 className="text-sm font-semibold">{t("privacy.yourConsents")}</h2>
         <p className="text-xs text-muted-foreground">
-          {t("privacy.consentsHint", { defaultValue: "Touchez un élément pour consulter le document. L'interrupteur gère votre consentement." })}
+          {t("privacy.consentsHint", { defaultValue: "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte." })}
         </p>
         <div className="space-y-2">
           {status?.items.map((i) => {
@@ -176,19 +176,12 @@ function PrivacyPage() {
             return (
               <div
                 key={i.kind}
-                className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+                className="rounded-lg border border-border p-3 space-y-2"
               >
-                <button
-                  type="button"
-                  onClick={() => legalKindFor && setLegalKind(legalKindFor)}
-                  disabled={!legalKindFor}
-                  className="flex-1 min-w-0 text-left flex items-center gap-2 group"
-                >
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
-                      <span className="truncate group-hover:text-primary transition-colors">
-                        {i.title}
-                      </span>
+                      <span className="truncate">{i.title}</span>
                       {i.required && (
                         <span className="text-[10px] uppercase tracking-wide text-destructive font-semibold">
                           {t("privacy.required")}
@@ -197,15 +190,22 @@ function PrivacyPage() {
                     </div>
                     <p className="text-xs text-muted-foreground">v{i.version}</p>
                   </div>
-                  {legalKindFor && (
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
-                  )}
-                </button>
-                <Switch
-                  checked={i.granted}
-                  disabled={busy || (i.required && i.granted)}
-                  onCheckedChange={() => toggleConsent(i.kind, i.version_id, i.granted)}
-                />
+                  <Switch
+                    checked={i.granted}
+                    disabled={busy || (i.required && i.granted)}
+                    onCheckedChange={() => toggleConsent(i.kind, i.version_id, i.granted)}
+                  />
+                </div>
+                {legalKindFor && (
+                  <button
+                    type="button"
+                    onClick={() => setLegalKind(legalKindFor)}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  >
+                    {t("privacy.readDocument", { defaultValue: "Lire le document" })}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
             );
           })}
