@@ -121,15 +121,27 @@ function ContactPage() {
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="c-name">Nom</Label>
+                <Label htmlFor="c-firstName">Prénom</Label>
                 <Input
-                  id="c-name"
+                  id="c-firstName"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Votre prénom"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="c-lastName">Nom</Label>
+                <Input
+                  id="c-lastName"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   placeholder="Votre nom"
                 />
               </div>
+            </div>
+            <div className="mt-4">
               <div className="space-y-1.5">
                 <Label htmlFor="c-email">E-mail</Label>
                 <Input
