@@ -181,6 +181,15 @@ function ContactPage() {
               </div>
             </div>
             <div className="mt-4 space-y-1.5">
+              <Label htmlFor="c-club">Club</Label>
+              <Input
+                id="c-club"
+                value={club}
+                onChange={(e) => setClub(e.target.value)}
+                placeholder="AS Riverside"
+              />
+            </div>
+            <div className="mt-4 space-y-1.5">
               <Label htmlFor="c-msg">Message</Label>
               <Textarea
                 id="c-msg"
