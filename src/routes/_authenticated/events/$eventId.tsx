@@ -332,6 +332,10 @@ function EventDetail() {
     const conv = (convocations ?? []).find((c: any) => c.id === id) as any;
     const playerId: string | undefined = conv?.player_id;
     const playerUserId: string | undefined = conv?.players?.user_id ?? undefined;
+    const playerEmail: string | undefined = conv?.players?.email ?? undefined;
+    const playerFirstName: string | undefined = conv?.players?.first_name ?? undefined;
+    const playerLastName: string | undefined = conv?.players?.last_name ?? undefined;
+    const playerName = [playerFirstName, playerLastName].filter(Boolean).join(" ") || undefined;
     const { error } = await supabase.from("convocations").delete().eq("id", id);
     if (error) {
       toast.error(error.message);
@@ -344,12 +348,14 @@ function EventDetail() {
     try {
       const recipientIds = new Set<string>();
       if (playerUserId) recipientIds.add(playerUserId);
+      let parentsRows: Array<{ parent_user_id: string | null; email: string | null; full_name: string | null }> = [];
       if (playerId) {
         const { data: parents } = await supabase
           .from("player_parents")
-          .select("parent_user_id")
+          .select("parent_user_id, email, full_name")
           .eq("player_id", playerId);
-        (parents ?? []).forEach((p: any) => {
+        parentsRows = (parents ?? []) as any;
+        parentsRows.forEach((p) => {
           if (p.parent_user_id) recipientIds.add(p.parent_user_id);
         });
       }
@@ -363,6 +369,50 @@ function EventDetail() {
             link: `/events/${event.id}`,
           })),
         );
+      }
+
+      // Email notification (best-effort)
+      if (event) {
+        const { data: clubRow } = event.team_id
+          ? await supabase
+              .from("teams")
+              .select("name, clubs:club_id(name, logo_url)")
+              .eq("id", event.team_id)
+              .maybeSingle()
+          : { data: null };
+        const teamName = (clubRow as any)?.name as string | undefined;
+        const clubName = (clubRow as any)?.clubs?.name as string | undefined;
+        const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+        const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+
+        const sendOne = (toEmail: string, recipientFirstName: string | undefined, idemSuffix: string) =>
+          sendTransactionalEmail({
+            templateName: "convocation-cancelled",
+            recipientEmail: toEmail,
+            fromName: `${clubName ?? "Clubero"} via Clubero`,
+            idempotencyKey: `convoc-cancel-${id}-${idemSuffix}`,
+            templateData: {
+              recipientFirstName,
+              playerName,
+              eventTitle: event.title,
+              eventDate: eventDateLabel,
+              eventLocation: event.location ?? undefined,
+              teamName,
+              clubName,
+              clubLogoUrl,
+            },
+          } as any).catch(() => undefined);
+
+        const sends: Promise<unknown>[] = [];
+        if (playerEmail) {
+          sends.push(sendOne(playerEmail, playerFirstName, "player"));
+        }
+        for (const parent of parentsRows) {
+          if (!parent.email) continue;
+          const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+          sends.push(sendOne(parent.email, parentFirst, `parent-${parent.email}`));
+        }
+        await Promise.allSettled(sends);
       }
     } catch {
       // best-effort
