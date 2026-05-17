@@ -196,41 +196,75 @@ function AssistantPage() {
               </div>
             </ConversationEmptyState>
           ) : (
-            messages.map((m) => (
-              <Message key={m.id} from={m.role === "user" ? "user" : "assistant"}>
-                <MessageContent className={m.role === "assistant" ? "bg-transparent p-0" : undefined}>
-                  {m.parts.map((part, idx) => {
-                    if (part.type === "text") {
-                      return m.role === "assistant" ? (
-                        <MessageResponse key={idx}>{part.text}</MessageResponse>
-                      ) : (
-                        <span key={idx} className="whitespace-pre-wrap">
-                          {part.text}
-                        </span>
-                      );
-                    }
-                    if (part.type?.startsWith("tool-")) {
-                      const state = (part as any).state;
-                      if (state === "output-available") return null;
-                      if (state === "output-error") {
+            messages.map((m, mIdx) => {
+              const isLastAssistant =
+                m.role === "assistant" && mIdx === messages.length - 1 && !isLoading;
+              return (
+                <Message key={m.id} from={m.role === "user" ? "user" : "assistant"}>
+                  <MessageContent className={m.role === "assistant" ? "bg-transparent p-0" : undefined}>
+                    {m.parts.map((part, idx) => {
+                      if (part.type === "text") {
+                        let text = part.text;
+                        let suggestions: string[] = [];
+                        if (m.role === "assistant") {
+                          const match = text.match(/\[suggestions:\s*([^\]]+)\]\s*$/i);
+                          if (match) {
+                            suggestions = match[1]
+                              .split("|")
+                              .map((s) => s.trim())
+                              .filter((s) => s.length > 0 && s.length <= 60)
+                              .slice(0, 5);
+                            text = text.slice(0, match.index).trimEnd();
+                          }
+                        }
                         return (
-                          <p key={idx} className="my-1 text-xs text-destructive/80">
-                            {t("assistant.toolError", { defaultValue: "Une action a échoué." })}
-                          </p>
+                          <div key={idx}>
+                            {m.role === "assistant" ? (
+                              <MessageResponse>{text}</MessageResponse>
+                            ) : (
+                              <span className="whitespace-pre-wrap">{text}</span>
+                            )}
+                            {isLastAssistant && suggestions.length > 0 && (
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {suggestions.map((s) => (
+                                  <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => sendMessage({ text: s })}
+                                    disabled={!authToken || !user || isLoading}
+                                    className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+                                  >
+                                    {s}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         );
                       }
-                      return (
-                        <div key={idx} className="my-1 flex items-center gap-2 text-xs text-muted-foreground">
-                          <Wrench className="h-3 w-3 animate-pulse" />
-                          <Shimmer>{t("assistant.searching", { defaultValue: "Recherche..." })}</Shimmer>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </MessageContent>
-              </Message>
-            ))
+                      if (part.type?.startsWith("tool-")) {
+                        const state = (part as any).state;
+                        if (state === "output-available") return null;
+                        if (state === "output-error") {
+                          return (
+                            <p key={idx} className="my-1 text-xs text-destructive/80">
+                              {t("assistant.toolError", { defaultValue: "Une action a échoué." })}
+                            </p>
+                          );
+                        }
+                        return (
+                          <div key={idx} className="my-1 flex items-center gap-2 text-xs text-muted-foreground">
+                            <Wrench className="h-3 w-3 animate-pulse" />
+                            <Shimmer>{t("assistant.searching", { defaultValue: "Recherche..." })}</Shimmer>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </MessageContent>
+                </Message>
+              );
+            })
           )}
           {status === "submitted" && (
             <Message from="assistant">
