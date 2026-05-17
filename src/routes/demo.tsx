@@ -5,8 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { toast } from "sonner";
+
+const ROLES = [
+  "Président·e",
+  "Dirigeant·e",
+  "Coach",
+  "Responsable technique",
+  "Parent",
+  "Joueur·euse",
+  "Autre",
+];
 
 export const Route = createFileRoute("/demo")({
   component: DemoPage,
