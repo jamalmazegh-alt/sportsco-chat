@@ -10,6 +10,7 @@ interface Props {
   kind: InquiryKind;
   name: string;
   email: string;
+  phone?: string;
   club?: string;
   role?: string;
   teams?: string;
@@ -36,8 +37,9 @@ const InboundInquiryEmail = (props: Props) => {
           <Section style={card}>
             <Row k="Nom" v={props.name || "—"} />
             <Row k="E-mail" v={props.email || "—"} />
+            {props.phone && <Row k="Téléphone" v={props.phone} />}
+            {props.role && <Row k="Rôle" v={props.role} />}
             {isDemo && <Row k="Club" v={props.club || "—"} />}
-            {isDemo && <Row k="Rôle" v={props.role || "—"} />}
             {isDemo && <Row k="Équipes" v={props.teams || "—"} />}
           </Section>
           {(props.message || props.notes) && (
