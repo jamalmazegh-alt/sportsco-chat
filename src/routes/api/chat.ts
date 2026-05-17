@@ -13,6 +13,7 @@ Tu aides les utilisateurs (joueurs, parents, coaches, dirigeants, admins) à com
 
 Règles importantes :
 - Réponds toujours dans la langue de l'utilisateur (français par défaut, sinon adapte-toi).
+- Tu es une IA (assistant automatisé). Si l'utilisateur te demande si tu es humain, une vraie personne, un robot ou une IA, réponds clairement et sans détour que tu es une IA (assistant Clubero propulsé par un LLM). Ne fais jamais semblant d'être humain.
 - Sois concis, chaleureux et précis. Pas de jargon technique inutile.
 - Pour répondre à des questions sur les données, utilise les tools fournis. Ne devine jamais — si tu n'as pas la donnée, dis-le.
 - Si un tool renvoie une liste vide ou un champ "note", explique simplement la situation à l'utilisateur (ex : "tu n'as pas de joueur lié à ton compte, donc il n'y a pas de stats de présence à afficher pour toi"). Ne dis JAMAIS "non autorisé", "unauthorized", "accès refusé" ou "erreur" dans ce cas — il s'agit simplement d'une absence de données pertinentes pour ce profil.
@@ -480,13 +481,42 @@ export const Route = createFileRoute("/api/chat")({
               }
               const team = matches[0];
 
-              // Validate the parsed date
+              // Validate the parsed dates
               const startsAtDate = new Date(startsAt);
               if (Number.isNaN(startsAtDate.getTime())) {
                 return { created: false, note: "Date/heure de début invalide." };
               }
               if (startsAtDate.getTime() < Date.now() - 60_000) {
                 return { created: false, note: "La date/heure de début est dans le passé." };
+              }
+              const MAX_HORIZON_MS = 1000 * 60 * 60 * 24 * 365 * 2; // 2 ans
+              if (startsAtDate.getTime() > Date.now() + MAX_HORIZON_MS) {
+                return { created: false, note: "Date/heure de début trop éloignée (max 2 ans). Vérifie l'année." };
+              }
+              let endsAtDate: Date | null = null;
+              if (endsAt) {
+                endsAtDate = new Date(endsAt);
+                if (Number.isNaN(endsAtDate.getTime())) {
+                  return { created: false, note: "Date/heure de fin invalide." };
+                }
+                if (endsAtDate.getTime() <= startsAtDate.getTime()) {
+                  return { created: false, note: "La date/heure de fin doit être postérieure au début." };
+                }
+                if (endsAtDate.getTime() - startsAtDate.getTime() > 1000 * 60 * 60 * 24) {
+                  return { created: false, note: "Durée d'événement trop longue (max 24 h). Vérifie la date de fin." };
+                }
+              }
+              if (convocationTime) {
+                const conv = new Date(convocationTime);
+                if (Number.isNaN(conv.getTime())) {
+                  return { created: false, note: "Heure de convocation invalide." };
+                }
+                if (conv.getTime() > startsAtDate.getTime()) {
+                  return { created: false, note: "L'heure de convocation doit être avant (ou égale au) début de l'événement." };
+                }
+                if (startsAtDate.getTime() - conv.getTime() > 1000 * 60 * 60 * 6) {
+                  return { created: false, note: "Heure de convocation suspecte (plus de 6 h avant le début)." };
+                }
               }
 
               // Duplicate check : même équipe + même date/heure + même type

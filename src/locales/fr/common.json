@@ -555,7 +555,8 @@
   },
   "attachments": {
     "add": "Ajouter un fichier",
-    "tooLarge": "{{name}} dépasse 10 Mo."
+    "tooLarge": "{{name}} dépasse 10 Mo.",
+    "invalidType": "Type de fichier non autorisé : {{name}}"
   },
   "wall": {
     "title": "Mur du club",
