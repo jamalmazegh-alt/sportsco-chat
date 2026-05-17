@@ -877,3 +877,70 @@ function CollapsibleTeamStats({ teamId }: { teamId: string }) {
   );
 }
 
+function TeamCoaches({ teamId }: { teamId: string }) {
+  const { t } = useTranslation();
+  const { data: coaches } = useQuery({
+    queryKey: ["team-coaches", teamId],
+    queryFn: async () => {
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("user_id, role")
+        .eq("team_id", teamId)
+        .in("role", ["coach", "admin"]);
+      const ids = Array.from(new Set((tm ?? []).map((m: any) => m.user_id).filter(Boolean)));
+      if (ids.length === 0) return [];
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, avatar_url")
+        .in("id", ids);
+      const byId = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      return (tm ?? [])
+        .filter((m: any) => m.user_id && byId.has(m.user_id))
+        .map((m: any) => ({ ...byId.get(m.user_id), role: m.role }));
+    },
+  });
+
+  if (!coaches || coaches.length === 0) return null;
+
+  return (
+    <section className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
+          <UserCircle2 className="h-4 w-4" />
+        </span>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+          {coaches.length > 1
+            ? t("teams.coaches", { defaultValue: "Coaches" })
+            : t("teams.coach", { defaultValue: "Coach" })}
+        </h2>
+      </div>
+      <ul className="flex flex-wrap gap-2">
+        {coaches.map((c: any) => {
+          const name = c.full_name
+            ?? [c.first_name, c.last_name].filter(Boolean).join(" ")
+            ?? "—";
+          return (
+            <li
+              key={c.id}
+              className="flex items-center gap-2 rounded-full bg-card border border-amber-500/30 pl-1 pr-3 py-1"
+            >
+              <div className="h-7 w-7 rounded-full bg-muted overflow-hidden flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
+                {c.avatar_url ? (
+                  <img src={c.avatar_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  (name?.[0] ?? "?").toUpperCase()
+                )}
+              </div>
+              <span className="text-sm font-medium truncate max-w-[140px]">{name}</span>
+              {c.role === "admin" && (
+                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
+                  {t("roles.admin")}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
