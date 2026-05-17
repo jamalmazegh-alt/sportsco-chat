@@ -4,6 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe, getPriceId } from "./stripe.server";
 import { notifySubscriptionAdmin } from "./subscription-notify.server";
+import { createLogger } from "@/lib/logger.server";
+
+const log = createLogger("billing");
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
@@ -239,7 +242,7 @@ export const cancelSubscriptionAtPeriodEnd = createServerFn({ method: "POST" })
       const fresh = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
       await notifySubscriptionAdmin("cancellation_scheduled", fresh, data.clubId);
     } catch (err) {
-      console.error("notify cancellation_scheduled failed:", err);
+      log.error("notify_cancellation_scheduled_failed", { err });
     }
     return { ok: true };
   });
@@ -266,7 +269,7 @@ export const reactivateSubscription = createServerFn({ method: "POST" })
       const fresh = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
       await notifySubscriptionAdmin("reactivated", fresh, data.clubId);
     } catch (err) {
-      console.error("notify reactivated failed:", err);
+      log.error("notify_reactivated_failed", { err });
     }
     return { ok: true };
   });
