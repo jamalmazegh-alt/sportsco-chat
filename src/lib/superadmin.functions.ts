@@ -1415,6 +1415,8 @@ export const getFinanceOverview = createServerFn({ method: "GET" })
       trial_conversion_rate: Math.round(trialConvRate * 10) / 10,
       past_due: pastDue ?? 0,
       generated_at: new Date().toISOString(),
+      stripe_cached_at,
+      stripe_stale,
     };
   });
 
