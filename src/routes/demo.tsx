@@ -49,6 +49,7 @@ function DemoPage() {
   const [club, setClub] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
   const [teams, setTeams] = useState("");
   const [notes, setNotes] = useState("");
