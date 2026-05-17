@@ -150,6 +150,8 @@
     "viewTeams": "View teams",
     "respondNow": "Respond now",
     "myConvocations": "Your invitations",
+    "childConvocations": "{{name}}'s invitations",
+    "childrenConvocations": "Your children's invitations",
     "noConvocations": "You're all caught up.",
     "viewAll": "View all",
     "myStats": "My attendance stats",
