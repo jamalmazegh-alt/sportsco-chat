@@ -58,11 +58,13 @@ function AuthLayout() {
                 <GlobalSearch />
               </div>
             </div>
+            <TrialBanner />
           </div>
           <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
             <Outlet />
           </div>
         </div>
+        <OnboardingWizard />
         <AssistantFab />
         <BottomNav />
       </div>
