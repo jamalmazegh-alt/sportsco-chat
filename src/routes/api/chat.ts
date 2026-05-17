@@ -649,6 +649,7 @@ export const Route = createFileRoute("/api/chat")({
             originalMessages: messages as UIMessage[],
           });
         } catch (err: any) {
+          clearTimeout(timeoutId);
           console.error("[chat] streamText error", err);
           const status = err?.statusCode ?? err?.status ?? 500;
           if (status === 429) {
