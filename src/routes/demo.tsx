@@ -5,8 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { toast } from "sonner";
+
+const ROLES = [
+  "Président·e",
+  "Dirigeant·e",
+  "Coach",
+  "Responsable technique",
+  "Parent",
+  "Joueur·euse",
+  "Autre",
+];
 
 export const Route = createFileRoute("/demo")({
   component: DemoPage,
@@ -32,6 +49,7 @@ function DemoPage() {
   const [club, setClub] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
   const [teams, setTeams] = useState("");
   const [notes, setNotes] = useState("");
@@ -46,11 +64,11 @@ function DemoPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "demo", name, email, club, role, teams, notes }),
+        body: JSON.stringify({ kind: "demo", name, email, phone, club, role, teams, notes }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setClub(""); setName(""); setEmail(""); setRole(""); setTeams(""); setNotes("");
+      setClub(""); setName(""); setEmail(""); setPhone(""); setRole(""); setTeams(""); setNotes("");
       toast.success("Demande envoyée. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
@@ -130,14 +148,30 @@ function DemoPage() {
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-role">Votre rôle</Label>
+                <Label htmlFor="d-phone">Téléphone</Label>
                 <Input
-                  id="d-role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  placeholder="Coach, dirigeant…"
+                  id="d-phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+33 6 12 34 56 78"
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="d-role">Votre rôle</Label>
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger id="d-role">
+                    <SelectValue placeholder="Sélectionnez un rôle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="d-teams">Nombre d&apos;équipes</Label>
                 <Input
