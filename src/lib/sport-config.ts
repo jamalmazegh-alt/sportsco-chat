@@ -49,7 +49,7 @@ const CONFIGS: Record<string, SportConfig> = {
   },
   rugby: {
     scoreUnit: "points",
-    statKinds: ["try", "yellow_card", "red_card"],
+    statKinds: ["try", "yellow_card", "red_card", "white_card"],
     assistsEnabled: false,
     cardsEnabled: true,
     setScoresEnabled: false,
