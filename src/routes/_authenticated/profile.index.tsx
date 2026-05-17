@@ -109,9 +109,12 @@ function ProfilePage() {
     <div className="px-5 pt-8 space-y-6 pb-6">
       <div>
         <h1 className="text-2xl font-semibold">{t("profile.title")}</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {profile?.full_name ?? user?.email}
-        </p>
+        {profile?.full_name && (
+          <p className="text-sm text-muted-foreground mt-1">{profile.full_name}</p>
+        )}
+        {user?.email && (
+          <p className="text-sm text-muted-foreground mt-0.5 break-all">{user.email}</p>
+        )}
         {role && (
           <span className="inline-flex items-center mt-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
             {t(`roles.${role}`, { defaultValue: role })}
