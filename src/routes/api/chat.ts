@@ -325,21 +325,19 @@ export const Route = createFileRoute("/api/chat")({
                 .describe("Optionnel : restreindre aux joueurs précis. Sinon, tous les pending de l'événement."),
             }),
             execute: async ({ eventId, playerIds }) => {
-              // Permission check: user must coach/admin the team of this event
               const { data: ev } = await supabase
                 .from("events")
                 .select("id, title, team_id")
                 .eq("id", eventId)
                 .maybeSingle();
               if (!ev) return { sent: 0, note: "Événement introuvable." };
-              const { data: membership } = await supabase
-                .from("team_members")
-                .select("role")
-                .eq("user_id", userId)
-                .eq("team_id", ev.team_id)
-                .in("role", ["coach", "admin"])
-                .maybeSingle();
-              if (!membership) {
+              const managedTeams = await getManagedTeamIds();
+              if (!managedTeams.includes(ev.team_id)) {
+                return {
+                  sent: 0,
+                  note: "L'utilisateur n'a pas les droits pour relancer sur cette équipe — relance refusée.",
+                };
+              }
                 return {
                   sent: 0,
                   note: "L'utilisateur n'est pas coach/admin de cette équipe — relance refusée.",
