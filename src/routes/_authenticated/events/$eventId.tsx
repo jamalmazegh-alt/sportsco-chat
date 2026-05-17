@@ -1291,7 +1291,7 @@ function EventDetail() {
 
       {/* Coach: send convocations */}
       {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
-        <Button onClick={openPicker} className="w-full h-11">
+        <Button onClick={() => openPicker()} className="w-full h-11">
           <Send className="h-4 w-4" />
           {t("events.sendConvocations")}
         </Button>
