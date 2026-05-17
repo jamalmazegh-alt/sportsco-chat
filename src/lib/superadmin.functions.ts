@@ -57,7 +57,8 @@ export const getPlatformStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertSuperAdmin(context.userId);
-    const { data, error } = await supabaseAdmin.rpc("get_platform_stats");
+    // Use user-scoped client so auth.uid() is available inside the SECURITY DEFINER RPC
+    const { data, error } = await context.supabase.rpc("get_platform_stats");
     if (error) throw new Error(error.message);
     return { stats: (data ?? {}) as Record<string, number | string> };
   });
