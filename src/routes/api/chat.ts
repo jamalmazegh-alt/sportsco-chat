@@ -338,11 +338,6 @@ export const Route = createFileRoute("/api/chat")({
                   note: "L'utilisateur n'a pas les droits pour relancer sur cette équipe — relance refusée.",
                 };
               }
-                return {
-                  sent: 0,
-                  note: "L'utilisateur n'est pas coach/admin de cette équipe — relance refusée.",
-                };
-              }
 
               // Get pending convocations for this event
               let q = supabase
