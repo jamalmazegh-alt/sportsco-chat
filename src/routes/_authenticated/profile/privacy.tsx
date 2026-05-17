@@ -228,14 +228,14 @@ function PrivacyPage() {
         <ul className="grid grid-cols-1 gap-1.5 pt-1">
           {(["terms", "privacy", "data_processing", "media", "notifications"] as const).map((k) => (
             <li key={k}>
-              <Link
-                to="/legal/$kind"
-                params={{ kind: k }}
-                className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/40"
+              <button
+                type="button"
+                onClick={() => setLegalKind(k)}
+                className="w-full flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/40 text-left"
               >
                 <span>{t(`privacy.legal.${k}`, { defaultValue: k })}</span>
-                <ChevronLeft className="h-4 w-4 rotate-180 text-muted-foreground" />
-              </Link>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
             </li>
           ))}
         </ul>
