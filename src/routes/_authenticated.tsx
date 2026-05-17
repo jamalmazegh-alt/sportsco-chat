@@ -9,6 +9,7 @@ import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
 import { TrialBanner } from "@/components/trial-banner";
 import { OnboardingWizard } from "@/components/onboarding-wizard";
+import { ClubSelector } from "@/components/club-selector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +54,9 @@ function AuthLayout() {
         <div className="mx-auto max-w-xl">
           <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
             <div className="relative flex items-center justify-center px-3 py-3">
+              <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                <ClubSelector />
+              </div>
               <img src={logo} alt="Clubero" className="h-10 w-auto object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5" />
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
                 <GlobalSearch />

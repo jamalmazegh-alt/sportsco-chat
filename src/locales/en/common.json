@@ -208,6 +208,11 @@
     "changeLogo": "Change logo",
     "logoUpdated": "Club logo updated"
   },
+  "clubSelector": {
+    "title": "My clubs",
+    "noClub": "No club",
+    "label": "Switch club"
+  },
   "players": {
     "title": "Players",
     "deleted": "Player deleted",
