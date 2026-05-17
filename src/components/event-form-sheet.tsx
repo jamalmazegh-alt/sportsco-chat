@@ -21,7 +21,9 @@ import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { Checkbox } from "@/components/ui/checkbox";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
+import { useNavigate } from "@tanstack/react-router";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
