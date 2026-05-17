@@ -18,15 +18,16 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Remplacez les convocations WhatsApp perdues par une vraie coordination de club : convocations, présences, communication, tout dans une seule app. WhatsApp reste disponible en option.",
+          "Convocations, présences, rappels et communication de club dans une seule app mobile. WhatsApp reste disponible en option.",
       },
       { property: "og:title", content: "Clubero — La coordination d'équipe pour clubs sportifs" },
       {
         property: "og:description",
         content: "Convocations, présences, rappels — tout dans un seul outil. En un clic.",
       },
+      { property: "og:url", content: "https://clubero.app/" },
     ],
-    links: [{ rel: "canonical", href: "https://www.clubero.app/" }],
+    links: [{ rel: "canonical", href: "https://clubero.app/" }],
   }),
 });
 

@@ -8,7 +8,11 @@ import { CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
 export const Route = createFileRoute('/dns-check')({
   component: DnsCheckPage,
   head: () => ({
-    meta: [{ title: 'DNS propagation check — clubero.app' }],
+    meta: [
+      { title: 'DNS propagation check — clubero.app' },
+      { name: 'description', content: 'Internal Clubero utility to verify DNS propagation (A and TXT records) for clubero.app across Google and Cloudflare resolvers.' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
   }),
 })
 

@@ -1,0 +1,20 @@
+# Clubero
+
+> Clubero is a mobile-first app for amateur and semi-pro sports clubs to coordinate events, send convocations, track attendance, and communicate with players and parents — without losing messages in WhatsApp.
+
+## Pages
+
+- [Home](/): Product overview and value proposition.
+- [Features](/features): Convocations, attendance, club communication, statistics.
+- [Pricing](/pricing): Plans for clubs of any size.
+- [FAQ](/faq): Answers to common questions about Clubero.
+- [Contact](/contact): Get in touch with the Clubero team.
+- [Demo](/demo): Request a guided demonstration.
+
+## Optional
+
+- [Login](/login): Sign in to your club account.
+- [Register](/register): Create a new club account.
+- [Terms](/legal/terms): Terms of service.
+- [Privacy](/legal/privacy): Privacy policy.
+- [Cookies](/legal/cookies): Cookie policy.
