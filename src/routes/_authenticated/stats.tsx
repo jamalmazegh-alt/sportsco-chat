@@ -360,35 +360,42 @@ type PlayerRow = {
   player_id: string;
   name: string;
   matches: number;
-  goals: number;
-  assists: number;
   present: number;
   total: number;
+  byKind: Record<string, number>; // scorer kinds
+  assists: number;
 };
 
-type SortKey = "name" | "matches" | "goals" | "assists" | "attendance";
-
-function TeamPlayersStats({ teamId }: { teamId: string }) {
+function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | null }) {
   const { t } = useTranslation();
-  const [sortKey, setSortKey] = useState<SortKey>("goals");
+  const cfg = useMemo(() => getSportConfig(sport), [sport]);
+
+  // Columns: name, matches, then one per scorer-kind from cfg.statKinds (except "assist"),
+  // then assists (if enabled), then attendance.
+  const scorerKinds = useMemo<StatKind[]>(
+    () => cfg.statKinds.filter((k) => k !== "assist"),
+    [cfg]
+  );
+  const showAssistCol = cfg.assistsEnabled;
+
+  type SortKey = "name" | "matches" | "attendance" | `kind:${StatKind}` | "assists";
+  const initialSort: SortKey =
+    scorerKinds.length > 0 ? (`kind:${scorerKinds[0]}` as SortKey) : "matches";
+  const [sortKey, setSortKey] = useState<SortKey>(initialSort);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["team-players-stats", teamId],
+    queryKey: ["team-players-stats", teamId, sport],
     queryFn: async () => {
-      // Roster
       const { data: roster } = await supabase
         .from("team_members")
         .select("player_id, players:player_id(id, first_name, last_name)")
         .eq("team_id", teamId)
         .eq("role", "player");
-      const players = (roster ?? [])
-        .map((r: any) => r.players)
-        .filter(Boolean);
+      const players = (roster ?? []).map((r: any) => r.players).filter(Boolean);
       const playerIds = players.map((p: any) => p.id);
       if (playerIds.length === 0) return [] as PlayerRow[];
 
-      // Events of team (non-cancelled, not deleted)
       const { data: events } = await supabase
         .from("events")
         .select("id, type, status")
@@ -396,9 +403,10 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
         .is("deleted_at", null)
         .neq("status", "cancelled");
       const eventIds = (events ?? []).map((e) => e.id);
-      const matchEventIds = new Set((events ?? []).filter((e) => e.type === "match").map((e) => e.id));
+      const matchEventIds = new Set(
+        (events ?? []).filter((e) => e.type === "match").map((e) => e.id)
+      );
 
-      // Convocations for these events for our players
       const { data: convocs } = eventIds.length > 0
         ? await supabase
             .from("convocations")
@@ -407,7 +415,6 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
             .in("player_id", playerIds)
         : { data: [] as any[] };
 
-      // Goals
       const { data: goals } = matchEventIds.size > 0
         ? await supabase
             .from("event_goals")
@@ -420,7 +427,7 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
         rows[p.id] = {
           player_id: p.id,
           name: `${p.first_name} ${p.last_name}`,
-          matches: 0, goals: 0, assists: 0, present: 0, total: 0,
+          matches: 0, present: 0, total: 0, byKind: {}, assists: 0,
         };
       });
 
@@ -434,8 +441,9 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
         }
       });
       (goals ?? []).forEach((g: any) => {
-        if (g.kind !== "own_goal" && g.scorer_player_id && rows[g.scorer_player_id]) {
-          rows[g.scorer_player_id].goals++;
+        if (g.scorer_player_id && rows[g.scorer_player_id]) {
+          rows[g.scorer_player_id].byKind[g.kind] =
+            (rows[g.scorer_player_id].byKind[g.kind] ?? 0) + 1;
         }
         if (g.assist_player_id && rows[g.assist_player_id]) {
           rows[g.assist_player_id].assists++;
@@ -450,15 +458,16 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
     const dir = sortDir === "asc" ? 1 : -1;
     list.sort((a, b) => {
       let av: number | string = 0, bv: number | string = 0;
-      switch (sortKey) {
-        case "name": av = a.name.toLowerCase(); bv = b.name.toLowerCase(); break;
-        case "matches": av = a.matches; bv = b.matches; break;
-        case "goals": av = a.goals; bv = b.goals; break;
-        case "assists": av = a.assists; bv = b.assists; break;
-        case "attendance":
-          av = a.total > 0 ? a.present / a.total : 0;
-          bv = b.total > 0 ? b.present / b.total : 0;
-          break;
+      if (sortKey === "name") { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
+      else if (sortKey === "matches") { av = a.matches; bv = b.matches; }
+      else if (sortKey === "assists") { av = a.assists; bv = b.assists; }
+      else if (sortKey === "attendance") {
+        av = a.total > 0 ? a.present / a.total : 0;
+        bv = b.total > 0 ? b.present / b.total : 0;
+      } else if (sortKey.startsWith("kind:")) {
+        const k = sortKey.slice(5);
+        av = a.byKind[k] ?? 0;
+        bv = b.byKind[k] ?? 0;
       }
       return av < bv ? -1 * dir : av > bv ? 1 * dir : 0;
     });
@@ -479,11 +488,18 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
     );
   }
 
-  const headers: Array<{ key: SortKey; label: string; align?: "right" }> = [
+  const headers: Array<{ key: SortKey; label: string; align?: "right"; negative?: boolean }> = [
     { key: "name", label: t("stats.col.player", { defaultValue: "Joueur" }) },
     { key: "matches", label: t("stats.col.matches", { defaultValue: "Matchs" }), align: "right" },
-    { key: "goals", label: t("stats.col.goals", { defaultValue: "Buts" }), align: "right" },
-    { key: "assists", label: t("stats.col.assists", { defaultValue: "Passes" }), align: "right" },
+    ...scorerKinds.map((k) => ({
+      key: `kind:${k}` as SortKey,
+      label: t(`match.kinds.${k}`, { defaultValue: k }),
+      align: "right" as const,
+      negative: SOLO_STAT_KINDS.includes(k) && (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal"),
+    })),
+    ...(showAssistCol
+      ? [{ key: "assists" as SortKey, label: t("match.kinds.assist", { defaultValue: "Passes" }), align: "right" as const }]
+      : []),
     { key: "attendance", label: t("stats.col.attendance", { defaultValue: "% Présent" }), align: "right" },
   ];
 
@@ -514,14 +530,30 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
               <tr key={r.player_id} className="border-t">
                 <td className="px-3 py-2 font-medium">{r.name}</td>
                 <td className="px-3 py-2 text-right">{r.matches}</td>
-                <td className="px-3 py-2 text-right">{r.goals}</td>
-                <td className="px-3 py-2 text-right">{r.assists}</td>
+                {scorerKinds.map((k) => (
+                  <td
+                    key={k}
+                    className={cn(
+                      "px-3 py-2 text-right tabular-nums",
+                      (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal") &&
+                        (r.byKind[k] ?? 0) > 0 && "text-destructive"
+                    )}
+                  >
+                    {r.byKind[k] ?? 0}
+                  </td>
+                ))}
+                {showAssistCol && <td className="px-3 py-2 text-right tabular-nums">{r.assists}</td>}
                 <td className="px-3 py-2 text-right">{r.total > 0 ? `${pct}%` : "—"}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      {scorerKinds.length === 0 && (
+        <p className="px-3 py-3 text-xs text-muted-foreground italic">
+          {t("stats.noStatKindsForSport", { defaultValue: "Aucune stat individuelle configurée pour ce sport." })}
+        </p>
+      )}
     </div>
   );
 }
