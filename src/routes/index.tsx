@@ -71,14 +71,14 @@ function Landing() {
 
 function WhatsAppHybrid() {
   return (
-    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[#25D366]/5 via-background to-[#075E54]/5">
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div
         aria-hidden
-        className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#25D366]/15 blur-3xl"
+        className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl"
       />
       <div
         aria-hidden
-        className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#075E54]/15 blur-3xl"
+        className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-secondary/10 blur-3xl"
       />
 
       <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
@@ -401,7 +401,7 @@ function Hero() {
               {[
                 { v: "12s", l: t("home.statConvoke") },
                 { v: "+78%", l: t("home.statResponse") },
-                { v: "0", l: t("home.statWhatsApp") },
+                { v: "3", l: t("home.statChannels") },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl border border-border/60 bg-card/60 backdrop-blur px-3 py-3">
                   <dt className="font-display text-2xl font-bold text-gradient-primary">{s.v}</dt>
@@ -518,9 +518,9 @@ const FEATURES = [
   },
   {
     icon: MessageSquareText,
-    title: "Compatible WhatsApp",
-    body: "Gardez votre groupe WhatsApp pour discuter. Clubero envoie les convocations groupées directement dedans, en un clic.",
-    accent: "from-[#25D366] to-[#075E54]",
+    title: "WhatsApp & email en option",
+    body: "Clubero est votre canal principal. Si certains membres préfèrent rester sur WhatsApp ou email, partagez le message formaté en un clic.",
+    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
   },
   {
     icon: Trophy,

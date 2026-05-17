@@ -57,8 +57,8 @@ const PILLARS = [
   },
   {
     icon: MessageCircle,
-    title: "Compatible WhatsApp (hybride)",
-    body: "Gardez votre groupe WhatsApp. Envoyez les convocations groupées formatées directement dedans, en un clic — sans abandonner le suivi des présences dans l'appli.",
+    title: "WhatsApp & email en option",
+    body: "Clubero centralise tout. Si certains préfèrent rester sur WhatsApp ou email, partagez le message formaté en un clic — sans abandonner le suivi dans l'appli.",
   },
   {
     icon: MessageSquareText,
@@ -128,7 +128,7 @@ const AUDIENCES = [
     points: [
       "Un clic pour confirmer ou décliner",
       "Calendrier familial avec tous les événements de vos enfants",
-      "Recevez les convocations dans WhatsApp ou par email — comme votre club préfère",
+      "Recevez les convocations dans l'appli Clubero, par email ou via WhatsApp — comme votre club préfère",
       "Messagerie directe avec le coach",
       "Gestion des autorisations pour les mineurs",
     ],
