@@ -56,11 +56,11 @@ function ContactPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "contact", name, email, phone, role, message }),
+        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, message }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setName(""); setEmail(""); setPhone(""); setRole(""); setMessage("");
+      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setMessage("");
       toast.success("Message envoyé. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
