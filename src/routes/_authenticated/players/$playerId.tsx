@@ -106,7 +106,7 @@ function PlayerProfile() {
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, jersey_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access")
+        .select("id, first_name, last_name, jersey_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status")
         .eq("id", playerId)
         .single();
       return data;
@@ -191,6 +191,16 @@ function PlayerProfile() {
 
     let photo_url = player.photo_url;
     if (photoFile) {
+      // RGPD: parental consent required for photos of minors
+      if (minor && player.media_consent_status !== "granted") {
+        setBusy(false);
+        toast.error(
+          t("players.photoBlockedMinor", {
+            defaultValue: "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
+          })
+        );
+        return;
+      }
       const ext = photoFile.name.split(".").pop() || "jpg";
       const path = `${player.club_id}/${player.id}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -387,6 +397,14 @@ function PlayerProfile() {
               disabled={!isCoach}
             />
           </label>
+          {minor && player.media_consent_status !== "granted" && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              {t("players.photoConsentRequired", {
+                defaultValue: "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : ",
+              })}
+              <b>{player.media_consent_status}</b>
+            </p>
+          )}
         </div>
         )}
 

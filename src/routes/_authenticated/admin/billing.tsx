@@ -1,6 +1,7 @@
 import { createFileRoute, Navigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import {
@@ -48,53 +49,43 @@ export const Route = createFileRoute("/_authenticated/admin/billing")({
   head: () => ({ meta: [{ title: "Abonnement — Clubero" }] }),
 });
 
-const FEATURES = [
-  "Équipes illimitées",
-  "Joueurs illimités",
-  "Gestion des matchs",
-  "Planning des entraînements",
-  "Suivi des présences",
-  "Communication club",
-  "Notifications",
-  "Statistiques",
-  "Événements",
-  "Accès mobile / PWA",
-  "Rôles coach & manager",
-];
-
 function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | null }) {
+  const { t, i18n } = useTranslation();
   const map: Record<string, { label: string; cls: string }> = {
-    trialing: { label: "Période d'essai", cls: "bg-primary/10 text-primary" },
-    active: { label: "Actif", cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-    past_due: { label: "Paiement en retard", cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-    canceled: { label: "Annulé", cls: "bg-muted text-muted-foreground" },
-    incomplete: { label: "Incomplet", cls: "bg-muted text-muted-foreground" },
-    incomplete_expired: { label: "Expiré", cls: "bg-destructive/10 text-destructive" },
-    unpaid: { label: "Impayé", cls: "bg-destructive/10 text-destructive" },
-    paused: { label: "En pause", cls: "bg-muted text-muted-foreground" },
+    trialing: { label: t("billing.statusTrialing"), cls: "bg-primary/10 text-primary" },
+    active: { label: t("billing.statusActive"), cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+    past_due: { label: t("billing.statusPastDue"), cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+    canceled: { label: t("billing.statusCanceled"), cls: "bg-muted text-muted-foreground" },
+    incomplete: { label: t("billing.statusIncomplete"), cls: "bg-muted text-muted-foreground" },
+    incomplete_expired: { label: t("billing.statusIncompleteExpired"), cls: "bg-destructive/10 text-destructive" },
+    unpaid: { label: t("billing.statusUnpaid"), cls: "bg-destructive/10 text-destructive" },
+    paused: { label: t("billing.statusPaused"), cls: "bg-muted text-muted-foreground" },
   };
   const s = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
+  const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${s.cls}`}>
       {s.label}
       {status === "trialing" && trialEnd && (
-        <> · jusqu'au {new Date(trialEnd).toLocaleDateString("fr-FR")}</>
+        <> · {t("billing.untilDate", { date: new Date(trialEnd).toLocaleDateString(locale) })}</>
       )}
     </span>
   );
 }
 
-function formatAmount(cents: number, currency: string) {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(cents / 100);
-}
-
 function BillingPage() {
+  const { t, i18n } = useTranslation();
   const { activeClubId } = useAuth();
   const role = useActiveRole();
   const search = useSearch({ from: "/_authenticated/admin/billing" });
+  const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
+
+  function formatAmount(cents: number, currency: string) {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).format(cents / 100);
+  }
 
   const fetchSub = useServerFn(getClubSubscription);
   const checkout = useServerFn(createCheckoutSession);
@@ -109,13 +100,13 @@ function BillingPage() {
 
   useEffect(() => {
     if (search.billing === "success") {
-      toast.success("Abonnement activé. Bienvenue dans Clubero !");
+      toast.success(t("billing.toastActivated"));
     } else if (search.billing === "canceled") {
-      toast.info("Paiement annulé.");
+      toast.info(t("billing.toastCanceledPayment"));
     } else if (search.card === "updated") {
-      toast.success("Carte bancaire mise à jour.");
+      toast.success(t("billing.toastCardUpdated"));
     }
-  }, [search.billing, search.card]);
+  }, [search.billing, search.card, t]);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["club-subscription", activeClubId],
@@ -162,7 +153,7 @@ function BillingPage() {
       const res = await checkout({ data: { clubId: activeClubId, plan } });
       if (res.url) navigateExternal(res.url);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de l'ouverture du paiement");
+      toast.error(e instanceof Error ? e.message : t("billing.errorCheckout"));
       setBusy(null);
     }
   }
@@ -174,7 +165,7 @@ function BillingPage() {
       const res = await portal({ data: { clubId: activeClubId } });
       if (res.url) navigateExternal(res.url);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Impossible d'ouvrir le portail");
+      toast.error(e instanceof Error ? e.message : t("billing.errorPortal"));
       setBusy(null);
     }
   }
@@ -184,10 +175,10 @@ function BillingPage() {
     setBusy("cancel");
     try {
       await cancelSub({ data: { clubId: activeClubId } });
-      toast.success("Abonnement résilié. Accès maintenu jusqu'à la fin de la période en cours.");
+      toast.success(t("billing.toastCanceled"));
       await refetch();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la résiliation");
+      toast.error(e instanceof Error ? e.message : t("billing.errorCancel"));
     } finally {
       setBusy(null);
       setConfirmCancel(false);
@@ -199,10 +190,10 @@ function BillingPage() {
     setBusy("reactivate");
     try {
       await reactivate({ data: { clubId: activeClubId } });
-      toast.success("Abonnement réactivé.");
+      toast.success(t("billing.toastReactivated"));
       await refetch();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur lors de la réactivation");
+      toast.error(e instanceof Error ? e.message : t("billing.errorReactivate"));
     } finally {
       setBusy(null);
     }
@@ -223,33 +214,45 @@ function BillingPage() {
     (sub as any)?.cancel_at ?? sub?.current_period_end ?? sub?.trial_end ?? null;
   const scheduledCancel = sub && (sub.cancel_at_period_end || (sub as any).cancel_at);
 
+  const FEATURES = [
+    t("billing.features.teams"),
+    t("billing.features.players"),
+    t("billing.features.matches"),
+    t("billing.features.training"),
+    t("billing.features.attendance"),
+    t("billing.features.comms"),
+    t("billing.features.notifications"),
+    t("billing.features.stats"),
+    t("billing.features.events"),
+    t("billing.features.pwa"),
+    t("billing.features.roles"),
+  ];
+
   return (
     <div className="px-5 py-4 space-y-5">
       <div>
-        <h1 className="text-2xl font-bold">Abonnement</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Gérez l'abonnement Clubero de votre club.
-        </p>
+        <h1 className="text-2xl font-bold">{t("billing.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("billing.subtitle")}</p>
       </div>
 
       {/* Current status */}
       <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <p className="text-sm text-muted-foreground">Statut actuel</p>
+            <p className="text-sm text-muted-foreground">{t("billing.status")}</p>
             <div className="mt-1.5">
               {sub ? (
                 <StatusBadge status={sub.status} trialEnd={sub.trial_end} />
               ) : (
-                <span className="text-sm text-muted-foreground">Aucun abonnement</span>
+                <span className="text-sm text-muted-foreground">{t("billing.noSubscription")}</span>
               )}
             </div>
           </div>
           {sub?.plan && (
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Plan</p>
+              <p className="text-sm text-muted-foreground">{t("billing.plan")}</p>
               <p className="font-semibold mt-1.5">
-                CLUBERO {sub.plan === "yearly" ? "Annuel" : "Mensuel"}
+                {sub.plan === "yearly" ? t("billing.planYearly") : t("billing.planMonthly")}
               </p>
             </div>
           )}
@@ -258,13 +261,11 @@ function BillingPage() {
         {scheduledCancel && cancelDate ? (
           <div className="text-sm flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
             <AlertCircle className="h-4 w-4" />
-            Résilié — prend fin le {new Date(cancelDate).toLocaleDateString("fr-FR")} (pas de
-            renouvellement)
+            {t("billing.scheduledCancel", { date: new Date(cancelDate).toLocaleDateString(locale) })}
           </div>
         ) : sub?.current_period_end ? (
           <div className="text-sm text-muted-foreground">
-            Prochain renouvellement le{" "}
-            {new Date(sub.current_period_end).toLocaleDateString("fr-FR")}
+            {t("billing.nextRenewal", { date: new Date(sub.current_period_end).toLocaleDateString(locale) })}
           </div>
         ) : null}
 
@@ -281,7 +282,7 @@ function BillingPage() {
               ) : (
                 <>
                   <CreditCard className="h-4 w-4" />
-                  Changer la carte
+                  {t("billing.updateCard")}
                 </>
               )}
             </Button>
@@ -298,7 +299,7 @@ function BillingPage() {
                 ) : (
                   <>
                     <RotateCcw className="h-4 w-4" />
-                    Réactiver l'abonnement
+                    {t("billing.reactivate")}
                   </>
                 )}
               </Button>
@@ -310,7 +311,7 @@ function BillingPage() {
                 className="w-full text-destructive hover:text-destructive"
               >
                 <XCircle className="h-4 w-4" />
-                Résilier l'abonnement
+                {t("billing.cancel")}
               </Button>
             )}
           </div>
@@ -326,7 +327,7 @@ function BillingPage() {
               <Loader2 className="h-3 w-3 animate-spin" />
             ) : (
               <>
-                Options avancées (portail Stripe) <ExternalLink className="h-3 w-3" />
+                {t("billing.advancedPortal")} <ExternalLink className="h-3 w-3" />
               </>
             )}
           </button>
@@ -338,7 +339,7 @@ function BillingPage() {
         <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
           <div className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-primary" />
-            <h2 className="font-semibold">Factures</h2>
+            <h2 className="font-semibold">{t("billing.invoices")}</h2>
           </div>
           <ul className="divide-y divide-border">
             {invoicesData.invoices.map((inv) => (
@@ -348,17 +349,17 @@ function BillingPage() {
                     {inv.number ?? inv.id}
                     {inv.status === "paid" && (
                       <span className="ml-2 text-xs text-emerald-600 dark:text-emerald-400">
-                        payée
+                        {t("billing.invoicePaid")}
                       </span>
                     )}
                     {inv.status === "open" && (
                       <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">
-                        à payer
+                        {t("billing.invoiceOpen")}
                       </span>
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(inv.created * 1000).toLocaleDateString("fr-FR")} ·{" "}
+                    {new Date(inv.created * 1000).toLocaleDateString(locale)} ·{" "}
                     {formatAmount(inv.amount_paid || inv.amount_due, inv.currency)}
                   </p>
                 </div>
@@ -387,16 +388,13 @@ function BillingPage() {
             </div>
             <div>
               <h2 className="font-bold text-lg">CLUBERO</h2>
-              <p className="text-sm text-muted-foreground">Tout inclus, sans limite</p>
+              <p className="text-sm text-muted-foreground">{t("billing.allInclusive")}</p>
             </div>
           </div>
 
           <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-sm">
-            <p className="font-medium text-primary">🎁 30 jours d'essai gratuit — sans carte bancaire</p>
-            <p className="text-muted-foreground mt-1">
-              Profitez de toutes les fonctionnalités pendant 30 jours. Aucune carte requise pendant l'essai.
-              Vous pourrez activer votre abonnement à tout moment ci-dessous pour continuer après l'essai.
-            </p>
+            <p className="font-medium text-primary">{t("billing.trialBadge")}</p>
+            <p className="text-muted-foreground mt-1">{t("billing.trialDescription")}</p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -405,9 +403,9 @@ function BillingPage() {
               disabled={busy !== null}
               className="rounded-xl border-2 border-border hover:border-primary p-4 text-left transition-colors disabled:opacity-50"
             >
-              <p className="text-sm text-muted-foreground">Mensuel</p>
+              <p className="text-sm text-muted-foreground">{t("billing.monthly")}</p>
               <p className="font-display text-2xl font-bold mt-1">39 €</p>
-              <p className="text-xs text-muted-foreground">/ mois · TTC</p>
+              <p className="text-xs text-muted-foreground">{t("billing.perMonth")}</p>
               {busy === "monthly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
             </button>
             <button
@@ -416,17 +414,17 @@ function BillingPage() {
               className="rounded-xl border-2 border-primary bg-primary/5 p-4 text-left relative disabled:opacity-50"
             >
               <span className="absolute -top-2 right-3 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                2 mois offerts
+                {t("billing.twoMonthsFree")}
               </span>
-              <p className="text-sm text-muted-foreground">Annuel</p>
+              <p className="text-sm text-muted-foreground">{t("billing.yearly")}</p>
               <p className="font-display text-2xl font-bold mt-1">390 €</p>
-              <p className="text-xs text-muted-foreground">/ an · TTC</p>
+              <p className="text-xs text-muted-foreground">{t("billing.perYear")}</p>
               {busy === "yearly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
             </button>
           </div>
 
           <p className="text-xs text-muted-foreground text-center -mt-1">
-            Prix TTC, TVA française incluse (20 %). Facturation en euros depuis la France.
+            {t("billing.taxNotice")}
           </p>
 
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-border">
@@ -448,18 +446,19 @@ function BillingPage() {
       />
 
       <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
-
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Résilier l'abonnement&nbsp;?</AlertDialogTitle>
+            <AlertDialogTitle>{t("billing.confirmCancelTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Votre accès reste actif jusqu'au{" "}
-              {cancelDate ? new Date(cancelDate).toLocaleDateString("fr-FR") : "terme de la période en cours"}.
-              Aucun nouveau prélèvement ne sera effectué. Vous pourrez réactiver à tout moment avant cette date.
+              {t("billing.confirmCancelBody", {
+                date: cancelDate
+                  ? new Date(cancelDate).toLocaleDateString(locale)
+                  : t("billing.confirmCancelFallbackDate"),
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={busy === "cancel"}>Annuler</AlertDialogCancel>
+            <AlertDialogCancel disabled={busy === "cancel"}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -468,7 +467,7 @@ function BillingPage() {
               disabled={busy === "cancel"}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {busy === "cancel" ? <Loader2 className="h-4 w-4 animate-spin" /> : "Résilier"}
+              {busy === "cancel" ? <Loader2 className="h-4 w-4 animate-spin" /> : t("billing.confirmCancelAction")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
