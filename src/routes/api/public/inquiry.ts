@@ -31,7 +31,7 @@ function generateToken(): string {
 }
 
 async function getOrCreateUnsubscribeToken(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   email: string,
 ): Promise<string> {
   const normalized = email.toLowerCase();
