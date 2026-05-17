@@ -208,6 +208,11 @@
     "changeLogo": "Changer le logo",
     "logoUpdated": "Logo du club mis à jour"
   },
+  "clubSelector": {
+    "title": "Mes clubs",
+    "noClub": "Aucun club",
+    "label": "Changer de club"
+  },
   "players": {
     "title": "Joueurs",
     "deleted": "Joueur supprimé",
