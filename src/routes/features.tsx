@@ -58,7 +58,7 @@ const PILLARS = [
   {
     icon: MessageCircle,
     title: "WhatsApp & email en option",
-    body: "Clubero centralise tout. Si certains préfèrent rester sur WhatsApp ou email, partagez le message formaté en un clic — sans abandonner le suivi dans l'appli.",
+    body: "Tout est géré dans Clubero. Pour ceux qui préfèrent rester sur WhatsApp ou par email, partagez le message formaté en un clic — sans perdre le suivi dans l'appli.",
   },
   {
     icon: MessageSquareText,
