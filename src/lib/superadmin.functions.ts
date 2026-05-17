@@ -33,7 +33,7 @@ async function logAction(opts: {
       target_type: opts.target_type ?? null,
       target_id: opts.target_id ?? null,
       club_id: opts.club_id ?? null,
-      metadata: opts.metadata ?? null,
+      metadata: (opts.metadata ?? null) as never,
     });
   } catch (err) {
     console.error("[superadmin] audit log failed", err);
