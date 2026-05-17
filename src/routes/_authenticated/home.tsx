@@ -303,11 +303,24 @@ function HomePage() {
       })()}
 
       {/* For players/parents: unified list of upcoming events with action-required highlight on pending convocations */}
-      {!isCoach && (
+      {!isCoach && (() => {
+        const convocPlayers = new Map<string, { id: string; first_name: string; isOwn?: boolean }>();
+        for (const e of (myConvocs ?? []) as any[]) {
+          if (e.player && !convocPlayers.has(e.player.id)) convocPlayers.set(e.player.id, e.player);
+        }
+        const list = Array.from(convocPlayers.values());
+        const hasOwn = list.some((p) => p.isOwn);
+        const childOnly = list.length > 0 && !hasOwn;
+        const headerLabel = !childOnly
+          ? t("dashboard.myConvocations")
+          : list.length === 1
+            ? t("dashboard.childConvocations", { name: list[0].first_name })
+            : t("dashboard.childrenConvocations");
+        return (
         <section>
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              {t("dashboard.myConvocations")}
+              {headerLabel}
             </h2>
             <Link to="/events" className="text-xs text-primary font-medium">
               {t("dashboard.viewAll")}
