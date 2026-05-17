@@ -26,7 +26,16 @@ type ClubSettings = {
   event_chat_enabled: boolean;
   event_chat_players_enabled: boolean;
   event_chat_parents_enabled: boolean;
+  auto_reminders_enabled: boolean;
+  auto_reminder_hours_before: number[];
 };
+
+const REMINDER_PRESETS = [
+  { value: [48, 3], label: "48h + 3h avant (standard)" },
+  { value: [72, 24, 3], label: "3j + 24h + 3h avant" },
+  { value: [24], label: "24h avant" },
+  { value: [3], label: "3h avant" },
+];
 
 function AdminSettingsPage() {
   const { t } = useTranslation();
@@ -39,7 +48,7 @@ function AdminSettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clubs")
-        .select("id, name, convocation_channels, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled")
+        .select("id, name, convocation_channels, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, auto_reminders_enabled, auto_reminder_hours_before")
         .eq("id", activeClubId!)
         .single();
       if (error) throw error;
@@ -57,6 +66,9 @@ function AdminSettingsPage() {
         convocation_channels: Array.isArray(data.convocation_channels)
           ? data.convocation_channels
           : ["email", "in_app"],
+        auto_reminder_hours_before: Array.isArray(data.auto_reminder_hours_before)
+          ? data.auto_reminder_hours_before
+          : [48, 3],
       });
     }
   }, [data]);
@@ -85,6 +97,8 @@ function AdminSettingsPage() {
         event_chat_enabled: form.event_chat_enabled,
         event_chat_players_enabled: form.event_chat_players_enabled,
         event_chat_parents_enabled: form.event_chat_parents_enabled,
+        auto_reminders_enabled: form.auto_reminders_enabled,
+        auto_reminder_hours_before: form.auto_reminder_hours_before,
       })
       .eq("id", form.id);
     setSaving(false);
@@ -169,6 +183,46 @@ function AdminSettingsPage() {
               checked={form.event_chat_parents_enabled}
               onChange={(v) => setForm({ ...form, event_chat_parents_enabled: v })}
             />
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
+        <div>
+          <Label className="text-base">Relances automatiques avant événement</Label>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Envoie un email aux joueurs et parents qui n'ont pas encore répondu à la convocation.
+          </p>
+        </div>
+        <Row
+          label="Activer les relances auto"
+          checked={form.auto_reminders_enabled}
+          onChange={(v) => setForm({ ...form, auto_reminders_enabled: v })}
+        />
+        {form.auto_reminders_enabled && (
+          <div className="space-y-2">
+            <Label className="text-sm">Quand envoyer ?</Label>
+            <div className="space-y-2">
+              {REMINDER_PRESETS.map((preset) => {
+                const selected =
+                  preset.value.length === form.auto_reminder_hours_before.length &&
+                  preset.value.every((v) => form.auto_reminder_hours_before.includes(v));
+                return (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setForm({ ...form, auto_reminder_hours_before: preset.value })}
+                    className={`w-full text-left rounded-lg border px-3 py-2 text-sm transition-colors ${
+                      selected
+                        ? "border-primary bg-primary/5 font-medium"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </section>

@@ -23,6 +23,8 @@ interface Props {
   clubName?: string;
   clubLogoUrl?: string;
   respondUrl: string; // base url for /r/<token>
+  isReminder?: boolean;
+  reminderHoursBefore?: number;
 }
 
 const ConvocationInviteEmail = ({
@@ -44,11 +46,13 @@ const ConvocationInviteEmail = ({
   clubName,
   clubLogoUrl,
   respondUrl,
+  isReminder,
+  reminderHoursBefore,
 }: Props) => (
   <Html lang="fr" dir="ltr">
     <Head />
     <Preview>
-      Convocation : {eventTitle}
+      {isReminder ? "Rappel — " : ""}Convocation : {eventTitle}
       {eventDate ? ` — ${eventDate}` : ""}
     </Preview>
     <Body style={main}>
@@ -66,11 +70,13 @@ const ConvocationInviteEmail = ({
         ) : null}
 
         <Heading style={h1}>
-          {recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
+          {isReminder
+            ? `⏰ Rappel — réponse attendue${reminderHoursBefore ? ` (${reminderHoursBefore}h avant)` : ""}`
+            : recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
         </Heading>
 
         <Text style={text}>
-          {playerName ? <strong>{playerName}</strong> : "Votre joueur"} est convoqué·e
+          {playerName ? <strong>{playerName}</strong> : "Votre joueur"} {isReminder ? "n'a pas encore répondu à la convocation" : "est convoqué·e"}
           {teamName ? <> avec <strong>{teamName}</strong></> : null}
           {clubName ? <> ({clubName})</> : null}.
         </Text>
@@ -160,7 +166,7 @@ const ConvocationInviteEmail = ({
 export const template = {
   component: ConvocationInviteEmail,
   subject: (d) =>
-    `📣 Convocation : ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`,
+    `${d.isReminder ? "⏰ Rappel — " : "📣 "}Convocation : ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`,
   displayName: "Convocation invite",
   previewData: {
     recipientFirstName: "Sophie",
