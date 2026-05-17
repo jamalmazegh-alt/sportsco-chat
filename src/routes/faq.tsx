@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: "Quels sports sont couverts ?",
-    a: "En V1, Clubero couvre 7 sports collectifs avec une saisie de score et des statistiques joueurs adaptées au sport : football, futsal, basketball, rugby, handball, volley-ball et hockey sur glace. D'autres sports arriveront ensuite — dites-nous lequel vous manque.",
+    a: "En V1, Clubero couvre 8 sports collectifs avec une saisie de score et des statistiques joueurs adaptées au sport : football, futsal, basketball, rugby, handball, volley-ball, hockey sur glace et hockey sur gazon. D'autres sports arriveront ensuite — dites-nous lequel vous manque.",
   },
   {
     q: "Y a-t-il une offre gratuite ?",

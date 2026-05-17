@@ -8,6 +8,7 @@ export const COLLECTIVE_SPORTS = [
   "rugby",
   "futsal",
   "ice_hockey",
+  "field_hockey",
 ] as const;
 
 export type SportKey = (typeof TOP_SPORTS)[number] | (typeof COLLECTIVE_SPORTS)[number];
