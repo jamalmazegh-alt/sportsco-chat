@@ -531,9 +531,10 @@ export const Route = createFileRoute("/api/chat")({
               location: z.string().max(200).optional(),
               meetingPoint: z.string().max(200).optional(),
               opponent: z.string().max(200).optional(),
+              isHome: z.boolean().optional().describe("true = match à domicile, false = à l'extérieur."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ eventId, title, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
+            execute: async ({ eventId, title, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
               const { data: ev, error: evErr } = await supabase
                 .from("events")
                 .select("id, team_id, title, team:team_id(name)")
