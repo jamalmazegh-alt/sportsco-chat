@@ -521,7 +521,18 @@ export const Route = createFileRoute("/api/chat")({
         try {
           const result = streamText({
             model,
-            system: SYSTEM_PROMPT,
+            system: (() => {
+              const now = new Date();
+              const dateStr = now.toLocaleDateString("fr-FR", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                timeZone: "Europe/Paris",
+              });
+              const isoNow = now.toISOString();
+              return `Date et heure actuelles : ${dateStr} (ISO: ${isoNow}, fuseau de référence : Europe/Paris).\nQuand l'utilisateur dit "samedi prochain", "demain", "la semaine prochaine", calcule la date à partir de cette date actuelle. Ne demande jamais à l'utilisateur de te confirmer l'année ou le mois courant — tu les connais.\n\n${SYSTEM_PROMPT}`;
+            })(),
             tools,
             stopWhen: stepCountIs(50),
             messages: await convertToModelMessages(messages as UIMessage[]),
