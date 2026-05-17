@@ -147,6 +147,7 @@ export type Database = {
       }
       clubs: {
         Row: {
+          archived_at: string | null
           convocation_channels: Json
           created_at: string
           created_by: string
@@ -160,6 +161,7 @@ export type Database = {
           wall_comments_enabled: boolean
         }
         Insert: {
+          archived_at?: string | null
           convocation_channels?: Json
           created_at?: string
           created_by: string
@@ -173,6 +175,7 @@ export type Database = {
           wall_comments_enabled?: boolean
         }
         Update: {
+          archived_at?: string | null
           convocation_channels?: Json
           created_at?: string
           created_by?: string
