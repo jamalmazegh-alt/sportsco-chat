@@ -17,6 +17,34 @@ export type Attachment = {
 
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
+// Allowlist strict côté client. Le bucket reste public mais on filtre les MIME
+// pour éviter qu'un utilisateur ne dépose des exécutables, scripts ou HTML
+// (vecteur XSS sur les liens publics).
+const ALLOWED_MIME_TYPES = new Set<string>([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  "text/csv",
+]);
+
+function isMimeAllowed(file: File): boolean {
+  if (ALLOWED_MIME_TYPES.has(file.type)) return true;
+  // Fallback: certains navigateurs ne renseignent pas file.type pour .heic/.csv.
+  // On valide alors par extension.
+  const ext = file.name.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
+  if (!ext) return false;
+  return ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "pdf", "doc", "docx", "xls", "xlsx", "txt", "csv"].includes(ext);
+}
+
 export function AttachmentPicker({
   value,
   onChange,
