@@ -1,11 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { getLegalDoc } from "@/lib/legal.functions";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
 export const Route = createFileRoute("/legal/$kind")({
   loader: async ({ params }) => {
+    // SSR fallback in FR; component re-fetches in the user's actual locale.
     const doc = await getLegalDoc({ data: { kind: params.kind, locale: "fr" } });
     if (!doc) throw notFound();
     return { doc };
