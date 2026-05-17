@@ -1383,7 +1383,7 @@ export const getClubFinancials = createServerFn({ method: "POST" })
       return {
         has_stripe: false,
         subscription: sub ?? null,
-        invoices: [] as Array<Record<string, unknown>>,
+        invoices: [] as InvoiceItem[],
         lifetime_paid_cents: 0,
         currency: "eur",
         payment_method: null as null | { brand: string; last4: string; exp: string },
