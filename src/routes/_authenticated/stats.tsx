@@ -84,7 +84,7 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
     if (!selectedId && players && players.length > 0) setSelectedId(players[0].id);
   }, [players, selectedId]);
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">{t("common.loading", { defaultValue: "Chargement…" })}</p>;
+  if (isLoading) return <PlayerSkeleton />;
   if (!players || players.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
