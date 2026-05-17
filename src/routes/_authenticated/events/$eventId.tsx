@@ -37,6 +37,69 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
+const CONVOC_SNAPSHOT_FIELDS = [
+  "title",
+  "description",
+  "starts_at",
+  "ends_at",
+  "convocation_time",
+  "location",
+  "meeting_point",
+  "competition_name",
+  "type",
+] as const;
+
+function buildConvocSnapshot(ev: any): Record<string, any> {
+  const snap: Record<string, any> = {};
+  for (const k of CONVOC_SNAPSHOT_FIELDS) snap[k] = ev?.[k] ?? null;
+  return snap;
+}
+
+function formatSnapshotValue(field: string, value: any, t: (k: string) => string): string | undefined {
+  if (value == null || value === "") return undefined;
+  if (field === "starts_at" || field === "ends_at" || field === "convocation_time") {
+    try {
+      return fmt(value, "EEEE d MMMM 'à' HH'h'mm");
+    } catch {
+      return String(value);
+    }
+  }
+  if (field === "type") {
+    return t(`events.types.${value}`) || String(value);
+  }
+  return String(value);
+}
+
+function diffSnapshot(prev: Record<string, any> | null | undefined, current: any, t: (k: string) => string): Array<{ field: string; label: string; previous?: string; current?: string }> {
+  if (!prev) return [];
+  const labels: Record<string, string> = {
+    title: "Titre",
+    description: "Description",
+    starts_at: "Date / heure",
+    ends_at: "Fin",
+    convocation_time: "Heure de RDV",
+    location: "Lieu",
+    meeting_point: "Point de RDV",
+    competition_name: "Compétition",
+    type: "Type",
+  };
+  const out: Array<{ field: string; label: string; previous?: string; current?: string }> = [];
+  for (const k of CONVOC_SNAPSHOT_FIELDS) {
+    const a = prev[k] ?? null;
+    const b = current?.[k] ?? null;
+    if ((a ?? "") !== (b ?? "")) {
+      out.push({
+        field: k,
+        label: labels[k] ?? k,
+        previous: formatSnapshotValue(k, a, t),
+        current: formatSnapshotValue(k, b, t),
+      });
+    }
+  }
+  return out;
+}
+
+
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   component: EventDetail,
 });
