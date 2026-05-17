@@ -73,17 +73,27 @@ function inline(text: string) {
 }
 
 function LegalPage() {
-  const { doc } = Route.useLoaderData();
+  const { doc: ssrDoc } = Route.useLoaderData();
+  const { kind } = Route.useParams();
+  const { i18n, t } = useTranslation();
+  const locale = i18n.language?.slice(0, 2) ?? "fr";
+  const { data: localizedDoc } = useQuery({
+    queryKey: ["legal-doc", kind, locale],
+    queryFn: () => getLegalDoc({ data: { kind, locale } }),
+    enabled: locale !== "fr",
+    staleTime: 5 * 60 * 1000,
+  });
+  const doc = localizedDoc ?? ssrDoc;
   return (
     <MarketingLayout>
       <div className="mx-auto max-w-3xl px-5 py-12 lg:px-8 lg:py-16">
         <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ChevronLeft className="h-4 w-4" /> Accueil
+          <ChevronLeft className="h-4 w-4" /> {t("common.home", { defaultValue: locale === "fr" ? "Accueil" : "Home" })}
         </Link>
         <article className="mt-6">
           <h1 className="font-display text-3xl font-bold tracking-tight">{doc.title}</h1>
           <p className="mt-2 text-xs text-muted-foreground">
-            v{doc.version} · {new Date(doc.published_at).toLocaleDateString("fr-FR")}
+            v{doc.version} · {new Date(doc.published_at).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US")}
           </p>
           <div className="mt-8">{renderMarkdown(doc.content_md)}</div>
         </article>
