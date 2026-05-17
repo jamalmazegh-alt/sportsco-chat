@@ -183,7 +183,14 @@ function EventDetail() {
         .eq("team_id", event!.team_id)
         .eq("role", "player");
       if (error) throw error;
-      return (data ?? []).filter((tp: any) => tp.players);
+      // Dedupe by player_id (a player may have multiple team_member rows e.g. player + coach)
+      const seen = new Set<string>();
+      return (data ?? []).filter((tp: any) => {
+        if (!tp.players) return false;
+        if (seen.has(tp.player_id)) return false;
+        seen.add(tp.player_id);
+        return true;
+      });
     },
   });
 
