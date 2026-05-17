@@ -96,7 +96,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
-        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
+        .select("id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email)")
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
