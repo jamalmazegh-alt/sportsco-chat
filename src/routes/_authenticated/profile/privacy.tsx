@@ -89,6 +89,9 @@ function PrivacyPage() {
 
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [legalKind, setLegalKind] = useState<
+    null | "terms" | "privacy" | "data_processing" | "media" | "notifications" | "legal_notice" | "parental_consent"
+  >(null);
 
   async function toggleConsent(kind: string, version_id: string, currentlyGranted: boolean) {
     setBusy(true);
