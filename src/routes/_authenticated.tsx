@@ -7,6 +7,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { AssistantFab } from "@/components/assistant-fab";
 import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
+import { TrialBanner } from "@/components/trial-banner";
+import { OnboardingWizard } from "@/components/onboarding-wizard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
