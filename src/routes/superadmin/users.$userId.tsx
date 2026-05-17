@@ -47,7 +47,7 @@ function UserDetail() {
   const [impLink, setImpLink] = useState<string | null>(null);
   const [impCopied, setImpCopied] = useState(false);
 
-
+  const confirmAndRun = async (
     label: string,
     fn: () => Promise<unknown>,
   ) => {
