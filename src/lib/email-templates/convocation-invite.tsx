@@ -186,7 +186,7 @@ const ConvocationInviteEmail = ({
 export const template = {
   component: ConvocationInviteEmail,
   subject: (d) =>
-    `${d.isReminder ? "⏰ Rappel — " : "📣 "}Convocation : ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`,
+    `${d.isUpdate ? "🔄 Mise à jour — " : d.isReminder ? "⏰ Rappel — " : "📣 "}Convocation : ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`,
   displayName: "Convocation invite",
   previewData: {
     recipientFirstName: "Sophie",
