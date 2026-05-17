@@ -56,14 +56,14 @@ export const Route = createFileRoute("/api/public/hooks/data-retention")({
         // verification_codes : delete expired + consumed > 1 day
         results.push(await deleteOlderThan("verification_codes", "expires_at", 1));
 
-        // data_export_requests fulfilled : 30 days after fulfilment
+        // data_export_requests completed : 30 days after completed_at
         {
           const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
           const { count, error } = await supabaseAdmin
             .from("data_export_requests")
             .delete({ count: "exact" })
-            .eq("status", "fulfilled")
-            .lt("fulfilled_at", cutoff);
+            .eq("status", "completed")
+            .lt("completed_at", cutoff);
           results.push({
             table: "data_export_requests",
             deleted: count ?? 0,
