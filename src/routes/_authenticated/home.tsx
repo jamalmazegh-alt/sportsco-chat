@@ -159,6 +159,11 @@ function HomePage() {
 
   const isCoach = role === "admin" || role === "coach";
 
+  // Show skeleton on first paint while the primary queries hydrate.
+  if (activeClubId && teamsLoading) {
+    return <HomeSkeleton />;
+  }
+
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">
       {/* Club hero — energetic gradient banner */}
