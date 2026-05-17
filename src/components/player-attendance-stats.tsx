@@ -100,6 +100,7 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
     "assist",
     "yellow_card",
     "red_card",
+    "white_card",
     "foul",
     "penalty",
     "own_goal",
@@ -131,14 +132,18 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
             ? "bg-yellow-400/15 text-yellow-700 dark:text-yellow-300 border-yellow-400/30"
             : k === "red_card"
               ? "bg-absent/10 text-absent border-absent/30"
-              : k === "foul" || k === "penalty" || k === "own_goal"
-                ? "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30"
-                : "bg-primary/10 text-primary border-primary/30",
+              : k === "white_card"
+                ? "bg-muted text-foreground border-border"
+                : k === "foul" || k === "penalty" || k === "own_goal"
+                  ? "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30"
+                  : "bg-primary/10 text-primary border-primary/30",
         icon:
           k === "yellow_card" ? (
             <Square className="h-3.5 w-3.5 fill-yellow-400 text-yellow-500" />
           ) : k === "red_card" ? (
             <Square className="h-3.5 w-3.5 fill-red-500 text-red-600" />
+          ) : k === "white_card" ? (
+            <Square className="h-3.5 w-3.5 fill-white text-muted-foreground" />
           ) : k === "foul" || k === "penalty" || k === "own_goal" ? (
             <AlertTriangle className="h-3.5 w-3.5" />
           ) : (
