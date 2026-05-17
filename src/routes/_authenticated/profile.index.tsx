@@ -321,12 +321,6 @@ function ProfilePage() {
         <LogOut className="h-4 w-4" />
         {t("auth.logout")}
       </Button>
-
-      <LegalDialog
-        open={!!legalKind}
-        onOpenChange={(o) => !o && setLegalKind(null)}
-        kind={legalKind}
-      />
     </div>
   );
 }
