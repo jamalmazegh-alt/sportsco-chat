@@ -65,6 +65,8 @@ function EventDetail() {
   const [rescheduleNewDate, setRescheduleNewDate] = useState("");
   const [rescheduleReason, setRescheduleReason] = useState("");
   const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
+  const [resendOpen, setResendOpen] = useState(false);
+  const [resendSubmitting, setResendSubmitting] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
