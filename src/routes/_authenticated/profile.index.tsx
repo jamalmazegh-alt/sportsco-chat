@@ -9,7 +9,7 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
@@ -120,14 +120,6 @@ function ProfilePage() {
           {profile?.full_name && (
             <p className="text-sm font-medium text-foreground mt-1 truncate">{profile.full_name}</p>
           )}
-          {user?.email && (
-            <a
-              href={`mailto:${user.email}`}
-              className="inline-flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground hover:text-primary transition-colors max-w-full"
-            >
-              <span className="truncate">{user.email}</span>
-            </a>
-          )}
           {role && (
             <div className="mt-2">
               <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
@@ -137,6 +129,25 @@ function ProfilePage() {
           )}
         </div>
       </div>
+
+      {user?.email && (
+        <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Mail className="h-5 w-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+              {t("profile.email", { defaultValue: "Adresse email" })}
+            </p>
+            <a
+              href={`mailto:${user.email}`}
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors break-all"
+            >
+              {user.email}
+            </a>
+          </div>
+        </div>
+      )}
 
       {club && (
         <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
