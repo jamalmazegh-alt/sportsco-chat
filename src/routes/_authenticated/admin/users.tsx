@@ -6,7 +6,7 @@ import { useState, type FormEvent } from "react";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { Loader2, Users, Mail, Plus, ShieldCheck, Whistle as WhistleIcon, UserPlus } from "lucide-react";
+import { Loader2, Users, Mail, ShieldCheck, Trophy, UserPlus } from "lucide-react";
 import { listClubUsers } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
