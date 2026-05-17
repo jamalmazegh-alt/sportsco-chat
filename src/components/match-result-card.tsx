@@ -569,6 +569,8 @@ function KindIcon({ kind }: { kind: StatKind }) {
     return <Square className="h-3.5 w-3.5 fill-yellow-400 text-yellow-500 shrink-0" />;
   if (kind === "red_card")
     return <Square className="h-3.5 w-3.5 fill-red-500 text-red-600 shrink-0" />;
+  if (kind === "white_card")
+    return <Square className="h-3.5 w-3.5 fill-white text-muted-foreground shrink-0" />;
   if (kind === "foul" || kind === "penalty" || kind === "own_goal")
     return <AlertTriangle className="h-3.5 w-3.5 text-orange-500 shrink-0" />;
   return <Trophy className="h-3.5 w-3.5 text-primary shrink-0" />;
