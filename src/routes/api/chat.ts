@@ -479,6 +479,33 @@ export const Route = createFileRoute("/api/chat")({
                 return { created: false, note: "La date/heure de début est dans le passé." };
               }
 
+              // Duplicate check : même équipe + même date/heure + même type
+              const { data: dupes } = await supabase
+                .from("events")
+                .select("id, title, starts_at, type, status")
+                .eq("team_id", team.id)
+                .eq("type", type)
+                .eq("starts_at", startsAtDate.toISOString())
+                .is("deleted_at", null)
+                .limit(1);
+              if (dupes && dupes.length > 0) {
+                const ex = dupes[0];
+                return {
+                  created: false,
+                  duplicate: true,
+                  existing_event: {
+                    id: ex.id,
+                    title: ex.title,
+                    type: ex.type,
+                    starts_at: ex.starts_at,
+                    status: ex.status,
+                    team: team.name,
+                    edit_link: `/events/${ex.id}`,
+                  },
+                  note: `Un événement de type "${type}" existe déjà pour ${team.name} à cette date/heure ("${ex.title}"). Aucun nouveau brouillon créé — propose à l'utilisateur d'ouvrir l'événement existant ou de choisir une autre date.`,
+                };
+              }
+
               const { data: created, error } = await supabase
                 .from("events")
                 .insert({
