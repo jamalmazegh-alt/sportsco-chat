@@ -235,6 +235,12 @@ export const cancelSubscriptionAtPeriodEnd = createServerFn({ method: "POST" })
         cancel_at: updated.cancel_at ? new Date(updated.cancel_at * 1000).toISOString() : null,
       })
       .eq("club_id", data.clubId);
+    try {
+      const fresh = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
+      await notifySubscriptionAdmin("cancellation_scheduled", fresh, data.clubId);
+    } catch (err) {
+      console.error("notify cancellation_scheduled failed:", err);
+    }
     return { ok: true };
   });
 
