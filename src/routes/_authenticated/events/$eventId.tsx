@@ -377,6 +377,24 @@ function EventDetail() {
     setPickerOpen(true);
   }
 
+  // Auto-open the convocation picker when arriving from event creation with ?send=1
+  useEffect(() => {
+    if (autoSendConsumed) return;
+    if (search.send !== 1) return;
+    if (!isCoach) return;
+    if (!event || (event as any).convocations_sent) return;
+    if (!teamPlayers) return;
+    setAutoSendConsumed(true);
+    openPicker();
+    navigate({
+      to: "/events/$eventId",
+      params: { eventId },
+      search: {} as any,
+      replace: true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.send, isCoach, event, teamPlayers, autoSendConsumed]);
+
   async function sendConvocations() {
     if (!event || !user) return;
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
