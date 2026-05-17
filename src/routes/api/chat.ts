@@ -584,6 +584,7 @@ export const Route = createFileRoute("/api/chat")({
               };
             },
           }),
+        };
 
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
