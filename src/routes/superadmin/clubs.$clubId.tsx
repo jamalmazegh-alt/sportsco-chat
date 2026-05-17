@@ -17,12 +17,32 @@ function ClubDetail() {
   const { clubId } = Route.useParams();
   const [data, setData] = useState<Awaited<ReturnType<typeof getClubDetail>> | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
+    setErr(null);
     getClubDetail({ data: { club_id: clubId } })
       .then(setData)
       .catch((e) => setErr(e instanceof Error ? e.message : "Failed"));
   }, [clubId]);
+
+  useEffect(refresh, [refresh]);
+
+  const runArchive = async (archive: boolean) => {
+    const label = archive ? "Archive club" : "Restore club";
+    if (!window.confirm(`${label} — are you sure?`)) return;
+    setBusy(true);
+    try {
+      if (archive) await archiveClub({ data: { club_id: clubId } });
+      else await unarchiveClub({ data: { club_id: clubId } });
+      toast.success(`${label} done`);
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   if (err) return <div className="p-8 text-sm text-destructive">{err}</div>;
   if (!data)
@@ -34,6 +54,7 @@ function ClubDetail() {
 
   const { club, subscription, teams, members } = data;
   if (!club) return <div className="p-8 text-sm">Club not found.</div>;
+  const archived = Boolean((club as { archived_at?: string | null }).archived_at);
 
   return (
     <div className="p-6 md:p-8 max-w-5xl">
@@ -43,9 +64,30 @@ function ClubDetail() {
       >
         <ArrowLeft className="h-3.5 w-3.5" /> All clubs
       </Link>
-      <header className="mb-6">
-        <h1 className="text-xl font-semibold">{club.name}</h1>
-        <div className="text-[11px] font-mono text-muted-foreground mt-0.5">{club.id}</div>
+      <header className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-semibold flex items-center gap-2">
+            {club.name}
+            {archived && (
+              <span className="rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-xs">
+                Archived
+              </span>
+            )}
+          </h1>
+          <div className="text-[11px] font-mono text-muted-foreground mt-0.5">{club.id}</div>
+        </div>
+        <Button
+          size="sm"
+          variant={archived ? "outline" : "destructive"}
+          disabled={busy}
+          onClick={() => runArchive(!archived)}
+        >
+          {archived ? (
+            <><ArchiveRestore className="h-4 w-4 mr-1.5" /> Restore</>
+          ) : (
+            <><Archive className="h-4 w-4 mr-1.5" /> Archive</>
+          )}
+        </Button>
       </header>
 
       <section className="grid md:grid-cols-2 gap-4 mb-6">
