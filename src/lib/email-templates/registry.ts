@@ -33,6 +33,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'player-invite': playerInviteTemplate,
   'convocation-response': convocationResponseTemplate,
   'convocation-invite': convocationInviteTemplate,
+  'convocation-cancelled': convocationCancelledTemplate,
   'subscription-admin-notification': subscriptionAdminNotificationTemplate,
   'event-cancelled': eventCancelledTemplate,
   'event-rescheduled': eventRescheduledTemplate,
