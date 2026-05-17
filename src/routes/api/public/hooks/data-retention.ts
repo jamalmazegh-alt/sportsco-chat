@@ -71,14 +71,14 @@ export const Route = createFileRoute("/api/public/hooks/data-retention")({
           });
         }
 
-        // account_deletion_requests completed : keep 30 days post-completion
+        // account_deletion_requests completed : keep 30 days post-processing
         {
           const cutoff = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
           const { count, error } = await supabaseAdmin
             .from("account_deletion_requests")
             .delete({ count: "exact" })
             .eq("status", "completed")
-            .lt("completed_at", cutoff);
+            .lt("processed_at", cutoff);
           results.push({
             table: "account_deletion_requests",
             deleted: count ?? 0,
