@@ -107,7 +107,7 @@ function HomePage() {
 
       const now = new Date();
       return (data ?? [])
-        .filter((c: any) => c.event && c.event.status === "published" && new Date(c.event.starts_at) >= now)
+        .filter((c: any) => c.event && new Date(c.event.starts_at) >= now)
         .map((c: any) => ({
           ...c.event,
           team_name: (teams ?? []).find((t) => t.id === c.event.team_id)?.name ?? "",
