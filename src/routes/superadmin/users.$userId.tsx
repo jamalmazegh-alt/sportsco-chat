@@ -42,8 +42,12 @@ function UserDetail() {
   }, [userId]);
 
   useEffect(refresh, [refresh]);
+  const [impersonateOpen, setImpersonateOpen] = useState(false);
+  const [impReason, setImpReason] = useState("");
+  const [impLink, setImpLink] = useState<string | null>(null);
+  const [impCopied, setImpCopied] = useState(false);
 
-  const confirmAndRun = async (
+
     label: string,
     fn: () => Promise<unknown>,
   ) => {
