@@ -14,10 +14,10 @@ Tu aides les utilisateurs (joueurs, parents, coaches, dirigeants, admins) à com
 Règles importantes :
 - Réponds toujours dans la langue de l'utilisateur (français par défaut, sinon adapte-toi).
 - Sois concis, chaleureux et précis. Pas de jargon technique inutile.
-- Pour répondre à des questions sur les données personnelles de l'utilisateur (mes prochains événements, mes statistiques, mes enfants, mon équipe), utilise les tools fournis. Ne devine jamais — si tu n'as pas la donnée, dis-le.
-- Si un tool renvoie une liste vide ou un champ "note", explique simplement la situation à l'utilisateur (ex : "tu n'as pas de joueur lié à ton compte, donc il n'y a pas de stats de présence à afficher pour toi"). Ne dis JAMAIS "non autorisé", "unauthorized", "accès refusé" ou "erreur" dans ce cas — il s'agit simplement d'une absence de données pertinentes pour ce profil (ex : un dirigeant qui n'est pas joueur n'a pas de stats personnelles).
-- Tu peux expliquer les fonctionnalités : convocations (présent/absent/incertain, avec motif), partage de convocations sur WhatsApp en 1 clic (mode hybride : Clubero structure, WhatsApp diffuse — les réponses restent suivies dans l'app, le groupe WhatsApp existant continue à vivre normalement), mur du club avec @mentions, posts épinglés, accusés de lecture ("Lu par X/Y") et pièces jointes, chat d'événement temps réel, résultats de matchs avec score et stats joueurs adaptées au sport (buts, essais, arrêts, paniers à 3 pts, etc.), statistiques de présence aux entraînements, recherche globale instantanée (Cmd/Ctrl + K) sur joueurs/équipes/événements, exports CSV (effectif d'équipe, présences d'un événement), corbeille avec restauration sous 7 jours après suppression, notifications dans l'app (cloche), par email et via WhatsApp (canal au choix du club), codes d'invitation et liens magiques pour faire entrer les membres, gestion des équipes multi-saisons, rôles (joueur, parent, coach, dirigeant, admin), assistant IA intégré (moi-même) connecté aux données du club avec respect des rôles, confidentialité (export et suppression de données), consentements (RGPD, droit à l'image pour les mineurs).
-- Mode hybride WhatsApp : Clubero ne remplace pas WhatsApp, il s'ajoute par-dessus. Le coach prépare la convocation dans Clubero, clique "Partager sur WhatsApp", choisit son groupe — le message formaté part avec le lien de réponse. Pas besoin de WhatsApp Business API, pas d'envoi automatique côté serveur.
+- Pour répondre à des questions sur les données, utilise les tools fournis. Ne devine jamais — si tu n'as pas la donnée, dis-le.
+- Si un tool renvoie une liste vide ou un champ "note", explique simplement la situation à l'utilisateur (ex : "tu n'as pas de joueur lié à ton compte, donc il n'y a pas de stats de présence à afficher pour toi"). Ne dis JAMAIS "non autorisé", "unauthorized", "accès refusé" ou "erreur" dans ce cas — il s'agit simplement d'une absence de données pertinentes pour ce profil.
+- Pour les coachs/admins : tu peux lister les joueurs qui n'ont pas encore répondu à une convocation avec \`getPendingResponsesForCoach\`. Si l'utilisateur te demande de relancer ces joueurs, **demande TOUJOURS confirmation explicite avant d'appeler \`sendConvocationReminders\`** ("Veux-tu que je leur envoie un rappel ?"). N'appelle ce tool qu'après un "oui" clair. Pour joueurs/parents qui te demandent de relancer un coach, redirige vers le contact direct du coach.
+- Tu peux expliquer les fonctionnalités : convocations (présent/absent/incertain, avec motif), partage de convocations sur WhatsApp en 1 clic (option : Clubero structure, WhatsApp diffuse — les réponses restent suivies dans l'app), mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes, chat d'événement temps réel, résultats de matchs avec stats joueurs par sport, statistiques de présence, recherche globale (Cmd/Ctrl + K), exports CSV, corbeille 7 jours, notifications in-app/email/WhatsApp, codes d'invitation, gestion multi-saisons, rôles, RGPD/droit à l'image.
 - Si la question est hors-sujet (politique, conseils médicaux, etc.), redirige poliment vers le sujet de l'app.
 - Format : utilise Markdown (listes, gras) pour la lisibilité, mais reste bref.`;
 
@@ -224,6 +224,178 @@ export const Route = createFileRoute("/api/chat")({
                   author: p.author?.full_name ?? "—",
                   created_at: p.created_at,
                 })),
+              };
+            },
+          }),
+
+          getPendingResponsesForCoach: tool({
+            description:
+              "Pour coachs/admins uniquement : liste les événements à venir des équipes que l'utilisateur encadre, avec les joueurs convoqués qui n'ont PAS encore répondu (statut 'pending'). Permet de répondre à 'Qui n'a pas répondu pour samedi ?', 'Qui manque samedi ?', etc. Si l'utilisateur n'est ni coach ni admin, retourne une liste vide.",
+            inputSchema: z.object({
+              daysAhead: z.number().int().min(1).max(60).optional(),
+            }),
+            execute: async ({ daysAhead = 14 }) => {
+              // Find teams where user is coach/admin
+              const { data: tm } = await supabase
+                .from("team_members")
+                .select("team_id, role, team:team_id(id, name)")
+                .eq("user_id", userId)
+                .in("role", ["coach", "admin"]);
+              const teamIds = (tm ?? []).map((t: any) => t.team_id);
+              if (teamIds.length === 0) {
+                return {
+                  events: [],
+                  note: "L'utilisateur n'encadre aucune équipe en tant que coach ou admin — cet outil ne s'applique pas à son profil.",
+                };
+              }
+              const now = new Date();
+              const horizon = new Date(now.getTime() + daysAhead * 86400000);
+              const { data: events } = await supabase
+                .from("events")
+                .select("id, title, type, starts_at, opponent, team_id, team:team_id(name)")
+                .in("team_id", teamIds)
+                .eq("status", "published")
+                .gte("starts_at", now.toISOString())
+                .lte("starts_at", horizon.toISOString())
+                .order("starts_at", { ascending: true });
+              const eventIds = (events ?? []).map((e: any) => e.id);
+              if (eventIds.length === 0) return { events: [] };
+              const { data: pending } = await supabase
+                .from("convocations")
+                .select("id, event_id, player_id, players:player_id(first_name, last_name)")
+                .in("event_id", eventIds)
+                .eq("status", "pending");
+              const byEvent = new Map<string, any[]>();
+              for (const c of pending ?? []) {
+                const p: any = (c as any).players ?? {};
+                const arr = byEvent.get(c.event_id) ?? [];
+                arr.push({
+                  convocation_id: c.id,
+                  player_id: c.player_id,
+                  player_name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "—",
+                });
+                byEvent.set(c.event_id, arr);
+              }
+              return {
+                events: (events ?? []).map((e: any) => ({
+                  event_id: e.id,
+                  title: e.title,
+                  type: e.type,
+                  starts_at: e.starts_at,
+                  opponent: e.opponent,
+                  team: e.team?.name,
+                  pending_players: byEvent.get(e.id) ?? [],
+                  pending_count: (byEvent.get(e.id) ?? []).length,
+                })),
+              };
+            },
+          }),
+
+          sendConvocationReminders: tool({
+            description:
+              "Pour coachs/admins uniquement : envoie un rappel in-app aux joueurs/parents qui n'ont pas encore répondu à un événement donné. **N'utilise ce tool QU'APRÈS avoir demandé une confirmation explicite à l'utilisateur** (ex : 'Veux-tu que je leur envoie un rappel ?' → 'Oui'). Évite les doublons : ne relance pas un joueur déjà relancé dans les 30 dernières minutes. Retourne le nombre de rappels envoyés.",
+            inputSchema: z.object({
+              eventId: z.string().uuid().describe("ID de l'événement obtenu via getPendingResponsesForCoach"),
+              playerIds: z
+                .array(z.string().uuid())
+                .optional()
+                .describe("Optionnel : restreindre aux joueurs précis. Sinon, tous les pending de l'événement."),
+            }),
+            execute: async ({ eventId, playerIds }) => {
+              // Permission check: user must coach/admin the team of this event
+              const { data: ev } = await supabase
+                .from("events")
+                .select("id, title, team_id")
+                .eq("id", eventId)
+                .maybeSingle();
+              if (!ev) return { sent: 0, note: "Événement introuvable." };
+              const { data: membership } = await supabase
+                .from("team_members")
+                .select("role")
+                .eq("user_id", userId)
+                .eq("team_id", ev.team_id)
+                .in("role", ["coach", "admin"])
+                .maybeSingle();
+              if (!membership) {
+                return {
+                  sent: 0,
+                  note: "L'utilisateur n'est pas coach/admin de cette équipe — relance refusée.",
+                };
+              }
+
+              // Get pending convocations for this event
+              let q = supabase
+                .from("convocations")
+                .select("id, player_id")
+                .eq("event_id", eventId)
+                .eq("status", "pending");
+              if (playerIds && playerIds.length > 0) {
+                q = q.in("player_id", playerIds);
+              }
+              const { data: convs } = await q;
+              if (!convs || convs.length === 0) return { sent: 0, note: "Aucun joueur en attente." };
+
+              let sent = 0;
+              const skipped: string[] = [];
+              for (const c of convs) {
+                // Anti-spam: skip if reminded in last 30 min
+                const { data: recent } = await supabase
+                  .from("reminders")
+                  .select("sent_at")
+                  .eq("convocation_id", c.id)
+                  .order("sent_at", { ascending: false })
+                  .limit(1);
+                if (
+                  recent &&
+                  recent[0] &&
+                  Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000
+                ) {
+                  skipped.push(c.player_id);
+                  continue;
+                }
+                // Recipients: the player + parents
+                const [{ data: parents }, { data: playerRow }] = await Promise.all([
+                  supabase
+                    .from("player_parents")
+                    .select("parent_user_id")
+                    .eq("player_id", c.player_id),
+                  supabase
+                    .from("players")
+                    .select("user_id")
+                    .eq("id", c.player_id)
+                    .maybeSingle(),
+                ]);
+                const recipients = Array.from(
+                  new Set([
+                    ...(playerRow?.user_id ? [playerRow.user_id] : []),
+                    ...((parents ?? [])
+                      .map((p: any) => p.parent_user_id)
+                      .filter(Boolean) as string[]),
+                  ])
+                );
+                await supabase
+                  .from("reminders")
+                  .insert({ convocation_id: c.id, channel: "in_app", sent_by: userId });
+                if (recipients.length > 0) {
+                  await supabase.from("notifications").insert(
+                    recipients.map((uid) => ({
+                      user_id: uid,
+                      type: "reminder",
+                      title: ev.title,
+                      body: "Merci de confirmer ta présence.",
+                      link: `/events/${eventId}`,
+                    }))
+                  );
+                }
+                sent += 1;
+              }
+              return {
+                sent,
+                skipped_recently_reminded: skipped.length,
+                note:
+                  sent === 0
+                    ? "Aucun rappel envoyé (tous les joueurs viennent d'être relancés)."
+                    : `${sent} rappel(s) envoyé(s) avec succès.`,
               };
             },
           }),
