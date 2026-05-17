@@ -385,8 +385,14 @@ function EventsPage() {
           <button
             type="button"
             onClick={() => setShowPast((s) => !s)}
-            className="text-xs font-medium text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+              showPast
+                ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+            )}
           >
+            {showPast ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
           </button>
         )}
