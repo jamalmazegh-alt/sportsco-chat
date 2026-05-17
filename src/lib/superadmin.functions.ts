@@ -27,12 +27,14 @@ async function logAction(opts: {
   metadata?: Record<string, unknown>;
 }) {
   try {
-    const params: Record<string, unknown> = { _action: opts.action };
-    if (opts.target_type) params._target_type = opts.target_type;
-    if (opts.target_id) params._target_id = opts.target_id;
-    if (opts.club_id) params._club_id = opts.club_id;
-    if (opts.metadata) params._metadata = opts.metadata;
-    await supabaseAdmin.rpc("log_superadmin_action", params as never);
+    await supabaseAdmin.from("superadmin_audit_logs").insert({
+      actor_user_id: opts.actor,
+      action: opts.action,
+      target_type: opts.target_type ?? null,
+      target_id: opts.target_id ?? null,
+      club_id: opts.club_id ?? null,
+      metadata: opts.metadata ?? null,
+    });
   } catch (err) {
     console.error("[superadmin] audit log failed", err);
   }
