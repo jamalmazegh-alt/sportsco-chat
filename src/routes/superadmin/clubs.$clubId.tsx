@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   getClubDetailExtended,
+  getClubFinancials,
   archiveClub,
   unarchiveClub,
 } from "@/lib/superadmin.functions";
@@ -15,9 +16,12 @@ import {
   Calendar,
   Users,
   Trophy,
+  Receipt,
+  CreditCard,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { StatusBadge, subTone, roleTone, Avatar, trialCountdown } from "@/lib/superadmin/ui";
+import { StatusBadge, subTone, roleTone, Avatar, trialCountdown, formatMoney } from "@/lib/superadmin/ui";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
