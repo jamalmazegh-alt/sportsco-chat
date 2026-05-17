@@ -326,6 +326,12 @@ function PrivacyPage() {
           ))}
         </div>
       </section>
+
+      <LegalDialog
+        open={!!legalKind}
+        onOpenChange={(o) => !o && setLegalKind(null)}
+        kind={legalKind}
+      />
     </div>
   );
 }
