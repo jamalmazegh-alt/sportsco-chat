@@ -1274,6 +1274,16 @@ function EventDetail() {
               {t("attendance.addMorePlayers")}
             </Button>
           )}
+          <Button
+            onClick={() => setResendOpen(true)}
+            variant={convocChanges.length > 0 ? "default" : "outline"}
+            className="w-full h-10"
+          >
+            <Send className="h-4 w-4" />
+            {convocChanges.length > 0
+              ? `Renvoyer (mise à jour · ${convocChanges.length})`
+              : "Renvoyer la convocation"}
+          </Button>
         </div>
       )}
 
