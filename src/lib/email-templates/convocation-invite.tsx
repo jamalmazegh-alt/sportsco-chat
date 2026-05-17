@@ -25,6 +25,8 @@ interface Props {
   respondUrl: string; // base url for /r/<token>
   isReminder?: boolean;
   reminderHoursBefore?: number;
+  isUpdate?: boolean;
+  changes?: Array<{ label: string; previous?: string; current?: string }>;
 }
 
 const ConvocationInviteEmail = ({
