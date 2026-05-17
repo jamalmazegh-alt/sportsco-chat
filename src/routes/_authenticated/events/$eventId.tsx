@@ -317,7 +317,7 @@ function EventDetail() {
         ...playerUserIds,
       ])
     );
-    if (recipients.length > 0) {
+    if (useInApp && recipients.length > 0) {
       const { error: notificationError } = await supabase.from("notifications").insert(
         recipients.map((uid) => ({
           user_id: uid,
