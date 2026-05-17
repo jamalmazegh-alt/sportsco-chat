@@ -150,6 +150,8 @@
     "viewTeams": "Voir les équipes",
     "respondNow": "Répondre",
     "myConvocations": "Vos convocations",
+    "childConvocations": "Convocations de {{name}}",
+    "childrenConvocations": "Convocations des enfants",
     "noConvocations": "Tout est à jour.",
     "viewAll": "Voir tout",
     "myStats": "Mes statistiques de présence",
