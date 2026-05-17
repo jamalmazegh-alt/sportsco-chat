@@ -949,6 +949,45 @@ export type Database = {
         }
         Relationships: []
       }
+      superadmin_audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string
+          club_id: string | null
+          created_at: string
+          id: string
+          ip: string | null
+          metadata: Json | null
+          target_id: string | null
+          target_type: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -1306,6 +1345,7 @@ export type Database = {
           used: boolean
         }[]
       }
+      get_platform_stats: { Args: never; Returns: Json }
       has_club_role: {
         Args: {
           _club_id: string
@@ -1326,6 +1366,18 @@ export type Database = {
       is_team_coach: {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
+      }
+      log_superadmin_action: {
+        Args: {
+          _action: string
+          _club_id?: string
+          _ip?: string
+          _metadata?: Json
+          _target_id?: string
+          _target_type?: string
+          _user_agent?: string
+        }
+        Returns: string
       }
       move_to_dlq: {
         Args: {

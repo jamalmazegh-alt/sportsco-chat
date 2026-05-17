@@ -1,90 +1,77 @@
-# Match scoring & stats par sport (V1)
+## Contexte
 
-Objectif : adapter la saisie de score et de stats joueurs au sport de l'équipe, en restant volontairement simple. Sports supportés : football, futsal, basketball, rugby, handball, volleyball, ice_hockey.
+Le projet a déjà :
+- une table `super_admins` + fonction `has_super_admin(uuid)`
+- une table `audit_logs` (par club)
+- un espace `/admin` réservé aux **club admins** (à ne pas confondre)
 
----
+Il n'y a aucune UI super admin pour l'instant. Le chantier complet est énorme — je propose de le découper en 4 phases livrables indépendamment. Tu valides phase par phase.
 
-## 1. Sport config (front, pas de table)
+## Découpage proposé
 
-Nouveau fichier `src/lib/sport-config.ts` qui exporte, par clé sport :
+### Phase 1 — Fondations sécurité (à faire en premier)
+- Nouvelle route racine `/superadmin/*` (séparée de `/admin` qui reste pour les club admins)
+- Layout `_superadmin.tsx` avec `beforeLoad` qui vérifie `has_super_admin` — sinon 404 (pas redirect, pour ne pas révéler l'existence)
+- Server functions dédiées (`src/lib/superadmin.functions.ts`) avec middleware qui re-vérifie le rôle côté serveur sur chaque appel
+- Table `superadmin_audit_logs` (séparée de `audit_logs` qui est scopée par club) — chaque action sensible journalisée
+- Navigation latérale interne (Dashboard / Clubs / Users / Billing / Logs / Support / Settings)
+- Design "operational SaaS" (sidebar dense, monospace pour IDs, badges de statut)
 
-- `scoreLabel` : `goals` | `points` | `sets`
-- `statKinds` : sous-ensemble de `goal | assist | try | point | yellow_card | red_card | foul | penalty`
-- `assistsEnabled`, `cardsEnabled`, `setScoresEnabled`, `minuteEnabled`
-- `defaultStatKind` (ce qui s'ajoute en 1 clic)
+### Phase 2 — Dashboard + Clubs + Users (lecture seule)
+- **Dashboard** : compteurs (clubs total/actifs, users, abonnements actifs/trial, expirations 7j, events, convocations envoyées), feed d'activité récente
+- **Clubs** : liste paginée + recherche + filtres (statut sub, pays plus tard, date création), détail club (owner/admins, équipes, sub Stripe, settings en lecture)
+- **Users** : recherche globale (email/nom/téléphone), filtre par rôle, détail user (clubs liés, joueurs liés, dernière connexion)
+- **Billing** : vue agrégée des subscriptions Stripe (statut, plan, trial_end, current_period_end, cancel_at)
 
-Mapping :
+### Phase 3 — Actions sensibles
+- Désactiver / réactiver un user (via Supabase Admin API)
+- Archiver un club (soft delete)
+- Reset password link pour un user
+- Chaque action → entrée dans `superadmin_audit_logs`
 
-| Sport       | Score | Stats joueur                                |
-|-------------|-------|---------------------------------------------|
-| football    | goals | goal, assist, yellow_card, red_card         |
-| futsal      | goals | goal, assist, yellow_card, red_card         |
-| basketball  | points| point, assist, foul                         |
-| rugby       | points| try, yellow_card, red_card                  |
-| handball    | goals | goal, yellow_card, red_card (assist opt.)   |
-| volleyball  | sets  | point (+ set scores)                        |
-| ice_hockey  | goals | goal, assist, penalty                       |
+### Phase 4 — Impersonation + Logs + Support
+- **Impersonation** : génération d'un magic link scoped au club (ou JWT court côté server) qui ouvre l'app en tant que club admin
+  - Bannière rouge fixe "🛡️ Mode impersonation — Sortir" visible partout
+  - Session impersonation expire en 1h
+  - Log entrée/sortie + toutes les actions effectuées
+- **Activity Logs** : visualisation des `superadmin_audit_logs` + `audit_logs` clubs, filtrable
+- **Support tools** : depuis le détail club, raccourcis vers events / convocations / wall (lecture seule via impersonation read-only)
 
-Tout sport non listé tombe en mode "score only" (home/away + notes).
+## Détails techniques
 
----
+**Routes** : `/superadmin`, `/superadmin/clubs`, `/superadmin/clubs/$clubId`, `/superadmin/users`, `/superadmin/users/$userId`, `/superadmin/billing`, `/superadmin/logs`, `/superadmin/settings`.
 
-## 2. Migration DB
+**Sécurité multicouches** :
+1. `beforeLoad` route : `has_super_admin` check → 404 si non
+2. Middleware server-fn `requireSuperAdmin` : re-check côté serveur, sinon 403 + log de tentative
+3. RLS : les server functions utilisent `supabaseAdmin` (service role) pour bypasser RLS quand nécessaire (lecture cross-club), mais chaque handler vérifie d'abord le rôle
+4. Impersonation : token JWT signé serveur avec `sub=target_user_id` + `impersonator_id` + exp 1h, stocké en cookie httpOnly
 
-Renommer/élargir le modèle existant pour rester générique :
+**Audit log** :
+```sql
+create table superadmin_audit_logs (
+  id uuid pk,
+  actor_user_id uuid not null,  -- le super admin
+  action text not null,         -- 'impersonate_start', 'disable_user', etc.
+  target_type text,             -- 'user' | 'club' | 'subscription'
+  target_id uuid,
+  club_id uuid,                 -- contexte si pertinent
+  metadata jsonb,
+  ip text, user_agent text,
+  created_at timestamptz
+);
+-- RLS: lecture super admin uniquement, insert via security definer fn
+```
 
-- `match_results` : ajouter `score_details JSONB NULL` (utilisé pour les sets de volley : `{ "sets": [[25,22],[23,25],…] }`).
-- `event_goals` → garder le nom (déjà des données) mais :
-  - élargir la contrainte `kind` pour accepter : `goal`, `own_goal`, `penalty`, `assist`, `try`, `point`, `yellow_card`, `red_card`, `foul`.
-  - rendre `assist_player_id` toujours nullable (déjà le cas).
-  - garder `minute` nullable.
-  - Pas de renommage de table pour préserver les données.
+**Design** : sidebar fixe gauche fond `--surface-muted`, header compact avec ID projet + env, tableaux denses avec colonnes triables, status pills monochromes (green/yellow/red), font mono pour UUIDs tronqués.
 
-RLS inchangée (déjà coach-write / view-team-read).
+## Hors scope (à confirmer)
 
----
+- Pas de modification structurelle des données clubs (juste lecture/archive)
+- Pas de remboursement Stripe direct (juste affichage — geste manuel via Stripe dashboard)
+- Pas de gestion multi-org/team interne CLUBERO (1 niveau de super admin pour V1)
+- Pas de 2FA spécifique super admin pour V1 (à ajouter en phase 5 si besoin)
 
-## 3. UI : `MatchResultCard`
+## Question avant de coder
 
-Refactor `src/components/match-result-card.tsx` :
-
-- Récupère le `sport` de l'équipe via `teams.sport`.
-- Résout `cfg = getSportConfig(sport)`.
-- Inputs score :
-  - `goals`/`points` → 2 inputs numériques (home/away) + label dynamique.
-  - `sets` (volley) → home/away = sets gagnés + bouton "Ajouter set" qui pousse `[home, away]` dans `score_details.sets[]`. Affichage : `3-2 (25-22, 23-25, 25-20…)`.
-- Liste d'événements joueurs (renommer "Scorers" en "Player events" / `match.playerEvents`) :
-  - Filtrer par `cfg.statKinds`.
-  - Form add : sélecteur `kind` limité à `cfg.statKinds`, sélecteur joueur (convoqués), `assist` masqué si `!cfg.assistsEnabled` ou si kind ∈ cards/foul/penalty, `minute` masqué si `!cfg.minuteEnabled`.
-  - Affichage : icône + couleur selon kind (carton jaune/rouge, but, etc.).
-- Outcome (win/loss/draw) :
-  - sports score-based (goals/points) → comparer scores.
-  - volley → comparer sets gagnés.
-
----
-
-## 4. Stats joueur
-
-`src/components/player-attendance-stats.tsx` (ou son équivalent) :
-
-- Ajouter agrégats par `kind` selon le sport principal du joueur (déduit de l'équipe). Affiche compteurs des kinds pertinents seulement (ex : basketteur → points/assists/fouls ; rugbyman → tries/cards).
-- Calcul côté client à partir de `event_goals` filtré par `scorer_player_id = playerId`.
-
----
-
-## 5. i18n
-
-Ajouter clés FR/EN dans `match.*` et `match.kinds.*` :
-`yellowCard`, `redCard`, `foul`, `try`, `point`, `assist`, `set`, `addSet`, `setsWon`, `playerEvents`, `addEvent`, `kind`, etc.
-
----
-
-## 6. Ordre d'exécution
-
-1. Migration `match_results.score_details` + élargissement contrainte `event_goals.kind`.
-2. `src/lib/sport-config.ts`.
-3. Refactor `MatchResultCard`.
-4. Mise à jour stats joueur.
-5. i18n FR/EN.
-
-Pas d'impact sur l'IA assistant ni sur les autres écrans.
+Tu veux que j'enchaîne **Phase 1 + Phase 2** maintenant (foundations + lecture seule, le plus utile au quotidien), ou tu préfères que je fasse uniquement la **Phase 1** d'abord pour valider l'architecture ?
