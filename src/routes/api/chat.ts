@@ -16,7 +16,7 @@ Règles importantes :
 - Sois concis, chaleureux et précis. Pas de jargon technique inutile.
 - Pour répondre à des questions sur les données, utilise les tools fournis. Ne devine jamais — si tu n'as pas la donnée, dis-le.
 - Si un tool renvoie une liste vide ou un champ "note", explique simplement la situation à l'utilisateur (ex : "tu n'as pas de joueur lié à ton compte, donc il n'y a pas de stats de présence à afficher pour toi"). Ne dis JAMAIS "non autorisé", "unauthorized", "accès refusé" ou "erreur" dans ce cas — il s'agit simplement d'une absence de données pertinentes pour ce profil.
-- Ne propose les outils réservés aux coachs/admins (`getPendingResponsesForCoach`, `sendConvocationReminders`, `createDraftEvent`) que si l'utilisateur est effectivement coach ou admin d'une équipe. Pour un joueur ou un parent, ne mentionne pas ces fonctions et redirige vers le coach.
+- Ne propose les outils réservés aux coachs/admins (\`getPendingResponsesForCoach\`, \`sendConvocationReminders\`, \`createDraftEvent\`) que si l'utilisateur est effectivement coach ou admin d'une équipe, OU admin/dirigeant du club. Pour un joueur ou un parent simple, ne mentionne pas ces fonctions et redirige vers le coach.
 - Pour les coachs/admins : tu peux lister les joueurs qui n'ont pas encore répondu à une convocation avec \`getPendingResponsesForCoach\`. Si l'utilisateur te demande de relancer ces joueurs, **demande TOUJOURS confirmation explicite avant d'appeler \`sendConvocationReminders\`** ("Veux-tu que je leur envoie un rappel ?"). N'appelle ce tool qu'après un "oui" clair. Pour joueurs/parents qui te demandent de relancer un coach, redirige vers le contact direct du coach.
 - Création d'événement (\`createDraftEvent\`, coachs/admins seulement) : avant d'appeler, vérifie que tu as l'équipe, le titre, le type (entraînement / match / tournoi / réunion / autre) et la date/heure précise. Convertis les dates relatives ("samedi prochain 14h30") en ISO complet avec fuseau horaire avant l'appel. **Récapitule ce que tu vas créer et demande une confirmation explicite ("Je crée ce brouillon ?") avant l'appel.** L'événement est créé en BROUILLON — précise ensuite à l'utilisateur qu'il doit l'ouvrir (lien fourni), sélectionner les convoqués et cliquer "Publier" pour envoyer les convocations.
 - Tu peux expliquer les fonctionnalités : convocations (présent/absent/incertain, avec motif), partage de convocations sur WhatsApp en 1 clic (option : Clubero structure, WhatsApp diffuse — les réponses restent suivies dans l'app), mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes, chat d'événement temps réel, résultats de matchs avec stats joueurs par sport, statistiques de présence, recherche globale (Cmd/Ctrl + K), exports CSV, corbeille 7 jours, notifications in-app/email/WhatsApp, codes d'invitation, gestion multi-saisons, rôles, RGPD/droit à l'image.
@@ -63,6 +63,33 @@ export const Route = createFileRoute("/api/chat")({
           const ids = new Set<string>();
           (own ?? []).forEach((p) => ids.add(p.id));
           (parents ?? []).forEach((p) => ids.add(p.player_id));
+          return Array.from(ids);
+        }
+
+        // Helper: list team ids the user can manage (team coach/admin OR club admin/dirigeant)
+        async function getManagedTeamIds(): Promise<string[]> {
+          const [{ data: tm }, { data: cm }] = await Promise.all([
+            supabase
+              .from("team_members")
+              .select("team_id")
+              .eq("user_id", userId)
+              .in("role", ["coach", "admin"]),
+            supabase
+              .from("club_members")
+              .select("club_id, role")
+              .eq("user_id", userId)
+              .in("role", ["admin", "dirigeant"]),
+          ]);
+          const ids = new Set<string>();
+          (tm ?? []).forEach((r: any) => ids.add(r.team_id));
+          const clubIds = (cm ?? []).map((r: any) => r.club_id);
+          if (clubIds.length > 0) {
+            const { data: clubTeams } = await supabase
+              .from("teams")
+              .select("id")
+              .in("club_id", clubIds);
+            (clubTeams ?? []).forEach((t: any) => ids.add(t.id));
+          }
           return Array.from(ids);
         }
 
@@ -237,17 +264,11 @@ export const Route = createFileRoute("/api/chat")({
               daysAhead: z.number().int().min(1).max(60).optional(),
             }),
             execute: async ({ daysAhead = 14 }) => {
-              // Find teams where user is coach/admin
-              const { data: tm } = await supabase
-                .from("team_members")
-                .select("team_id, role, team:team_id(id, name)")
-                .eq("user_id", userId)
-                .in("role", ["coach", "admin"]);
-              const teamIds = (tm ?? []).map((t: any) => t.team_id);
+              const teamIds = await getManagedTeamIds();
               if (teamIds.length === 0) {
                 return {
                   events: [],
-                  note: "L'utilisateur n'encadre aucune équipe en tant que coach ou admin — cet outil ne s'applique pas à son profil.",
+                  note: "L'utilisateur n'encadre aucune équipe (ni comme coach/admin d'équipe, ni comme admin/dirigeant de club) — cet outil ne s'applique pas à son profil.",
                 };
               }
               const now = new Date();
@@ -304,24 +325,17 @@ export const Route = createFileRoute("/api/chat")({
                 .describe("Optionnel : restreindre aux joueurs précis. Sinon, tous les pending de l'événement."),
             }),
             execute: async ({ eventId, playerIds }) => {
-              // Permission check: user must coach/admin the team of this event
               const { data: ev } = await supabase
                 .from("events")
                 .select("id, title, team_id")
                 .eq("id", eventId)
                 .maybeSingle();
               if (!ev) return { sent: 0, note: "Événement introuvable." };
-              const { data: membership } = await supabase
-                .from("team_members")
-                .select("role")
-                .eq("user_id", userId)
-                .eq("team_id", ev.team_id)
-                .in("role", ["coach", "admin"])
-                .maybeSingle();
-              if (!membership) {
+              const managedTeams = await getManagedTeamIds();
+              if (!managedTeams.includes(ev.team_id)) {
                 return {
                   sent: 0,
-                  note: "L'utilisateur n'est pas coach/admin de cette équipe — relance refusée.",
+                  note: "L'utilisateur n'a pas les droits pour relancer sur cette équipe — relance refusée.",
                 };
               }
 
@@ -416,15 +430,16 @@ export const Route = createFileRoute("/api/chat")({
               description: z.string().max(1000).optional(),
             }),
             execute: async ({ teamName, title, type, startsAt, endsAt, location, opponent, description }) => {
-              // Resolve coached teams
-              const { data: tm } = await supabase
-                .from("team_members")
-                .select("team_id, team:team_id(id, name)")
-                .eq("user_id", userId)
-                .in("role", ["coach", "admin"]);
-              const coached = (tm ?? [])
-                .map((t: any) => t.team)
-                .filter(Boolean) as Array<{ id: string; name: string }>;
+              // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
+              const managedTeamIds = await getManagedTeamIds();
+              let coached: Array<{ id: string; name: string }> = [];
+              if (managedTeamIds.length > 0) {
+                const { data: teamRows } = await supabase
+                  .from("teams")
+                  .select("id, name")
+                  .in("id", managedTeamIds);
+                coached = (teamRows ?? []) as Array<{ id: string; name: string }>;
+              }
               if (coached.length === 0) {
                 return {
                   created: false,
