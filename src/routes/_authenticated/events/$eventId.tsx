@@ -37,6 +37,69 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
+const CONVOC_SNAPSHOT_FIELDS = [
+  "title",
+  "description",
+  "starts_at",
+  "ends_at",
+  "convocation_time",
+  "location",
+  "meeting_point",
+  "competition_name",
+  "type",
+] as const;
+
+function buildConvocSnapshot(ev: any): Record<string, any> {
+  const snap: Record<string, any> = {};
+  for (const k of CONVOC_SNAPSHOT_FIELDS) snap[k] = ev?.[k] ?? null;
+  return snap;
+}
+
+function formatSnapshotValue(field: string, value: any, t: (k: string) => string): string | undefined {
+  if (value == null || value === "") return undefined;
+  if (field === "starts_at" || field === "ends_at" || field === "convocation_time") {
+    try {
+      return fmt(value, "EEEE d MMMM 'à' HH'h'mm");
+    } catch {
+      return String(value);
+    }
+  }
+  if (field === "type") {
+    return t(`events.types.${value}`) || String(value);
+  }
+  return String(value);
+}
+
+function diffSnapshot(prev: Record<string, any> | null | undefined, current: any, t: (k: string) => string): Array<{ field: string; label: string; previous?: string; current?: string }> {
+  if (!prev) return [];
+  const labels: Record<string, string> = {
+    title: "Titre",
+    description: "Description",
+    starts_at: "Date / heure",
+    ends_at: "Fin",
+    convocation_time: "Heure de RDV",
+    location: "Lieu",
+    meeting_point: "Point de RDV",
+    competition_name: "Compétition",
+    type: "Type",
+  };
+  const out: Array<{ field: string; label: string; previous?: string; current?: string }> = [];
+  for (const k of CONVOC_SNAPSHOT_FIELDS) {
+    const a = prev[k] ?? null;
+    const b = current?.[k] ?? null;
+    if ((a ?? "") !== (b ?? "")) {
+      out.push({
+        field: k,
+        label: labels[k] ?? k,
+        previous: formatSnapshotValue(k, a, t),
+        current: formatSnapshotValue(k, b, t),
+      });
+    }
+  }
+  return out;
+}
+
+
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   component: EventDetail,
 });
@@ -65,13 +128,15 @@ function EventDetail() {
   const [rescheduleNewDate, setRescheduleNewDate] = useState("");
   const [rescheduleReason, setRescheduleReason] = useState("");
   const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
+  const [resendOpen, setResendOpen] = useState(false);
+  const [resendSubmitting, setResendSubmitting] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments, cancellation_reason, cancelled_at")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at")
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -96,7 +161,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
-        .select("id, status, comment, player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
+        .select("id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email)")
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
@@ -489,13 +554,23 @@ function EventDetail() {
       // best-effort: in-app notif already sent
     }
 
+    // Save snapshot of values just sent so we can diff later for "resend with changes"
+    const snapshot = buildConvocSnapshot(event);
     if (!event.convocations_sent) {
-      const { error: sentError } = await supabase.from("events").update({ convocations_sent: true }).eq("id", event.id);
+      const { error: sentError } = await supabase
+        .from("events")
+        .update({ convocations_sent: true, convocation_sent_snapshot: snapshot, convocation_last_sent_at: new Date().toISOString() })
+        .eq("id", event.id);
       if (sentError) {
         setSending(false);
         toast.error(sentError.message);
         return;
       }
+    } else {
+      await supabase
+        .from("events")
+        .update({ convocation_sent_snapshot: snapshot, convocation_last_sent_at: new Date().toISOString() })
+        .eq("id", event.id);
     }
 
     // WhatsApp convocation: the coach shares via the WhatsApp card below
@@ -867,6 +942,131 @@ function EventDetail() {
     qc.invalidateQueries({ queryKey: ["events"] });
   }
 
+  async function resendConvocations() {
+    if (!event || !user) return;
+    if (!convocations || convocations.length === 0) {
+      toast.error("Aucune convocation à renvoyer");
+      return;
+    }
+    const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
+    setResendSubmitting(true);
+    try {
+      const playerIds = convocations.map((c: any) => c.player_id);
+      const { data: parents } = await supabase
+        .from("player_parents")
+        .select("parent_user_id, email, full_name, player_id")
+        .in("player_id", playerIds);
+
+      const { data: clubRow } = await supabase
+        .from("teams")
+        .select("name, clubs:club_id(name, logo_url)")
+        .eq("id", event.team_id)
+        .maybeSingle();
+      const teamName = (clubRow as any)?.name as string | undefined;
+      const clubName = (clubRow as any)?.clubs?.name as string | undefined;
+      const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+      const competitionLabel = (event as any).competition_name
+        || ((event as any).competition_type
+          ? t(`events.competitionTypes.${(event as any).competition_type}`)
+          : undefined);
+      const locationMapsUrl = event.location
+        ? ((event as any).location_url ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
+        : undefined;
+      const meetingPointMapsUrl = (event as any).meeting_point
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
+        : undefined;
+
+      const squadList = (convocations as any[])
+        .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
+        .filter(Boolean);
+
+      const idemBase = Date.now();
+      const sendOne = (token: string, toEmail: string, recipientFirstName: string | undefined, playerName: string, idemSuffix: string) =>
+        sendTransactionalEmail({
+          templateName: "convocation-invite",
+          recipientEmail: toEmail,
+          fromName: `${clubName ?? "Clubero"} via Clubero`,
+          idempotencyKey: `convoc-update-${event.id}-${idemBase}-${idemSuffix}`,
+          templateData: {
+            recipientFirstName,
+            playerName,
+            eventTitle: event.title,
+            eventType: event.type,
+            eventDate: eventDateLabel,
+            eventDescription: (event as any).description ?? undefined,
+            convocationTime: (event as any).convocation_time
+              ? fmt((event as any).convocation_time, "EEEE d MMMM 'à' HH'h'mm")
+              : undefined,
+            eventLocation: event.location ?? undefined,
+            locationMapsUrl,
+            meetingPoint: (event as any).meeting_point ?? undefined,
+            meetingPointMapsUrl,
+            competitionName: competitionLabel,
+            squadList,
+            teamName,
+            clubName,
+            clubLogoUrl,
+            respondUrl: `${origin}/r/${token}`,
+            isUpdate: true,
+            changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
+          },
+        }).catch(() => undefined);
+
+      const sends: Promise<unknown>[] = [];
+      const inAppRecipients = new Set<string>();
+      for (const c of convocations as any[]) {
+        if (!c.response_token) continue;
+        const player = c.players;
+        const playerName = `${player?.first_name ?? ""} ${player?.last_name ?? ""}`.trim();
+        if (player?.email) {
+          sends.push(sendOne(c.response_token, player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+        }
+        if (player?.user_id) inAppRecipients.add(player.user_id);
+        for (const parent of (parents ?? []).filter((p: any) => p.player_id === c.player_id)) {
+          if (parent.email) {
+            const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+            sends.push(sendOne(c.response_token, parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+          }
+          if (parent.parent_user_id) inAppRecipients.add(parent.parent_user_id);
+        }
+      }
+      if (inAppRecipients.size > 0) {
+        await supabase.from("notifications").insert(
+          Array.from(inAppRecipients).map((uid) => ({
+            user_id: uid,
+            type: "convocation",
+            title: `🔄 ${event.title}`,
+            body: changes.length > 0
+              ? `Convocation mise à jour : ${changes.map((ch) => ch.label).join(", ")}`
+              : "Convocation renvoyée",
+            link: `/events/${event.id}`,
+          })),
+        );
+      }
+      await Promise.allSettled(sends);
+
+      await supabase
+        .from("events")
+        .update({ convocation_sent_snapshot: buildConvocSnapshot(event), convocation_last_sent_at: new Date().toISOString() })
+        .eq("id", event.id);
+
+      toast.success(`Convocation renvoyée à ${convocations.length} joueur(s)`);
+      setResendOpen(false);
+      refetchEvent();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erreur lors du renvoi");
+    } finally {
+      setResendSubmitting(false);
+    }
+  }
+
+  const convocChanges = useMemo(
+    () => diffSnapshot((event as any)?.convocation_sent_snapshot, event, t),
+    [event, t],
+  );
 
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
@@ -1074,6 +1274,16 @@ function EventDetail() {
               {t("attendance.addMorePlayers")}
             </Button>
           )}
+          <Button
+            onClick={() => setResendOpen(true)}
+            variant={convocChanges.length > 0 ? "default" : "outline"}
+            className="w-full h-10"
+          >
+            <Send className="h-4 w-4" />
+            {convocChanges.length > 0
+              ? `Renvoyer (mise à jour · ${convocChanges.length})`
+              : "Renvoyer la convocation"}
+          </Button>
         </div>
       )}
 
@@ -1287,8 +1497,47 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
+      {/* Resend convocation dialog */}
+      <Dialog open={resendOpen} onOpenChange={(o) => { if (!resendSubmitting) setResendOpen(o); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Renvoyer la convocation</DialogTitle>
+            <DialogDescription>
+              {convocChanges.length > 0
+                ? `${convocChanges.length} modification(s) détectée(s) depuis le dernier envoi. Le mail mettra en évidence les changements.`
+                : "Aucun changement détecté depuis le dernier envoi. La convocation sera tout de même renvoyée à tous les joueurs."}
+            </DialogDescription>
+          </DialogHeader>
+          {convocChanges.length > 0 && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2 max-h-64 overflow-auto">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">Modifications</p>
+              {convocChanges.map((c) => (
+                <div key={c.field} className="text-sm">
+                  <span className="font-medium text-amber-900">{c.label} : </span>
+                  <span className="text-muted-foreground line-through">{c.previous ?? "—"}</span>
+                  {" → "}
+                  <span className="font-semibold text-emerald-700">{c.current ?? "—"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Envoyé à {convocations?.length ?? 0} joueur(s) (+ parents). Les réponses existantes sont conservées.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setResendOpen(false)} disabled={resendSubmitting}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={resendConvocations} disabled={resendSubmitting}>
+              {resendSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              <Send className="h-4 w-4" />
+              Renvoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Player picker dialog */}
+
       <Dialog open={pickerOpen} onOpenChange={(o) => { setPickerOpen(o); if (!o) setPickerStep("select"); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>

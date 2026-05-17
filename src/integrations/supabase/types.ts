@@ -461,6 +461,8 @@ export type Database = {
           cancelled_at: string | null
           competition_name: string | null
           competition_type: string | null
+          convocation_last_sent_at: string | null
+          convocation_sent_snapshot: Json | null
           convocation_time: string | null
           convocations_sent: boolean
           created_at: string
@@ -487,6 +489,8 @@ export type Database = {
           cancelled_at?: string | null
           competition_name?: string | null
           competition_type?: string | null
+          convocation_last_sent_at?: string | null
+          convocation_sent_snapshot?: Json | null
           convocation_time?: string | null
           convocations_sent?: boolean
           created_at?: string
@@ -513,6 +517,8 @@ export type Database = {
           cancelled_at?: string | null
           competition_name?: string | null
           competition_type?: string | null
+          convocation_last_sent_at?: string | null
+          convocation_sent_snapshot?: Json | null
           convocation_time?: string | null
           convocations_sent?: boolean
           created_at?: string
