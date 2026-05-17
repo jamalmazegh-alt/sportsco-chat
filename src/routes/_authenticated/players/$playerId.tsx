@@ -152,6 +152,38 @@ function PlayerProfile() {
   const isSelf = !!player?.user_id && player.user_id === user?.id;
   const canSeePrivate = isCoach || isSelf || isParentOfThisPlayer;
 
+  async function sendChildOnboardingInvite(targetEmail: string) {
+    if (!player || !user) return;
+    const token = crypto.randomUUID().replace(/-/g, "");
+    const { error: invErr } = await supabase.from("member_invites").insert({
+      club_id: player.club_id,
+      created_by: user.id,
+      player_id: player.id,
+      role: "player",
+      token,
+      email: targetEmail,
+    });
+    if (invErr) { toast.error(invErr.message); return; }
+    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+    try {
+      const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", player.club_id).maybeSingle();
+      await sendTransactionalEmail({
+        templateName: "player-invite",
+        recipientEmail: targetEmail,
+        idempotencyKey: `member-invite-${token}`,
+        templateData: {
+          firstName: player.first_name || undefined,
+          clubName: clubRow?.name ?? undefined,
+          clubLogoUrl: clubRow?.logo_url ?? undefined,
+          inviteUrl,
+        },
+      });
+      toast.success(t("players.inviteSent", { defaultValue: "Invitation envoyée" }));
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  }
+
   async function onSave(e: FormEvent) {
     e.preventDefault();
     if (!player) return;
@@ -169,6 +201,10 @@ function PlayerProfile() {
         photo_url = data.publicUrl;
       }
     }
+
+    const prevEmail = (player.email ?? "").toLowerCase().trim();
+    const newEmail = (email ?? "").toLowerCase().trim();
+    const emailChanged = newEmail && newEmail !== prevEmail;
 
     const { error } = await supabase
       .from("players")
@@ -192,10 +228,25 @@ function PlayerProfile() {
     qc.invalidateQueries({ queryKey: ["player", playerId] });
     qc.invalidateQueries({ queryKey: ["team-players"] });
     toast.success(t("common.saved"));
+
+    // If child access is already enabled and the email was added/changed, (re)send onboarding email
+    if (player.child_platform_access && !player.user_id && emailChanged) {
+      await sendChildOnboardingInvite(newEmail);
+    }
   }
 
   async function toggleChildAccess(value: boolean) {
     if (!player) return;
+    if (value) {
+      const target = (email || player.email || "").trim();
+      if (!target) {
+        toast.error(t("players.childAccessNeedsEmail", { defaultValue: "Ajoutez d'abord un email à l'enfant pour activer l'accès." }));
+        return;
+      }
+      if (player.user_id) {
+        // Already linked — just flip flag
+      }
+    }
     const { error } = await supabase
       .from("players")
       .update({ child_platform_access: value })
@@ -206,6 +257,11 @@ function PlayerProfile() {
     }
     refetchPlayer();
     toast.success(t("common.saved"));
+
+    if (value && !player.user_id) {
+      const target = (email || player.email || "").trim();
+      if (target) await sendChildOnboardingInvite(target);
+    }
   }
 
   // ---- Parent form (collapsed) ----
