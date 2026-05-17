@@ -14,7 +14,9 @@ const CONFIRM_TEMPLATE = "inquiry-confirmation";
 
 const InquirySchema = z.object({
   kind: z.enum(["contact", "demo"]),
-  name: z.string().trim().min(1).max(120),
+  firstName: z.string().trim().min(1).max(120).optional().default(""),
+  lastName: z.string().trim().min(1).max(120).optional().default(""),
+  name: z.string().trim().min(1).max(120).optional().default(""),
   email: z.string().trim().email().max(255),
   phone: z.string().trim().max(40).optional().default(""),
   club: z.string().trim().max(160).optional().default(""),

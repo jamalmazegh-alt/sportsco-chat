@@ -39,7 +39,8 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
@@ -55,11 +56,11 @@ function ContactPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "contact", name, email, phone, role, message }),
+        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, message }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setName(""); setEmail(""); setPhone(""); setRole(""); setMessage("");
+      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setMessage("");
       toast.success("Message envoyé. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
@@ -120,15 +121,27 @@ function ContactPage() {
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="c-name">Nom</Label>
+                <Label htmlFor="c-firstName">Prénom</Label>
                 <Input
-                  id="c-name"
+                  id="c-firstName"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Votre prénom"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="c-lastName">Nom</Label>
+                <Input
+                  id="c-lastName"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   placeholder="Votre nom"
                 />
               </div>
+            </div>
+            <div className="mt-4">
               <div className="space-y-1.5">
                 <Label htmlFor="c-email">E-mail</Label>
                 <Input
