@@ -106,7 +106,7 @@ function PlayerProfile() {
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, jersey_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access")
+        .select("id, first_name, last_name, jersey_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status")
         .eq("id", playerId)
         .single();
       return data;
