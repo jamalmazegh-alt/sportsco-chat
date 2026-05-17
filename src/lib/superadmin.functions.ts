@@ -39,7 +39,7 @@ async function logAction(opts: {
       metadata: (opts.metadata ?? null) as never,
     });
   } catch (err) {
-    console.error("[superadmin] audit log failed", err);
+    log.error("audit_log_failed", { err });
   }
 }
 
@@ -1312,7 +1312,7 @@ async function getStripeOverviewCached(): Promise<StripeOverviewCache | null> {
   try {
     return await stripeOverviewInflight;
   } catch (err) {
-    console.error("[superadmin] Stripe overview fetch failed", err);
+    log.error("stripe_overview_failed", { err });
     // Serve stale on failure if we have anything, else null.
     return stripeOverviewCache;
   }
@@ -1400,7 +1400,7 @@ export const getFinanceOverview = createServerFn({ method: "GET" })
         stripe_stale = Date.now() - cached.fetched_at > STRIPE_OVERVIEW_TTL_MS;
       }
     } catch (err) {
-      console.error("[superadmin] Stripe MRR fetch failed", err);
+      log.error("stripe_mrr_failed", { err });
     }
 
     return {
@@ -1521,7 +1521,7 @@ export const getClubFinancials = createServerFn({ method: "POST" })
         }
       }
     } catch (err) {
-      console.error("[superadmin] Stripe customer/invoices fetch failed", err);
+      log.error("stripe_customer_invoices_failed", { err });
     }
 
     return {
