@@ -265,7 +265,7 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
             <TabsTrigger value="attendance">{t("stats.tabAttendance", { defaultValue: "Présences" })}</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="mt-4">
-            <TeamMatchRecord teamId={teamId} />
+            <TeamMatchRecord teamId={teamId} sport={selectedSport} />
           </TabsContent>
           <TabsContent value="players" className="mt-4">
             <TeamPlayersStats teamId={teamId} sport={selectedSport} />
