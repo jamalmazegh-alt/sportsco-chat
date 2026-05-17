@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { searchUsers } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
