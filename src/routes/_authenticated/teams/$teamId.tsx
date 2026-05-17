@@ -60,9 +60,14 @@ function TeamDetail() {
         .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id, email, phone)")
         .eq("team_id", teamId)
         .eq("role", "player");
+      const seen = new Set<string>();
       return (tm ?? [])
         .map((r: any) => r.players)
-        .filter(Boolean)
+        .filter((p: any) => {
+          if (!p || seen.has(p.id)) return false;
+          seen.add(p.id);
+          return true;
+        })
         .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
     },
   });
