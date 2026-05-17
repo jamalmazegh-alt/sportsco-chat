@@ -441,3 +441,190 @@ export const getUserAuthStatus = createServerFn({ method: "POST" })
       created_at: u?.user?.created_at ?? null,
     };
   });
+
+/** Aggregate support snapshot for a user — clubs, teams, players linked. */
+export const getUserSupportSummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    await logAction({
+      actor: context.userId,
+      action: "view_user_support_summary",
+      target_type: "user",
+      target_id: data.user_id,
+    });
+
+    const [{ data: profile }, { data: memberships }, { data: teamRoles }, { data: playerSelf }, { data: parentLinks }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, first_name, last_name, phone, preferred_language, created_at")
+          .eq("id", data.user_id)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("club_members")
+          .select("club_id, role, created_at")
+          .eq("user_id", data.user_id),
+        supabaseAdmin
+          .from("team_members")
+          .select("team_id, role, player_id")
+          .eq("user_id", data.user_id),
+        supabaseAdmin
+          .from("players")
+          .select("id, first_name, last_name, club_id")
+          .eq("user_id", data.user_id),
+        supabaseAdmin
+          .from("player_parents")
+          .select("player_id, can_respond")
+          .eq("parent_user_id", data.user_id),
+      ]);
+
+    const clubIds = Array.from(new Set((memberships ?? []).map((m) => m.club_id)));
+    const { data: clubs } = clubIds.length
+      ? await supabaseAdmin
+          .from("clubs")
+          .select("id, name, archived_at")
+          .in("id", clubIds)
+      : { data: [] as never[] };
+    const clubMap = new Map((clubs ?? []).map((c) => [c.id, c]));
+
+    return {
+      profile: profile ?? null,
+      clubs: (memberships ?? []).map((m) => ({
+        ...m,
+        club: clubMap.get(m.club_id) ?? null,
+      })),
+      team_roles: teamRoles ?? [],
+      player_profiles: playerSelf ?? [],
+      parent_of: parentLinks ?? [],
+    };
+  });
+
+/**
+ * Generate a one-time magic sign-in link as the target user (impersonation).
+ * The super admin opens this link in a private window to access the user's
+ * account for support purposes. A reason is REQUIRED and recorded in the audit log.
+ */
+export const generateImpersonationLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        user_id: z.string().uuid(),
+        reason: z.string().trim().min(10).max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    if (data.user_id === context.userId) {
+      throw new Error("You cannot impersonate yourself.");
+    }
+    // Block impersonation of other super admins
+    const { data: targetSuper } = await supabaseAdmin
+      .from("super_admins")
+      .select("user_id")
+      .eq("user_id", data.user_id)
+      .maybeSingle();
+    if (targetSuper) {
+      throw new Error("Cannot impersonate another super admin.");
+    }
+
+    const { data: u, error: ue } =
+      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    if (ue || !u?.user?.email) {
+      throw new Error("Target user has no email on file.");
+    }
+
+    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "magiclink",
+      email: u.user.email,
+    });
+    if (error) throw new Error(error.message);
+
+    await logAction({
+      actor: context.userId,
+      action: "impersonate_user",
+      target_type: "user",
+      target_id: data.user_id,
+      metadata: { reason: data.reason, email: u.user.email },
+    });
+
+    return {
+      email: u.user.email,
+      action_link: link.properties?.action_link ?? null,
+      expires_in_seconds: 3600,
+    };
+  });
+
+/** Support snapshot for a club — admins, recent events, subscription. */
+export const getClubSupportSummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ club_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    await logAction({
+      actor: context.userId,
+      action: "view_club_support_summary",
+      target_type: "club",
+      target_id: data.club_id,
+      club_id: data.club_id,
+    });
+
+    const [{ data: club }, { data: sub }, { data: admins }, { data: recentEvents }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("clubs")
+          .select("id, name, created_at, created_by, archived_at, logo_url")
+          .eq("id", data.club_id)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("subscriptions")
+          .select("status, plan, trial_end, current_period_end, cancel_at_period_end, stripe_customer_id")
+          .eq("club_id", data.club_id)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("club_members")
+          .select("user_id, role, created_at")
+          .eq("club_id", data.club_id)
+          .in("role", ["admin", "dirigeant"]),
+        supabaseAdmin
+          .from("events")
+          .select("id, title, type, starts_at, team_id, deleted_at")
+          .in(
+            "team_id",
+            (
+              await supabaseAdmin
+                .from("teams")
+                .select("id")
+                .eq("club_id", data.club_id)
+            ).data?.map((t) => t.id) ?? [],
+          )
+          .order("created_at", { ascending: false })
+          .limit(10),
+      ]);
+
+    const adminIds = (admins ?? []).map((a) => a.user_id);
+    const { data: adminProfiles } = adminIds.length
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, phone")
+          .in("id", adminIds)
+      : { data: [] as never[] };
+    const pMap = new Map((adminProfiles ?? []).map((p) => [p.id, p]));
+
+    return {
+      club,
+      subscription: sub,
+      admins: (admins ?? []).map((a) => ({
+        ...a,
+        profile: pMap.get(a.user_id) ?? null,
+      })),
+      recent_events: recentEvents ?? [],
+    };
+  });
