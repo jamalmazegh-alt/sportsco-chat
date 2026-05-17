@@ -1242,6 +1242,79 @@ export const listSuperadminLogsEnriched = createServerFn({ method: "POST" })
 // ============================================================================
 import { getStripe } from "./stripe.server";
 
+// In-memory TTL cache for live Stripe overview (avoids blocking the dashboard
+// on every load and isolates it from Stripe slowness/outages).
+type StripeOverviewCache = {
+  mrrCents: number;
+  stripeActive: number;
+  avgRevenuePerClubCents: number;
+  currency: string;
+  fetched_at: number;
+};
+const STRIPE_OVERVIEW_TTL_MS = 10 * 60 * 1000; // 10 min
+let stripeOverviewCache: StripeOverviewCache | null = null;
+let stripeOverviewInflight: Promise<StripeOverviewCache> | null = null;
+
+async function fetchStripeOverview(): Promise<StripeOverviewCache> {
+  const stripe = getStripe();
+  const stripeSubs = await stripe.subscriptions.list({
+    status: "active",
+    limit: 100,
+    expand: ["data.items.data.price"],
+  });
+  let mrrCents = 0;
+  let currency = "eur";
+  for (const s of stripeSubs.data) {
+    for (const item of s.items.data) {
+      const price = item.price;
+      if (!price?.unit_amount) continue;
+      currency = price.currency || currency;
+      const interval = price.recurring?.interval ?? "month";
+      const intervalCount = price.recurring?.interval_count ?? 1;
+      const monthly =
+        interval === "year"
+          ? price.unit_amount / (12 * intervalCount)
+          : interval === "week"
+            ? (price.unit_amount * 52) / 12 / intervalCount
+            : interval === "day"
+              ? (price.unit_amount * 30) / intervalCount
+              : price.unit_amount / intervalCount;
+      mrrCents += monthly * (item.quantity ?? 1);
+    }
+  }
+  const stripeActive = stripeSubs.data.length;
+  return {
+    mrrCents: Math.round(mrrCents),
+    stripeActive,
+    avgRevenuePerClubCents: stripeActive > 0 ? mrrCents / stripeActive : 0,
+    currency,
+    fetched_at: Date.now(),
+  };
+}
+
+async function getStripeOverviewCached(): Promise<StripeOverviewCache | null> {
+  const now = Date.now();
+  if (stripeOverviewCache && now - stripeOverviewCache.fetched_at < STRIPE_OVERVIEW_TTL_MS) {
+    return stripeOverviewCache;
+  }
+  if (stripeOverviewInflight) return stripeOverviewInflight.catch(() => stripeOverviewCache);
+  stripeOverviewInflight = fetchStripeOverview()
+    .then((res) => {
+      stripeOverviewCache = res;
+      return res;
+    })
+    .finally(() => {
+      stripeOverviewInflight = null;
+    });
+  try {
+    return await stripeOverviewInflight;
+  } catch (err) {
+    console.error("[superadmin] Stripe overview fetch failed", err);
+    // Serve stale on failure if we have anything, else null.
+    return stripeOverviewCache;
+  }
+}
+
 /**
  * Platform-wide financial snapshot.
  * Computes MRR/ARR from live Stripe subscriptions for accuracy, plus growth
