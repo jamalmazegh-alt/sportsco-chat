@@ -21,7 +21,8 @@ export const Route = createFileRoute("/_superadmin")({
   component: SuperAdminLayout,
 });
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/superadmin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/superadmin/clubs", label: "Clubs", icon: Building2 },
   { to: "/superadmin/users", label: "Users", icon: Users },
@@ -29,7 +30,7 @@ const NAV = [
   { to: "/superadmin/logs", label: "Activity logs", icon: ScrollText },
   { to: "/superadmin/support", label: "Support", icon: LifeBuoy },
   { to: "/superadmin/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 function SuperAdminLayout() {
   const { session, loading } = useAuth();
