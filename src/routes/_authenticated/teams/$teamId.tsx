@@ -165,6 +165,15 @@ function TeamDetail() {
   }
 
   async function uploadPhoto(playerId: string, file: File): Promise<string | null> {
+    // Limite côté client : refuse > 5 Mo (le bucket impose aussi la limite côté serveur)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("players.photoTooLarge", { defaultValue: "Photo trop lourde (max 5 Mo)." }));
+      return null;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }));
+      return null;
+    }
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${activeClubId}/${playerId}.${ext}`;
     const { error: upErr } = await supabase.storage
@@ -782,6 +791,14 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
 
   async function onPick(file: File) {
     if (!team?.club_id) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("teams.imageTooLarge", { defaultValue: "Image trop lourde (max 5 Mo)." }));
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("teams.imageInvalidType", { defaultValue: "Format de fichier non supporté." }));
+      return;
+    }
     setBusy(true);
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${team.club_id}/${team.id}-${Date.now()}.${ext}`;

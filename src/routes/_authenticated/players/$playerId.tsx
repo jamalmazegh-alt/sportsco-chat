@@ -201,6 +201,17 @@ function PlayerProfile() {
         );
         return;
       }
+      // Limite côté client : refuse > 5 Mo (le bucket impose aussi la limite côté serveur)
+      if (photoFile.size > 5 * 1024 * 1024) {
+        setBusy(false);
+        toast.error(t("players.photoTooLarge", { defaultValue: "Photo trop lourde (max 5 Mo)." }));
+        return;
+      }
+      if (!photoFile.type.startsWith("image/")) {
+        setBusy(false);
+        toast.error(t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }));
+        return;
+      }
       const ext = photoFile.name.split(".").pop() || "jpg";
       const path = `${player.club_id}/${player.id}.${ext}`;
       const { error: upErr } = await supabase.storage
