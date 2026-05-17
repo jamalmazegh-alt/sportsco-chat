@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, Trophy, Target, ShieldCheck } from "lucide-react";
+import { BarChart3, ShieldCheck } from "lucide-react";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 
 export const Route = createFileRoute("/_authenticated/stats")({
   component: StatsPage,
@@ -117,15 +118,26 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
   );
 }
 
+// Stat kinds counted as "scoring" in summary tiles (vs cards/fouls which are negative).
+const NEGATIVE_KINDS: StatKind[] = ["yellow_card", "red_card", "foul", "own_goal"];
+
 function PlayerScoringSummary({ playerId }: { playerId: string }) {
   const { t } = useTranslation();
   const { data } = useQuery({
     queryKey: ["player-scoring", playerId],
     queryFn: async () => {
+      // Detect player's sport via first team membership
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("teams:team_id(sport)")
+        .eq("player_id", playerId)
+        .limit(1);
+      const sport = (tm?.[0] as any)?.teams?.sport ?? null;
+
       const [goalsRes, assistsRes, matchesRes] = await Promise.all([
         supabase
           .from("event_goals")
-          .select("id, kind", { count: "exact", head: false })
+          .select("id, kind")
           .eq("scorer_player_id", playerId),
         supabase
           .from("event_goals")
@@ -137,36 +149,50 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
           .eq("player_id", playerId)
           .eq("status", "present"),
       ]);
-      const goals = (goalsRes.data ?? []).filter((g: any) => g.kind !== "own_goal").length;
-      const ownGoals = (goalsRes.data ?? []).filter((g: any) => g.kind === "own_goal").length;
+      const byKind: Record<string, number> = {};
+      (goalsRes.data ?? []).forEach((g: any) => {
+        byKind[g.kind] = (byKind[g.kind] ?? 0) + 1;
+      });
       const assists = assistsRes.count ?? 0;
       const matchesPlayed = (matchesRes.data ?? []).filter(
         (c: any) => c.events?.type === "match" && c.events?.status !== "cancelled"
       ).length;
-      return { goals, ownGoals, assists, matchesPlayed };
+      return { sport, byKind, assists, matchesPlayed };
     },
   });
 
-  const items = [
-    { label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }), value: data?.matchesPlayed ?? 0, icon: ShieldCheck },
-    { label: t("stats.goals", { defaultValue: "Buts" }), value: data?.goals ?? 0, icon: Target },
-    { label: t("stats.assists", { defaultValue: "Passes décisives" }), value: data?.assists ?? 0, icon: Trophy },
+  const cfg = getSportConfig(data?.sport);
+  const tiles: Array<{ label: string; value: number; negative?: boolean }> = [
+    { label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }), value: data?.matchesPlayed ?? 0 },
   ];
+  // Per-kind tiles from sport config (scorer_player_id kinds)
+  cfg.statKinds.forEach((k) => {
+    if (k === "assist") return; // handled below
+    tiles.push({
+      label: t(`match.kinds.${k}`, { defaultValue: k }),
+      value: data?.byKind[k] ?? 0,
+      negative: NEGATIVE_KINDS.includes(k),
+    });
+  });
+  if (cfg.assistsEnabled && cfg.statKinds.includes("assist")) {
+    tiles.push({ label: t("match.kinds.assist", { defaultValue: "Passes" }), value: data?.assists ?? 0 });
+  } else if (cfg.assistsEnabled) {
+    tiles.push({ label: t("match.kinds.assist", { defaultValue: "Passes" }), value: data?.assists ?? 0 });
+  }
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {items.map((it) => {
-        const Icon = it.icon;
-        return (
-          <div key={it.label} className="rounded-xl border bg-card p-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Icon className="h-3.5 w-3.5" />
-              {it.label}
-            </div>
-            <div className="mt-1 text-2xl font-bold">{it.value}</div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {tiles.map((it) => (
+        <div key={it.label} className="rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            {it.label}
           </div>
-        );
-      })}
+          <div className={cn("mt-1 text-2xl font-bold", it.negative && "text-destructive")}>
+            {it.value}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -182,22 +208,21 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
       if (isAdmin) {
         const { data } = await supabase
           .from("teams")
-          .select("id, name")
+          .select("id, name, sport")
           .eq("club_id", clubId)
           .is("deleted_at", null)
           .order("name");
         return data ?? [];
       }
-      // coach: teams they coach
       const { data } = await supabase
         .from("team_members")
-        .select("team_id, teams:team_id(id, name, club_id, deleted_at)")
+        .select("team_id, teams:team_id(id, name, sport, club_id, deleted_at)")
         .eq("user_id", userId)
         .in("role", ["coach", "admin"]);
       return (data ?? [])
         .map((r: any) => r.teams)
         .filter((tm: any) => tm && tm.club_id === clubId && !tm.deleted_at)
-        .map((tm: any) => ({ id: tm.id, name: tm.name }));
+        .map((tm: any) => ({ id: tm.id, name: tm.name, sport: tm.sport }));
     },
   });
 
@@ -205,6 +230,9 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
   useEffect(() => {
     if (!teamId && teams && teams.length > 0) setTeamId(teams[0].id);
   }, [teams, teamId]);
+
+  const selectedTeam = teams?.find((tm: any) => tm.id === teamId) ?? null;
+  const selectedSport: string | null = (selectedTeam as any)?.sport ?? null;
 
   if (isLoading) return <p className="text-sm text-muted-foreground">{t("common.loading", { defaultValue: "Chargement…" })}</p>;
   if (!teams || teams.length === 0) {
@@ -240,7 +268,7 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
             <TeamMatchRecord teamId={teamId} />
           </TabsContent>
           <TabsContent value="players" className="mt-4">
-            <TeamPlayersStats teamId={teamId} />
+            <TeamPlayersStats teamId={teamId} sport={selectedSport} />
           </TabsContent>
           <TabsContent value="attendance" className="mt-4">
             <TeamAttendanceStats teamId={teamId} />
@@ -332,35 +360,42 @@ type PlayerRow = {
   player_id: string;
   name: string;
   matches: number;
-  goals: number;
-  assists: number;
   present: number;
   total: number;
+  byKind: Record<string, number>; // scorer kinds
+  assists: number;
 };
 
-type SortKey = "name" | "matches" | "goals" | "assists" | "attendance";
-
-function TeamPlayersStats({ teamId }: { teamId: string }) {
+function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | null }) {
   const { t } = useTranslation();
-  const [sortKey, setSortKey] = useState<SortKey>("goals");
+  const cfg = useMemo(() => getSportConfig(sport), [sport]);
+
+  // Columns: name, matches, then one per scorer-kind from cfg.statKinds (except "assist"),
+  // then assists (if enabled), then attendance.
+  const scorerKinds = useMemo<StatKind[]>(
+    () => cfg.statKinds.filter((k) => k !== "assist"),
+    [cfg]
+  );
+  const showAssistCol = cfg.assistsEnabled;
+
+  type SortKey = "name" | "matches" | "attendance" | `kind:${StatKind}` | "assists";
+  const initialSort: SortKey =
+    scorerKinds.length > 0 ? (`kind:${scorerKinds[0]}` as SortKey) : "matches";
+  const [sortKey, setSortKey] = useState<SortKey>(initialSort);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["team-players-stats", teamId],
+    queryKey: ["team-players-stats", teamId, sport],
     queryFn: async () => {
-      // Roster
       const { data: roster } = await supabase
         .from("team_members")
         .select("player_id, players:player_id(id, first_name, last_name)")
         .eq("team_id", teamId)
         .eq("role", "player");
-      const players = (roster ?? [])
-        .map((r: any) => r.players)
-        .filter(Boolean);
+      const players = (roster ?? []).map((r: any) => r.players).filter(Boolean);
       const playerIds = players.map((p: any) => p.id);
       if (playerIds.length === 0) return [] as PlayerRow[];
 
-      // Events of team (non-cancelled, not deleted)
       const { data: events } = await supabase
         .from("events")
         .select("id, type, status")
@@ -368,9 +403,10 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
         .is("deleted_at", null)
         .neq("status", "cancelled");
       const eventIds = (events ?? []).map((e) => e.id);
-      const matchEventIds = new Set((events ?? []).filter((e) => e.type === "match").map((e) => e.id));
+      const matchEventIds = new Set(
+        (events ?? []).filter((e) => e.type === "match").map((e) => e.id)
+      );
 
-      // Convocations for these events for our players
       const { data: convocs } = eventIds.length > 0
         ? await supabase
             .from("convocations")
@@ -379,7 +415,6 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
             .in("player_id", playerIds)
         : { data: [] as any[] };
 
-      // Goals
       const { data: goals } = matchEventIds.size > 0
         ? await supabase
             .from("event_goals")
@@ -392,7 +427,7 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
         rows[p.id] = {
           player_id: p.id,
           name: `${p.first_name} ${p.last_name}`,
-          matches: 0, goals: 0, assists: 0, present: 0, total: 0,
+          matches: 0, present: 0, total: 0, byKind: {}, assists: 0,
         };
       });
 
@@ -406,8 +441,9 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
         }
       });
       (goals ?? []).forEach((g: any) => {
-        if (g.kind !== "own_goal" && g.scorer_player_id && rows[g.scorer_player_id]) {
-          rows[g.scorer_player_id].goals++;
+        if (g.scorer_player_id && rows[g.scorer_player_id]) {
+          rows[g.scorer_player_id].byKind[g.kind] =
+            (rows[g.scorer_player_id].byKind[g.kind] ?? 0) + 1;
         }
         if (g.assist_player_id && rows[g.assist_player_id]) {
           rows[g.assist_player_id].assists++;
@@ -422,15 +458,16 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
     const dir = sortDir === "asc" ? 1 : -1;
     list.sort((a, b) => {
       let av: number | string = 0, bv: number | string = 0;
-      switch (sortKey) {
-        case "name": av = a.name.toLowerCase(); bv = b.name.toLowerCase(); break;
-        case "matches": av = a.matches; bv = b.matches; break;
-        case "goals": av = a.goals; bv = b.goals; break;
-        case "assists": av = a.assists; bv = b.assists; break;
-        case "attendance":
-          av = a.total > 0 ? a.present / a.total : 0;
-          bv = b.total > 0 ? b.present / b.total : 0;
-          break;
+      if (sortKey === "name") { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
+      else if (sortKey === "matches") { av = a.matches; bv = b.matches; }
+      else if (sortKey === "assists") { av = a.assists; bv = b.assists; }
+      else if (sortKey === "attendance") {
+        av = a.total > 0 ? a.present / a.total : 0;
+        bv = b.total > 0 ? b.present / b.total : 0;
+      } else if (sortKey.startsWith("kind:")) {
+        const k = sortKey.slice(5);
+        av = a.byKind[k] ?? 0;
+        bv = b.byKind[k] ?? 0;
       }
       return av < bv ? -1 * dir : av > bv ? 1 * dir : 0;
     });
@@ -451,11 +488,18 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
     );
   }
 
-  const headers: Array<{ key: SortKey; label: string; align?: "right" }> = [
+  const headers: Array<{ key: SortKey; label: string; align?: "right"; negative?: boolean }> = [
     { key: "name", label: t("stats.col.player", { defaultValue: "Joueur" }) },
     { key: "matches", label: t("stats.col.matches", { defaultValue: "Matchs" }), align: "right" },
-    { key: "goals", label: t("stats.col.goals", { defaultValue: "Buts" }), align: "right" },
-    { key: "assists", label: t("stats.col.assists", { defaultValue: "Passes" }), align: "right" },
+    ...scorerKinds.map((k) => ({
+      key: `kind:${k}` as SortKey,
+      label: t(`match.kinds.${k}`, { defaultValue: k }),
+      align: "right" as const,
+      negative: SOLO_STAT_KINDS.includes(k) && (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal"),
+    })),
+    ...(showAssistCol
+      ? [{ key: "assists" as SortKey, label: t("match.kinds.assist", { defaultValue: "Passes" }), align: "right" as const }]
+      : []),
     { key: "attendance", label: t("stats.col.attendance", { defaultValue: "% Présent" }), align: "right" },
   ];
 
@@ -486,14 +530,30 @@ function TeamPlayersStats({ teamId }: { teamId: string }) {
               <tr key={r.player_id} className="border-t">
                 <td className="px-3 py-2 font-medium">{r.name}</td>
                 <td className="px-3 py-2 text-right">{r.matches}</td>
-                <td className="px-3 py-2 text-right">{r.goals}</td>
-                <td className="px-3 py-2 text-right">{r.assists}</td>
+                {scorerKinds.map((k) => (
+                  <td
+                    key={k}
+                    className={cn(
+                      "px-3 py-2 text-right tabular-nums",
+                      (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal") &&
+                        (r.byKind[k] ?? 0) > 0 && "text-destructive"
+                    )}
+                  >
+                    {r.byKind[k] ?? 0}
+                  </td>
+                ))}
+                {showAssistCol && <td className="px-3 py-2 text-right tabular-nums">{r.assists}</td>}
                 <td className="px-3 py-2 text-right">{r.total > 0 ? `${pct}%` : "—"}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
+      {scorerKinds.length === 0 && (
+        <p className="px-3 py-3 text-xs text-muted-foreground italic">
+          {t("stats.noStatKindsForSport", { defaultValue: "Aucune stat individuelle configurée pour ce sport." })}
+        </p>
+      )}
     </div>
   );
 }
