@@ -281,7 +281,7 @@ function AdminUsersPage() {
                             }
                           >
                             {r === "admin" && <ShieldCheck className="h-3 w-3" />}
-                            {r === "coach" && <span aria-hidden>🏖️</span>}
+                            {r === "coach" && <Trophy className="h-3 w-3" />}
                             {t(`roles.${r}`, { defaultValue: r })}
                           </span>
                         );
