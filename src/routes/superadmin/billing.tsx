@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { listSubscriptions } from "@/lib/superadmin.functions";
 import { Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/_superadmin/billing")({
+export const Route = createFileRoute("/superadmin/billing")({
   component: SuperAdminBilling,
 });
 

@@ -4,7 +4,7 @@ import { listAllClubs } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search } from "lucide-react";
 
-export const Route = createFileRoute("/_superadmin/clubs")({
+export const Route = createFileRoute("/superadmin/clubs")({
   component: SuperAdminClubs,
 });
 

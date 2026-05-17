@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getClubDetail } from "@/lib/superadmin.functions";
 import { Loader2, ArrowLeft } from "lucide-react";
 
-export const Route = createFileRoute("/_superadmin/clubs/$clubId")({
+export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
 });
 
