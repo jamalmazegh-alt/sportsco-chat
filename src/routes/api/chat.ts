@@ -18,7 +18,7 @@ Règles importantes :
 - Si un tool renvoie une liste vide ou un champ "note", explique simplement la situation à l'utilisateur (ex : "tu n'as pas de joueur lié à ton compte, donc il n'y a pas de stats de présence à afficher pour toi"). Ne dis JAMAIS "non autorisé", "unauthorized", "accès refusé" ou "erreur" dans ce cas — il s'agit simplement d'une absence de données pertinentes pour ce profil.
 - Ne propose les outils réservés aux coachs/admins (\`getPendingResponsesForCoach\`, \`sendConvocationReminders\`, \`createDraftEvent\`) que si l'utilisateur est effectivement coach ou admin d'une équipe, OU admin/dirigeant du club. Pour un joueur ou un parent simple, ne mentionne pas ces fonctions et redirige vers le coach.
 - Pour les coachs/admins : tu peux lister les joueurs qui n'ont pas encore répondu à une convocation avec \`getPendingResponsesForCoach\`. Si l'utilisateur te demande de relancer ces joueurs, **demande TOUJOURS confirmation explicite avant d'appeler \`sendConvocationReminders\`** ("Veux-tu que je leur envoie un rappel ?"). N'appelle ce tool qu'après un "oui" clair. Pour joueurs/parents qui te demandent de relancer un coach, redirige vers le contact direct du coach.
-- Création d'événement (\`createDraftEvent\`, coachs/admins seulement) : avant d'appeler, vérifie que tu as l'équipe, le titre, le type (entraînement / match / tournoi / réunion / autre) et la date/heure précise. Convertis les dates relatives ("samedi prochain 14h30") en ISO complet avec fuseau horaire avant l'appel. **Récapitule ce que tu vas créer et demande une confirmation explicite ("Je crée ce brouillon ?") avant l'appel.** L'événement est créé en BROUILLON — précise ensuite à l'utilisateur qu'il doit l'ouvrir (lien fourni), sélectionner les convoqués et cliquer "Publier" pour envoyer les convocations.
+- Création d'événement (\`createDraftEvent\`, coachs/admins seulement) : avant d'appeler, vérifie que tu as l'équipe, le titre, le type (entraînement / match / tournoi / réunion / autre) et la date/heure précise. Convertis les dates relatives ("samedi prochain 14h30") en ISO complet avec fuseau horaire avant l'appel. Si l'utilisateur mentionne une **heure de rendez-vous** distincte de l'heure de début, passe-la dans \`convocationTime\` (pas dans la description). Si l'utilisateur mentionne un **point de ralliement / lieu de RDV** distinct du lieu de l'événement, passe-le dans \`meetingPoint\` (et le lieu du match/entraînement dans \`location\`). N'inclus jamais l'heure de RDV ou le point de ralliement uniquement dans \`description\`. **Récapitule ce que tu vas créer et demande une confirmation explicite ("Je crée ce brouillon ?") avant l'appel.** L'événement est créé en BROUILLON — précise ensuite à l'utilisateur qu'il doit l'ouvrir (lien fourni), sélectionner les convoqués et cliquer "Publier" pour envoyer les convocations.
 - Tu peux expliquer les fonctionnalités : convocations (présent/absent/incertain, avec motif), partage de convocations sur WhatsApp en 1 clic (option : Clubero structure, WhatsApp diffuse — les réponses restent suivies dans l'app), mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes, chat d'événement temps réel, résultats de matchs avec stats joueurs par sport, statistiques de présence, recherche globale (Cmd/Ctrl + K), exports CSV, corbeille 7 jours, notifications in-app/email/WhatsApp, codes d'invitation, gestion multi-saisons, rôles, RGPD/droit à l'image.
 - Si la question est hors-sujet (politique, conseils médicaux, etc.), redirige poliment vers le sujet de l'app.
 - Format : utilise Markdown (listes, gras) pour la lisibilité, mais reste bref.`;
@@ -425,11 +425,13 @@ export const Route = createFileRoute("/api/chat")({
               type: z.enum(["training", "match", "tournament", "meeting", "other"]),
               startsAt: z.string().describe("Date/heure de début au format ISO 8601 avec fuseau (ex : '2025-05-24T14:30:00+02:00'). Convertis toujours les indications relatives (samedi prochain 14h30) en ISO complet AVANT d'appeler."),
               endsAt: z.string().optional().describe("Date/heure de fin ISO 8601 (optionnel)."),
-              location: z.string().max(200).optional(),
+              convocationTime: z.string().optional().describe("Heure du rendez-vous (convocation) au format ISO 8601 avec fuseau. Renseigne-la dès que l'utilisateur mentionne une heure de RDV distincte (ex : RDV 11h00 pour un match à 12h30)."),
+              location: z.string().max(200).optional().describe("Lieu de l'événement (ex : stade, gymnase)."),
+              meetingPoint: z.string().max(200).optional().describe("Lieu du rendez-vous / point de ralliement (ex : 'Parking du club', 'Devant le vestiaire'). Distinct du lieu de l'événement."),
               opponent: z.string().max(200).optional().describe("Pour les matchs uniquement."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ teamName, title, type, startsAt, endsAt, location, opponent, description }) => {
+            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
               // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
               const managedTeamIds = await getManagedTeamIds();
               let coached: Array<{ id: string; name: string }> = [];
@@ -483,7 +485,9 @@ export const Route = createFileRoute("/api/chat")({
                   type,
                   starts_at: startsAtDate.toISOString(),
                   ends_at: endsAt ? new Date(endsAt).toISOString() : null,
+                  convocation_time: convocationTime ? new Date(convocationTime).toISOString() : null,
                   location: location ?? null,
+                  meeting_point: meetingPoint ?? null,
                   opponent: opponent ?? null,
                   description: description ?? null,
                   status: "draft",
