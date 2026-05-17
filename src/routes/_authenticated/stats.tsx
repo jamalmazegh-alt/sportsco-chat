@@ -45,6 +45,62 @@ function StatsPage() {
   );
 }
 
+/* =================== Skeletons =================== */
+
+function PlayerSkeleton() {
+  return (
+    <div className="space-y-4 animate-in fade-in duration-200">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-9 w-[240px]" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="rounded-xl border bg-card p-4 space-y-2">
+            <Skeleton className="h-3.5 w-20" />
+            <Skeleton className="h-8 w-12" />
+          </div>
+        ))}
+      </div>
+      <div className="rounded-xl border bg-card p-4 space-y-3">
+        <Skeleton className="h-5 w-32" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StaffSkeleton() {
+  return (
+    <div className="space-y-4 animate-in fade-in duration-200">
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-9 w-[240px]" />
+      </div>
+      <div className="flex gap-2">
+        <Skeleton className="h-9 w-28" />
+        <Skeleton className="h-9 w-24" />
+        <Skeleton className="h-9 w-28" />
+      </div>
+      <div className="rounded-xl border bg-card p-4 space-y-3">
+        <Skeleton className="h-5 w-40" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-3.5 w-20" />
+              <Skeleton className="h-8 w-12" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* =================== Player / Parent =================== */
 
 function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: string }) {
