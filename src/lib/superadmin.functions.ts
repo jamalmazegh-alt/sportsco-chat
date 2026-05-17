@@ -1450,12 +1450,12 @@ export const getClubFinancials = createServerFn({ method: "POST" })
 
       if (sub.stripe_subscription_id) {
         try {
-          const upcoming = await stripe.invoices.retrieveUpcoming({
-            customer: sub.stripe_customer_id,
-          });
+          const upcoming = await (stripe.invoices as unknown as {
+            retrieveUpcoming: (p: { customer: string }) => Promise<{ amount_due: number }>;
+          }).retrieveUpcoming({ customer: sub.stripe_customer_id });
           upcomingAmount = upcoming.amount_due;
         } catch {
-          // no upcoming invoice (e.g. canceled)
+          // no upcoming invoice (e.g. canceled or unsupported on this api version)
         }
       }
     } catch (err) {
