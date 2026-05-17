@@ -26,7 +26,16 @@ type ClubSettings = {
   event_chat_enabled: boolean;
   event_chat_players_enabled: boolean;
   event_chat_parents_enabled: boolean;
+  auto_reminders_enabled: boolean;
+  auto_reminder_hours_before: number[];
 };
+
+const REMINDER_PRESETS = [
+  { value: [48, 3], label: "48h + 3h avant (standard)" },
+  { value: [72, 24, 3], label: "3j + 24h + 3h avant" },
+  { value: [24], label: "24h avant" },
+  { value: [3], label: "3h avant" },
+];
 
 function AdminSettingsPage() {
   const { t } = useTranslation();
