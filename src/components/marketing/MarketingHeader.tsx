@@ -36,7 +36,7 @@ export function MarketingHeader() {
               key={item.to}
               to={item.to}
               className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "bg-primary/10 text-primary font-semibold" }}
+              activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
             >
               {t(`nav.${item.key}`)}
             </Link>
