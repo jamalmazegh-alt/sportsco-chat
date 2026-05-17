@@ -73,6 +73,15 @@ export function AttachmentPicker({
         toast.error(t("attachments.tooLarge", { name: file.name }));
         continue;
       }
+      if (!isMimeAllowed(file)) {
+        toast.error(
+          t("attachments.invalidType", {
+            name: file.name,
+            defaultValue: `Type de fichier non autorisé : ${file.name}`,
+          }),
+        );
+        continue;
+      }
       const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${user.id}/${prefix}/${Date.now()}-${safe}`;
       const { error } = await supabase.storage.from("attachments").upload(path, file, {
