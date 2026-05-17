@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe, getPriceId } from "./stripe.server";
+import { notifySubscriptionAdmin } from "./subscription-notify.server";
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
@@ -234,6 +235,12 @@ export const cancelSubscriptionAtPeriodEnd = createServerFn({ method: "POST" })
         cancel_at: updated.cancel_at ? new Date(updated.cancel_at * 1000).toISOString() : null,
       })
       .eq("club_id", data.clubId);
+    try {
+      const fresh = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
+      await notifySubscriptionAdmin("cancellation_scheduled", fresh, data.clubId);
+    } catch (err) {
+      console.error("notify cancellation_scheduled failed:", err);
+    }
     return { ok: true };
   });
 
@@ -255,6 +262,12 @@ export const reactivateSubscription = createServerFn({ method: "POST" })
       .from("subscriptions")
       .update({ cancel_at_period_end: false, cancel_at: null })
       .eq("club_id", data.clubId);
+    try {
+      const fresh = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
+      await notifySubscriptionAdmin("reactivated", fresh, data.clubId);
+    } catch (err) {
+      console.error("notify reactivated failed:", err);
+    }
     return { ok: true };
   });
 
