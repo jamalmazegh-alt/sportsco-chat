@@ -264,17 +264,11 @@ export const Route = createFileRoute("/api/chat")({
               daysAhead: z.number().int().min(1).max(60).optional(),
             }),
             execute: async ({ daysAhead = 14 }) => {
-              // Find teams where user is coach/admin
-              const { data: tm } = await supabase
-                .from("team_members")
-                .select("team_id, role, team:team_id(id, name)")
-                .eq("user_id", userId)
-                .in("role", ["coach", "admin"]);
-              const teamIds = (tm ?? []).map((t: any) => t.team_id);
+              const teamIds = await getManagedTeamIds();
               if (teamIds.length === 0) {
                 return {
                   events: [],
-                  note: "L'utilisateur n'encadre aucune équipe en tant que coach ou admin — cet outil ne s'applique pas à son profil.",
+                  note: "L'utilisateur n'encadre aucune équipe (ni comme coach/admin d'équipe, ni comme admin/dirigeant de club) — cet outil ne s'applique pas à son profil.",
                 };
               }
               const now = new Date();
