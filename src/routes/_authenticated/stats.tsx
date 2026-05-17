@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, Trophy, Target, ShieldCheck } from "lucide-react";
+import { BarChart3, ShieldCheck } from "lucide-react";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 
 export const Route = createFileRoute("/_authenticated/stats")({
   component: StatsPage,
