@@ -605,6 +605,9 @@ export function EventFormSheet({
       toast.success(t("events.publish"));
       onOpenChange(false);
       onSaved(data.id);
+      if (sendNow && type !== "other" && type !== "meeting") {
+        navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
+      }
     } else {
       const { error } = await supabase.from("events").update(payload).eq("id", initial!.id!);
       setBusy(false);
