@@ -429,9 +429,10 @@ export const Route = createFileRoute("/api/chat")({
               location: z.string().max(200).optional().describe("Lieu de l'événement (ex : stade, gymnase)."),
               meetingPoint: z.string().max(200).optional().describe("Lieu du rendez-vous / point de ralliement (ex : 'Parking du club', 'Devant le vestiaire'). Distinct du lieu de l'événement."),
               opponent: z.string().max(200).optional().describe("Pour les matchs uniquement."),
+              isHome: z.boolean().optional().describe("Pour les matchs : true = match à domicile, false = à l'extérieur. **Déduis-le toi-même** : si le lieu est une ville/stade adverse ou différent du club de l'utilisateur, mets false. Si l'utilisateur dit explicitement 'à domicile' / 'à la maison' / 'chez nous', mets true. Si l'utilisateur dit 'à [ville extérieure]' ou nomme un stade adverse, mets false. Ne demande pas confirmation pour ce champ — déduis-le du contexte."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
+            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
               // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
               const managedTeamIds = await getManagedTeamIds();
               let coached: Array<{ id: string; name: string }> = [];
