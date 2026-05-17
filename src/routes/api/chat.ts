@@ -66,6 +66,33 @@ export const Route = createFileRoute("/api/chat")({
           return Array.from(ids);
         }
 
+        // Helper: list team ids the user can manage (team coach/admin OR club admin/dirigeant)
+        async function getManagedTeamIds(): Promise<string[]> {
+          const [{ data: tm }, { data: cm }] = await Promise.all([
+            supabase
+              .from("team_members")
+              .select("team_id")
+              .eq("user_id", userId)
+              .in("role", ["coach", "admin"]),
+            supabase
+              .from("club_members")
+              .select("club_id, role")
+              .eq("user_id", userId)
+              .in("role", ["admin", "dirigeant"]),
+          ]);
+          const ids = new Set<string>();
+          (tm ?? []).forEach((r: any) => ids.add(r.team_id));
+          const clubIds = (cm ?? []).map((r: any) => r.club_id);
+          if (clubIds.length > 0) {
+            const { data: clubTeams } = await supabase
+              .from("teams")
+              .select("id")
+              .in("club_id", clubIds);
+            (clubTeams ?? []).forEach((t: any) => ids.add(t.id));
+          }
+          return Array.from(ids);
+        }
+
         const tools = {
           getMyProfile: tool({
             description: "Récupère le profil de l'utilisateur connecté : nom, langue, clubs et rôles.",
