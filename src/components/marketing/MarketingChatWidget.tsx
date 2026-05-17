@@ -91,7 +91,7 @@ export function MarketingChatWidget() {
               <div>
                 <p className="text-sm font-semibold leading-tight">Assistant Clubero</p>
                 <p className="text-[11px] text-muted-foreground">
-                  Posez vos questions sur le produit
+                  Assistant IA · réponses générées automatiquement
                 </p>
               </div>
             </div>
