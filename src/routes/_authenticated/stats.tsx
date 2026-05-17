@@ -288,9 +288,26 @@ function getCurrentSeason() {
   return { start, end, label: `${startYear}-${startYear + 1}` };
 }
 
-function TeamMatchRecord({ teamId }: { teamId: string }) {
+function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | null }) {
   const { t } = useTranslation();
   const season = useMemo(getCurrentSeason, []);
+  const cfg = useMemo(() => getSportConfig(sport), [sport]);
+  const unitKey = cfg.scoreUnit; // "goals" | "points" | "sets"
+  const unitLabels = {
+    goals: {
+      for: t("stats.goalsFor", { defaultValue: "Buts pour" }),
+      against: t("stats.goalsAgainst", { defaultValue: "Buts contre" }),
+    },
+    points: {
+      for: t("stats.pointsFor", { defaultValue: "Points pour" }),
+      against: t("stats.pointsAgainst", { defaultValue: "Points contre" }),
+    },
+    sets: {
+      for: t("stats.setsFor", { defaultValue: "Sets gagnés" }),
+      against: t("stats.setsAgainst", { defaultValue: "Sets perdus" }),
+    },
+  }[unitKey];
+
   const { data } = useQuery({
     queryKey: ["team-match-record", teamId, season.label],
     queryFn: async () => {
@@ -333,9 +350,9 @@ function TeamMatchRecord({ teamId }: { teamId: string }) {
     { label: t("stats.wins", { defaultValue: "Victoires" }), value: r.w, tone: "text-emerald-600" },
     { label: t("stats.draws", { defaultValue: "Nuls" }), value: r.d, tone: "text-muted-foreground" },
     { label: t("stats.losses", { defaultValue: "Défaites" }), value: r.l, tone: "text-destructive" },
-    { label: t("stats.goalsFor", { defaultValue: "Buts pour" }), value: r.gf },
-    { label: t("stats.goalsAgainst", { defaultValue: "Buts contre" }), value: r.ga },
-    { label: t("stats.goalDiff", { defaultValue: "Différence" }), value: `${diff > 0 ? "+" : ""}${diff}` },
+    { label: unitLabels.for, value: r.gf },
+    { label: unitLabels.against, value: r.ga },
+    { label: t("stats.diff", { defaultValue: "Différence" }), value: `${diff > 0 ? "+" : ""}${diff}` },
     { label: t("stats.winRate", { defaultValue: "% Victoires" }), value: `${winRate}%` },
   ];
 
