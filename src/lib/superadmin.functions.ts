@@ -2,6 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { createLogger } from "@/lib/logger.server";
+
+const log = createLogger("superadmin");
 
 /**
  * Server-side guard: throws 403 unless the caller is a registered super admin.
