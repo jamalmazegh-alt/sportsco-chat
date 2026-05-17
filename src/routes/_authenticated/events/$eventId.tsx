@@ -1497,8 +1497,47 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
+      {/* Resend convocation dialog */}
+      <Dialog open={resendOpen} onOpenChange={(o) => { if (!resendSubmitting) setResendOpen(o); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Renvoyer la convocation</DialogTitle>
+            <DialogDescription>
+              {convocChanges.length > 0
+                ? `${convocChanges.length} modification(s) détectée(s) depuis le dernier envoi. Le mail mettra en évidence les changements.`
+                : "Aucun changement détecté depuis le dernier envoi. La convocation sera tout de même renvoyée à tous les joueurs."}
+            </DialogDescription>
+          </DialogHeader>
+          {convocChanges.length > 0 && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2 max-h-64 overflow-auto">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">Modifications</p>
+              {convocChanges.map((c) => (
+                <div key={c.field} className="text-sm">
+                  <span className="font-medium text-amber-900">{c.label} : </span>
+                  <span className="text-muted-foreground line-through">{c.previous ?? "—"}</span>
+                  {" → "}
+                  <span className="font-semibold text-emerald-700">{c.current ?? "—"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Envoyé à {convocations?.length ?? 0} joueur(s) (+ parents). Les réponses existantes sont conservées.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setResendOpen(false)} disabled={resendSubmitting}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={resendConvocations} disabled={resendSubmitting}>
+              {resendSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              <Send className="h-4 w-4" />
+              Renvoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {/* Player picker dialog */}
+
       <Dialog open={pickerOpen} onOpenChange={(o) => { setPickerOpen(o); if (!o) setPickerStep("select"); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
