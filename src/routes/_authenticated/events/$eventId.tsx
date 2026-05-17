@@ -942,6 +942,131 @@ function EventDetail() {
     qc.invalidateQueries({ queryKey: ["events"] });
   }
 
+  async function resendConvocations() {
+    if (!event || !user) return;
+    if (!convocations || convocations.length === 0) {
+      toast.error("Aucune convocation à renvoyer");
+      return;
+    }
+    const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
+    setResendSubmitting(true);
+    try {
+      const playerIds = convocations.map((c: any) => c.player_id);
+      const { data: parents } = await supabase
+        .from("player_parents")
+        .select("parent_user_id, email, full_name, player_id")
+        .in("player_id", playerIds);
+
+      const { data: clubRow } = await supabase
+        .from("teams")
+        .select("name, clubs:club_id(name, logo_url)")
+        .eq("id", event.team_id)
+        .maybeSingle();
+      const teamName = (clubRow as any)?.name as string | undefined;
+      const clubName = (clubRow as any)?.clubs?.name as string | undefined;
+      const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+      const competitionLabel = (event as any).competition_name
+        || ((event as any).competition_type
+          ? t(`events.competitionTypes.${(event as any).competition_type}`)
+          : undefined);
+      const locationMapsUrl = event.location
+        ? ((event as any).location_url ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
+        : undefined;
+      const meetingPointMapsUrl = (event as any).meeting_point
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
+        : undefined;
+
+      const squadList = (convocations as any[])
+        .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
+        .filter(Boolean);
+
+      const idemBase = Date.now();
+      const sendOne = (token: string, toEmail: string, recipientFirstName: string | undefined, playerName: string, idemSuffix: string) =>
+        sendTransactionalEmail({
+          templateName: "convocation-invite",
+          recipientEmail: toEmail,
+          fromName: `${clubName ?? "Clubero"} via Clubero`,
+          idempotencyKey: `convoc-update-${event.id}-${idemBase}-${idemSuffix}`,
+          templateData: {
+            recipientFirstName,
+            playerName,
+            eventTitle: event.title,
+            eventType: event.type,
+            eventDate: eventDateLabel,
+            eventDescription: (event as any).description ?? undefined,
+            convocationTime: (event as any).convocation_time
+              ? fmt((event as any).convocation_time, "EEEE d MMMM 'à' HH'h'mm")
+              : undefined,
+            eventLocation: event.location ?? undefined,
+            locationMapsUrl,
+            meetingPoint: (event as any).meeting_point ?? undefined,
+            meetingPointMapsUrl,
+            competitionName: competitionLabel,
+            squadList,
+            teamName,
+            clubName,
+            clubLogoUrl,
+            respondUrl: `${origin}/r/${token}`,
+            isUpdate: true,
+            changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
+          },
+        }).catch(() => undefined);
+
+      const sends: Promise<unknown>[] = [];
+      const inAppRecipients = new Set<string>();
+      for (const c of convocations as any[]) {
+        if (!c.response_token) continue;
+        const player = c.players;
+        const playerName = `${player?.first_name ?? ""} ${player?.last_name ?? ""}`.trim();
+        if (player?.email) {
+          sends.push(sendOne(c.response_token, player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+        }
+        if (player?.user_id) inAppRecipients.add(player.user_id);
+        for (const parent of (parents ?? []).filter((p: any) => p.player_id === c.player_id)) {
+          if (parent.email) {
+            const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+            sends.push(sendOne(c.response_token, parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+          }
+          if (parent.parent_user_id) inAppRecipients.add(parent.parent_user_id);
+        }
+      }
+      if (inAppRecipients.size > 0) {
+        await supabase.from("notifications").insert(
+          Array.from(inAppRecipients).map((uid) => ({
+            user_id: uid,
+            type: "convocation",
+            title: `🔄 ${event.title}`,
+            body: changes.length > 0
+              ? `Convocation mise à jour : ${changes.map((ch) => ch.label).join(", ")}`
+              : "Convocation renvoyée",
+            link: `/events/${event.id}`,
+          })),
+        );
+      }
+      await Promise.allSettled(sends);
+
+      await supabase
+        .from("events")
+        .update({ convocation_sent_snapshot: buildConvocSnapshot(event), convocation_last_sent_at: new Date().toISOString() })
+        .eq("id", event.id);
+
+      toast.success(`Convocation renvoyée à ${convocations.length} joueur(s)`);
+      setResendOpen(false);
+      refetchEvent();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erreur lors du renvoi");
+    } finally {
+      setResendSubmitting(false);
+    }
+  }
+
+  const convocChanges = useMemo(
+    () => diffSnapshot((event as any)?.convocation_sent_snapshot, event, t),
+    [event, t],
+  );
 
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
