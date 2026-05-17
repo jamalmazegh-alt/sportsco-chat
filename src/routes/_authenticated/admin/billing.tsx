@@ -1,7 +1,7 @@
-import { createFileRoute, Navigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import {
