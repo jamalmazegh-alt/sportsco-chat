@@ -64,11 +64,11 @@ function DemoPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "demo", name, email, club, role, teams, notes }),
+        body: JSON.stringify({ kind: "demo", name, email, phone, club, role, teams, notes }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setClub(""); setName(""); setEmail(""); setRole(""); setTeams(""); setNotes("");
+      setClub(""); setName(""); setEmail(""); setPhone(""); setRole(""); setTeams(""); setNotes("");
       toast.success("Demande envoyée. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
