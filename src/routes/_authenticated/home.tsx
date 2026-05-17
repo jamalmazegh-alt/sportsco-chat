@@ -14,6 +14,7 @@ import { EventFormSheet } from "@/components/event-form-sheet";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
+import { HomeSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -37,7 +38,7 @@ function HomePage() {
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const { data: teams } = useQuery({
+  const { data: teams, isLoading: teamsLoading } = useQuery({
     queryKey: ["teams", activeClubId],
     enabled: !!activeClubId,
     queryFn: async () => {
@@ -157,6 +158,11 @@ function HomePage() {
   });
 
   const isCoach = role === "admin" || role === "coach";
+
+  // Show skeleton on first paint while the primary queries hydrate.
+  if (activeClubId && teamsLoading) {
+    return <HomeSkeleton />;
+  }
 
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">

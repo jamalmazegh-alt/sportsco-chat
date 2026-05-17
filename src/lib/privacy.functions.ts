@@ -202,11 +202,33 @@ export const setPlayerMediaConsent = createServerFn({ method: "POST" })
       .parse(input)
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const { error } = await supabase
       .from("players")
       .update({ media_consent_status: data.status })
       .eq("id", data.player_id);
     if (error) throw error;
+
+    // Trace the consent decision in user_consents for audit/GDPR.
+    // We attach the latest published `media` consent version (any locale)
+    // so the record is provable even years later.
+    const { data: version } = await supabase
+      .from("consent_versions")
+      .select("id")
+      .eq("kind", "media")
+      .order("version", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (version?.id) {
+      await supabase.from("user_consents").insert({
+        user_id: userId,
+        version_id: version.id,
+        kind: "media",
+        granted: data.status === "granted",
+        on_behalf_of_player_id: data.player_id,
+      });
+    }
+
     return { ok: true };
   });
