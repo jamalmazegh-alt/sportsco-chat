@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Clubero structure vos convocations, présences et communication de club en un seul outil. Pour clubs, coachs, parents et joueurs. WhatsApp reste disponible en option si besoin.",
+          "Remplacez le chaos WhatsApp par une vraie coordination de club : convocations, présences, communication, tout dans une seule app. WhatsApp reste disponible en option pour ceux qui préfèrent.",
       },
       { property: "og:title", content: "Clubero — La coordination d'équipe pour clubs sportifs" },
       {
@@ -86,28 +86,29 @@ function WhatsAppHybrid() {
           <div className="lg:col-span-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
               <MessageCircle className="h-3.5 w-3.5" />
-              Communication flexible
+              Fini le chaos WhatsApp
             </div>
             <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-              Tout le monde reçoit.
+              Remplacez <span className="text-[#25D366] line-through decoration-2">WhatsApp</span>.
               <br />
-              Même ceux qui préfèrent <span className="text-[#25D366]">WhatsApp</span>.
+              Gardez-le si vous voulez.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Clubero centralise vos convocations, présences et rappels dans un seul outil.
-              Si certains parents ou joueurs préfèrent rester sur WhatsApp, vous pouvez
-              partager le message formaté directement dans le groupe en un clic.
+              Convocations qui se perdent, réponses noyées dans 200 messages, parents qui
+              ratent l'info : Clubero remplace tout ça par une vraie coordination de club.
+              Et pour ceux qui ne veulent pas lâcher WhatsApp, un bouton partage le message
+              formaté dans le groupe en un clic.
             </p>
 
             <ul className="mt-7 space-y-3">
               {[
                 {
-                  t: "Convocations centralisées dans Clubero",
-                  d: "C'est dans l'appli que tout se passe : convocations, réponses de présence, rappels et chat par événement.",
+                  t: "Tout se passe dans Clubero",
+                  d: "Convocations, réponses de présence, rappels, stats et chat par événement — un seul endroit, plus aucun message qui se perd.",
                 },
                 {
-                  t: "WhatsApp en option",
-                  d: "Besoin de toucher ceux qui n'utilisent pas encore l'appli ? Un bouton copie le message formaté prêt à partager dans WhatsApp.",
+                  t: "WhatsApp en option, pas en obligation",
+                  d: "Un parent ou joueur préfère rester sur WhatsApp ? Un bouton copie le message formaté prêt à partager. Vous gardez le suivi dans l'appli.",
                 },
                 {
                   t: "Email pour les résistants au téléphone",
@@ -139,7 +140,7 @@ function WhatsAppHybrid() {
                 </Link>
               </Button>
               <span className="text-xs text-muted-foreground">
-                Clubero en priorité — WhatsApp et email en option
+                Tout dans l'app — WhatsApp et email restent en option
               </span>
             </div>
           </div>
