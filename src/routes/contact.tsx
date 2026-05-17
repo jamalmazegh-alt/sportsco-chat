@@ -30,11 +30,12 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Clubero" },
-      { name: "description", content: "Contactez l'équipe Clubero." },
+      { name: "description", content: "Contactez l'équipe Clubero : questions produit, démonstration, partenariats ou support pour votre club sportif. Nous vous répondons sous 24 h." },
       { property: "og:title", content: "Contact — Clubero" },
-      { property: "og:description", content: "Contactez l'équipe Clubero." },
+      { property: "og:description", content: "Contactez l'équipe Clubero : démo, support et partenariats pour votre club sportif." },
+      { property: "og:url", content: "https://clubero.app/contact" },
     ],
-    links: [{ rel: "canonical", href: "https://www.clubero.app/contact" }],
+    links: [{ rel: "canonical", href: "https://clubero.app/contact" }],
   }),
 });
 
