@@ -5,8 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { toast } from "sonner";
+
+const ROLES = [
+  "Président·e",
+  "Dirigeant·e",
+  "Coach",
+  "Responsable technique",
+  "Parent",
+  "Joueur·euse",
+  "Autre",
+];
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -24,6 +41,8 @@ export const Route = createFileRoute("/contact")({
 function ContactPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -36,12 +55,12 @@ function ContactPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "contact", name, email, message }),
+        body: JSON.stringify({ kind: "contact", name, email, phone, role, message }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setName(""); setEmail(""); setMessage("");
-      toast.success("Message envoyé. Nous revenons vers vous rapidement.");
+      setName(""); setEmail(""); setPhone(""); setRole(""); setMessage("");
+      toast.success("Message envoyé. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
       toast.error("Envoi impossible. Réessayez ou écrivez à hello@clubero.app.");
@@ -61,7 +80,8 @@ function ContactPage() {
             Discutons.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Question, partenariat ou simple curiosité ? Écrivez-nous.
+            Question, partenariat ou simple curiosité ? Écrivez-nous — nous
+            reviendrons vers vous sous <strong>48h ouvrées</strong>.
           </p>
         </div>
       </section>
@@ -119,6 +139,31 @@ function ContactPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="vous@club.fr"
                 />
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="c-phone">Téléphone</Label>
+                <Input
+                  id="c-phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+33 6 12 34 56 78"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="c-role">Votre rôle</Label>
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger id="c-role">
+                    <SelectValue placeholder="Sélectionnez un rôle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="mt-4 space-y-1.5">

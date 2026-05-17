@@ -25,8 +25,10 @@ import { template as eventCancelledTemplate } from './event-cancelled'
 import { template as eventRescheduledTemplate } from './event-rescheduled'
 import { template as trialReminderTemplate } from './trial-reminder'
 import { template as inboundInquiryTemplate } from './inbound-inquiry'
+import { template as inquiryConfirmationTemplate } from './inquiry-confirmation'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'inquiry-confirmation': inquiryConfirmationTemplate,
   'player-invite': playerInviteTemplate,
   'convocation-response': convocationResponseTemplate,
   'convocation-invite': convocationInviteTemplate,
