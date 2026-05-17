@@ -262,6 +262,12 @@ export const reactivateSubscription = createServerFn({ method: "POST" })
       .from("subscriptions")
       .update({ cancel_at_period_end: false, cancel_at: null })
       .eq("club_id", data.clubId);
+    try {
+      const fresh = await stripe.subscriptions.retrieve(subscriptionId, { expand: ["customer"] });
+      await notifySubscriptionAdmin("reactivated", fresh, data.clubId);
+    } catch (err) {
+      console.error("notify reactivated failed:", err);
+    }
     return { ok: true };
   });
 
