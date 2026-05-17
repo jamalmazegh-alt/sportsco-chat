@@ -27,12 +27,14 @@ async function logAction(opts: {
   metadata?: Record<string, unknown>;
 }) {
   try {
-    const params: Record<string, unknown> = { _action: opts.action };
-    if (opts.target_type) params._target_type = opts.target_type;
-    if (opts.target_id) params._target_id = opts.target_id;
-    if (opts.club_id) params._club_id = opts.club_id;
-    if (opts.metadata) params._metadata = opts.metadata;
-    await supabaseAdmin.rpc("log_superadmin_action", params as never);
+    await supabaseAdmin.from("superadmin_audit_logs").insert({
+      actor_user_id: opts.actor,
+      action: opts.action,
+      target_type: opts.target_type ?? null,
+      target_id: opts.target_id ?? null,
+      club_id: opts.club_id ?? null,
+      metadata: (opts.metadata ?? null) as never,
+    });
   } catch (err) {
     console.error("[superadmin] audit log failed", err);
   }
@@ -77,7 +79,7 @@ export const listAllClubs = createServerFn({ method: "POST" })
 
     let query = supabaseAdmin
       .from("clubs")
-      .select("id, name, created_at, created_by, logo_url", { count: "exact" })
+      .select("id, name, created_at, created_by, logo_url, archived_at", { count: "exact" })
       .order("created_at", { ascending: false })
       .range(data.offset, data.offset + data.limit - 1);
 
@@ -276,5 +278,166 @@ export const listSubscriptions = createServerFn({ method: "POST" })
         ...s,
         club_name: nameById.get(s.club_id) ?? "—",
       })),
+    };
+  });
+
+/** Disable (ban) a user via the Supabase Admin API. */
+export const disableUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        user_id: z.string().uuid(),
+        reason: z.string().trim().max(500).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    if (data.user_id === context.userId) {
+      throw new Error("You cannot disable your own account.");
+    }
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+      data.user_id,
+      { ban_duration: "876000h" },
+    );
+    if (error) throw new Error(error.message);
+    await logAction({
+      actor: context.userId,
+      action: "disable_user",
+      target_type: "user",
+      target_id: data.user_id,
+      metadata: data.reason ? { reason: data.reason } : undefined,
+    });
+    return { ok: true };
+  });
+
+/** Reactivate (unban) a previously disabled user. */
+export const reactivateUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+      data.user_id,
+      { ban_duration: "none" },
+    );
+    if (error) throw new Error(error.message);
+    await logAction({
+      actor: context.userId,
+      action: "reactivate_user",
+      target_type: "user",
+      target_id: data.user_id,
+    });
+    return { ok: true };
+  });
+
+/** Generate a password reset link for a user. Returns the link to the super admin. */
+export const generatePasswordResetLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { data: u, error: ue } =
+      await supabaseAdmin.auth.admin.getUserById(data.user_id);
+    if (ue || !u?.user?.email) {
+      throw new Error("User has no email on file.");
+    }
+    const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email: u.user.email,
+    });
+    if (error) throw new Error(error.message);
+    await logAction({
+      actor: context.userId,
+      action: "generate_password_reset",
+      target_type: "user",
+      target_id: data.user_id,
+      metadata: { email: u.user.email },
+    });
+    return {
+      email: u.user.email,
+      action_link: link.properties?.action_link ?? null,
+    };
+  });
+
+/** Archive (soft-delete) a club — hides it from members. */
+export const archiveClub = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        reason: z.string().trim().max(500).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { error } = await supabaseAdmin
+      .from("clubs")
+      .update({ archived_at: new Date().toISOString() })
+      .eq("id", data.club_id);
+    if (error) throw new Error(error.message);
+    await logAction({
+      actor: context.userId,
+      action: "archive_club",
+      target_type: "club",
+      target_id: data.club_id,
+      club_id: data.club_id,
+      metadata: data.reason ? { reason: data.reason } : undefined,
+    });
+    return { ok: true };
+  });
+
+/** Restore an archived club. */
+export const unarchiveClub = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ club_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { error } = await supabaseAdmin
+      .from("clubs")
+      .update({ archived_at: null })
+      .eq("id", data.club_id);
+    if (error) throw new Error(error.message);
+    await logAction({
+      actor: context.userId,
+      action: "unarchive_club",
+      target_type: "club",
+      target_id: data.club_id,
+      club_id: data.club_id,
+    });
+    return { ok: true };
+  });
+
+/** Lightweight auth-level status for a user (banned/email confirmed). */
+export const getUserAuthStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ user_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
+    const { data: u, error } = await supabaseAdmin.auth.admin.getUserById(
+      data.user_id,
+    );
+    if (error) throw new Error(error.message);
+    const banned_until =
+      (u?.user as { banned_until?: string | null } | null)?.banned_until ?? null;
+    return {
+      email: u?.user?.email ?? null,
+      banned_until,
+      is_banned: banned_until
+        ? new Date(banned_until).getTime() > Date.now()
+        : false,
+      last_sign_in_at: u?.user?.last_sign_in_at ?? null,
+      created_at: u?.user?.created_at ?? null,
     };
   });
