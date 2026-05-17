@@ -21,21 +21,18 @@ async function assertSuperAdmin(userId: string) {
 async function logAction(opts: {
   actor: string;
   action: string;
-  target_type?: string | null;
-  target_id?: string | null;
-  club_id?: string | null;
-  metadata?: Record<string, unknown> | null;
+  target_type?: string;
+  target_id?: string;
+  club_id?: string;
+  metadata?: Record<string, unknown>;
 }) {
   try {
-    await supabaseAdmin.rpc("log_superadmin_action", {
-      _action: opts.action,
-      _target_type: opts.target_type ?? null,
-      _target_id: opts.target_id ?? null,
-      _club_id: opts.club_id ?? null,
-      _metadata: (opts.metadata ?? null) as never,
-      _ip: null,
-      _user_agent: null,
-    });
+    const params: Record<string, unknown> = { _action: opts.action };
+    if (opts.target_type) params._target_type = opts.target_type;
+    if (opts.target_id) params._target_id = opts.target_id;
+    if (opts.club_id) params._club_id = opts.club_id;
+    if (opts.metadata) params._metadata = opts.metadata;
+    await supabaseAdmin.rpc("log_superadmin_action", params as never);
   } catch (err) {
     console.error("[superadmin] audit log failed", err);
   }
