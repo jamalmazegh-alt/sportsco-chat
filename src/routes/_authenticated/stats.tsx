@@ -118,15 +118,26 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
   );
 }
 
+// Stat kinds counted as "scoring" in summary tiles (vs cards/fouls which are negative).
+const NEGATIVE_KINDS: StatKind[] = ["yellow_card", "red_card", "foul", "own_goal"];
+
 function PlayerScoringSummary({ playerId }: { playerId: string }) {
   const { t } = useTranslation();
   const { data } = useQuery({
     queryKey: ["player-scoring", playerId],
     queryFn: async () => {
+      // Detect player's sport via first team membership
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("teams:team_id(sport)")
+        .eq("player_id", playerId)
+        .limit(1);
+      const sport = (tm?.[0] as any)?.teams?.sport ?? null;
+
       const [goalsRes, assistsRes, matchesRes] = await Promise.all([
         supabase
           .from("event_goals")
-          .select("id, kind", { count: "exact", head: false })
+          .select("id, kind")
           .eq("scorer_player_id", playerId),
         supabase
           .from("event_goals")
@@ -138,36 +149,50 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
           .eq("player_id", playerId)
           .eq("status", "present"),
       ]);
-      const goals = (goalsRes.data ?? []).filter((g: any) => g.kind !== "own_goal").length;
-      const ownGoals = (goalsRes.data ?? []).filter((g: any) => g.kind === "own_goal").length;
+      const byKind: Record<string, number> = {};
+      (goalsRes.data ?? []).forEach((g: any) => {
+        byKind[g.kind] = (byKind[g.kind] ?? 0) + 1;
+      });
       const assists = assistsRes.count ?? 0;
       const matchesPlayed = (matchesRes.data ?? []).filter(
         (c: any) => c.events?.type === "match" && c.events?.status !== "cancelled"
       ).length;
-      return { goals, ownGoals, assists, matchesPlayed };
+      return { sport, byKind, assists, matchesPlayed };
     },
   });
 
-  const items = [
-    { label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }), value: data?.matchesPlayed ?? 0, icon: ShieldCheck },
-    { label: t("stats.goals", { defaultValue: "Buts" }), value: data?.goals ?? 0, icon: Target },
-    { label: t("stats.assists", { defaultValue: "Passes décisives" }), value: data?.assists ?? 0, icon: Trophy },
+  const cfg = getSportConfig(data?.sport);
+  const tiles: Array<{ label: string; value: number; negative?: boolean }> = [
+    { label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }), value: data?.matchesPlayed ?? 0 },
   ];
+  // Per-kind tiles from sport config (scorer_player_id kinds)
+  cfg.statKinds.forEach((k) => {
+    if (k === "assist") return; // handled below
+    tiles.push({
+      label: t(`match.kinds.${k}`, { defaultValue: k }),
+      value: data?.byKind[k] ?? 0,
+      negative: NEGATIVE_KINDS.includes(k),
+    });
+  });
+  if (cfg.assistsEnabled && cfg.statKinds.includes("assist")) {
+    tiles.push({ label: t("match.kinds.assist", { defaultValue: "Passes" }), value: data?.assists ?? 0 });
+  } else if (cfg.assistsEnabled) {
+    tiles.push({ label: t("match.kinds.assist", { defaultValue: "Passes" }), value: data?.assists ?? 0 });
+  }
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {items.map((it) => {
-        const Icon = it.icon;
-        return (
-          <div key={it.label} className="rounded-xl border bg-card p-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Icon className="h-3.5 w-3.5" />
-              {it.label}
-            </div>
-            <div className="mt-1 text-2xl font-bold">{it.value}</div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {tiles.map((it) => (
+        <div key={it.label} className="rounded-xl border bg-card p-4">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            {it.label}
           </div>
-        );
-      })}
+          <div className={cn("mt-1 text-2xl font-bold", it.negative && "text-destructive")}>
+            {it.value}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
