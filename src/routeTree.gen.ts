@@ -63,6 +63,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
+import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
 
 const SuperadminRoute = SuperadminRouteImport.update({
@@ -345,6 +346,12 @@ const ApiPublicHooksTrialRemindersRoute =
     path: '/api/public/hooks/trial-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksEventRemindersRoute =
+  ApiPublicHooksEventRemindersRouteImport.update({
+    id: '/api/public/hooks/event-reminders',
+    path: '/api/public/hooks/event-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminUsersUserIdRoute =
   AuthenticatedAdminUsersUserIdRouteImport.update({
     id: '/$userId',
@@ -401,6 +408,7 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -454,6 +462,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -512,6 +521,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/superadmin/clubs/'
     | '/admin/users/$userId'
+    | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/superadmin/clubs'
     | '/admin/users/$userId'
+    | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -680,6 +692,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/'
     | '/superadmin/clubs/'
     | '/_authenticated/admin/users/$userId'
+    | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -710,6 +723,7 @@ export interface RootRouteChildren {
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -1098,6 +1112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTrialRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/event-reminders': {
+      id: '/api/public/hooks/event-reminders'
+      path: '/api/public/hooks/event-reminders'
+      fullPath: '/api/public/hooks/event-reminders'
+      preLoaderRoute: typeof ApiPublicHooksEventRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/users/$userId': {
       id: '/_authenticated/admin/users/$userId'
       path: '/$userId'
@@ -1264,6 +1285,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
