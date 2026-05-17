@@ -163,25 +163,52 @@ function PrivacyPage() {
       {/* Consents */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h2 className="text-sm font-semibold">{t("privacy.yourConsents")}</h2>
+        <p className="text-xs text-muted-foreground">
+          {t("privacy.consentsHint", { defaultValue: "Touchez un élément pour consulter le document. L'interrupteur gère votre consentement." })}
+        </p>
         <div className="space-y-2">
-          {status?.items.map((i) => (
-            <div key={i.kind} className="flex items-start justify-between gap-3 rounded-lg border border-border p-3">
-              <div className="text-sm">
-                <div className="font-medium">
-                  {i.title}
-                  {i.required && (
-                    <span className="ml-2 text-xs text-destructive">{t("privacy.required")}</span>
+          {status?.items.map((i) => {
+            const legalKindFor = (
+              ["terms", "privacy", "data_processing", "media", "notifications"] as const
+            ).includes(i.kind as any)
+              ? (i.kind as any)
+              : null;
+            return (
+              <div
+                key={i.kind}
+                className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+              >
+                <button
+                  type="button"
+                  onClick={() => legalKindFor && setLegalKind(legalKindFor)}
+                  disabled={!legalKindFor}
+                  className="flex-1 min-w-0 text-left flex items-center gap-2 group"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
+                      <span className="truncate group-hover:text-primary transition-colors">
+                        {i.title}
+                      </span>
+                      {i.required && (
+                        <span className="text-[10px] uppercase tracking-wide text-destructive font-semibold">
+                          {t("privacy.required")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">v{i.version}</p>
+                  </div>
+                  {legalKindFor && (
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
                   )}
-                </div>
-                <p className="text-xs text-muted-foreground">v{i.version}</p>
+                </button>
+                <Switch
+                  checked={i.granted}
+                  disabled={busy || (i.required && i.granted)}
+                  onCheckedChange={() => toggleConsent(i.kind, i.version_id, i.granted)}
+                />
               </div>
-              <Switch
-                checked={i.granted}
-                disabled={busy || (i.required && i.granted)}
-                onCheckedChange={() => toggleConsent(i.kind, i.version_id, i.granted)}
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -221,25 +248,8 @@ function PrivacyPage() {
         </section>
       )}
 
-      {/* Legal docs */}
-      <section className="rounded-2xl border border-border bg-card p-4 space-y-2">
-        <h2 className="text-sm font-semibold">{t("privacy.legalDocs", { defaultValue: "Documents légaux" })}</h2>
-        <p className="text-xs text-muted-foreground">{t("privacy.legalDocsHint", { defaultValue: "Consulte les conditions et politiques en vigueur." })}</p>
-        <ul className="grid grid-cols-1 gap-1.5 pt-1">
-          {(["terms", "privacy", "data_processing", "media", "notifications"] as const).map((k) => (
-            <li key={k}>
-              <button
-                type="button"
-                onClick={() => setLegalKind(k)}
-                className="w-full flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm hover:bg-muted/40 text-left"
-              >
-                <span>{t(`privacy.legal.${k}`, { defaultValue: k })}</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* Legal docs section removed — each consent above opens its document. */}
+
 
       {/* GDPR rights */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">

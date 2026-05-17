@@ -103,19 +103,39 @@ function ProfilePage() {
 
   return (
     <div className="px-5 pt-8 space-y-6 pb-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("profile.title")}</h1>
-        {profile?.full_name && (
-          <p className="text-sm text-muted-foreground mt-1">{profile.full_name}</p>
-        )}
-        {user?.email && (
-          <p className="text-sm text-muted-foreground mt-0.5 break-all">{user.email}</p>
-        )}
-        {role && (
-          <span className="inline-flex items-center mt-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
-            {t(`roles.${role}`, { defaultValue: role })}
+      <div className="flex items-start gap-4">
+        <div className="h-14 w-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20 flex items-center justify-center shrink-0">
+          <span className="text-lg font-semibold text-primary">
+            {(profile?.full_name ?? user?.email ?? "?")
+              .split(" ")
+              .map((s) => s[0])
+              .filter(Boolean)
+              .slice(0, 2)
+              .join("")
+              .toUpperCase()}
           </span>
-        )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-semibold leading-tight">{t("profile.title")}</h1>
+          {profile?.full_name && (
+            <p className="text-sm font-medium text-foreground mt-1 truncate">{profile.full_name}</p>
+          )}
+          {user?.email && (
+            <a
+              href={`mailto:${user.email}`}
+              className="inline-flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground hover:text-primary transition-colors max-w-full"
+            >
+              <span className="truncate">{user.email}</span>
+            </a>
+          )}
+          {role && (
+            <div className="mt-2">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
+                {t(`roles.${role}`, { defaultValue: role })}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {club && (
