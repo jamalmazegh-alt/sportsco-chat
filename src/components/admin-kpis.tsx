@@ -98,12 +98,11 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
       bg: "bg-present/10 border-present/20",
     },
     {
-      icon: AlertTriangle,
-      label: t("dashboard.kpis.playersAlert"),
-      hint: t("dashboard.kpis.playersAlertHint"),
-      value: data?.playersAlert ?? 0,
-      tone: "text-absent",
-      bg: "bg-absent/10 border-absent/20",
+      icon: Clock,
+      label: t("dashboard.kpis.pendingResponses", { defaultValue: "Réponses en attente" }),
+      value: data?.pendingResponses ?? 0,
+      tone: "text-pending",
+      bg: "bg-pending/10 border-pending/20",
     },
     {
       icon: CalendarClock,
