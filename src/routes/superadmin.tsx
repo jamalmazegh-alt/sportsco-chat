@@ -55,11 +55,17 @@ const NAV: NavItem[] = [
 
 function SuperAdminLayout() {
   const { session, loading } = useAuth();
-  const [state, setState] = useState<"checking" | "ok" | "denied">("checking");
+  const { verified } = Route.useLoaderData();
+  // If the server loader verified, we skip the client re-check (no spinner flash).
+  const [state, setState] = useState<"checking" | "ok" | "denied">(
+    verified ? "ok" : "checking",
+  );
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Already verified server-side — skip the client roundtrip.
+    if (verified) return;
     let cancelled = false;
     if (loading) return;
     if (!session) {
@@ -78,7 +84,7 @@ function SuperAdminLayout() {
     return () => {
       cancelled = true;
     };
-  }, [session, loading, location.href, navigate]);
+  }, [verified, session, loading, location.href, navigate]);
 
   if (loading || state === "checking") {
     return (
