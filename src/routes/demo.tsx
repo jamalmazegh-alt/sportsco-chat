@@ -47,7 +47,8 @@ export const Route = createFileRoute("/demo")({
 
 function DemoPage() {
   const [club, setClub] = useState("");
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
@@ -64,11 +65,11 @@ function DemoPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "demo", name, email, phone, club, role, teams, notes }),
+        body: JSON.stringify({ kind: "demo", firstName, lastName, name: `${firstName} ${lastName}`.trim(), email, phone, club, role, teams, notes }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setClub(""); setName(""); setEmail(""); setPhone(""); setRole(""); setTeams(""); setNotes("");
+      setClub(""); setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setTeams(""); setNotes("");
       toast.success("Demande envoyée. Nous revenons vers vous sous 48h ouvrées.");
     } catch (err) {
       console.error(err);
@@ -126,14 +127,27 @@ function DemoPage() {
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-name">Votre nom</Label>
+                <Label htmlFor="d-firstName">Prénom</Label>
                 <Input
-                  id="d-name"
+                  id="d-firstName"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Votre prénom"
                 />
               </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="d-lastName">Nom</Label>
+                <Input
+                  id="d-lastName"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Votre nom"
+                />
+              </div>
+            </div>
+            <div className="mt-4">
               <div className="space-y-1.5">
                 <Label htmlFor="d-email">E-mail</Label>
                 <Input
