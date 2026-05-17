@@ -429,9 +429,10 @@ export const Route = createFileRoute("/api/chat")({
               location: z.string().max(200).optional().describe("Lieu de l'événement (ex : stade, gymnase)."),
               meetingPoint: z.string().max(200).optional().describe("Lieu du rendez-vous / point de ralliement (ex : 'Parking du club', 'Devant le vestiaire'). Distinct du lieu de l'événement."),
               opponent: z.string().max(200).optional().describe("Pour les matchs uniquement."),
+              isHome: z.boolean().optional().describe("Pour les matchs : true = match à domicile, false = à l'extérieur. **Déduis-le toi-même** : si le lieu est une ville/stade adverse ou différent du club de l'utilisateur, mets false. Si l'utilisateur dit explicitement 'à domicile' / 'à la maison' / 'chez nous', mets true. Si l'utilisateur dit 'à [ville extérieure]' ou nomme un stade adverse, mets false. Ne demande pas confirmation pour ce champ — déduis-le du contexte."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
+            execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
               // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
               const managedTeamIds = await getManagedTeamIds();
               let coached: Array<{ id: string; name: string }> = [];
@@ -489,6 +490,7 @@ export const Route = createFileRoute("/api/chat")({
                   location: location ?? null,
                   meeting_point: meetingPoint ?? null,
                   opponent: opponent ?? null,
+                  is_home: isHome ?? null,
                   description: description ?? null,
                   status: "draft",
                   convocations_sent: false,
@@ -529,9 +531,10 @@ export const Route = createFileRoute("/api/chat")({
               location: z.string().max(200).optional(),
               meetingPoint: z.string().max(200).optional(),
               opponent: z.string().max(200).optional(),
+              isHome: z.boolean().optional().describe("true = match à domicile, false = à l'extérieur."),
               description: z.string().max(1000).optional(),
             }),
-            execute: async ({ eventId, title, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, description }) => {
+            execute: async ({ eventId, title, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
               const { data: ev, error: evErr } = await supabase
                 .from("events")
                 .select("id, team_id, title, team:team_id(name)")
@@ -564,6 +567,7 @@ export const Route = createFileRoute("/api/chat")({
               if (location !== undefined) patch.location = location;
               if (meetingPoint !== undefined) patch.meeting_point = meetingPoint;
               if (opponent !== undefined) patch.opponent = opponent;
+              if (isHome !== undefined) patch.is_home = isHome;
               if (description !== undefined) patch.description = description;
               if (Object.keys(patch).length === 0) {
                 return { updated: false, note: "Aucun champ à mettre à jour." };
