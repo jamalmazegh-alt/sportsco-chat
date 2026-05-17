@@ -226,9 +226,44 @@ function HomePage() {
         </div>
       )}
 
-      {/* For players/parents: shortcut to own attendance stats */}
+      {/* For players/parents: shortcut to team(s) */}
+      {!isCoach && myTeams && myTeams.length > 0 && (
+        <section className="space-y-2">
+          {myTeams.map(({ team, player }) => (
+            <Link
+              key={`${team.id}-${player.id}`}
+              to="/teams/$teamId"
+              params={{ teamId: team.id }}
+              className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                {team.image_url ? (
+                  <img src={team.image_url} alt={team.name} className="h-10 w-10 rounded-xl object-cover shrink-0" />
+                ) : (
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {player.isOwn
+                      ? t("dashboard.myTeam")
+                      : t("dashboard.childTeam", { name: player.first_name })}
+                    {" · "}
+                    {team.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{t("dashboard.teamHint")}</p>
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {/* For players/parents: shortcut to attendance stats (own or child's) */}
       {!isCoach && myConvocs && myConvocs.length > 0 && (() => {
-        const seen = new Map<string, { id: string; first_name: string; last_name?: string }>();
+        const seen = new Map<string, { id: string; first_name: string; last_name?: string; isOwn?: boolean }>();
         for (const e of myConvocs as any[]) {
           if (e.player && !seen.has(e.player.id)) seen.set(e.player.id, e.player);
         }
@@ -249,12 +284,14 @@ function HomePage() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">
-                      {players.length > 1
-                        ? `${t("dashboard.myStats")} · ${p.first_name}`
-                        : t("dashboard.myStats")}
+                      {p.isOwn
+                        ? t("dashboard.myStats")
+                        : t("dashboard.childStats", { name: p.first_name })}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {t("dashboard.myStatsHint")}
+                      {p.isOwn
+                        ? t("dashboard.myStatsHint")
+                        : t("dashboard.childStatsHint", { name: p.first_name })}
                     </p>
                   </div>
                 </div>
