@@ -109,6 +109,8 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
 
 function EventDetail() {
   const { eventId } = Route.useParams();
+  const search = Route.useSearch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
@@ -116,6 +118,7 @@ function EventDetail() {
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [autoSendConsumed, setAutoSendConsumed] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerStep, setPickerStep] = useState<"select" | "review">("select");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
