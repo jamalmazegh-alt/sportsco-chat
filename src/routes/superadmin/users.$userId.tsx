@@ -212,6 +212,87 @@ function UserDetail() {
           </section>
         </>
       )}
+
+      <Dialog open={impersonateOpen} onOpenChange={setImpersonateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Impersonate user</DialogTitle>
+            <DialogDescription>
+              This generates a one-time magic sign-in link as{" "}
+              <span className="font-medium text-foreground">{status?.email}</span>.
+              Open it in a private window. The action is recorded in the audit log.
+            </DialogDescription>
+          </DialogHeader>
+          {!impLink ? (
+            <>
+              <div className="space-y-2">
+                <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Reason (required, min 10 chars)
+                </label>
+                <Textarea
+                  rows={3}
+                  value={impReason}
+                  onChange={(e) => setImpReason(e.target.value)}
+                  placeholder="e.g. Investigating ticket #421 — user reports missing events"
+                />
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setImpersonateOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={busy || impReason.trim().length < 10}
+                  onClick={async () => {
+                    setBusy(true);
+                    try {
+                      const r = await generateImpersonationLink({
+                        data: { user_id: userId, reason: impReason.trim() },
+                      });
+                      setImpLink(r.action_link);
+                      toast.success("Impersonation link generated");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  {busy && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                  Generate link
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <div className="space-y-3">
+              <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+                Single-use link. Open in a private/incognito window so it does not
+                replace your super-admin session.
+              </div>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 text-[11px] font-mono break-all bg-background border border-border rounded px-2 py-1.5">
+                  {impLink}
+                </code>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(impLink);
+                    setImpCopied(true);
+                    setTimeout(() => setImpCopied(false), 2000);
+                  }}
+                >
+                  {impCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setImpersonateOpen(false)}>
+                  Close
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
