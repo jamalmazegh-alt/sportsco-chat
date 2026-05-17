@@ -1302,7 +1302,7 @@ function EventDetail() {
             ✓ {t("events.convocationsSent")}
           </p>
           {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
-            <Button onClick={openPicker} variant="outline" className="w-full h-10">
+            <Button onClick={() => openPicker()} variant="outline" className="w-full h-10">
               <Send className="h-4 w-4" />
               {t("attendance.addMorePlayers")}
             </Button>
