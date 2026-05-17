@@ -191,6 +191,16 @@ function PlayerProfile() {
 
     let photo_url = player.photo_url;
     if (photoFile) {
+      // RGPD: parental consent required for photos of minors
+      if (minor && player.media_consent_status !== "granted") {
+        setBusy(false);
+        toast.error(
+          t("players.photoBlockedMinor", {
+            defaultValue: "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
+          })
+        );
+        return;
+      }
       const ext = photoFile.name.split(".").pop() || "jpg";
       const path = `${player.club_id}/${player.id}.${ext}`;
       const { error: upErr } = await supabase.storage
