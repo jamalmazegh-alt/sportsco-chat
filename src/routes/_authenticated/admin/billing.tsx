@@ -43,10 +43,18 @@ const searchSchema = z.object({
   card: z.literal("updated").optional(),
 });
 
+import i18nInstance from "@/lib/i18n";
+
 export const Route = createFileRoute("/_authenticated/admin/billing")({
   component: BillingPage,
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Abonnement — Clubero" }] }),
+  head: () => ({
+    meta: [
+      {
+        title: `${i18nInstance.t("billing.title", { defaultValue: "Abonnement" })} — Clubero`,
+      },
+    ],
+  }),
 });
 
 function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | null }) {

@@ -153,7 +153,7 @@ function AssistantPage() {
               {t("assistant.title", { defaultValue: "Assistant Clubero" })}
             </h1>
             <p className="text-xs text-muted-foreground">
-              {t("assistant.subtitle", { defaultValue: "Pose une question sur l'app ou tes données" })}
+              {t("assistant.subtitle", { defaultValue: "Assistant IA · vérifie les informations importantes" })}
             </p>
           </div>
         </div>

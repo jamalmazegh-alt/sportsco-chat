@@ -30,6 +30,7 @@ import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/sett
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
 import { Route as RTokenRouteImport } from './routes/r.$token'
+import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -170,6 +171,11 @@ const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
 const RTokenRoute = RTokenRouteImport.update({
   id: '/r/$token',
   path: '/r/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/legal/cookies',
+  path: '/legal/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalKindRoute = LegalKindRouteImport.update({
@@ -398,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
@@ -454,6 +461,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
@@ -515,6 +523,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
+  '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
@@ -576,6 +585,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/legal/cookies'
     | '/r/$token'
     | '/superadmin/billing'
     | '/superadmin/logs'
@@ -632,6 +642,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/legal/cookies'
     | '/r/$token'
     | '/superadmin/billing'
     | '/superadmin/logs'
@@ -692,6 +703,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
+    | '/legal/cookies'
     | '/r/$token'
     | '/superadmin/billing'
     | '/superadmin/logs'
@@ -744,6 +756,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   LegalKindRoute: typeof LegalKindRoute
+  LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
@@ -906,6 +919,13 @@ declare module '@tanstack/react-router' {
       path: '/r/$token'
       fullPath: '/r/$token'
       preLoaderRoute: typeof RTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/legal/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/$kind': {
@@ -1322,6 +1342,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   LegalKindRoute: LegalKindRoute,
+  LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,

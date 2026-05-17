@@ -110,7 +110,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         ...(trialPeriodDays ? { trial_period_days: trialPeriodDays } : {}),
         metadata: { club_id: club.id, plan: data.plan },
       },
-      billing_address_collection: "auto",
+      // VAT multi-pays : Stripe collecte l'adresse de facturation, calcule
+      // automatiquement la TVA selon le pays/état et la persiste sur le client.
+      billing_address_collection: "required",
+      tax_id_collection: { enabled: true },
+      automatic_tax: { enabled: true },
+      customer_update: { address: "auto", name: "auto" },
       allow_promotion_codes: true,
       success_url: `${origin}/admin?billing=success`,
       cancel_url: `${origin}/pricing?billing=canceled`,
