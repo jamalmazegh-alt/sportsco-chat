@@ -36,41 +36,7 @@ async function notifyAdmin(
   sub: Stripe.Subscription,
   clubId: string | null,
 ) {
-  try {
-    let clubName: string | null = null;
-    if (clubId) {
-      const { data: club } = await supabaseAdmin
-        .from("clubs")
-        .select("name")
-        .eq("id", clubId)
-        .maybeSingle();
-      clubName = club?.name ?? null;
-    }
-    const item = sub.items.data[0];
-    const priceId = item?.price?.id ?? null;
-    const customerEmail =
-      typeof sub.customer === "object" && sub.customer && "email" in sub.customer
-        ? (sub.customer as Stripe.Customer).email
-        : null;
-    await enqueueTransactionalEmailServer({
-      templateName: "subscription-admin-notification",
-      idempotencyKey: `sub-${eventType}-${sub.id}-${sub.canceled_at ?? sub.cancel_at ?? ""}`,
-      templateData: {
-        eventType,
-        clubId,
-        clubName,
-        plan: planFromPriceId(priceId),
-        status: sub.status,
-        customerEmail,
-        trialEnd: toIso(sub.trial_end),
-        currentPeriodEnd: toIso(item?.current_period_end),
-        cancelAt: toIso(sub.cancel_at),
-        stripeSubscriptionId: sub.id,
-      },
-    });
-  } catch (err) {
-    console.error("notifyAdmin failed:", err);
-  }
+  await notifySubscriptionAdmin(eventType, sub, clubId);
 }
 
 async function upsertSubscription(sub: Stripe.Subscription) {
