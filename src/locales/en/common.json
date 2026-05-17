@@ -467,6 +467,7 @@
       "point": "Point",
       "yellow_card": "Yellow card",
       "red_card": "Red card",
+      "white_card": "White card",
       "foul": "Foul"
     },
     "goal": "Goal",

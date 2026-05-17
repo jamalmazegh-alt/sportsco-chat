@@ -12,6 +12,7 @@ export type StatKind =
   | "point"
   | "yellow_card"
   | "red_card"
+  | "white_card"
   | "foul";
 
 export interface SportConfig {
@@ -26,7 +27,7 @@ export interface SportConfig {
 
 const FOOTBALL: SportConfig = {
   scoreUnit: "goals",
-  statKinds: ["goal", "assist", "yellow_card", "red_card"],
+  statKinds: ["goal", "assist", "yellow_card", "red_card", "white_card"],
   assistsEnabled: true,
   cardsEnabled: true,
   setScoresEnabled: false,
@@ -48,7 +49,7 @@ const CONFIGS: Record<string, SportConfig> = {
   },
   rugby: {
     scoreUnit: "points",
-    statKinds: ["try", "yellow_card", "red_card"],
+    statKinds: ["try", "yellow_card", "red_card", "white_card"],
     assistsEnabled: false,
     cardsEnabled: true,
     setScoresEnabled: false,
@@ -57,7 +58,7 @@ const CONFIGS: Record<string, SportConfig> = {
   },
   handball: {
     scoreUnit: "goals",
-    statKinds: ["goal", "assist", "yellow_card", "red_card"],
+    statKinds: ["goal", "assist", "yellow_card", "red_card", "white_card"],
     assistsEnabled: true,
     cardsEnabled: true,
     setScoresEnabled: false,
@@ -84,7 +85,7 @@ const CONFIGS: Record<string, SportConfig> = {
   },
   field_hockey: {
     scoreUnit: "goals",
-    statKinds: ["goal", "assist", "yellow_card", "red_card"],
+    statKinds: ["goal", "assist", "yellow_card", "red_card", "white_card"],
     assistsEnabled: true,
     cardsEnabled: true,
     setScoresEnabled: false,
@@ -113,6 +114,7 @@ export function getSportConfig(sport: string | null | undefined): SportConfig {
 export const SOLO_STAT_KINDS: StatKind[] = [
   "yellow_card",
   "red_card",
+  "white_card",
   "foul",
   "penalty",
   "own_goal",
