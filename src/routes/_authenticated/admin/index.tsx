@@ -15,8 +15,8 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin settings — Clubero" }] }),
 });
 
-type ChannelKey = "in_app" | "email" | "push";
-const CHANNELS: ChannelKey[] = ["in_app", "email", "push"];
+type ChannelKey = "in_app" | "email";
+const CHANNELS: ChannelKey[] = ["in_app", "email"];
 
 type ClubSettings = {
   id: string;
