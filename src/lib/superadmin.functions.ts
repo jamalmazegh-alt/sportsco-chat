@@ -1399,8 +1399,8 @@ export const getClubFinancials = createServerFn({ method: "POST" })
       amount_due: number;
       currency: string;
       created: number;
-      hosted_invoice_url: string | null;
-      invoice_pdf: string | null;
+      hosted_invoice_url: string | null | undefined;
+      invoice_pdf: string | null | undefined;
     };
     let invoices: InvoiceItem[] = [];
     let lifetimePaid = 0;
