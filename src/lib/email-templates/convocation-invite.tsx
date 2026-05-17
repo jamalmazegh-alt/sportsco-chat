@@ -252,3 +252,14 @@ const squadCard = {
 const squadTitle = { fontSize: "12px", fontWeight: "bold" as const, color: "#475569", margin: "0 0 6px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
 const squadText = { fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: 0 };
 const squadLine = { fontSize: "13px", color: "#334155", lineHeight: "1.6", margin: "0 0 2px" };
+const changesCard = {
+  backgroundColor: "#fef3c7",
+  border: "1px solid #f59e0b",
+  borderRadius: "10px",
+  padding: "12px 14px",
+  margin: "0 0 18px",
+};
+const changesTitle = { fontSize: "13px", fontWeight: "bold" as const, color: "#92400e", margin: "0 0 8px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
+const changesLine = { fontSize: "13px", color: "#451a03", lineHeight: "1.6", margin: "0 0 4px" };
+const oldValue = { color: "#9ca3af", textDecoration: "line-through" as const };
+const newValue = { color: "#065f46", fontWeight: "bold" as const, backgroundColor: "#d1fae5", padding: "1px 6px", borderRadius: "4px" };
