@@ -97,6 +97,8 @@ function AdminSettingsPage() {
         event_chat_enabled: form.event_chat_enabled,
         event_chat_players_enabled: form.event_chat_players_enabled,
         event_chat_parents_enabled: form.event_chat_parents_enabled,
+        auto_reminders_enabled: form.auto_reminders_enabled,
+        auto_reminder_hours_before: form.auto_reminder_hours_before,
       })
       .eq("id", form.id);
     setSaving(false);
