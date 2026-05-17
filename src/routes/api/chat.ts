@@ -399,6 +399,103 @@ export const Route = createFileRoute("/api/chat")({
               };
             },
           }),
+
+          createDraftEvent: tool({
+            description:
+              "Pour coachs/admins uniquement : crée un événement (entraînement, match, tournoi, réunion) en BROUILLON pour une équipe encadrée par l'utilisateur. L'événement n'est PAS publié automatiquement — l'utilisateur doit le réviser et le publier dans la page Événements pour envoyer les convocations. **Demande TOUJOURS confirmation explicite avant d'appeler ce tool** (récapitule équipe, titre, type, date/heure et lieu, puis attends un 'oui' clair). Si l'utilisateur n'a pas précisé une info essentielle (équipe, date, heure), redemande-la avant d'appeler.",
+            inputSchema: z.object({
+              teamName: z.string().min(1).describe("Nom (ou portion) de l'équipe. Sera matché de façon flexible parmi les équipes encadrées."),
+              title: z.string().min(1).max(200).describe("Titre de l'événement (ex : 'U13 vs FC Riverside', 'Entraînement hebdo')."),
+              type: z.enum(["training", "match", "tournament", "meeting", "other"]),
+              startsAt: z.string().describe("Date/heure de début au format ISO 8601 avec fuseau (ex : '2025-05-24T14:30:00+02:00'). Convertis toujours les indications relatives (samedi prochain 14h30) en ISO complet AVANT d'appeler."),
+              endsAt: z.string().optional().describe("Date/heure de fin ISO 8601 (optionnel)."),
+              location: z.string().max(200).optional(),
+              opponent: z.string().max(200).optional().describe("Pour les matchs uniquement."),
+              description: z.string().max(1000).optional(),
+            }),
+            execute: async ({ teamName, title, type, startsAt, endsAt, location, opponent, description }) => {
+              // Resolve coached teams
+              const { data: tm } = await supabase
+                .from("team_members")
+                .select("team_id, team:team_id(id, name)")
+                .eq("user_id", userId)
+                .in("role", ["coach", "admin"]);
+              const coached = (tm ?? [])
+                .map((t: any) => t.team)
+                .filter(Boolean) as Array<{ id: string; name: string }>;
+              if (coached.length === 0) {
+                return {
+                  created: false,
+                  note: "L'utilisateur n'encadre aucune équipe — création refusée.",
+                };
+              }
+              const needle = teamName.toLowerCase().trim();
+              const exact = coached.find((t) => t.name.toLowerCase() === needle);
+              const matches =
+                exact !== undefined
+                  ? [exact]
+                  : coached.filter((t) => t.name.toLowerCase().includes(needle));
+              if (matches.length === 0) {
+                return {
+                  created: false,
+                  note: `Aucune équipe trouvée pour "${teamName}". Équipes disponibles : ${coached.map((t) => t.name).join(", ")}.`,
+                };
+              }
+              if (matches.length > 1) {
+                return {
+                  created: false,
+                  note: `Plusieurs équipes correspondent à "${teamName}" : ${matches.map((t) => t.name).join(", ")}. Demande à l'utilisateur de préciser.`,
+                };
+              }
+              const team = matches[0];
+
+              // Validate the parsed date
+              const startsAtDate = new Date(startsAt);
+              if (Number.isNaN(startsAtDate.getTime())) {
+                return { created: false, note: "Date/heure de début invalide." };
+              }
+              if (startsAtDate.getTime() < Date.now() - 60_000) {
+                return { created: false, note: "La date/heure de début est dans le passé." };
+              }
+
+              const { data: created, error } = await supabase
+                .from("events")
+                .insert({
+                  team_id: team.id,
+                  title,
+                  type,
+                  starts_at: startsAtDate.toISOString(),
+                  ends_at: endsAt ? new Date(endsAt).toISOString() : null,
+                  location: location ?? null,
+                  opponent: opponent ?? null,
+                  description: description ?? null,
+                  status: "draft",
+                  convocations_sent: false,
+                  created_by: userId,
+                })
+                .select("id, title, starts_at, type, status, team_id")
+                .single();
+              if (error || !created) {
+                return {
+                  created: false,
+                  note: `Échec de la création : ${error?.message ?? "erreur inconnue"}.`,
+                };
+              }
+              return {
+                created: true,
+                event: {
+                  id: created.id,
+                  title: created.title,
+                  type: created.type,
+                  starts_at: created.starts_at,
+                  status: created.status,
+                  team: team.name,
+                  edit_link: `/events/${created.id}`,
+                },
+                note: `Événement créé en brouillon pour ${team.name}. Pour publier et envoyer les convocations, l'utilisateur doit ouvrir l'événement (lien fourni), sélectionner les joueurs convoqués et cliquer 'Publier'.`,
+              };
+            },
+          }),
         };
 
         const gateway = createLovableAiGatewayProvider(apiKey);
