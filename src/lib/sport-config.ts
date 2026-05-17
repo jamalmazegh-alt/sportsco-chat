@@ -82,6 +82,15 @@ const CONFIGS: Record<string, SportConfig> = {
     minuteEnabled: true,
     defaultStatKind: "goal",
   },
+  field_hockey: {
+    scoreUnit: "goals",
+    statKinds: ["goal", "assist", "yellow_card", "red_card"],
+    assistsEnabled: true,
+    cardsEnabled: true,
+    setScoresEnabled: false,
+    minuteEnabled: true,
+    defaultStatKind: "goal",
+  },
 };
 
 const FALLBACK: SportConfig = {
