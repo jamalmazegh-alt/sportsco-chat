@@ -71,6 +71,8 @@ function RegisterPage() {
         setEmail(row.email);
         setInviteEmailLocked(true);
       }
+      if (row.suggested_first_name) setFirstName(row.suggested_first_name);
+      if (row.suggested_last_name) setLastName(row.suggested_last_name);
       setInviteLoading(false);
     })();
     return () => {
