@@ -148,6 +148,8 @@ export type Database = {
       clubs: {
         Row: {
           archived_at: string | null
+          auto_reminder_hours_before: number[]
+          auto_reminders_enabled: boolean
           convocation_channels: Json
           created_at: string
           created_by: string
@@ -162,6 +164,8 @@ export type Database = {
         }
         Insert: {
           archived_at?: string | null
+          auto_reminder_hours_before?: number[]
+          auto_reminders_enabled?: boolean
           convocation_channels?: Json
           created_at?: string
           created_by: string
@@ -176,6 +180,8 @@ export type Database = {
         }
         Update: {
           archived_at?: string | null
+          auto_reminder_hours_before?: number[]
+          auto_reminders_enabled?: boolean
           convocation_channels?: Json
           created_at?: string
           created_by?: string
@@ -842,6 +848,7 @@ export type Database = {
           channel: Database["public"]["Enums"]["reminder_channel"]
           convocation_id: string
           id: string
+          milestone_hours: number | null
           sent_at: string
           sent_by: string | null
         }
@@ -849,6 +856,7 @@ export type Database = {
           channel?: Database["public"]["Enums"]["reminder_channel"]
           convocation_id: string
           id?: string
+          milestone_hours?: number | null
           sent_at?: string
           sent_by?: string | null
         }
@@ -856,6 +864,7 @@ export type Database = {
           channel?: Database["public"]["Enums"]["reminder_channel"]
           convocation_id?: string
           id?: string
+          milestone_hours?: number | null
           sent_at?: string
           sent_by?: string | null
         }
