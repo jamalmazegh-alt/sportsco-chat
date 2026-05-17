@@ -16,6 +16,7 @@ export function BottomNav() {
     { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
     { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
     { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
+    { to: "/stats", icon: BarChart3, label: t("nav.stats"), badge: 0 },
     { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
     ...(role === "admin"
       ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
