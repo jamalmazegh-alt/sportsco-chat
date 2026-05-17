@@ -1345,6 +1345,8 @@ export type Database = {
           expired: boolean
           kind: string
           role: Database["public"]["Enums"]["app_role"]
+          suggested_first_name: string
+          suggested_last_name: string
           used: boolean
         }[]
       }
