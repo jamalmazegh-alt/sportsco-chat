@@ -166,16 +166,17 @@ function DemoPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="d-role">Votre rôle</Label>
-                <Select value={role} onValueChange={setRole}>
-                  <SelectTrigger id="d-role">
-                    <SelectValue placeholder="Sélectionnez un rôle" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROLES.map((r) => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  id="d-role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="" disabled>Sélectionnez un rôle</option>
+                  {ROLES.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
