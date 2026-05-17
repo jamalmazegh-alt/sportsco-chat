@@ -555,7 +555,8 @@
   },
   "attachments": {
     "add": "Add file",
-    "tooLarge": "{{name}} exceeds 10 MB."
+    "tooLarge": "{{name}} exceeds 10 MB.",
+    "invalidType": "File type not allowed: {{name}}"
   },
   "wall": {
     "title": "Club wall",
