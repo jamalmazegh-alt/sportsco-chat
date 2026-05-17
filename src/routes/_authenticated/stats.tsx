@@ -208,22 +208,21 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
       if (isAdmin) {
         const { data } = await supabase
           .from("teams")
-          .select("id, name")
+          .select("id, name, sport")
           .eq("club_id", clubId)
           .is("deleted_at", null)
           .order("name");
         return data ?? [];
       }
-      // coach: teams they coach
       const { data } = await supabase
         .from("team_members")
-        .select("team_id, teams:team_id(id, name, club_id, deleted_at)")
+        .select("team_id, teams:team_id(id, name, sport, club_id, deleted_at)")
         .eq("user_id", userId)
         .in("role", ["coach", "admin"]);
       return (data ?? [])
         .map((r: any) => r.teams)
         .filter((tm: any) => tm && tm.club_id === clubId && !tm.deleted_at)
-        .map((tm: any) => ({ id: tm.id, name: tm.name }));
+        .map((tm: any) => ({ id: tm.id, name: tm.name, sport: tm.sport }));
     },
   });
 
@@ -231,6 +230,9 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
   useEffect(() => {
     if (!teamId && teams && teams.length > 0) setTeamId(teams[0].id);
   }, [teams, teamId]);
+
+  const selectedTeam = teams?.find((tm: any) => tm.id === teamId) ?? null;
+  const selectedSport: string | null = (selectedTeam as any)?.sport ?? null;
 
   if (isLoading) return <p className="text-sm text-muted-foreground">{t("common.loading", { defaultValue: "Chargement…" })}</p>;
   if (!teams || teams.length === 0) {
