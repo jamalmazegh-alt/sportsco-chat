@@ -238,14 +238,24 @@ export const Route = createFileRoute("/api/chat")({
           }),
 
           getRecentClubAnnouncements: tool({
-            description: "Récupère les dernières annonces du mur du club actif.",
+            description: "Récupère les dernières annonces du mur des clubs auxquels l'utilisateur appartient.",
             inputSchema: z.object({
               limit: z.number().int().min(1).max(10).optional(),
             }),
             execute: async ({ limit = 5 }) => {
+              const { data: memberships } = await supabase
+                .from("club_members")
+                .select("club_id")
+                .eq("user_id", userId);
+              const clubIds = (memberships ?? []).map((m: any) => m.club_id);
+              if (clubIds.length === 0) {
+                return { posts: [], note: "L'utilisateur n'appartient à aucun club." };
+              }
               const { data: posts } = await supabase
                 .from("wall_posts")
                 .select("body, created_at, author:author_user_id(full_name)")
+                .in("club_id", clubIds)
+                .is("deleted_at", null)
                 .order("created_at", { ascending: false })
                 .limit(limit);
               return {

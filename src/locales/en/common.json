@@ -635,6 +635,7 @@
     "invoicePaid": "paid",
     "invoiceOpen": "to pay",
     "taxNotice": "Prices include applicable VAT. Billing in EUR from France. For EU business customers, reverse charge may apply — provide your VAT number in the Stripe portal.",
+    "termsNotice": "By subscribing, you accept our <1>Terms of Sale</1> and <3>Privacy Policy</3>. Cancel anytime from the Stripe portal.",
     "trialingLabel": "Trial",
     "untilDate": "until {{date}}",
     "statusActive": "Active",

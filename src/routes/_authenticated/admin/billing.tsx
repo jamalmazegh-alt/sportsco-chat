@@ -1,7 +1,7 @@
-import { createFileRoute, Navigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import {
@@ -425,6 +425,33 @@ function BillingPage() {
 
           <p className="text-xs text-muted-foreground text-center -mt-1">
             {t("billing.taxNotice")}
+          </p>
+
+          <p className="text-xs text-muted-foreground text-center">
+            <Trans
+              i18nKey="billing.termsNotice"
+              t={t}
+              components={{
+                1: (
+                  <Link
+                    to="/legal/$kind"
+                    params={{ kind: "terms" }}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-foreground"
+                  />
+                ),
+                3: (
+                  <Link
+                    to="/legal/$kind"
+                    params={{ kind: "privacy" }}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-foreground"
+                  />
+                ),
+              }}
+            />
           </p>
 
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-border">

@@ -635,6 +635,7 @@
     "invoicePaid": "payée",
     "invoiceOpen": "à payer",
     "taxNotice": "Prix TTC, TVA applicable incluse. Facturation en euros depuis la France. Pour les clients professionnels UE, l'autoliquidation peut s'appliquer — renseignez votre numéro de TVA dans le portail Stripe.",
+    "termsNotice": "En souscrivant, vous acceptez nos <1>Conditions Générales de Vente</1> et notre <3>Politique de confidentialité</3>. Résiliable à tout moment depuis le portail Stripe.",
     "trialingLabel": "Période d'essai",
     "untilDate": "jusqu'au {{date}}",
     "statusActive": "Actif",
