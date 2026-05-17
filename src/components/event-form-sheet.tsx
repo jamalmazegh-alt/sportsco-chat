@@ -848,10 +848,10 @@ export function EventFormSheet({
               />
               <div className="space-y-0.5">
                 <div className="text-sm font-medium">
-                  {t("events.sendConvocationsNow", { defaultValue: "Convoquer toute l'équipe maintenant" })}
+                  {t("events.openConvocationAfterCreate", { defaultValue: "Choisir les convoqués juste après" })}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
-                  {t("events.sendConvocationsNowHint", { defaultValue: "Tu pourras ajuster la liste juste après la création." })}
+                  {t("events.openConvocationAfterCreateHint", { defaultValue: "L'écran de convocation s'ouvrira pour que tu sélectionnes les joueurs." })}
                 </div>
               </div>
             </label>

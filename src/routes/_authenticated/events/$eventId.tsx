@@ -183,7 +183,14 @@ function EventDetail() {
         .eq("team_id", event!.team_id)
         .eq("role", "player");
       if (error) throw error;
-      return (data ?? []).filter((tp: any) => tp.players);
+      // Dedupe by player_id (a player may have multiple team_member rows e.g. player + coach)
+      const seen = new Set<string>();
+      return (data ?? []).filter((tp: any) => {
+        if (!tp.players) return false;
+        if (seen.has(tp.player_id)) return false;
+        seen.add(tp.player_id);
+        return true;
+      });
     },
   });
 
@@ -362,16 +369,19 @@ function EventDetail() {
     }
   }
 
-  function openPicker() {
+  function openPicker(opts?: { preselectAll?: boolean }) {
     if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
       return;
     }
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
-    // pre-select players that don't already have a convocation
-    const preselect = new Set(
-      teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid))
-    );
+    const preselect = opts?.preselectAll
+      ? new Set<string>(
+          teamPlayers
+            .map((tp: any) => tp.player_id)
+            .filter((pid: string) => !existing.has(pid)),
+        )
+      : new Set<string>();
     setSelectedIds(preselect);
     setPickerStep("select");
     setPickerOpen(true);
@@ -385,7 +395,7 @@ function EventDetail() {
     if (!event || (event as any).convocations_sent) return;
     if (!teamPlayers) return;
     setAutoSendConsumed(true);
-    openPicker();
+    openPicker(); // no preselection — coach picks who to call up
     navigate({
       to: "/events/$eventId",
       params: { eventId },
@@ -1281,7 +1291,7 @@ function EventDetail() {
 
       {/* Coach: send convocations */}
       {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
-        <Button onClick={openPicker} className="w-full h-11">
+        <Button onClick={() => openPicker()} className="w-full h-11">
           <Send className="h-4 w-4" />
           {t("events.sendConvocations")}
         </Button>
@@ -1292,7 +1302,7 @@ function EventDetail() {
             ✓ {t("events.convocationsSent")}
           </p>
           {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
-            <Button onClick={openPicker} variant="outline" className="w-full h-10">
+            <Button onClick={() => openPicker()} variant="outline" className="w-full h-10">
               <Send className="h-4 w-4" />
               {t("attendance.addMorePlayers")}
             </Button>
