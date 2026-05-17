@@ -4,6 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe, getPriceId } from "./stripe.server";
 import { notifySubscriptionAdmin } from "./subscription-notify.server";
+import { createLogger } from "@/lib/logger.server";
+
+const log = createLogger("billing");
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
