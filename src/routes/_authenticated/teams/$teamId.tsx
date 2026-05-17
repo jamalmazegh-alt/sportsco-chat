@@ -217,12 +217,30 @@ function TeamDetail() {
 
     if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
 
+    // Déduplication : si l'email est déjà associé à un compte Clubero existant,
+    // on saute l'invitation (et on tag comme "skipped" pour informer l'utilisateur).
+    const filtered: InviteTarget[] = [];
+    let skippedExisting = 0;
+    for (const target of targets) {
+      if (target.email) {
+        const { data: exists } = await supabase.rpc("email_exists", { _email: target.email });
+        if (exists === true) {
+          skippedExisting += 1;
+          continue;
+        }
+      }
+      filtered.push(target);
+    }
+    if (filtered.length === 0) {
+      return { sent: 0, failed: 0, skipped: skippedExisting || 1 };
+    }
+
     const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
 
     let sent = 0; let failed = 0;
-    for (const target of targets) {
+    for (const target of filtered) {
       const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
       const { error: invErr } = await supabase.from("member_invites").insert({
         club_id: activeClubId,
