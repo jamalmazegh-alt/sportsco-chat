@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getPlatformStats } from "@/lib/superadmin.functions";
 import { Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/_superadmin/")({
+export const Route = createFileRoute("/superadmin/")({
   component: SuperAdminDashboard,
 });
 

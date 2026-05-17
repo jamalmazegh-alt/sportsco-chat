@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_superadmin")({
+export const Route = createFileRoute("/superadmin")({
   component: SuperAdminLayout,
 });
 
@@ -167,3 +167,4 @@ function SuperAdminLayout() {
     </div>
   );
 }
+

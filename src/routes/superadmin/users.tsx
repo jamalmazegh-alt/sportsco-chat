@@ -4,7 +4,7 @@ import { searchUsers } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search } from "lucide-react";
 
-export const Route = createFileRoute("/_superadmin/users")({
+export const Route = createFileRoute("/superadmin/users")({
   component: SuperAdminUsers,
 });
 
@@ -73,7 +73,7 @@ function SuperAdminUsers() {
             {!loading && items.map((u) => (
               <tr key={u.id} className="border-t border-border hover:bg-muted/20">
                 <td className="px-3 py-2">
-                  {u.full_name ?? `${u.first_name ?? ""} ${u.last_name ?? ""}`.trim() || "—"}
+                  {(u.full_name ?? `${u.first_name ?? ""} ${u.last_name ?? ""}`.trim()) || "—"}
                   <div className="text-[10px] font-mono text-muted-foreground/70">{u.id.slice(0, 8)}</div>
                 </td>
                 <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">{u.phone ?? "—"}</td>

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getClubDetail } from "@/lib/superadmin.functions";
 import { Loader2, ArrowLeft } from "lucide-react";
 
-export const Route = createFileRoute("/_superadmin/clubs/$clubId")({
+export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
 });
 
@@ -90,7 +90,7 @@ function ClubDetail() {
             {members.map((m) => (
               <tr key={m.user_id} className="border-t border-border">
                 <td className="px-3 py-2">
-                  {m.profile?.full_name ?? `${m.profile?.first_name ?? ""} ${m.profile?.last_name ?? ""}`.trim() || "—"}
+                  {(m.profile?.full_name ?? `${m.profile?.first_name ?? ""} ${m.profile?.last_name ?? ""}`.trim()) || "—"}
                   <div className="text-[10px] font-mono text-muted-foreground/70">{m.user_id.slice(0, 8)}</div>
                 </td>
                 <td className="px-3 py-2 text-xs">{m.role}</td>
