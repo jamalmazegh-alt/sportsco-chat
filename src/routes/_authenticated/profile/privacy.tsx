@@ -31,9 +31,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2 } from "lucide-react";
+import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { LegalDialog } from "@/components/legal-dialog";
 
 export const Route = createFileRoute("/_authenticated/profile/privacy")({
   component: PrivacyPage,
