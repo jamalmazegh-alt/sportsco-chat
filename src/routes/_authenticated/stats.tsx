@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, ShieldCheck } from "lucide-react";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
