@@ -251,10 +251,20 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
   );
 }
 
+function getCurrentSeason() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const startYear = now.getMonth() >= 7 ? y : y - 1; // season starts August
+  const start = new Date(Date.UTC(startYear, 7, 1)).toISOString();
+  const end = new Date(Date.UTC(startYear + 1, 7, 1)).toISOString();
+  return { start, end, label: `${startYear}-${startYear + 1}` };
+}
+
 function TeamMatchRecord({ teamId }: { teamId: string }) {
   const { t } = useTranslation();
+  const season = useMemo(getCurrentSeason, []);
   const { data } = useQuery({
-    queryKey: ["team-match-record", teamId],
+    queryKey: ["team-match-record", teamId, season.label],
     queryFn: async () => {
       const { data: matches } = await supabase
         .from("events")
@@ -262,7 +272,9 @@ function TeamMatchRecord({ teamId }: { teamId: string }) {
         .eq("team_id", teamId)
         .eq("type", "match")
         .neq("status", "cancelled")
-        .is("deleted_at", null);
+        .is("deleted_at", null)
+        .gte("starts_at", season.start)
+        .lt("starts_at", season.end);
       const matchIds = (matches ?? []).map((m) => m.id);
       const homeMap = new Map((matches ?? []).map((m: any) => [m.id, m.is_home]));
       if (matchIds.length === 0) return { played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
