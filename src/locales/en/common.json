@@ -154,6 +154,11 @@
     "viewAll": "View all",
     "myStats": "My attendance stats",
     "myStatsHint": "See my training attendance",
+    "childStats": "{{name}}'s attendance stats",
+    "childStatsHint": "See {{name}}'s training attendance",
+    "myTeam": "My team",
+    "childTeam": "{{name}}'s team",
+    "teamHint": "View team and teammates",
     "kpis": {
       "title": "Overview",
       "attendance30d": "Attendance 30d",

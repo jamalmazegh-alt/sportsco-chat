@@ -87,9 +87,13 @@ function HomePage() {
           .select("player_id, players:player_id(id, first_name, last_name)")
           .eq("parent_user_id", user!.id),
       ]);
+      const ownIds = new Set((own ?? []).map((p: any) => p.id));
       const players = [
-        ...(own ?? []),
-        ...((children ?? []).map((c: any) => c.players).filter(Boolean) as any[]),
+        ...(own ?? []).map((p: any) => ({ ...p, isOwn: true })),
+        ...((children ?? [])
+          .map((c: any) => c.players)
+          .filter(Boolean)
+          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) }))),
       ];
       const playerIds = players.map((p) => p.id);
       if (playerIds.length === 0) return [];
@@ -110,6 +114,45 @@ function HomePage() {
           player: players.find((p) => p.id === c.player_id) ?? null,
         }))
         .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
+    },
+  });
+
+  // Teams the user (or their children) belong to — for player/parent quick access
+  const { data: myTeams } = useQuery({
+    queryKey: ["my-teams-home", user?.id, activeClubId],
+    enabled: !!user && !!activeClubId,
+    queryFn: async () => {
+      const [{ data: own }, { data: children }] = await Promise.all([
+        supabase.from("players").select("id, first_name, last_name").eq("user_id", user!.id),
+        supabase
+          .from("player_parents")
+          .select("player_id, players:player_id(id, first_name, last_name)")
+          .eq("parent_user_id", user!.id),
+      ]);
+      const ownIds = new Set((own ?? []).map((p: any) => p.id));
+      const players = [
+        ...(own ?? []).map((p: any) => ({ ...p, isOwn: true })),
+        ...((children ?? [])
+          .map((c: any) => c.players)
+          .filter(Boolean)
+          .map((p: any) => ({ ...p, isOwn: ownIds.has(p.id) }))),
+      ];
+      if (players.length === 0) return [] as any[];
+      const playerIds = players.map((p) => p.id);
+      const { data: tms } = await supabase
+        .from("team_members")
+        .select("team_id, player_id, teams:team_id(id, name, image_url, deleted_at)")
+        .in("player_id", playerIds);
+      const seen = new Map<string, { team: any; player: any }>();
+      for (const tm of (tms ?? []) as any[]) {
+        const team = tm.teams;
+        if (!team || team.deleted_at) continue;
+        const player = players.find((p) => p.id === tm.player_id);
+        if (!player) continue;
+        const key = `${team.id}:${player.id}`;
+        if (!seen.has(key)) seen.set(key, { team, player });
+      }
+      return Array.from(seen.values());
     },
   });
 
@@ -183,9 +226,44 @@ function HomePage() {
         </div>
       )}
 
-      {/* For players/parents: shortcut to own attendance stats */}
+      {/* For players/parents: shortcut to team(s) */}
+      {!isCoach && myTeams && myTeams.length > 0 && (
+        <section className="space-y-2">
+          {myTeams.map(({ team, player }) => (
+            <Link
+              key={`${team.id}-${player.id}`}
+              to="/teams/$teamId"
+              params={{ teamId: team.id }}
+              className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-muted/40 transition-colors"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                {team.image_url ? (
+                  <img src={team.image_url} alt={team.name} className="h-10 w-10 rounded-xl object-cover shrink-0" />
+                ) : (
+                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {player.isOwn
+                      ? t("dashboard.myTeam")
+                      : t("dashboard.childTeam", { name: player.first_name })}
+                    {" · "}
+                    {team.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{t("dashboard.teamHint")}</p>
+                </div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {/* For players/parents: shortcut to attendance stats (own or child's) */}
       {!isCoach && myConvocs && myConvocs.length > 0 && (() => {
-        const seen = new Map<string, { id: string; first_name: string; last_name?: string }>();
+        const seen = new Map<string, { id: string; first_name: string; last_name?: string; isOwn?: boolean }>();
         for (const e of myConvocs as any[]) {
           if (e.player && !seen.has(e.player.id)) seen.set(e.player.id, e.player);
         }
@@ -206,12 +284,14 @@ function HomePage() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">
-                      {players.length > 1
-                        ? `${t("dashboard.myStats")} · ${p.first_name}`
-                        : t("dashboard.myStats")}
+                      {p.isOwn
+                        ? t("dashboard.myStats")
+                        : t("dashboard.childStats", { name: p.first_name })}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {t("dashboard.myStatsHint")}
+                      {p.isOwn
+                        ? t("dashboard.myStatsHint")
+                        : t("dashboard.childStatsHint", { name: p.first_name })}
                     </p>
                   </div>
                 </div>
