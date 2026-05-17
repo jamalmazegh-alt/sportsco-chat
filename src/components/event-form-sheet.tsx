@@ -428,7 +428,7 @@ export function EventFormSheet({
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
   const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
-  const [sendNow, setSendNow] = useState<boolean>(true);
+  const [sendNow, setSendNow] = useState<boolean>(false);
 
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
@@ -460,7 +460,7 @@ export function EventFormSheet({
     setConvocDate(c.date);
     setConvocTime(c.time);
     setRepeatWeeks(1);
-    setSendNow(true);
+    setSendNow(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
