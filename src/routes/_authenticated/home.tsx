@@ -14,6 +14,7 @@ import { EventFormSheet } from "@/components/event-form-sheet";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
+import { HomeSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
