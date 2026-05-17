@@ -541,18 +541,50 @@ export function EventFormSheet({
           };
           rows.push(shifted);
         }
+        // Duplicate check: skip rows that already exist (same team + type + starts_at)
+        const { data: existing } = await supabase
+          .from("events")
+          .select("starts_at")
+          .eq("team_id", teamId)
+          .eq("type", type)
+          .in("starts_at", rows.map((r) => r.starts_at))
+          .is("deleted_at", null);
+        const existingSet = new Set((existing ?? []).map((e) => new Date(e.starts_at).toISOString()));
+        const toInsert = rows.filter((r) => !existingSet.has(r.starts_at));
+        if (toInsert.length === 0) {
+          setBusy(false);
+          toast.error(t("events.duplicateExists", { defaultValue: "Un événement existe déjà pour cette équipe à cette date/heure." }));
+          return;
+        }
         const { data, error } = await supabase
           .from("events")
-          .insert(rows.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })))
+          .insert(toInsert.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })))
           .select("id");
         setBusy(false);
         if (error || !data || data.length === 0) {
           toast.error(error?.message ?? "Failed");
           return;
         }
+        if (existingSet.size > 0) {
+          toast.info(t("events.someDuplicatesSkipped", { defaultValue: "{{count}} doublon(s) ignoré(s).", count: existingSet.size }));
+        }
         toast.success(t("events.repeatCreated", { count: data.length }));
         onOpenChange(false);
         onSaved(data[0].id);
+        return;
+      }
+      // Duplicate check for single create
+      const { data: dupes } = await supabase
+        .from("events")
+        .select("id")
+        .eq("team_id", teamId)
+        .eq("type", type)
+        .eq("starts_at", payload.starts_at)
+        .is("deleted_at", null)
+        .limit(1);
+      if (dupes && dupes.length > 0) {
+        setBusy(false);
+        toast.error(t("events.duplicateExists", { defaultValue: "Un événement existe déjà pour cette équipe à cette date/heure." }));
         return;
       }
       const { data, error } = await supabase
