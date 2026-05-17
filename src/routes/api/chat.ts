@@ -567,6 +567,7 @@ export const Route = createFileRoute("/api/chat")({
               if (location !== undefined) patch.location = location;
               if (meetingPoint !== undefined) patch.meeting_point = meetingPoint;
               if (opponent !== undefined) patch.opponent = opponent;
+              if (isHome !== undefined) patch.is_home = isHome;
               if (description !== undefined) patch.description = description;
               if (Object.keys(patch).length === 0) {
                 return { updated: false, note: "Aucun champ à mettre à jour." };
