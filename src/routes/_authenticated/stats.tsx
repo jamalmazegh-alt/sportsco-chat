@@ -268,7 +268,7 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
             <TeamMatchRecord teamId={teamId} />
           </TabsContent>
           <TabsContent value="players" className="mt-4">
-            <TeamPlayersStats teamId={teamId} />
+            <TeamPlayersStats teamId={teamId} sport={selectedSport} />
           </TabsContent>
           <TabsContent value="attendance" className="mt-4">
             <TeamAttendanceStats teamId={teamId} />
