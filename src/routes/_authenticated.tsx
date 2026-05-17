@@ -7,6 +7,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { AssistantFab } from "@/components/assistant-fab";
 import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
+import { TrialBanner } from "@/components/trial-banner";
+import { OnboardingWizard } from "@/components/onboarding-wizard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,11 +58,13 @@ function AuthLayout() {
                 <GlobalSearch />
               </div>
             </div>
+            <TrialBanner />
           </div>
           <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
             <Outlet />
           </div>
         </div>
+        <OnboardingWizard />
         <AssistantFab />
         <BottomNav />
       </div>
