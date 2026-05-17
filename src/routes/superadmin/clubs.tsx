@@ -13,6 +13,7 @@ type Club = {
   name: string;
   created_at: string;
   member_count: number;
+  archived_at: string | null;
   subscription: {
     status: string;
     trial_end: string | null;
