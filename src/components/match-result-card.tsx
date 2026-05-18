@@ -124,18 +124,32 @@ export function MatchResultCard({
   });
 
   const { data: players } = useQuery({
-    queryKey: ["event-convoqued-players", eventId],
+    queryKey: ["event-roster-players", eventId, teamId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
         .select("players:player_id(id, first_name, last_name, jersey_number)")
         .eq("event_id", eventId);
       if (error) throw error;
-      return ((data ?? [])
+      const fromConv = ((data ?? [])
+        .map((r: any) => r.players)
+        .filter(Boolean)) as Player[];
+      if (fromConv.length > 0) return fromConv;
+
+      // Fallback: load roster directly from team_members when no convocations exist
+      if (!teamId) return [];
+      const { data: tm, error: tmErr } = await supabase
+        .from("team_members")
+        .select("players:player_id(id, first_name, last_name, jersey_number)")
+        .eq("team_id", teamId)
+        .eq("role", "player");
+      if (tmErr) throw tmErr;
+      return ((tm ?? [])
         .map((r: any) => r.players)
         .filter(Boolean)) as Player[];
     },
   });
+
 
   const playersById = useMemo(() => {
     const m = new Map<string, Player>();
