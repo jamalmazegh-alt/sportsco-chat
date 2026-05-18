@@ -162,35 +162,8 @@ function AdminUsersPage() {
                     {t("roles.admin")} — {t("admin.roleAdminHint", { defaultValue: "accès complet au club" })}
                   </SelectItem>
                   <SelectItem value="coach">
-                    {t("roles.coach")} — {t("admin.roleCoachHint", { defaultValue: "accès limité à son équipe" })}
+                    {t("roles.coach")}
                   </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {inviteRole === "coach" && (teams ?? []).length > 0 && (
-              <div className="space-y-1.5">
-                <Label>
-                  {t("admin.inviteTeam", { defaultValue: "Équipe (optionnel)" })}
-                </Label>
-                <Select value={teamId || "none"} onValueChange={(v) => setTeamId(v === "none" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("admin.inviteTeamPlaceholder", { defaultValue: "Aucune équipe pour le moment" })} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
-                      {t("admin.inviteNoTeamYet", { defaultValue: "Pas d'équipe pour le moment" })}
-                    </SelectItem>
-                    {(teams ?? []).map((tm) => (
-                      <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  {t("admin.inviteTeamHint", { defaultValue: "Vous pourrez attacher ce coach à une ou plusieurs équipes plus tard depuis la page de l'équipe." })}
-                </p>
-              </div>
-            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
