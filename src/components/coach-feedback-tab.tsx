@@ -69,8 +69,9 @@ export function CoachFeedbackTab({
         },
       });
       if (generated?.review) {
+        const review = generated.review as any;
         qc.setQueryData(["player-reviews", playerId], (current: any) => ({
-          reviews: [generated.review, ...((current?.reviews ?? []).filter((r: any) => r.id !== generated.review.id))],
+          reviews: [review, ...((current?.reviews ?? []).filter((r: any) => r.id !== review.id))],
         }));
       }
       toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }));
@@ -286,22 +287,5 @@ export function CoachFeedbackTab({
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function VisibilityBadge({ v }: { v: string }) {
-  const { t } = useTranslation();
-  const isPrivate = v === "coach_only" || v === "staff";
-  const Icon = isPrivate ? Lock : Eye;
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-        isPrivate ? "bg-muted text-muted-foreground" : "bg-primary/15 text-primary"
-      )}
-    >
-      <Icon className="h-3 w-3" />
-      {t(`feedback.visibility_${v}`, { defaultValue: v })}
-    </span>
   );
 }
