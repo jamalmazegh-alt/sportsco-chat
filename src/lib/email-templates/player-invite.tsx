@@ -34,7 +34,9 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
           {clubName && <Text style={clubLabel}>{clubName}</Text>}
         </Section>
         <Heading style={h1}>
-          {firstName ? `Welcome, ${firstName}!` : "You've been invited"}
+          {firstName
+            ? (roleLabel ? `Bienvenue, ${firstName} !` : `Welcome, ${firstName}!`)
+            : (roleLabel ? `Vous êtes invité·e en tant que ${roleLabel}` : "You've been invited")}
         </Heading>
         <Text style={text}>
           {roleLabel ? (
