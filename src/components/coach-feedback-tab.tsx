@@ -171,7 +171,7 @@ export function CoachFeedbackTab({
                       <span className="truncate">{f.event.title}</span>
                     </>
                   )}
-                  <span className="ml-auto"><VisibilityBadge v={f.visibility} /></span>
+                  
                 </div>
 
                 {f.rating && (
