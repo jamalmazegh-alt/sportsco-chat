@@ -161,6 +161,41 @@ function EventDetail() {
     },
   });
 
+  const { data: canAccessFeedback } = useQuery({
+    queryKey: ["event-feedback-access", event?.id, event?.team_id, user?.id],
+    enabled: !!event?.team_id && !!user,
+    queryFn: async () => {
+      const [{ data: teamRoles }, { data: team }] = await Promise.all([
+        supabase
+          .from("team_members")
+          .select("role")
+          .eq("team_id", event!.team_id)
+          .eq("user_id", user!.id)
+          .in("role", ["coach", "admin"])
+          .limit(1),
+        supabase
+          .from("teams")
+          .select("club_id")
+          .eq("id", event!.team_id)
+          .maybeSingle(),
+      ]);
+
+      if ((teamRoles ?? []).length > 0) return true;
+      const clubId = (team as any)?.club_id;
+      if (!clubId) return false;
+
+      const { data: clubAdminRoles } = await supabase
+        .from("club_members")
+        .select("role")
+        .eq("club_id", clubId)
+        .eq("user_id", user!.id)
+        .eq("role", "admin")
+        .limit(1);
+
+      return (clubAdminRoles ?? []).length > 0;
+    },
+  });
+
   const { data: convocations, refetch } = useQuery({
     queryKey: ["convocations", eventId],
     queryFn: async () => {
@@ -1175,6 +1210,9 @@ function EventDetail() {
   const hasPendingForMe =
     !event.responses_locked &&
     visibleMyConvocs.some((c: any) => c.status === "pending");
+  const isPastMatch =
+    event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
+  const showFeedbackButton = isPastMatch && !!canAccessFeedback;
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -1218,18 +1256,20 @@ function EventDetail() {
               </span>
             )}
           </div>
-          {isCoach && teams && (
+          {teams && (isCoach || showFeedbackButton) && (
             <div className="flex items-center gap-1 shrink-0">
-              {event.type === "match" && (
+              {showFeedbackButton && (
                 <Button asChild size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}>
                   <Link to="/events/$eventId/feedback" params={{ eventId }}>
                     <ClipboardList className="h-4 w-4" />
                   </Link>
                 </Button>
               )}
-              <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" onClick={() => setEditOpen(true)}>
-                <Pencil className="h-4 w-4" />
-              </Button>
+              {isCoach && (
+                <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" onClick={() => setEditOpen(true)}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           )}
         </div>

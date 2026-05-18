@@ -17,9 +17,10 @@ import {
   EMPTY_FEEDBACK,
   type FeedbackFormValue,
 } from "@/components/player-feedback-form";
-import { useActiveRole } from "@/lib/auth-context";
+import { useActiveRole, useAuth } from "@/lib/auth-context";
 import { Navigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/feedback")({
   component: PostMatchFeedback,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId/feedback")
 function PostMatchFeedback() {
   const { eventId } = Route.useParams();
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
@@ -36,10 +38,42 @@ function PostMatchFeedback() {
   const createFn = useServerFn(createPlayerFeedback);
   const updateFn = useServerFn(updatePlayerFeedback);
 
+  const { data: canAccessFeedback, isLoading: isAccessLoading } = useQuery({
+    queryKey: ["event-feedback-access", eventId, user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data: event } = await supabase
+        .from("events")
+        .select("team_id, type, starts_at, teams:team_id(club_id)")
+        .eq("id", eventId)
+        .maybeSingle();
+      if (!event?.team_id || event.type !== "match") return false;
+
+      const [{ data: teamRoles }, { data: clubAdminRoles }] = await Promise.all([
+        supabase
+          .from("team_members")
+          .select("role")
+          .eq("team_id", event.team_id)
+          .eq("user_id", user!.id)
+          .in("role", ["coach", "admin"])
+          .limit(1),
+        supabase
+          .from("club_members")
+          .select("role")
+          .eq("club_id", (event as any).teams?.club_id)
+          .eq("user_id", user!.id)
+          .eq("role", "admin")
+          .limit(1),
+      ]);
+
+      return (teamRoles ?? []).length > 0 || (clubAdminRoles ?? []).length > 0;
+    },
+  });
+
   const { data, isLoading } = useQuery({
     queryKey: ["event-feedback", eventId],
     queryFn: async () => fetchData({ data: { eventId } }),
-    enabled: isCoach,
+    enabled: !!canAccessFeedback,
   });
 
   const [values, setValues] = useState<Record<string, FeedbackFormValue>>({});
@@ -75,7 +109,7 @@ function PostMatchFeedback() {
     setSavedIds(filled);
   }, [data]);
 
-  if (!isCoach) return <Navigate to="/home" replace />;
+  if (!isAccessLoading && canAccessFeedback === false) return <Navigate to="/home" replace />;
 
   async function saveOne(playerId: string) {
     const v = values[playerId];
