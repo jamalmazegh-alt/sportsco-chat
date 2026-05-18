@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot,
 } from "lucide-react";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import {
@@ -28,9 +28,6 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AttendancePill } from "@/components/attendance-pill";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { MatchResultCard } from "@/components/match-result-card";
@@ -39,6 +36,17 @@ import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
+
+const ATTENDANCE_ACTIONS: Array<{
+  status: AttendanceStatus;
+  Icon: typeof CheckCircle2;
+  className: string;
+}> = [
+  { status: "present", Icon: CheckCircle2, className: "text-present hover:bg-present/15 hover:text-present" },
+  { status: "absent", Icon: XCircle, className: "text-absent hover:bg-absent/10 hover:text-absent" },
+  { status: "uncertain", Icon: HelpCircle, className: "text-uncertain-foreground hover:bg-uncertain/20 hover:text-uncertain-foreground" },
+  { status: "pending", Icon: CircleDot, className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground" },
+];
 
 const CONVOC_SNAPSHOT_FIELDS = [
   "title",
@@ -116,7 +124,7 @@ function EventDetail() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const isActiveCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -168,36 +176,16 @@ function EventDetail() {
     queryKey: ["event-feedback-access", event?.id, event?.team_id, user?.id],
     enabled: !!event?.team_id && !!user,
     queryFn: async () => {
-      const [{ data: teamRoles }, { data: team }] = await Promise.all([
-        supabase
-          .from("team_members")
-          .select("role")
-          .eq("team_id", event!.team_id)
-          .eq("user_id", user!.id)
-          .in("role", ["coach", "admin"])
-          .limit(1),
-        supabase
-          .from("teams")
-          .select("club_id")
-          .eq("id", event!.team_id)
-          .maybeSingle(),
-      ]);
-
-      if ((teamRoles ?? []).length > 0) return true;
-      const clubId = (team as any)?.club_id;
-      if (!clubId) return false;
-
-      const { data: clubAdminRoles } = await supabase
-        .from("club_members")
-        .select("role")
-        .eq("club_id", clubId)
-        .eq("user_id", user!.id)
-        .eq("role", "admin")
-        .limit(1);
-
-      return (clubAdminRoles ?? []).length > 0;
+      const { data, error } = await supabase.rpc("is_team_coach", {
+        _team_id: event!.team_id,
+        _user_id: user!.id,
+      });
+      if (error) return false;
+      return !!data;
     },
   });
+
+  const isCoach = isActiveCoach || !!canAccessFeedback;
 
   const { data: convocations, refetch } = useQuery({
     queryKey: ["convocations", eventId],
@@ -1215,18 +1203,7 @@ function EventDetail() {
     visibleMyConvocs.some((c: any) => c.status === "pending");
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
-  const showFeedbackButton = isPastMatch && (isCoach || !!canAccessFeedback);
-  // eslint-disable-next-line no-console
-  console.log("[feedback-btn]", {
-    eventId: event.id,
-    type: event.type,
-    starts_at: event.starts_at,
-    isPastMatch,
-    isCoach,
-    role,
-    canAccessFeedback,
-    showFeedbackButton,
-  });
+  const showFeedbackButton = isPastMatch && isCoach;
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -2010,28 +1987,24 @@ function EventDetail() {
                   </div>
                   <div className="flex items-center gap-0.5 shrink-0">
                     {isCoach ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
+                      <div className="flex items-center gap-1 rounded-full border bg-background/80 p-0.5 shadow-sm">
+                        <AttendancePill status={c.status} className="mr-1" />
+                        {ATTENDANCE_ACTIONS.map(({ status, Icon, className }) => (
+                          <Button
+                            key={status}
                             type="button"
-                            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring"
-                            title={t("attendance.setStatus", { defaultValue: "Modifier le statut" })}
+                            size="icon"
+                            variant={c.status === status ? "secondary" : "ghost"}
+                            className={cn("h-7 w-7 rounded-full", c.status === status ? "ring-1 ring-ring" : className)}
+                            onClick={() => submitResponse(c.id, status, null)}
+                            disabled={c.status === status}
+                            title={t("attendance.setStatusTo", { defaultValue: "Marquer : {{status}}", status: t(`attendance.${status}`) })}
+                            aria-label={t("attendance.setStatusTo", { defaultValue: "Marquer : {{status}}", status: t(`attendance.${status}`) })}
                           >
-                            <AttendancePill status={c.status} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {(["present", "absent", "uncertain", "pending"] as AttendanceStatus[]).map((s) => (
-                            <DropdownMenuItem
-                              key={s}
-                              disabled={c.status === s}
-                              onSelect={() => submitResponse(c.id, s, null)}
-                            >
-                              {t(`attendance.${s}`)}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <Icon className="h-3.5 w-3.5" />
+                          </Button>
+                        ))}
+                      </div>
                     ) : (
                       <AttendancePill status={c.status} />
                     )}
