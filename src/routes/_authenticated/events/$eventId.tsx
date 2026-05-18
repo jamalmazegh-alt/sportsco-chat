@@ -1969,59 +1969,77 @@ function EventDetail() {
             </div>
           ) : (
             <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {sortedConvocations.map((c: any) => {
-                const clickable = isCoach;
-                const rowContent = (
-                  <>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-9 w-9 shrink-0 rounded-full bg-muted overflow-hidden">
-                        {c.players?.photo_url ? (
-                          <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
-                            {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0 text-left">
-                        <p className="text-sm font-medium truncate leading-tight">
-                          {c.players?.first_name} {c.players?.last_name}
-                          {c.players?.jersey_number ? (
-                            <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
-                          ) : null}
-                        </p>
-                        {c.comment && (isCoach || c.players?.user_id === user?.id) && (
-                          <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <AttendancePill status={c.status} />
-                      {isCoach && c.status === "pending" && (
-                        <span className="hidden sm:inline-flex h-2 w-2 rounded-full bg-pending-foreground/40" aria-hidden />
+              {sortedConvocations.map((c: any) => (
+                <li key={c.id} className="flex items-center justify-between gap-2 px-3 py-2">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
+                      {c.players?.photo_url ? (
+                        <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
+                          {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
+                        </div>
                       )}
                     </div>
-                  </>
-                );
-                return (
-                  <li key={c.id}>
-                    {clickable ? (
-                      <button
-                        type="button"
-                        onClick={() => setDetailConvocId(c.id)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-muted/40 active:bg-muted/60 transition-colors text-left"
-                        aria-label={t("attendance.openDetails", { defaultValue: "Ouvrir la fiche du joueur" })}
-                      >
-                        {rowContent}
-                      </button>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate leading-tight">
+                        {c.players?.first_name} {c.players?.last_name}
+                        {c.players?.jersey_number ? (
+                          <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
+                        ) : null}
+                      </p>
+                      {c.comment && (isCoach || c.players?.user_id === user?.id) && (
+                        <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    {isCoach ? (
+                      <>
+                        <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
+                          {ATTENDANCE_ACTIONS.filter(a => a.status !== "pending").map(({ status, Icon, className }) => (
+                            <Button
+                              key={status}
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              className={cn(
+                                "h-7 w-7 rounded-full",
+                                c.status === status
+                                  ? status === "present" ? "bg-present text-present-foreground hover:bg-present hover:text-present-foreground"
+                                    : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
+                                    : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
+                                  : className,
+                              )}
+                              onClick={() => submitResponse(c.id, status, null)}
+                              title={t(`attendance.${status}`)}
+                              aria-label={t(`attendance.${status}`)}
+                            >
+                              <Icon className="h-4 w-4" />
+                            </Button>
+                          ))}
+                        </div>
+                        {c.status === "pending" && (
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-pending-foreground" onClick={() => remind(c.id)} title={t("attendance.remind")}>
+                            <Bell className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-muted-foreground"
+                          onClick={() => setDetailConvocId(c.id)}
+                          title={t("attendance.details")}
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </Button>
+                      </>
                     ) : (
-                      <div className="flex items-center justify-between px-3 py-2.5">
-                        {rowContent}
-                      </div>
+                      <AttendancePill status={c.status} />
                     )}
-                  </li>
-                );
-              })}
+                  </div>
+                </li>
+              ))}
             </ul>
           )}
         </section>
