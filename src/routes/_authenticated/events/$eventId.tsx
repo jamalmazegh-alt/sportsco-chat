@@ -2097,6 +2097,36 @@ function EventDetail() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={!!coachOverrideTarget} onOpenChange={(o) => !o && setCoachOverrideTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Forcer la réponse&nbsp;?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {coachOverrideTarget ? (
+                <>
+                  {coachOverrideTarget.playerName} a déjà répondu&nbsp;
+                  <strong>{t(`attendance.${coachOverrideTarget.currentStatus}`)}</strong>. Voulez-vous vraiment forcer son statut à&nbsp;
+                  <strong>{t(`attendance.${coachOverrideTarget.status}`)}</strong>&nbsp;?
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (coachOverrideTarget) {
+                  submitResponse(coachOverrideTarget.id, coachOverrideTarget.status, null);
+                }
+                setCoachOverrideTarget(null);
+              }}
+            >
+              Forcer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Dialog
         open={!!respondTarget}
         onOpenChange={(o) => {
