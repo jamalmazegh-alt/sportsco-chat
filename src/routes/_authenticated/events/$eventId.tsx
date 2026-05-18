@@ -1998,7 +1998,32 @@ function EventDetail() {
                     </div>
                   </div>
                   <div className="flex items-center gap-0.5 shrink-0">
-                    <AttendancePill status={c.status} />
+                    {isCoach ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring"
+                            title={t("attendance.setStatus", { defaultValue: "Modifier le statut" })}
+                          >
+                            <AttendancePill status={c.status} />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {(["present", "absent", "uncertain", "pending"] as AttendanceStatus[]).map((s) => (
+                            <DropdownMenuItem
+                              key={s}
+                              disabled={c.status === s}
+                              onSelect={() => submitResponse(c.id, s, null)}
+                            >
+                              {t(`attendance.${s}`)}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <AttendancePill status={c.status} />
+                    )}
                     {isCoach && (
                       <Button
                         size="icon"
