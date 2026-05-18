@@ -1212,7 +1212,7 @@ function EventDetail() {
     visibleMyConvocs.some((c: any) => c.status === "pending");
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
-  const showFeedbackButton = isPastMatch && !!canAccessFeedback;
+  const showFeedbackButton = isPastMatch && (isCoach || !!canAccessFeedback);
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -1259,9 +1259,10 @@ function EventDetail() {
           {teams && (isCoach || showFeedbackButton) && (
             <div className="flex items-center gap-1 shrink-0">
               {showFeedbackButton && (
-                <Button asChild size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}>
+                <Button asChild size="sm" variant="secondary" className="h-8 gap-1.5 px-2.5" title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}>
                   <Link to="/events/$eventId/feedback" params={{ eventId }}>
                     <ClipboardList className="h-4 w-4" />
+                    <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
                   </Link>
                 </Button>
               )}
