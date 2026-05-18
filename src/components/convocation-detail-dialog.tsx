@@ -133,10 +133,37 @@ export function ConvocationDetailDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between rounded-xl border p-3">
-            <span className="text-sm text-muted-foreground">{t("attendance.status")}</span>
-            <AttendancePill status={convocation.status as any} />
-          </div>
+          {isCoach && onChangeStatus ? (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                {t("attendance.status")}
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {STATUS_ACTIONS.map(({ status, Icon, activeCls, idleCls }) => {
+                  const active = convocation.status === status;
+                  return (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => onChangeStatus(convocation.id, status)}
+                      className={cn(
+                        "flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-2 py-3 text-xs font-semibold transition-all",
+                        active ? activeCls : cn("border-border bg-background", idleCls),
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {t(`attendance.${status}`)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between rounded-xl border p-3">
+              <span className="text-sm text-muted-foreground">{t("attendance.status")}</span>
+              <AttendancePill status={convocation.status as any} />
+            </div>
+          )}
 
           {convocation.comment && (isCoach || (currentUserId && convocation.players?.user_id === currentUserId)) && (
             <div className="rounded-xl border bg-muted/50 p-3">
