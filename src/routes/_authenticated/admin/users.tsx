@@ -38,20 +38,6 @@ function AdminUsersPage() {
     },
   });
 
-  // Teams (used when role=coach to assign on invite)
-  const { data: teams } = useQuery({
-    queryKey: ["teams-for-invite", activeClubId],
-    enabled: !!activeClubId && role === "admin",
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("teams")
-        .select("id, name")
-        .eq("club_id", activeClubId!)
-        .is("deleted_at", null)
-        .order("name");
-      return data ?? [];
-    },
-  });
 
   const [open, setOpen] = useState(false);
   const [inviteRole, setInviteRole] = useState<"admin" | "coach">("coach");
