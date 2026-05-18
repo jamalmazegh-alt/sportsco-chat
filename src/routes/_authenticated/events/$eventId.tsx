@@ -1969,86 +1969,59 @@ function EventDetail() {
             </div>
           ) : (
             <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {sortedConvocations.map((c: any) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between px-3 py-2"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
-                      {c.players?.photo_url ? (
-                        <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
-                          {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate leading-tight">
-                        {c.players?.first_name} {c.players?.last_name}
-                        {c.players?.jersey_number ? (
-                          <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
-                        ) : null}
-                      </p>
-                      {c.comment && (isCoach || c.players?.user_id === user?.id) && (
-                        <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    {isCoach ? (
-                      <div className="flex items-center gap-1 rounded-full border bg-background/80 p-0.5 shadow-sm">
-                        <AttendancePill status={c.status} className="mr-1" />
-                        {ATTENDANCE_ACTIONS.map(({ status, Icon, className }) => (
-                          <Button
-                            key={status}
-                            type="button"
-                            size="icon"
-                            variant={c.status === status ? "secondary" : "ghost"}
-                            className={cn("h-7 w-7 rounded-full", c.status === status ? "ring-1 ring-ring" : className)}
-                            onClick={() => submitResponse(c.id, status, null)}
-                            disabled={c.status === status}
-                            title={t("attendance.setStatusTo", { defaultValue: "Marquer : {{status}}", status: t(`attendance.${status}`) })}
-                            aria-label={t("attendance.setStatusTo", { defaultValue: "Marquer : {{status}}", status: t(`attendance.${status}`) })}
-                          >
-                            <Icon className="h-3.5 w-3.5" />
-                          </Button>
-                        ))}
+              {sortedConvocations.map((c: any) => {
+                const clickable = isCoach;
+                const rowContent = (
+                  <>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="h-9 w-9 shrink-0 rounded-full bg-muted overflow-hidden">
+                        {c.players?.photo_url ? (
+                          <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
+                            {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
+                          </div>
+                        )}
                       </div>
-                    ) : (
+                      <div className="min-w-0 text-left">
+                        <p className="text-sm font-medium truncate leading-tight">
+                          {c.players?.first_name} {c.players?.last_name}
+                          {c.players?.jersey_number ? (
+                            <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
+                          ) : null}
+                        </p>
+                        {c.comment && (isCoach || c.players?.user_id === user?.id) && (
+                          <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <AttendancePill status={c.status} />
-                    )}
-                    {isCoach && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 text-muted-foreground"
+                      {isCoach && c.status === "pending" && (
+                        <span className="hidden sm:inline-flex h-2 w-2 rounded-full bg-pending-foreground/40" aria-hidden />
+                      )}
+                    </div>
+                  </>
+                );
+                return (
+                  <li key={c.id}>
+                    {clickable ? (
+                      <button
+                        type="button"
                         onClick={() => setDetailConvocId(c.id)}
-                        title={t("attendance.details")}
+                        className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-muted/40 active:bg-muted/60 transition-colors text-left"
+                        aria-label={t("attendance.openDetails", { defaultValue: "Ouvrir la fiche du joueur" })}
                       >
-                        <Info className="h-3.5 w-3.5" />
-                      </Button>
+                        {rowContent}
+                      </button>
+                    ) : (
+                      <div className="flex items-center justify-between px-3 py-2.5">
+                        {rowContent}
+                      </div>
                     )}
-                    {isCoach && c.status === "pending" && (
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remind(c.id)}>
-                        <Bell className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
-                    {isCoach && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                        onClick={() => setCancelTargetId(c.id)}
-                        title={t("attendance.cancelConvocation")}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
@@ -2067,6 +2040,9 @@ function EventDetail() {
         onCancel={(id) => {
           setDetailConvocId(null);
           setCancelTargetId(id);
+        }}
+        onChangeStatus={(id, status) => {
+          submitResponse(id, status, null);
         }}
       />
 
