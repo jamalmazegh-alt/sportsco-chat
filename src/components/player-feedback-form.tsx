@@ -48,15 +48,18 @@ export function PlayerFeedbackForm({
   onSubmit,
   busy,
   compact,
+  sport,
 }: {
   value: FeedbackFormValue;
   onChange: (next: FeedbackFormValue) => void;
   onSubmit: () => Promise<void> | void;
   busy?: boolean;
   compact?: boolean;
+  sport?: string | null;
 }) {
   const { t } = useTranslation();
   const [advanced, setAdvanced] = useState(!compact);
+  const tags = sport !== undefined ? getFeedbackTagsForSport(sport) : (FEEDBACK_TAGS as readonly string[]);
 
   const set = <K extends keyof FeedbackFormValue>(k: K, v: FeedbackFormValue[K]) =>
     onChange({ ...value, [k]: v });
