@@ -68,10 +68,6 @@ function AdminUsersPage() {
   async function onInvite(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
-    if (inviteRole === "coach" && !teamId) {
-      toast.error(t("admin.inviteCoachNeedsTeam", { defaultValue: "Sélectionnez une équipe pour le coach." }));
-      return;
-    }
     setBusy(true);
 
     // Refuse if email already has a Clubero account in this club
