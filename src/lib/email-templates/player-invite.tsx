@@ -10,13 +10,16 @@ interface PlayerInviteProps {
   clubName?: string;
   clubLogoUrl?: string;
   inviteUrl: string;
+  roleLabel?: string;
 }
 
-const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl }: PlayerInviteProps) => (
+const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl, roleLabel }: PlayerInviteProps) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      {clubName ? `${clubName} invited you to join` : "You've been invited to join Clubero"}
+      {roleLabel
+        ? `${clubName ?? "Un club"} vous invite en tant que ${roleLabel}`
+        : clubName ? `${clubName} invited you to join` : "You've been invited to join Clubero"}
     </Preview>
     <Body style={main}>
       <Container style={container}>
@@ -31,13 +34,24 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
           {clubName && <Text style={clubLabel}>{clubName}</Text>}
         </Section>
         <Heading style={h1}>
-          {firstName ? `Welcome, ${firstName}!` : "You've been invited"}
+          {firstName
+            ? (roleLabel ? `Bienvenue, ${firstName} !` : `Welcome, ${firstName}!`)
+            : (roleLabel ? `Vous êtes invité·e en tant que ${roleLabel}` : "You've been invited")}
         </Heading>
         <Text style={text}>
-          {clubName ? <strong>{clubName}</strong> : "Your club"} has added you
-          {teamName ? <> to <strong>{teamName}</strong></> : null} on Clubero.
-          Accept your invitation to set up your account, view upcoming events
-          and respond to convocations.
+          {roleLabel ? (
+            <>
+              {clubName ? <strong>{clubName}</strong> : "Votre club"} vous invite à rejoindre Clubero en tant que <strong>{roleLabel}</strong>.
+              Acceptez l'invitation pour créer votre compte et accéder à votre espace.
+            </>
+          ) : (
+            <>
+              {clubName ? <strong>{clubName}</strong> : "Your club"} has added you
+              {teamName ? <> to <strong>{teamName}</strong></> : null} on Clubero.
+              Accept your invitation to set up your account, view upcoming events
+              and respond to convocations.
+            </>
+          )}
         </Text>
         <Button style={button} href={inviteUrl}>
           Accept invitation
@@ -56,7 +70,9 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
 
 export const template = {
   component: PlayerInviteEmail,
-  subject: (data) => data.clubName ? `${data.clubName} vous invite sur Clubero` : "Votre invitation Clubero",
+  subject: (data) => data.roleLabel
+    ? `${data.clubName ?? "Un club"} vous invite en tant que ${data.roleLabel} sur Clubero`
+    : (data.clubName ? `${data.clubName} vous invite sur Clubero` : "Votre invitation Clubero"),
   displayName: "Player invitation",
   previewData: {
     firstName: "Alex",
