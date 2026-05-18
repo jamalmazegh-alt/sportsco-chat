@@ -131,6 +131,30 @@ function AdminUserDetailPage() {
     }
   }
 
+  const clubMemberships = (data.memberships ?? []).filter(
+    (m: any) => m.club_id === activeClubId
+  );
+  const isUserAdmin = clubMemberships.some((m: any) => m.role === "admin");
+  const isUserCoach = clubMemberships.some((m: any) => m.role === "coach");
+
+  async function toggleStaffRole(next: { is_admin: boolean; is_coach: boolean }) {
+    if (!activeClubId) return;
+    setActing("roles");
+    try {
+      await callSetStaffRoles({
+        data: { club_id: activeClubId, user_id: userId, ...next },
+      });
+      toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
+      qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setActing(null);
+    }
+  }
+
+
   return (
     <div className="px-5 pt-4 pb-10 space-y-5">
       <Link to="/admin/users" className="inline-flex items-center text-sm text-muted-foreground gap-1">
