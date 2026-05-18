@@ -263,6 +263,7 @@ function PostMatchFeedback() {
                       onSubmit={() => saveOne(p.id)}
                       busy={savingId === p.id}
                       compact
+                      sport={(data as any)?.sport ?? null}
                     />
                   </div>
                 )}
