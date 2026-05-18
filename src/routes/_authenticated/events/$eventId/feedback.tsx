@@ -109,7 +109,7 @@ function PostMatchFeedback() {
     setSavedIds(filled);
   }, [data]);
 
-  if (!isAccessLoading && !isCoach && canAccessFeedback === false) return <Navigate to="/home" replace />;
+  if (!isAccessLoading && canAccessFeedback === false) return <Navigate to="/home" replace />;
 
   async function saveOne(playerId: string) {
     const v = values[playerId];
