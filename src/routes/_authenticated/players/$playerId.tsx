@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { AttendanceHeatmap } from "@/components/attendance-heatmap";
+import { CoachFeedbackTab } from "@/components/coach-feedback-tab";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
