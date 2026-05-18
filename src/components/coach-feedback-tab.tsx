@@ -126,7 +126,7 @@ export function CoachFeedbackTab({
           {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
         </p>
         {(rv?.reviews ?? []).length > 0 ? (
-          {(rv?.reviews ?? []).map((r: any, idx: number) => (
+          (rv?.reviews ?? []).map((r: any, idx: number) => (
             <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3" open={idx === 0}>
               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="h-4 w-4 text-primary" />
@@ -148,7 +148,7 @@ export function CoachFeedbackTab({
                 </button>
               )}
             </details>
-          ))}
+          ))
         ) : !lRv ? (
           <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
             {t("feedback.noSyntheses", { defaultValue: "Aucune synthèse IA pour ce joueur." })}
