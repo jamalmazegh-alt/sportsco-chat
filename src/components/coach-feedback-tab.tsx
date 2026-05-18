@@ -103,9 +103,14 @@ export function CoachFeedbackTab({
   return (
     <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {t("feedback.coachTab", { defaultValue: "Retours Coach" })}
-        </h2>
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("feedback.coachTab", { defaultValue: "Retours Coach" })}
+          </h2>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {t("feedback.profileInternalHint", { defaultValue: "Profil joueur · interne staff" })}
+          </p>
+        </div>
         {isCoach && (
           <Button size="sm" variant="outline" className="h-8" onClick={() => setGenOpen(true)}>
             <Sparkles className="h-4 w-4" />
@@ -115,12 +120,12 @@ export function CoachFeedbackTab({
       </div>
 
       {/* Reviews */}
-      {(rv?.reviews ?? []).length > 0 && (
-        <div className="space-y-2" id="coach-reviews-anchor">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Sparkles className="h-3 w-3 text-primary" />
-            {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
-          </p>
+      <div className="space-y-2 scroll-mt-20" id="coach-reviews-anchor">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <Sparkles className="h-3 w-3 text-primary" />
+          {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
+        </p>
+        {(rv?.reviews ?? []).length > 0 ? (
           {(rv?.reviews ?? []).map((r: any, idx: number) => (
             <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3" open={idx === 0}>
               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
@@ -144,8 +149,12 @@ export function CoachFeedbackTab({
               )}
             </details>
           ))}
-        </div>
-      )}
+        ) : !lRv ? (
+          <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
+            {t("feedback.noSyntheses", { defaultValue: "Aucune synthèse IA pour ce joueur." })}
+          </div>
+        ) : null}
+      </div>
 
       {/* Timeline */}
       {lFb || lRv ? (
