@@ -64,6 +64,7 @@ export function ConvocationDetailDialog({
   currentUserId,
   onRemind,
   onCancel,
+  onChangeStatus,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
@@ -73,6 +74,7 @@ export function ConvocationDetailDialog({
   currentUserId?: string | null;
   onRemind?: (convocationId: string) => void;
   onCancel?: (convocationId: string) => void;
+  onChangeStatus?: (convocationId: string, status: "present" | "uncertain" | "absent") => void;
 }) {
   const { t } = useTranslation();
 
