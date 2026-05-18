@@ -884,7 +884,7 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
   const [busyUid, setBusyUid] = useState<string | null>(null);
 
   const { data: coaches } = useQuery({
-    queryKey: ["team-coaches", teamId],
+    queryKey: ["team-coaches", teamId, clubId],
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
@@ -893,14 +893,34 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
         .in("role", ["coach", "admin"]);
       const ids = Array.from(new Set((tm ?? []).map((m: any) => m.user_id).filter(Boolean)));
       if (ids.length === 0) return [] as any[];
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, full_name, first_name, last_name, avatar_url")
-        .in("id", ids);
+      const [{ data: profs }, { data: cm }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, first_name, last_name, avatar_url")
+          .in("id", ids),
+        clubId
+          ? supabase
+              .from("club_members")
+              .select("user_id, role")
+              .eq("club_id", clubId)
+              .in("user_id", ids)
+              .in("role", ["admin", "coach"])
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
       const byId = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      const clubRolesByUser = new Map<string, Set<string>>();
+      for (const m of (cm ?? []) as any[]) {
+        if (!m.user_id) continue;
+        if (!clubRolesByUser.has(m.user_id)) clubRolesByUser.set(m.user_id, new Set());
+        clubRolesByUser.get(m.user_id)!.add(m.role);
+      }
       return (tm ?? [])
         .filter((m: any) => m.user_id && byId.has(m.user_id))
-        .map((m: any) => ({ ...byId.get(m.user_id), role: m.role }));
+        .map((m: any) => ({
+          ...byId.get(m.user_id),
+          role: m.role,
+          clubRoles: Array.from(clubRolesByUser.get(m.user_id) ?? []),
+        }));
     },
   });
 
