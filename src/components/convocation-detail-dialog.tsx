@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
-import { Bell, Mail, MessageSquare, Smartphone, Send, X } from "lucide-react";
+import { Bell, Mail, MessageSquare, Smartphone, Send, X, CheckCircle2, XCircle, HelpCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+
+const STATUS_ACTIONS = [
+  { status: "present", Icon: CheckCircle2, activeCls: "bg-present text-present-foreground border-present", idleCls: "text-present hover:bg-present/15" },
+  { status: "uncertain", Icon: HelpCircle, activeCls: "bg-uncertain text-uncertain-foreground border-uncertain", idleCls: "text-uncertain-foreground hover:bg-uncertain/20" },
+  { status: "absent", Icon: XCircle, activeCls: "bg-absent text-white border-absent", idleCls: "text-absent hover:bg-absent/10" },
+] as const;
 
 type Convocation = {
   id: string;
