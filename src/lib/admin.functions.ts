@@ -260,3 +260,64 @@ export const sendUserPasswordReset = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 500 });
     return { ok: true };
   });
+
+/**
+ * Admin-only: set the staff roles (admin / coach) of a user inside the
+ * caller's club. Passing both = user has both roles. At least one role must
+ * remain so the user keeps a club_members row (use removeUserFromClub
+ * otherwise). Player / parent / dirigeant rows are left untouched.
+ */
+export const setUserClubStaffRoles = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: { club_id: string; user_id: string; is_admin: boolean; is_coach: boolean }) =>
+      z
+        .object({
+          club_id: z.string().uuid(),
+          user_id: z.string().uuid(),
+          is_admin: z.boolean(),
+          is_coach: z.boolean(),
+        })
+        .parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCallerAdmin(supabase, data.club_id, userId);
+
+    if (!data.is_admin && !data.is_coach) {
+      throw new Response("At least one staff role required", { status: 400 });
+    }
+    // Prevent an admin from demoting themselves accidentally
+    if (data.user_id === userId && !data.is_admin) {
+      throw new Response("You cannot remove your own admin role", { status: 400 });
+    }
+
+    const desired: ("admin" | "coach")[] = [];
+    if (data.is_admin) desired.push("admin");
+    if (data.is_coach) desired.push("coach");
+
+    // Delete staff rows that are no longer desired
+    const { error: delErr } = await supabaseAdmin
+      .from("club_members")
+      .delete()
+      .eq("club_id", data.club_id)
+      .eq("user_id", data.user_id)
+      .in("role", ["admin", "coach"])
+      .not("role", "in", `(${desired.join(",")})`);
+    if (delErr) throw new Response(delErr.message, { status: 500 });
+
+    // Upsert desired roles
+    const rows = desired.map((role) => ({
+      club_id: data.club_id,
+      user_id: data.user_id,
+      role,
+    }));
+    if (rows.length > 0) {
+      const { error: upErr } = await supabaseAdmin
+        .from("club_members")
+        .upsert(rows, { onConflict: "club_id,user_id,role", ignoreDuplicates: true });
+      if (upErr) throw new Response(upErr.message, { status: 500 });
+    }
+    return { ok: true, roles: desired };
+  });
+
