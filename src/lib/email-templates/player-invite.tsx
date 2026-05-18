@@ -13,60 +13,55 @@ interface PlayerInviteProps {
   roleLabel?: string;
 }
 
-const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl, roleLabel }: PlayerInviteProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>
-      {roleLabel
-        ? `${clubName ?? "Un club"} vous invite en tant que ${roleLabel}`
-        : clubName ? `${clubName} invited you to join` : "You've been invited to join Clubero"}
-    </Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Section style={clubHeader}>
-          <Img
-            src={clubLogoUrl || "https://www.clubero.app/clubero-logo.png"}
-            alt={clubName ?? "Clubero"}
-            width="64"
-            height="64"
-            style={clubLogo}
-          />
-          {clubName && <Text style={clubLabel}>{clubName}</Text>}
-        </Section>
-        <Heading style={h1}>
-          {firstName
-            ? (roleLabel ? `Bienvenue, ${firstName} !` : `Welcome, ${firstName}!`)
-            : (roleLabel ? `Vous êtes invité·e en tant que ${roleLabel}` : "You've been invited")}
-        </Heading>
-        <Text style={text}>
-          {roleLabel ? (
-            <>
-              {clubName ? <strong>{clubName}</strong> : "Votre club"} vous invite à rejoindre Clubero en tant que <strong>{roleLabel}</strong>.
-              Acceptez l'invitation pour créer votre compte et accéder à votre espace.
-            </>
-          ) : (
-            <>
-              {clubName ? <strong>{clubName}</strong> : "Your club"} has added you
-              {teamName ? <> to <strong>{teamName}</strong></> : null} on Clubero.
-              Accept your invitation to set up your account, view upcoming events
-              and respond to convocations.
-            </>
-          )}
-        </Text>
-        <Button style={button} href={inviteUrl}>
-          Accept invitation
-        </Button>
-        <Text style={small}>
-          Or paste this link in your browser:<br />
-          <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
-        </Text>
-        <Text style={footer}>
-          If you weren't expecting this, you can ignore this email.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-);
+const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl, roleLabel }: PlayerInviteProps) => {
+  const club = clubName ?? "Votre club";
+  const isStaff = !!roleLabel && roleLabel.toLowerCase() !== "joueur";
+  const role = roleLabel ?? "joueur";
+  return (
+    <Html lang="fr" dir="ltr">
+      <Head />
+      <Preview>
+        {`${club} vous invite à rejoindre Clubero en tant que ${role}`}
+      </Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Section style={clubHeader}>
+            <Img
+              src={clubLogoUrl || "https://www.clubero.app/clubero-logo.png"}
+              alt={club}
+              width="64"
+              height="64"
+              style={clubLogo}
+            />
+            <Text style={clubLabel}>{club}</Text>
+          </Section>
+          <Heading style={h1}>
+            {firstName ? `Bonjour ${firstName},` : "Bonjour,"}
+          </Heading>
+          <Text style={text}>
+            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>{role}</strong>
+            {isStaff ? null : teamName ? <> au sein de l'équipe <strong>{teamName}</strong></> : null}.
+          </Text>
+          <Text style={text}>
+            {isStaff
+              ? "Acceptez l'invitation pour créer votre compte et accéder à votre espace d'encadrement : gestion des équipes, convocations, suivi des joueurs et événements du club."
+              : "Acceptez l'invitation pour créer votre compte, consulter vos prochains événements et répondre à vos convocations."}
+          </Text>
+          <Button style={button} href={inviteUrl}>
+            Accepter l'invitation
+          </Button>
+          <Text style={small}>
+            Ou copiez ce lien dans votre navigateur :<br />
+            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
+          </Text>
+          <Text style={footer}>
+            Si vous n'attendiez pas cet email, vous pouvez l'ignorer.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
+};
 
 export const template = {
   component: PlayerInviteEmail,
