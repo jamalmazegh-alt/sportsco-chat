@@ -225,6 +225,8 @@ function PostMatchFeedback() {
                     </p>
                     <p className="text-[11px] text-muted-foreground">
                       {t(`attendance.${row.attendance}`, { defaultValue: row.attendance })}
+                      {saved && values[p.id]?.rating ? ` · ★ ${values[p.id]!.rating}/5` : ""}
+                      {saved && (values[p.id]?.tags?.length ?? 0) > 0 ? ` · ${values[p.id]!.tags.length} tag(s)` : ""}
                     </p>
                   </div>
                   {saved && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
@@ -234,6 +236,16 @@ function PostMatchFeedback() {
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}
                 </button>
+                {saved && !open && (values[p.id]?.strengths || values[p.id]?.improvements || values[p.id]?.comment) && (
+                  <div className="px-3 pb-2.5 -mt-1 space-y-0.5 text-[11px] text-muted-foreground">
+                    {values[p.id]?.strengths && (
+                      <p className="line-clamp-1"><span className="font-medium text-emerald-600 dark:text-emerald-400">+ </span>{values[p.id]!.strengths}</p>
+                    )}
+                    {values[p.id]?.improvements && (
+                      <p className="line-clamp-1"><span className="font-medium text-amber-600 dark:text-amber-400">→ </span>{values[p.id]!.improvements}</p>
+                    )}
+                  </div>
+                )}
                 {open && values[p.id] && (
                   <div className="px-3 pb-3">
                     <PlayerFeedbackForm
