@@ -1013,6 +1013,12 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
                           )}
                         </div>
                         <span className="text-sm font-medium flex-1 text-left truncate">{name}</span>
+                        {(s.roles ?? []).includes("admin") && (
+                          <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary mr-1">
+                            {t("roles.admin", { defaultValue: "Admin" })}
+                          </span>
+                        )}
+
                         {busyUid === s.id && <Loader2 className="h-4 w-4 animate-spin" />}
                       </button>
                     );
