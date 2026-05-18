@@ -20,7 +20,7 @@ import { AttachmentList, type Attachment } from "@/components/attachments";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -1250,12 +1250,15 @@ function EventDetail() {
           {teams && (isCoach || showFeedbackButton) && (
             <div className="flex items-center gap-1 shrink-0">
               {showFeedbackButton && (
-                <Button asChild size="sm" variant="secondary" className="h-8 gap-1.5 px-2.5" title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}>
-                  <Link to="/events/$eventId/feedback" params={{ eventId }}>
-                    <ClipboardList className="h-4 w-4" />
-                    <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
-                  </Link>
-                </Button>
+                <Link
+                  to="/events/$eventId/feedback"
+                  params={{ eventId }}
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-8 gap-1.5 px-2.5")}
+                  title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
+                </Link>
               )}
               {isCoach && (
                 <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" onClick={() => setEditOpen(true)}>
