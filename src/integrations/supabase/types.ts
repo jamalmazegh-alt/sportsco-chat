@@ -592,7 +592,9 @@ export type Database = {
           created_by: string
           email: string | null
           expires_at: string
+          first_name: string | null
           id: string
+          last_name: string | null
           parent_for_player_id: string | null
           phone: string | null
           player_id: string | null
@@ -607,7 +609,9 @@ export type Database = {
           created_by: string
           email?: string | null
           expires_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           parent_for_player_id?: string | null
           phone?: string | null
           player_id?: string | null
@@ -622,7 +626,9 @@ export type Database = {
           created_by?: string
           email?: string | null
           expires_at?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           parent_for_player_id?: string | null
           phone?: string | null
           player_id?: string | null
