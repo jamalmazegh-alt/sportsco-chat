@@ -2024,7 +2024,7 @@ function EventDetail() {
                                     : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
                                   : className,
                               )}
-                              onClick={() => submitResponse(c.id, status, null)}
+                              onClick={() => coachChangeStatus(c, status)}
                               title={t(`attendance.${status}`)}
                               aria-label={t(`attendance.${status}`)}
                             >
