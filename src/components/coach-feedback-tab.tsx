@@ -65,14 +65,18 @@ export function CoachFeedbackTab({
         data: {
           playerId,
           kind,
-          visibility,
+          visibility: "coach_only",
           periodStart: periodStart || null,
           periodEnd: periodEnd || null,
         },
       });
-      toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée" }));
+      toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }));
       setGenOpen(false);
-      qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+      await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+      // Scroll to the reviews section so the new synthesis is immediately visible.
+      setTimeout(() => {
+        document.getElementById("coach-reviews-anchor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     } catch (e: any) {
       const msg = e?.message ?? "";
       if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." }));
