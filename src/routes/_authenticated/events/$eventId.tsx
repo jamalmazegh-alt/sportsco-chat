@@ -348,6 +348,18 @@ function EventDetail() {
     return true;
   }
 
+  function coachChangeStatus(c: any, status: AttendanceStatus) {
+    if (!c || c.status === status) return;
+    if (c.status !== "pending" && c.responded_at) {
+      const playerName = `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim() || "ce joueur";
+      setCoachOverrideTarget({ id: c.id, status, playerName, currentStatus: c.status });
+      return;
+    }
+    submitResponse(c.id, status, null);
+  }
+
+
+
   async function confirmRespond() {
     if (!respondTarget) return;
     setRespondSubmitting(true);
