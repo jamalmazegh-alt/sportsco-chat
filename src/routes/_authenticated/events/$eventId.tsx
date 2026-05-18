@@ -1970,7 +1970,7 @@ function EventDetail() {
           ) : (
             <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
               {sortedConvocations.map((c: any) => (
-                <li key={c.id} className="flex items-center justify-between gap-2 px-3 py-2">
+                <li key={c.id} className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
                       {c.players?.photo_url ? (
@@ -1993,18 +1993,18 @@ function EventDetail() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
+                  <div className="flex w-full items-center gap-1 shrink-0 sm:w-auto">
                     {isCoach ? (
                       <>
-                        <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
+                        <div className="grid flex-1 grid-cols-3 gap-1 rounded-xl border bg-background/80 p-1 sm:flex sm:flex-none sm:rounded-full sm:gap-0.5 sm:p-0.5">
                           {ATTENDANCE_ACTIONS.filter(a => a.status !== "pending").map(({ status, Icon, className }) => (
                             <Button
                               key={status}
                               type="button"
-                              size="icon"
+                              size="sm"
                               variant="ghost"
                               className={cn(
-                                "h-7 w-7 rounded-full",
+                                "h-8 min-w-0 rounded-lg px-1.5 text-[11px] sm:h-7 sm:rounded-full sm:px-2",
                                 c.status === status
                                   ? status === "present" ? "bg-present text-present-foreground hover:bg-present hover:text-present-foreground"
                                     : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
@@ -2016,6 +2016,7 @@ function EventDetail() {
                               aria-label={t(`attendance.${status}`)}
                             >
                               <Icon className="h-4 w-4" />
+                              <span className="truncate">{t(`attendance.${status}`)}</span>
                             </Button>
                           ))}
                         </div>

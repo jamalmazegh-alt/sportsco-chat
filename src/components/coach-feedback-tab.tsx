@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Lock, Eye, Sparkles, Trash2, Star } from "lucide-react";
+import { Loader2, Lock, Sparkles, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -21,7 +21,6 @@ import {
   generatePlayerReview,
   deletePlayerFeedback,
   deletePlayerReview,
-  VISIBILITY_VALUES,
 } from "@/lib/player-feedback.functions";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +51,6 @@ export function CoachFeedbackTab({
   const [genOpen, setGenOpen] = useState(false);
   const [genBusy, setGenBusy] = useState(false);
   const [kind, setKind] = useState<"end_of_season" | "meeting" | "development" | "coaching">("development");
-  const [visibility, setVisibility] = useState<(typeof VISIBILITY_VALUES)[number]>("coach_only");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
 
@@ -61,7 +59,7 @@ export function CoachFeedbackTab({
   async function onGenerate() {
     setGenBusy(true);
     try {
-      await genFn({
+      const generated = await genFn({
         data: {
           playerId,
           kind,
@@ -70,6 +68,12 @@ export function CoachFeedbackTab({
           periodEnd: periodEnd || null,
         },
       });
+      if (generated?.review) {
+        const review = generated.review as any;
+        qc.setQueryData(["player-reviews", playerId], (current: any) => ({
+          reviews: [review, ...((current?.reviews ?? []).filter((r: any) => r.id !== review.id))],
+        }));
+      }
       toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }));
       setGenOpen(false);
       await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
@@ -99,9 +103,14 @@ export function CoachFeedbackTab({
   return (
     <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {t("feedback.coachTab", { defaultValue: "Retours Coach" })}
-        </h2>
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("feedback.coachTab", { defaultValue: "Retours Coach" })}
+          </h2>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {t("feedback.profileInternalHint", { defaultValue: "Profil joueur · interne staff" })}
+          </p>
+        </div>
         {isCoach && (
           <Button size="sm" variant="outline" className="h-8" onClick={() => setGenOpen(true)}>
             <Sparkles className="h-4 w-4" />
@@ -111,13 +120,13 @@ export function CoachFeedbackTab({
       </div>
 
       {/* Reviews */}
-      {(rv?.reviews ?? []).length > 0 && (
-        <div className="space-y-2" id="coach-reviews-anchor">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Sparkles className="h-3 w-3 text-primary" />
-            {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
-          </p>
-          {(rv?.reviews ?? []).map((r: any, idx: number) => (
+      <div className="space-y-2 scroll-mt-20" id="coach-reviews-anchor">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <Sparkles className="h-3 w-3 text-primary" />
+          {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
+        </p>
+        {(rv?.reviews ?? []).length > 0 ? (
+          (rv?.reviews ?? []).map((r: any, idx: number) => (
             <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3" open={idx === 0}>
               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="h-4 w-4 text-primary" />
@@ -139,9 +148,13 @@ export function CoachFeedbackTab({
                 </button>
               )}
             </details>
-          ))}
-        </div>
-      )}
+          ))
+        ) : !lRv ? (
+          <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
+            {t("feedback.noSyntheses", { defaultValue: "Aucune synthèse IA pour ce joueur." })}
+          </div>
+        ) : null}
+      </div>
 
       {/* Timeline */}
       {lFb || lRv ? (
@@ -283,22 +296,5 @@ export function CoachFeedbackTab({
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function VisibilityBadge({ v }: { v: string }) {
-  const { t } = useTranslation();
-  const isPrivate = v === "coach_only" || v === "staff";
-  const Icon = isPrivate ? Lock : Eye;
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-        isPrivate ? "bg-muted text-muted-foreground" : "bg-primary/15 text-primary"
-      )}
-    >
-      <Icon className="h-3 w-3" />
-      {t(`feedback.visibility_${v}`, { defaultValue: v })}
-    </span>
   );
 }
