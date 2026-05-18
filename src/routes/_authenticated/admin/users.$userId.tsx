@@ -226,6 +226,42 @@ function AdminUserDetailPage() {
         )}
       </section>
 
+      {!isSelf && (isUserAdmin || isUserCoach) && (
+        <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("admin.staffRoles", { defaultValue: "Rôles staff" })}
+          </h2>
+          <p className="text-[11px] text-muted-foreground">
+            {t("admin.staffRolesHint", {
+              defaultValue: "Un utilisateur peut cumuler les rôles administrateur et coach.",
+            })}
+          </p>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer">
+              <Checkbox
+                checked={isUserAdmin}
+                disabled={acting === "roles"}
+                onCheckedChange={(v) =>
+                  toggleStaffRole({ is_admin: !!v, is_coach: isUserCoach })
+                }
+              />
+              <span className="text-sm">{t("roles.admin", { defaultValue: "Administrateur" })}</span>
+            </label>
+            <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer">
+              <Checkbox
+                checked={isUserCoach}
+                disabled={acting === "roles"}
+                onCheckedChange={(v) =>
+                  toggleStaffRole({ is_admin: isUserAdmin, is_coach: !!v })
+                }
+              />
+              <span className="text-sm">{t("roles.coach", { defaultValue: "Coach" })}</span>
+            </label>
+          </div>
+        </section>
+      )}
+
+
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("admin.linkedPlayers")}
