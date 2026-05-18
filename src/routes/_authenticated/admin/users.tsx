@@ -94,7 +94,6 @@ function AdminUsersPage() {
         fromName: `${clubLabel} via Clubero`,
         templateData: {
           firstName: first || undefined,
-          teamName,
           clubName: clubLabel,
           clubLogoUrl,
           inviteUrl,
