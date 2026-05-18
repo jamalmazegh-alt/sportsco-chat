@@ -2074,7 +2074,8 @@ function EventDetail() {
           setCancelTargetId(id);
         }}
         onChangeStatus={(id, status) => {
-          submitResponse(id, status, null);
+          const conv = (convocations ?? []).find((x: any) => x.id === id);
+          if (conv) coachChangeStatus(conv, status);
         }}
       />
 
