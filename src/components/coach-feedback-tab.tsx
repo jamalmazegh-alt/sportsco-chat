@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Lock, Eye, Sparkles, Trash2, Star } from "lucide-react";
+import { Loader2, Lock, Sparkles, Trash2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -21,7 +21,6 @@ import {
   generatePlayerReview,
   deletePlayerFeedback,
   deletePlayerReview,
-  VISIBILITY_VALUES,
 } from "@/lib/player-feedback.functions";
 import { cn } from "@/lib/utils";
 
@@ -52,7 +51,6 @@ export function CoachFeedbackTab({
   const [genOpen, setGenOpen] = useState(false);
   const [genBusy, setGenBusy] = useState(false);
   const [kind, setKind] = useState<"end_of_season" | "meeting" | "development" | "coaching">("development");
-  const [visibility, setVisibility] = useState<(typeof VISIBILITY_VALUES)[number]>("coach_only");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
 
@@ -61,7 +59,7 @@ export function CoachFeedbackTab({
   async function onGenerate() {
     setGenBusy(true);
     try {
-      await genFn({
+      const generated = await genFn({
         data: {
           playerId,
           kind,
@@ -70,6 +68,11 @@ export function CoachFeedbackTab({
           periodEnd: periodEnd || null,
         },
       });
+      if (generated?.review) {
+        qc.setQueryData(["player-reviews", playerId], (current: any) => ({
+          reviews: [generated.review, ...((current?.reviews ?? []).filter((r: any) => r.id !== generated.review.id))],
+        }));
+      }
       toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }));
       setGenOpen(false);
       await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
