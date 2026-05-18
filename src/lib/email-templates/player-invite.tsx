@@ -10,13 +10,16 @@ interface PlayerInviteProps {
   clubName?: string;
   clubLogoUrl?: string;
   inviteUrl: string;
+  roleLabel?: string;
 }
 
-const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl }: PlayerInviteProps) => (
+const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl, roleLabel }: PlayerInviteProps) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      {clubName ? `${clubName} invited you to join` : "You've been invited to join Clubero"}
+      {roleLabel
+        ? `${clubName ?? "Un club"} vous invite en tant que ${roleLabel}`
+        : clubName ? `${clubName} invited you to join` : "You've been invited to join Clubero"}
     </Preview>
     <Body style={main}>
       <Container style={container}>
