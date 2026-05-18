@@ -10,6 +10,7 @@ import {
 import { Lock, Star, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FEEDBACK_TAGS, VISIBILITY_VALUES } from "@/lib/player-feedback.functions";
+import { getFeedbackTagsForSport } from "@/lib/feedback-tags";
 
 export type FeedbackFormValue = {
   rating: number | null;
