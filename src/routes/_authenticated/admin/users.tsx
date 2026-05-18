@@ -44,11 +44,10 @@ function AdminUsersPage() {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
-  const [teamId, setTeamId] = useState<string>("");
   const [busy, setBusy] = useState(false);
 
   function reset() {
-    setInviteRole("coach"); setFirst(""); setLast(""); setEmail(""); setTeamId("");
+    setInviteRole("coach"); setFirst(""); setLast(""); setEmail("");
   }
 
   async function onInvite(e: FormEvent) {
