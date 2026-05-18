@@ -32,7 +32,7 @@ function PostMatchFeedback() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const isActiveCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const fetchData = useServerFn(listEventPlayersForFeedback);
   const createFn = useServerFn(createPlayerFeedback);
@@ -44,34 +44,21 @@ function PostMatchFeedback() {
     queryFn: async () => {
       const { data: event } = await supabase
         .from("events")
-        .select("team_id, type, starts_at, teams:team_id(club_id)")
+        .select("team_id, type")
         .eq("id", eventId)
         .maybeSingle();
       if (!event?.team_id || event.type !== "match") return false;
 
-      const { data: teamRoles } = await supabase
-        .from("team_members")
-        .select("role")
-        .eq("team_id", event.team_id)
-        .eq("user_id", user!.id)
-        .in("role", ["coach", "admin"])
-        .limit(1);
-      if ((teamRoles ?? []).length > 0) return true;
-
-      const clubId = (event as any).teams?.club_id;
-      if (!clubId) return false;
-
-      const { data: clubAdminRoles } = await supabase
-        .from("club_members")
-        .select("role")
-        .eq("club_id", clubId)
-        .eq("user_id", user!.id)
-        .eq("role", "admin")
-        .limit(1);
-
-      return (clubAdminRoles ?? []).length > 0;
+      const { data, error } = await supabase.rpc("is_team_coach", {
+        _team_id: event.team_id,
+        _user_id: user!.id,
+      });
+      if (error) return false;
+      return !!data;
     },
   });
+
+  const isCoach = isActiveCoach || !!canAccessFeedback;
 
   const { data, isLoading } = useQuery({
     queryKey: ["event-feedback", eventId],
