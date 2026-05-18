@@ -877,8 +877,12 @@ function CollapsibleTeamStats({ teamId }: { teamId: string }) {
   );
 }
 
-function TeamCoaches({ teamId }: { teamId: string }) {
+function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: string; isAdmin: boolean }) {
   const { t } = useTranslation();
+  const qc = useQueryClient();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [busyUid, setBusyUid] = useState<string | null>(null);
+
   const { data: coaches } = useQuery({
     queryKey: ["team-coaches", teamId],
     queryFn: async () => {
@@ -888,7 +892,7 @@ function TeamCoaches({ teamId }: { teamId: string }) {
         .eq("team_id", teamId)
         .in("role", ["coach", "admin"]);
       const ids = Array.from(new Set((tm ?? []).map((m: any) => m.user_id).filter(Boolean)));
-      if (ids.length === 0) return [];
+      if (ids.length === 0) return [] as any[];
       const { data: profs } = await supabase
         .from("profiles")
         .select("id, full_name, first_name, last_name, avatar_url")
@@ -900,47 +904,160 @@ function TeamCoaches({ teamId }: { teamId: string }) {
     },
   });
 
-  if (!coaches || coaches.length === 0) return null;
+  // Club staff available to attach (admins + coaches not already on this team)
+  const { data: availableStaff } = useQuery({
+    queryKey: ["club-staff-available", clubId, teamId, coaches?.length ?? 0],
+    enabled: isAdmin && !!clubId && pickerOpen,
+    queryFn: async () => {
+      const { data: cm } = await supabase
+        .from("club_members")
+        .select("user_id, role")
+        .eq("club_id", clubId!)
+        .in("role", ["coach", "admin"]);
+      const taken = new Set((coaches ?? []).map((c: any) => c.id));
+      const ids = Array.from(new Set((cm ?? []).map((m: any) => m.user_id))).filter((id) => !taken.has(id));
+      if (ids.length === 0) return [] as any[];
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, avatar_url")
+        .in("id", ids);
+      return profs ?? [];
+    },
+  });
+
+  async function attach(uid: string) {
+    setBusyUid(uid);
+    const { error } = await supabase
+      .from("team_members")
+      .insert({ team_id: teamId, user_id: uid, role: "coach" });
+    setBusyUid(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("teams.coachAttached", { defaultValue: "Coach attaché" }));
+    qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
+  }
+
+  async function detach(uid: string) {
+    if (!confirm(t("teams.coachDetachConfirm", { defaultValue: "Retirer ce coach de l'équipe ?" }))) return;
+    setBusyUid(uid);
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("user_id", uid)
+      .in("role", ["coach", "admin"]);
+    setBusyUid(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("teams.coachDetached", { defaultValue: "Coach retiré" }));
+    qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
+  }
+
+  const hasCoaches = (coaches ?? []).length > 0;
+  if (!hasCoaches && !isAdmin) return null;
 
   return (
     <section className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
-          <UserCircle2 className="h-4 w-4" />
-        </span>
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
-          {coaches.length > 1
-            ? t("teams.coaches", { defaultValue: "Coaches" })
-            : t("teams.coach", { defaultValue: "Coach" })}
-        </h2>
-      </div>
-      <ul className="flex flex-wrap gap-2">
-        {coaches.map((c: any) => {
-          const name = c.full_name
-            ?? [c.first_name, c.last_name].filter(Boolean).join(" ")
-            ?? "—";
-          return (
-            <li
-              key={c.id}
-              className="flex items-center gap-2 rounded-full bg-card border border-amber-500/30 pl-1 pr-3 py-1"
-            >
-              <div className="h-7 w-7 rounded-full bg-muted overflow-hidden flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
-                {c.avatar_url ? (
-                  <img src={c.avatar_url} alt="" className="h-full w-full object-cover" />
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
+            <UserCircle2 className="h-4 w-4" />
+          </span>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+            {(coaches?.length ?? 0) > 1
+              ? t("teams.coaches", { defaultValue: "Coaches" })
+              : t("teams.coach", { defaultValue: "Coach" })}
+          </h2>
+        </div>
+        {isAdmin && (
+          <Sheet open={pickerOpen} onOpenChange={setPickerOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" variant="outline" className="h-7 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10">
+                <Plus className="h-3.5 w-3.5" />
+                {t("teams.attachCoach", { defaultValue: "Attacher" })}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-3xl">
+              <SheetHeader>
+                <SheetTitle>{t("teams.attachCoachTitle", { defaultValue: "Attacher un coach" })}</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 pb-6 space-y-2">
+                {(availableStaff ?? []).length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">
+                    {t("teams.noAvailableCoach", { defaultValue: "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs." })}
+                  </p>
                 ) : (
-                  (name?.[0] ?? "?").toUpperCase()
+                  (availableStaff ?? []).map((s: any) => {
+                    const name = s.full_name ?? [s.first_name, s.last_name].filter(Boolean).join(" ") ?? "—";
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        disabled={busyUid === s.id}
+                        onClick={async () => { await attach(s.id); setPickerOpen(false); }}
+                        className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/40 transition disabled:opacity-50"
+                      >
+                        <div className="h-9 w-9 rounded-full bg-muted overflow-hidden flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                          {s.avatar_url ? (
+                            <img src={s.avatar_url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            (name?.[0] ?? "?").toUpperCase()
+                          )}
+                        </div>
+                        <span className="text-sm font-medium flex-1 text-left truncate">{name}</span>
+                        {busyUid === s.id && <Loader2 className="h-4 w-4 animate-spin" />}
+                      </button>
+                    );
+                  })
                 )}
               </div>
-              <span className="text-sm font-medium truncate max-w-[140px]">{name}</span>
-              {c.role === "admin" && (
-                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
-                  {t("roles.admin")}
-                </span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+            </SheetContent>
+          </Sheet>
+        )}
+      </div>
+      {hasCoaches ? (
+        <ul className="flex flex-wrap gap-2">
+          {(coaches ?? []).map((c: any) => {
+            const name = c.full_name
+              ?? [c.first_name, c.last_name].filter(Boolean).join(" ")
+              ?? "—";
+            return (
+              <li
+                key={c.id}
+                className="flex items-center gap-2 rounded-full bg-card border border-amber-500/30 pl-1 pr-2 py-1"
+              >
+                <div className="h-7 w-7 rounded-full bg-muted overflow-hidden flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
+                  {c.avatar_url ? (
+                    <img src={c.avatar_url} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    (name?.[0] ?? "?").toUpperCase()
+                  )}
+                </div>
+                <span className="text-sm font-medium truncate max-w-[140px]">{name}</span>
+                {c.role === "admin" && (
+                  <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
+                    {t("roles.admin")}
+                  </span>
+                )}
+                {isAdmin && c.role !== "admin" && (
+                  <button
+                    type="button"
+                    onClick={() => detach(c.id)}
+                    disabled={busyUid === c.id}
+                    className="ml-1 h-5 w-5 inline-flex items-center justify-center rounded-full hover:bg-destructive/15 text-muted-foreground hover:text-destructive disabled:opacity-50"
+                    aria-label={t("teams.coachDetach", { defaultValue: "Retirer" })}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          {t("teams.noCoachYet", { defaultValue: "Aucun coach attaché. Cliquez sur Attacher pour en ajouter." })}
+        </p>
+      )}
     </section>
   );
 }
+
