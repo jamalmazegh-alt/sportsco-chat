@@ -236,7 +236,7 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
       for (const r of rows ?? []) existing[(r as any).player_id] = r;
     }
 
-    return { event, players, existing };
+    return { event, players, existing, sport };
   });
 
 // ------------------------------------------------------------------
