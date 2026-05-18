@@ -65,14 +65,18 @@ export function CoachFeedbackTab({
         data: {
           playerId,
           kind,
-          visibility,
+          visibility: "coach_only",
           periodStart: periodStart || null,
           periodEnd: periodEnd || null,
         },
       });
-      toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée" }));
+      toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }));
       setGenOpen(false);
-      qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+      await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+      // Scroll to the reviews section so the new synthesis is immediately visible.
+      setTimeout(() => {
+        document.getElementById("coach-reviews-anchor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     } catch (e: any) {
       const msg = e?.message ?? "";
       if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." }));
@@ -108,9 +112,13 @@ export function CoachFeedbackTab({
 
       {/* Reviews */}
       {(rv?.reviews ?? []).length > 0 && (
-        <div className="space-y-2">
-          {(rv?.reviews ?? []).map((r: any) => (
-            <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3">
+        <div className="space-y-2" id="coach-reviews-anchor">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Sparkles className="h-3 w-3 text-primary" />
+            {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
+          </p>
+          {(rv?.reviews ?? []).map((r: any, idx: number) => (
+            <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3" open={idx === 0}>
               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="flex-1 truncate">
@@ -119,7 +127,6 @@ export function CoachFeedbackTab({
                 <span className="text-[11px] text-muted-foreground">
                   {format(new Date(r.created_at), "d MMM yyyy", { locale })}
                 </span>
-                <VisibilityBadge v={r.visibility} />
               </summary>
               <div className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{r.content}</div>
               {isCoach && (
@@ -164,7 +171,7 @@ export function CoachFeedbackTab({
                       <span className="truncate">{f.event.title}</span>
                     </>
                   )}
-                  <span className="ml-auto"><VisibilityBadge v={f.visibility} /></span>
+                  
                 </div>
 
                 {f.rating && (
@@ -259,19 +266,10 @@ export function CoachFeedbackTab({
                 <Input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs flex items-center gap-1"><Lock className="h-3 w-3" />{t("feedback.visibility")}</Label>
-              <Select value={visibility} onValueChange={(v) => setVisibility(v as any)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {VISIBILITY_VALUES.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {t(`feedback.visibility_${v}`, { defaultValue: v })}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+              <Lock className="h-3 w-3" />
+              {t("feedback.generateInternalHint", { defaultValue: "Synthèse interne, visible uniquement par le staff coach." })}
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setGenOpen(false)} disabled={genBusy}>

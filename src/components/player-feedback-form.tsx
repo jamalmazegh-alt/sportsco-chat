@@ -186,49 +186,7 @@ export function PlayerFeedbackForm({
         </>
       )}
 
-      {/* Visibility */}
-      <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground flex items-center gap-1">
-          <Lock className="h-3 w-3" />
-          {t("feedback.visibility")}
-        </Label>
-        <Select
-          value={value.visibility}
-          onValueChange={(v) => set("visibility", v as any)}
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {VISIBILITY_VALUES.map((v) => (
-              <SelectItem key={v} value={v}>
-                {t(`feedback.visibility_${v}`, { defaultValue: v })}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {value.visibility !== "coach_only" && value.visibility !== "staff" && (
-          <div className="space-y-1.5 mt-2">
-            <Label className="text-xs text-muted-foreground">
-              {t("feedback.sharedSummary")}
-            </Label>
-            <Textarea
-              value={value.sharedSummary}
-              onChange={(e) => set("sharedSummary", e.target.value)}
-              rows={2}
-              placeholder={t("feedback.sharedSummaryPlaceholder", {
-                defaultValue: "Résumé partagé (édulcoré, constructif)…",
-              })}
-            />
-            <p className="text-[11px] text-muted-foreground">
-              {t("feedback.sharedSummaryHint", {
-                defaultValue:
-                  "Seul ce résumé est visible par les destinataires. Les notes privées restent confidentielles.",
-              })}
-            </p>
-          </div>
-        )}
-      </div>
+      {/* Visibility is locked to coach_only — feedback always stays internal. */}
 
       <Button
         type="button"

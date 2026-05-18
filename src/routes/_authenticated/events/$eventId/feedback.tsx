@@ -74,26 +74,38 @@ function PostMatchFeedback() {
 
   useEffect(() => {
     if (!data) return;
-    const v: Record<string, FeedbackFormValue> = {};
-    const ix: Record<string, string | null> = {};
-    for (const row of data.players) {
-      const ex = data.existing[row.player.id];
-      ix[row.player.id] = ex?.id ?? null;
-      v[row.player.id] = ex
-        ? {
+    setValues((prev) => {
+      const v = { ...prev };
+      for (const row of data.players) {
+        const ex = data.existing[row.player.id];
+        if (ex) {
+          // Server has saved values → use them as source of truth.
+          v[row.player.id] = {
             rating: ex.rating ?? null,
             comment: ex.comment ?? "",
             devNotes: ex.dev_notes ?? "",
             strengths: ex.strengths ?? "",
             improvements: ex.improvements ?? "",
             tags: ex.tags ?? [],
-            visibility: ex.visibility ?? "coach_only",
-            sharedSummary: ex.shared_summary ?? "",
-          }
-        : { ...EMPTY_FEEDBACK };
-    }
-    setValues(v);
-    setIds(ix);
+            visibility: "coach_only",
+            sharedSummary: "",
+          };
+        } else if (!v[row.player.id]) {
+          // No server row and nothing typed locally → empty form.
+          v[row.player.id] = { ...EMPTY_FEEDBACK };
+        }
+      }
+      return v;
+    });
+    setIds((prev) => {
+      const ix = { ...prev };
+      for (const row of data.players) {
+        const ex = data.existing[row.player.id];
+        if (ex) ix[row.player.id] = ex.id;
+        else if (!(row.player.id in ix)) ix[row.player.id] = null;
+      }
+      return ix;
+    });
     const filled = new Set<string>();
     for (const row of data.players) if (data.existing[row.player.id]) filled.add(row.player.id);
     setSavedIds(filled);
@@ -213,6 +225,8 @@ function PostMatchFeedback() {
                     </p>
                     <p className="text-[11px] text-muted-foreground">
                       {t(`attendance.${row.attendance}`, { defaultValue: row.attendance })}
+                      {saved && values[p.id]?.rating ? ` · ★ ${values[p.id]!.rating}/5` : ""}
+                      {saved && (values[p.id]?.tags?.length ?? 0) > 0 ? ` · ${values[p.id]!.tags.length} tag(s)` : ""}
                     </p>
                   </div>
                   {saved && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
@@ -222,6 +236,16 @@ function PostMatchFeedback() {
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}
                 </button>
+                {saved && !open && (values[p.id]?.strengths || values[p.id]?.improvements || values[p.id]?.comment) && (
+                  <div className="px-3 pb-2.5 -mt-1 space-y-0.5 text-[11px] text-muted-foreground">
+                    {values[p.id]?.strengths && (
+                      <p className="line-clamp-1"><span className="font-medium text-emerald-600 dark:text-emerald-400">+ </span>{values[p.id]!.strengths}</p>
+                    )}
+                    {values[p.id]?.improvements && (
+                      <p className="line-clamp-1"><span className="font-medium text-amber-600 dark:text-amber-400">→ </span>{values[p.id]!.improvements}</p>
+                    )}
+                  </div>
+                )}
                 {open && values[p.id] && (
                   <div className="px-3 pb-3">
                     <PlayerFeedbackForm
