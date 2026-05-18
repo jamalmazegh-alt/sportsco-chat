@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -114,8 +114,16 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
   validateSearch: (s: Record<string, unknown>) => ({
     send: s.send === 1 || s.send === "1" ? 1 : undefined,
   }),
-  component: EventDetail,
+  component: EventDetailRoute,
 });
+
+function EventDetailRoute() {
+  const { eventId } = Route.useParams();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  if (pathname !== `/events/${eventId}`) return <Outlet />;
+  return <EventDetail />;
+}
 
 function EventDetail() {
   const { eventId } = Route.useParams();
