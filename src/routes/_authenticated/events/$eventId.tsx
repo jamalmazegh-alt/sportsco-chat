@@ -2041,6 +2041,9 @@ function EventDetail() {
           setDetailConvocId(null);
           setCancelTargetId(id);
         }}
+        onChangeStatus={(id, status) => {
+          submitResponse(id, status, null);
+        }}
       />
 
       <AlertDialog open={!!cancelTargetId} onOpenChange={(o) => !o && setCancelTargetId(null)}>
