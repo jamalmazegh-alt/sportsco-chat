@@ -74,26 +74,38 @@ function PostMatchFeedback() {
 
   useEffect(() => {
     if (!data) return;
-    const v: Record<string, FeedbackFormValue> = {};
-    const ix: Record<string, string | null> = {};
-    for (const row of data.players) {
-      const ex = data.existing[row.player.id];
-      ix[row.player.id] = ex?.id ?? null;
-      v[row.player.id] = ex
-        ? {
+    setValues((prev) => {
+      const v = { ...prev };
+      for (const row of data.players) {
+        const ex = data.existing[row.player.id];
+        if (ex) {
+          // Server has saved values → use them as source of truth.
+          v[row.player.id] = {
             rating: ex.rating ?? null,
             comment: ex.comment ?? "",
             devNotes: ex.dev_notes ?? "",
             strengths: ex.strengths ?? "",
             improvements: ex.improvements ?? "",
             tags: ex.tags ?? [],
-            visibility: ex.visibility ?? "coach_only",
-            sharedSummary: ex.shared_summary ?? "",
-          }
-        : { ...EMPTY_FEEDBACK };
-    }
-    setValues(v);
-    setIds(ix);
+            visibility: "coach_only",
+            sharedSummary: "",
+          };
+        } else if (!v[row.player.id]) {
+          // No server row and nothing typed locally → empty form.
+          v[row.player.id] = { ...EMPTY_FEEDBACK };
+        }
+      }
+      return v;
+    });
+    setIds((prev) => {
+      const ix = { ...prev };
+      for (const row of data.players) {
+        const ex = data.existing[row.player.id];
+        if (ex) ix[row.player.id] = ex.id;
+        else if (!(row.player.id in ix)) ix[row.player.id] = null;
+      }
+      return ix;
+    });
     const filled = new Set<string>();
     for (const row of data.players) if (data.existing[row.player.id]) filled.add(row.player.id);
     setSavedIds(filled);
