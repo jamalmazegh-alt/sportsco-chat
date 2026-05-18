@@ -23,7 +23,10 @@ import {
   setUserDisabled,
   removeUserFromClub,
   sendUserPasswordReset,
+  setUserClubStaffRoles,
 } from "@/lib/admin.functions";
+import { Checkbox } from "@/components/ui/checkbox";
+
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
