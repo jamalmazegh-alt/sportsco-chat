@@ -168,27 +168,27 @@ function AdminUsersPage() {
               </Select>
             </div>
 
-            {inviteRole === "coach" && (
+            {inviteRole === "coach" && (teams ?? []).length > 0 && (
               <div className="space-y-1.5">
                 <Label>
-                  {t("admin.inviteTeam", { defaultValue: "Équipe assignée" })}
-                  <span className="text-destructive ml-1">*</span>
+                  {t("admin.inviteTeam", { defaultValue: "Équipe (optionnel)" })}
                 </Label>
-                <Select value={teamId} onValueChange={setTeamId}>
+                <Select value={teamId || "none"} onValueChange={(v) => setTeamId(v === "none" ? "" : v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t("admin.inviteTeamPlaceholder", { defaultValue: "Choisir une équipe" })} />
+                    <SelectValue placeholder={t("admin.inviteTeamPlaceholder", { defaultValue: "Aucune équipe pour le moment" })} />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">
+                      {t("admin.inviteNoTeamYet", { defaultValue: "Pas d'équipe pour le moment" })}
+                    </SelectItem>
                     {(teams ?? []).map((tm) => (
                       <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(teams ?? []).length === 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    {t("admin.inviteNoTeams", { defaultValue: "Créez d'abord une équipe pour inviter un coach." })}
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground">
+                  {t("admin.inviteTeamHint", { defaultValue: "Vous pourrez attacher ce coach à une ou plusieurs équipes plus tard depuis la page de l'équipe." })}
+                </p>
               </div>
             )}
 
