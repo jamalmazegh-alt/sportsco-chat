@@ -145,6 +145,7 @@ function EventDetail() {
   const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
   const [respondReason, setRespondReason] = useState("");
   const [respondSubmitting, setRespondSubmitting] = useState(false);
+  const [coachOverrideTarget, setCoachOverrideTarget] = useState<{ id: string; status: AttendanceStatus; playerName: string; currentStatus: AttendanceStatus } | null>(null);
   const [cancelEventOpen, setCancelEventOpen] = useState(false);
   const [cancelEventReason, setCancelEventReason] = useState("");
   const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
