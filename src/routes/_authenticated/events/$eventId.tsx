@@ -176,36 +176,16 @@ function EventDetail() {
     queryKey: ["event-feedback-access", event?.id, event?.team_id, user?.id],
     enabled: !!event?.team_id && !!user,
     queryFn: async () => {
-      const [{ data: teamRoles }, { data: team }] = await Promise.all([
-        supabase
-          .from("team_members")
-          .select("role")
-          .eq("team_id", event!.team_id)
-          .eq("user_id", user!.id)
-          .in("role", ["coach", "admin"])
-          .limit(1),
-        supabase
-          .from("teams")
-          .select("club_id")
-          .eq("id", event!.team_id)
-          .maybeSingle(),
-      ]);
-
-      if ((teamRoles ?? []).length > 0) return true;
-      const clubId = (team as any)?.club_id;
-      if (!clubId) return false;
-
-      const { data: clubAdminRoles } = await supabase
-        .from("club_members")
-        .select("role")
-        .eq("club_id", clubId)
-        .eq("user_id", user!.id)
-        .eq("role", "admin")
-        .limit(1);
-
-      return (clubAdminRoles ?? []).length > 0;
+      const { data, error } = await supabase.rpc("is_team_coach", {
+        _team_id: event!.team_id,
+        _user_id: user!.id,
+      });
+      if (error) return false;
+      return !!data;
     },
   });
+
+  const isCoach = isActiveCoach || !!canAccessFeedback;
 
   const { data: convocations, refetch } = useQuery({
     queryKey: ["convocations", eventId],
