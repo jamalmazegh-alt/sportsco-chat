@@ -480,7 +480,7 @@ function PlayerProfile() {
 
       {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
       {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
-      {canSeePrivate && <CoachFeedbackTab playerId={player.id} />}
+      {canSeePrivate && <CoachFeedbackTab playerId={player.id} isCoach={isCoach} />}
 
       {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
       {minor && (isParentOfThisPlayer || isCoach) && (
