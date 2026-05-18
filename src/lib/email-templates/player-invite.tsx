@@ -37,10 +37,19 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
           {firstName ? `Welcome, ${firstName}!` : "You've been invited"}
         </Heading>
         <Text style={text}>
-          {clubName ? <strong>{clubName}</strong> : "Your club"} has added you
-          {teamName ? <> to <strong>{teamName}</strong></> : null} on Clubero.
-          Accept your invitation to set up your account, view upcoming events
-          and respond to convocations.
+          {roleLabel ? (
+            <>
+              {clubName ? <strong>{clubName}</strong> : "Votre club"} vous invite à rejoindre Clubero en tant que <strong>{roleLabel}</strong>.
+              Acceptez l'invitation pour créer votre compte et accéder à votre espace.
+            </>
+          ) : (
+            <>
+              {clubName ? <strong>{clubName}</strong> : "Your club"} has added you
+              {teamName ? <> to <strong>{teamName}</strong></> : null} on Clubero.
+              Accept your invitation to set up your account, view upcoming events
+              and respond to convocations.
+            </>
+          )}
         </Text>
         <Button style={button} href={inviteUrl}>
           Accept invitation
