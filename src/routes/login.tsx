@@ -23,7 +23,6 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,12 +31,16 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
     if (error) {
+      setBusy(false);
       toast.error(t("auth.loginError"));
       return;
     }
-    navigate({ to: "/home" });
+    // Force a full reload so AuthProvider rehydrates the session cleanly,
+    // avoiding a race where /home renders before onAuthStateChange fires.
+    if (typeof window !== "undefined") {
+      window.location.replace("/home");
+    }
   }
 
   function rememberEmailForReset() {
