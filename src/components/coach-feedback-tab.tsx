@@ -112,9 +112,13 @@ export function CoachFeedbackTab({
 
       {/* Reviews */}
       {(rv?.reviews ?? []).length > 0 && (
-        <div className="space-y-2">
-          {(rv?.reviews ?? []).map((r: any) => (
-            <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3">
+        <div className="space-y-2" id="coach-reviews-anchor">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Sparkles className="h-3 w-3 text-primary" />
+            {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
+          </p>
+          {(rv?.reviews ?? []).map((r: any, idx: number) => (
+            <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3" open={idx === 0}>
               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="flex-1 truncate">
@@ -123,7 +127,6 @@ export function CoachFeedbackTab({
                 <span className="text-[11px] text-muted-foreground">
                   {format(new Date(r.created_at), "d MMM yyyy", { locale })}
                 </span>
-                <VisibilityBadge v={r.visibility} />
               </summary>
               <div className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{r.content}</div>
               {isCoach && (
