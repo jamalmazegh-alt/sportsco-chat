@@ -145,6 +145,7 @@ function EventDetail() {
   const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
   const [respondReason, setRespondReason] = useState("");
   const [respondSubmitting, setRespondSubmitting] = useState(false);
+  const [coachOverrideTarget, setCoachOverrideTarget] = useState<{ id: string; status: AttendanceStatus; playerName: string; currentStatus: AttendanceStatus } | null>(null);
   const [cancelEventOpen, setCancelEventOpen] = useState(false);
   const [cancelEventReason, setCancelEventReason] = useState("");
   const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
@@ -346,6 +347,18 @@ function EventDetail() {
     }
     return true;
   }
+
+  function coachChangeStatus(c: any, status: AttendanceStatus) {
+    if (!c || c.status === status) return;
+    if (c.status !== "pending" && c.responded_at) {
+      const playerName = `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim() || "ce joueur";
+      setCoachOverrideTarget({ id: c.id, status, playerName, currentStatus: c.status });
+      return;
+    }
+    submitResponse(c.id, status, null);
+  }
+
+
 
   async function confirmRespond() {
     if (!respondTarget) return;
@@ -2011,7 +2024,7 @@ function EventDetail() {
                                     : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
                                   : className,
                               )}
-                              onClick={() => submitResponse(c.id, status, null)}
+                              onClick={() => coachChangeStatus(c, status)}
                               title={t(`attendance.${status}`)}
                               aria-label={t(`attendance.${status}`)}
                             >
@@ -2061,7 +2074,8 @@ function EventDetail() {
           setCancelTargetId(id);
         }}
         onChangeStatus={(id, status) => {
-          submitResponse(id, status, null);
+          const conv = (convocations ?? []).find((x: any) => x.id === id);
+          if (conv) coachChangeStatus(conv, status);
         }}
       />
 
@@ -2078,6 +2092,36 @@ function EventDetail() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {t("attendance.cancelConvocation")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!coachOverrideTarget} onOpenChange={(o) => !o && setCoachOverrideTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Forcer la réponse&nbsp;?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {coachOverrideTarget ? (
+                <>
+                  {coachOverrideTarget.playerName} a déjà répondu&nbsp;
+                  <strong>{t(`attendance.${coachOverrideTarget.currentStatus}`)}</strong>. Voulez-vous vraiment forcer son statut à&nbsp;
+                  <strong>{t(`attendance.${coachOverrideTarget.status}`)}</strong>&nbsp;?
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (coachOverrideTarget) {
+                  submitResponse(coachOverrideTarget.id, coachOverrideTarget.status, null);
+                }
+                setCoachOverrideTarget(null);
+              }}
+            >
+              Forcer
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
