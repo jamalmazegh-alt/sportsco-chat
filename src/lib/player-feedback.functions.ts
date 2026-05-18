@@ -195,10 +195,11 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: event } = await supabase
       .from("events")
-      .select("id, title, starts_at, type, team_id, opponent")
+      .select("id, title, starts_at, type, team_id, opponent, team:team_id(sport)")
       .eq("id", data.eventId)
       .maybeSingle();
     if (!event) throw new Response("Event not found", { status: 404 });
+    const sport = (event as any)?.team?.sport ?? null;
 
     const { data: convs } = await supabase
       .from("convocations")
@@ -235,7 +236,7 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
       for (const r of rows ?? []) existing[(r as any).player_id] = r;
     }
 
-    return { event, players, existing };
+    return { event, players, existing, sport };
   });
 
 // ------------------------------------------------------------------

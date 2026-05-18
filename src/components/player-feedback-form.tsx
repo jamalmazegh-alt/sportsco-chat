@@ -10,6 +10,7 @@ import {
 import { Lock, Star, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FEEDBACK_TAGS, VISIBILITY_VALUES } from "@/lib/player-feedback.functions";
+import { getFeedbackTagsForSport } from "@/lib/feedback-tags";
 
 export type FeedbackFormValue = {
   rating: number | null;
@@ -47,15 +48,18 @@ export function PlayerFeedbackForm({
   onSubmit,
   busy,
   compact,
+  sport,
 }: {
   value: FeedbackFormValue;
   onChange: (next: FeedbackFormValue) => void;
   onSubmit: () => Promise<void> | void;
   busy?: boolean;
   compact?: boolean;
+  sport?: string | null;
 }) {
   const { t } = useTranslation();
   const [advanced, setAdvanced] = useState(!compact);
+  const tags = sport !== undefined ? getFeedbackTagsForSport(sport) : (FEEDBACK_TAGS as readonly string[]);
 
   const set = <K extends keyof FeedbackFormValue>(k: K, v: FeedbackFormValue[K]) =>
     onChange({ ...value, [k]: v });
@@ -103,7 +107,7 @@ export function PlayerFeedbackForm({
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">{t("feedback.tags")}</Label>
         <div className="flex flex-wrap gap-1.5">
-          {FEEDBACK_TAGS.map((tag) => {
+          {tags.map((tag) => {
             const active = value.tags.includes(tag);
             return (
               <button
