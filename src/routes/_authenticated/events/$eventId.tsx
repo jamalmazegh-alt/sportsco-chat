@@ -37,6 +37,17 @@ import { sendTransactionalEmail } from "@/lib/email/send";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
+const ATTENDANCE_ACTIONS: Array<{
+  status: AttendanceStatus;
+  Icon: typeof CheckCircle2;
+  className: string;
+}> = [
+  { status: "present", Icon: CheckCircle2, className: "text-present hover:bg-present/15 hover:text-present" },
+  { status: "absent", Icon: XCircle, className: "text-absent hover:bg-absent/10 hover:text-absent" },
+  { status: "uncertain", Icon: HelpCircle, className: "text-uncertain-foreground hover:bg-uncertain/20 hover:text-uncertain-foreground" },
+  { status: "pending", Icon: CircleDot, className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground" },
+];
+
 const CONVOC_SNAPSHOT_FIELDS = [
   "title",
   "description",
@@ -113,7 +124,7 @@ function EventDetail() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const isActiveCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
