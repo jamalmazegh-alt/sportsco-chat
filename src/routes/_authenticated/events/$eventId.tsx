@@ -1219,9 +1219,18 @@ function EventDetail() {
             )}
           </div>
           {isCoach && teams && (
-            <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0 hover:bg-primary/10" onClick={() => setEditOpen(true)}>
-              <Pencil className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-1 shrink-0">
+              {new Date(event.starts_at).getTime() <= Date.now() && (
+                <Button asChild size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}>
+                  <Link to="/events/$eventId/feedback" params={{ eventId }}>
+                    <ClipboardList className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+              <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-primary/10" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
         <h1 className={cn(
