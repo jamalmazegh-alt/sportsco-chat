@@ -107,7 +107,7 @@ export function PlayerFeedbackForm({
       <div className="space-y-1.5">
         <Label className="text-xs text-muted-foreground">{t("feedback.tags")}</Label>
         <div className="flex flex-wrap gap-1.5">
-          {FEEDBACK_TAGS.map((tag) => {
+          {tags.map((tag) => {
             const active = value.tags.includes(tag);
             return (
               <button
