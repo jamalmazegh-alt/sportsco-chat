@@ -87,6 +87,10 @@ function AdminUsersPage() {
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
 
+    const roleLabel = inviteRole === "admin"
+      ? t("roles.admin", { defaultValue: "Administrateur" })
+      : t("roles.coach", { defaultValue: "Coach" });
+
     try {
       await sendTransactionalEmail({
         templateName: "player-invite",
@@ -98,6 +102,7 @@ function AdminUsersPage() {
           clubName: clubLabel,
           clubLogoUrl,
           inviteUrl,
+          roleLabel,
         },
       });
     } catch (err: any) {
