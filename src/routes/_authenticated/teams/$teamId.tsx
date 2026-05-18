@@ -1068,7 +1068,7 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
                   )}
                 </div>
                 <span className="text-sm font-medium truncate max-w-[140px]">{name}</span>
-                {c.role === "admin" && (
+                {(c.role === "admin" || (c.clubRoles ?? []).includes("admin")) && (
                   <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
                     {t("roles.admin")}
                   </span>
