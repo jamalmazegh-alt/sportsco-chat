@@ -72,6 +72,8 @@ function AdminUsersPage() {
       email,
       token,
       created_by: user.id,
+      first_name: first.trim() || null,
+      last_name: last.trim() || null,
     });
     if (invErr) {
       setBusy(false);
