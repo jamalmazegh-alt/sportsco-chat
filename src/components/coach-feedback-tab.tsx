@@ -1,0 +1,306 @@
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Loader2, Lock, Eye, Sparkles, Trash2, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import {
+  listPlayerFeedback,
+  listPlayerReviews,
+  generatePlayerReview,
+  deletePlayerFeedback,
+  deletePlayerReview,
+  VISIBILITY_VALUES,
+} from "@/lib/player-feedback.functions";
+import { cn } from "@/lib/utils";
+
+export function CoachFeedbackTab({
+  playerId,
+  isCoach,
+}: {
+  playerId: string;
+  isCoach: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  const qc = useQueryClient();
+  const fetchFb = useServerFn(listPlayerFeedback);
+  const fetchRv = useServerFn(listPlayerReviews);
+  const genFn = useServerFn(generatePlayerReview);
+  const delFb = useServerFn(deletePlayerFeedback);
+  const delRv = useServerFn(deletePlayerReview);
+
+  const { data: fb, isLoading: lFb } = useQuery({
+    queryKey: ["player-feedback", playerId],
+    queryFn: () => fetchFb({ data: { playerId } }),
+  });
+  const { data: rv, isLoading: lRv } = useQuery({
+    queryKey: ["player-reviews", playerId],
+    queryFn: () => fetchRv({ data: { playerId } }),
+  });
+
+  const [genOpen, setGenOpen] = useState(false);
+  const [genBusy, setGenBusy] = useState(false);
+  const [kind, setKind] = useState<"end_of_season" | "meeting" | "development" | "coaching">("development");
+  const [visibility, setVisibility] = useState<(typeof VISIBILITY_VALUES)[number]>("coach_only");
+  const [periodStart, setPeriodStart] = useState("");
+  const [periodEnd, setPeriodEnd] = useState("");
+
+  const locale = i18n.language?.startsWith("fr") ? fr : undefined;
+
+  async function onGenerate() {
+    setGenBusy(true);
+    try {
+      await genFn({
+        data: {
+          playerId,
+          kind,
+          visibility,
+          periodStart: periodStart || null,
+          periodEnd: periodEnd || null,
+        },
+      });
+      toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée" }));
+      setGenOpen(false);
+      qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+    } catch (e: any) {
+      const msg = e?.message ?? "";
+      if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." }));
+      else if (msg.includes("402")) toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
+      else toast.error(msg || "Error");
+    } finally {
+      setGenBusy(false);
+    }
+  }
+
+  async function onDeleteFb(id: string) {
+    await delFb({ data: { id } });
+    qc.invalidateQueries({ queryKey: ["player-feedback", playerId] });
+  }
+  async function onDeleteRv(id: string) {
+    await delRv({ data: { id } });
+    qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          {t("feedback.coachTab", { defaultValue: "Retours Coach" })}
+        </h2>
+        {isCoach && (
+          <Button size="sm" variant="outline" className="h-8" onClick={() => setGenOpen(true)}>
+            <Sparkles className="h-4 w-4" />
+            {t("feedback.generate", { defaultValue: "Générer une synthèse" })}
+          </Button>
+        )}
+      </div>
+
+      {/* Reviews */}
+      {(rv?.reviews ?? []).length > 0 && (
+        <div className="space-y-2">
+          {(rv?.reviews ?? []).map((r: any) => (
+            <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3">
+              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="flex-1 truncate">
+                  {t(`feedback.kind_${r.kind}`, { defaultValue: r.kind })}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  {format(new Date(r.created_at), "d MMM yyyy", { locale })}
+                </span>
+                <VisibilityBadge v={r.visibility} />
+              </summary>
+              <div className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{r.content}</div>
+              {isCoach && (
+                <button
+                  type="button"
+                  onClick={() => onDeleteRv(r.id)}
+                  className="mt-2 text-[11px] text-destructive inline-flex items-center gap-1"
+                >
+                  <Trash2 className="h-3 w-3" /> {t("common.delete")}
+                </button>
+              )}
+            </details>
+          ))}
+        </div>
+      )}
+
+      {/* Timeline */}
+      {lFb || lRv ? (
+        <div className="flex justify-center py-6">
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        </div>
+      ) : (fb?.feedback ?? []).length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          {t("feedback.empty", { defaultValue: "Pas encore de retours coach pour ce joueur." })}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {(fb?.feedback ?? []).map((f: any) => {
+            const authorName =
+              f.author?.full_name ??
+              [f.author?.first_name, f.author?.last_name].filter(Boolean).join(" ") ??
+              "—";
+            return (
+              <li key={f.id} className="rounded-xl border border-border bg-muted/20 p-3 space-y-2">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <span>{format(new Date(f.created_at), "d MMM yyyy", { locale })}</span>
+                  <span>·</span>
+                  <span className="truncate">{authorName}</span>
+                  {f.event && (
+                    <>
+                      <span>·</span>
+                      <span className="truncate">{f.event.title}</span>
+                    </>
+                  )}
+                  <span className="ml-auto"><VisibilityBadge v={f.visibility} /></span>
+                </div>
+
+                {f.rating && (
+                  <div className="flex items-center gap-0.5 text-amber-500">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <Star
+                        key={n}
+                        className={cn(
+                          "h-3.5 w-3.5",
+                          n <= f.rating ? "fill-current" : "text-muted-foreground/30"
+                        )}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {f.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {f.tags.map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary"
+                      >
+                        {t(`feedback.tag.${tag}`, { defaultValue: tag })}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {f.strengths && (
+                  <p className="text-sm">
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      {t("feedback.strengths")} : 
+                    </span>
+                    {f.strengths}
+                  </p>
+                )}
+                {f.improvements && (
+                  <p className="text-sm">
+                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                      {t("feedback.improvements")} : 
+                    </span>
+                    {f.improvements}
+                  </p>
+                )}
+                {f.comment && <p className="text-sm text-muted-foreground">{f.comment}</p>}
+                {f.shared_summary && (
+                  <p className="text-sm border-l-2 border-primary/40 pl-2 italic">
+                    {f.shared_summary}
+                  </p>
+                )}
+                {isCoach && (
+                  <button
+                    type="button"
+                    onClick={() => onDeleteFb(f.id)}
+                    className="text-[11px] text-destructive inline-flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3 w-3" /> {t("common.delete")}
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <Dialog open={genOpen} onOpenChange={setGenOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("feedback.generateTitle", { defaultValue: "Générer une synthèse" })}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">{t("feedback.kindLabel", { defaultValue: "Type" })}</Label>
+              <Select value={kind} onValueChange={(v) => setKind(v as any)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="end_of_season">{t("feedback.kind_end_of_season", { defaultValue: "Bilan de saison" })}</SelectItem>
+                  <SelectItem value="meeting">{t("feedback.kind_meeting", { defaultValue: "Préparation d'entretien" })}</SelectItem>
+                  <SelectItem value="development">{t("feedback.kind_development", { defaultValue: "Rapport de développement" })}</SelectItem>
+                  <SelectItem value="coaching">{t("feedback.kind_coaching", { defaultValue: "Synthèse staff coaching" })}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs">{t("feedback.periodStart", { defaultValue: "Début" })}</Label>
+                <Input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">{t("feedback.periodEnd", { defaultValue: "Fin" })}</Label>
+                <Input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1"><Lock className="h-3 w-3" />{t("feedback.visibility")}</Label>
+              <Select value={visibility} onValueChange={(v) => setVisibility(v as any)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {VISIBILITY_VALUES.map((v) => (
+                    <SelectItem key={v} value={v}>
+                      {t(`feedback.visibility_${v}`, { defaultValue: v })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setGenOpen(false)} disabled={genBusy}>
+              {t("common.cancel")}
+            </Button>
+            <Button onClick={onGenerate} disabled={genBusy}>
+              {genBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {t("feedback.generate", { defaultValue: "Générer" })}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function VisibilityBadge({ v }: { v: string }) {
+  const { t } = useTranslation();
+  const isPrivate = v === "coach_only" || v === "staff";
+  const Icon = isPrivate ? Lock : Eye;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+        isPrivate ? "bg-muted text-muted-foreground" : "bg-primary/15 text-primary"
+      )}
+    >
+      <Icon className="h-3 w-3" />
+      {t(`feedback.visibility_${v}`, { defaultValue: v })}
+    </span>
+  );
+}

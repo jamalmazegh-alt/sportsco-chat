@@ -1,110 +1,85 @@
-## Statistiques d'équipe — plan
+# Player Feedback & Development System
 
-Nouvel onglet "Statistiques / Statistics" sur la page équipe, qui s'appuie sur les données déjà capturées (matches, scores, buts, présences) et complète avec des stats spécifiques au sport.
+Système structuré de retours post-match et de développement long terme pour chaque joueur, avec historique, visibilité contrôlée et synthèse IA.
 
-### 1. Structure de la page équipe
+## 1. Modèle de données
 
-La page `teams/$teamId` n'a pas encore d'onglets. Je vais introduire un système d'onglets simple en haut :
-- **Effectif** (contenu actuel)
-- **Statistiques** (nouveau)
+Nouvelles tables :
 
-Aucune route séparée pour rester sur la même URL ; les filtres seront dans l'état local.
+**`player_feedback`** — un retour par (coach, joueur, optionnellement événement)
+- `id`, `club_id`, `team_id`, `player_id`, `event_id` (nullable — feedback hors match possible)
+- `author_user_id` (coach)
+- `rating` smallint nullable (1–5, optionnel)
+- `comment` text (privé)
+- `dev_notes` text (notes de développement)
+- `strengths` text
+- `improvements` text
+- `tags` text[] (positioning, mentality, effort, leadership, technical, physical, discipline, teamwork…)
+- `visibility` enum `feedback_visibility` : `coach_only` (défaut), `staff`, `share_summary`, `parent_summary`, `player_summary`
+- `shared_summary` text nullable (résumé édulcoré exposable selon `visibility`)
+- `created_at`, `updated_at`, `deleted_at`
 
-### 2. Source des données
+**`player_reviews`** — synthèses générées par IA, archivées
+- `id`, `club_id`, `player_id`, `author_user_id`
+- `kind` text (`end_of_season`, `meeting`, `development`, `coaching`)
+- `period_start`, `period_end` dates (nullable)
+- `content` text (markdown)
+- `visibility` enum (mêmes valeurs)
+- `model` text, `created_at`
 
-Tout est déjà en base :
-- `events` : `type` (match/training/…), `competition_type`, `is_home`, `opponent`, `starts_at`, `status`, `team_id`
-- `match_results` : `home_score`, `away_score`, `score_details` (jsonb libre), `notes`
-- `event_goals` : `scorer_player_id`, `assist_player_id`, `kind` (`goal`, `yellow_card`, `red_card`, `penalty_scored`, `penalty_missed`, `try`, `conversion`, `rebound`, `assist`, `save`, `ace`, `block`, etc.), `minute`
-- `convocations` : présences pour croiser avec les résultats
+Helpers SQL (SECURITY DEFINER) :
+- `can_view_player_feedback(_user_id, _feedback_id)` — applique la matrice de visibilité (coach/staff/parent/joueur)
+- `can_view_player_review(_user_id, _review_id)`
 
-Le champ `event_goals.kind` étant un `text` libre, j'utilise des constantes par sport et j'étends la saisie post-match pour ces types. **Aucune migration nécessaire** pour la v1.
+RLS :
+- `player_feedback` :
+  - SELECT : `can_view_player_feedback(auth.uid(), id)`
+  - INSERT/UPDATE/DELETE : coach/admin du club du joueur uniquement, et `author = auth.uid()` pour UPDATE/DELETE (admin peut tout)
+- `player_reviews` : même logique
 
-### 3. KPIs généraux (tous sports)
+## 2. Backend / Server functions (`src/lib/player-feedback.functions.ts`)
 
-Affichés en cartes en haut :
-- Matchs joués, Victoires, Nuls, Défaites, % victoires
-- Marqués / Encaissés / Différence
-- Moyennes par match
-- Forme sur 5 derniers (V/N/D pills)
-- Domicile vs Extérieur (mini-tableau)
-- Clean sheets (sports concernés)
-- Plus large victoire / défaite
-- Dernier match + Prochain match (cartes)
+- `listPlayerFeedback({ playerId })` — timeline filtrée par RLS
+- `createPlayerFeedback({ playerId, eventId?, rating?, comment, devNotes?, strengths?, improvements?, tags?, visibility, sharedSummary? })`
+- `updatePlayerFeedback({ id, ...patch })`
+- `deletePlayerFeedback({ id })` (soft-delete)
+- `listEventPlayers({ eventId })` — joueurs convoqués/présents pour la saisie rapide post-match
+- `generatePlayerReview({ playerId, kind, periodStart?, periodEnd?, visibility })` :
+  - charge feedbacks (privés visibles au coach), convocations/attendance, stats (`event_goals`, `match_results`)
+  - appelle Lovable AI Gateway (`google/gemini-3-flash-preview`) avec un prompt cadré « développement, bienveillant, constructif »
+  - persiste dans `player_reviews`, retourne contenu
+- `listPlayerReviews({ playerId })`
 
-### 4. Filtres
+## 3. UI
 
-Au-dessus des KPIs :
-- Saison (depuis `teams.season` actuel + saisons déduites des dates d'events)
-- Compétition (amical / championnat / coupe / tournoi)
-- Domicile / Extérieur / Tout
-- Plage de dates
+**Saisie post-match — route `/_authenticated/events/$eventId/feedback`**
+- Liste verticale des joueurs convoqués (présents en haut)
+- Carte compacte par joueur (mobile-first) : note optionnelle (5 étoiles douces, libellées « Excellent / Bon / OK / À travailler / Difficile » — pas de score chiffré agressif), tags chips multi-select, champs `Commentaire`, `Forces`, `À développer`, sélecteur `Visibilité` (icône cadenas → Coach uniquement par défaut)
+- Bouton « Enregistrer » par joueur + raccourci « Tout enregistrer »
+- Bouton d'accès depuis la page de l'événement (visible aux coachs uniquement)
 
-Tout est calculé côté client à partir d'un seul fetch (les volumes sont modestes pour une équipe amateur).
+**Profil joueur — nouvel onglet `Retours Coach` / `Coach Feedback`**
+- Timeline chronologique : date + lien événement, auteur, note (si présente), tags, sections forces / à développer, commentaire (selon visibilité)
+- Badges visuels pour visibilité (cadenas privé, œil partagé…)
+- Bouton « Générer une synthèse » (coach/admin) → modal : type (fin de saison / réunion / développement / coaching), période, visibilité → affiche la synthèse Markdown, sauvegardée
+- Section « Synthèses » sous la timeline listant les `player_reviews`
 
-### 5. Historique par saison
+## 4. Ton & UX
 
-Onglet secondaire "Saisons" dans la page Stats avec un tableau comparatif (saison → MJ, V, N, D, BP, BC, diff). Une saison = champ texte sur l'équipe + bucket déduit du `starts_at` (juillet→juin).
+- Vocabulaire développemental : « À développer » et non « Faiblesses », « Difficile » et non « Mauvais »
+- Note 1–5 optionnelle, jamais affichée publiquement comme classement
+- Aucun classement comparatif entre joueurs
+- Confidentialité visible : icône cadenas + libellé partout, par défaut « Coach uniquement »
+- Tags pré-définis (i18n FR/EN) avec saisie libre limitée
 
-### 6. Stats spécifiques par sport
+## 5. Périmètre de cette itération
 
-Selon `teams.sport`, j'affiche un bloc supplémentaire :
-- **Football / Futsal** : top buteurs, top passeurs, cartons J/R, péno réussis/manqués, clean sheets
-- **Basketball** : pts/match, rebonds, passes, interceptions, contres, fautes, top scoreurs
-- **Rugby** : essais, transfo, péno, cartons, top marqueurs (pts), top essayeurs
-- **Handball** : buts, arrêts, exclusions 2', péno, top buteurs
-- **Volleyball** : sets gagnés/perdus, aces, blocks, attaques, taux par compétition
-- **Hockey sur glace** : buts, passes, pénalités, power play, shutouts, top scoreurs
-- **Hockey sur gazon** : buts, passes, clean sheets, corners, cartons, top scoreurs
+Inclus :
+- Migration tables + RLS + helpers
+- Server functions CRUD + génération IA
+- UI saisie post-match
+- Onglet `Retours Coach` dans le profil joueur (timeline + génération synthèse)
+- i18n FR/EN
 
-Chaque ligne s'agrège depuis `event_goals.kind` + jointure joueurs. Les sports sans données ne montrent que la section générale + un état vide explicite ("Activez la saisie détaillée après chaque match pour voir ces statistiques").
-
-### 7. Charts
-
-Composants Recharts (déjà utilisé dans le projet si présent, sinon ajouté) :
-- Aire empilée : buts marqués vs encaissés par mois
-- Bar chart : résultats par compétition (V/N/D)
-- Donut : domicile vs extérieur
-- Sparkline forme
-
-### 8. Saisie de match
-
-Le coach a déjà l'écran résultat (`match_results` + `event_goals`). Je l'étends légèrement sur l'écran événement :
-- Sélecteur de "type d'événement" par sport pour ajouter cartons, péno, etc. (mappé sur `event_goals.kind`)
-- Rien d'obligatoire au-delà du score final
-
-Pas de changement de schéma — uniquement de nouveaux `kind` autorisés côté UI.
-
-### 9. UX
-
-- Mobile-first : cartes empilées, charts responsive
-- États vides clairs ("Pas encore de matchs joués cette saison")
-- Filtres en sticky header sur mobile
-- Le bloc spécifique-sport n'apparaît que si `teams.sport` est défini
-
-### 10. Permissions
-
-Lecture : tous les membres de l'équipe (RLS `events` + `match_results` + `event_goals` déjà OK via `can_view_team`).
-Édition de la saisie post-match : déjà restreinte aux coachs.
-
-### 11. Découpage technique
-
-Nouveaux fichiers :
-- `src/components/team-stats/index.tsx` (onglet principal + filtres)
-- `src/components/team-stats/kpi-cards.tsx`
-- `src/components/team-stats/form-strip.tsx`
-- `src/components/team-stats/season-history.tsx`
-- `src/components/team-stats/sport-blocks/<sport>.tsx` (un par sport)
-- `src/lib/team-stats.ts` (agrégations purement client à partir des données fetched)
-
-Modifications :
-- `src/routes/_authenticated/teams/$teamId.tsx` : ajout des onglets Effectif / Statistiques
-- Extension légère de la saisie post-match pour les `kind` supplémentaires (optionnel, peut être livré dans un 2e tour)
-
-### Livraison en 2 phases recommandée
-
-**Phase 1 (ce tour)** : onglets sur la page équipe + section Statistiques générales (KPIs, filtres, forme, dom/ext, charts, historique par saison, top buteurs/passeurs football qui marche déjà avec les données existantes).
-
-**Phase 2 (prochain tour, si OK)** : blocs sport-par-sport restants + extension de la saisie post-match pour cartons/péno/etc.
-
-Cela permet de livrer quelque chose d'utile immédiatement sans bâcler 7 sports d'un coup. Dis-moi si tu préfères que je tente tout en un seul tour ou que je commence par la Phase 1.
+Préparé pour plus tard (non inclus) :
+- Graphiques de progression, comparaisons saisons, PDF, scouting, évaluations entraînement — l'architecture (tags structurés, `kind`, périodes, `rating` numérique optionnel) reste compatible.

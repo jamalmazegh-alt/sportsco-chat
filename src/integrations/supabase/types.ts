@@ -701,6 +701,95 @@ export type Database = {
         }
         Relationships: []
       }
+      player_feedback: {
+        Row: {
+          author_user_id: string
+          club_id: string
+          comment: string | null
+          created_at: string
+          deleted_at: string | null
+          dev_notes: string | null
+          event_id: string | null
+          id: string
+          improvements: string | null
+          player_id: string
+          rating: number | null
+          shared_summary: string | null
+          strengths: string | null
+          tags: string[]
+          team_id: string | null
+          updated_at: string
+          visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Insert: {
+          author_user_id: string
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          dev_notes?: string | null
+          event_id?: string | null
+          id?: string
+          improvements?: string | null
+          player_id: string
+          rating?: number | null
+          shared_summary?: string | null
+          strengths?: string | null
+          tags?: string[]
+          team_id?: string | null
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Update: {
+          author_user_id?: string
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          dev_notes?: string | null
+          event_id?: string | null
+          id?: string
+          improvements?: string | null
+          player_id?: string
+          rating?: number | null
+          shared_summary?: string | null
+          strengths?: string | null
+          tags?: string[]
+          team_id?: string | null
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_feedback_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_feedback_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_feedback_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_feedback_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_parents: {
         Row: {
           can_respond: boolean
@@ -735,6 +824,63 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "player_parents_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_reviews: {
+        Row: {
+          author_user_id: string
+          club_id: string
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          model: string | null
+          period_end: string | null
+          period_start: string | null
+          player_id: string
+          visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Insert: {
+          author_user_id: string
+          club_id: string
+          content: string
+          created_at?: string
+          id?: string
+          kind: string
+          model?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          player_id: string
+          visibility?: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Update: {
+          author_user_id?: string
+          club_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          model?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          player_id?: string
+          visibility?: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_reviews_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_reviews_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
@@ -1315,12 +1461,24 @@ export type Database = {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
       }
+      can_author_player_feedback: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_respond_for_player: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_player_feedback: {
+        Args: { _feedback_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_player_media: {
         Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_player_review: {
+        Args: { _review_id: string; _user_id: string }
         Returns: boolean
       }
       can_view_team: {
@@ -1456,6 +1614,12 @@ export type Database = {
         | "parental_consent"
       event_status: "draft" | "published" | "cancelled"
       event_type: "training" | "match" | "tournament" | "meeting" | "other"
+      feedback_visibility:
+        | "coach_only"
+        | "staff"
+        | "share_summary"
+        | "parent_summary"
+        | "player_summary"
       media_consent_status: "pending" | "granted" | "denied"
       privacy_request_status:
         | "pending"
@@ -1614,6 +1778,13 @@ export const Constants = {
       ],
       event_status: ["draft", "published", "cancelled"],
       event_type: ["training", "match", "tournament", "meeting", "other"],
+      feedback_visibility: [
+        "coach_only",
+        "staff",
+        "share_summary",
+        "parent_summary",
+        "player_summary",
+      ],
       media_consent_status: ["pending", "granted", "denied"],
       privacy_request_status: [
         "pending",
