@@ -126,10 +126,11 @@ export function MatchResultCard({
   const { data: players } = useQuery({
     queryKey: ["event-convoqued-players", eventId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("convocations")
         .select("players:player_id(id, first_name, last_name, jersey_number)")
         .eq("event_id", eventId);
+      if (error) throw error;
       return ((data ?? [])
         .map((r: any) => r.players)
         .filter(Boolean)) as Player[];
@@ -220,6 +221,7 @@ export function MatchResultCard({
     setKind(cfg.defaultStatKind);
     setShowGoalForm(false);
     qc.invalidateQueries({ queryKey: ["event-goals", eventId] });
+    qc.invalidateQueries({ queryKey: ["event-feedback", eventId] });
   }
 
   async function deleteGoal(id: string) {
@@ -481,7 +483,7 @@ export function MatchResultCard({
                     <SelectContent>
                       {(players ?? []).map((p) => (
                         <SelectItem key={p.id} value={p.id}>
-                          {p.first_name} {p.last_name}
+                          {[p.first_name, p.last_name].filter(Boolean).join(" ") || "Joueur"}
                           {p.jersey_number ? ` · #${p.jersey_number}` : ""}
                         </SelectItem>
                       ))}
@@ -507,7 +509,7 @@ export function MatchResultCard({
                             .filter((p) => p.id !== scorerId)
                             .map((p) => (
                               <SelectItem key={p.id} value={p.id}>
-                                {p.first_name} {p.last_name}
+                                {[p.first_name, p.last_name].filter(Boolean).join(" ") || "Joueur"}
                               </SelectItem>
                             ))}
                         </SelectContent>
