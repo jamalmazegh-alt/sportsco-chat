@@ -68,10 +68,6 @@ function AdminUsersPage() {
   async function onInvite(e: FormEvent) {
     e.preventDefault();
     if (!activeClubId || !user) return;
-    if (inviteRole === "coach" && !teamId) {
-      toast.error(t("admin.inviteCoachNeedsTeam", { defaultValue: "Sélectionnez une équipe pour le coach." }));
-      return;
-    }
     setBusy(true);
 
     // Refuse if email already has a Clubero account in this club
@@ -87,7 +83,7 @@ function AdminUsersPage() {
     const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
       club_id: activeClubId,
-      team_id: inviteRole === "coach" ? teamId : null,
+      team_id: inviteRole === "coach" && teamId ? teamId : null,
       role: inviteRole,
       email,
       token,
@@ -103,7 +99,7 @@ function AdminUsersPage() {
       .from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
-    const teamName = inviteRole === "coach"
+    const teamName = inviteRole === "coach" && teamId
       ? teams?.find((tt) => tt.id === teamId)?.name
       : undefined;
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
@@ -172,27 +168,27 @@ function AdminUsersPage() {
               </Select>
             </div>
 
-            {inviteRole === "coach" && (
+            {inviteRole === "coach" && (teams ?? []).length > 0 && (
               <div className="space-y-1.5">
                 <Label>
-                  {t("admin.inviteTeam", { defaultValue: "Équipe assignée" })}
-                  <span className="text-destructive ml-1">*</span>
+                  {t("admin.inviteTeam", { defaultValue: "Équipe (optionnel)" })}
                 </Label>
-                <Select value={teamId} onValueChange={setTeamId}>
+                <Select value={teamId || "none"} onValueChange={(v) => setTeamId(v === "none" ? "" : v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder={t("admin.inviteTeamPlaceholder", { defaultValue: "Choisir une équipe" })} />
+                    <SelectValue placeholder={t("admin.inviteTeamPlaceholder", { defaultValue: "Aucune équipe pour le moment" })} />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">
+                      {t("admin.inviteNoTeamYet", { defaultValue: "Pas d'équipe pour le moment" })}
+                    </SelectItem>
                     {(teams ?? []).map((tm) => (
                       <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {(teams ?? []).length === 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    {t("admin.inviteNoTeams", { defaultValue: "Créez d'abord une équipe pour inviter un coach." })}
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground">
+                  {t("admin.inviteTeamHint", { defaultValue: "Vous pourrez attacher ce coach à une ou plusieurs équipes plus tard depuis la page de l'équipe." })}
+                </p>
               </div>
             )}
 
