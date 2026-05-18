@@ -49,31 +49,34 @@ function PostMatchFeedback() {
         .maybeSingle();
       if (!event?.team_id || event.type !== "match") return false;
 
-      const [{ data: teamRoles }, { data: clubAdminRoles }] = await Promise.all([
-        supabase
-          .from("team_members")
-          .select("role")
-          .eq("team_id", event.team_id)
-          .eq("user_id", user!.id)
-          .in("role", ["coach", "admin"])
-          .limit(1),
-        supabase
-          .from("club_members")
-          .select("role")
-          .eq("club_id", (event as any).teams?.club_id)
-          .eq("user_id", user!.id)
-          .eq("role", "admin")
-          .limit(1),
-      ]);
+      const { data: teamRoles } = await supabase
+        .from("team_members")
+        .select("role")
+        .eq("team_id", event.team_id)
+        .eq("user_id", user!.id)
+        .in("role", ["coach", "admin"])
+        .limit(1);
+      if ((teamRoles ?? []).length > 0) return true;
 
-      return (teamRoles ?? []).length > 0 || (clubAdminRoles ?? []).length > 0;
+      const clubId = (event as any).teams?.club_id;
+      if (!clubId) return false;
+
+      const { data: clubAdminRoles } = await supabase
+        .from("club_members")
+        .select("role")
+        .eq("club_id", clubId)
+        .eq("user_id", user!.id)
+        .eq("role", "admin")
+        .limit(1);
+
+      return (clubAdminRoles ?? []).length > 0;
     },
   });
 
   const { data, isLoading } = useQuery({
     queryKey: ["event-feedback", eventId],
     queryFn: async () => fetchData({ data: { eventId } }),
-    enabled: !!canAccessFeedback,
+    enabled: isCoach || !!canAccessFeedback,
   });
 
   const [values, setValues] = useState<Record<string, FeedbackFormValue>>({});
@@ -109,7 +112,7 @@ function PostMatchFeedback() {
     setSavedIds(filled);
   }, [data]);
 
-  if (!isAccessLoading && canAccessFeedback === false) return <Navigate to="/home" replace />;
+  if (!isAccessLoading && !isCoach && canAccessFeedback === false) return <Navigate to="/home" replace />;
 
   async function saveOne(playerId: string) {
     const v = values[playerId];
