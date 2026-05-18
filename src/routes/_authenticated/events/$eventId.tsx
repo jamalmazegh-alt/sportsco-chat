@@ -1216,6 +1216,17 @@ function EventDetail() {
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
   const showFeedbackButton = isPastMatch && (isCoach || !!canAccessFeedback);
+  // eslint-disable-next-line no-console
+  console.log("[feedback-btn]", {
+    eventId: event.id,
+    type: event.type,
+    starts_at: event.starts_at,
+    isPastMatch,
+    isCoach,
+    role,
+    canAccessFeedback,
+    showFeedbackButton,
+  });
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
