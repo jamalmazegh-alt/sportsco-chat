@@ -23,7 +23,10 @@ import {
   setUserDisabled,
   removeUserFromClub,
   sendUserPasswordReset,
+  setUserClubStaffRoles,
 } from "@/lib/admin.functions";
+import { Checkbox } from "@/components/ui/checkbox";
+
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -53,10 +56,12 @@ function AdminUserDetailPage() {
   const callSetDisabled = useServerFn(setUserDisabled);
   const callRemove = useServerFn(removeUserFromClub);
   const callReset = useServerFn(sendUserPasswordReset);
+  const callSetStaffRoles = useServerFn(setUserClubStaffRoles);
 
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [acting, setActing] = useState<string | null>(null);
+
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-user-detail", userId, activeClubId],
@@ -125,6 +130,30 @@ function AdminUserDetailPage() {
       setActing(null);
     }
   }
+
+  const clubMemberships = (data.memberships ?? []).filter(
+    (m: any) => m.club_id === activeClubId
+  );
+  const isUserAdmin = clubMemberships.some((m: any) => m.role === "admin");
+  const isUserCoach = clubMemberships.some((m: any) => m.role === "coach");
+
+  async function toggleStaffRole(next: { is_admin: boolean; is_coach: boolean }) {
+    if (!activeClubId) return;
+    setActing("roles");
+    try {
+      await callSetStaffRoles({
+        data: { club_id: activeClubId, user_id: userId, ...next },
+      });
+      toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
+      qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error");
+    } finally {
+      setActing(null);
+    }
+  }
+
 
   return (
     <div className="px-5 pt-4 pb-10 space-y-5">
@@ -196,6 +225,42 @@ function AdminUserDetailPage() {
           </ul>
         )}
       </section>
+
+      {!isSelf && (isUserAdmin || isUserCoach) && (
+        <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("admin.staffRoles", { defaultValue: "Rôles staff" })}
+          </h2>
+          <p className="text-[11px] text-muted-foreground">
+            {t("admin.staffRolesHint", {
+              defaultValue: "Un utilisateur peut cumuler les rôles administrateur et coach.",
+            })}
+          </p>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer">
+              <Checkbox
+                checked={isUserAdmin}
+                disabled={acting === "roles"}
+                onCheckedChange={(v) =>
+                  toggleStaffRole({ is_admin: !!v, is_coach: isUserCoach })
+                }
+              />
+              <span className="text-sm">{t("roles.admin", { defaultValue: "Administrateur" })}</span>
+            </label>
+            <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer">
+              <Checkbox
+                checked={isUserCoach}
+                disabled={acting === "roles"}
+                onCheckedChange={(v) =>
+                  toggleStaffRole({ is_admin: isUserAdmin, is_coach: !!v })
+                }
+              />
+              <span className="text-sm">{t("roles.coach", { defaultValue: "Coach" })}</span>
+            </label>
+          </div>
+        </section>
+      )}
+
 
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">

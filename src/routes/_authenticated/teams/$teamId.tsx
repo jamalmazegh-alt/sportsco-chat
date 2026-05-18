@@ -915,15 +915,25 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
         .eq("club_id", clubId!)
         .in("role", ["coach", "admin"]);
       const taken = new Set((coaches ?? []).map((c: any) => c.id));
-      const ids = Array.from(new Set((cm ?? []).map((m: any) => m.user_id))).filter((id) => !taken.has(id));
+      const rolesByUser = new Map<string, Set<string>>();
+      for (const m of cm ?? []) {
+        if (!m.user_id || taken.has(m.user_id)) continue;
+        if (!rolesByUser.has(m.user_id)) rolesByUser.set(m.user_id, new Set());
+        rolesByUser.get(m.user_id)!.add(m.role);
+      }
+      const ids = Array.from(rolesByUser.keys());
       if (ids.length === 0) return [] as any[];
       const { data: profs } = await supabase
         .from("profiles")
         .select("id, full_name, first_name, last_name, avatar_url")
         .in("id", ids);
-      return profs ?? [];
+      return (profs ?? []).map((p: any) => ({
+        ...p,
+        roles: Array.from(rolesByUser.get(p.id) ?? []),
+      }));
     },
   });
+
 
   async function attach(uid: string) {
     setBusyUid(uid);
@@ -1003,6 +1013,12 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
                           )}
                         </div>
                         <span className="text-sm font-medium flex-1 text-left truncate">{name}</span>
+                        {(s.roles ?? []).includes("admin") && (
+                          <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary mr-1">
+                            {t("roles.admin", { defaultValue: "Admin" })}
+                          </span>
+                        )}
+
                         {busyUid === s.id && <Loader2 className="h-4 w-4 animate-spin" />}
                       </button>
                     );
