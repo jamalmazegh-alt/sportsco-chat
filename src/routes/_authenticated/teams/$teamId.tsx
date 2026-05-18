@@ -506,7 +506,7 @@ function TeamDetail() {
 
       {isCoach && <CollapsibleTeamStats teamId={teamId} />}
 
-      <TeamCoaches teamId={teamId} />
+      <TeamCoaches teamId={teamId} clubId={(team as any)?.club_id} isAdmin={role === "admin"} />
 
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
