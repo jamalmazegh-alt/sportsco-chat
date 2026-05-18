@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -30,6 +30,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId/feedback")
 function PostMatchFeedback() {
   const { eventId } = Route.useParams();
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const role = useActiveRole();
   const isActiveCoach = role === "admin" || role === "coach";
@@ -153,7 +154,13 @@ function PostMatchFeedback() {
       setSavedIds((p) => new Set(p).add(playerId));
       qc.invalidateQueries({ queryKey: ["event-feedback", eventId] });
       qc.invalidateQueries({ queryKey: ["player-feedback", playerId] });
-      toast.success(t("common.saved"));
+      toast.success(t("common.saved"), {
+        description: t("feedback.savedLocation", { defaultValue: "Visible dans le profil du joueur, section Retours Coach." }),
+        action: {
+          label: t("players.profile", { defaultValue: "Profil du joueur" }),
+          onClick: () => navigate({ to: "/players/$playerId", params: { playerId } }),
+        },
+      });
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {
