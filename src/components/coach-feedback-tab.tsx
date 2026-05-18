@@ -259,19 +259,10 @@ export function CoachFeedbackTab({
                 <Input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs flex items-center gap-1"><Lock className="h-3 w-3" />{t("feedback.visibility")}</Label>
-              <Select value={visibility} onValueChange={(v) => setVisibility(v as any)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {VISIBILITY_VALUES.map((v) => (
-                    <SelectItem key={v} value={v}>
-                      {t(`feedback.visibility_${v}`, { defaultValue: v })}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+              <Lock className="h-3 w-3" />
+              {t("feedback.generateInternalHint", { defaultValue: "Synthèse interne, visible uniquement par le staff coach." })}
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setGenOpen(false)} disabled={genBusy}>
