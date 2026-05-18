@@ -83,7 +83,7 @@ function AdminUsersPage() {
     const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
       club_id: activeClubId,
-      team_id: inviteRole === "coach" ? teamId : null,
+      team_id: inviteRole === "coach" && teamId ? teamId : null,
       role: inviteRole,
       email,
       token,
@@ -99,7 +99,7 @@ function AdminUsersPage() {
       .from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
-    const teamName = inviteRole === "coach"
+    const teamName = inviteRole === "coach" && teamId
       ? teams?.find((tt) => tt.id === teamId)?.name
       : undefined;
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
