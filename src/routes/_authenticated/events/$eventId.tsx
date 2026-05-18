@@ -1203,18 +1203,7 @@ function EventDetail() {
     visibleMyConvocs.some((c: any) => c.status === "pending");
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
-  const showFeedbackButton = isPastMatch && (isCoach || !!canAccessFeedback);
-  // eslint-disable-next-line no-console
-  console.log("[feedback-btn]", {
-    eventId: event.id,
-    type: event.type,
-    starts_at: event.starts_at,
-    isPastMatch,
-    isCoach,
-    role,
-    canAccessFeedback,
-    showFeedbackButton,
-  });
+  const showFeedbackButton = isPastMatch && isCoach;
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -1998,28 +1987,24 @@ function EventDetail() {
                   </div>
                   <div className="flex items-center gap-0.5 shrink-0">
                     {isCoach ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
+                      <div className="flex items-center gap-1 rounded-full border bg-background/80 p-0.5 shadow-sm">
+                        <AttendancePill status={c.status} className="mr-1" />
+                        {ATTENDANCE_ACTIONS.map(({ status, Icon, className }) => (
+                          <Button
+                            key={status}
                             type="button"
-                            className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring"
-                            title={t("attendance.setStatus", { defaultValue: "Modifier le statut" })}
+                            size="icon"
+                            variant={c.status === status ? "secondary" : "ghost"}
+                            className={cn("h-7 w-7 rounded-full", c.status === status ? "ring-1 ring-ring" : className)}
+                            onClick={() => submitResponse(c.id, status, null)}
+                            disabled={c.status === status}
+                            title={t("attendance.setStatusTo", { defaultValue: "Marquer : {{status}}", status: t(`attendance.${status}`) })}
+                            aria-label={t("attendance.setStatusTo", { defaultValue: "Marquer : {{status}}", status: t(`attendance.${status}`) })}
                           >
-                            <AttendancePill status={c.status} />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {(["present", "absent", "uncertain", "pending"] as AttendanceStatus[]).map((s) => (
-                            <DropdownMenuItem
-                              key={s}
-                              disabled={c.status === s}
-                              onSelect={() => submitResponse(c.id, s, null)}
-                            >
-                              {t(`attendance.${s}`)}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <Icon className="h-3.5 w-3.5" />
+                          </Button>
+                        ))}
+                      </div>
                     ) : (
                       <AttendancePill status={c.status} />
                     )}
