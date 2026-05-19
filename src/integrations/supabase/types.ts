@@ -1489,6 +1489,28 @@ export type Database = {
         Args: { _club_id: string }
         Returns: boolean
       }
+      create_player_review: {
+        Args: {
+          _content: string
+          _kind: string
+          _model: string
+          _period_end: string
+          _period_start: string
+          _player_id: string
+          _visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Returns: {
+          author_user_id: string
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          model: string
+          period_end: string
+          period_start: string
+          visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -1599,6 +1621,24 @@ export type Database = {
       restore_entity: {
         Args: { _id: string; _kind: string }
         Returns: undefined
+      }
+      save_player_feedback: {
+        Args: {
+          _comment: string
+          _dev_notes: string
+          _event_id: string
+          _id: string
+          _improvements: string
+          _player_id: string
+          _rating: number
+          _shared_summary: string
+          _strengths: string
+          _tags: string[]
+          _visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }
+        Returns: {
+          id: string
+        }[]
       }
       soft_delete_entity: {
         Args: { _id: string; _kind: string }

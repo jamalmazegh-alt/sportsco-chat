@@ -26,6 +26,18 @@ export const VISIBILITY_VALUES = [
 const FeedbackVisibility = z.enum(VISIBILITY_VALUES);
 const ReviewKind = z.enum(["end_of_season", "meeting", "development", "coaching"]);
 
+type PlayerReviewRow = {
+  id: string;
+  kind: string;
+  period_start: string | null;
+  period_end: string | null;
+  content: string;
+  visibility: string;
+  model: string | null;
+  created_at: string;
+  author_user_id: string;
+};
+
 const FeedbackInput = z.object({
   playerId: z.string().uuid(),
   eventId: z.string().uuid().nullish(),
@@ -93,7 +105,7 @@ export const createPlayerFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => FeedbackInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase } = context;
 
     // Look up player → club_id, team_id (event's team if provided)
     const { data: player, error: pErr } = await supabase
@@ -103,34 +115,20 @@ export const createPlayerFeedback = createServerFn({ method: "POST" })
       .maybeSingle();
     if (pErr || !player) throw new Response("Player not found", { status: 404 });
 
-    let teamId: string | null = null;
-    if (data.eventId) {
-      const { data: ev } = await supabase
-        .from("events")
-        .select("team_id")
-        .eq("id", data.eventId)
-        .maybeSingle();
-      teamId = (ev as any)?.team_id ?? null;
-    }
-
     const { data: row, error } = await supabase
-      .from("player_feedback" as any)
-      .insert({
-        club_id: player.club_id,
-        team_id: teamId,
-        player_id: data.playerId,
-        event_id: data.eventId ?? null,
-        author_user_id: userId,
-        rating: data.rating ?? null,
-        comment: data.comment ?? null,
-        dev_notes: data.devNotes ?? null,
-        strengths: data.strengths ?? null,
-        improvements: data.improvements ?? null,
-        tags: data.tags ?? [],
-        visibility: data.visibility,
-        shared_summary: data.sharedSummary ?? null,
+      .rpc("save_player_feedback" as any, {
+        _id: null,
+        _player_id: data.playerId,
+        _event_id: data.eventId ?? null,
+        _rating: data.rating ?? null,
+        _comment: data.comment ?? null,
+        _dev_notes: data.devNotes ?? null,
+        _strengths: data.strengths ?? null,
+        _improvements: data.improvements ?? null,
+        _tags: data.tags ?? [],
+        _visibility: data.visibility,
+        _shared_summary: data.sharedSummary ?? null,
       })
-      .select("id")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
     return { id: (row as any).id };
@@ -157,12 +155,30 @@ export const updatePlayerFeedback = createServerFn({ method: "POST" })
     if (data.tags !== undefined) patch.tags = data.tags;
     if (data.visibility !== undefined) patch.visibility = data.visibility;
     if (data.sharedSummary !== undefined) patch.shared_summary = data.sharedSummary;
-    const { error } = await supabase
+    const { data: current, error: currentError } = await supabase
       .from("player_feedback" as any)
-      .update(patch)
-      .eq("id", data.id);
+      .select("player_id, event_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (currentError || !current) throw new Response("Retour introuvable", { status: 404 });
+
+    const { data: row, error } = await supabase
+      .rpc("save_player_feedback" as any, {
+        _id: data.id,
+        _player_id: (current as any).player_id,
+        _event_id: (current as any).event_id ?? null,
+        _rating: patch.rating ?? (current as any).rating ?? null,
+        _comment: patch.comment ?? (current as any).comment ?? null,
+        _dev_notes: patch.dev_notes ?? (current as any).dev_notes ?? null,
+        _strengths: patch.strengths ?? (current as any).strengths ?? null,
+        _improvements: patch.improvements ?? (current as any).improvements ?? null,
+        _tags: patch.tags ?? (current as any).tags ?? [],
+        _visibility: patch.visibility ?? (current as any).visibility ?? "coach_only",
+        _shared_summary: patch.shared_summary ?? (current as any).shared_summary ?? null,
+      })
+      .single();
     if (error) throw new Response(error.message, { status: 400 });
-    return { ok: true };
+    return { id: (row as any).id, ok: true };
   });
 
 // ------------------------------------------------------------------
@@ -387,22 +403,18 @@ Consignes de rédaction :
 
     // Persist
     const { data: row, error } = await supabase
-      .from("player_reviews" as any)
-      .insert({
-        club_id: player.club_id,
-        player_id: player.id,
-        author_user_id: userId,
-        kind: data.kind,
-        period_start: data.periodStart || null,
-        period_end: data.periodEnd || null,
-        content,
-        visibility: data.visibility,
-        model: "google/gemini-3-flash-preview",
+      .rpc("create_player_review" as any, {
+        _player_id: player.id,
+        _kind: data.kind,
+        _period_start: data.periodStart || null,
+        _period_end: data.periodEnd || null,
+        _content: content,
+        _visibility: data.visibility,
+        _model: "google/gemini-3-flash-preview",
       })
-      .select("id, content, kind, visibility, period_start, period_end, created_at, model")
       .single();
     if (error) throw new Response(error.message, { status: 500 });
-    return { review: row };
+    return { review: row as PlayerReviewRow };
   });
 
 export const deletePlayerReview = createServerFn({ method: "POST" })
