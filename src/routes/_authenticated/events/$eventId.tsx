@@ -1386,6 +1386,7 @@ function EventDetail() {
           </div>
         )}
 
+        {event.status === "cancelled" && (
           <div className="relative mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
             <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
               <Ban className="h-4 w-4" />
