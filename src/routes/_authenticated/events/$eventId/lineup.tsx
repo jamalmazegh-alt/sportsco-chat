@@ -127,16 +127,17 @@ function LineupPage() {
   useEffect(() => {
     const l = lineupData?.lineup;
     if (!l) return;
-    setFormation((l.formation as FormationKey) ?? "4-4-2");
+    const f = ((l.formation as FormationKey) ?? "4-4-2") as FormationKey;
+    setFormation(f);
     setSlots(
       Array.isArray(l.slots) && l.slots.length > 0
-        ? (l.slots as LineupSlot[])
-        : makeEmptySlots((l.formation as FormationKey) ?? "4-4-2"),
+        ? (l.slots as unknown as LineupSlot[])
+        : makeEmptySlots(f),
     );
-    setBench(Array.isArray(l.bench) ? (l.bench as string[]) : []);
+    setBench(Array.isArray(l.bench) ? (l.bench as unknown as string[]) : []);
     setCaptain(l.captain_player_id ?? null);
     setGk(l.gk_player_id ?? null);
-    setVisibility(l.visibility ?? "draft");
+    setVisibility((l.visibility as any) ?? "draft");
     setIncludeInConv(!!l.include_in_convocation);
   }, [lineupData?.lineup]);
 
