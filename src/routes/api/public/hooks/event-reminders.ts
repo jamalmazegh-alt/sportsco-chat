@@ -166,7 +166,9 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     respondUrl,
                     isReminder: true,
                     reminderHoursBefore: milestone,
+                    lineup: lineupEmail,
                   },
+
                 });
                 sent++;
               } catch (e) {
