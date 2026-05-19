@@ -51,6 +51,16 @@ const PILLARS = [
     body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
   },
   {
+    icon: ClipboardList,
+    title: "Retours coach par joueur",
+    body: "Après chaque match ou entraînement, le coach saisit en quelques secondes : note, forces, axes de progrès, tags adaptés au sport. Historique privé conservé sur la fiche du joueur.",
+  },
+  {
+    icon: Wand2,
+    title: "Synthèses IA itératives",
+    body: "Génère en un clic un bilan de saison, un rapport de développement ou une préparation d'entretien à partir des retours coachs et des stats. Affine ensuite la synthèse en dialoguant avec l'IA jusqu'au rendu parfait.",
+  },
+  {
     icon: BrainCircuit,
     title: "Assistant IA intégré",
     body: "Un assistant en français, connecté à vos données de club. Posez vos questions sur les présences, les convocations, les stats. Réponses instantanées, respect des rôles, hébergé en Europe.",
