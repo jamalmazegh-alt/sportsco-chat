@@ -69,8 +69,9 @@ function splitSentences(content: string) {
 
 function cleanReviewContent(content: string) {
   return content
+    .trim()
     .replace(/^```(?:markdown|md|text)?\s*/i, "")
-    .replace(/```$/i, "")
+    .replace(/```\s*$/i, "")
     .replace(/^\s*(voici|bien sûr|d'accord)[^\n]*\n+/i, "")
     .trim();
 }
@@ -553,7 +554,7 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
         changes = `L'IA n'a pas répondu correctement, j'ai quand même réduit la synthèse à ${requestedSentenceCount} phrases.`;
         if (!content) throw new Response("AI generation failed: " + msg, { status: 500 });
       } else {
-      throw new Response("AI generation failed: " + msg, { status: 500 });
+        throw new Response("AI generation failed: " + msg, { status: 500 });
       }
     }
 
