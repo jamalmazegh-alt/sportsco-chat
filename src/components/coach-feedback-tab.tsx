@@ -59,7 +59,11 @@ export function CoachFeedbackTab({
         }));
       }
       setRefineInputs((s) => ({ ...s, [reviewId]: "" }));
-      toast.success(t("feedback.reviewRefined", { defaultValue: "Synthèse affinée" }));
+      const changes = (res as any)?.changes?.trim();
+      toast.success(
+        t("feedback.reviewRefined", { defaultValue: "Synthèse affinée" }),
+        changes ? { description: changes, duration: 8000 } : undefined
+      );
     } catch (e: any) {
       const msg = e?.message ?? "";
       if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes." }));
