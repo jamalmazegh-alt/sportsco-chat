@@ -90,6 +90,16 @@ function locallyLimitSentences(content: string, sentenceCount: number) {
   return sentences.slice(0, sentenceCount).join(" ").trim();
 }
 
+function localInstructionFallback(content: string, requestedSentenceCount: number | null) {
+  if (!requestedSentenceCount) return "";
+  return locallyLimitSentences(content, requestedSentenceCount);
+}
+
+function hasVisibleDifference(before: string, after: string) {
+  const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+  return normalize(before) !== normalize(after);
+}
+
 const FeedbackInput = z.object({
   playerId: z.string().uuid(),
   eventId: z.string().uuid().nullish(),
@@ -531,51 +541,79 @@ INSTRUCTION DU COACH (priorité absolue) :
 Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas de diff, pas de commentaire, pas de JSON.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
-    const model = gateway("google/gemini-2.5-flash");
+    const modelNames = ["google/gemini-2.5-flash", "openai/gpt-5-mini"] as const;
     const requestedSentenceCount = getRequestedSentenceCount(data.instruction);
 
-    let content: string;
+    const previousContent = String((review as any).content ?? "");
+    let content = "";
     let changes: string = "";
-    try {
-      const sentenceInstruction = requestedSentenceCount
-        ? `\n\nIMPORTANT : produis exactement ${requestedSentenceCount} phrases. Ne garde pas les titres de sections si cela empêche de respecter la limite.`
-        : "";
-      const { text, finishReason } = await generateText({
-        model,
-        system: systemPrompt,
-        prompt: userPrompt + sentenceInstruction + `\n\nRéponds uniquement avec la synthèse complète réécrite.`,
-        maxOutputTokens: 8192,
-        temperature: 0.2,
-      });
-      content = cleanReviewContent(text ?? "");
-      if (!content) throw new Error(`empty_ai_response:${finishReason}`);
-    } catch (e: any) {
-      const msg: string = e?.message ?? "";
-      console.error("[refinePlayerReview] generation failed", msg);
-      if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
-      if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
-      if (requestedSentenceCount) {
-        content = locallyLimitSentences((review as any).content, requestedSentenceCount);
-        changes = `L'IA n'a pas répondu correctement, j'ai quand même réduit la synthèse à ${requestedSentenceCount} phrases.`;
-        if (!content) throw new Response("AI generation failed: " + msg, { status: 500 });
-      } else {
-        throw new Response("AI generation failed: " + msg, { status: 500 });
+    let usedModel = modelNames[0];
+    let lastError = "";
+    const sentenceInstruction = requestedSentenceCount
+      ? `\n\nIMPORTANT : produis exactement ${requestedSentenceCount} phrases. Ne garde pas les titres de sections si cela empêche de respecter la limite.`
+      : "";
+
+    for (const modelName of modelNames) {
+      try {
+        const { text, finishReason } = await generateText({
+          model: gateway(modelName),
+          system: systemPrompt,
+          prompt: userPrompt + sentenceInstruction + `\n\nRéponds uniquement avec la synthèse complète réécrite.`,
+          maxOutputTokens: 8192,
+          temperature: 0.2,
+        });
+        const candidate = cleanReviewContent(text ?? "");
+        console.info("[refinePlayerReview] generation result", {
+          modelName,
+          finishReason,
+          textLength: candidate.length,
+          requestedSentenceCount,
+        });
+        if (candidate) {
+          content = candidate;
+          usedModel = modelName;
+          break;
+        }
+        lastError = `empty_ai_response:${finishReason}`;
+      } catch (e: any) {
+        const msg: string = e?.message ?? "";
+        console.error("[refinePlayerReview] generation failed", { modelName, msg });
+        if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
+        if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
+        lastError = msg;
       }
     }
 
+    if (!content) {
+      const fallback = localInstructionFallback(previousContent, requestedSentenceCount);
+      if (!fallback) {
+        throw new Response("L'IA a renvoyé une réponse vide. Rien n'a été modifié.", { status: 502 });
+      }
+      content = fallback;
+      usedModel = "local-fallback" as typeof usedModel;
+      changes = `L'IA a renvoyé une réponse vide, j'ai appliqué localement la réduction à ${requestedSentenceCount} phrase${requestedSentenceCount && requestedSentenceCount > 1 ? "s" : ""}.`;
+      console.warn("[refinePlayerReview] used local fallback", { requestedSentenceCount, lastError });
+    }
+
     if (requestedSentenceCount) {
-      content = locallyLimitSentences(content, requestedSentenceCount) || content;
+      content = locallyLimitSentences(content, requestedSentenceCount) || localInstructionFallback(previousContent, requestedSentenceCount) || content;
       const finalSentenceCount = splitSentences(content).length;
       changes ||= `J'ai réduit la synthèse à ${finalSentenceCount} phrase${finalSentenceCount > 1 ? "s" : ""} comme demandé.`;
     } else {
       changes = "J'ai réécrit la synthèse selon ta demande.";
     }
 
+    content = cleanReviewContent(content);
+    if (!content) throw new Response("La synthèse générée est vide. Rien n'a été modifié.", { status: 502 });
+    if (!hasVisibleDifference(previousContent, content)) {
+      changes = "Je n'ai pas détecté de changement visible après traitement ; la synthèse affichée reste identique.";
+    }
+
     const { data: row, error } = await supabase
       .rpc("update_player_review_content" as any, {
         _id: data.reviewId,
         _content: content,
-        _model: "google/gemini-2.5-flash",
+        _model: usedModel,
       })
       .single();
     if (error) throw new Response(error.message, { status: 500 });
