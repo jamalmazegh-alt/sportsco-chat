@@ -9,13 +9,22 @@ interface Slot {
   player_id: string | null;
 }
 
+interface PlayerRow {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  jersey_number: number | null;
+}
+
 /** Server-side variant of loadLineupForConvocationEmail (uses admin client). */
 export async function loadLineupForConvocationEmailServer(
   eventId: string,
 ): Promise<LineupEmailData | undefined> {
   const { data: lineup } = await supabaseAdmin
     .from("event_lineups")
-    .select("formation, slots, bench, captain_player_id, gk_player_id, published_at, include_in_convocation")
+    .select(
+      "formation, slots, bench, captain_player_id, gk_player_id, published_at, include_in_convocation",
+    )
     .eq("event_id", eventId)
     .not("published_at", "is", null)
     .maybeSingle();
@@ -35,9 +44,8 @@ export async function loadLineupForConvocationEmailServer(
     .select("id, first_name, last_name, jersey_number")
     .in("id", Array.from(ids));
 
-  const byId = new Map<string, any>((players ?? []).map((p: any) => [p.id, p]));
-  const fullName = (p: any) =>
-    `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
+  const byId = new Map<string, PlayerRow>(((players ?? []) as PlayerRow[]).map((p) => [p.id, p]));
+  const fullName = (p?: PlayerRow) => `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
 
   const starting: LineupEmailPlayer[] = slots
     .filter((s) => s.player_id)
@@ -59,4 +67,26 @@ export async function loadLineupForConvocationEmailServer(
   });
 
   return { formation: lineup.formation ?? undefined, starting, bench };
+}
+
+export async function loadLineupForConvocationEmailServerForCoach(
+  eventId: string,
+  userId: string,
+): Promise<LineupEmailData | undefined> {
+  const { data: event } = await supabaseAdmin
+    .from("events")
+    .select("team_id")
+    .eq("id", eventId)
+    .maybeSingle();
+
+  if (!event?.team_id) return undefined;
+
+  const { data: canSend } = await supabaseAdmin.rpc("is_team_coach", {
+    _user_id: userId,
+    _team_id: event.team_id,
+  });
+
+  if (!canSend) return undefined;
+
+  return loadLineupForConvocationEmailServer(eventId);
 }
