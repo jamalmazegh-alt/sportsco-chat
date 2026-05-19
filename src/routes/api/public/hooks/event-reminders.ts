@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
+
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
 
