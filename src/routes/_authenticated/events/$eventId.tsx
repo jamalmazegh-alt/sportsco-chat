@@ -1154,7 +1154,9 @@ function EventDetail() {
             respondUrl: `${origin}/r/${token}`,
             isUpdate: true,
             changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
+            lineup: lineupEmail,
           },
+
         }).catch(() => undefined);
 
       const sends: Promise<unknown>[] = [];
