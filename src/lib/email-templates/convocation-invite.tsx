@@ -186,6 +186,41 @@ const ConvocationInviteEmail = ({
           </Section>
         ) : null}
 
+        {lineup && ((lineup.starting?.length ?? 0) > 0 || (lineup.bench?.length ?? 0) > 0) ? (
+          <Section style={lineupCard}>
+            <Text style={lineupKicker}>⚽ Composition prévue</Text>
+            {lineup.formation ? (
+              <Text style={lineupFormation}>Formation : <strong>{lineup.formation}</strong></Text>
+            ) : null}
+            {lineup.starting && lineup.starting.length > 0 ? (
+              <>
+                <Text style={lineupSectionTitle}>XI de départ</Text>
+                {lineup.starting.map((p, i) => (
+                  <Text key={`s-${i}`} style={lineupLine}>
+                    {p.role ? <span style={lineupRole}>{p.role}</span> : null}
+                    {p.jersey != null ? <strong> #{p.jersey}</strong> : null}
+                    {" "}{p.name}
+                    {p.isCaptain ? " (C)" : ""}
+                    {p.isGK ? " 🧤" : ""}
+                  </Text>
+                ))}
+              </>
+            ) : null}
+            {lineup.bench && lineup.bench.length > 0 ? (
+              <>
+                <Text style={lineupSectionTitle}>Remplaçants</Text>
+                {lineup.bench.map((p, i) => (
+                  <Text key={`b-${i}`} style={lineupLine}>
+                    {p.jersey != null ? <strong>#{p.jersey} </strong> : null}
+                    {p.name}
+                  </Text>
+                ))}
+              </>
+            ) : null}
+          </Section>
+        ) : null}
+
+
         <Text style={smallText}>
           Pas besoin de vous connecter — votre réponse est enregistrée automatiquement et
           vous pourrez la modifier plus tard.
