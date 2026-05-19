@@ -60,6 +60,7 @@ function LineupPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const fetchLineup = useServerFn(getLineup);
   const saveLineup = useServerFn(upsertLineup);
   const unpublishFn = useServerFn(unpublishLineup);
