@@ -341,3 +341,151 @@ function PostMatchFeedback() {
     </div>
   );
 }
+
+type PlayerRowProps = {
+  player: any;
+  attendance: string;
+  value: RowValue;
+  saved: boolean;
+  isDirty: boolean;
+  saving: boolean;
+  tags: readonly string[];
+  onPatch: (playerId: string, p: Partial<RowValue>) => void;
+  onToggleTag: (playerId: string, tag: string) => void;
+  onSaveOne: (playerId: string, v: RowValue) => void;
+  onOpenPlayer: (playerId: string) => void;
+};
+
+const STAR_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+
+const PlayerRow = memo(function PlayerRow({
+  player: p,
+  attendance,
+  value: v,
+  saved,
+  isDirty,
+  saving,
+  tags,
+  onPatch,
+  onToggleTag,
+  onSaveOne,
+  onOpenPlayer,
+}: PlayerRowProps) {
+  const { t } = useTranslation();
+  return (
+    <li
+      className={cn(
+        "rounded-2xl border bg-card p-3 transition-colors",
+        isDirty
+          ? "border-primary/60 ring-1 ring-primary/30"
+          : saved
+          ? "border-primary/30"
+          : "border-border"
+      )}
+    >
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => onOpenPlayer(p.id)}
+          className="h-9 w-9 rounded-full bg-muted overflow-hidden flex items-center justify-center shrink-0"
+        >
+          {p.photo_url ? (
+            <img src={p.photo_url} alt="" className="h-full w-full object-cover" loading="lazy" />
+          ) : (
+            <span className="text-xs font-semibold text-muted-foreground">
+              {(p.first_name?.[0] ?? "") + (p.last_name?.[0] ?? "")}
+            </span>
+          )}
+        </button>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium truncate">
+            {p.first_name} {p.last_name}
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            {t(`attendance.${attendance}`, { defaultValue: attendance })}
+          </p>
+        </div>
+        {saved && !isDirty && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
+      </div>
+
+      <div className="mt-3">
+        <div className="flex items-center gap-0.5">
+          {STAR_NUMBERS.map((n) => {
+            const active = (v.rating ?? 0) >= n;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => onPatch(p.id, { rating: v.rating === n ? null : n })}
+                className={cn(
+                  "h-7 w-6 flex flex-col items-center justify-center transition-colors",
+                  active
+                    ? "text-amber-500"
+                    : "text-muted-foreground/40 hover:text-muted-foreground"
+                )}
+                aria-label={`${n}/10`}
+              >
+                <Star className={cn("h-3.5 w-3.5", active && "fill-current")} />
+                <span className="text-[9px] leading-none mt-0.5 text-muted-foreground/70">{n}</span>
+              </button>
+            );
+          })}
+          {v.rating ? (
+            <span className="ml-2 text-[11px] font-medium text-foreground">{v.rating}/10</span>
+          ) : null}
+        </div>
+        {v.rating ? (
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {t(`feedback.rating${v.rating}`, { defaultValue: "" })}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="mt-2 flex justify-end">
+        <Button
+          type="button"
+          size="sm"
+          variant={isDirty ? "default" : "outline"}
+          onClick={() => onSaveOne(p.id, v)}
+          disabled={saving || (!isDirty && saved)}
+          className="h-8"
+        >
+          {saved && !isDirty
+            ? t("feedback.saved", { defaultValue: "Enregistré" })
+            : t("common.save")}
+        </Button>
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {tags.map((tag) => {
+          const active = v.tags.includes(tag);
+          return (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => onToggleTag(p.id, tag)}
+              className={cn(
+                "text-[11px] px-2 py-0.5 rounded-full border transition-colors",
+                active
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border bg-muted/30 text-muted-foreground hover:bg-muted"
+              )}
+            >
+              {t(`feedback.tag.${tag}`, { defaultValue: tag })}
+            </button>
+          );
+        })}
+      </div>
+
+      <Textarea
+        value={v.note}
+        onChange={(e) => onPatch(p.id, { note: e.target.value })}
+        rows={2}
+        className="mt-2 text-sm"
+        placeholder={t("feedback.notePlaceholder", {
+          defaultValue: "Note rapide (forces, axes de progrès…)",
+        })}
+      />
+    </li>
+  );
+});
