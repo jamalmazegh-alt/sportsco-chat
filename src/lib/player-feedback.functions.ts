@@ -431,3 +431,76 @@ export const deletePlayerReview = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     return { ok: true };
   });
+
+// ------------------------------------------------------------------
+// Refine an existing AI review with a coach instruction.
+// The conversation is stateless: we send the previous content + the
+// new instruction back to the model and replace the review in place.
+// ------------------------------------------------------------------
+export const refinePlayerReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        reviewId: z.string().uuid(),
+        instruction: z.string().trim().min(2).max(2000),
+      })
+      .parse(input)
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Response("AI not configured", { status: 500 });
+
+    const { data: review, error: rErr } = await supabase
+      .from("player_reviews" as any)
+      .select("id, player_id, kind, content")
+      .eq("id", data.reviewId)
+      .maybeSingle();
+    if (rErr || !review) throw new Response("Review not found", { status: 404 });
+
+    const { data: player } = await supabase
+      .from("players")
+      .select("first_name, last_name")
+      .eq("id", (review as any).player_id)
+      .maybeSingle();
+
+    const prompt = `Tu es un coach sportif bienveillant. Voici une synthèse existante pour le joueur "${player?.first_name ?? ""} ${player?.last_name ?? ""}".
+
+--- SYNTHÈSE ACTUELLE ---
+${(review as any).content}
+--- FIN DE LA SYNTHÈSE ---
+
+Le coach te demande d'affiner cette synthèse avec l'instruction suivante :
+"${data.instruction}"
+
+Consignes :
+- Renvoie la synthèse complète mise à jour (pas seulement les modifications).
+- Conserve le format Markdown avec les sections : **Forces**, **Axes de progrès**, **Recommandations**, **Synthèse**.
+- Garde un ton constructif, axé développement.
+- 250 à 400 mots. Pas d'introduction du type "voici la nouvelle synthèse".`;
+
+    const gateway = createLovableAiGatewayProvider(apiKey);
+    const model = gateway("google/gemini-3-flash-preview");
+
+    let content: string;
+    try {
+      const { text } = await generateText({ model, prompt });
+      content = text;
+    } catch (e: any) {
+      const msg: string = e?.message ?? "";
+      if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
+      if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
+      throw new Response("AI generation failed", { status: 500 });
+    }
+
+    const { data: row, error } = await supabase
+      .rpc("update_player_review_content" as any, {
+        _id: data.reviewId,
+        _content: content,
+        _model: "google/gemini-3-flash-preview",
+      })
+      .single();
+    if (error) throw new Response(error.message, { status: 500 });
+    return { review: row as PlayerReviewRow };
+  });
