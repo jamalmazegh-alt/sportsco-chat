@@ -109,17 +109,31 @@ function PostMatchFeedback() {
   if (!isAccessLoading && !isCoach && canAccessFeedback === false)
     return <Navigate to="/home" replace />;
 
-  function patch(playerId: string, p: Partial<RowValue>) {
-    setValues((prev) => ({ ...prev, [playerId]: { ...prev[playerId], ...p } }));
-    setDirty((prev) => new Set(prev).add(playerId));
-  }
-
-  function toggleTag(playerId: string, tag: string) {
-    const cur = values[playerId]?.tags ?? [];
-    patch(playerId, {
-      tags: cur.includes(tag) ? cur.filter((x) => x !== tag) : [...cur, tag],
+  const patch = useCallback((playerId: string, p: Partial<RowValue>) => {
+    setValues((prev) => ({ ...prev, [playerId]: { ...(prev[playerId] ?? EMPTY), ...p } }));
+    setDirty((prev) => {
+      if (prev.has(playerId)) return prev;
+      const n = new Set(prev);
+      n.add(playerId);
+      return n;
     });
-  }
+  }, []);
+
+  const toggleTag = useCallback((playerId: string, tag: string) => {
+    setValues((prev) => {
+      const cur = prev[playerId] ?? EMPTY;
+      const tags = cur.tags.includes(tag)
+        ? cur.tags.filter((x) => x !== tag)
+        : [...cur.tags, tag];
+      return { ...prev, [playerId]: { ...cur, tags } };
+    });
+    setDirty((prev) => {
+      if (prev.has(playerId)) return prev;
+      const n = new Set(prev);
+      n.add(playerId);
+      return n;
+    });
+  }, []);
 
   async function saveAll() {
     if (dirty.size === 0) return;
