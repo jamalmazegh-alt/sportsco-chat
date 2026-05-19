@@ -58,6 +58,8 @@ export async function loadLineupForConvocationEmailServer(
         role: s.role,
         isCaptain: lineup.captain_player_id === s.player_id,
         isGK: lineup.gk_player_id === s.player_id,
+        x: s.x,
+        y: s.y,
       };
     });
 
