@@ -42,6 +42,8 @@ function PlayerProfile() {
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isFeedback = pathname === `/players/${playerId}/feedback`;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
