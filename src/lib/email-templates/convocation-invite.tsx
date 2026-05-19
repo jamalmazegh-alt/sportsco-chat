@@ -66,7 +66,9 @@ const ConvocationInviteEmail = ({
   reminderHoursBefore,
   isUpdate,
   changes,
+  lineup,
 }: Props) => (
+
   <Html lang="fr" dir="ltr">
     <Head />
     <Preview>
