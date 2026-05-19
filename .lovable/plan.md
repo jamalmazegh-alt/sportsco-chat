@@ -45,9 +45,12 @@ RLS :
 5. Patch du template email `convocation-invite` pour la section composition optionnelle.
 6. Lecture côté joueur : afficher la composition publiée sur la page event si visible.
 
-### 6. Restrictions V1 (non inclus)
-- Pas de dessin tactique (flèches, zones, heatmaps).
-- Pas d'image PNG générée pour l'email.
+### 6. Restrictions V1 (non inclus — volontaire)
+- **Section composition dans l'email de convocation** : le toggle `include_in_convocation` est stocké en base mais **pas encore branché** dans le template `convocation-invite`. Comportement cible (V2) :
+  - Si `include_in_convocation = true` au moment de l'envoi/renvoi de la convocation **et** qu'une compo est publiée → ajouter la section "Composition prévue" (formation + XI + remplaçants) dans l'email de convocation.
+  - Sinon, au moment de **publier** la compo → envoyer un **email séparé** "Composition publiée" aux joueurs convoqués (+ parents).
+- **Image PNG générée pour l'email** (rendu visuel du terrain) — texte simple uniquement en V1.
+- **Tactiques avancées** : flèches, zones, heatmaps, consignes par joueur.
 - Pas de multi-sport (basket/rugby/etc. réutiliseront le modèle plus tard).
 - Pas d'historique de compositions par event (1 seule ligne, modifiable).
 
@@ -57,8 +60,3 @@ RLS :
 - i18n : nouvelles clés sous `lineup.*` (FR + EN).
 - Mobile : drag tactile via PointerSensor + TouchSensor.
 
-Confirme-moi (ou ajuste) avant que je code :
-- OK pour table dédiée `event_lineups` (1 par event, pas d'historique) ?
-- OK pour `@dnd-kit` comme librairie drag & drop ?
-- OK pour demi-terrain vertical mobile-first ?
-- Pour l'email de convocation : texte simple suffit en V1 (pas d'image) ?
