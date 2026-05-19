@@ -1,85 +1,64 @@
-# Player Feedback & Development System
+## Football Lineup Builder ("Composition") — V1
 
-Système structuré de retours post-match et de développement long terme pour chaque joueur, avec historique, visibilité contrôlée et synthèse IA.
+Une nouvelle fonctionnalité réservée au **football** permettant aux coachs de bâtir, sauvegarder et publier une composition visuelle pour un match.
 
-## 1. Modèle de données
+### 1. Où ça vit
+- Sur la page d'un événement de type **match** dont l'équipe a `sport = 'football'`.
+- Nouvel onglet **« Composition »** (FR) / "Lineup" (EN) à côté des onglets existants (Convocations, Feedback, etc.).
+- Masqué si l'événement n'est pas un match ou si le sport n'est pas football.
 
-Nouvelles tables :
-
-**`player_feedback`** — un retour par (coach, joueur, optionnellement événement)
-- `id`, `club_id`, `team_id`, `player_id`, `event_id` (nullable — feedback hors match possible)
-- `author_user_id` (coach)
-- `rating` smallint nullable (1–5, optionnel)
-- `comment` text (privé)
-- `dev_notes` text (notes de développement)
-- `strengths` text
-- `improvements` text
-- `tags` text[] (positioning, mentality, effort, leadership, technical, physical, discipline, teamwork…)
-- `visibility` enum `feedback_visibility` : `coach_only` (défaut), `staff`, `share_summary`, `parent_summary`, `player_summary`
-- `shared_summary` text nullable (résumé édulcoré exposable selon `visibility`)
-- `created_at`, `updated_at`, `deleted_at`
-
-**`player_reviews`** — synthèses générées par IA, archivées
-- `id`, `club_id`, `player_id`, `author_user_id`
-- `kind` text (`end_of_season`, `meeting`, `development`, `coaching`)
-- `period_start`, `period_end` dates (nullable)
-- `content` text (markdown)
-- `visibility` enum (mêmes valeurs)
-- `model` text, `created_at`
-
-Helpers SQL (SECURITY DEFINER) :
-- `can_view_player_feedback(_user_id, _feedback_id)` — applique la matrice de visibilité (coach/staff/parent/joueur)
-- `can_view_player_review(_user_id, _review_id)`
+### 2. Modèle de données
+Nouvelle table `event_lineups` (1 ligne par event) :
+- `event_id` (unique), `team_id`, `club_id`
+- `formation` (texte : '4-4-2', '4-3-3', '4-2-3-1', '3-5-2', '3-4-3', 'custom')
+- `slots` (jsonb) : tableau `[{ slot_id, role: 'GK'|'DEF'|'MID'|'FWD', x, y, player_id|null }]` — positions en % (0-100) pour responsive
+- `bench` (jsonb) : `[player_id...]`
+- `captain_player_id`, `gk_player_id` (nullable)
+- `visibility` enum : `draft` | `staff` | `selected_players` | `team` (défaut `draft`)
+- `published_at` (nullable), `include_in_convocation` (bool)
+- `created_by`, timestamps
 
 RLS :
-- `player_feedback` :
-  - SELECT : `can_view_player_feedback(auth.uid(), id)`
-  - INSERT/UPDATE/DELETE : coach/admin du club du joueur uniquement, et `author = auth.uid()` pour UPDATE/DELETE (admin peut tout)
-- `player_reviews` : même logique
+- SELECT : coach/admin de l'équipe toujours ; joueurs/parents seulement si publié + visibilité le permet.
+- INSERT/UPDATE/DELETE : coach de l'équipe ou admin du club.
 
-## 2. Backend / Server functions (`src/lib/player-feedback.functions.ts`)
+### 3. UI / UX
+- **Terrain** : SVG vertical demi-terrain (mobile-first), responsive, fond vert avec lignes. Composant `<PitchBoard>`.
+- **Joueurs disponibles** : panneau latéral (desktop) / drawer (mobile) listant le roster de l'équipe. Les joueurs convoqués (statut ≠ "decline") sont mis en avant ; les non-convoqués sont grisés mais utilisables (avec badge "non convoqué").
+- **Banc** : zone horizontale scrollable sous le terrain.
+- **Drag & drop** : `@dnd-kit/core` (déjà compatible mobile/touch). Drop sur slot pitch, slot banc, ou retour à la liste.
+- **Sélecteur de formation** : Select shadcn ; changer de formation réorganise les slots vides en gardant les joueurs déjà placés quand possible (par rôle).
+- **Capitaine / GK** : icônes cliquables sur la carte joueur dans le terrain (brassard C, gants GK).
+- **Player card** : photo/initiales, numéro, nom court.
+- **Actions header** : `Formation`, `Visibilité`, `Enregistrer brouillon`, `Publier`.
 
-- `listPlayerFeedback({ playerId })` — timeline filtrée par RLS
-- `createPlayerFeedback({ playerId, eventId?, rating?, comment, devNotes?, strengths?, improvements?, tags?, visibility, sharedSummary? })`
-- `updatePlayerFeedback({ id, ...patch })`
-- `deletePlayerFeedback({ id })` (soft-delete)
-- `listEventPlayers({ eventId })` — joueurs convoqués/présents pour la saisie rapide post-match
-- `generatePlayerReview({ playerId, kind, periodStart?, periodEnd?, visibility })` :
-  - charge feedbacks (privés visibles au coach), convocations/attendance, stats (`event_goals`, `match_results`)
-  - appelle Lovable AI Gateway (`google/gemini-3-flash-preview`) avec un prompt cadré « développement, bienveillant, constructif »
-  - persiste dans `player_reviews`, retourne contenu
-- `listPlayerReviews({ playerId })`
+### 4. Intégration convocation
+- Toggle "Inclure dans la convocation" dans les options de visibilité.
+- Quand activé + publié : le template email `convocation-invite` ajoute une section "Composition prévue" (formation + XI + remplaçants en texte). Pas d'image générée en V1.
+- Dans l'app, sur la fiche événement côté joueur/parent : affichage de la composition si publiée et visible pour eux.
 
-## 3. UI
+### 5. Découpage technique
+1. Migration SQL : table `event_lineups` + enum visibility + RLS + trigger updated_at.
+2. Server fns (`src/lib/lineup.functions.ts`) : `getLineup`, `upsertLineup`, `publishLineup`.
+3. Composant `<PitchBoard>` (SVG + dnd-kit) + `<PlayerChip>` + `<FormationSelect>` + `<BenchStrip>` + `<AvailablePlayersList>`.
+4. Route/onglet : nouvelle section dans `src/routes/_authenticated/events/$eventId.tsx` (ou sous-route `$eventId/lineup.tsx`) conditionnée à football+match.
+5. Patch du template email `convocation-invite` pour la section composition optionnelle.
+6. Lecture côté joueur : afficher la composition publiée sur la page event si visible.
 
-**Saisie post-match — route `/_authenticated/events/$eventId/feedback`**
-- Liste verticale des joueurs convoqués (présents en haut)
-- Carte compacte par joueur (mobile-first) : note optionnelle (5 étoiles douces, libellées « Excellent / Bon / OK / À travailler / Difficile » — pas de score chiffré agressif), tags chips multi-select, champs `Commentaire`, `Forces`, `À développer`, sélecteur `Visibilité` (icône cadenas → Coach uniquement par défaut)
-- Bouton « Enregistrer » par joueur + raccourci « Tout enregistrer »
-- Bouton d'accès depuis la page de l'événement (visible aux coachs uniquement)
+### 6. Restrictions V1 (non inclus)
+- Pas de dessin tactique (flèches, zones, heatmaps).
+- Pas d'image PNG générée pour l'email.
+- Pas de multi-sport (basket/rugby/etc. réutiliseront le modèle plus tard).
+- Pas d'historique de compositions par event (1 seule ligne, modifiable).
 
-**Profil joueur — nouvel onglet `Retours Coach` / `Coach Feedback`**
-- Timeline chronologique : date + lien événement, auteur, note (si présente), tags, sections forces / à développer, commentaire (selon visibilité)
-- Badges visuels pour visibilité (cadenas privé, œil partagé…)
-- Bouton « Générer une synthèse » (coach/admin) → modal : type (fin de saison / réunion / développement / coaching), période, visibilité → affiche la synthèse Markdown, sauvegardée
-- Section « Synthèses » sous la timeline listant les `player_reviews`
+### Détails techniques
+- Dep : `bun add @dnd-kit/core @dnd-kit/sortable` (si pas déjà présents).
+- Slots formation prédéfinis en constantes (`src/lib/football-formations.ts`) avec coordonnées % par formation.
+- i18n : nouvelles clés sous `lineup.*` (FR + EN).
+- Mobile : drag tactile via PointerSensor + TouchSensor.
 
-## 4. Ton & UX
-
-- Vocabulaire développemental : « À développer » et non « Faiblesses », « Difficile » et non « Mauvais »
-- Note 1–5 optionnelle, jamais affichée publiquement comme classement
-- Aucun classement comparatif entre joueurs
-- Confidentialité visible : icône cadenas + libellé partout, par défaut « Coach uniquement »
-- Tags pré-définis (i18n FR/EN) avec saisie libre limitée
-
-## 5. Périmètre de cette itération
-
-Inclus :
-- Migration tables + RLS + helpers
-- Server functions CRUD + génération IA
-- UI saisie post-match
-- Onglet `Retours Coach` dans le profil joueur (timeline + génération synthèse)
-- i18n FR/EN
-
-Préparé pour plus tard (non inclus) :
-- Graphiques de progression, comparaisons saisons, PDF, scouting, évaluations entraînement — l'architecture (tags structurés, `kind`, périodes, `rating` numérique optionnel) reste compatible.
+Confirme-moi (ou ajuste) avant que je code :
+- OK pour table dédiée `event_lineups` (1 par event, pas d'historique) ?
+- OK pour `@dnd-kit` comme librairie drag & drop ?
+- OK pour demi-terrain vertical mobile-first ?
+- Pour l'email de convocation : texte simple suffit en V1 (pas d'image) ?
