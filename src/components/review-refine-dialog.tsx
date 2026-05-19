@@ -46,11 +46,20 @@ export function ReviewRefineDialog({
   useEffect(() => {
     if (open) {
       setCurrentContent(initialContent);
-      setTurns([]);
+      setTurns([
+        {
+          role: "assistant",
+          changes: t("feedback.refineWelcome", {
+            defaultValue:
+              "Salut 👋 Dis-moi ce que tu veux ajuster : longueur, ton, structure, focus particulier… Je réécris la synthèse à chaque message.",
+          }),
+          preview: "",
+        },
+      ]);
       setInput("");
       setTimeout(() => taRef.current?.focus(), 50);
     }
-  }, [open, initialContent]);
+  }, [open, initialContent, t]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
