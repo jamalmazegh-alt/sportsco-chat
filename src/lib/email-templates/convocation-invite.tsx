@@ -390,3 +390,55 @@ const lineupFormation = { fontSize: "13px", color: "#065f46", margin: "0 0 8px" 
 const lineupSectionTitle = { fontSize: "11px", fontWeight: "bold" as const, color: "#047857", margin: "8px 0 4px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
 const lineupLine = { fontSize: "13px", color: "#064e3b", lineHeight: "1.6", margin: "0 0 2px" };
 const lineupRole = { display: "inline-block", minWidth: "32px", fontSize: "10px", fontWeight: "bold" as const, color: "#ffffff", backgroundColor: "#10b981", padding: "1px 5px", borderRadius: "4px", marginRight: "6px" };
+const pitchWrap = { margin: "8px 0 12px", textAlign: "center" as const };
+const pitch = {
+  position: "relative" as const,
+  width: "100%",
+  maxWidth: "320px",
+  height: "480px",
+  margin: "0 auto",
+  backgroundColor: "#1f7a3a",
+  backgroundImage: "linear-gradient(180deg, #1f7a3a 0%, #155e2c 100%)",
+  border: "2px solid rgba(255,255,255,0.7)",
+  borderRadius: "6px",
+  overflow: "hidden" as const,
+};
+const pitchHalfway = {
+  position: "absolute" as const,
+  left: 0,
+  right: 0,
+  top: "50%",
+  height: 0,
+  borderTop: "1px solid rgba(255,255,255,0.7)",
+};
+const pitchCircle = {
+  position: "absolute" as const,
+  left: "50%",
+  top: "50%",
+  width: "60px",
+  height: "60px",
+  marginLeft: "-30px",
+  marginTop: "-30px",
+  border: "1px solid rgba(255,255,255,0.7)",
+  borderRadius: "50%",
+};
+const pitchPenaltyTop = {
+  position: "absolute" as const,
+  left: "20%",
+  top: 0,
+  width: "60%",
+  height: "12%",
+  borderLeft: "1px solid rgba(255,255,255,0.7)",
+  borderRight: "1px solid rgba(255,255,255,0.7)",
+  borderBottom: "1px solid rgba(255,255,255,0.7)",
+};
+const pitchPenaltyBottom = {
+  position: "absolute" as const,
+  left: "20%",
+  bottom: 0,
+  width: "60%",
+  height: "12%",
+  borderLeft: "1px solid rgba(255,255,255,0.7)",
+  borderRight: "1px solid rgba(255,255,255,0.7)",
+  borderTop: "1px solid rgba(255,255,255,0.7)",
+};
