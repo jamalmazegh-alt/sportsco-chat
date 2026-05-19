@@ -1121,7 +1121,11 @@ function EventDetail() {
         .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
         .filter(Boolean);
 
+      const { loadLineupForConvocationEmail } = await import("@/lib/lineup-email");
+      const lineupEmail = await loadLineupForConvocationEmail(event.id).catch(() => undefined);
+
       const idemBase = Date.now();
+
       const sendOne = (token: string, toEmail: string, recipientFirstName: string | undefined, playerName: string, idemSuffix: string) =>
         sendTransactionalEmail({
           templateName: "convocation-invite",
