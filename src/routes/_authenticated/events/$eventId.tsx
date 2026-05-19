@@ -5,8 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import {
   buildConvocationMessage,
