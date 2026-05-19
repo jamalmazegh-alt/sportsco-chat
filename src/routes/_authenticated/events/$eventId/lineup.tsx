@@ -71,7 +71,7 @@ function LineupPage() {
     queryFn: async () => {
       const { data: event } = await supabase
         .from("events")
-        .select("id, team_id, type, title, teams:team_id(name, sport)")
+        .select("id, team_id, type, title, convocations_sent, teams:team_id(name, sport)")
         .eq("id", eventId)
         .maybeSingle();
       if (!event) return null;
