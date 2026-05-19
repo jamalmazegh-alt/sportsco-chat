@@ -565,7 +565,8 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
 
     if (requestedSentenceCount) {
       content = locallyLimitSentences(content, requestedSentenceCount) || content;
-      changes ||= `J'ai réduit la synthèse à ${splitSentences(content).length} phrase${splitSentences(content).length > 1 ? "s" : ""} comme demandé.`;
+      const finalSentenceCount = splitSentences(content).length;
+      changes ||= `J'ai réduit la synthèse à ${finalSentenceCount} phrase${finalSentenceCount > 1 ? "s" : ""} comme demandé.`;
     } else {
       changes = "J'ai réécrit la synthèse selon ta demande.";
     }
