@@ -641,6 +641,8 @@ function PlayerProfile() {
         )}
       </div>
       )}
+      </>
+      )}
 
       <span className="sr-only">{activeClubId}</span>
 
