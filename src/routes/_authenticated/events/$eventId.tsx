@@ -2018,24 +2018,36 @@ function EventDetail() {
                         {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
                           const Icon = s === "present" ? CheckCircle2 : s === "absent" ? XCircle : HelpCircle;
                           const active = c.status === s;
+                          const inactiveTint =
+                            s === "present"
+                              ? "border-present/25 bg-present/5 text-present hover:bg-present/10 hover:border-present/50"
+                              : s === "absent"
+                                ? "border-absent/25 bg-absent/5 text-absent hover:bg-absent/10 hover:border-absent/50"
+                                : "border-uncertain/30 bg-uncertain/5 text-uncertain-foreground hover:bg-uncertain/15 hover:border-uncertain/60";
+                          const activeTint =
+                            s === "present"
+                              ? "bg-present text-present-foreground border-present shadow-md shadow-present/20 ring-2 ring-present/30"
+                              : s === "absent"
+                                ? "bg-absent text-white border-absent shadow-md shadow-absent/20 ring-2 ring-absent/30"
+                                : "bg-uncertain text-uncertain-foreground border-uncertain shadow-md shadow-uncertain/20 ring-2 ring-uncertain/30";
                           return (
                             <button
                               key={s}
                               type="button"
                               onClick={() => respond(c.id, s)}
                               className={cn(
-                                "flex flex-col items-center justify-center gap-1.5 rounded-xl py-3.5 border-2 transition-all active:scale-95",
-                                active
-                                  ? s === "present"
-                                    ? "bg-present text-present-foreground border-present shadow-sm"
-                                    : s === "absent"
-                                      ? "bg-absent text-white border-absent shadow-sm"
-                                      : "bg-uncertain text-uncertain-foreground border-uncertain shadow-sm"
-                                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                                "group flex flex-col items-center justify-center gap-1.5 rounded-2xl py-4 border-2 font-medium transition-all duration-150 active:scale-[0.97]",
+                                active ? activeTint : inactiveTint,
                               )}
                             >
-                              <Icon className="h-6 w-6" />
-                              <span className="text-xs font-semibold">{t(`attendance.${s}`)}</span>
+                              <Icon
+                                className={cn(
+                                  "h-6 w-6 transition-transform",
+                                  active ? "scale-110" : "group-hover:scale-105",
+                                )}
+                                strokeWidth={active ? 2.5 : 2}
+                              />
+                              <span className="text-[13px] font-semibold tracking-tight">{t(`attendance.${s}`)}</span>
                             </button>
                           );
                         })}
