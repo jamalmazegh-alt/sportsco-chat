@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 
@@ -65,6 +65,23 @@ function splitSentences(content: string) {
   return (content.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) ?? [])
     .map((sentence) => sentence.trim())
     .filter(Boolean);
+}
+
+function cleanReviewContent(content: string) {
+  return content
+    .replace(/^```(?:markdown|md|text)?\s*/i, "")
+    .replace(/```$/i, "")
+    .replace(/^\s*(voici|bien sûr|d'accord)[^\n]*\n+/i, "")
+    .trim();
+}
+
+function locallyLimitSentences(content: string, sentenceCount: number) {
+  const withoutHeadings = content
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\*\*(.+?)\*\*\s*$/gm, "$1.")
+    .replace(/[-*]\s+/g, "");
+  const sentences = splitSentences(withoutHeadings);
+  return sentences.slice(0, sentenceCount).join(" ").trim();
 }
 
 const FeedbackInput = z.object({
