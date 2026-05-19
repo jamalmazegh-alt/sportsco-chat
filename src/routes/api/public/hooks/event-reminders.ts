@@ -118,6 +118,10 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.meeting_point)}`
             : undefined;
 
+          const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
+
+
+
           for (const conv of toSend) {
             const player: any = (players ?? []).find((p: any) => p.id === conv.player_id);
             if (!player) continue;
