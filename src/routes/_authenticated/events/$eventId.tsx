@@ -612,6 +612,11 @@ function EventDetail() {
         })
         .filter(Boolean);
 
+      // Composition (si publiée + include_in_convocation = true)
+      const { loadLineupForConvocationEmail } = await import("@/lib/lineup-email");
+      const lineupEmail = await loadLineupForConvocationEmail(event.id).catch(() => undefined);
+
+
       const competitionLabel = (event as any).competition_name
         || ((event as any).competition_type
           ? t(`events.competitionTypes.${(event as any).competition_type}`)
@@ -657,8 +662,10 @@ function EventDetail() {
             clubName,
             clubLogoUrl,
             respondUrl: `${origin}/r/${token}`,
+            lineup: lineupEmail,
           },
         });
+
 
       const sends: Promise<unknown>[] = [];
       for (const conv of insertedConvs ?? []) {
@@ -1114,7 +1121,11 @@ function EventDetail() {
         .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
         .filter(Boolean);
 
+      const { loadLineupForConvocationEmail } = await import("@/lib/lineup-email");
+      const lineupEmail = await loadLineupForConvocationEmail(event.id).catch(() => undefined);
+
       const idemBase = Date.now();
+
       const sendOne = (token: string, toEmail: string, recipientFirstName: string | undefined, playerName: string, idemSuffix: string) =>
         sendTransactionalEmail({
           templateName: "convocation-invite",
@@ -1143,7 +1154,9 @@ function EventDetail() {
             respondUrl: `${origin}/r/${token}`,
             isUpdate: true,
             changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
+            lineup: lineupEmail,
           },
+
         }).catch(() => undefined);
 
       const sends: Promise<unknown>[] = [];

@@ -4,6 +4,14 @@ import {
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
+interface LineupPlayer {
+  name: string;
+  jersey?: number | null;
+  role?: string;
+  isCaptain?: boolean;
+  isGK?: boolean;
+}
+
 interface Props {
   recipientFirstName?: string;
   playerName: string;
@@ -27,7 +35,13 @@ interface Props {
   reminderHoursBefore?: number;
   isUpdate?: boolean;
   changes?: Array<{ label: string; previous?: string; current?: string }>;
+  lineup?: {
+    formation?: string;
+    starting?: LineupPlayer[];
+    bench?: LineupPlayer[];
+  };
 }
+
 
 const ConvocationInviteEmail = ({
   recipientFirstName,
@@ -52,7 +66,9 @@ const ConvocationInviteEmail = ({
   reminderHoursBefore,
   isUpdate,
   changes,
+  lineup,
 }: Props) => (
+
   <Html lang="fr" dir="ltr">
     <Head />
     <Preview>
@@ -170,6 +186,41 @@ const ConvocationInviteEmail = ({
           </Section>
         ) : null}
 
+        {lineup && ((lineup.starting?.length ?? 0) > 0 || (lineup.bench?.length ?? 0) > 0) ? (
+          <Section style={lineupCard}>
+            <Text style={lineupKicker}>⚽ Composition prévue</Text>
+            {lineup.formation ? (
+              <Text style={lineupFormation}>Formation : <strong>{lineup.formation}</strong></Text>
+            ) : null}
+            {lineup.starting && lineup.starting.length > 0 ? (
+              <>
+                <Text style={lineupSectionTitle}>XI de départ</Text>
+                {lineup.starting.map((p, i) => (
+                  <Text key={`s-${i}`} style={lineupLine}>
+                    {p.role ? <span style={lineupRole}>{p.role}</span> : null}
+                    {p.jersey != null ? <strong> #{p.jersey}</strong> : null}
+                    {" "}{p.name}
+                    {p.isCaptain ? " (C)" : ""}
+                    {p.isGK ? " 🧤" : ""}
+                  </Text>
+                ))}
+              </>
+            ) : null}
+            {lineup.bench && lineup.bench.length > 0 ? (
+              <>
+                <Text style={lineupSectionTitle}>Remplaçants</Text>
+                {lineup.bench.map((p, i) => (
+                  <Text key={`b-${i}`} style={lineupLine}>
+                    {p.jersey != null ? <strong>#{p.jersey} </strong> : null}
+                    {p.name}
+                  </Text>
+                ))}
+              </>
+            ) : null}
+          </Section>
+        ) : null}
+
+
         <Text style={smallText}>
           Pas besoin de vous connecter — votre réponse est enregistrée automatiquement et
           vous pourrez la modifier plus tard.
@@ -263,3 +314,15 @@ const changesTitle = { fontSize: "13px", fontWeight: "bold" as const, color: "#9
 const changesLine = { fontSize: "13px", color: "#451a03", lineHeight: "1.6", margin: "0 0 4px" };
 const oldValue = { color: "#9ca3af", textDecoration: "line-through" as const };
 const newValue = { color: "#065f46", fontWeight: "bold" as const, backgroundColor: "#d1fae5", padding: "1px 6px", borderRadius: "4px" };
+const lineupCard = {
+  backgroundColor: "#ecfdf5",
+  border: "1px solid #10b981",
+  borderRadius: "10px",
+  padding: "12px 14px",
+  margin: "0 0 16px",
+};
+const lineupKicker = { fontSize: "12px", fontWeight: "bold" as const, color: "#065f46", margin: "0 0 6px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
+const lineupFormation = { fontSize: "13px", color: "#065f46", margin: "0 0 8px" };
+const lineupSectionTitle = { fontSize: "11px", fontWeight: "bold" as const, color: "#047857", margin: "8px 0 4px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
+const lineupLine = { fontSize: "13px", color: "#064e3b", lineHeight: "1.6", margin: "0 0 2px" };
+const lineupRole = { display: "inline-block", minWidth: "32px", fontSize: "10px", fontWeight: "bold" as const, color: "#ffffff", backgroundColor: "#10b981", padding: "1px 5px", borderRadius: "4px", marginRight: "6px" };

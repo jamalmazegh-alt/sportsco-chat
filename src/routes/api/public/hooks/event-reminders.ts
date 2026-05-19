@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
+
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
 
@@ -116,6 +118,10 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.meeting_point)}`
             : undefined;
 
+          const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
+
+
+
           for (const conv of toSend) {
             const player: any = (players ?? []).find((p: any) => p.id === conv.player_id);
             if (!player) continue;
@@ -160,7 +166,9 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     respondUrl,
                     isReminder: true,
                     reminderHoursBefore: milestone,
+                    lineup: lineupEmail,
                   },
+
                 });
                 sent++;
               } catch (e) {
