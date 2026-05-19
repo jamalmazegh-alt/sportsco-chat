@@ -93,7 +93,7 @@ export const createPlayerFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => FeedbackInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase } = context;
 
     // Look up player → club_id, team_id (event's team if provided)
     const { data: player, error: pErr } = await supabase
@@ -102,16 +102,6 @@ export const createPlayerFeedback = createServerFn({ method: "POST" })
       .eq("id", data.playerId)
       .maybeSingle();
     if (pErr || !player) throw new Response("Player not found", { status: 404 });
-
-    let teamId: string | null = null;
-    if (data.eventId) {
-      const { data: ev } = await supabase
-        .from("events")
-        .select("team_id")
-        .eq("id", data.eventId)
-        .maybeSingle();
-      teamId = (ev as any)?.team_id ?? null;
-    }
 
     const { data: row, error } = await supabase
       .rpc("save_player_feedback" as any, {
@@ -401,19 +391,15 @@ Consignes de rédaction :
 
     // Persist
     const { data: row, error } = await supabase
-      .from("player_reviews" as any)
-      .insert({
-        club_id: player.club_id,
-        player_id: player.id,
-        author_user_id: userId,
-        kind: data.kind,
-        period_start: data.periodStart || null,
-        period_end: data.periodEnd || null,
-        content,
-        visibility: data.visibility,
-        model: "google/gemini-3-flash-preview",
+      .rpc("create_player_review" as any, {
+        _player_id: player.id,
+        _kind: data.kind,
+        _period_start: data.periodStart || null,
+        _period_end: data.periodEnd || null,
+        _content: content,
+        _visibility: data.visibility,
+        _model: "google/gemini-3-flash-preview",
       })
-      .select("id, content, kind, visibility, period_start, period_end, created_at, model")
       .single();
     if (error) throw new Response(error.message, { status: 500 });
     return { review: row };
