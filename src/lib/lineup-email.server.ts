@@ -44,9 +44,7 @@ export async function loadLineupForConvocationEmailServer(
     .select("id, first_name, last_name, jersey_number")
     .in("id", Array.from(ids));
 
-  const byId = new Map<string, PlayerRow>(
-    ((players ?? []) as PlayerRow[]).map((p) => [p.id, p]),
-  );
+  const byId = new Map<string, PlayerRow>(((players ?? []) as PlayerRow[]).map((p) => [p.id, p]));
   const fullName = (p?: PlayerRow) => `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
 
   const starting: LineupEmailPlayer[] = slots
