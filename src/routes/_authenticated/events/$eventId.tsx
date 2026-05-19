@@ -474,19 +474,27 @@ function EventDetail() {
     }
   }
 
-  function openPicker(opts?: { preselectAll?: boolean }) {
+  function openPicker(opts?: { preselectAll?: boolean; preselectIds?: string[] }) {
     if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
       return;
     }
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
-    const preselect = opts?.preselectAll
-      ? new Set<string>(
-          teamPlayers
-            .map((tp: any) => tp.player_id)
-            .filter((pid: string) => !existing.has(pid)),
-        )
-      : new Set<string>();
+    const teamPlayerIds = new Set(teamPlayers.map((tp: any) => tp.player_id));
+    let preselect: Set<string>;
+    if (opts?.preselectIds && opts.preselectIds.length > 0) {
+      preselect = new Set(
+        opts.preselectIds.filter((pid) => teamPlayerIds.has(pid) && !existing.has(pid)),
+      );
+    } else if (opts?.preselectAll) {
+      preselect = new Set<string>(
+        teamPlayers
+          .map((tp: any) => tp.player_id)
+          .filter((pid: string) => !existing.has(pid)),
+      );
+    } else {
+      preselect = new Set<string>();
+    }
     setSelectedIds(preselect);
     setPickerStep("select");
     setPickerOpen(true);
@@ -500,7 +508,10 @@ function EventDetail() {
     if (!event || (event as any).convocations_sent) return;
     if (!teamPlayers) return;
     setAutoSendConsumed(true);
-    openPicker(); // no preselection — coach picks who to call up
+    const preselectIds = search.preselect
+      ? search.preselect.split(",").filter(Boolean)
+      : undefined;
+    openPicker(preselectIds ? { preselectIds } : undefined);
     navigate({
       to: "/events/$eventId",
       params: { eventId },
@@ -508,7 +519,7 @@ function EventDetail() {
       replace: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search.send, isCoach, event, teamPlayers, autoSendConsumed]);
+  }, [search.send, search.preselect, isCoach, event, teamPlayers, autoSendConsumed]);
 
   async function sendConvocations() {
     if (!event || !user) return;
