@@ -41,7 +41,7 @@ type PlayerReviewRow = {
 const FeedbackInput = z.object({
   playerId: z.string().uuid(),
   eventId: z.string().uuid().nullish(),
-  rating: z.number().int().min(1).max(5).nullish(),
+  rating: z.number().int().min(1).max(10).nullish(),
   comment: z.string().trim().max(4000).nullish(),
   devNotes: z.string().trim().max(4000).nullish(),
   strengths: z.string().trim().max(2000).nullish(),
