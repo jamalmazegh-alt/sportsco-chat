@@ -17,7 +17,18 @@ function frDate(iso: string) {
 export const Route = createFileRoute("/api/public/hooks/event-reminders")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        // Shared cron secret — required to prevent public abuse (mass email trigger).
+        const secret = process.env.DATA_RETENTION_SECRET;
+        if (!secret) {
+          return new Response("Not configured", { status: 503 });
+        }
+        const provided =
+          request.headers.get("x-cron-secret") ||
+          request.headers.get("x-retention-secret");
+        if (provided !== secret) {
+          return new Response("Forbidden", { status: 403 });
+        }
         const now = Date.now();
         const horizon = new Date(now + 72 * 60 * 60 * 1000).toISOString();
 
