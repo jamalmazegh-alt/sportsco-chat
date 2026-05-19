@@ -1,9 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, Navigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, Loader2, ChevronDown, ChevronRight, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Loader2, CheckCircle2, Star } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -12,13 +12,10 @@ import {
   createPlayerFeedback,
   updatePlayerFeedback,
 } from "@/lib/player-feedback.functions";
-import {
-  PlayerFeedbackForm,
-  EMPTY_FEEDBACK,
-  type FeedbackFormValue,
-} from "@/components/player-feedback-form";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { getFeedbackTagsForSport } from "@/lib/feedback-tags";
 import { useActiveRole, useAuth } from "@/lib/auth-context";
-import { Navigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,6 +23,14 @@ export const Route = createFileRoute("/_authenticated/events/$eventId/feedback")
   component: PostMatchFeedback,
   head: () => ({ meta: [{ title: "Retours coach — Clubero" }] }),
 });
+
+type RowValue = {
+  rating: number | null;
+  note: string;
+  tags: string[];
+};
+
+const EMPTY: RowValue = { rating: null, note: "", tags: [] };
 
 function PostMatchFeedback() {
   const { eventId } = Route.useParams();
@@ -49,7 +54,6 @@ function PostMatchFeedback() {
         .eq("id", eventId)
         .maybeSingle();
       if (!event?.team_id || event.type !== "match") return false;
-
       const { data, error } = await supabase.rpc("is_team_coach", {
         _team_id: event.team_id,
         _user_id: user!.id,
@@ -67,113 +71,133 @@ function PostMatchFeedback() {
     enabled: isCoach || !!canAccessFeedback,
   });
 
-  const [values, setValues] = useState<Record<string, FeedbackFormValue>>({});
+  const [values, setValues] = useState<Record<string, RowValue>>({});
   const [ids, setIds] = useState<Record<string, string | null>>({});
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [savingId, setSavingId] = useState<string | null>(null);
+  const [dirty, setDirty] = useState<Set<string>>(new Set());
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!data) return;
-    setValues((prev) => {
-      const v = { ...prev };
-      for (const row of data.players) {
-        const ex = data.existing[row.player.id];
-        if (ex) {
-          // Server has saved values → use them as source of truth.
-          v[row.player.id] = {
-            rating: ex.rating ?? null,
-            comment: ex.comment ?? "",
-            devNotes: ex.dev_notes ?? "",
-            strengths: ex.strengths ?? "",
-            improvements: ex.improvements ?? "",
-            tags: ex.tags ?? [],
-            visibility: "coach_only",
-            sharedSummary: "",
-          };
-        } else if (!v[row.player.id]) {
-          // No server row and nothing typed locally → empty form.
-          v[row.player.id] = { ...EMPTY_FEEDBACK };
-        }
-      }
-      return v;
-    });
-    setIds((prev) => {
-      const ix = { ...prev };
-      for (const row of data.players) {
-        const ex = data.existing[row.player.id];
-        if (ex) ix[row.player.id] = ex.id;
-        else if (!(row.player.id in ix)) ix[row.player.id] = null;
-      }
-      return ix;
-    });
+    const v: Record<string, RowValue> = {};
+    const ix: Record<string, string | null> = {};
     const filled = new Set<string>();
-    for (const row of data.players) if (data.existing[row.player.id]) filled.add(row.player.id);
+    for (const row of data.players) {
+      const ex = (data as any).existing[row.player.id];
+      if (ex) {
+        const merged = [ex.strengths, ex.improvements, ex.comment]
+          .filter(Boolean)
+          .join("\n\n");
+        v[row.player.id] = {
+          rating: ex.rating ?? null,
+          note: merged ?? "",
+          tags: ex.tags ?? [],
+        };
+        ix[row.player.id] = ex.id;
+        filled.add(row.player.id);
+      } else {
+        v[row.player.id] = { ...EMPTY };
+        ix[row.player.id] = null;
+      }
+    }
+    setValues(v);
+    setIds(ix);
     setSavedIds(filled);
+    setDirty(new Set());
   }, [data]);
 
-  if (!isAccessLoading && !isCoach && canAccessFeedback === false) return <Navigate to="/home" replace />;
+  if (!isAccessLoading && !isCoach && canAccessFeedback === false)
+    return <Navigate to="/home" replace />;
 
-  async function saveOne(playerId: string) {
-    const v = values[playerId];
-    if (!v) return;
-    setSavingId(playerId);
-    try {
-      const existingId = ids[playerId];
-      if (existingId) {
-        await updateFn({
-          data: {
-            id: existingId,
-            rating: v.rating,
-            comment: v.comment || null,
-            devNotes: v.devNotes || null,
-            strengths: v.strengths || null,
-            improvements: v.improvements || null,
-            tags: v.tags,
-            visibility: v.visibility,
-            sharedSummary: v.sharedSummary || null,
-          },
-        });
-      } else {
-        const res = await createFn({
-          data: {
-            playerId,
-            eventId,
-            rating: v.rating,
-            comment: v.comment || null,
-            devNotes: v.devNotes || null,
-            strengths: v.strengths || null,
-            improvements: v.improvements || null,
-            tags: v.tags,
-            visibility: v.visibility,
-            sharedSummary: v.sharedSummary || null,
-          },
-        });
-        setIds((p) => ({ ...p, [playerId]: res.id }));
-      }
-      setSavedIds((p) => new Set(p).add(playerId));
-      qc.invalidateQueries({ queryKey: ["event-feedback", eventId] });
-      qc.invalidateQueries({ queryKey: ["player-feedback", playerId] });
+  function patch(playerId: string, p: Partial<RowValue>) {
+    setValues((prev) => ({ ...prev, [playerId]: { ...prev[playerId], ...p } }));
+    setDirty((prev) => new Set(prev).add(playerId));
+  }
+
+  function toggleTag(playerId: string, tag: string) {
+    const cur = values[playerId]?.tags ?? [];
+    patch(playerId, {
+      tags: cur.includes(tag) ? cur.filter((x) => x !== tag) : [...cur, tag],
+    });
+  }
+
+  async function saveAll() {
+    if (dirty.size === 0) return;
+    setSaving(true);
+    const newIds: Record<string, string> = {};
+    let okCount = 0;
+    const failed: string[] = [];
+    await Promise.all(
+      Array.from(dirty).map(async (playerId) => {
+        const v = values[playerId];
+        if (!v) return;
+        const payload = {
+          rating: v.rating,
+          comment: v.note || null,
+          devNotes: null,
+          strengths: null,
+          improvements: null,
+          tags: v.tags,
+          visibility: "coach_only" as const,
+          sharedSummary: null,
+        };
+        try {
+          const existingId = ids[playerId];
+          if (existingId) {
+            await updateFn({ data: { id: existingId, ...payload } });
+          } else {
+            const res = await createFn({
+              data: { playerId, eventId, ...payload },
+            });
+            newIds[playerId] = res.id;
+          }
+          okCount++;
+        } catch (e: any) {
+          failed.push(playerId);
+        }
+      })
+    );
+    if (Object.keys(newIds).length) {
+      setIds((prev) => ({ ...prev, ...newIds }));
+    }
+    setSavedIds((prev) => {
+      const n = new Set(prev);
+      for (const pid of dirty) if (!failed.includes(pid)) n.add(pid);
+      return n;
+    });
+    setDirty(new Set(failed));
+    qc.invalidateQueries({ queryKey: ["event-feedback", eventId] });
+    setSaving(false);
+    if (failed.length === 0) {
       toast.success(t("common.saved"), {
-        description: t("feedback.savedLocation", { defaultValue: "Visible dans le profil du joueur, section Retours Coach." }),
-        action: {
-          label: t("players.profile", { defaultValue: "Profil du joueur" }),
-          onClick: () => navigate({ to: "/players/$playerId", params: { playerId } }),
-        },
+        description: t("feedback.bulkSaved", {
+          defaultValue: "{{count}} retour(s) enregistré(s).",
+          count: okCount,
+        }),
       });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Error");
-    } finally {
-      setSavingId(null);
+    } else {
+      toast.error(
+        t("feedback.bulkPartial", {
+          defaultValue: "{{ok}} enregistré(s), {{ko}} en échec.",
+          ok: okCount,
+          ko: failed.length,
+        })
+      );
     }
   }
 
   const locale = i18n.language?.startsWith("fr") ? fr : undefined;
   const event = data?.event;
+  const sport = (data as any)?.sport ?? null;
+  const tags = useMemo(() => getFeedbackTagsForSport(sport), [sport]);
 
   return (
-    <div className="px-5 pt-6 pb-10 space-y-5">
-      <Link to="/events/$eventId" params={{ eventId }} className="inline-flex items-center text-sm text-muted-foreground gap-1">
+    <div className="px-5 pt-6 pb-28 space-y-5">
+      <Link
+        to="/events/$eventId"
+        params={{ eventId }}
+        className="inline-flex items-center text-sm text-muted-foreground gap-1"
+      >
         <ChevronLeft className="h-4 w-4" /> {t("common.back")}
       </Link>
 
@@ -183,11 +207,17 @@ function PostMatchFeedback() {
         </h1>
         {event && (
           <p className="text-sm text-muted-foreground mt-0.5 truncate">
-            {event.title}
-            {event.starts_at &&
-              ` · ${format(new Date(event.starts_at), "EEE d MMM", { locale })}`}
+            {(event as any).title}
+            {(event as any).starts_at &&
+              ` · ${format(new Date((event as any).starts_at), "EEE d MMM", { locale })}`}
           </p>
         )}
+        <p className="text-xs text-muted-foreground mt-2">
+          {t("feedback.bulkHint", {
+            defaultValue:
+              "Note rapide pour tous les joueurs. Tout est enregistré en une fois.",
+          })}
+        </p>
       </div>
 
       {isLoading ? (
@@ -199,25 +229,36 @@ function PostMatchFeedback() {
           {t("feedback.noPlayers", { defaultValue: "Aucun joueur convoqué." })}
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {data.players.map((row: any) => {
             const p = row.player;
-            const open = openId === p.id;
+            const v = values[p.id] ?? EMPTY;
             const saved = savedIds.has(p.id);
+            const isDirty = dirty.has(p.id);
             return (
               <li
                 key={p.id}
                 className={cn(
-                  "rounded-2xl border bg-card transition-colors",
-                  saved ? "border-primary/40" : "border-border"
+                  "rounded-2xl border bg-card p-3 transition-colors",
+                  isDirty
+                    ? "border-primary/60 ring-1 ring-primary/30"
+                    : saved
+                    ? "border-primary/30"
+                    : "border-border"
                 )}
               >
-                <button
-                  type="button"
-                  onClick={() => setOpenId(open ? null : p.id)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-left"
-                >
-                  <div className="h-9 w-9 rounded-full bg-muted overflow-hidden flex items-center justify-center shrink-0">
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate({
+                        to: "/players/$playerId",
+                        params: { playerId: p.id },
+                      })
+                    }
+                    className="h-9 w-9 rounded-full bg-muted overflow-hidden flex items-center justify-center shrink-0"
+                  >
                     {p.photo_url ? (
                       <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
                     ) : (
@@ -225,52 +266,114 @@ function PostMatchFeedback() {
                         {(p.first_name?.[0] ?? "") + (p.last_name?.[0] ?? "")}
                       </span>
                     )}
-                  </div>
+                  </button>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">
                       {p.first_name} {p.last_name}
                     </p>
                     <p className="text-[11px] text-muted-foreground">
                       {t(`attendance.${row.attendance}`, { defaultValue: row.attendance })}
-                      {saved && values[p.id]?.rating ? ` · ★ ${values[p.id]!.rating}/5` : ""}
-                      {saved && (values[p.id]?.tags?.length ?? 0) > 0 ? ` · ${values[p.id]!.tags.length} tag(s)` : ""}
                     </p>
                   </div>
-                  {saved && <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />}
-                  {open ? (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  {saved && !isDirty && (
+                    <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                   )}
-                </button>
-                {saved && !open && (values[p.id]?.strengths || values[p.id]?.improvements || values[p.id]?.comment) && (
-                  <div className="px-3 pb-2.5 -mt-1 space-y-0.5 text-[11px] text-muted-foreground">
-                    {values[p.id]?.strengths && (
-                      <p className="line-clamp-1"><span className="font-medium text-emerald-600 dark:text-emerald-400">+ </span>{values[p.id]!.strengths}</p>
-                    )}
-                    {values[p.id]?.improvements && (
-                      <p className="line-clamp-1"><span className="font-medium text-amber-600 dark:text-amber-400">→ </span>{values[p.id]!.improvements}</p>
-                    )}
-                  </div>
-                )}
-                {open && values[p.id] && (
-                  <div className="px-3 pb-3">
-                    <PlayerFeedbackForm
-                      value={values[p.id]}
-                      onChange={(next) =>
-                        setValues((prev) => ({ ...prev, [p.id]: next }))
-                      }
-                      onSubmit={() => saveOne(p.id)}
-                      busy={savingId === p.id}
-                      compact
-                      sport={(data as any)?.sport ?? null}
-                    />
-                  </div>
-                )}
+                </div>
+
+                {/* Rating */}
+                <div className="mt-3 flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
+                    const active = (v.rating ?? 0) >= n;
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() =>
+                          patch(p.id, { rating: v.rating === n ? null : n })
+                        }
+                        className={cn(
+                          "h-7 w-6 flex items-center justify-center transition-colors",
+                          active
+                            ? "text-amber-500"
+                            : "text-muted-foreground/40 hover:text-muted-foreground"
+                        )}
+                        aria-label={`${n}/10`}
+                      >
+                        <Star className={cn("h-3.5 w-3.5", active && "fill-current")} />
+                      </button>
+                    );
+                  })}
+                  {v.rating ? (
+                    <span className="ml-2 text-[11px] text-muted-foreground">
+                      {v.rating}/10
+                    </span>
+                  ) : null}
+                </div>
+
+                {/* Tags */}
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {tags.map((tag) => {
+                    const active = v.tags.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTag(p.id, tag)}
+                        className={cn(
+                          "text-[11px] px-2 py-0.5 rounded-full border transition-colors",
+                          active
+                            ? "border-primary bg-primary/15 text-primary"
+                            : "border-border bg-muted/30 text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        {t(`feedback.tag.${tag}`, { defaultValue: tag })}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Note */}
+                <Textarea
+                  value={v.note}
+                  onChange={(e) => patch(p.id, { note: e.target.value })}
+                  rows={2}
+                  className="mt-2 text-sm"
+                  placeholder={t("feedback.notePlaceholder", {
+                    defaultValue: "Note rapide (forces, axes de progrès…)",
+                  })}
+                />
               </li>
             );
           })}
         </ul>
+      )}
+
+      {/* Sticky save bar */}
+      {data && data.players.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 px-5 py-3">
+          <div className="mx-auto max-w-3xl flex items-center gap-3">
+            <p className="text-xs text-muted-foreground flex-1">
+              {dirty.size > 0
+                ? t("feedback.dirtyCount", {
+                    defaultValue: "{{count}} modification(s) en attente",
+                    count: dirty.size,
+                  })
+                : t("feedback.allSaved", { defaultValue: "Tout est à jour" })}
+            </p>
+            <Button
+              type="button"
+              onClick={saveAll}
+              disabled={saving || dirty.size === 0}
+              className="h-10 min-w-32"
+            >
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("feedback.saveAll", { defaultValue: "Tout enregistrer" })
+              )}
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
