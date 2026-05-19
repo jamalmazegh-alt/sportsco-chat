@@ -127,6 +127,8 @@ const AUDIENCES = [
       "Convocation prête en moins d'une minute",
       "Réponses de présence en temps réel",
       "Saisie des résultats de match avec stats joueurs adaptées au sport",
+      "Retours individuels par joueur (note, forces, axes de progrès, tags propres à votre sport)",
+      "Synthèses IA bilan / entretien / développement, affinables au fil d'un dialogue avec l'IA",
       "Chat par événement avec joueurs et parents",
       "@mentions et accusés de lecture sur le mur",
       "Gestion des remplaçants et attribution des numéros",
