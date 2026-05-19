@@ -511,7 +511,7 @@ export const refinePlayerReview = createServerFn({ method: "POST" })
       .eq("id", (review as any).player_id)
       .maybeSingle();
 
-    const systemPrompt = `Tu es un coach sportif bienveillant qui affine des synthèses joueurs. Tu DOIS suivre l'instruction du coach à la lettre : nombre exact de phrases, ton, longueur, format et angle demandé. L'instruction prime sur toute structure par défaut : si le coach demande un résumé en 5 phrases, tu renvoies exactement 5 phrases et tu supprimes les sections longues. Tu réponds toujours en français, sans préambule.`;
+    const systemPrompt = `Tu es un coach sportif bienveillant qui affine des synthèses joueurs. Tu DOIS suivre l'instruction du coach à la lettre : nombre exact de phrases, ton, longueur, format et angle demandé. L'instruction prime sur toute structure par défaut : si le coach demande un résumé en 5 phrases, tu renvoies exactement 5 phrases et tu supprimes les sections longues. Tu réponds toujours en français, sans préambule, sans JSON et sans bloc de code.`;
 
     const userPrompt = `Joueur : ${player?.first_name ?? ""} ${player?.last_name ?? ""}
 
@@ -533,55 +533,36 @@ Renvoie :
     let content: string;
     let changes: string = "";
     try {
-      const { output, finishReason, rawFinishReason } = await generateText({
+      const sentenceInstruction = requestedSentenceCount
+        ? `\n\nIMPORTANT : produis exactement ${requestedSentenceCount} phrases. Ne garde pas les titres de sections si cela empêche de respecter la limite.`
+        : "";
+      const { text, finishReason } = await generateText({
         model,
         system: systemPrompt,
-        prompt: userPrompt,
-        maxOutputTokens: 4096,
+        prompt: userPrompt + sentenceInstruction + `\n\nRéponds uniquement avec la synthèse complète réécrite.`,
+        maxOutputTokens: 8192,
         temperature: 0.2,
-        output: Output.object({
-          schema: z.object({
-            content: z.string().min(1),
-            changes: z.string().default(""),
-          }),
-        }),
       });
-      content = output.content.trim();
-      changes = (output.changes ?? "").trim();
-      if (!content) throw new Error(`empty_ai_response:${finishReason}:${rawFinishReason ?? ""}`);
+      content = cleanReviewContent(text ?? "");
+      if (!content) throw new Error(`empty_ai_response:${finishReason}`);
     } catch (e: any) {
       const msg: string = e?.message ?? "";
-      console.error("[refinePlayerReview] structured generation failed", msg);
+      console.error("[refinePlayerReview] generation failed", msg);
       if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
       if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
-      // Fallback: plain text generation
-      try {
-        const { text } = await generateText({
-          model,
-          system: systemPrompt,
-          prompt: userPrompt + `\n\nRéponds uniquement avec la nouvelle synthèse, sans aucun commentaire.`,
-          maxOutputTokens: 4096,
-          temperature: 0.2,
-        });
-        content = (text ?? "").trim();
-        changes = "";
-        if (!content) throw new Response("empty_ai_response", { status: 500 });
-      } catch (e2: any) {
-        const m2: string = e2?.message ?? "";
-        if (m2.includes("429")) throw new Response("rate_limited", { status: 429 });
-        if (m2.includes("402")) throw new Response("credits_exhausted", { status: 402 });
-        throw new Response("AI generation failed: " + (m2 || msg), { status: 500 });
-      }
+      throw new Response("AI generation failed: " + msg, { status: 500 });
     }
 
     if (requestedSentenceCount) {
       const sentences = splitSentences(content);
       if (sentences.length > requestedSentenceCount) {
-        content = sentences.slice(0, requestedSentenceCount).join(" ");
+        content = locallyLimitSentences(content, requestedSentenceCount);
         changes = `J'ai réduit la synthèse à ${requestedSentenceCount} phrases comme demandé.`;
       } else if (!changes) {
         changes = `J'ai reformulé la synthèse en ${sentences.length} phrase${sentences.length > 1 ? "s" : ""}.`;
       }
+    } else {
+      changes = "J'ai réécrit la synthèse selon ta demande.";
     }
 
     const { data: row, error } = await supabase
