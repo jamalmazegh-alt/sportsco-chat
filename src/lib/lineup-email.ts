@@ -6,6 +6,8 @@ export interface LineupEmailPlayer {
   role?: string;
   isCaptain?: boolean;
   isGK?: boolean;
+  x?: number;
+  y?: number;
 }
 
 export interface LineupEmailData {
