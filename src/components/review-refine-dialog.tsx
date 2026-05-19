@@ -98,18 +98,23 @@ export function ReviewRefineDialog({
       toast.success(t("feedback.refineUpdated", { defaultValue: "Synthèse mise à jour" }));
     } catch (e: any) {
       const msg = e?.message ?? "";
+      const assistantMessage = msg.includes("rate_limited") || msg.includes("429")
+        ? t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." })
+        : msg.includes("credits_exhausted") || msg.includes("402")
+          ? t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." })
+          : msg || t("feedback.refineFailed", {
+              defaultValue: "Je n'ai pas pu appliquer ta demande. La synthèse n'a pas été modifiée.",
+            });
       if (msg.includes("429"))
         toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes." }));
       else if (msg.includes("402"))
         toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
-      else toast.error(msg || "Error");
+      else toast.error(assistantMessage);
       setTurns((s) => [
         ...s,
         {
           role: "assistant",
-          changes: t("feedback.refineFailed", {
-            defaultValue: "Je n'ai pas pu appliquer ta demande, réessaie.",
-          }),
+          changes: assistantMessage,
           preview: "",
         },
       ]);
