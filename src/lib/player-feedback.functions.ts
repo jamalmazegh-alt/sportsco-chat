@@ -511,6 +511,7 @@ Renvoie :
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-2.5-flash");
+    const requestedSentenceCount = getRequestedSentenceCount(data.instruction);
 
     let content: string;
     let changes: string = "";
@@ -553,6 +554,16 @@ Renvoie :
         if (m2.includes("429")) throw new Response("rate_limited", { status: 429 });
         if (m2.includes("402")) throw new Response("credits_exhausted", { status: 402 });
         throw new Response("AI generation failed: " + (m2 || msg), { status: 500 });
+      }
+    }
+
+    if (requestedSentenceCount) {
+      const sentences = splitSentences(content);
+      if (sentences.length > requestedSentenceCount) {
+        content = sentences.slice(0, requestedSentenceCount).join(" ");
+        changes = `J'ai réduit la synthèse à ${requestedSentenceCount} phrases comme demandé.`;
+      } else if (!changes) {
+        changes = `J'ai reformulé la synthèse en ${sentences.length} phrase${sentences.length > 1 ? "s" : ""}.`;
       }
     }
 
