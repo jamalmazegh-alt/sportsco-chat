@@ -4,6 +4,14 @@ import {
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
+interface LineupPlayer {
+  name: string;
+  jersey?: number | null;
+  role?: string;
+  isCaptain?: boolean;
+  isGK?: boolean;
+}
+
 interface Props {
   recipientFirstName?: string;
   playerName: string;
@@ -27,7 +35,13 @@ interface Props {
   reminderHoursBefore?: number;
   isUpdate?: boolean;
   changes?: Array<{ label: string; previous?: string; current?: string }>;
+  lineup?: {
+    formation?: string;
+    starting?: LineupPlayer[];
+    bench?: LineupPlayer[];
+  };
 }
+
 
 const ConvocationInviteEmail = ({
   recipientFirstName,
