@@ -80,7 +80,12 @@ function locallyLimitSentences(content: string, sentenceCount: number) {
   const withoutHeadings = content
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^\*\*(.+?)\*\*\s*$/gm, "$1.")
-    .replace(/[-*]\s+/g, "");
+    .replace(/^\s*[-*]\s+/gm, "")
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => /[.!?…]$/.test(line) ? line : `${line}.`)
+    .join(" ");
   const sentences = splitSentences(withoutHeadings);
   return sentences.slice(0, sentenceCount).join(" ").trim();
 }
@@ -559,13 +564,8 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
     }
 
     if (requestedSentenceCount) {
-      const sentences = splitSentences(content);
-      if (sentences.length > requestedSentenceCount) {
-        content = locallyLimitSentences(content, requestedSentenceCount);
-        changes = `J'ai réduit la synthèse à ${requestedSentenceCount} phrases comme demandé.`;
-      } else if (!changes) {
-        changes = `J'ai reformulé la synthèse en ${sentences.length} phrase${sentences.length > 1 ? "s" : ""}.`;
-      }
+      content = locallyLimitSentences(content, requestedSentenceCount) || content;
+      changes ||= `J'ai réduit la synthèse à ${splitSentences(content).length} phrase${splitSentences(content).length > 1 ? "s" : ""} comme demandé.`;
     } else {
       changes = "J'ai réécrit la synthèse selon ta demande.";
     }
