@@ -547,7 +547,7 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
     const previousContent = String((review as any).content ?? "");
     let content = "";
     let changes: string = "";
-    let usedModel = modelNames[0];
+    let usedModel: string = modelNames[0];
     let lastError = "";
     const sentenceInstruction = requestedSentenceCount
       ? `\n\nIMPORTANT : produis exactement ${requestedSentenceCount} phrases. Ne garde pas les titres de sections si cela empêche de respecter la limite.`
@@ -590,7 +590,7 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
         throw new Response("L'IA a renvoyé une réponse vide. Rien n'a été modifié.", { status: 502 });
       }
       content = fallback;
-      usedModel = "local-fallback" as typeof usedModel;
+      usedModel = "local-fallback";
       changes = `L'IA a renvoyé une réponse vide, j'ai appliqué localement la réduction à ${requestedSentenceCount} phrase${requestedSentenceCount && requestedSentenceCount > 1 ? "s" : ""}.`;
       console.warn("[refinePlayerReview] used local fallback", { requestedSentenceCount, lastError });
     }
