@@ -612,6 +612,11 @@ function EventDetail() {
         })
         .filter(Boolean);
 
+      // Composition (si publiée + include_in_convocation = true)
+      const { loadLineupForConvocationEmail } = await import("@/lib/lineup-email");
+      const lineupEmail = await loadLineupForConvocationEmail(event.id).catch(() => undefined);
+
+
       const competitionLabel = (event as any).competition_name
         || ((event as any).competition_type
           ? t(`events.competitionTypes.${(event as any).competition_type}`)
