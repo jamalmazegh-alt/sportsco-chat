@@ -1865,45 +1865,8 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* My response (player/parent) */}
-      {visibleMyConvocs.length > 0 && (
-        <section id="my-response" className="space-y-3 scroll-mt-20">
-          {visibleMyConvocs.map((c: any) => (
-            <div key={c.id} className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-sm font-medium mb-3">
-                {t("attendance.respondPrompt")}{" "}
-                <span className="text-muted-foreground font-normal">
-                  · {c.players?.first_name} {c.players?.last_name}
-                </span>
-              </p>
-              {event.responses_locked ? (
-                <p className="text-xs text-muted-foreground">{t("attendance.responsesLocked")}</p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => respond(c.id, s)}
-                      className={cn(
-                        "rounded-xl py-3 text-sm font-semibold transition-all active:scale-95",
-                        c.status === s
-                          ? s === "present"
-                            ? "bg-present text-present-foreground"
-                            : s === "absent"
-                              ? "bg-absent text-absent-foreground"
-                              : "bg-uncertain text-uncertain-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-accent"
-                      )}
-                    >
-                      {t(`attendance.${s}`)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
-      )}
+      {/* "My response" merged into the unified Convocation card below */}
+
 
       {/* Match result + scorers (matches only) */}
       {event.type === "match" && (
