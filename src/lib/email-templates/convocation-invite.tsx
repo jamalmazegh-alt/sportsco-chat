@@ -10,6 +10,8 @@ interface LineupPlayer {
   role?: string;
   isCaptain?: boolean;
   isGK?: boolean;
+  x?: number;
+  y?: number;
 }
 
 interface Props {
