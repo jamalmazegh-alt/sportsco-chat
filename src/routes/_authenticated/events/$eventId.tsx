@@ -119,6 +119,7 @@ function diffSnapshot(prev: Record<string, any> | null | undefined, current: any
 export const Route = createFileRoute("/_authenticated/events/$eventId")({
   validateSearch: (s: Record<string, unknown>) => ({
     send: s.send === 1 || s.send === "1" ? 1 : undefined,
+    preselect: typeof s.preselect === "string" && s.preselect.length > 0 ? s.preselect : undefined,
   }),
   component: EventDetailRoute,
 });
@@ -473,19 +474,27 @@ function EventDetail() {
     }
   }
 
-  function openPicker(opts?: { preselectAll?: boolean }) {
+  function openPicker(opts?: { preselectAll?: boolean; preselectIds?: string[] }) {
     if (!teamPlayers || teamPlayers.length === 0) {
       toast.error(t("players.noPlayers"));
       return;
     }
     const existing = new Set((convocations ?? []).map((c: any) => c.player_id));
-    const preselect = opts?.preselectAll
-      ? new Set<string>(
-          teamPlayers
-            .map((tp: any) => tp.player_id)
-            .filter((pid: string) => !existing.has(pid)),
-        )
-      : new Set<string>();
+    const teamPlayerIds = new Set(teamPlayers.map((tp: any) => tp.player_id));
+    let preselect: Set<string>;
+    if (opts?.preselectIds && opts.preselectIds.length > 0) {
+      preselect = new Set(
+        opts.preselectIds.filter((pid) => teamPlayerIds.has(pid) && !existing.has(pid)),
+      );
+    } else if (opts?.preselectAll) {
+      preselect = new Set<string>(
+        teamPlayers
+          .map((tp: any) => tp.player_id)
+          .filter((pid: string) => !existing.has(pid)),
+      );
+    } else {
+      preselect = new Set<string>();
+    }
     setSelectedIds(preselect);
     setPickerStep("select");
     setPickerOpen(true);
@@ -499,7 +508,10 @@ function EventDetail() {
     if (!event || (event as any).convocations_sent) return;
     if (!teamPlayers) return;
     setAutoSendConsumed(true);
-    openPicker(); // no preselection — coach picks who to call up
+    const preselectIds = search.preselect
+      ? search.preselect.split(",").filter(Boolean)
+      : undefined;
+    openPicker(preselectIds ? { preselectIds } : undefined);
     navigate({
       to: "/events/$eventId",
       params: { eventId },
@@ -507,7 +519,7 @@ function EventDetail() {
       replace: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search.send, isCoach, event, teamPlayers, autoSendConsumed]);
+  }, [search.send, search.preselect, isCoach, event, teamPlayers, autoSendConsumed]);
 
   async function sendConvocations() {
     if (!event || !user) return;
@@ -2006,24 +2018,36 @@ function EventDetail() {
                         {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
                           const Icon = s === "present" ? CheckCircle2 : s === "absent" ? XCircle : HelpCircle;
                           const active = c.status === s;
+                          const inactiveTint =
+                            s === "present"
+                              ? "border-present/25 bg-present/5 text-present hover:bg-present/10 hover:border-present/50"
+                              : s === "absent"
+                                ? "border-absent/25 bg-absent/5 text-absent hover:bg-absent/10 hover:border-absent/50"
+                                : "border-uncertain/30 bg-uncertain/5 text-uncertain-foreground hover:bg-uncertain/15 hover:border-uncertain/60";
+                          const activeTint =
+                            s === "present"
+                              ? "bg-present text-present-foreground border-present shadow-md shadow-present/20 ring-2 ring-present/30"
+                              : s === "absent"
+                                ? "bg-absent text-white border-absent shadow-md shadow-absent/20 ring-2 ring-absent/30"
+                                : "bg-uncertain text-uncertain-foreground border-uncertain shadow-md shadow-uncertain/20 ring-2 ring-uncertain/30";
                           return (
                             <button
                               key={s}
                               type="button"
                               onClick={() => respond(c.id, s)}
                               className={cn(
-                                "flex flex-col items-center justify-center gap-1.5 rounded-xl py-3.5 border-2 transition-all active:scale-95",
-                                active
-                                  ? s === "present"
-                                    ? "bg-present text-present-foreground border-present shadow-sm"
-                                    : s === "absent"
-                                      ? "bg-absent text-white border-absent shadow-sm"
-                                      : "bg-uncertain text-uncertain-foreground border-uncertain shadow-sm"
-                                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                                "group flex flex-col items-center justify-center gap-1.5 rounded-2xl py-4 border-2 font-medium transition-all duration-150 active:scale-[0.97]",
+                                active ? activeTint : inactiveTint,
                               )}
                             >
-                              <Icon className="h-6 w-6" />
-                              <span className="text-xs font-semibold">{t(`attendance.${s}`)}</span>
+                              <Icon
+                                className={cn(
+                                  "h-6 w-6 transition-transform",
+                                  active ? "scale-110" : "group-hover:scale-105",
+                                )}
+                                strokeWidth={active ? 2.5 : 2}
+                              />
+                              <span className="text-[13px] font-semibold tracking-tight">{t(`attendance.${s}`)}</span>
                             </button>
                           );
                         })}

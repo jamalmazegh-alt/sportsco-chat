@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -10,7 +10,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand } from "lucide-react";
+import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -60,6 +60,7 @@ function LineupPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const fetchLineup = useServerFn(getLineup);
   const saveLineup = useServerFn(upsertLineup);
   const unpublishFn = useServerFn(unpublishLineup);
@@ -71,7 +72,7 @@ function LineupPage() {
     queryFn: async () => {
       const { data: event } = await supabase
         .from("events")
-        .select("id, team_id, type, title, teams:team_id(name, sport)")
+        .select("id, team_id, type, title, convocations_sent, teams:team_id(name, sport)")
         .eq("id", eventId)
         .maybeSingle();
       if (!event) return null;
@@ -152,6 +153,23 @@ function LineupPage() {
     bench.forEach((id) => s.add(id));
     return s;
   }, [slots, bench]);
+
+  const placedCount = placedIds.size;
+  const convocationsSent = !!ctx?.event?.convocations_sent;
+
+  function createConvocationFromLineup() {
+    const ids = Array.from(placedIds);
+    if (ids.length === 0) {
+      toast.error(t("lineup.noPlayersForConvoc", "Ajoutez d'abord des joueurs à la compo."));
+      return;
+    }
+    navigate({
+      to: "/events/$eventId",
+      params: { eventId },
+      search: { send: 1, preselect: ids.join(",") } as any,
+    });
+  }
+
 
   const available = useMemo(
     () => (roster ?? []).filter((p) => !placedIds.has(p.id)),
@@ -359,6 +377,31 @@ function LineupPage() {
             <span>{t("lineup.includeInConv", "Inclure dans la convocation")}</span>
           </label>
         </div>
+
+        {/* Create convocation from lineup */}
+        {!convocationsSent && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold leading-tight">
+                {t("lineup.convocFromLineup.title", "Créer la convocation depuis cette compo")}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {placedCount > 0
+                  ? t("lineup.convocFromLineup.desc", "{{count}} joueur(s) placés seront pré-sélectionnés.", { count: placedCount })
+                  : t("lineup.convocFromLineup.empty", "Placez des joueurs sur le terrain ou le banc d'abord.")}
+              </p>
+            </div>
+            <Button
+              onClick={createConvocationFromLineup}
+              disabled={placedCount === 0}
+              size="sm"
+              className="shrink-0"
+            >
+              <UserPlus className="h-4 w-4" />
+              {t("lineup.convocFromLineup.cta", "Créer la convoc")}
+            </Button>
+          </div>
+        )}
 
         {/* Pitch + Players layout */}
         <div className="grid md:grid-cols-[1fr_minmax(0,280px)] gap-4">
