@@ -662,8 +662,10 @@ function EventDetail() {
             clubName,
             clubLogoUrl,
             respondUrl: `${origin}/r/${token}`,
+            lineup: lineupEmail,
           },
         });
+
 
       const sends: Promise<unknown>[] = [];
       for (const conv of insertedConvs ?? []) {
