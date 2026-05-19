@@ -308,6 +308,16 @@ export function CoachFeedbackTab({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {refineTarget && (
+        <ReviewRefineDialog
+          open={!!refineTarget}
+          onOpenChange={(v) => !v && setRefineTarget(null)}
+          reviewId={refineTarget.id}
+          playerId={playerId}
+          initialContent={refineTarget.content}
+        />
+      )}
     </div>
   );
 }
