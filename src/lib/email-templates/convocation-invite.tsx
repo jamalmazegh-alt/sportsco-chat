@@ -197,14 +197,14 @@ const ConvocationInviteEmail = ({
             {lineup.starting && lineup.starting.some((p) => p.x != null && p.y != null) ? (
               <div style={pitchWrap}>
                 <div style={pitch}>
-                  {/* halfway line (top edge) */}
+                  {/* halfway line */}
                   <div style={pitchHalfway} />
-                  {/* center half-circle at top */}
+                  {/* center circle */}
                   <div style={pitchCircle} />
-                  {/* bottom penalty area (own goal) */}
+                  {/* top penalty area */}
+                  <div style={pitchPenaltyTop} />
+                  {/* bottom penalty area */}
                   <div style={pitchPenaltyBottom} />
-                  {/* bottom 6-yard box */}
-                  <div style={pitchSixYard} />
                   {lineup.starting.map((p, i) => {
                     if (p.x == null || p.y == null) return null;
                     const isCap = p.isCaptain;
@@ -395,7 +395,7 @@ const pitch = {
   position: "relative" as const,
   width: "100%",
   maxWidth: "320px",
-  height: "300px",
+  height: "480px",
   margin: "0 auto",
   backgroundColor: "#1f7a3a",
   backgroundImage: "linear-gradient(180deg, #1f7a3a 0%, #155e2c 100%)",
@@ -407,38 +407,37 @@ const pitchHalfway = {
   position: "absolute" as const,
   left: 0,
   right: 0,
-  top: 0,
+  top: "50%",
   height: 0,
-  borderTop: "2px solid rgba(255,255,255,0.8)",
+  borderTop: "1px solid rgba(255,255,255,0.7)",
 };
 const pitchCircle = {
   position: "absolute" as const,
   left: "50%",
-  top: 0,
-  width: "70px",
-  height: "35px",
-  marginLeft: "-35px",
-  marginTop: "-18px",
+  top: "50%",
+  width: "60px",
+  height: "60px",
+  marginLeft: "-30px",
+  marginTop: "-30px",
   border: "1px solid rgba(255,255,255,0.7)",
-  borderRadius: "0 0 35px 35px",
-  borderTop: "none",
+  borderRadius: "50%",
+};
+const pitchPenaltyTop = {
+  position: "absolute" as const,
+  left: "20%",
+  top: 0,
+  width: "60%",
+  height: "12%",
+  borderLeft: "1px solid rgba(255,255,255,0.7)",
+  borderRight: "1px solid rgba(255,255,255,0.7)",
+  borderBottom: "1px solid rgba(255,255,255,0.7)",
 };
 const pitchPenaltyBottom = {
   position: "absolute" as const,
-  left: "18%",
+  left: "20%",
   bottom: 0,
-  width: "64%",
-  height: "22%",
-  borderLeft: "1px solid rgba(255,255,255,0.7)",
-  borderRight: "1px solid rgba(255,255,255,0.7)",
-  borderTop: "1px solid rgba(255,255,255,0.7)",
-};
-const pitchSixYard = {
-  position: "absolute" as const,
-  left: "34%",
-  bottom: 0,
-  width: "32%",
-  height: "9%",
+  width: "60%",
+  height: "12%",
   borderLeft: "1px solid rgba(255,255,255,0.7)",
   borderRight: "1px solid rgba(255,255,255,0.7)",
   borderTop: "1px solid rgba(255,255,255,0.7)",
