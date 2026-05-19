@@ -465,52 +465,66 @@ export const refinePlayerReview = createServerFn({ method: "POST" })
       .eq("id", (review as any).player_id)
       .maybeSingle();
 
-    const prompt = `Tu es un coach sportif bienveillant. Tu affines une synthèse existante pour le joueur "${player?.first_name ?? ""} ${player?.last_name ?? ""}".
+    const systemPrompt = `Tu es un coach sportif bienveillant qui affine des synthèses joueurs. Tu DOIS suivre l'instruction du coach à la lettre (nombre de phrases, ton, longueur, format). L'instruction prime sur toute structure par défaut. Tu réponds toujours en français, sans préambule.`;
+
+    const userPrompt = `Joueur : ${player?.first_name ?? ""} ${player?.last_name ?? ""}
 
 --- SYNTHÈSE ACTUELLE ---
 ${(review as any).content}
---- FIN ---
+--- FIN SYNTHÈSE ---
 
-INSTRUCTION DU COACH (priorité absolue, à appliquer littéralement) :
+INSTRUCTION DU COACH (priorité absolue) :
 "${data.instruction}"
 
-Règles :
-- L'instruction du coach prime sur toute structure ou longueur par défaut. Si elle demande "5 phrases", renvoie exactement 5 phrases sans titres ni sections. Si elle demande un ton, une longueur, un format précis, applique-le strictement.
-- Renvoie la synthèse complète mise à jour (pas un diff).
-- Garde un ton constructif et bienveillant.
-- Pas de préambule type "Voici la nouvelle synthèse".
-
-Tu dois répondre UNIQUEMENT avec un objet JSON valide (pas de markdown, pas de \`\`\`), exactement ce format :
-{"content": "<la synthèse mise à jour>", "changes": "<1 à 3 phrases courtes décrivant ce que tu as changé par rapport à l'ancienne version>"}`;
+Renvoie :
+- "content" : la synthèse COMPLÈTE mise à jour selon l'instruction (pas un diff, pas de préambule).
+- "changes" : 1 à 2 phrases courtes décrivant concrètement ce que tu as modifié.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
-    const model = gateway("google/gemini-3-flash-preview");
+    const model = gateway("google/gemini-2.5-flash");
 
     let content: string;
     let changes: string = "";
     try {
-      const { text } = await generateText({ model, prompt });
-      const raw = (text ?? "").trim().replace(/^```(?:json)?\s*|\s*```$/g, "");
-      try {
-        const parsed = JSON.parse(raw);
-        content = String(parsed.content ?? "").trim();
-        changes = String(parsed.changes ?? "").trim();
-        if (!content) content = raw;
-      } catch {
-        content = raw;
-      }
+      const { object } = await generateObject({
+        model,
+        system: systemPrompt,
+        prompt: userPrompt,
+        schema: z.object({
+          content: z.string().min(1),
+          changes: z.string().default(""),
+        }),
+      });
+      content = object.content.trim();
+      changes = (object.changes ?? "").trim();
     } catch (e: any) {
       const msg: string = e?.message ?? "";
+      console.error("[refinePlayerReview] generateObject failed", msg);
       if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
       if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
-      throw new Response("AI generation failed", { status: 500 });
+      // Fallback: plain text generation
+      try {
+        const { text } = await generateText({
+          model,
+          system: systemPrompt,
+          prompt: userPrompt + `\n\nRéponds uniquement avec la nouvelle synthèse, sans aucun commentaire.`,
+        });
+        content = (text ?? "").trim();
+        changes = "";
+        if (!content) throw new Response("empty_ai_response", { status: 500 });
+      } catch (e2: any) {
+        const m2: string = e2?.message ?? "";
+        if (m2.includes("429")) throw new Response("rate_limited", { status: 429 });
+        if (m2.includes("402")) throw new Response("credits_exhausted", { status: 402 });
+        throw new Response("AI generation failed: " + (m2 || msg), { status: 500 });
+      }
     }
 
     const { data: row, error } = await supabase
       .rpc("update_player_review_content" as any, {
         _id: data.reviewId,
         _content: content,
-        _model: "google/gemini-3-flash-preview",
+        _model: "google/gemini-2.5-flash",
       })
       .single();
     if (error) throw new Response(error.message, { status: 500 });
