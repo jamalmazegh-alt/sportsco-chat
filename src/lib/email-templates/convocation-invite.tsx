@@ -197,14 +197,14 @@ const ConvocationInviteEmail = ({
             {lineup.starting && lineup.starting.some((p) => p.x != null && p.y != null) ? (
               <div style={pitchWrap}>
                 <div style={pitch}>
-                  {/* halfway line */}
+                  {/* halfway line (top edge) */}
                   <div style={pitchHalfway} />
-                  {/* center circle */}
+                  {/* center half-circle at top */}
                   <div style={pitchCircle} />
-                  {/* top penalty area */}
-                  <div style={pitchPenaltyTop} />
-                  {/* bottom penalty area */}
+                  {/* bottom penalty area (own goal) */}
                   <div style={pitchPenaltyBottom} />
+                  {/* bottom 6-yard box */}
+                  <div style={pitchSixYard} />
                   {lineup.starting.map((p, i) => {
                     if (p.x == null || p.y == null) return null;
                     const isCap = p.isCaptain;
