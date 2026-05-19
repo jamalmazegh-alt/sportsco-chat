@@ -762,5 +762,36 @@
       "physical": "Physical",
       "technical": "Technical"
     }
+  },
+  "lineup": {
+    "title": "Lineup",
+    "formation": "Formation",
+    "visibility": "Visibility",
+    "includeInConv": "Include in convocation",
+    "available": "Available players",
+    "allPlaced": "All players are placed.",
+    "notCalled": "Not called up",
+    "bench": "Substitutes",
+    "benchEmpty": "Drag players here.",
+    "unsaved": "Unsaved changes",
+    "saveDraft": "Save",
+    "publish": "Publish",
+    "update": "Update",
+    "unpublish": "Unpublish",
+    "published": "Lineup published",
+    "unpublished": "Lineup unpublished",
+    "saved": "Draft saved",
+    "draft": "Draft",
+    "publishedBadge": "Published",
+    "publishedTitle": "Match lineup",
+    "unavailable": "Lineup is only available for football matches.",
+    "captain": "Captain",
+    "gk": "Goalkeeper",
+    "vis": {
+      "draft": "Private draft",
+      "staff": "Staff only",
+      "selected": "Called-up players",
+      "team": "Whole team"
+    }
   }
 }
