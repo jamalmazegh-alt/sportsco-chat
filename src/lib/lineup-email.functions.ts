@@ -10,8 +10,5 @@ export const loadLineupForConvocationEmailFn = createServerFn({ method: "POST" }
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => InputSchema.parse(input))
   .handler(async ({ data, context }): Promise<LineupEmailData | undefined> => {
-    return loadLineupForConvocationEmailServerForCoach(
-      data.eventId,
-      context.userId,
-    );
+    return loadLineupForConvocationEmailServerForCoach(data.eventId, context.userId);
   });
