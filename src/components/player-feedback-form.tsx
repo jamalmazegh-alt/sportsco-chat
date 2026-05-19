@@ -40,6 +40,11 @@ const RATING_LABELS = [
   "feedback.rating3",
   "feedback.rating4",
   "feedback.rating5",
+  "feedback.rating6",
+  "feedback.rating7",
+  "feedback.rating8",
+  "feedback.rating9",
+  "feedback.rating10",
 ];
 
 export function PlayerFeedbackForm({
