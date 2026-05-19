@@ -284,11 +284,6 @@ function LineupPage() {
   }
   if (!ctx.isCoach) return <Navigate to="/events/$eventId" params={{ eventId }} />;
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
-  );
-
   const published = !!lineupData?.lineup?.published_at;
 
   return (
