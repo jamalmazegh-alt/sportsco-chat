@@ -24,26 +24,28 @@ export function ReviewRefineDialog({
   reviewId,
   playerId,
   initialContent,
+  onUpdated,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   reviewId: string;
   playerId: string;
   initialContent: string;
+  onUpdated?: (review: any) => void;
 }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const refineFn = useServerFn(refinePlayerReview);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
+  const [currentContent, setCurrentContent] = useState(initialContent);
   const [busy, setBusy] = useState(false);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const currentContentRef = useRef<string>(initialContent);
 
   useEffect(() => {
     if (open) {
-      currentContentRef.current = initialContent;
+      setCurrentContent(initialContent);
       setTurns([]);
       setInput("");
       setTimeout(() => taRef.current?.focus(), 50);
@@ -64,27 +66,36 @@ export function ReviewRefineDialog({
       const res: any = await refineFn({ data: { reviewId, instruction } });
       const review = res?.review;
       const changes: string = (res?.changes ?? "").trim();
-      if (review) {
-        currentContentRef.current = review.content;
-        qc.setQueryData(["player-reviews", playerId], (current: any) => ({
-          reviews: (current?.reviews ?? []).map((r: any) =>
-            r.id === review.id ? { ...r, ...review } : r
-          ),
-        }));
-        const preview = String(review.content ?? "").slice(0, 220);
-        setTurns((s) => [
-          ...s,
-          {
-            role: "assistant",
-            changes:
-              changes ||
-              t("feedback.refineDoneFallback", {
-                defaultValue: "Synthèse mise à jour selon ta demande.",
-              }),
-            preview,
-          },
-        ]);
-      }
+      if (!review?.content) throw new Error("Réponse IA vide");
+
+      setCurrentContent(review.content);
+      qc.setQueryData(["player-reviews", playerId], (current: any) => {
+        const reviews = Array.isArray(current?.reviews) ? current.reviews : [];
+        const exists = reviews.some((r: any) => r.id === review.id);
+        return {
+          ...(current ?? {}),
+          reviews: exists
+            ? reviews.map((r: any) => (r.id === review.id ? { ...r, ...review } : r))
+            : [review, ...reviews],
+        };
+      });
+      onUpdated?.(review);
+      await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
+
+      const preview = String(review.content ?? "").slice(0, 360);
+      setTurns((s) => [
+        ...s,
+        {
+          role: "assistant",
+          changes:
+            changes ||
+            t("feedback.refineDoneFallback", {
+              defaultValue: "Synthèse mise à jour selon ta demande.",
+            }),
+          preview,
+        },
+      ]);
+      toast.success(t("feedback.refineUpdated", { defaultValue: "Synthèse mise à jour" }));
     } catch (e: any) {
       const msg = e?.message ?? "";
       if (msg.includes("429"))
@@ -153,7 +164,7 @@ export function ReviewRefineDialog({
                 {turn.preview && (
                   <p className="text-xs text-muted-foreground italic line-clamp-3 border-l-2 border-primary/30 pl-2">
                     {turn.preview}
-                    {turn.preview.length >= 220 && "…"}
+                    {turn.preview.length >= 360 && "…"}
                   </p>
                 )}
               </div>
@@ -165,6 +176,15 @@ export function ReviewRefineDialog({
               {t("feedback.refineWorking", { defaultValue: "L'IA réécrit la synthèse…" })}
             </div>
           )}
+        </div>
+
+        <div className="border-t border-border bg-muted/20 px-5 py-3">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {t("feedback.currentSynthesis", { defaultValue: "Synthèse actuelle" })}
+          </p>
+          <p className="max-h-24 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
+            {currentContent}
+          </p>
         </div>
 
         <div className="border-t border-border p-3">

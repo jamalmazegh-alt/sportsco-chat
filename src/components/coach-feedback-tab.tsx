@@ -39,7 +39,7 @@ export function CoachFeedbackTab({
   const genFn = useServerFn(generatePlayerReview);
   const delFb = useServerFn(deletePlayerFeedback);
   const delRv = useServerFn(deletePlayerReview);
-  const [refineTarget, setRefineTarget] = useState<{ id: string; content: string } | null>(null);
+  const [refineTarget, setRefineTarget] = useState<{ id: string; content: string; revision: number } | null>(null);
 
   const { data: fb, isLoading: lFb } = useQuery({
     queryKey: ["player-feedback", playerId],
@@ -153,7 +153,7 @@ export function CoachFeedbackTab({
                     size="sm"
                     variant="outline"
                     className="h-8"
-                    onClick={() => setRefineTarget({ id: r.id, content: r.content })}
+                    onClick={() => setRefineTarget({ id: r.id, content: r.content, revision: Date.now() })}
                   >
                     <Wand2 className="h-3.5 w-3.5" />
                     {t("feedback.refineWithAi", { defaultValue: "Affiner avec l'IA" })}
@@ -311,11 +311,13 @@ export function CoachFeedbackTab({
 
       {refineTarget && (
         <ReviewRefineDialog
+          key={`${refineTarget.id}-${refineTarget.revision}`}
           open={!!refineTarget}
           onOpenChange={(v) => !v && setRefineTarget(null)}
           reviewId={refineTarget.id}
           playerId={playerId}
           initialContent={refineTarget.content}
+          onUpdated={(review) => setRefineTarget((current) => current ? { ...current, content: review.content } : current)}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { generateText, generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 
@@ -37,6 +37,35 @@ type PlayerReviewRow = {
   created_at: string;
   author_user_id: string;
 };
+
+const FRENCH_NUMBER_WORDS: Record<string, number> = {
+  une: 1,
+  un: 1,
+  deux: 2,
+  trois: 3,
+  quatre: 4,
+  cinq: 5,
+  six: 6,
+  sept: 7,
+  huit: 8,
+  neuf: 9,
+  dix: 10,
+};
+
+function getRequestedSentenceCount(instruction: string) {
+  const normalized = instruction.toLowerCase();
+  if (!/phras/.test(normalized)) return null;
+  const digit = normalized.match(/(?:en|dans|sur|de)?\s*(\d{1,2})\s+\w*phras/i)?.[1];
+  if (digit) return Number(digit);
+  const word = normalized.match(/(?:en|dans|sur|de)?\s*(une|un|deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s+\w*phras/i)?.[1];
+  return word ? FRENCH_NUMBER_WORDS[word] ?? null : null;
+}
+
+function splitSentences(content: string) {
+  return (content.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) ?? [])
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+}
 
 const FeedbackInput = z.object({
   playerId: z.string().uuid(),
@@ -465,7 +494,7 @@ export const refinePlayerReview = createServerFn({ method: "POST" })
       .eq("id", (review as any).player_id)
       .maybeSingle();
 
-    const systemPrompt = `Tu es un coach sportif bienveillant qui affine des synthèses joueurs. Tu DOIS suivre l'instruction du coach à la lettre (nombre de phrases, ton, longueur, format). L'instruction prime sur toute structure par défaut. Tu réponds toujours en français, sans préambule.`;
+    const systemPrompt = `Tu es un coach sportif bienveillant qui affine des synthèses joueurs. Tu DOIS suivre l'instruction du coach à la lettre : nombre exact de phrases, ton, longueur, format et angle demandé. L'instruction prime sur toute structure par défaut : si le coach demande un résumé en 5 phrases, tu renvoies exactement 5 phrases et tu supprimes les sections longues. Tu réponds toujours en français, sans préambule.`;
 
     const userPrompt = `Joueur : ${player?.first_name ?? ""} ${player?.last_name ?? ""}
 
@@ -478,28 +507,34 @@ INSTRUCTION DU COACH (priorité absolue) :
 
 Renvoie :
 - "content" : la synthèse COMPLÈTE mise à jour selon l'instruction (pas un diff, pas de préambule).
-- "changes" : 1 à 2 phrases courtes décrivant concrètement ce que tu as modifié.`;
+- "changes" : 1 phrase courte décrivant concrètement ce que tu as modifié, par exemple le nombre de phrases obtenu.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-2.5-flash");
+    const requestedSentenceCount = getRequestedSentenceCount(data.instruction);
 
     let content: string;
     let changes: string = "";
     try {
-      const { object } = await generateObject({
+      const { output, finishReason, rawFinishReason } = await generateText({
         model,
         system: systemPrompt,
         prompt: userPrompt,
-        schema: z.object({
-          content: z.string().min(1),
-          changes: z.string().default(""),
+        maxOutputTokens: 4096,
+        temperature: 0.2,
+        output: Output.object({
+          schema: z.object({
+            content: z.string().min(1),
+            changes: z.string().default(""),
+          }),
         }),
       });
-      content = object.content.trim();
-      changes = (object.changes ?? "").trim();
+      content = output.content.trim();
+      changes = (output.changes ?? "").trim();
+      if (!content) throw new Error(`empty_ai_response:${finishReason}:${rawFinishReason ?? ""}`);
     } catch (e: any) {
       const msg: string = e?.message ?? "";
-      console.error("[refinePlayerReview] generateObject failed", msg);
+      console.error("[refinePlayerReview] structured generation failed", msg);
       if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
       if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
       // Fallback: plain text generation
@@ -508,6 +543,8 @@ Renvoie :
           model,
           system: systemPrompt,
           prompt: userPrompt + `\n\nRéponds uniquement avec la nouvelle synthèse, sans aucun commentaire.`,
+          maxOutputTokens: 4096,
+          temperature: 0.2,
         });
         content = (text ?? "").trim();
         changes = "";
@@ -517,6 +554,16 @@ Renvoie :
         if (m2.includes("429")) throw new Response("rate_limited", { status: 429 });
         if (m2.includes("402")) throw new Response("credits_exhausted", { status: 402 });
         throw new Response("AI generation failed: " + (m2 || msg), { status: 500 });
+      }
+    }
+
+    if (requestedSentenceCount) {
+      const sentences = splitSentences(content);
+      if (sentences.length > requestedSentenceCount) {
+        content = sentences.slice(0, requestedSentenceCount).join(" ");
+        changes = `J'ai réduit la synthèse à ${requestedSentenceCount} phrases comme demandé.`;
+      } else if (!changes) {
+        changes = `J'ai reformulé la synthèse en ${sentences.length} phrase${sentences.length > 1 ? "s" : ""}.`;
       }
     }
 
