@@ -1439,36 +1439,8 @@ function EventDetail() {
         />
       )}
 
-      {/* Coach: send convocations */}
-      {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
-        <Button onClick={() => openPicker()} className="w-full h-11">
-          <Send className="h-4 w-4" />
-          {t("events.sendConvocations")}
-        </Button>
-      )}
-      {isCoach && event.status !== "cancelled" && event.convocations_sent && (
-        <div className="space-y-2">
-          <p className="text-xs text-center text-muted-foreground">
-            ✓ {t("events.convocationsSent")}
-          </p>
-          {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
-            <Button onClick={() => openPicker()} variant="outline" className="w-full h-10">
-              <Send className="h-4 w-4" />
-              {t("attendance.addMorePlayers")}
-            </Button>
-          )}
-          <Button
-            onClick={() => setResendOpen(true)}
-            variant={convocChanges.length > 0 ? "default" : "outline"}
-            className="w-full h-10"
-          >
-            <Send className="h-4 w-4" />
-            {convocChanges.length > 0
-              ? `Renvoyer (mise à jour · ${convocChanges.length})`
-              : "Renvoyer la convocation"}
-          </Button>
-        </div>
-      )}
+      {/* Convocation CTAs moved into the unified Convocation card below */}
+
 
       {/* Coach: reschedule event */}
       {isCoach && event.status !== "cancelled" && (
