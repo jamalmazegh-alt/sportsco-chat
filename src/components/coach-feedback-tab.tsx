@@ -39,39 +39,7 @@ export function CoachFeedbackTab({
   const genFn = useServerFn(generatePlayerReview);
   const delFb = useServerFn(deletePlayerFeedback);
   const delRv = useServerFn(deletePlayerReview);
-  const refineFn = useServerFn(refinePlayerReview);
-  const [refineInputs, setRefineInputs] = useState<Record<string, string>>({});
-  const [refineBusy, setRefineBusy] = useState<Record<string, boolean>>({});
-
-  async function onRefine(reviewId: string) {
-    const instruction = (refineInputs[reviewId] ?? "").trim();
-    if (instruction.length < 2) return;
-    setRefineBusy((s) => ({ ...s, [reviewId]: true }));
-    try {
-      const res = await refineFn({ data: { reviewId, instruction } });
-      if (res?.review) {
-        const review = res.review as any;
-        qc.setQueryData(["player-reviews", playerId], (current: any) => ({
-          reviews: (current?.reviews ?? []).map((r: any) =>
-            r.id === review.id ? { ...r, ...review } : r
-          ),
-        }));
-      }
-      setRefineInputs((s) => ({ ...s, [reviewId]: "" }));
-      const changes = (res as any)?.changes?.trim();
-      toast.success(
-        t("feedback.reviewRefined", { defaultValue: "Synthèse affinée" }),
-        changes ? { description: changes, duration: 8000 } : undefined
-      );
-    } catch (e: any) {
-      const msg = e?.message ?? "";
-      if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes." }));
-      else if (msg.includes("402")) toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
-      else toast.error(msg || "Error");
-    } finally {
-      setRefineBusy((s) => ({ ...s, [reviewId]: false }));
-    }
-  }
+  const [refineTarget, setRefineTarget] = useState<{ id: string; content: string } | null>(null);
 
   const { data: fb, isLoading: lFb } = useQuery({
     queryKey: ["player-feedback", playerId],
