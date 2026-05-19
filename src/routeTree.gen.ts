@@ -67,6 +67,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
+import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
 
@@ -372,6 +373,12 @@ const ApiPublicHooksDataRetentionRoute =
     path: '/api/public/hooks/data-retention',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedPlayersPlayerIdFeedbackRoute =
+  AuthenticatedPlayersPlayerIdFeedbackRouteImport.update({
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
 const AuthenticatedEventsEventIdFeedbackRoute =
   AuthenticatedEventsEventIdFeedbackRouteImport.update({
     id: '/feedback',
@@ -422,7 +429,7 @@ export interface FileRoutesByFullPath {
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
-  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
@@ -437,6 +444,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
@@ -480,7 +488,7 @@ export interface FileRoutesByTo {
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
-  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
@@ -495,6 +503,7 @@ export interface FileRoutesByTo {
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
@@ -543,7 +552,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
-  '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
@@ -558,6 +567,7 @@ export interface FileRoutesById {
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
@@ -621,6 +631,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
+    | '/players/$playerId/feedback'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
@@ -679,6 +690,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
+    | '/players/$playerId/feedback'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
@@ -741,6 +753,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
+    | '/_authenticated/players/$playerId/feedback'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
@@ -1193,6 +1206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDataRetentionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/players/$playerId/feedback': {
+      id: '/_authenticated/players/$playerId/feedback'
+      path: '/feedback'
+      fullPath: '/players/$playerId/feedback'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
     '/_authenticated/events/$eventId/feedback': {
       id: '/_authenticated/events/$eventId/feedback'
       path: '/feedback'
@@ -1291,6 +1311,21 @@ const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
 const AuthenticatedTeamsRouteWithChildren =
   AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
 
+interface AuthenticatedPlayersPlayerIdRouteChildren {
+  AuthenticatedPlayersPlayerIdFeedbackRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+}
+
+const AuthenticatedPlayersPlayerIdRouteChildren: AuthenticatedPlayersPlayerIdRouteChildren =
+  {
+    AuthenticatedPlayersPlayerIdFeedbackRoute:
+      AuthenticatedPlayersPlayerIdFeedbackRoute,
+  }
+
+const AuthenticatedPlayersPlayerIdRouteWithChildren =
+  AuthenticatedPlayersPlayerIdRoute._addFileChildren(
+    AuthenticatedPlayersPlayerIdRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
@@ -1301,7 +1336,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
-  AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRoute
+  AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -1314,7 +1349,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
-  AuthenticatedPlayersPlayerIdRoute: AuthenticatedPlayersPlayerIdRoute,
+  AuthenticatedPlayersPlayerIdRoute:
+    AuthenticatedPlayersPlayerIdRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

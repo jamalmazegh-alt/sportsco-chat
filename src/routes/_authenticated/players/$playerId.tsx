@@ -1,7 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { AttendanceHeatmap } from "@/components/attendance-heatmap";
-import { CoachFeedbackTab } from "@/components/coach-feedback-tab";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -17,7 +16,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send } from "lucide-react";
+import { ChevronLeft, Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
@@ -43,6 +42,8 @@ function PlayerProfile() {
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isFeedback = pathname === `/players/${playerId}/feedback`;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -384,6 +385,42 @@ function PlayerProfile() {
         )}
       </div>
 
+      {/* Tabs */}
+      {isCoach && (
+        <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1">
+          <Link
+            to="/players/$playerId"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors",
+              !isFeedback
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <User className="h-3.5 w-3.5" />
+            {t("players.tabProfile", { defaultValue: "Profil" })}
+          </Link>
+          <Link
+            to="/players/$playerId/feedback"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors",
+              isFeedback
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <ClipboardList className="h-3.5 w-3.5" />
+            {t("players.tabFeedback", { defaultValue: "Retours coach" })}
+          </Link>
+        </div>
+      )}
+
+      {isFeedback ? (
+        <Outlet />
+      ) : (
+      <>
       <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("players.details")}
@@ -480,7 +517,6 @@ function PlayerProfile() {
 
       {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
       {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
-      {canSeePrivate && <CoachFeedbackTab playerId={player.id} isCoach={isCoach} />}
 
       {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
       {minor && (isParentOfThisPlayer || isCoach) && (
@@ -604,6 +640,8 @@ function PlayerProfile() {
           </form>
         )}
       </div>
+      )}
+      </>
       )}
 
       <span className="sr-only">{activeClubId}</span>
