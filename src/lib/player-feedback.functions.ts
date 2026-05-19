@@ -38,6 +38,35 @@ type PlayerReviewRow = {
   author_user_id: string;
 };
 
+const FRENCH_NUMBER_WORDS: Record<string, number> = {
+  une: 1,
+  un: 1,
+  deux: 2,
+  trois: 3,
+  quatre: 4,
+  cinq: 5,
+  six: 6,
+  sept: 7,
+  huit: 8,
+  neuf: 9,
+  dix: 10,
+};
+
+function getRequestedSentenceCount(instruction: string) {
+  const normalized = instruction.toLowerCase();
+  if (!/phras/.test(normalized)) return null;
+  const digit = normalized.match(/(?:en|dans|sur|de)?\s*(\d{1,2})\s+\w*phras/i)?.[1];
+  if (digit) return Number(digit);
+  const word = normalized.match(/(?:en|dans|sur|de)?\s*(une|un|deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s+\w*phras/i)?.[1];
+  return word ? FRENCH_NUMBER_WORDS[word] ?? null : null;
+}
+
+function splitSentences(content: string) {
+  return (content.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) ?? [])
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+}
+
 const FeedbackInput = z.object({
   playerId: z.string().uuid(),
   eventId: z.string().uuid().nullish(),
