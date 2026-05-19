@@ -17,6 +17,7 @@ import {
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
 import { AttachmentList, type Attachment } from "@/components/attachments";
+import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
