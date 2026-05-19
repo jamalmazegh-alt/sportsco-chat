@@ -1271,7 +1271,7 @@ function EventDetail() {
           </div>
           {teams && (isCoach || showFeedbackButton) && (
             <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
-              {isCoach && event.type === "match" && teams?.[0]?.sport === "football" && (
+              {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toLowerCase().trim(); return s === "" || s === "football" || s === "foot" || s === "soccer"; })() && (
                 <Link
                   to="/events/$eventId/lineup"
                   params={{ eventId }}
