@@ -17,6 +17,7 @@ import {
 import { ConvocationDetailDialog } from "@/components/convocation-detail-dialog";
 import { EventChat } from "@/components/event-chat";
 import { AttachmentList, type Attachment } from "@/components/attachments";
+import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -1269,7 +1270,18 @@ function EventDetail() {
             )}
           </div>
           {teams && (isCoach || showFeedbackButton) && (
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+              {isCoach && event.type === "match" && teams?.[0]?.sport === "football" && (
+                <Link
+                  to="/events/$eventId/lineup"
+                  params={{ eventId }}
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-8 gap-1.5 px-2.5")}
+                  title={t("lineup.title", { defaultValue: "Composition" })}
+                >
+                  <CircleDot className="h-4 w-4" />
+                  <span>{t("lineup.title", { defaultValue: "Composition" })}</span>
+                </Link>
+              )}
               {showFeedbackButton && (
                 <Link
                   to="/events/$eventId/feedback"
@@ -1368,6 +1380,12 @@ function EventDetail() {
             ) : null;
           })()}
         </div>
+        {event.type === "match" && teams?.[0]?.sport === "football" && (
+          <div className="mt-4">
+            <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
+          </div>
+        )}
+
         {event.status === "cancelled" && (
           <div className="relative mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
             <div className="flex items-center gap-2 text-destructive font-semibold text-sm">

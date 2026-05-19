@@ -427,6 +427,60 @@ export type Database = {
         }
         Relationships: []
       }
+      event_lineups: {
+        Row: {
+          bench: Json
+          captain_player_id: string | null
+          club_id: string
+          created_at: string
+          created_by: string
+          event_id: string
+          formation: string
+          gk_player_id: string | null
+          id: string
+          include_in_convocation: boolean
+          published_at: string | null
+          slots: Json
+          team_id: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["lineup_visibility"]
+        }
+        Insert: {
+          bench?: Json
+          captain_player_id?: string | null
+          club_id: string
+          created_at?: string
+          created_by: string
+          event_id: string
+          formation?: string
+          gk_player_id?: string | null
+          id?: string
+          include_in_convocation?: boolean
+          published_at?: string | null
+          slots?: Json
+          team_id: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["lineup_visibility"]
+        }
+        Update: {
+          bench?: Json
+          captain_player_id?: string | null
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          event_id?: string
+          formation?: string
+          gk_player_id?: string | null
+          id?: string
+          include_in_convocation?: boolean
+          published_at?: string | null
+          slots?: Json
+          team_id?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["lineup_visibility"]
+        }
+        Relationships: []
+      }
       event_messages: {
         Row: {
           attachments: Json
@@ -1678,6 +1732,7 @@ export type Database = {
         | "share_summary"
         | "parent_summary"
         | "player_summary"
+      lineup_visibility: "draft" | "staff" | "selected_players" | "team"
       media_consent_status: "pending" | "granted" | "denied"
       privacy_request_status:
         | "pending"
@@ -1843,6 +1898,7 @@ export const Constants = {
         "parent_summary",
         "player_summary",
       ],
+      lineup_visibility: ["draft", "staff", "selected_players", "team"],
       media_consent_status: ["pending", "granted", "denied"],
       privacy_request_status: [
         "pending",

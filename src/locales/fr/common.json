@@ -762,5 +762,36 @@
       "physical": "Physique",
       "technical": "Technique"
     }
+  },
+  "lineup": {
+    "title": "Composition",
+    "formation": "Formation",
+    "visibility": "Visibilité",
+    "includeInConv": "Inclure dans la convocation",
+    "available": "Joueurs disponibles",
+    "allPlaced": "Tous les joueurs sont placés.",
+    "notCalled": "Non convoqué",
+    "bench": "Remplaçants",
+    "benchEmpty": "Glissez des joueurs ici.",
+    "unsaved": "Modifications non enregistrées",
+    "saveDraft": "Enregistrer",
+    "publish": "Publier",
+    "update": "Mettre à jour",
+    "unpublish": "Retirer",
+    "published": "Composition publiée",
+    "unpublished": "Composition retirée",
+    "saved": "Brouillon enregistré",
+    "draft": "Brouillon",
+    "publishedBadge": "Publiée",
+    "publishedTitle": "Composition prévue",
+    "unavailable": "La composition est disponible uniquement pour les matchs de football.",
+    "captain": "Capitaine",
+    "gk": "Gardien",
+    "vis": {
+      "draft": "Brouillon privé",
+      "staff": "Staff uniquement",
+      "selected": "Joueurs convoqués",
+      "team": "Toute l'équipe"
+    }
   }
 }

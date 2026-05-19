@@ -68,6 +68,7 @@ import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
+import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
 
@@ -379,6 +380,12 @@ const AuthenticatedPlayersPlayerIdFeedbackRoute =
     path: '/feedback',
     getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
   } as any)
+const AuthenticatedEventsEventIdLineupRoute =
+  AuthenticatedEventsEventIdLineupRouteImport.update({
+    id: '/lineup',
+    path: '/lineup',
+    getParentRoute: () => AuthenticatedEventsEventIdRoute,
+  } as any)
 const AuthenticatedEventsEventIdFeedbackRoute =
   AuthenticatedEventsEventIdFeedbackRouteImport.update({
     id: '/feedback',
@@ -444,6 +451,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -503,6 +511,7 @@ export interface FileRoutesByTo {
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -567,6 +576,7 @@ export interface FileRoutesById {
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -631,6 +641,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
+    | '/events/$eventId/lineup'
     | '/players/$playerId/feedback'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -690,6 +701,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
+    | '/events/$eventId/lineup'
     | '/players/$playerId/feedback'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -753,6 +765,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
+    | '/_authenticated/events/$eventId/lineup'
     | '/_authenticated/players/$playerId/feedback'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1213,6 +1226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRouteImport
       parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
     }
+    '/_authenticated/events/$eventId/lineup': {
+      id: '/_authenticated/events/$eventId/lineup'
+      path: '/lineup'
+      fullPath: '/events/$eventId/lineup'
+      preLoaderRoute: typeof AuthenticatedEventsEventIdLineupRouteImport
+      parentRoute: typeof AuthenticatedEventsEventIdRoute
+    }
     '/_authenticated/events/$eventId/feedback': {
       id: '/_authenticated/events/$eventId/feedback'
       path: '/feedback'
@@ -1261,12 +1281,15 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedEventsEventIdRouteChildren {
   AuthenticatedEventsEventIdFeedbackRoute: typeof AuthenticatedEventsEventIdFeedbackRoute
+  AuthenticatedEventsEventIdLineupRoute: typeof AuthenticatedEventsEventIdLineupRoute
 }
 
 const AuthenticatedEventsEventIdRouteChildren: AuthenticatedEventsEventIdRouteChildren =
   {
     AuthenticatedEventsEventIdFeedbackRoute:
       AuthenticatedEventsEventIdFeedbackRoute,
+    AuthenticatedEventsEventIdLineupRoute:
+      AuthenticatedEventsEventIdLineupRoute,
   }
 
 const AuthenticatedEventsEventIdRouteWithChildren =
@@ -1431,13 +1454,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
