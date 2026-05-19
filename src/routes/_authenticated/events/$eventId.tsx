@@ -1271,7 +1271,7 @@ function EventDetail() {
           </div>
           {teams && (isCoach || showFeedbackButton) && (
             <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
-              {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toLowerCase().trim(); return s === "" || s === "football" || s === "foot" || s === "soccer"; })() && (
+              {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
                 <Link
                   to="/events/$eventId/lineup"
                   params={{ eventId }}
@@ -1380,7 +1380,7 @@ function EventDetail() {
             ) : null;
           })()}
         </div>
-        {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toLowerCase().trim(); return s === "" || s === "football" || s === "foot" || s === "soccer"; })() && (
+        {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
           <div className="mt-4">
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>

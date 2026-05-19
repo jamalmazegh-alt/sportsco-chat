@@ -54,7 +54,10 @@ export const upsertLineup = createServerFn({ method: "POST" })
     if (!event) throw new Error("Event not found");
     const team = (event as any).teams;
     if (!team) throw new Error("Team not found");
-    if (team.sport !== "football") throw new Error("Lineup only available for football");
+    const sport = (team.sport ?? "").toString().toLowerCase().trim();
+    if (sport !== "football" && sport !== "foot" && sport !== "soccer") {
+      throw new Error("Lineup only available for football");
+    }
 
     const payload = {
       event_id: data.eventId,
