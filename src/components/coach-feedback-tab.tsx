@@ -257,11 +257,11 @@ export function CoachFeedbackTab({
 
                 {f.rating && (
                   <div className="flex items-center gap-0.5 text-amber-500">
-                    {[1, 2, 3, 4, 5].map((n) => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                       <Star
                         key={n}
                         className={cn(
-                          "h-3.5 w-3.5",
+                          "h-3 w-3",
                           n <= f.rating ? "fill-current" : "text-muted-foreground/30"
                         )}
                       />
