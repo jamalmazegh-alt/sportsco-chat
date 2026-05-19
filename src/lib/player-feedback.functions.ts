@@ -522,9 +522,7 @@ ${(review as any).content}
 INSTRUCTION DU COACH (priorité absolue) :
 "${data.instruction}"
 
-Renvoie :
-- "content" : la synthèse COMPLÈTE mise à jour selon l'instruction (pas un diff, pas de préambule).
-- "changes" : 1 phrase courte décrivant concrètement ce que tu as modifié, par exemple le nombre de phrases obtenu.`;
+Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas de diff, pas de commentaire, pas de JSON.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-2.5-flash");
@@ -550,7 +548,13 @@ Renvoie :
       console.error("[refinePlayerReview] generation failed", msg);
       if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
       if (msg.includes("402")) throw new Response("credits_exhausted", { status: 402 });
+      if (requestedSentenceCount) {
+        content = locallyLimitSentences((review as any).content, requestedSentenceCount);
+        changes = `L'IA n'a pas répondu correctement, j'ai quand même réduit la synthèse à ${requestedSentenceCount} phrases.`;
+        if (!content) throw new Response("AI generation failed: " + msg, { status: 500 });
+      } else {
       throw new Response("AI generation failed: " + msg, { status: 500 });
+      }
     }
 
     if (requestedSentenceCount) {
