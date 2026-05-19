@@ -26,6 +26,18 @@ export const VISIBILITY_VALUES = [
 const FeedbackVisibility = z.enum(VISIBILITY_VALUES);
 const ReviewKind = z.enum(["end_of_season", "meeting", "development", "coaching"]);
 
+type PlayerReviewRow = {
+  id: string;
+  kind: string;
+  period_start: string | null;
+  period_end: string | null;
+  content: string;
+  visibility: string;
+  model: string | null;
+  created_at: string;
+  author_user_id: string;
+};
+
 const FeedbackInput = z.object({
   playerId: z.string().uuid(),
   eventId: z.string().uuid().nullish(),
@@ -145,7 +157,7 @@ export const updatePlayerFeedback = createServerFn({ method: "POST" })
     if (data.sharedSummary !== undefined) patch.shared_summary = data.sharedSummary;
     const { data: current, error: currentError } = await supabase
       .from("player_feedback" as any)
-      .select("player_id, event_id")
+      .select("player_id, event_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary")
       .eq("id", data.id)
       .maybeSingle();
     if (currentError || !current) throw new Response("Retour introuvable", { status: 404 });
@@ -155,14 +167,14 @@ export const updatePlayerFeedback = createServerFn({ method: "POST" })
         _id: data.id,
         _player_id: (current as any).player_id,
         _event_id: (current as any).event_id ?? null,
-        _rating: patch.rating ?? null,
-        _comment: patch.comment ?? null,
-        _dev_notes: patch.dev_notes ?? null,
-        _strengths: patch.strengths ?? null,
-        _improvements: patch.improvements ?? null,
-        _tags: patch.tags ?? [],
-        _visibility: patch.visibility ?? "coach_only",
-        _shared_summary: patch.shared_summary ?? null,
+        _rating: patch.rating ?? (current as any).rating ?? null,
+        _comment: patch.comment ?? (current as any).comment ?? null,
+        _dev_notes: patch.dev_notes ?? (current as any).dev_notes ?? null,
+        _strengths: patch.strengths ?? (current as any).strengths ?? null,
+        _improvements: patch.improvements ?? (current as any).improvements ?? null,
+        _tags: patch.tags ?? (current as any).tags ?? [],
+        _visibility: patch.visibility ?? (current as any).visibility ?? "coach_only",
+        _shared_summary: patch.shared_summary ?? (current as any).shared_summary ?? null,
       })
       .single();
     if (error) throw new Response(error.message, { status: 400 });
@@ -402,7 +414,7 @@ Consignes de rédaction :
       })
       .single();
     if (error) throw new Response(error.message, { status: 500 });
-    return { review: row };
+    return { review: row as PlayerReviewRow };
   });
 
 export const deletePlayerReview = createServerFn({ method: "POST" })
