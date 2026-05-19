@@ -1269,7 +1269,18 @@ function EventDetail() {
             )}
           </div>
           {teams && (isCoach || showFeedbackButton) && (
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-1 shrink-0 flex-wrap justify-end">
+              {isCoach && event.type === "match" && teams?.[0]?.sport === "football" && (
+                <Link
+                  to="/events/$eventId/lineup"
+                  params={{ eventId }}
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-8 gap-1.5 px-2.5")}
+                  title={t("lineup.title", { defaultValue: "Composition" })}
+                >
+                  <CircleDot className="h-4 w-4" />
+                  <span>{t("lineup.title", { defaultValue: "Composition" })}</span>
+                </Link>
+              )}
               {showFeedbackButton && (
                 <Link
                   to="/events/$eventId/feedback"
