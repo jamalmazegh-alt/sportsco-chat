@@ -5,8 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot,
+  ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import {
   buildConvocationMessage,
@@ -1436,36 +1439,8 @@ function EventDetail() {
         />
       )}
 
-      {/* Coach: send convocations */}
-      {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
-        <Button onClick={() => openPicker()} className="w-full h-11">
-          <Send className="h-4 w-4" />
-          {t("events.sendConvocations")}
-        </Button>
-      )}
-      {isCoach && event.status !== "cancelled" && event.convocations_sent && (
-        <div className="space-y-2">
-          <p className="text-xs text-center text-muted-foreground">
-            ✓ {t("events.convocationsSent")}
-          </p>
-          {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
-            <Button onClick={() => openPicker()} variant="outline" className="w-full h-10">
-              <Send className="h-4 w-4" />
-              {t("attendance.addMorePlayers")}
-            </Button>
-          )}
-          <Button
-            onClick={() => setResendOpen(true)}
-            variant={convocChanges.length > 0 ? "default" : "outline"}
-            className="w-full h-10"
-          >
-            <Send className="h-4 w-4" />
-            {convocChanges.length > 0
-              ? `Renvoyer (mise à jour · ${convocChanges.length})`
-              : "Renvoyer la convocation"}
-          </Button>
-        </div>
-      )}
+      {/* Convocation CTAs moved into the unified Convocation card below */}
+
 
       {/* Coach: reschedule event */}
       {isCoach && event.status !== "cancelled" && (
@@ -1890,45 +1865,8 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* My response (player/parent) */}
-      {visibleMyConvocs.length > 0 && (
-        <section id="my-response" className="space-y-3 scroll-mt-20">
-          {visibleMyConvocs.map((c: any) => (
-            <div key={c.id} className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-sm font-medium mb-3">
-                {t("attendance.respondPrompt")}{" "}
-                <span className="text-muted-foreground font-normal">
-                  · {c.players?.first_name} {c.players?.last_name}
-                </span>
-              </p>
-              {event.responses_locked ? (
-                <p className="text-xs text-muted-foreground">{t("attendance.responsesLocked")}</p>
-              ) : (
-                <div className="grid grid-cols-3 gap-2">
-                  {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => respond(c.id, s)}
-                      className={cn(
-                        "rounded-xl py-3 text-sm font-semibold transition-all active:scale-95",
-                        c.status === s
-                          ? s === "present"
-                            ? "bg-present text-present-foreground"
-                            : s === "absent"
-                              ? "bg-absent text-absent-foreground"
-                              : "bg-uncertain text-uncertain-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-accent"
-                      )}
-                    >
-                      {t(`attendance.${s}`)}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
-      )}
+      {/* "My response" merged into the unified Convocation card below */}
+
 
       {/* Match result + scorers (matches only) */}
       {event.type === "match" && (
@@ -1944,152 +1882,267 @@ function EventDetail() {
         />
       )}
 
-      {/* Attendance board (visible to all team viewers once convocations are sent) */}
-      {event.convocations_sent && (
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              {isCoach ? t("attendance.title") : t("attendance.convokedPlayers")}
-            </h2>
-            {isCoach && (
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8"
-                  onClick={() => {
-                    const rows = (convocations ?? []).map((c: any) => ({
-                      last_name: c.players?.last_name ?? "",
-                      first_name: c.players?.first_name ?? "",
-                      jersey_number: c.players?.jersey_number ?? "",
-                      status: c.status,
-                      comment: c.comment ?? "",
-                    }));
-                    const csv = toCsv(rows, [
-                      { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
-                      { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
-                      { key: "jersey_number", header: "#" },
-                      { key: "status", header: t("attendance.status", { defaultValue: "Status" }) },
-                      { key: "comment", header: t("common.comment", { defaultValue: "Comment" }) },
-                    ]);
-                    downloadCsv(`${event.title}-attendance`, csv);
-                  }}
-                  aria-label={t("common.exportCsv", { defaultValue: "Export CSV" })}
-                >
-                  <Download className="h-3.5 w-3.5" />
-                </Button>
-                <Button size="sm" variant="outline" className="h-8" onClick={remindAllPending}>
-                  <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
-                </Button>
-                <Button size="sm" variant="outline" className="h-8" onClick={toggleLock}>
-                  {event.responses_locked ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {isCoach && (
-            <div className="grid grid-cols-4 gap-1.5 mb-3">
-              <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present-foreground border-present/30" />
-              <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain/15 text-uncertain-foreground border-uncertain/30" />
-              <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent/10 text-absent border-absent/30" />
-              <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending/40 text-pending-foreground border-border" />
+      {/* === Unified Convocation card === */}
+      {(event.convocations_sent || (isCoach && event.status !== "cancelled") || visibleMyConvocs.length > 0) && (
+        <section id="my-response" className="rounded-2xl border border-border bg-card overflow-hidden scroll-mt-20">
+          {/* Header */}
+          <header className="flex items-start justify-between gap-3 px-4 py-3 border-b border-border">
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold leading-tight">
+                {t("attendance.title", { defaultValue: "Convocation" })}
+              </h2>
+              {event.convocations_sent ? (
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+                  <span>
+                    {(convocations?.length ?? 0) - counts.pending}/{convocations?.length ?? 0}{" "}
+                    {t("attendance.responded", { defaultValue: "réponses" })}
+                  </span>
+                  {event.responses_locked && (
+                    <span className="inline-flex items-center gap-0.5 text-pending-foreground">
+                      · <Lock className="h-3 w-3" />
+                    </span>
+                  )}
+                  {convocChanges.length > 0 && (
+                    <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-900 px-1.5 py-0.5 text-[10px] font-semibold">
+                      {convocChanges.length} màj
+                    </span>
+                  )}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("attendance.notSentYet", { defaultValue: "Pas encore envoyée" })}
+                </p>
+              )}
             </div>
-          )}
+            {isCoach && event.status !== "cancelled" && event.convocations_sent && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 -mt-1 -mr-1 shrink-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {counts.pending > 0 && (
+                    <DropdownMenuItem onClick={remindAllPending}>
+                      <Bell className="h-4 w-4" /> {t("attendance.remindAll")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={() => setResendOpen(true)}>
+                    <Send className="h-4 w-4" />
+                    {convocChanges.length > 0
+                      ? `Renvoyer (${convocChanges.length} màj)`
+                      : "Renvoyer la convocation"}
+                  </DropdownMenuItem>
+                  {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
+                    <DropdownMenuItem onClick={() => openPicker()}>
+                      <UserPlus className="h-4 w-4" /> {t("attendance.addMorePlayers")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={toggleLock}>
+                    {event.responses_locked ? (
+                      <><Unlock className="h-4 w-4" /> Déverrouiller les réponses</>
+                    ) : (
+                      <><Lock className="h-4 w-4" /> Verrouiller les réponses</>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      const rows = (convocations ?? []).map((c: any) => ({
+                        last_name: c.players?.last_name ?? "",
+                        first_name: c.players?.first_name ?? "",
+                        jersey_number: c.players?.jersey_number ?? "",
+                        status: c.status,
+                        comment: c.comment ?? "",
+                      }));
+                      const csv = toCsv(rows, [
+                        { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
+                        { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                        { key: "jersey_number", header: "#" },
+                        { key: "status", header: t("attendance.status", { defaultValue: "Status" }) },
+                        { key: "comment", header: t("common.comment", { defaultValue: "Comment" }) },
+                      ]);
+                      downloadCsv(`${event.title}-attendance`, csv);
+                    }}
+                  >
+                    <Download className="h-4 w-4" /> {t("common.exportCsv", { defaultValue: "Export CSV" })}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </header>
 
-          {isCoach && counts.pending > 0 && (
-            <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
-              <p className="text-xs font-medium text-pending-foreground">
-                {t("attendance.pendingCount", { count: counts.pending })}
-              </p>
-              <Button size="sm" className="h-8" onClick={remindAllPending}>
-                <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
+          {/* Coach: send convocations the first time */}
+          {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
+            <div className="p-4">
+              <Button onClick={() => openPicker()} className="w-full h-11">
+                <Send className="h-4 w-4" />
+                {t("events.sendConvocations")}
               </Button>
             </div>
           )}
 
-          {convocations && convocations.length === 0 ? (
-            <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-              {t("attendance.noConvokedPlayers")}
-            </div>
-          ) : (
-            <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-              {sortedConvocations.map((c: any) => (
-                <li key={c.id} className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
-                      {c.players?.photo_url ? (
-                        <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
+          {/* My response — big colored icon + label buttons */}
+          {visibleMyConvocs.length > 0 && (
+            <div className="px-4 py-4 space-y-4 border-b border-border">
+              {visibleMyConvocs.map((c: any) => {
+                const playerLabel = `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim();
+                return (
+                  <div key={c.id}>
+                    <p className="text-sm font-medium mb-2.5">
+                      {visibleMyConvocs.length > 1 ? (
+                        <>
+                          {t("attendance.respondPrompt")}
+                          <span className="text-muted-foreground font-normal"> · {playerLabel}</span>
+                        </>
                       ) : (
-                        <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
-                          {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
-                        </div>
+                        t("attendance.respondPrompt")
                       )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate leading-tight">
-                        {c.players?.first_name} {c.players?.last_name}
-                        {c.players?.jersey_number ? (
-                          <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
-                        ) : null}
-                      </p>
-                      {c.comment && (isCoach || c.players?.user_id === user?.id) && (
-                        <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex w-full items-center gap-1 shrink-0 sm:w-auto">
-                    {isCoach ? (
-                      <>
-                        <div className="grid flex-1 grid-cols-3 gap-1 rounded-xl border bg-background/80 p-1 sm:flex sm:flex-none sm:rounded-full sm:gap-0.5 sm:p-0.5">
-                          {ATTENDANCE_ACTIONS.filter(a => a.status !== "pending").map(({ status, Icon, className }) => (
-                            <Button
-                              key={status}
-                              type="button"
-                              size="sm"
-                              variant="ghost"
-                              className={cn(
-                                "h-8 min-w-0 rounded-lg px-1.5 text-[11px] sm:h-7 sm:rounded-full sm:px-2",
-                                c.status === status
-                                  ? status === "present" ? "bg-present text-present-foreground hover:bg-present hover:text-present-foreground"
-                                    : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
-                                    : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
-                                  : className,
-                              )}
-                              onClick={() => coachChangeStatus(c, status)}
-                              title={t(`attendance.${status}`)}
-                              aria-label={t(`attendance.${status}`)}
-                            >
-                              <Icon className="h-4 w-4" />
-                              <span className="truncate">{t(`attendance.${status}`)}</span>
-                            </Button>
-                          ))}
-                        </div>
-                        {c.status === "pending" && (
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-pending-foreground" onClick={() => remind(c.id)} title={t("attendance.remind")}>
-                            <Bell className="h-3.5 w-3.5" />
-                          </Button>
-                        )}
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-muted-foreground"
-                          onClick={() => setDetailConvocId(c.id)}
-                          title={t("attendance.details")}
-                        >
-                          <Info className="h-3.5 w-3.5" />
-                        </Button>
-                      </>
+                    </p>
+                    {event.responses_locked ? (
+                      <p className="text-xs text-muted-foreground">{t("attendance.responsesLocked")}</p>
                     ) : (
-                      <AttendancePill status={c.status} />
+                      <div className="grid grid-cols-3 gap-2">
+                        {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
+                          const Icon = s === "present" ? CheckCircle2 : s === "absent" ? XCircle : HelpCircle;
+                          const active = c.status === s;
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => respond(c.id, s)}
+                              className={cn(
+                                "flex flex-col items-center justify-center gap-1.5 rounded-xl py-3.5 border-2 transition-all active:scale-95",
+                                active
+                                  ? s === "present"
+                                    ? "bg-present text-present-foreground border-present shadow-sm"
+                                    : s === "absent"
+                                      ? "bg-absent text-white border-absent shadow-sm"
+                                      : "bg-uncertain text-uncertain-foreground border-uncertain shadow-sm"
+                                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                              )}
+                            >
+                              <Icon className="h-6 w-6" />
+                              <span className="text-xs font-semibold">{t(`attendance.${s}`)}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Stats + players list (visible once convocations are sent) */}
+          {event.convocations_sent && (
+            <>
+              {isCoach && (
+                <div className="grid grid-cols-4 gap-1.5 px-4 pt-3">
+                  <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present-foreground border-present/30" />
+                  <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain/15 text-uncertain-foreground border-uncertain/30" />
+                  <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent/10 text-absent border-absent/30" />
+                  <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending/40 text-pending-foreground border-border" />
+                </div>
+              )}
+
+              {isCoach && counts.pending > 0 && (
+                <div className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
+                  <p className="text-xs font-medium text-pending-foreground">
+                    {t("attendance.pendingCount", { count: counts.pending })}
+                  </p>
+                  <Button size="sm" className="h-8" onClick={remindAllPending}>
+                    <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
+                  </Button>
+                </div>
+              )}
+
+              {convocations && convocations.length === 0 ? (
+                <div className="p-6 text-center text-sm text-muted-foreground">
+                  {t("attendance.noConvokedPlayers")}
+                </div>
+              ) : (
+                <ul className="mt-3 divide-y divide-border border-t border-border">
+                  {sortedConvocations.map((c: any) => (
+                    <li key={c.id} className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
+                          {c.players?.photo_url ? (
+                            <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
+                              {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate leading-tight">
+                            {c.players?.first_name} {c.players?.last_name}
+                            {c.players?.jersey_number ? (
+                              <span className="text-muted-foreground font-normal"> · #{c.players.jersey_number}</span>
+                            ) : null}
+                          </p>
+                          {c.comment && (isCoach || c.players?.user_id === user?.id) && (
+                            <p className="text-[11px] text-muted-foreground italic truncate">"{c.comment}"</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex w-full items-center gap-1 shrink-0 sm:w-auto">
+                        {isCoach ? (
+                          <>
+                            <div className="grid flex-1 grid-cols-3 gap-1 rounded-xl border bg-background/80 p-1 sm:flex sm:flex-none sm:rounded-full sm:gap-0.5 sm:p-0.5">
+                              {ATTENDANCE_ACTIONS.filter(a => a.status !== "pending").map(({ status, Icon, className }) => (
+                                <Button
+                                  key={status}
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  className={cn(
+                                    "h-8 min-w-0 rounded-lg px-1.5 text-[11px] sm:h-7 sm:rounded-full sm:px-2",
+                                    c.status === status
+                                      ? status === "present" ? "bg-present text-present-foreground hover:bg-present hover:text-present-foreground"
+                                        : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
+                                        : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
+                                      : className,
+                                  )}
+                                  onClick={() => coachChangeStatus(c, status)}
+                                  title={t(`attendance.${status}`)}
+                                  aria-label={t(`attendance.${status}`)}
+                                >
+                                  <Icon className="h-4 w-4" />
+                                  <span className="truncate">{t(`attendance.${status}`)}</span>
+                                </Button>
+                              ))}
+                            </div>
+                            {c.status === "pending" && (
+                              <Button size="icon" variant="ghost" className="h-7 w-7 text-pending-foreground" onClick={() => remind(c.id)} title={t("attendance.remind")}>
+                                <Bell className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 text-muted-foreground"
+                              onClick={() => setDetailConvocId(c.id)}
+                              title={t("attendance.details")}
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                            </Button>
+                          </>
+                        ) : (
+                          <AttendancePill status={c.status} />
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </section>
       )}
+
 
       <ConvocationDetailDialog
         open={!!detailConvocId}
