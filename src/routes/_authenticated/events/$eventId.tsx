@@ -616,8 +616,7 @@ function EventDetail() {
         .filter(Boolean);
 
       // Composition (si publiée + include_in_convocation = true)
-      const { loadLineupForConvocationEmail } = await import("@/lib/lineup-email");
-      const lineupEmail = await loadLineupForConvocationEmail(event.id).catch(() => undefined);
+      const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined);
 
 
       const competitionLabel = (event as any).competition_name
@@ -1124,8 +1123,7 @@ function EventDetail() {
         .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
         .filter(Boolean);
 
-      const { loadLineupForConvocationEmail } = await import("@/lib/lineup-email");
-      const lineupEmail = await loadLineupForConvocationEmail(event.id).catch(() => undefined);
+      const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined);
 
       const idemBase = Date.now();
 
