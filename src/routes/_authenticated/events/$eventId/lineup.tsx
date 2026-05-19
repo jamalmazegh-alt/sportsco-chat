@@ -123,6 +123,11 @@ function LineupPage() {
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
+  );
+
   // Hydrate from server
   useEffect(() => {
     const l = lineupData?.lineup;
