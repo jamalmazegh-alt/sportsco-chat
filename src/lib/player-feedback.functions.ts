@@ -490,6 +490,8 @@ Renvoie :
         model,
         system: systemPrompt,
         prompt: userPrompt,
+        maxOutputTokens: 4096,
+        temperature: 0.2,
         output: Output.object({
           schema: z.object({
             content: z.string().min(1),
@@ -511,6 +513,8 @@ Renvoie :
           model,
           system: systemPrompt,
           prompt: userPrompt + `\n\nRéponds uniquement avec la nouvelle synthèse, sans aucun commentaire.`,
+          maxOutputTokens: 4096,
+          temperature: 0.2,
         });
         content = (text ?? "").trim();
         changes = "";
