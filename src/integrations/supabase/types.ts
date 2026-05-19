@@ -1644,6 +1644,20 @@ export type Database = {
         Args: { _id: string; _kind: string }
         Returns: undefined
       }
+      update_player_review_content: {
+        Args: { _content: string; _id: string; _model: string }
+        Returns: {
+          author_user_id: string
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          model: string
+          period_end: string
+          period_start: string
+          visibility: Database["public"]["Enums"]["feedback_visibility"]
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "coach" | "parent" | "player" | "dirigeant"

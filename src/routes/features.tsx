@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit } from "lucide-react";
+import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit, ClipboardList, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import coachShot from "@/assets/features/coach-attendance.png";
@@ -49,6 +49,16 @@ const PILLARS = [
     icon: Bell,
     title: "Rappels",
     body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Retours coach par joueur",
+    body: "Après chaque match ou entraînement, le coach saisit en quelques secondes : note, forces, axes de progrès, tags adaptés au sport. Historique privé conservé sur la fiche du joueur.",
+  },
+  {
+    icon: Wand2,
+    title: "Synthèses IA itératives",
+    body: "Génère en un clic un bilan de saison, un rapport de développement ou une préparation d'entretien à partir des retours coachs et des stats. Affine ensuite la synthèse en dialoguant avec l'IA jusqu'au rendu parfait.",
   },
   {
     icon: BrainCircuit,
@@ -117,6 +127,8 @@ const AUDIENCES = [
       "Convocation prête en moins d'une minute",
       "Réponses de présence en temps réel",
       "Saisie des résultats de match avec stats joueurs adaptées au sport",
+      "Retours individuels par joueur (note, forces, axes de progrès, tags propres à votre sport)",
+      "Synthèses IA bilan / entretien / développement, affinables au fil d'un dialogue avec l'IA",
       "Chat par événement avec joueurs et parents",
       "@mentions et accusés de lecture sur le mur",
       "Gestion des remplaçants et attribution des numéros",

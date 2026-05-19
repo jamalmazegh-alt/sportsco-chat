@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Lock, Sparkles, Trash2, Star } from "lucide-react";
+import { Loader2, Lock, Sparkles, Trash2, Star, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,11 +14,13 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   listPlayerFeedback,
   listPlayerReviews,
   generatePlayerReview,
+  refinePlayerReview,
   deletePlayerFeedback,
   deletePlayerReview,
 } from "@/lib/player-feedback.functions";
@@ -38,6 +40,35 @@ export function CoachFeedbackTab({
   const genFn = useServerFn(generatePlayerReview);
   const delFb = useServerFn(deletePlayerFeedback);
   const delRv = useServerFn(deletePlayerReview);
+  const refineFn = useServerFn(refinePlayerReview);
+  const [refineInputs, setRefineInputs] = useState<Record<string, string>>({});
+  const [refineBusy, setRefineBusy] = useState<Record<string, boolean>>({});
+
+  async function onRefine(reviewId: string) {
+    const instruction = (refineInputs[reviewId] ?? "").trim();
+    if (instruction.length < 2) return;
+    setRefineBusy((s) => ({ ...s, [reviewId]: true }));
+    try {
+      const res = await refineFn({ data: { reviewId, instruction } });
+      if (res?.review) {
+        const review = res.review as any;
+        qc.setQueryData(["player-reviews", playerId], (current: any) => ({
+          reviews: (current?.reviews ?? []).map((r: any) =>
+            r.id === review.id ? { ...r, ...review } : r
+          ),
+        }));
+      }
+      setRefineInputs((s) => ({ ...s, [reviewId]: "" }));
+      toast.success(t("feedback.reviewRefined", { defaultValue: "Synthèse affinée" }));
+    } catch (e: any) {
+      const msg = e?.message ?? "";
+      if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes." }));
+      else if (msg.includes("402")) toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
+      else toast.error(msg || "Error");
+    } finally {
+      setRefineBusy((s) => ({ ...s, [reviewId]: false }));
+    }
+  }
 
   const { data: fb, isLoading: lFb } = useQuery({
     queryKey: ["player-feedback", playerId],
@@ -139,13 +170,50 @@ export function CoachFeedbackTab({
               </summary>
               <div className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{r.content}</div>
               {isCoach && (
-                <button
-                  type="button"
-                  onClick={() => onDeleteRv(r.id)}
-                  className="mt-2 text-[11px] text-destructive inline-flex items-center gap-1"
-                >
-                  <Trash2 className="h-3 w-3" /> {t("common.delete")}
-                </button>
+                <div className="mt-3 space-y-2 border-t border-primary/15 pt-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Wand2 className="h-3 w-3 text-primary" />
+                    {t("feedback.refineTitle", { defaultValue: "Affiner avec l'IA" })}
+                  </p>
+                  <Textarea
+                    value={refineInputs[r.id] ?? ""}
+                    onChange={(e) =>
+                      setRefineInputs((s) => ({ ...s, [r.id]: e.target.value }))
+                    }
+                    placeholder={t("feedback.refinePlaceholder", {
+                      defaultValue:
+                        "Ex : insiste davantage sur le mental, raccourcis, ou ajoute une recommandation sur le placement…",
+                    })}
+                    className="min-h-[64px] text-sm"
+                    disabled={!!refineBusy[r.id]}
+                  />
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onDeleteRv(r.id)}
+                      className="text-[11px] text-destructive inline-flex items-center gap-1"
+                    >
+                      <Trash2 className="h-3 w-3" /> {t("common.delete")}
+                    </button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8"
+                      onClick={() => onRefine(r.id)}
+                      disabled={
+                        !!refineBusy[r.id] ||
+                        (refineInputs[r.id] ?? "").trim().length < 2
+                      }
+                    >
+                      {refineBusy[r.id] ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Wand2 className="h-3.5 w-3.5" />
+                      )}
+                      {t("feedback.refine", { defaultValue: "Affiner" })}
+                    </Button>
+                  </div>
+                </div>
               )}
             </details>
           ))
