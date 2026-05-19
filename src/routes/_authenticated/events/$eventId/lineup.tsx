@@ -275,7 +275,9 @@ function LineupPage() {
   }
 
   if (!ctx?.event) return <Navigate to="/events" />;
-  if (ctx.event.type !== "match" || (ctx.event as any).teams?.sport !== "football") {
+  const _sportRaw = ((ctx.event as any).teams?.sport ?? "").toString().toLowerCase().trim();
+  const _isFootball = _sportRaw === "" || _sportRaw === "football" || _sportRaw === "foot" || _sportRaw === "soccer";
+  if (ctx.event.type !== "match" || !_isFootball) {
     return (
       <div className="p-6 space-y-4">
         <Link to="/events/$eventId" params={{ eventId }} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
