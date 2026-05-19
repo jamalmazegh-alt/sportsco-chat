@@ -281,33 +281,92 @@ function PostMatchFeedback() {
                 </div>
 
                 {/* Rating */}
-                <div className="mt-3 flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
-                    const active = (v.rating ?? 0) >= n;
-                    return (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() =>
-                          patch(p.id, { rating: v.rating === n ? null : n })
-                        }
-                        className={cn(
-                          "h-7 w-6 flex items-center justify-center transition-colors",
-                          active
-                            ? "text-amber-500"
-                            : "text-muted-foreground/40 hover:text-muted-foreground"
-                        )}
-                        aria-label={`${n}/10`}
-                      >
-                        <Star className={cn("h-3.5 w-3.5", active && "fill-current")} />
-                      </button>
-                    );
-                  })}
+                <div className="mt-3">
+                  <div className="flex items-center gap-0.5">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
+                      const active = (v.rating ?? 0) >= n;
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() =>
+                            patch(p.id, { rating: v.rating === n ? null : n })
+                          }
+                          className={cn(
+                            "h-7 w-6 flex flex-col items-center justify-center transition-colors",
+                            active
+                              ? "text-amber-500"
+                              : "text-muted-foreground/40 hover:text-muted-foreground"
+                          )}
+                          aria-label={`${n}/10`}
+                        >
+                          <Star className={cn("h-3.5 w-3.5", active && "fill-current")} />
+                          <span className="text-[9px] leading-none mt-0.5 text-muted-foreground/70">{n}</span>
+                        </button>
+                      );
+                    })}
+                    {v.rating ? (
+                      <span className="ml-2 text-[11px] font-medium text-foreground">
+                        {v.rating}/10
+                      </span>
+                    ) : null}
+                  </div>
                   {v.rating ? (
-                    <span className="ml-2 text-[11px] text-muted-foreground">
-                      {v.rating}/10
-                    </span>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {t(`feedback.rating${v.rating}`, { defaultValue: "" })}
+                    </p>
                   ) : null}
+                </div>
+
+                {/* Per-row save */}
+                <div className="mt-2 flex justify-end">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={isDirty ? "default" : "outline"}
+                    onClick={async () => {
+                      const v2 = values[p.id];
+                      if (!v2) return;
+                      setSaving(true);
+                      try {
+                        const payload = {
+                          rating: v2.rating,
+                          comment: v2.note || null,
+                          devNotes: null,
+                          strengths: null,
+                          improvements: null,
+                          tags: v2.tags,
+                          visibility: "coach_only" as const,
+                          sharedSummary: null,
+                        };
+                        const existingId = ids[p.id];
+                        if (existingId) {
+                          await updateFn({ data: { id: existingId, ...payload } });
+                        } else {
+                          const res = await createFn({ data: { playerId: p.id, eventId, ...payload } });
+                          setIds((prev) => ({ ...prev, [p.id]: res.id }));
+                        }
+                        setSavedIds((prev) => new Set(prev).add(p.id));
+                        setDirty((prev) => {
+                          const n = new Set(prev);
+                          n.delete(p.id);
+                          return n;
+                        });
+                        qc.invalidateQueries({ queryKey: ["event-feedback", eventId] });
+                        toast.success(t("common.saved"));
+                      } catch (e: any) {
+                        toast.error(e?.message ?? "Error");
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                    disabled={saving || (!isDirty && saved)}
+                    className="h-8"
+                  >
+                    {saved && !isDirty
+                      ? t("feedback.saved", { defaultValue: "Enregistré" })
+                      : t("common.save")}
+                  </Button>
                 </div>
 
                 {/* Tags */}
