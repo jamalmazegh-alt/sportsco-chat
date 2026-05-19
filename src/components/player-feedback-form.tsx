@@ -83,7 +83,7 @@ export function PlayerFeedbackForm({
           {t("feedback.ratingLabel", { defaultValue: "Évaluation (optionnel)" })}
         </Label>
         <div className="flex items-center gap-1">
-          {[1, 2, 3, 4, 5].map((n) => {
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
             const active = (value.rating ?? 0) >= n;
             return (
               <button
@@ -92,11 +92,11 @@ export function PlayerFeedbackForm({
                 aria-label={t(RATING_LABELS[n - 1], { defaultValue: `Niveau ${n}` })}
                 onClick={() => set("rating", value.rating === n ? null : n)}
                 className={cn(
-                  "h-8 w-8 rounded-md flex items-center justify-center transition-colors",
+                  "h-8 w-7 rounded-md flex items-center justify-center transition-colors",
                   active ? "text-amber-500" : "text-muted-foreground/40 hover:text-muted-foreground"
                 )}
               >
-                <Star className={cn("h-5 w-5", active && "fill-current")} />
+                <Star className={cn("h-4 w-4", active && "fill-current")} />
               </button>
             );
           })}
