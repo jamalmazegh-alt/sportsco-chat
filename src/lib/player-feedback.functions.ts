@@ -629,5 +629,5 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
       console.error("[refinePlayerReview] update returned no row", { reviewId: data.reviewId });
       throw new Response("La synthèse a été générée mais l'enregistrement est introuvable après mise à jour.", { status: 500 });
     }
-    return { review: row as PlayerReviewRow, changes };
+    return { review: row as unknown as PlayerReviewRow, changes };
   });
