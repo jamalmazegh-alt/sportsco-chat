@@ -378,6 +378,31 @@ function LineupPage() {
           </label>
         </div>
 
+        {/* Create convocation from lineup */}
+        {!convocationsSent && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold leading-tight">
+                {t("lineup.convocFromLineup.title", "Créer la convocation depuis cette compo")}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {placedCount > 0
+                  ? t("lineup.convocFromLineup.desc", "{{count}} joueur(s) placés seront pré-sélectionnés.", { count: placedCount })
+                  : t("lineup.convocFromLineup.empty", "Placez des joueurs sur le terrain ou le banc d'abord.")}
+              </p>
+            </div>
+            <Button
+              onClick={createConvocationFromLineup}
+              disabled={placedCount === 0}
+              size="sm"
+              className="shrink-0"
+            >
+              <UserPlus className="h-4 w-4" />
+              {t("lineup.convocFromLineup.cta", "Créer la convoc")}
+            </Button>
+          </div>
+        )}
+
         {/* Pitch + Players layout */}
         <div className="grid md:grid-cols-[1fr_minmax(0,280px)] gap-4">
           {/* Pitch */}
