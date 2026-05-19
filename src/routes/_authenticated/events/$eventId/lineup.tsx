@@ -154,6 +154,23 @@ function LineupPage() {
     return s;
   }, [slots, bench]);
 
+  const placedCount = placedIds.size;
+  const convocationsSent = !!ctx?.event?.convocations_sent;
+
+  function createConvocationFromLineup() {
+    const ids = Array.from(placedIds);
+    if (ids.length === 0) {
+      toast.error(t("lineup.noPlayersForConvoc", "Ajoutez d'abord des joueurs à la compo."));
+      return;
+    }
+    navigate({
+      to: "/events/$eventId",
+      params: { eventId },
+      search: { send: 1, preselect: ids.join(",") } as any,
+    });
+  }
+
+
   const available = useMemo(
     () => (roster ?? []).filter((p) => !placedIds.has(p.id)),
     [roster, placedIds],
