@@ -276,7 +276,7 @@ function LineupPage() {
 
   if (!ctx?.event) return <Navigate to="/events" />;
   const _sportRaw = ((ctx.event as any).teams?.sport ?? "").toString().toLowerCase().trim();
-  const _isFootball = _sportRaw === "" || _sportRaw === "football" || _sportRaw === "foot" || _sportRaw === "soccer";
+  const _isFootball = _sportRaw === "football" || _sportRaw === "foot" || _sportRaw === "soccer";
   if (ctx.event.type !== "match" || !_isFootball) {
     return (
       <div className="p-6 space-y-4">
