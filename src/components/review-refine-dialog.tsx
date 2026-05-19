@@ -164,7 +164,7 @@ export function ReviewRefineDialog({
                 {turn.preview && (
                   <p className="text-xs text-muted-foreground italic line-clamp-3 border-l-2 border-primary/30 pl-2">
                     {turn.preview}
-                    {turn.preview.length >= 220 && "…"}
+                    {turn.preview.length >= 360 && "…"}
                   </p>
                 )}
               </div>
