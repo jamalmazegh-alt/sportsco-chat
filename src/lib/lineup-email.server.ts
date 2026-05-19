@@ -60,3 +60,25 @@ export async function loadLineupForConvocationEmailServer(
 
   return { formation: lineup.formation ?? undefined, starting, bench };
 }
+
+export async function loadLineupForConvocationEmailServerForCoach(
+  eventId: string,
+  userId: string,
+): Promise<LineupEmailData | undefined> {
+  const { data: event } = await supabaseAdmin
+    .from("events")
+    .select("team_id")
+    .eq("id", eventId)
+    .maybeSingle();
+
+  if (!event?.team_id) return undefined;
+
+  const { data: canSend } = await supabaseAdmin.rpc("is_team_coach", {
+    _user_id: userId,
+    _team_id: event.team_id,
+  });
+
+  if (!canSend) return undefined;
+
+  return loadLineupForConvocationEmailServer(eventId);
+}
