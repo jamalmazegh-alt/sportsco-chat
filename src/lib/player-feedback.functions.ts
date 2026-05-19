@@ -610,12 +610,24 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
     }
 
     const { data: row, error } = await supabase
-      .rpc("update_player_review_content" as any, {
-        _id: data.reviewId,
-        _content: content,
-        _model: usedModel,
-      })
-      .single();
-    if (error) throw new Response(error.message, { status: 500 });
-    return { review: row as PlayerReviewRow, changes };
+      .from("player_reviews" as any)
+      .update({ content, model: usedModel })
+      .eq("id", data.reviewId)
+      .select("id, kind, period_start, period_end, content, visibility, model, created_at, author_user_id")
+      .maybeSingle();
+
+    if (error) {
+      console.error("[refinePlayerReview] update failed", {
+        reviewId: data.reviewId,
+        code: error.code,
+        message: error.message,
+        details: error.details,
+      });
+      throw new Response(`La synthèse a été générée mais n'a pas pu être enregistrée : ${error.message}`, { status: 500 });
+    }
+    if (!row) {
+      console.error("[refinePlayerReview] update returned no row", { reviewId: data.reviewId });
+      throw new Response("La synthèse a été générée mais l'enregistrement est introuvable après mise à jour.", { status: 500 });
+    }
+    return { review: row as unknown as PlayerReviewRow, changes };
   });
