@@ -141,49 +141,23 @@ export function CoachFeedbackTab({
               </summary>
               <div className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{r.content}</div>
               {isCoach && (
-                <div className="mt-3 space-y-2 border-t border-primary/15 pt-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                    <Wand2 className="h-3 w-3 text-primary" />
-                    {t("feedback.refineTitle", { defaultValue: "Affiner avec l'IA" })}
-                  </p>
-                  <Textarea
-                    value={refineInputs[r.id] ?? ""}
-                    onChange={(e) =>
-                      setRefineInputs((s) => ({ ...s, [r.id]: e.target.value }))
-                    }
-                    placeholder={t("feedback.refinePlaceholder", {
-                      defaultValue:
-                        "Ex : insiste davantage sur le mental, raccourcis, ou ajoute une recommandation sur le placement…",
-                    })}
-                    className="min-h-[64px] text-sm"
-                    disabled={!!refineBusy[r.id]}
-                  />
-                  <div className="flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => onDeleteRv(r.id)}
-                      className="text-[11px] text-destructive inline-flex items-center gap-1"
-                    >
-                      <Trash2 className="h-3 w-3" /> {t("common.delete")}
-                    </button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8"
-                      onClick={() => onRefine(r.id)}
-                      disabled={
-                        !!refineBusy[r.id] ||
-                        (refineInputs[r.id] ?? "").trim().length < 2
-                      }
-                    >
-                      {refineBusy[r.id] ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Wand2 className="h-3.5 w-3.5" />
-                      )}
-                      {t("feedback.refine", { defaultValue: "Affiner" })}
-                    </Button>
-                  </div>
+                <div className="mt-3 flex items-center justify-between gap-2 border-t border-primary/15 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => onDeleteRv(r.id)}
+                    className="text-[11px] text-destructive inline-flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3 w-3" /> {t("common.delete")}
+                  </button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8"
+                    onClick={() => setRefineTarget({ id: r.id, content: r.content })}
+                  >
+                    <Wand2 className="h-3.5 w-3.5" />
+                    {t("feedback.refineWithAi", { defaultValue: "Affiner avec l'IA" })}
+                  </Button>
                 </div>
               )}
             </details>
