@@ -114,23 +114,19 @@ export const createPlayerFeedback = createServerFn({ method: "POST" })
     }
 
     const { data: row, error } = await supabase
-      .from("player_feedback" as any)
-      .insert({
-        club_id: player.club_id,
-        team_id: teamId,
-        player_id: data.playerId,
-        event_id: data.eventId ?? null,
-        author_user_id: userId,
-        rating: data.rating ?? null,
-        comment: data.comment ?? null,
-        dev_notes: data.devNotes ?? null,
-        strengths: data.strengths ?? null,
-        improvements: data.improvements ?? null,
-        tags: data.tags ?? [],
-        visibility: data.visibility,
-        shared_summary: data.sharedSummary ?? null,
+      .rpc("save_player_feedback" as any, {
+        _id: null,
+        _player_id: data.playerId,
+        _event_id: data.eventId ?? null,
+        _rating: data.rating ?? null,
+        _comment: data.comment ?? null,
+        _dev_notes: data.devNotes ?? null,
+        _strengths: data.strengths ?? null,
+        _improvements: data.improvements ?? null,
+        _tags: data.tags ?? [],
+        _visibility: data.visibility,
+        _shared_summary: data.sharedSummary ?? null,
       })
-      .select("id")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
     return { id: (row as any).id };
@@ -157,12 +153,30 @@ export const updatePlayerFeedback = createServerFn({ method: "POST" })
     if (data.tags !== undefined) patch.tags = data.tags;
     if (data.visibility !== undefined) patch.visibility = data.visibility;
     if (data.sharedSummary !== undefined) patch.shared_summary = data.sharedSummary;
-    const { error } = await supabase
+    const { data: current, error: currentError } = await supabase
       .from("player_feedback" as any)
-      .update(patch)
-      .eq("id", data.id);
+      .select("player_id, event_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (currentError || !current) throw new Response("Retour introuvable", { status: 404 });
+
+    const { data: row, error } = await supabase
+      .rpc("save_player_feedback" as any, {
+        _id: data.id,
+        _player_id: (current as any).player_id,
+        _event_id: (current as any).event_id ?? null,
+        _rating: patch.rating ?? null,
+        _comment: patch.comment ?? null,
+        _dev_notes: patch.dev_notes ?? null,
+        _strengths: patch.strengths ?? null,
+        _improvements: patch.improvements ?? null,
+        _tags: patch.tags ?? [],
+        _visibility: patch.visibility ?? "coach_only",
+        _shared_summary: patch.shared_summary ?? null,
+      })
+      .single();
     if (error) throw new Response(error.message, { status: 400 });
-    return { ok: true };
+    return { id: (row as any).id, ok: true };
   });
 
 // ------------------------------------------------------------------
