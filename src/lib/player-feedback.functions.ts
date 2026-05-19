@@ -465,28 +465,40 @@ export const refinePlayerReview = createServerFn({ method: "POST" })
       .eq("id", (review as any).player_id)
       .maybeSingle();
 
-    const prompt = `Tu es un coach sportif bienveillant. Voici une synthèse existante pour le joueur "${player?.first_name ?? ""} ${player?.last_name ?? ""}".
+    const prompt = `Tu es un coach sportif bienveillant. Tu affines une synthèse existante pour le joueur "${player?.first_name ?? ""} ${player?.last_name ?? ""}".
 
 --- SYNTHÈSE ACTUELLE ---
 ${(review as any).content}
---- FIN DE LA SYNTHÈSE ---
+--- FIN ---
 
-Le coach te demande d'affiner cette synthèse avec l'instruction suivante :
+INSTRUCTION DU COACH (priorité absolue, à appliquer littéralement) :
 "${data.instruction}"
 
-Consignes :
-- Renvoie la synthèse complète mise à jour (pas seulement les modifications).
-- Conserve le format Markdown avec les sections : **Forces**, **Axes de progrès**, **Recommandations**, **Synthèse**.
-- Garde un ton constructif, axé développement.
-- 250 à 400 mots. Pas d'introduction du type "voici la nouvelle synthèse".`;
+Règles :
+- L'instruction du coach prime sur toute structure ou longueur par défaut. Si elle demande "5 phrases", renvoie exactement 5 phrases sans titres ni sections. Si elle demande un ton, une longueur, un format précis, applique-le strictement.
+- Renvoie la synthèse complète mise à jour (pas un diff).
+- Garde un ton constructif et bienveillant.
+- Pas de préambule type "Voici la nouvelle synthèse".
+
+Tu dois répondre UNIQUEMENT avec un objet JSON valide (pas de markdown, pas de \`\`\`), exactement ce format :
+{"content": "<la synthèse mise à jour>", "changes": "<1 à 3 phrases courtes décrivant ce que tu as changé par rapport à l'ancienne version>"}`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
 
     let content: string;
+    let changes: string = "";
     try {
       const { text } = await generateText({ model, prompt });
-      content = text;
+      const raw = (text ?? "").trim().replace(/^```(?:json)?\s*|\s*```$/g, "");
+      try {
+        const parsed = JSON.parse(raw);
+        content = String(parsed.content ?? "").trim();
+        changes = String(parsed.changes ?? "").trim();
+        if (!content) content = raw;
+      } catch {
+        content = raw;
+      }
     } catch (e: any) {
       const msg: string = e?.message ?? "";
       if (msg.includes("429")) throw new Response("rate_limited", { status: 429 });
@@ -502,5 +514,5 @@ Consignes :
       })
       .single();
     if (error) throw new Response(error.message, { status: 500 });
-    return { review: row as PlayerReviewRow };
+    return { review: row as PlayerReviewRow, changes };
   });
