@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Lock, Sparkles, Trash2, Star } from "lucide-react";
+import { Loader2, Lock, Sparkles, Trash2, Star, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,11 +14,13 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   listPlayerFeedback,
   listPlayerReviews,
   generatePlayerReview,
+  refinePlayerReview,
   deletePlayerFeedback,
   deletePlayerReview,
 } from "@/lib/player-feedback.functions";
