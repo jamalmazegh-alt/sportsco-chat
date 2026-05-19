@@ -14,17 +14,16 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   listPlayerFeedback,
   listPlayerReviews,
   generatePlayerReview,
-  refinePlayerReview,
   deletePlayerFeedback,
   deletePlayerReview,
 } from "@/lib/player-feedback.functions";
 import { cn } from "@/lib/utils";
+import { ReviewRefineDialog } from "@/components/review-refine-dialog";
 
 export function CoachFeedbackTab({
   playerId,
