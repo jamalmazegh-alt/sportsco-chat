@@ -409,7 +409,7 @@ function PostMatchFeedback() {
 
       {/* Sticky save bar */}
       {data && data.players.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 px-5 py-3">
+        <div className="fixed bottom-16 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 px-5 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
           <div className="mx-auto max-w-3xl flex items-center gap-3">
             <p className="text-xs text-muted-foreground flex-1">
               {dirty.size > 0
