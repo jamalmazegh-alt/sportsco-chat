@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
@@ -35,6 +36,7 @@ import { MatchResultCard } from "@/components/match-result-card";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -135,6 +137,7 @@ function EventDetail() {
   const role = useActiveRole();
   const isActiveCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
+  const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const [sending, setSending] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [autoSendConsumed, setAutoSendConsumed] = useState(false);
