@@ -200,10 +200,58 @@ function PostMatchFeedback() {
     }
   }
 
+  const saveOne = useCallback(
+    async (playerId: string, v2: RowValue) => {
+      if (!v2) return;
+      setSaving(true);
+      try {
+        const payload = {
+          rating: v2.rating,
+          comment: v2.note || null,
+          devNotes: null,
+          strengths: null,
+          improvements: null,
+          tags: v2.tags,
+          visibility: "coach_only" as const,
+          sharedSummary: null,
+        };
+        const existingId = ids[playerId];
+        if (existingId) {
+          await updateFn({ data: { id: existingId, ...payload } });
+        } else {
+          const res = await createFn({ data: { playerId, eventId, ...payload } });
+          setIds((prev) => ({ ...prev, [playerId]: res.id }));
+        }
+        setSavedIds((prev) => new Set(prev).add(playerId));
+        setDirty((prev) => {
+          const n = new Set(prev);
+          n.delete(playerId);
+          return n;
+        });
+        qc.invalidateQueries({ queryKey: ["event-feedback", eventId] });
+        toast.success(t("common.saved"));
+      } catch (e: any) {
+        toast.error(e?.message ?? "Error");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [ids, updateFn, createFn, eventId, qc, t]
+  );
+
+  const openPlayer = useCallback(
+    (playerId: string) => {
+      navigate({ to: "/players/$playerId", params: { playerId } });
+    },
+    [navigate]
+  );
+
   const locale = i18n.language?.startsWith("fr") ? fr : undefined;
   const event = data?.event;
   const sport = (data as any)?.sport ?? null;
   const tags = useMemo(() => getFeedbackTagsForSport(sport), [sport]);
+
+
 
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">
