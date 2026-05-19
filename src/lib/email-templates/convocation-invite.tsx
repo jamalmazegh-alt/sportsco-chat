@@ -192,6 +192,68 @@ const ConvocationInviteEmail = ({
             {lineup.formation ? (
               <Text style={lineupFormation}>Formation : <strong>{lineup.formation}</strong></Text>
             ) : null}
+            {lineup.starting && lineup.starting.some((p) => p.x != null && p.y != null) ? (
+              <div style={pitchWrap}>
+                <div style={pitch}>
+                  {/* halfway line */}
+                  <div style={pitchHalfway} />
+                  {/* center circle */}
+                  <div style={pitchCircle} />
+                  {/* top penalty area */}
+                  <div style={pitchPenaltyTop} />
+                  {/* bottom penalty area */}
+                  <div style={pitchPenaltyBottom} />
+                  {lineup.starting.map((p, i) => {
+                    if (p.x == null || p.y == null) return null;
+                    const isCap = p.isCaptain;
+                    const isGK = p.isGK;
+                    return (
+                      <div
+                        key={`pp-${i}`}
+                        style={{
+                          position: "absolute",
+                          left: `${p.x}%`,
+                          top: `${p.y}%`,
+                          transform: "translate(-50%, -50%)",
+                          width: 44,
+                          marginLeft: -22,
+                          marginTop: -22,
+                          textAlign: "center" as const,
+                        }}
+                      >
+                        <div style={{
+                          width: 32,
+                          height: 32,
+                          margin: "0 auto",
+                          borderRadius: 16,
+                          backgroundColor: isGK ? "#fbbf24" : "#ffffff",
+                          color: "#0f172a",
+                          fontSize: 12,
+                          fontWeight: "bold" as const,
+                          lineHeight: "32px",
+                          border: isCap ? "2px solid #f59e0b" : "2px solid #064e3b",
+                        }}>
+                          {p.jersey != null ? p.jersey : "•"}
+                        </div>
+                        <div style={{
+                          marginTop: 2,
+                          fontSize: 9,
+                          color: "#ffffff",
+                          fontWeight: "bold" as const,
+                          textShadow: "0 1px 2px rgba(0,0,0,0.7)",
+                          whiteSpace: "nowrap" as const,
+                          overflow: "hidden" as const,
+                          textOverflow: "ellipsis" as const,
+                        }}>
+                          {p.name.split(" ").slice(-1)[0]}
+                          {isCap ? " (C)" : ""}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
             {lineup.starting && lineup.starting.length > 0 ? (
               <>
                 <Text style={lineupSectionTitle}>XI de départ</Text>
