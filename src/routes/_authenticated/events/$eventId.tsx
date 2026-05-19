@@ -1380,7 +1380,7 @@ function EventDetail() {
             ) : null;
           })()}
         </div>
-        {event.type === "match" && teams?.[0]?.sport === "football" && (
+        {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toLowerCase().trim(); return s === "" || s === "football" || s === "foot" || s === "soccer"; })() && (
           <div className="mt-4">
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>
