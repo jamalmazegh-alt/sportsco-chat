@@ -1380,7 +1380,12 @@ function EventDetail() {
             ) : null;
           })()}
         </div>
-        {event.status === "cancelled" && (
+        {event.type === "match" && teams?.[0]?.sport === "football" && (
+          <div className="mt-4">
+            <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
+          </div>
+        )}
+
           <div className="relative mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
             <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
               <Ban className="h-4 w-4" />
