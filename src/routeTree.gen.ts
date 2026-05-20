@@ -35,6 +35,7 @@ import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
+import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
@@ -201,6 +203,11 @@ const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   path: '/teams',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
@@ -246,6 +253,12 @@ const SuperadminClubsIndexRoute = SuperadminClubsIndexRouteImport.update({
   path: '/clubs/',
   getParentRoute: () => SuperadminRoute,
 } as any)
+const AuthenticatedSupportIndexRoute =
+  AuthenticatedSupportIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSupportRoute,
+  } as any)
 const AuthenticatedProfileIndexRoute =
   AuthenticatedProfileIndexRouteImport.update({
     id: '/',
@@ -421,6 +434,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/stats': typeof AuthenticatedStatsRoute
+  '/support': typeof AuthenticatedSupportRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -448,6 +462,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
@@ -508,6 +523,7 @@ export interface FileRoutesByTo {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
+  '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
@@ -546,6 +562,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRouteWithChildren
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -573,6 +590,7 @@ export interface FileRoutesById {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
@@ -611,6 +629,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/profile'
     | '/stats'
+    | '/support'
     | '/teams'
     | '/api/chat'
     | '/email/unsubscribe'
@@ -638,6 +657,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/admin/'
     | '/profile/'
+    | '/support/'
     | '/superadmin/clubs/'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
@@ -698,6 +718,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/admin'
     | '/profile'
+    | '/support'
     | '/superadmin/clubs'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
@@ -735,6 +756,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox'
     | '/_authenticated/profile'
     | '/_authenticated/stats'
+    | '/_authenticated/support'
     | '/_authenticated/teams'
     | '/api/chat'
     | '/email/unsubscribe'
@@ -762,6 +784,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
+    | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
@@ -995,6 +1018,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/stats': {
       id: '/_authenticated/stats'
       path: '/stats'
@@ -1057,6 +1087,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/clubs/'
       preLoaderRoute: typeof SuperadminClubsIndexRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/_authenticated/support/': {
+      id: '/_authenticated/support/'
+      path: '/'
+      fullPath: '/support/'
+      preLoaderRoute: typeof AuthenticatedSupportIndexRouteImport
+      parentRoute: typeof AuthenticatedSupportRoute
     }
     '/_authenticated/profile/': {
       id: '/_authenticated/profile/'
@@ -1323,6 +1360,17 @@ const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
 const AuthenticatedProfileRouteWithChildren =
   AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
 
+interface AuthenticatedSupportRouteChildren {
+  AuthenticatedSupportIndexRoute: typeof AuthenticatedSupportIndexRoute
+}
+
+const AuthenticatedSupportRouteChildren: AuthenticatedSupportRouteChildren = {
+  AuthenticatedSupportIndexRoute: AuthenticatedSupportIndexRoute,
+}
+
+const AuthenticatedSupportRouteWithChildren =
+  AuthenticatedSupportRoute._addFileChildren(AuthenticatedSupportRouteChildren)
+
 interface AuthenticatedTeamsRouteChildren {
   AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRoute
 }
@@ -1358,6 +1406,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRouteWithChildren
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
 }
@@ -1371,6 +1420,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRouteWithChildren,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
