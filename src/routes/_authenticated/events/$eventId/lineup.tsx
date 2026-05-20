@@ -213,39 +213,70 @@ function LineupPage() {
     if (gk === playerId) setGk(null);
   }
 
+  function placePlayer(playerId: string, target: { kind: "slot"; slotId: string } | { kind: "bench" } | { kind: "available" }) {
+    setDirty(true);
+    // Remove from any current location first (snapshot prior slot)
+    let priorSlot: LineupSlot | undefined;
+    setSlots((prev) => {
+      priorSlot = prev.find((s) => s.player_id === playerId);
+      return prev.map((s) => (s.player_id === playerId ? { ...s, player_id: null } : s));
+    });
+    setBench((prev) => prev.filter((id) => id !== playerId));
+
+    if (target.kind === "slot") {
+      const { slotId } = target;
+      setSlots((prev) => {
+        const targetSlot = prev.find((s) => s.id === slotId);
+        const displaced = targetSlot?.player_id ?? null;
+        const next = prev.map((s) => (s.id === slotId ? { ...s, player_id: playerId } : s));
+        if (displaced && displaced !== playerId) {
+          setBench((b) => (b.includes(displaced) ? b : [...b, displaced]));
+        }
+        return next;
+      });
+      // Auto-set GK if dropped on GK slot
+      const targetSlot = slots.find((s) => s.id === slotId);
+      if (targetSlot?.role === "GK") setGk(playerId);
+    } else if (target.kind === "bench") {
+      setBench((prev) => (prev.includes(playerId) ? prev : [...prev, playerId]));
+    }
+    setSelectedPid(null);
+    setActionPid(null);
+    // priorSlot reference suppresses lint "unused" while keeping the snapshot for future undo
+    void priorSlot;
+  }
+
   function handleDragEnd(e: DragEndEvent) {
     const over = e.over;
     if (!over) return;
     const playerId = (e.active.data.current as any)?.playerId as string | undefined;
     if (!playerId) return;
     const kind = (over.data.current as any)?.kind as string | undefined;
+    if (kind === "slot") placePlayer(playerId, { kind: "slot", slotId: String(over.id) });
+    else if (kind === "bench") placePlayer(playerId, { kind: "bench" });
+    else if (kind === "available") placePlayer(playerId, { kind: "available" });
+  }
 
-    // Remove from any current location first
-    setDirty(true);
-    setSlots((prev) => prev.map((s) => (s.player_id === playerId ? { ...s, player_id: null } : s)));
-    setBench((prev) => prev.filter((id) => id !== playerId));
-
-    if (kind === "slot") {
-      const slotId = String(over.id);
-      setSlots((prev) => {
-        const target = prev.find((s) => s.id === slotId);
-        const displaced = target?.player_id ?? null;
-        const next = prev.map((s) =>
-          s.id === slotId ? { ...s, player_id: playerId } : s,
-        );
-        if (displaced && displaced !== playerId) {
-          // Send displaced player to bench
-          setBench((b) => (b.includes(displaced) ? b : [...b, displaced]));
-        }
-        return next;
-      });
-      // Auto-set GK if dropped on GK slot
-      const target = slots.find((s) => s.id === slotId);
-      if (target?.role === "GK") setGk(playerId);
-    } else if (kind === "bench") {
-      setBench((prev) => (prev.includes(playerId) ? prev : [...prev, playerId]));
-    } else if (kind === "available") {
-      // already removed
+  function handleChipTap(playerId: string, location: "available" | "slot" | "bench") {
+    if (selectedPid && selectedPid !== playerId) {
+      // user has another player selected → swap by moving this position not relevant; treat as place selected onto same area
+      // If tapping a placed chip while another player is selected: replace target → place selected at that slot
+      // Easier: open action panel if the tapped chip is already placed (slot/bench). For available, just switch selection.
+      if (location === "available") {
+        setSelectedPid(playerId);
+        return;
+      }
+      setActionPid(playerId);
+      return;
+    }
+    if (selectedPid === playerId) {
+      setSelectedPid(null);
+      return;
+    }
+    if (location === "available") {
+      setSelectedPid(playerId);
+    } else {
+      setActionPid(playerId);
     }
   }
 
