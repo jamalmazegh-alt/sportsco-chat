@@ -1712,15 +1712,27 @@ function EventDetail() {
                 </a>
               )}
             </div>
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(msg)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
-            >
-              <MessageCircle className="h-4 w-4" />
-              {isCancelled ? "Partager l'annulation sur WhatsApp" : "Envoyer via WhatsApp"}
-            </a>
+            {!isCancelled && lineupData ? (
+              <button
+                type="button"
+                onClick={() => shareLineupAsImage(msg)}
+                disabled={sharingLineup}
+                className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium disabled:opacity-60"
+              >
+                {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                Partager sur WhatsApp avec la compo
+              </button>
+            ) : (
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(msg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {isCancelled ? "Partager l'annulation sur WhatsApp" : "Envoyer via WhatsApp"}
+              </a>
+            )}
             {!isCancelled && (
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(buildReminderMessage(base))}`}
@@ -1732,19 +1744,10 @@ function EventDetail() {
                 Envoyer un rappel WhatsApp
               </a>
             )}
-            {!isCancelled && lineupData && (
-              <button
-                type="button"
-                onClick={() => shareLineupAsImage(msg)}
-                disabled={sharingLineup}
-                className="inline-flex items-center justify-center gap-2 w-full h-9 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium disabled:opacity-60"
-              >
-                {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                Partager la compo (image)
-              </button>
-            )}
             <p className="text-[11px] text-muted-foreground">
-              WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer.{lineupData ? " Pour la compo en image, utilisez le bouton dédié." : ""}
+              {lineupData && !isCancelled
+                ? "Le partage mobile joint l’image de la compo avec le message. Si votre navigateur ne le permet pas, l’image est téléchargée et le message copié."
+                : "WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer."}
             </p>
           </div>
         );
