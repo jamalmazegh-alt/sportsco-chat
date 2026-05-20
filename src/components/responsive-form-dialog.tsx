@@ -32,12 +32,14 @@ export function ResponsiveFormDialog({ open, onOpenChange, trigger, title, child
         {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
         <SheetContent
           side="bottom"
-          className="rounded-t-3xl max-h-[92dvh] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
+          className="rounded-t-3xl max-h-[92dvh] p-0 flex flex-col overflow-hidden"
         >
-          <SheetHeader className="sticky top-0 z-10 -mx-6 -mt-6 mb-2 bg-background px-6 pt-6 pb-3 rounded-t-3xl">
+          <SheetHeader className="shrink-0 px-6 pt-6 pb-3 pr-12 border-b bg-background">
             <SheetTitle>{title}</SheetTitle>
           </SheetHeader>
-          {children}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     );
