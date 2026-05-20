@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,23 +13,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { createSupportTicket } from "@/lib/support.functions";
 import { useAuth } from "@/lib/auth-context";
-
-const CATEGORIES = [
-  { v: "bug", l: "Bug" },
-  { v: "payment", l: "Paiement" },
-  { v: "account", l: "Compte" },
-  { v: "team", l: "Équipes / Joueurs" },
-  { v: "event", l: "Événements" },
-  { v: "feature_request", l: "Demande de fonctionnalité" },
-  { v: "other", l: "Autre" },
-] as const;
-
-const PRIORITIES = [
-  { v: "low", l: "Faible" },
-  { v: "normal", l: "Normale" },
-  { v: "high", l: "Élevée" },
-  { v: "urgent", l: "Urgente" },
-] as const;
+import { SUPPORT_CATEGORIES, type SupportCategory } from "@/lib/support-constants";
 
 export function SupportFormDialog({
   open,
@@ -37,11 +22,11 @@ export function SupportFormDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const { t } = useTranslation("support");
   const { user, activeClubId } = useAuth();
   const navigate = useNavigate();
   const [subject, setSubject] = useState("");
-  const [category, setCategory] = useState<typeof CATEGORIES[number]["v"]>("bug");
-  const [priority, setPriority] = useState<typeof PRIORITIES[number]["v"]>("normal");
+  const [category, setCategory] = useState<SupportCategory>("bug");
   const [description, setDescription] = useState("");
   const [intent, setIntent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -50,7 +35,6 @@ export function SupportFormDialog({
   const reset = () => {
     setSubject("");
     setCategory("bug");
-    setPriority("normal");
     setDescription("");
     setIntent("");
     setFiles([]);
@@ -64,7 +48,9 @@ export function SupportFormDialog({
       // Upload attachments first
       const paths: string[] = [];
       for (const f of files) {
-        if (f.size > 5 * 1024 * 1024) throw new Error(`${f.name} dépasse 5 Mo`);
+        if (f.size > 5 * 1024 * 1024) {
+          throw new Error(t("form.file_too_large", { name: f.name }));
+        }
         const ext = f.name.split(".").pop() || "bin";
         const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error } = await supabase.storage
@@ -87,7 +73,8 @@ export function SupportFormDialog({
           subject: subject.trim(),
           description: description.trim(),
           category,
-          priority,
+          // Users always submit at normal priority; staff can escalate later.
+          priority: "normal",
           club_id: activeClubId ?? null,
           user_intent: intent.trim() || undefined,
           context: ctx,
@@ -98,9 +85,9 @@ export function SupportFormDialog({
     },
     onSuccess: (id) => {
       setDone(id);
-      toast.success("Demande envoyée");
+      toast.success(t("form.sent"));
     },
-    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Erreur"),
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : t("form.error")),
   });
 
   const close = () => {
@@ -114,90 +101,81 @@ export function SupportFormDialog({
         {done ? (
           <div className="py-6 text-center space-y-4">
             <CheckCircle2 className="h-12 w-12 text-primary mx-auto" />
-            <DialogTitle>Demande envoyée</DialogTitle>
-            <p className="text-sm text-muted-foreground">
-              Nous reviendrons vers vous très vite. Vous pouvez suivre votre demande dans « Mes demandes ».
-            </p>
+            <DialogTitle>{t("form.sent")}</DialogTitle>
+            <p className="text-sm text-muted-foreground">{t("form.sent_desc")}</p>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" onClick={close}>Fermer</Button>
+              <Button variant="outline" onClick={close}>{t("form.close")}</Button>
               <Button
                 onClick={() => {
                   close();
                   navigate({ to: "/support/$ticketId", params: { ticketId: done } });
                 }}
               >
-                Voir le ticket
+                {t("form.view")}
               </Button>
             </div>
           </div>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Signaler un problème</DialogTitle>
+              <DialogTitle>{t("form.title")}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label>Sujet</Label>
+                <Label>{t("form.subject")}</Label>
                 <Input
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  placeholder="Décrivez le problème en quelques mots"
+                  placeholder={t("form.subject_placeholder")}
                   maxLength={200}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label>Catégorie</Label>
-                  <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map((c) => (
-                        <SelectItem key={c.v} value={c.v}>{c.l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Priorité</Label>
-                  <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {PRIORITIES.map((p) => (
-                        <SelectItem key={p.v} value={p.v}>{p.l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-1.5">
+                <Label>{t("form.category")}</Label>
+                <Select value={category} onValueChange={(v) => setCategory(v as SupportCategory)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {SUPPORT_CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>{t(`category.${c}`)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1.5">
-                <Label>Description</Label>
+                <Label>{t("form.description")}</Label>
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Soyez le plus précis possible…"
+                  placeholder={t("form.description_placeholder")}
                   rows={5}
                   maxLength={10000}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label>Que cherchiez-vous à faire ? <span className="text-muted-foreground font-normal">(optionnel)</span></Label>
+                <Label>
+                  {t("form.intent")}{" "}
+                  <span className="text-muted-foreground font-normal">{t("form.intent_optional")}</span>
+                </Label>
                 <Input
                   value={intent}
                   onChange={(e) => setIntent(e.target.value)}
-                  placeholder="Ex. créer un événement"
+                  placeholder={t("form.intent_placeholder")}
                   maxLength={2000}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label>Captures d'écran <span className="text-muted-foreground font-normal">(max 5, 5 Mo)</span></Label>
+                <Label>
+                  {t("form.attachments")}{" "}
+                  <span className="text-muted-foreground font-normal">{t("form.attachments_hint")}</span>
+                </Label>
                 <label className="flex items-center gap-2 h-10 px-3 rounded-md border border-dashed text-sm cursor-pointer hover:bg-accent/30">
                   <Paperclip className="h-4 w-4" />
-                  Ajouter un fichier
+                  {t("form.add_file")}
                   <input
                     type="file"
                     accept="image/*,application/pdf"
@@ -230,14 +208,14 @@ export function SupportFormDialog({
 
               <div className="flex gap-2 pt-2">
                 <Button variant="outline" className="flex-1" onClick={close} disabled={submit.isPending}>
-                  Annuler
+                  {t("form.cancel")}
                 </Button>
                 <Button
                   className="flex-1"
                   onClick={() => submit.mutate()}
                   disabled={submit.isPending || !subject.trim() || !description.trim()}
                 >
-                  {submit.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Envoyer"}
+                  {submit.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("form.send")}
                 </Button>
               </div>
             </div>
