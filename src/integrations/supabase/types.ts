@@ -1209,6 +1209,109 @@ export type Database = {
         }
         Relationships: []
       }
+      support_messages: {
+        Row: {
+          attachment_paths: string[]
+          body: string
+          created_at: string
+          id: string
+          is_internal_note: boolean
+          sender_id: string
+          sender_role: string
+          ticket_id: string
+        }
+        Insert: {
+          attachment_paths?: string[]
+          body: string
+          created_at?: string
+          id?: string
+          is_internal_note?: boolean
+          sender_id: string
+          sender_role: string
+          ticket_id: string
+        }
+        Update: {
+          attachment_paths?: string[]
+          body?: string
+          created_at?: string
+          id?: string
+          is_internal_note?: boolean
+          sender_id?: string
+          sender_role?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: Database["public"]["Enums"]["support_ticket_category"]
+          club_id: string | null
+          context_data: Json
+          created_at: string
+          description: string
+          id: string
+          last_activity_at: string
+          priority: Database["public"]["Enums"]["support_ticket_priority"]
+          staff_unread_count: number
+          status: Database["public"]["Enums"]["support_ticket_status"]
+          subject: string
+          updated_at: string
+          user_id: string
+          user_unread_count: number
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: Database["public"]["Enums"]["support_ticket_category"]
+          club_id?: string | null
+          context_data?: Json
+          created_at?: string
+          description: string
+          id?: string
+          last_activity_at?: string
+          priority?: Database["public"]["Enums"]["support_ticket_priority"]
+          staff_unread_count?: number
+          status?: Database["public"]["Enums"]["support_ticket_status"]
+          subject: string
+          updated_at?: string
+          user_id: string
+          user_unread_count?: number
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: Database["public"]["Enums"]["support_ticket_category"]
+          club_id?: string | null
+          context_data?: Json
+          created_at?: string
+          description?: string
+          id?: string
+          last_activity_at?: string
+          priority?: Database["public"]["Enums"]["support_ticket_priority"]
+          staff_unread_count?: number
+          status?: Database["public"]["Enums"]["support_ticket_status"]
+          subject?: string
+          updated_at?: string
+          user_id?: string
+          user_unread_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -1640,6 +1743,10 @@ export type Database = {
         }
         Returns: string
       }
+      mark_support_ticket_read: {
+        Args: { _ticket_id: string }
+        Returns: undefined
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -1748,6 +1855,21 @@ export type Database = {
         | "incomplete_expired"
         | "unpaid"
         | "paused"
+      support_ticket_category:
+        | "bug"
+        | "payment"
+        | "account"
+        | "team"
+        | "event"
+        | "feature_request"
+        | "other"
+      support_ticket_priority: "low" | "normal" | "high" | "urgent"
+      support_ticket_status:
+        | "open"
+        | "in_progress"
+        | "waiting_user"
+        | "resolved"
+        | "closed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1915,6 +2037,23 @@ export const Constants = {
         "incomplete_expired",
         "unpaid",
         "paused",
+      ],
+      support_ticket_category: [
+        "bug",
+        "payment",
+        "account",
+        "team",
+        "event",
+        "feature_request",
+        "other",
+      ],
+      support_ticket_priority: ["low", "normal", "high", "urgent"],
+      support_ticket_status: [
+        "open",
+        "in_progress",
+        "waiting_user",
+        "resolved",
+        "closed",
       ],
     },
   },
