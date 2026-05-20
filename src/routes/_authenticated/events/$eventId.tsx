@@ -1731,7 +1731,7 @@ function EventDetail() {
                 <MessageCircle className="h-4 w-4 text-[#25D366]" />
                 <span>WhatsApp</span>
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                  {mode === "whatsapp" ? "WhatsApp uniquement" : mode === "hybrid" ? "Hybride" : "Partage rapide"}
+                  {mode === "whatsapp" ? t("events.whatsappShare.modeWhatsappOnly") : mode === "hybrid" ? t("events.whatsappShare.modeHybrid") : t("events.whatsappShare.modeQuickShare")}
                 </span>
               </div>
               {groupUrl && (
@@ -1741,7 +1741,7 @@ function EventDetail() {
                   rel="noopener noreferrer"
                   className="text-xs font-medium text-[#075E54] inline-flex items-center gap-1"
                 >
-                  Ouvrir le groupe <ExternalLink className="h-3 w-3" />
+                  {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
                 </a>
               )}
             </div>
@@ -1753,7 +1753,7 @@ function EventDetail() {
                 className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
               >
                 <MessageCircle className="h-4 w-4" />
-                Partager l'annulation
+                {t("events.whatsappShare.shareCancellation")}
               </a>
             ) : (
               <>
@@ -1764,7 +1764,7 @@ function EventDetail() {
                   className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Partager la convoc
+                  {t("events.whatsappShare.shareConvoc")}
                 </a>
                 {lineupData && (
                   <button
@@ -1774,7 +1774,7 @@ function EventDetail() {
                     className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#075E54] text-white hover:bg-[#064a42] text-sm font-medium disabled:opacity-60"
                   >
                     {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
-                    Partager la convoc + compo
+                    {t("events.whatsappShare.shareConvocWithLineup")}
                   </button>
                 )}
                 <a
@@ -1784,11 +1784,12 @@ function EventDetail() {
                   className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium"
                 >
                   <Bell className="h-4 w-4" />
-                  Rappel
+                  {t("events.whatsappShare.reminder")}
                 </a>
                 <p className="text-[11px] text-muted-foreground pl-1">
-                  Le rappel inclut le statut des joueurs (présents, absents, sans réponse).{lineupData ? " La compo est jointe en image sur mobile." : ""}
+                  {lineupData ? t("events.whatsappShare.reminderHintWithLineup") : t("events.whatsappShare.reminderHint")}
                 </p>
+
               </>
             )}
           </div>
