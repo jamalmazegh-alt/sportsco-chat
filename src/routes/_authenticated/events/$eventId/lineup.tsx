@@ -40,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
@@ -120,7 +120,7 @@ function LineupPage() {
   const [captain, setCaptain] = useState<string | null>(null);
   const [gk, setGk] = useState<string | null>(null);
   const [visibility, setVisibility] = useState<"draft" | "staff" | "selected_players" | "team">("draft");
-  const [includeInConv, setIncludeInConv] = useState(false);
+  // include_in_convocation: always true now (config retiré côté UI)
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedPid, setSelectedPid] = useState<string | null>(null);
@@ -146,7 +146,7 @@ function LineupPage() {
     setCaptain(l.captain_player_id ?? null);
     setGk(l.gk_player_id ?? null);
     setVisibility((l.visibility as any) ?? "draft");
-    setIncludeInConv(!!l.include_in_convocation);
+    
   }, [lineupData?.lineup]);
 
   const placedIds = useMemo(() => {
@@ -293,7 +293,7 @@ function LineupPage() {
           captain_player_id: captain,
           gk_player_id: gk,
           visibility: publish && visibility === "draft" ? "team" : visibility,
-          include_in_convocation: includeInConv,
+          include_in_convocation: true,
           publish,
         },
       });
@@ -411,10 +411,6 @@ function LineupPage() {
               </SelectContent>
             </Select>
           </div>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <Switch checked={includeInConv} onCheckedChange={(v) => { setIncludeInConv(v); setDirty(true); }} />
-            <span>{t("lineup.includeInConv", "Inclure dans la convocation")}</span>
-          </label>
         </div>
 
         {/* Create convocation from lineup */}

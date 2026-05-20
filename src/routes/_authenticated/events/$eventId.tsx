@@ -1695,18 +1695,35 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
-          lineup: lineupData?.include_in_convocation
-            ? {
-                formation: lineupData.formation,
-                starting: (lineupData as any)._starting ?? [],
-                bench: (lineupData as any)._bench ?? [],
-              }
-            : null,
+          lineup: null,
         };
+        const lineupBlock = lineupData
+          ? {
+              formation: lineupData.formation,
+              starting: (lineupData as any)._starting ?? [],
+              bench: (lineupData as any)._bench ?? [],
+            }
+          : null;
+        const respondents = (() => {
+          const buckets: { present: string[]; absent: string[]; uncertain: string[]; pending: string[] } = {
+            present: [], absent: [], uncertain: [], pending: [],
+          };
+          for (const c of (convocations ?? []) as any[]) {
+            const p = c.players ?? {};
+            const name = [p.first_name, p.last_name].filter(Boolean).join(" ") || "—";
+            if (c.status === "present") buckets.present.push(name);
+            else if (c.status === "absent") buckets.absent.push(name);
+            else if (c.status === "uncertain") buckets.uncertain.push(name);
+            else buckets.pending.push(name);
+          }
+          return buckets;
+        })();
         const isCancelled = event.status === "cancelled";
-        const msg = isCancelled
+        const convocMsg = isCancelled
           ? buildCancellationMessage(base)
           : buildConvocationMessage(base);
+        const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
+        const reminderMsg = buildReminderMessage({ ...base, respondents });
         return (
           <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-3 space-y-2">
             <div className="flex items-center justify-between gap-2">
@@ -1728,53 +1745,51 @@ function EventDetail() {
                 </a>
               )}
             </div>
-            {!isCancelled && lineupData ? (
-              <button
-                type="button"
-                onClick={() => shareLineupAsImage(msg)}
-                disabled={sharingLineup}
-                className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium disabled:opacity-60"
-              >
-                {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
-                Partager la convocation (avec la compo)
-              </button>
-            ) : (
+            {isCancelled ? (
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(msg)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
               >
                 <MessageCircle className="h-4 w-4" />
-                {isCancelled ? "Partager l'annulation" : "Partager la convocation"}
+                Partager l'annulation
               </a>
-            )}
-            {!isCancelled && (
-              <p className="text-[11px] text-muted-foreground pl-1">
-                Message complet : date, lieu, point de RDV, joueurs convoqués{lineupData ? " et compo" : ""}.
-              </p>
-            )}
-            {!isCancelled && (
+            ) : (
               <>
-                <div className="h-px bg-border/60 my-1" />
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(buildReminderMessage(base))}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 w-full h-9 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium"
+                  className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Partager la convoc
+                </a>
+                {lineupData && (
+                  <button
+                    type="button"
+                    onClick={() => shareLineupAsImage(convocWithCompoMsg)}
+                    disabled={sharingLineup}
+                    className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#075E54] text-white hover:bg-[#064a42] text-sm font-medium disabled:opacity-60"
+                  >
+                    {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                    Partager la convoc + compo
+                  </button>
+                )}
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(reminderMsg)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium"
                 >
                   <Bell className="h-4 w-4" />
-                  Envoyer un rappel (J-1 / jour J)
+                  Rappel
                 </a>
                 <p className="text-[11px] text-muted-foreground pl-1">
-                  Message court pour relancer les joueurs qui n'ont pas encore répondu.
+                  Le rappel inclut le statut des joueurs (présents, absents, sans réponse).{lineupData ? " La compo est jointe en image sur mobile." : ""}
                 </p>
               </>
-            )}
-            {lineupData && !isCancelled && (
-              <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/40">
-                Sur mobile, l'image de la compo est jointe automatiquement. Sinon elle est téléchargée et le message copié.
-              </p>
             )}
           </div>
         );

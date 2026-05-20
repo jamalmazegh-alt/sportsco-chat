@@ -38,6 +38,12 @@ export type WhatsAppEventInput = {
   cancellationReason?: string | null;
   previousStart?: string | null; // for reschedule
   lineup?: WhatsAppLineup | null;
+  respondents?: {
+    present?: string[];
+    absent?: string[];
+    uncertain?: string[];
+    pending?: string[];
+  } | null;
 };
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
@@ -216,8 +222,31 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
     lines.push(`📍 ${input.location}`);
     pushNavLinks(lines, input.location, input.locationUrl);
   }
-  lines.push("");
-  lines.push("Merci de confirmer votre présence 🙏");
+
+  const r = input.respondents;
+  if (r) {
+    const present = r.present ?? [];
+    const absent = r.absent ?? [];
+    const uncertain = r.uncertain ?? [];
+    const pending = r.pending ?? [];
+    if (present.length + absent.length + uncertain.length + pending.length > 0) {
+      lines.push("");
+      lines.push("📊 *Réponses*");
+      if (present.length) lines.push(`✅ Présents (${present.length}) : ${present.join(", ")}`);
+      if (absent.length) lines.push(`❌ Absents (${absent.length}) : ${absent.join(", ")}`);
+      if (uncertain.length) lines.push(`❔ Incertains (${uncertain.length}) : ${uncertain.join(", ")}`);
+      if (pending.length) {
+        lines.push("");
+        lines.push(`⏳ *Pas encore répondu (${pending.length})*`);
+        for (const n of pending) lines.push(`• ${n}`);
+        lines.push("");
+        lines.push("Merci de confirmer votre présence 🙏");
+      }
+    }
+  } else {
+    lines.push("");
+    lines.push("Merci de confirmer votre présence 🙏");
+  }
   lines.push("— envoyé via Clubero");
   return lines.join("\n");
 }
