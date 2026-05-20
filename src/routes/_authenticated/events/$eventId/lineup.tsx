@@ -146,7 +146,7 @@ function LineupPage() {
     setCaptain(l.captain_player_id ?? null);
     setGk(l.gk_player_id ?? null);
     setVisibility((l.visibility as any) ?? "draft");
-    setIncludeInConv(!!l.include_in_convocation);
+    
   }, [lineupData?.lineup]);
 
   const placedIds = useMemo(() => {
