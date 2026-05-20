@@ -28,6 +28,7 @@ type Finance = Awaited<ReturnType<typeof getFinanceOverview>>;
 function SuperAdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [finance, setFinance] = useState<Finance | null>(null);
+  const [supportStats, setSupportStats] = useState<{ open: number; urgent: number; unread: number } | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,6 +38,9 @@ function SuperAdminDashboard() {
     getFinanceOverview()
       .then(setFinance)
       .catch((e) => console.error("finance", e));
+    getSupportStats()
+      .then(setSupportStats)
+      .catch((e) => console.error("support stats", e));
   }, []);
 
   return (
