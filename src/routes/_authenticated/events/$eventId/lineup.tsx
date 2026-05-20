@@ -540,9 +540,6 @@ function LineupPage() {
             })}
           </DroppableBench>
         </div>
-            })}
-          </DroppableBench>
-        </div>
 
         {/* Sticky action bar */}
         <div className="sticky bottom-4 md:bottom-6 flex flex-wrap gap-2 justify-end bg-background/90 backdrop-blur rounded-xl border p-3 shadow-md">
