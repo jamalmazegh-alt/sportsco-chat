@@ -4,6 +4,20 @@
 
 import { fmt } from "@/lib/date-locale";
 
+export type WhatsAppLineupPlayer = {
+  name: string;
+  jersey?: number | null;
+  role?: string | null;
+  isCaptain?: boolean;
+  isGK?: boolean;
+};
+
+export type WhatsAppLineup = {
+  formation?: string | null;
+  starting?: WhatsAppLineupPlayer[];
+  bench?: WhatsAppLineupPlayer[];
+};
+
 export type WhatsAppEventInput = {
   clubName?: string | null;
   teamName?: string | null;
@@ -23,6 +37,7 @@ export type WhatsAppEventInput = {
   selectedPlayers?: string[]; // names
   cancellationReason?: string | null;
   previousStart?: string | null; // for reschedule
+  lineup?: WhatsAppLineup | null;
 };
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
