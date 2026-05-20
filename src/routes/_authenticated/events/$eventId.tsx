@@ -144,6 +144,46 @@ function EventDetail() {
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const [sending, setSending] = useState(false);
+  const [sharingLineup, setSharingLineup] = useState(false);
+  const lineupCardRef = useRef<HTMLDivElement | null>(null);
+
+  async function shareLineupAsImage(messageText: string) {
+    const node = lineupCardRef.current;
+    if (!node) {
+      toast.error("Compo non disponible");
+      return;
+    }
+    setSharingLineup(true);
+    try {
+      const dataUrl = await toPng(node, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+      });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "composition.png", { type: "image/png" });
+      const nav = navigator as any;
+      if (nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({ files: [file], text: messageText });
+      } else {
+        // Fallback: download image + open WhatsApp with text
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = "composition.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
+        toast.success("Image téléchargée — attachez-la dans WhatsApp");
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") {
+        toast.error("Impossible de générer l'image");
+      }
+    } finally {
+      setSharingLineup(false);
+    }
+  }
   const [editOpen, setEditOpen] = useState(false);
   const [autoSendConsumed, setAutoSendConsumed] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
