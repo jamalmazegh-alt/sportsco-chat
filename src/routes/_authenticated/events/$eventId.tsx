@@ -1536,7 +1536,6 @@ function EventDetail() {
         const team = teams?.[0] as any;
         if (!team) return null;
         const mode = (team.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
-        if (mode === "app") return null;
         const groupUrl = normalizeGroupUrl(team.whatsapp_group_url);
         const clubName = team.clubs?.name ?? undefined;
         const teamName = team.name ?? undefined;
