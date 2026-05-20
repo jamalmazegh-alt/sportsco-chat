@@ -1979,15 +1979,7 @@ function EventDetail() {
             </div>
             {isCoach && event.status !== "cancelled" && event.convocations_sent && (
               <div className="flex items-center gap-1 shrink-0">
-                <Button
-                  variant={convocChanges.length > 0 ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setResendOpen(true)}
-                  className="h-8"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  {convocChanges.length > 0 ? `Renvoyer (${convocChanges.length})` : "Renvoyer"}
-                </Button>
+                <DropdownMenu>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
