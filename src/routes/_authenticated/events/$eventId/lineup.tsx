@@ -602,22 +602,22 @@ function LineupPage() {
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <Button variant="outline" onClick={() => { setSelectedPid(actionPid); setActionPid(null); }}>
-                  <Move className="h-4 w-4" /> Déplacer
+                  <Move className="h-4 w-4" /> {t("lineup.move", "Déplacer")}
                 </Button>
                 <Button
                   variant={captain === actionPid ? "default" : "outline"}
                   onClick={() => { setCaptain(captain === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
                 >
-                  <Star className="h-4 w-4" /> Capitaine
+                  <Star className="h-4 w-4" /> {t("lineup.captain", "Capitaine")}
                 </Button>
                 <Button
                   variant={gk === actionPid ? "default" : "outline"}
                   onClick={() => { setGk(gk === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
                 >
-                  <Hand className="h-4 w-4" /> Gardien
+                  <Hand className="h-4 w-4" /> {t("lineup.gk", "Gardien")}
                 </Button>
                 <Button variant="destructive" onClick={() => { removePlayer(actionPid); setDirty(true); setActionPid(null); }}>
-                  <XIcon className="h-4 w-4" /> Retirer
+                  <XIcon className="h-4 w-4" /> {t("lineup.remove", "Retirer")}
                 </Button>
               </div>
             </div>
