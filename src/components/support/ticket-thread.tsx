@@ -179,7 +179,7 @@ export function TicketThread({
                   checked={internalNote}
                   onChange={(e) => setInternalNote(e.target.checked)}
                 />
-                Note interne
+                {t("thread.internal_note")}
               </label>
             )}
           </div>
@@ -189,7 +189,7 @@ export function TicketThread({
             size="sm"
           >
             {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Envoyer
+            {t("thread.send")}
           </Button>
         </div>
       </div>
