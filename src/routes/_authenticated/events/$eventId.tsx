@@ -195,7 +195,21 @@ function EventDetail() {
 
       if (nativeShare && canNativeShare) {
         if (!canShareFull) await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-        await nativeShare(canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" });
+        try {
+          await nativeShare(canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" });
+        } catch (shareError: any) {
+          if (shareError?.name === "AbortError") return;
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = "composition.png";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          await navigator.clipboard?.writeText(messageText).catch(() => undefined);
+          window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
+          toast.success("Image téléchargée, message copié — attachez l’image dans WhatsApp");
+          return;
+        }
         toast.success("Partage prêt — choisissez WhatsApp");
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
