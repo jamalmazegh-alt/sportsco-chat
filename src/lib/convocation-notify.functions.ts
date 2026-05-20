@@ -61,7 +61,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     // Fetch coach profiles + emails (auth.users via admin)
     const { data: profs } = await supabaseAdmin
       .from("profiles")
-      .select("id, first_name, notifications_email")
+      .select("id, first_name, notifications_email, preferred_language")
       .in("id", coachIds);
 
     const baseUrl =
@@ -75,9 +75,12 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       const email = u?.user?.email;
       if (!email) continue;
 
+      const lang = ((p as any).preferred_language ?? "en").toLowerCase();
+      const locale: "fr" | "en" = lang.startsWith("fr") ? "fr" : "en";
+
       const startsAt = ev.starts_at ? new Date(ev.starts_at) : null;
       const eventDate = startsAt
-        ? startsAt.toLocaleDateString("fr-FR", {
+        ? startsAt.toLocaleDateString(locale === "fr" ? "fr-FR" : "en-GB", {
             weekday: "long",
             day: "numeric",
             month: "long",
@@ -106,6 +109,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               status,
               reason: conv.comment ?? null,
               eventUrl: `${baseUrl}/events/${ev.id}`,
+              locale,
             },
           }),
         });
