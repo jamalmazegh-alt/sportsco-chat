@@ -443,43 +443,37 @@ function LineupPage() {
             <PitchSvg />
             {slots.map((s) => {
               const player = s.player_id ? playerById.get(s.player_id) : null;
+              const slotClickable = !!selectedPid && !player;
               return (
-                <DroppableSlot key={s.id} id={s.id} x={s.x} y={s.y} role={s.role} empty={!player}>
+                <DroppableSlot
+                  key={s.id}
+                  id={s.id}
+                  x={s.x}
+                  y={s.y}
+                  role={s.role}
+                  empty={!player}
+                  highlight={slotClickable}
+                  onClick={
+                    selectedPid && !player
+                      ? () => placePlayer(selectedPid, { kind: "slot", slotId: s.id })
+                      : undefined
+                  }
+                >
                   {player && (
-                    <div className="relative group">
-                      <DraggablePlayer
-                        id={`slot:${s.id}`}
-                        player={player}
-                        isCaptain={captain === player.id}
-                        isGK={gk === player.id}
-                      />
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full mt-1 hidden group-hover:flex items-center gap-1 bg-background/95 backdrop-blur rounded-md shadow-md ring-1 ring-border p-1 z-10">
-                        <Button
-                          size="icon-sm"
-                          variant={captain === player.id ? "default" : "ghost"}
-                          onClick={() => { setCaptain(captain === player.id ? null : player.id); setDirty(true); }}
-                          title={t("lineup.captain", "Capitaine")}
-                        >
-                          <Star className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          size="icon-sm"
-                          variant={gk === player.id ? "default" : "ghost"}
-                          onClick={() => { setGk(gk === player.id ? null : player.id); setDirty(true); }}
-                          title={t("lineup.gk", "Gardien")}
-                        >
-                          <Hand className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          size="icon-sm"
-                          variant="ghost"
-                          onClick={() => { removePlayer(player.id); setDirty(true); }}
-                          title={t("common.remove", "Retirer")}
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    </div>
+                    <DraggablePlayer
+                      id={`slot:${s.id}`}
+                      player={player}
+                      isCaptain={captain === player.id}
+                      isGK={gk === player.id}
+                      selected={actionPid === player.id}
+                      onSelect={() => {
+                        if (selectedPid && selectedPid !== player.id) {
+                          placePlayer(selectedPid, { kind: "slot", slotId: s.id });
+                        } else {
+                          handleChipTap(player.id, "slot");
+                        }
+                      }}
+                    />
                   )}
                 </DroppableSlot>
               );
@@ -490,13 +484,26 @@ function LineupPage() {
           <div className="space-y-3">
             <div>
               <h2 className="text-sm font-semibold mb-2">{t("lineup.available", "Joueurs disponibles")}</h2>
-              <DroppableAvailable>
+              <DroppableAvailable
+                highlight={!!selectedPid && placedIds.has(selectedPid)}
+                onClick={
+                  selectedPid && placedIds.has(selectedPid)
+                    ? () => placePlayer(selectedPid, { kind: "available" })
+                    : undefined
+                }
+              >
                 {available.length === 0 && (
                   <p className="text-xs text-muted-foreground">{t("lineup.allPlaced", "Tous les joueurs sont placés.")}</p>
                 )}
                 {available.map((p) => (
                   <div key={p.id} className={cn(!p.convocated && "opacity-60")}>
-                    <DraggablePlayer id={`avail:${p.id}`} player={p} size="sm" />
+                    <DraggablePlayer
+                      id={`avail:${p.id}`}
+                      player={p}
+                      size="sm"
+                      selected={selectedPid === p.id}
+                      onSelect={() => handleChipTap(p.id, "available")}
+                    />
                     {!p.convocated && (
                       <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
                     )}
@@ -510,14 +517,29 @@ function LineupPage() {
         {/* Bench */}
         <div>
           <h2 className="text-sm font-semibold mb-2">{t("lineup.bench", "Remplaçants")} ({bench.length})</h2>
-          <DroppableBench>
+          <DroppableBench
+            highlight={!!selectedPid}
+            onClick={selectedPid ? () => placePlayer(selectedPid, { kind: "bench" }) : undefined}
+          >
             {bench.length === 0 && (
-              <p className="text-xs text-muted-foreground">{t("lineup.benchEmpty", "Glissez des joueurs ici.")}</p>
+              <p className="text-xs text-muted-foreground">{t("lineup.benchEmpty", "Touche un joueur puis le banc, ou glisse-le ici.")}</p>
             )}
             {bench.map((id) => {
               const p = playerById.get(id);
               if (!p) return null;
-              return <DraggablePlayer key={id} id={`bench:${id}`} player={p} size="sm" />;
+              return (
+                <DraggablePlayer
+                  key={id}
+                  id={`bench:${id}`}
+                  player={p}
+                  size="sm"
+                  selected={actionPid === p.id}
+                  onSelect={() => handleChipTap(p.id, "bench")}
+                />
+              );
+            })}
+          </DroppableBench>
+        </div>
             })}
           </DroppableBench>
         </div>
