@@ -374,6 +374,12 @@ function LineupPage() {
           <p className="text-sm text-muted-foreground">{ctx.event.title}</p>
         </div>
 
+        {/* Tap-to-place hint */}
+        <div className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+          💡 <strong>Astuce mobile :</strong> touche un joueur puis touche une case (ou le banc) pour le placer.
+          Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.
+        </div>
+
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
