@@ -125,6 +125,27 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
   component: EventDetailRoute,
 });
 
+async function waitForShareAssets(node: HTMLElement) {
+  const fontsReady = "fonts" in document ? (document as any).fonts.ready.catch(() => undefined) : undefined;
+  const imagesReady = Array.from(node.querySelectorAll("img")).map((img) => {
+    if (img.complete) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      img.addEventListener("load", () => resolve(), { once: true });
+      img.addEventListener("error", () => resolve(), { once: true });
+    });
+  });
+  await Promise.allSettled([fontsReady, ...imagesReady].filter(Boolean));
+}
+
+function dataUrlToBlob(dataUrl: string) {
+  const [header, payload] = dataUrl.split(",");
+  const mime = header.match(/data:(.*?);/)?.[1] ?? "image/png";
+  const binary = atob(payload);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
 function EventDetailRoute() {
   const { eventId } = Route.useParams();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -155,29 +176,40 @@ function EventDetail() {
     }
     setSharingLineup(true);
     try {
+      await waitForShareAssets(node);
       const dataUrl = await domToPng(node, {
         scale: 2,
         backgroundColor: "#ffffff",
       });
-      const blob = await (await fetch(dataUrl)).blob();
+      const blob = dataUrlToBlob(dataUrl);
       const file = new File([blob], "composition.png", { type: "image/png" });
-      const nav = navigator as any;
-      if (nav.canShare && nav.canShare({ files: [file] })) {
-        await nav.share({ files: [file], text: messageText });
+      const nav = navigator as Navigator & {
+        canShare?: (data: ShareData) => boolean;
+        share?: (data: ShareData) => Promise<void>;
+      };
+      const sharePayload: ShareData = { files: [file], text: messageText, title: "Composition Clubero" };
+      const canNativeShare =
+        typeof nav.share === "function" &&
+        (typeof nav.canShare !== "function" || nav.canShare(sharePayload) || nav.canShare({ files: [file] }));
+
+      if (canNativeShare) {
+        await nav.share(sharePayload);
+        toast.success("Partage prêt — choisissez WhatsApp");
       } else {
-        // Fallback: download image + open WhatsApp with text
+        // Browser fallback: WhatsApp deep-links cannot auto-attach files.
         const a = document.createElement("a");
         a.href = dataUrl;
         a.download = "composition.png";
         document.body.appendChild(a);
         a.click();
         a.remove();
+        await navigator.clipboard?.writeText(messageText).catch(() => undefined);
         window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
-        toast.success("Image téléchargée — attachez-la dans WhatsApp");
+        toast.success("Image téléchargée, message copié — attachez l’image dans WhatsApp");
       }
     } catch (e: any) {
       if (e?.name !== "AbortError") {
-        toast.error("Impossible de générer l'image");
+        toast.error("Impossible de partager l'image");
       }
     } finally {
       setSharingLineup(false);
