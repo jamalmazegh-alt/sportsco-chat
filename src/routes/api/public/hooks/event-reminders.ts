@@ -167,6 +167,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     isReminder: true,
                     reminderHoursBefore: milestone,
                     lineup: lineupEmail,
+                    locale: "fr",
                   },
 
                 });
