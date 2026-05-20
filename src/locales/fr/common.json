@@ -830,6 +830,9 @@
     "refineWelcome": "Salut 👋 Dis-moi ce que tu veux ajuster : longueur, ton, structure, focus particulier… Je réécris la synthèse à chaque message.",
     "refineWithAi": "Affiner avec l'IA",
     "refineWorking": "L'IA réécrit la synthèse…",
+    "refineExample1": "Résume en 5 phrases",
+    "refineExample2": "Insiste davantage sur le mental",
+    "refineExample3": "Ajoute une recommandation sur le placement",
     "saveAll": "Tout enregistrer",
     "saved": "Enregistré",
     "send": "Envoyer"
