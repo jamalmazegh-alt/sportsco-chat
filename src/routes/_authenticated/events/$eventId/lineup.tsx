@@ -411,10 +411,6 @@ function LineupPage() {
               </SelectContent>
             </Select>
           </div>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <Switch checked={includeInConv} onCheckedChange={(v) => { setIncludeInConv(v); setDirty(true); }} />
-            <span>{t("lineup.includeInConv", "Inclure dans la convocation")}</span>
-          </label>
         </div>
 
         {/* Create convocation from lineup */}
