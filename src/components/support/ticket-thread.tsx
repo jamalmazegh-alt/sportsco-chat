@@ -31,6 +31,7 @@ export function TicketThread({
   isStaffView: boolean;
   onReplied: () => void;
 }) {
+  const { t } = useTranslation("support");
   const { user } = useAuth();
   const [body, setBody] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -41,7 +42,9 @@ export function TicketThread({
       if (!user) throw new Error("not_authenticated");
       const paths: string[] = [];
       for (const f of files) {
-        if (f.size > 5 * 1024 * 1024) throw new Error(`${f.name} dépasse 5 Mo`);
+        if (f.size > 5 * 1024 * 1024) {
+          throw new Error(t("form.file_too_large", { name: f.name }));
+        }
         const ext = f.name.split(".").pop() || "bin";
         const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error } = await supabase.storage
@@ -65,7 +68,7 @@ export function TicketThread({
       setInternalNote(false);
       onReplied();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("form.error")),
   });
 
   const openAttachment = async (path: string) => {
@@ -73,7 +76,7 @@ export function TicketThread({
       const { url } = await getSupportAttachmentUrl({ data: { path } });
       window.open(url, "_blank");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Lien indisponible");
+      toast.error(e instanceof Error ? e.message : t("thread.link_unavailable"));
     }
   };
 
