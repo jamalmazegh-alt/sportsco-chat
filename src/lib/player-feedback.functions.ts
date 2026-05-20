@@ -4,16 +4,9 @@ import { generateText } from "ai";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
 
-export const FEEDBACK_TAGS = [
-  "positioning",
-  "mentality",
-  "effort",
-  "leadership",
-  "technical",
-  "physical",
-  "discipline",
-  "teamwork",
-] as const;
+// Tag catalog lives in `src/lib/feedback-tags.ts` (sport-aware).
+// Tags are stored as free-form strings (validated as `z.string().min(1).max(40)`)
+// so no enum needs to be enforced on the server.
 
 export const VISIBILITY_VALUES = [
   "coach_only",

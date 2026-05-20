@@ -75,6 +75,12 @@ export function formationSlots(formation: FormationKey): FormationSlot[] {
         ...row("FWD", 3, 18, "f"),
       ];
     case "custom":
-      return [gk];
+      // Free layout: 10 empty outfield slots in a neutral 4-3-3 grid as starting positions
+      return [
+        gk,
+        ...row("DEF", 4, 70, "d"),
+        ...row("MID", 3, 45, "m"),
+        ...row("FWD", 3, 18, "f"),
+      ];
   }
 }
