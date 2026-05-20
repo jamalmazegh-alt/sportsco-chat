@@ -352,7 +352,11 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
     if (!isAdmin) throw new Error("forbidden");
 
-    const patch: Record<string, unknown> = {};
+    const patch: {
+      status?: typeof STATUSES[number];
+      priority?: typeof PRIORITIES[number];
+      assigned_to?: string | null;
+    } = {};
     if (data.status !== undefined) patch.status = data.status;
     if (data.priority !== undefined) patch.priority = data.priority;
     if (data.assigned_to !== undefined) patch.assigned_to = data.assigned_to;
