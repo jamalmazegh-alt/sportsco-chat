@@ -275,7 +275,11 @@
       "shareConvocWithLineup": "Share call-up + lineup",
       "reminder": "Reminder",
       "reminderHint": "The reminder includes player statuses (attending, absent, no reply).",
-      "reminderHintWithLineup": "The reminder includes player statuses (attending, absent, no reply). The lineup is attached as an image on mobile."
+      "reminderHintWithLineup": "The reminder includes player statuses (attending, absent, no reply). The lineup is attached as an image on mobile.",
+      "imageDownloadedAttach": "Image downloaded, message copied — attach the image in WhatsApp",
+      "shareReady": "Share ready — pick WhatsApp",
+      "shareImageFailed": "Unable to share the image",
+      "convocationsCreated": "Call-ups created — share now via WhatsApp below"
     },
     "title": "Events",
     "create": "New event",
@@ -362,7 +366,35 @@
     "rescheduleSameDate": "The new date must differ from the current one.",
     "eventRescheduled": "Event rescheduled",
     "previousDate": "Previous date",
-    "newDate": "New date"
+    "newDate": "New date",
+    "resend": {
+      "title": "Resend call-up",
+      "descChanges": "{{count}} change(s) detected since the last send. The email will highlight what changed.",
+      "descNoChanges": "No changes detected since the last send. The call-up will still be resent to all players.",
+      "changesHeader": "Changes",
+      "recipientsHint": "Sent to {{count}} player(s) (+ parents). Existing responses are preserved.",
+      "confirm": "Resend",
+      "button": "Resend call-up",
+      "buttonWithChanges": "Resend call-up ({{count}} update(s))",
+      "changesDetected": "Changes were detected since the last send.",
+      "noConvocations": "No call-up to resend",
+      "notifUpdated": "Call-up updated: {{fields}}",
+      "notifResent": "Call-up resent",
+      "success": "Call-up resent to {{count}} player(s)",
+      "error": "Error while resending",
+      "updatesBadge": "{{count}} update(s)"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "starts_at": "Date / time",
+      "ends_at": "End",
+      "convocation_time": "Meeting time",
+      "location": "Location",
+      "meeting_point": "Meeting point",
+      "competition_name": "Competition",
+      "type": "Type"
+    }
   },
   "followUps": {
     "title": "Follow-ups",
@@ -428,7 +460,10 @@
       "Family",
       "Minor health issue"
     ],
-    "suggestedReasons": "Suggestions"
+    "suggestedReasons": "Suggestions",
+    "forceResponseTitle": "Force response?",
+    "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
+    "notSentYet": "Not sent yet"
   },
   "stats": {
     "title": "Stats",

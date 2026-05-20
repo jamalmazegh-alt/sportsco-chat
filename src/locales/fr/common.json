@@ -275,7 +275,11 @@
       "shareConvocWithLineup": "Partager la convoc + compo",
       "reminder": "Rappel",
       "reminderHint": "Le rappel inclut le statut des joueurs (présents, absents, sans réponse).",
-      "reminderHintWithLineup": "Le rappel inclut le statut des joueurs (présents, absents, sans réponse). La compo est jointe en image sur mobile."
+      "reminderHintWithLineup": "Le rappel inclut le statut des joueurs (présents, absents, sans réponse). La compo est jointe en image sur mobile.",
+      "imageDownloadedAttach": "Image téléchargée, message copié — attachez l'image dans WhatsApp",
+      "shareReady": "Partage prêt — choisissez WhatsApp",
+      "shareImageFailed": "Impossible de partager l'image",
+      "convocationsCreated": "Convocations créées — partagez maintenant via WhatsApp ci-dessous"
     },
     "title": "Événements",
     "create": "Nouvel événement",
@@ -362,7 +366,35 @@
     "rescheduleSameDate": "La nouvelle date doit être différente de l'actuelle.",
     "eventRescheduled": "Événement reporté",
     "previousDate": "Date précédente",
-    "newDate": "Nouvelle date"
+    "newDate": "Nouvelle date",
+    "resend": {
+      "title": "Renvoyer la convocation",
+      "descChanges": "{{count}} changement(s) détecté(s) depuis le dernier envoi. L'email mettra en évidence ce qui a changé.",
+      "descNoChanges": "Aucun changement détecté depuis le dernier envoi. La convocation sera tout de même renvoyée à tous les joueurs.",
+      "changesHeader": "Changements",
+      "recipientsHint": "Envoyé à {{count}} joueur(s) (+ parents). Les réponses existantes sont conservées.",
+      "confirm": "Renvoyer",
+      "button": "Renvoyer la convocation",
+      "buttonWithChanges": "Renvoyer la convocation ({{count}} màj)",
+      "changesDetected": "Des changements ont été détectés depuis le dernier envoi.",
+      "noConvocations": "Aucune convocation à renvoyer",
+      "notifUpdated": "Convocation mise à jour : {{fields}}",
+      "notifResent": "Convocation renvoyée",
+      "success": "Convocation renvoyée à {{count}} joueur(s)",
+      "error": "Erreur lors du renvoi",
+      "updatesBadge": "{{count}} màj"
+    },
+    "fields": {
+      "title": "Titre",
+      "description": "Description",
+      "starts_at": "Date / heure",
+      "ends_at": "Fin",
+      "convocation_time": "Heure de RDV",
+      "location": "Lieu",
+      "meeting_point": "Point de RDV",
+      "competition_name": "Compétition",
+      "type": "Type"
+    }
   },
   "followUps": {
     "title": "À relancer",
@@ -378,7 +410,7 @@
     "uncertain": "Incertain",
     "pending": "En attente",
     "lockResponses": "Verrouiller les réponses",
-    "unlockResponses": "Déverrouiller",
+    "unlockResponses": "Déverrouiller les réponses",
     "responsesLocked": "Réponses verrouillées",
     "remindAll": "Relancer tous",
     "remind": "Relancer",
@@ -428,7 +460,10 @@
       "Famille",
       "Léger souci de santé"
     ],
-    "suggestedReasons": "Suggestions"
+    "suggestedReasons": "Suggestions",
+    "forceResponseTitle": "Forcer la réponse ?",
+    "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
+    "notSentYet": "Pas encore envoyée"
   },
   "stats": {
     "title": "Statistiques",

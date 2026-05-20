@@ -94,15 +94,15 @@ function formatSnapshotValue(field: string, value: any, t: (k: string) => string
 function diffSnapshot(prev: Record<string, any> | null | undefined, current: any, t: (k: string) => string): Array<{ field: string; label: string; previous?: string; current?: string }> {
   if (!prev) return [];
   const labels: Record<string, string> = {
-    title: "Titre",
-    description: "Description",
-    starts_at: "Date / heure",
-    ends_at: "Fin",
-    convocation_time: "Heure de RDV",
-    location: "Lieu",
-    meeting_point: "Point de RDV",
-    competition_name: "Compétition",
-    type: "Type",
+    title: t("events.fields.title" as any) || "Title",
+    description: t("events.fields.description" as any) || "Description",
+    starts_at: t("events.fields.starts_at" as any) || "Date / time",
+    ends_at: t("events.fields.ends_at" as any) || "End",
+    convocation_time: t("events.fields.convocation_time" as any) || "Meeting time",
+    location: t("events.fields.location" as any) || "Location",
+    meeting_point: t("events.fields.meeting_point" as any) || "Meeting point",
+    competition_name: t("events.fields.competition_name" as any) || "Competition",
+    type: t("events.fields.type" as any) || "Type",
   };
   const out: Array<{ field: string; label: string; previous?: string; current?: string }> = [];
   for (const k of CONVOC_SNAPSHOT_FIELDS) {
@@ -210,10 +210,10 @@ function EventDetail() {
           a.remove();
           await navigator.clipboard?.writeText(messageText).catch(() => undefined);
           window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
-          toast.success("Image téléchargée, message copié — attachez l’image dans WhatsApp");
+          toast.success(t("events.whatsappShare.imageDownloadedAttach", { defaultValue: "Image downloaded, message copied — attach the image in WhatsApp" }));
           return;
         }
-        toast.success("Partage prêt — choisissez WhatsApp");
+        toast.success(t("events.whatsappShare.shareReady", { defaultValue: "Share ready — pick WhatsApp" }));
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
         const a = document.createElement("a");
@@ -224,11 +224,11 @@ function EventDetail() {
         a.remove();
         await navigator.clipboard?.writeText(messageText).catch(() => undefined);
         window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
-        toast.success("Image téléchargée, message copié — attachez l’image dans WhatsApp");
+        toast.success(t("events.whatsappShare.imageDownloadedAttach", { defaultValue: "Image downloaded, message copied — attach the image in WhatsApp" }));
       }
     } catch (e: any) {
       if (e?.name !== "AbortError") {
-        toast.error("Impossible de partager l'image");
+        toast.error(t("events.whatsappShare.shareImageFailed", { defaultValue: "Unable to share the image" }));
       }
     } finally {
       setSharingLineup(false);
@@ -875,7 +875,7 @@ function EventDetail() {
     refetchEvent();
     toast.success(
       useWhatsApp
-        ? "Convocations créées — partagez maintenant via WhatsApp ci-dessous"
+        ? t("events.whatsappShare.convocationsCreated", { defaultValue: "Call-ups created — share now via WhatsApp below" })
         : t("events.convocationsSent")
     );
   }
@@ -2104,7 +2104,7 @@ function EventDetail() {
                   )}
                   {convocChanges.length > 0 && (
                     <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-900 px-1.5 py-0.5 text-[10px] font-semibold">
-                      {convocChanges.length} màj
+                      {t("events.resend.updatesBadge", { defaultValue: "{{count}} update(s)", count: convocChanges.length })}
                     </span>
                   )}
                 </p>
@@ -2136,9 +2136,9 @@ function EventDetail() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={toggleLock}>
                       {event.responses_locked ? (
-                        <><Unlock className="h-4 w-4" /> Déverrouiller les réponses</>
+                        <><Unlock className="h-4 w-4" /> {t("attendance.unlockResponses", { defaultValue: "Unlock responses" })}</>
                       ) : (
-                        <><Lock className="h-4 w-4" /> Verrouiller les réponses</>
+                        <><Lock className="h-4 w-4" /> {t("attendance.lockResponses", { defaultValue: "Lock responses" })}</>
                       )}
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -2413,13 +2413,16 @@ function EventDetail() {
       <AlertDialog open={!!coachOverrideTarget} onOpenChange={(o) => !o && setCoachOverrideTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Forcer la réponse&nbsp;?</AlertDialogTitle>
+            <AlertDialogTitle>{t("attendance.forceResponseTitle", { defaultValue: "Force response?" })}</AlertDialogTitle>
             <AlertDialogDescription>
               {coachOverrideTarget ? (
                 <>
-                  {coachOverrideTarget.playerName} a déjà répondu&nbsp;
-                  <strong>{t(`attendance.${coachOverrideTarget.currentStatus}`)}</strong>. Voulez-vous vraiment forcer son statut à&nbsp;
-                  <strong>{t(`attendance.${coachOverrideTarget.status}`)}</strong>&nbsp;?
+                  {t("attendance.forceResponseDesc", {
+                    defaultValue: "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
+                    name: coachOverrideTarget.playerName,
+                    current: t(`attendance.${coachOverrideTarget.currentStatus}`),
+                    next: t(`attendance.${coachOverrideTarget.status}`),
+                  })}
                 </>
               ) : null}
             </AlertDialogDescription>
