@@ -4,6 +4,20 @@
 
 import { fmt } from "@/lib/date-locale";
 
+export type WhatsAppLineupPlayer = {
+  name: string;
+  jersey?: number | null;
+  role?: string | null;
+  isCaptain?: boolean;
+  isGK?: boolean;
+};
+
+export type WhatsAppLineup = {
+  formation?: string | null;
+  starting?: WhatsAppLineupPlayer[];
+  bench?: WhatsAppLineupPlayer[];
+};
+
 export type WhatsAppEventInput = {
   clubName?: string | null;
   teamName?: string | null;
@@ -23,6 +37,7 @@ export type WhatsAppEventInput = {
   selectedPlayers?: string[]; // names
   cancellationReason?: string | null;
   previousStart?: string | null; // for reschedule
+  lineup?: WhatsAppLineup | null;
 };
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
@@ -113,6 +128,29 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
     lines.push(`👥 *Convoqués (${input.selectedPlayers.length})*`);
     for (const n of input.selectedPlayers) lines.push(`• ${n}`);
   }
+
+  const lu = input.lineup;
+  if (lu && ((lu.starting?.length ?? 0) > 0 || (lu.bench?.length ?? 0) > 0)) {
+    lines.push("");
+    lines.push(`⚽ *Composition prévue${lu.formation ? ` (${lu.formation})` : ""}*`);
+    if (lu.starting && lu.starting.length > 0) {
+      lines.push(`_XI de départ_`);
+      for (const p of lu.starting) {
+        const num = p.jersey != null ? `#${p.jersey} ` : "";
+        const role = p.role ? `[${p.role}] ` : "";
+        const marks = `${p.isCaptain ? " (C)" : ""}${p.isGK ? " 🧤" : ""}`;
+        lines.push(`• ${role}${num}${p.name}${marks}`);
+      }
+    }
+    if (lu.bench && lu.bench.length > 0) {
+      lines.push(`_Remplaçants_`);
+      for (const p of lu.bench) {
+        const num = p.jersey != null ? `#${p.jersey} ` : "";
+        lines.push(`• ${num}${p.name}`);
+      }
+    }
+  }
+
 
   const att = (input.attachments ?? []).filter((a) => a?.url);
   if (att.length > 0) {

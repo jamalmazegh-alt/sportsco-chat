@@ -237,6 +237,51 @@ function EventDetail() {
     },
   });
 
+  // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
+  const { data: lineupData } = useQuery({
+    queryKey: ["event-lineup-wa", eventId],
+    enabled: !!event,
+    queryFn: async () => {
+      const { data: l } = await supabase
+        .from("event_lineups")
+        .select("formation, slots, bench, captain_player_id, gk_player_id, published_at")
+        .eq("event_id", eventId)
+        .not("published_at", "is", null)
+        .maybeSingle();
+      if (!l) return null;
+      const slots = (l.slots as any[]) ?? [];
+      const benchIds = (l.bench as any[]) ?? [];
+      const ids = new Set<string>();
+      slots.forEach((s: any) => s.player_id && ids.add(s.player_id));
+      benchIds.forEach((id: any) => id && ids.add(id));
+      if (ids.size === 0) return { ...l, _starting: [], _bench: [] };
+      const { data: players } = await supabase
+        .from("players")
+        .select("id, first_name, last_name, jersey_number")
+        .in("id", Array.from(ids));
+      const byId = new Map<string, any>((players ?? []).map((p: any) => [p.id, p]));
+      const name = (p: any) => `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
+      const starting = slots
+        .filter((s: any) => s.player_id)
+        .sort((a: any, b: any) => a.y - b.y || a.x - b.x)
+        .map((s: any) => {
+          const p = byId.get(s.player_id);
+          return {
+            name: name(p),
+            jersey: p?.jersey_number ?? null,
+            role: s.role,
+            isCaptain: l.captain_player_id === s.player_id,
+            isGK: l.gk_player_id === s.player_id,
+          };
+        });
+      const bench = benchIds.map((id: any) => {
+        const p = byId.get(id);
+        return { name: name(p), jersey: p?.jersey_number ?? null };
+      });
+      return { formation: l.formation, _starting: starting, _bench: bench };
+    },
+  });
+
   // Realtime
   useEffect(() => {
     const channel = supabase
@@ -1562,6 +1607,13 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
+          lineup: lineupData
+            ? {
+                formation: lineupData.formation,
+                starting: (lineupData as any)._starting ?? [],
+                bench: (lineupData as any)._bench ?? [],
+              }
+            : null,
         };
         const isCancelled = event.status === "cancelled";
         const msg = isCancelled
@@ -1927,15 +1979,6 @@ function EventDetail() {
             </div>
             {isCoach && event.status !== "cancelled" && event.convocations_sent && (
               <div className="flex items-center gap-1 shrink-0">
-                <Button
-                  variant={convocChanges.length > 0 ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setResendOpen(true)}
-                  className="h-8"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  {convocChanges.length > 0 ? `Renvoyer (${convocChanges.length})` : "Renvoyer"}
-                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -1989,6 +2032,26 @@ function EventDetail() {
           </header>
 
           {/* Coach: send convocations the first time */}
+          {isCoach && event.status !== "cancelled" && event.convocations_sent && (
+            <div className="p-4 border-b border-border">
+              <Button
+                onClick={() => setResendOpen(true)}
+                variant={convocChanges.length > 0 ? "default" : "outline"}
+                className="w-full h-11"
+              >
+                <Send className="h-4 w-4" />
+                {convocChanges.length > 0
+                  ? `Renvoyer la convocation (${convocChanges.length} màj)`
+                  : "Renvoyer la convocation"}
+              </Button>
+              {convocChanges.length > 0 && (
+                <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
+                  Des modifications ont été détectées depuis le dernier envoi.
+                </p>
+              )}
+            </div>
+          )}
+
           {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
             <div className="p-4">
               <Button onClick={() => openPicker()} className="w-full h-11">
