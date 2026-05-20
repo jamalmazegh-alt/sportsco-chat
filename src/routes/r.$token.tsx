@@ -35,11 +35,78 @@ type ConvocationInfo = {
   club_name: string | null;
 };
 
-const STATUS_CONFIG: Record<Status, { label: string; icon: typeof CheckCircle2; color: string; bg: string }> = {
-  present: { label: "Présent", icon: CheckCircle2, color: "text-green-700", bg: "bg-green-100" },
-  uncertain: { label: "Incertain", icon: HelpCircle, color: "text-amber-700", bg: "bg-amber-100" },
-  absent: { label: "Absent", icon: XCircle, color: "text-red-700", bg: "bg-red-100" },
+type StatusStyle = {
+  label: string;
+  icon: typeof CheckCircle2;
+  // Idle (white card) styles
+  border: string;
+  hoverBorder: string;
+  iconBg: string;
+  iconText: string;
+  iconHoverBg: string;
+  labelText: string;
+  // Active (selected) styles
+  activeBorder: string;
+  activeBg: string;
+  activeIconBg: string;
+  activeIconText: string;
+  activeLabel: string;
+  activeRing: string;
 };
+
+const STATUS_CONFIG: Record<Status, StatusStyle> = {
+  present: {
+    label: "Présent",
+    icon: CheckCircle2,
+    border: "border-emerald-100",
+    hoverBorder: "hover:border-emerald-300",
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-600",
+    iconHoverBg: "group-hover:bg-emerald-100",
+    labelText: "text-emerald-900",
+    activeBorder: "border-emerald-500",
+    activeBg: "bg-emerald-50/60",
+    activeIconBg: "bg-emerald-600",
+    activeIconText: "text-white",
+    activeLabel: "text-emerald-900",
+    activeRing: "ring-2 ring-emerald-500/30",
+  },
+  uncertain: {
+    label: "Incertain",
+    icon: HelpCircle,
+    border: "border-amber-100",
+    hoverBorder: "hover:border-amber-300",
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-600",
+    iconHoverBg: "group-hover:bg-amber-100",
+    labelText: "text-amber-900",
+    activeBorder: "border-amber-500",
+    activeBg: "bg-amber-50/60",
+    activeIconBg: "bg-amber-500",
+    activeIconText: "text-white",
+    activeLabel: "text-amber-900",
+    activeRing: "ring-2 ring-amber-500/30",
+  },
+  absent: {
+    label: "Absent",
+    icon: XCircle,
+    border: "border-rose-100",
+    hoverBorder: "hover:border-rose-300",
+    iconBg: "bg-rose-50",
+    iconText: "text-rose-600",
+    iconHoverBg: "group-hover:bg-rose-100",
+    labelText: "text-rose-900",
+    activeBorder: "border-rose-500",
+    activeBg: "bg-rose-50/60",
+    activeIconBg: "bg-rose-600",
+    activeIconText: "text-white",
+    activeLabel: "text-rose-900",
+    activeRing: "ring-2 ring-rose-500/30",
+  },
+};
+
+// Display order: Présent, Absent, Incertain
+const STATUS_ORDER: Status[] = ["present", "absent", "uncertain"];
 
 function RespondPage() {
   const { token } = Route.useParams();
