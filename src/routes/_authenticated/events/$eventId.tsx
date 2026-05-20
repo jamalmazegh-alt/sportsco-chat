@@ -1607,6 +1607,13 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
+          lineup: lineupData
+            ? {
+                formation: lineupData.formation,
+                starting: (lineupData as any)._starting ?? [],
+                bench: (lineupData as any)._bench ?? [],
+              }
+            : null,
         };
         const isCancelled = event.status === "cancelled";
         const msg = isCancelled
