@@ -405,7 +405,7 @@ function LineupPage() {
               <SelectContent>
                 {FORMATIONS.map((f) => (
                   <SelectItem key={f.key} value={f.key}>
-                    {f.label}
+                    {f.key === "custom" ? t("lineup.customLabel", "Personnalisée") : f.label}
                   </SelectItem>
                 ))}
               </SelectContent>
