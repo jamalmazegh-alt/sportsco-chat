@@ -4,6 +4,8 @@ import {
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
+type Locale = "fr" | "en";
+
 interface Props {
   coachFirstName?: string;
   playerName: string;
@@ -12,60 +14,86 @@ interface Props {
   status: "absent" | "uncertain";
   reason?: string;
   eventUrl: string;
+  locale?: Locale;
 }
 
-const labels: Record<string, string> = {
-  absent: "Absent",
-  uncertain: "Incertain",
-};
+const T = {
+  fr: {
+    labels: { absent: "Absent", uncertain: "Incertain" },
+    preview: (n: string, s: string, t: string) => `${n} a répondu : ${s} — ${t}`,
+    subject: (n: string, s: string, t: string) => `${n} : ${s} — ${t}`,
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    answered: "a répondu",
+    toCallup: "à la convocation pour",
+    reason: "Motif",
+    seeEvent: "Voir l'événement",
+    foot: "Vous recevez cet e-mail en tant que coach de l'équipe sur Clubero.",
+  },
+  en: {
+    labels: { absent: "Absent", uncertain: "Uncertain" },
+    preview: (n: string, s: string, t: string) => `${n} replied: ${s} — ${t}`,
+    subject: (n: string, s: string, t: string) => `${n}: ${s} — ${t}`,
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    answered: "replied",
+    toCallup: "to the call-up for",
+    reason: "Reason",
+    seeEvent: "View event",
+    foot: "You receive this email as a team coach on Clubero.",
+  },
+} as const;
 
 const ConvocationResponseEmail = ({
-  coachFirstName, playerName, eventTitle, eventDate, status, reason, eventUrl,
-}: Props) => (
-  <Html lang="fr" dir="ltr">
+  coachFirstName, playerName, eventTitle, eventDate, status, reason, eventUrl, locale,
+}: Props) => {
+  const l: Locale = locale === "fr" ? "fr" : "en";
+  const t = T[l];
+  const statusLabel = t.labels[status];
+  return (
+  <Html lang={l} dir="ltr">
     <Head />
-    <Preview>{playerName} a répondu : {labels[status]} — {eventTitle}</Preview>
+    <Preview>{t.preview(playerName, statusLabel, eventTitle)}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>
-          {coachFirstName ? `Bonjour ${coachFirstName},` : "Bonjour,"}
-        </Heading>
+        <Heading style={h1}>{t.hello(coachFirstName)}</Heading>
         <Text style={text}>
-          <strong>{playerName}</strong> a répondu{" "}
+          <strong>{playerName}</strong> {t.answered}{" "}
           <strong style={{ color: status === "absent" ? "#dc2626" : "#d97706" }}>
-            {labels[status]}
+            {statusLabel}
           </strong>{" "}
-          à la convocation pour <strong>{eventTitle}</strong>
+          {t.toCallup} <strong>{eventTitle}</strong>
           {eventDate ? <> ({eventDate})</> : null}.
         </Text>
         {reason && (
           <Section style={reasonBox}>
-            <Text style={reasonLabel}>Motif</Text>
+            <Text style={reasonLabel}>{t.reason}</Text>
             <Text style={reasonText}>"{reason}"</Text>
           </Section>
         )}
-        <Button style={button} href={eventUrl}>Voir l'événement</Button>
-        <Text style={footer}>
-          Vous recevez cet e-mail en tant que coach de l'équipe sur Clubero.
-        </Text>
+        <Button style={button} href={eventUrl}>{t.seeEvent}</Button>
+        <Text style={footer}>{t.foot}</Text>
       </Container>
     </Body>
   </Html>
-);
+  );
+};
 
 export const template = {
   component: ConvocationResponseEmail,
-  subject: (d) =>
-    `${d.playerName} : ${labels[d.status as string] ?? d.status} — ${d.eventTitle}`,
+  subject: (d) => {
+    const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
+    const status = d.status as "absent" | "uncertain";
+    return T[l].subject(d.playerName as string, T[l].labels[status] ?? status, d.eventTitle as string);
+  },
   displayName: "Convocation response",
   previewData: {
     coachFirstName: "Marc",
-    playerName: "Léo Dupont",
-    eventTitle: "Match vs FC Exemple",
-    eventDate: "samedi 24 mai à 15h00",
+    playerName: "Leo Dupont",
+    eventTitle: "Match vs FC Example",
+    eventDate: "Saturday, May 24 at 3:00 PM",
     status: "absent",
-    reason: "Tournoi familial ce week-end",
+    reason: "Family tournament this weekend",
     eventUrl: "https://app.clubero.app/events/123",
+    locale: "en",
   },
 } satisfies TemplateEntry;
 
