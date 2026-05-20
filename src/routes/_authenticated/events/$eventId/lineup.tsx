@@ -293,7 +293,7 @@ function LineupPage() {
           captain_player_id: captain,
           gk_player_id: gk,
           visibility: publish && visibility === "draft" ? "team" : visibility,
-          include_in_convocation: includeInConv,
+          include_in_convocation: true,
           publish,
         },
       });
