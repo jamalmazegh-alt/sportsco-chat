@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toPng } from "html-to-image";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
@@ -143,6 +144,46 @@ function EventDetail() {
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const [sending, setSending] = useState(false);
+  const [sharingLineup, setSharingLineup] = useState(false);
+  const lineupCardRef = useRef<HTMLDivElement | null>(null);
+
+  async function shareLineupAsImage(messageText: string) {
+    const node = lineupCardRef.current;
+    if (!node) {
+      toast.error("Compo non disponible");
+      return;
+    }
+    setSharingLineup(true);
+    try {
+      const dataUrl = await toPng(node, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+      });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "composition.png", { type: "image/png" });
+      const nav = navigator as any;
+      if (nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({ files: [file], text: messageText });
+      } else {
+        // Fallback: download image + open WhatsApp with text
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = "composition.png";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
+        toast.success("Image téléchargée — attachez-la dans WhatsApp");
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") {
+        toast.error("Impossible de générer l'image");
+      }
+    } finally {
+      setSharingLineup(false);
+    }
+  }
   const [editOpen, setEditOpen] = useState(false);
   const [autoSendConsumed, setAutoSendConsumed] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -1455,7 +1496,7 @@ function EventDetail() {
           })()}
         </div>
         {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
-          <div className="mt-4">
+          <div className="mt-4" ref={lineupCardRef}>
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>
         )}
@@ -1660,8 +1701,19 @@ function EventDetail() {
                 Envoyer un rappel WhatsApp
               </a>
             )}
+            {!isCancelled && lineupData && (
+              <button
+                type="button"
+                onClick={() => shareLineupAsImage(msg)}
+                disabled={sharingLineup}
+                className="inline-flex items-center justify-center gap-2 w-full h-9 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium disabled:opacity-60"
+              >
+                {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                Partager la compo (image)
+              </button>
+            )}
             <p className="text-[11px] text-muted-foreground">
-              WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer.
+              WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer.{lineupData ? " Pour la compo en image, utilisez le bouton dédié." : ""}
             </p>
           </div>
         );
