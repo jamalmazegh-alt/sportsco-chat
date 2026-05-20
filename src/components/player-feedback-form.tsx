@@ -64,7 +64,7 @@ export function PlayerFeedbackForm({
 }) {
   const { t } = useTranslation();
   const [advanced, setAdvanced] = useState(!compact);
-  const tags = sport !== undefined ? getFeedbackTagsForSport(sport) : (FEEDBACK_TAGS as readonly string[]);
+  const tags = getFeedbackTagsForSport(sport ?? null);
 
   const set = <K extends keyof FeedbackFormValue>(k: K, v: FeedbackFormValue[K]) =>
     onChange({ ...value, [k]: v });
