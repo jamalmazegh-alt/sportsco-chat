@@ -71,12 +71,16 @@ export function DraggablePlayer({
   isCaptain,
   isGK,
   size,
+  selected,
+  onSelect,
 }: {
   id: string;
   player: PlayerLite;
   isCaptain?: boolean;
   isGK?: boolean;
   size?: "sm" | "md";
+  selected?: boolean;
+  onSelect?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id,
@@ -87,7 +91,16 @@ export function DraggablePlayer({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={cn("touch-none cursor-grab active:cursor-grabbing", isDragging && "opacity-30")}
+      onClick={(e) => {
+        if (!onSelect) return;
+        e.stopPropagation();
+        onSelect();
+      }}
+      className={cn(
+        "touch-none cursor-pointer rounded-full transition-all",
+        selected && "ring-4 ring-amber-400 ring-offset-2 ring-offset-background scale-105",
+        isDragging && "opacity-30",
+      )}
     >
       <PlayerChip player={player} isCaptain={isCaptain} isGK={isGK} size={size} />
     </div>
@@ -101,6 +114,8 @@ export function DroppableSlot({
   role,
   children,
   empty,
+  highlight,
+  onClick,
 }: {
   id: string;
   x: number;
@@ -108,22 +123,27 @@ export function DroppableSlot({
   role: string;
   children?: React.ReactNode;
   empty: boolean;
+  highlight?: boolean;
+  onClick?: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id, data: { kind: "slot" } });
   return (
     <div
       ref={setNodeRef}
+      onClick={onClick}
       className={cn(
         "absolute -translate-x-1/2 -translate-y-1/2 transition-all",
-        isOver && "scale-110",
+        (isOver || highlight) && "scale-110",
+        onClick && "cursor-pointer",
       )}
       style={{ left: `${x}%`, top: `${y}%` }}
     >
       {empty ? (
         <div
           className={cn(
-            "h-14 w-14 rounded-full border-2 border-dashed border-white/60 grid place-content-center text-[10px] font-semibold text-white/80 bg-white/10 backdrop-blur-sm",
+            "h-14 w-14 rounded-full border-2 border-dashed border-white/60 grid place-content-center text-[10px] font-semibold text-white/80 bg-white/10 backdrop-blur-sm transition-colors",
             isOver && "bg-white/30 border-white",
+            highlight && "bg-amber-400/40 border-amber-300 animate-pulse",
           )}
         >
           {role}
@@ -135,14 +155,25 @@ export function DroppableSlot({
   );
 }
 
-export function DroppableBench({ children }: { children: React.ReactNode }) {
+export function DroppableBench({
+  children,
+  highlight,
+  onClick,
+}: {
+  children: React.ReactNode;
+  highlight?: boolean;
+  onClick?: () => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: "bench", data: { kind: "bench" } });
   return (
     <div
       ref={setNodeRef}
+      onClick={onClick}
       className={cn(
         "rounded-xl border-2 border-dashed p-3 min-h-[88px] transition-colors",
         isOver ? "border-primary bg-primary/10" : "border-border bg-muted/40",
+        highlight && "border-amber-400 bg-amber-400/10 ring-2 ring-amber-300/40",
+        onClick && "cursor-pointer",
       )}
     >
       <div className="flex gap-3 flex-wrap">{children}</div>
@@ -150,14 +181,25 @@ export function DroppableBench({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function DroppableAvailable({ children }: { children: React.ReactNode }) {
+export function DroppableAvailable({
+  children,
+  highlight,
+  onClick,
+}: {
+  children: React.ReactNode;
+  highlight?: boolean;
+  onClick?: () => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: "available", data: { kind: "available" } });
   return (
     <div
       ref={setNodeRef}
+      onClick={onClick}
       className={cn(
         "rounded-xl border p-3 min-h-[120px] transition-colors",
         isOver ? "border-primary bg-primary/10" : "border-border bg-card",
+        highlight && "border-amber-400 ring-2 ring-amber-300/40",
+        onClick && "cursor-pointer",
       )}
     >
       <div className="flex gap-3 flex-wrap">{children}</div>

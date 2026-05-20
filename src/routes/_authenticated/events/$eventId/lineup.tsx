@@ -10,7 +10,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus } from "lucide-react";
+import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus, X as XIcon, Move } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -123,10 +123,12 @@ function LineupPage() {
   const [includeInConv, setIncludeInConv] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [selectedPid, setSelectedPid] = useState<string | null>(null);
+  const [actionPid, setActionPid] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
   );
 
   // Hydrate from server
@@ -211,39 +213,70 @@ function LineupPage() {
     if (gk === playerId) setGk(null);
   }
 
+  function placePlayer(playerId: string, target: { kind: "slot"; slotId: string } | { kind: "bench" } | { kind: "available" }) {
+    setDirty(true);
+    // Remove from any current location first (snapshot prior slot)
+    let priorSlot: LineupSlot | undefined;
+    setSlots((prev) => {
+      priorSlot = prev.find((s) => s.player_id === playerId);
+      return prev.map((s) => (s.player_id === playerId ? { ...s, player_id: null } : s));
+    });
+    setBench((prev) => prev.filter((id) => id !== playerId));
+
+    if (target.kind === "slot") {
+      const { slotId } = target;
+      setSlots((prev) => {
+        const targetSlot = prev.find((s) => s.id === slotId);
+        const displaced = targetSlot?.player_id ?? null;
+        const next = prev.map((s) => (s.id === slotId ? { ...s, player_id: playerId } : s));
+        if (displaced && displaced !== playerId) {
+          setBench((b) => (b.includes(displaced) ? b : [...b, displaced]));
+        }
+        return next;
+      });
+      // Auto-set GK if dropped on GK slot
+      const targetSlot = slots.find((s) => s.id === slotId);
+      if (targetSlot?.role === "GK") setGk(playerId);
+    } else if (target.kind === "bench") {
+      setBench((prev) => (prev.includes(playerId) ? prev : [...prev, playerId]));
+    }
+    setSelectedPid(null);
+    setActionPid(null);
+    // priorSlot reference suppresses lint "unused" while keeping the snapshot for future undo
+    void priorSlot;
+  }
+
   function handleDragEnd(e: DragEndEvent) {
     const over = e.over;
     if (!over) return;
     const playerId = (e.active.data.current as any)?.playerId as string | undefined;
     if (!playerId) return;
     const kind = (over.data.current as any)?.kind as string | undefined;
+    if (kind === "slot") placePlayer(playerId, { kind: "slot", slotId: String(over.id) });
+    else if (kind === "bench") placePlayer(playerId, { kind: "bench" });
+    else if (kind === "available") placePlayer(playerId, { kind: "available" });
+  }
 
-    // Remove from any current location first
-    setDirty(true);
-    setSlots((prev) => prev.map((s) => (s.player_id === playerId ? { ...s, player_id: null } : s)));
-    setBench((prev) => prev.filter((id) => id !== playerId));
-
-    if (kind === "slot") {
-      const slotId = String(over.id);
-      setSlots((prev) => {
-        const target = prev.find((s) => s.id === slotId);
-        const displaced = target?.player_id ?? null;
-        const next = prev.map((s) =>
-          s.id === slotId ? { ...s, player_id: playerId } : s,
-        );
-        if (displaced && displaced !== playerId) {
-          // Send displaced player to bench
-          setBench((b) => (b.includes(displaced) ? b : [...b, displaced]));
-        }
-        return next;
-      });
-      // Auto-set GK if dropped on GK slot
-      const target = slots.find((s) => s.id === slotId);
-      if (target?.role === "GK") setGk(playerId);
-    } else if (kind === "bench") {
-      setBench((prev) => (prev.includes(playerId) ? prev : [...prev, playerId]));
-    } else if (kind === "available") {
-      // already removed
+  function handleChipTap(playerId: string, location: "available" | "slot" | "bench") {
+    if (selectedPid && selectedPid !== playerId) {
+      // user has another player selected → swap by moving this position not relevant; treat as place selected onto same area
+      // If tapping a placed chip while another player is selected: replace target → place selected at that slot
+      // Easier: open action panel if the tapped chip is already placed (slot/bench). For available, just switch selection.
+      if (location === "available") {
+        setSelectedPid(playerId);
+        return;
+      }
+      setActionPid(playerId);
+      return;
+    }
+    if (selectedPid === playerId) {
+      setSelectedPid(null);
+      return;
+    }
+    if (location === "available") {
+      setSelectedPid(playerId);
+    } else {
+      setActionPid(playerId);
     }
   }
 
@@ -341,6 +374,12 @@ function LineupPage() {
           <p className="text-sm text-muted-foreground">{ctx.event.title}</p>
         </div>
 
+        {/* Tap-to-place hint */}
+        <div className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+          💡 <strong>Astuce mobile :</strong> touche un joueur puis touche une case (ou le banc) pour le placer.
+          Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.
+        </div>
+
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
@@ -410,43 +449,37 @@ function LineupPage() {
             <PitchSvg />
             {slots.map((s) => {
               const player = s.player_id ? playerById.get(s.player_id) : null;
+              const slotClickable = !!selectedPid && !player;
               return (
-                <DroppableSlot key={s.id} id={s.id} x={s.x} y={s.y} role={s.role} empty={!player}>
+                <DroppableSlot
+                  key={s.id}
+                  id={s.id}
+                  x={s.x}
+                  y={s.y}
+                  role={s.role}
+                  empty={!player}
+                  highlight={slotClickable}
+                  onClick={
+                    selectedPid && !player
+                      ? () => placePlayer(selectedPid, { kind: "slot", slotId: s.id })
+                      : undefined
+                  }
+                >
                   {player && (
-                    <div className="relative group">
-                      <DraggablePlayer
-                        id={`slot:${s.id}`}
-                        player={player}
-                        isCaptain={captain === player.id}
-                        isGK={gk === player.id}
-                      />
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full mt-1 hidden group-hover:flex items-center gap-1 bg-background/95 backdrop-blur rounded-md shadow-md ring-1 ring-border p-1 z-10">
-                        <Button
-                          size="icon-sm"
-                          variant={captain === player.id ? "default" : "ghost"}
-                          onClick={() => { setCaptain(captain === player.id ? null : player.id); setDirty(true); }}
-                          title={t("lineup.captain", "Capitaine")}
-                        >
-                          <Star className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          size="icon-sm"
-                          variant={gk === player.id ? "default" : "ghost"}
-                          onClick={() => { setGk(gk === player.id ? null : player.id); setDirty(true); }}
-                          title={t("lineup.gk", "Gardien")}
-                        >
-                          <Hand className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          size="icon-sm"
-                          variant="ghost"
-                          onClick={() => { removePlayer(player.id); setDirty(true); }}
-                          title={t("common.remove", "Retirer")}
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    </div>
+                    <DraggablePlayer
+                      id={`slot:${s.id}`}
+                      player={player}
+                      isCaptain={captain === player.id}
+                      isGK={gk === player.id}
+                      selected={actionPid === player.id}
+                      onSelect={() => {
+                        if (selectedPid && selectedPid !== player.id) {
+                          placePlayer(selectedPid, { kind: "slot", slotId: s.id });
+                        } else {
+                          handleChipTap(player.id, "slot");
+                        }
+                      }}
+                    />
                   )}
                 </DroppableSlot>
               );
@@ -457,13 +490,26 @@ function LineupPage() {
           <div className="space-y-3">
             <div>
               <h2 className="text-sm font-semibold mb-2">{t("lineup.available", "Joueurs disponibles")}</h2>
-              <DroppableAvailable>
+              <DroppableAvailable
+                highlight={!!selectedPid && placedIds.has(selectedPid)}
+                onClick={
+                  selectedPid && placedIds.has(selectedPid)
+                    ? () => placePlayer(selectedPid, { kind: "available" })
+                    : undefined
+                }
+              >
                 {available.length === 0 && (
                   <p className="text-xs text-muted-foreground">{t("lineup.allPlaced", "Tous les joueurs sont placés.")}</p>
                 )}
                 {available.map((p) => (
                   <div key={p.id} className={cn(!p.convocated && "opacity-60")}>
-                    <DraggablePlayer id={`avail:${p.id}`} player={p} size="sm" />
+                    <DraggablePlayer
+                      id={`avail:${p.id}`}
+                      player={p}
+                      size="sm"
+                      selected={selectedPid === p.id}
+                      onSelect={() => handleChipTap(p.id, "available")}
+                    />
                     {!p.convocated && (
                       <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
                     )}
@@ -477,14 +523,26 @@ function LineupPage() {
         {/* Bench */}
         <div>
           <h2 className="text-sm font-semibold mb-2">{t("lineup.bench", "Remplaçants")} ({bench.length})</h2>
-          <DroppableBench>
+          <DroppableBench
+            highlight={!!selectedPid}
+            onClick={selectedPid ? () => placePlayer(selectedPid, { kind: "bench" }) : undefined}
+          >
             {bench.length === 0 && (
-              <p className="text-xs text-muted-foreground">{t("lineup.benchEmpty", "Glissez des joueurs ici.")}</p>
+              <p className="text-xs text-muted-foreground">{t("lineup.benchEmpty", "Touche un joueur puis le banc, ou glisse-le ici.")}</p>
             )}
             {bench.map((id) => {
               const p = playerById.get(id);
               if (!p) return null;
-              return <DraggablePlayer key={id} id={`bench:${id}`} player={p} size="sm" />;
+              return (
+                <DraggablePlayer
+                  key={id}
+                  id={`bench:${id}`}
+                  player={p}
+                  size="sm"
+                  selected={actionPid === p.id}
+                  onSelect={() => handleChipTap(p.id, "bench")}
+                />
+              );
             })}
           </DroppableBench>
         </div>
@@ -507,6 +565,54 @@ function LineupPage() {
             {published ? t("lineup.update", "Mettre à jour") : t("lineup.publish", "Publier")}
           </Button>
         </div>
+
+        {/* Floating selection banner */}
+        {selectedPid && (
+          <div className="fixed left-1/2 -translate-x-1/2 bottom-24 z-40 flex items-center gap-2 rounded-full bg-amber-500 text-white shadow-lg px-4 py-2 text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
+            <Move className="h-4 w-4" />
+            <span className="truncate max-w-[180px]">
+              {playerById.get(selectedPid)?.first_name} {playerById.get(selectedPid)?.last_name}
+            </span>
+            <span className="opacity-90 hidden xs:inline">— touche une case</span>
+            <button onClick={() => setSelectedPid(null)} className="ml-1 rounded-full hover:bg-white/20 p-0.5">
+              <XIcon className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Action sheet for a placed/bench player */}
+        {actionPid && playerById.get(actionPid) && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center" onClick={() => setActionPid(null)}>
+            <div onClick={(e) => e.stopPropagation()} className="w-full sm:max-w-sm bg-background rounded-t-2xl sm:rounded-2xl p-4 space-y-2 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <p className="font-semibold text-sm">
+                  {playerById.get(actionPid)!.first_name} {playerById.get(actionPid)!.last_name}
+                </p>
+                <button onClick={() => setActionPid(null)} className="text-muted-foreground"><XIcon className="h-4 w-4" /></button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Button variant="outline" onClick={() => { setSelectedPid(actionPid); setActionPid(null); }}>
+                  <Move className="h-4 w-4" /> Déplacer
+                </Button>
+                <Button
+                  variant={captain === actionPid ? "default" : "outline"}
+                  onClick={() => { setCaptain(captain === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
+                >
+                  <Star className="h-4 w-4" /> Capitaine
+                </Button>
+                <Button
+                  variant={gk === actionPid ? "default" : "outline"}
+                  onClick={() => { setGk(gk === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
+                >
+                  <Hand className="h-4 w-4" /> Gardien
+                </Button>
+                <Button variant="destructive" onClick={() => { removePlayer(actionPid); setDirty(true); setActionPid(null); }}>
+                  <XIcon className="h-4 w-4" /> Retirer
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DndContext>
   );
