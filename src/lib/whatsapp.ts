@@ -38,6 +38,12 @@ export type WhatsAppEventInput = {
   cancellationReason?: string | null;
   previousStart?: string | null; // for reschedule
   lineup?: WhatsAppLineup | null;
+  respondents?: {
+    present?: string[];
+    absent?: string[];
+    uncertain?: string[];
+    pending?: string[];
+  } | null;
 };
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
