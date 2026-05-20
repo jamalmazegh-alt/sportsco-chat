@@ -321,7 +321,7 @@ function EventDetail() {
         .eq("event_id", eventId)
         .not("published_at", "is", null)
         .maybeSingle();
-      if (!l || !l.include_in_convocation) return null;
+      if (!l) return null;
       const slots = (l.slots as any[]) ?? [];
       const benchIds = (l.bench as any[]) ?? [];
       const ids = new Set<string>();
@@ -351,7 +351,7 @@ function EventDetail() {
         const p = byId.get(id);
         return { name: name(p), jersey: p?.jersey_number ?? null };
       });
-      return { formation: l.formation, _starting: starting, _bench: bench };
+      return { formation: l.formation, include_in_convocation: l.include_in_convocation, _starting: starting, _bench: bench };
     },
   });
 
