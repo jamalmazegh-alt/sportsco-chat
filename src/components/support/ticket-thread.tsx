@@ -100,11 +100,11 @@ export function TicketThread({
               >
                 {m.is_internal_note && (
                   <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide opacity-70 mb-1">
-                    <Lock className="h-3 w-3" /> Note interne
+                    <Lock className="h-3 w-3" /> {t("thread.internal_note")}
                   </div>
                 )}
                 {!m.is_internal_note && isStaff && !mine && (
-                  <div className="text-[10px] uppercase tracking-wide opacity-70 mb-1">Équipe Clubero</div>
+                  <div className="text-[10px] uppercase tracking-wide opacity-70 mb-1">{t("thread.staff_label")}</div>
                 )}
                 <div>{m.body}</div>
                 {m.attachment_paths.length > 0 && (
