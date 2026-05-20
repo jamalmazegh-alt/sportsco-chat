@@ -9,7 +9,7 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail, LifeBuoy } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
