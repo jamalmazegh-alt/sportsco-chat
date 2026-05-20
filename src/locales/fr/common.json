@@ -858,6 +858,10 @@
     "unavailable": "La composition est disponible uniquement pour les matchs de football.",
     "captain": "Capitaine",
     "gk": "Gardien",
+    "move": "Déplacer",
+    "remove": "Retirer",
+    "tapHint": "💡 <b>Astuce mobile :</b> touche un joueur puis touche une case (ou le banc) pour le placer. Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.",
+    "customLabel": "Personnalisée",
     "vis": {
       "draft": "Brouillon privé",
       "staff": "Staff uniquement",
