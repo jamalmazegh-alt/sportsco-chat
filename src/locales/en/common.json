@@ -830,6 +830,9 @@
     "refineWelcome": "Hi 👋 Tell me what to tweak: length, tone, structure, specific focus… I'll rewrite the summary with each message.",
     "refineWithAi": "Refine with AI",
     "refineWorking": "AI is rewriting the summary…",
+    "refineExample1": "Summarize in 5 sentences",
+    "refineExample2": "Emphasize mentality more",
+    "refineExample3": "Add a recommendation on positioning",
     "saveAll": "Save all",
     "saved": "Saved",
     "send": "Send"
