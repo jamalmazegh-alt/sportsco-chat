@@ -35,6 +35,7 @@ import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
@@ -199,6 +200,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
@@ -421,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AuthenticatedInboxRoute
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/stats': typeof AuthenticatedStatsRoute
+  '/support': typeof AuthenticatedSupportRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -481,6 +488,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
   '/stats': typeof AuthenticatedStatsRoute
+  '/support': typeof AuthenticatedSupportRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -546,6 +554,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -611,6 +620,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/profile'
     | '/stats'
+    | '/support'
     | '/teams'
     | '/api/chat'
     | '/email/unsubscribe'
@@ -671,6 +681,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/inbox'
     | '/stats'
+    | '/support'
     | '/teams'
     | '/api/chat'
     | '/email/unsubscribe'
@@ -735,6 +746,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox'
     | '/_authenticated/profile'
     | '/_authenticated/stats'
+    | '/_authenticated/support'
     | '/_authenticated/teams'
     | '/api/chat'
     | '/email/unsubscribe'
@@ -993,6 +1005,13 @@ declare module '@tanstack/react-router' {
       path: '/teams'
       fullPath: '/teams'
       preLoaderRoute: typeof AuthenticatedTeamsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/stats': {
@@ -1358,6 +1377,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
 }
@@ -1371,6 +1391,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
