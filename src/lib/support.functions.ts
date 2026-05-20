@@ -123,6 +123,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
     const profile = await getUserProfile(userId);
     const email = await getUserEmail(userId);
     if (email) {
+      const locale = profile?.preferred_language === "en" ? "en" : "fr";
       await enqueueTransactionalEmailServer({
         templateName: "support-ticket-created",
         recipientEmail: email,
@@ -132,6 +133,7 @@ export const createSupportTicket = createServerFn({ method: "POST" })
           ticketShortId: shortId(ticket.id),
           category: ticket.category,
           ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
+          locale,
         },
         idempotencyKey: `support-created-${ticket.id}`,
       }).catch((e) => console.error("[support] email failed", e));
