@@ -2182,7 +2182,7 @@ function EventDetail() {
             <>
               {isCoach && (
                 <div className="grid grid-cols-4 gap-1.5 px-4 pt-3">
-                  <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present-foreground border-present/30" />
+                  <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present border-present/40" />
                   <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain/15 text-uncertain-foreground border-uncertain/30" />
                   <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent/10 text-absent border-absent/30" />
                   <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending/40 text-pending-foreground border-border" />
