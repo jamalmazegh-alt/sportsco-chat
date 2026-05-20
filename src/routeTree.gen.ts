@@ -44,17 +44,20 @@ import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/superadmin/support-tickets.index'
 import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
+import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
+import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
@@ -248,6 +251,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const SuperadminSupportTicketsIndexRoute =
+  SuperadminSupportTicketsIndexRouteImport.update({
+    id: '/support-tickets/',
+    path: '/support-tickets/',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
 const SuperadminClubsIndexRoute = SuperadminClubsIndexRouteImport.update({
   id: '/clubs/',
   path: '/clubs/',
@@ -275,6 +284,12 @@ const SuperadminUsersUserIdRoute = SuperadminUsersUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => SuperadminUsersRoute,
 } as any)
+const SuperadminSupportTicketsTicketIdRoute =
+  SuperadminSupportTicketsTicketIdRouteImport.update({
+    id: '/support-tickets/$ticketId',
+    path: '/support-tickets/$ticketId',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
 const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
   id: '/clubs/$clubId',
   path: '/clubs/$clubId',
@@ -305,6 +320,12 @@ const AuthenticatedTeamsTeamIdRoute =
     id: '/$teamId',
     path: '/$teamId',
     getParentRoute: () => AuthenticatedTeamsRoute,
+  } as any)
+const AuthenticatedSupportTicketIdRoute =
+  AuthenticatedSupportTicketIdRouteImport.update({
+    id: '/$ticketId',
+    path: '/$ticketId',
+    getParentRoute: () => AuthenticatedSupportRoute,
   } as any)
 const AuthenticatedProfilePrivacyRoute =
   AuthenticatedProfilePrivacyRouteImport.update({
@@ -453,17 +474,20 @@ export interface FileRoutesByFullPath {
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
+  '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -514,17 +538,20 @@ export interface FileRoutesByTo {
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
+  '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -581,17 +608,20 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
+  '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -648,17 +678,20 @@ export interface FileRouteTypes {
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
+    | '/support/$ticketId'
     | '/teams/$teamId'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
+    | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
     | '/admin/'
     | '/profile/'
     | '/support/'
     | '/superadmin/clubs/'
+    | '/superadmin/support-tickets/'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -709,17 +742,20 @@ export interface FileRouteTypes {
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
+    | '/support/$ticketId'
     | '/teams/$teamId'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
+    | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
     | '/admin'
     | '/profile'
     | '/support'
     | '/superadmin/clubs'
+    | '/superadmin/support-tickets'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -775,17 +811,20 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
+    | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
+    | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
+    | '/superadmin/support-tickets/'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
@@ -1081,6 +1120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/superadmin/support-tickets/': {
+      id: '/superadmin/support-tickets/'
+      path: '/support-tickets'
+      fullPath: '/superadmin/support-tickets/'
+      preLoaderRoute: typeof SuperadminSupportTicketsIndexRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/superadmin/clubs/': {
       id: '/superadmin/clubs/'
       path: '/clubs'
@@ -1115,6 +1161,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/users/$userId'
       preLoaderRoute: typeof SuperadminUsersUserIdRouteImport
       parentRoute: typeof SuperadminUsersRoute
+    }
+    '/superadmin/support-tickets/$ticketId': {
+      id: '/superadmin/support-tickets/$ticketId'
+      path: '/support-tickets/$ticketId'
+      fullPath: '/superadmin/support-tickets/$ticketId'
+      preLoaderRoute: typeof SuperadminSupportTicketsTicketIdRouteImport
+      parentRoute: typeof SuperadminRoute
     }
     '/superadmin/clubs/$clubId': {
       id: '/superadmin/clubs/$clubId'
@@ -1157,6 +1210,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/teams/$teamId'
       preLoaderRoute: typeof AuthenticatedTeamsTeamIdRouteImport
       parentRoute: typeof AuthenticatedTeamsRoute
+    }
+    '/_authenticated/support/$ticketId': {
+      id: '/_authenticated/support/$ticketId'
+      path: '/$ticketId'
+      fullPath: '/support/$ticketId'
+      preLoaderRoute: typeof AuthenticatedSupportTicketIdRouteImport
+      parentRoute: typeof AuthenticatedSupportRoute
     }
     '/_authenticated/profile/privacy': {
       id: '/_authenticated/profile/privacy'
@@ -1361,10 +1421,12 @@ const AuthenticatedProfileRouteWithChildren =
   AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
 
 interface AuthenticatedSupportRouteChildren {
+  AuthenticatedSupportTicketIdRoute: typeof AuthenticatedSupportTicketIdRoute
   AuthenticatedSupportIndexRoute: typeof AuthenticatedSupportIndexRoute
 }
 
 const AuthenticatedSupportRouteChildren: AuthenticatedSupportRouteChildren = {
+  AuthenticatedSupportTicketIdRoute: AuthenticatedSupportTicketIdRoute,
   AuthenticatedSupportIndexRoute: AuthenticatedSupportIndexRoute,
 }
 
@@ -1450,7 +1512,9 @@ interface SuperadminRouteChildren {
   SuperadminUsersRoute: typeof SuperadminUsersRouteWithChildren
   SuperadminIndexRoute: typeof SuperadminIndexRoute
   SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
+  SuperadminSupportTicketsTicketIdRoute: typeof SuperadminSupportTicketsTicketIdRoute
   SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
+  SuperadminSupportTicketsIndexRoute: typeof SuperadminSupportTicketsIndexRoute
 }
 
 const SuperadminRouteChildren: SuperadminRouteChildren = {
@@ -1461,7 +1525,9 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminUsersRoute: SuperadminUsersRouteWithChildren,
   SuperadminIndexRoute: SuperadminIndexRoute,
   SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
+  SuperadminSupportTicketsTicketIdRoute: SuperadminSupportTicketsTicketIdRoute,
   SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
+  SuperadminSupportTicketsIndexRoute: SuperadminSupportTicketsIndexRoute,
 }
 
 const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(

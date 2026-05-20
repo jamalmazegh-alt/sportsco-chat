@@ -9,7 +9,7 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail, LifeBuoy } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
@@ -320,6 +320,22 @@ function ProfilePage() {
           <div>
             <div className="text-sm font-medium">{t("privacy.menu")}</div>
             <p className="text-xs text-muted-foreground">{t("privacy.subtitle")}</p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
+
+      <Link
+        to="/support"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
+      >
+        <div className="flex items-center gap-3">
+          <LifeBuoy className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("support.menu", { defaultValue: "Support" })}</div>
+            <p className="text-xs text-muted-foreground">
+              {t("support.menuSubtitle", { defaultValue: "Signaler un problème ou suivre vos demandes" })}
+            </p>
           </div>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
