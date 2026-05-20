@@ -380,6 +380,37 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ---------- Stats for admin dashboard ----------
+
+export const getSupportStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
+    if (!isAdmin) throw new Error("forbidden");
+
+    const { count: openCount } = await supabaseAdmin
+      .from("support_tickets")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["open", "in_progress", "waiting_user"]);
+
+    const { count: urgentCount } = await supabaseAdmin
+      .from("support_tickets")
+      .select("id", { count: "exact", head: true })
+      .eq("priority", "urgent")
+      .in("status", ["open", "in_progress", "waiting_user"]);
+
+    const { count: unreadCount } = await supabaseAdmin
+      .from("support_tickets")
+      .select("id", { count: "exact", head: true })
+      .gt("staff_unread_count", 0);
+
+    return {
+      open: openCount ?? 0,
+      urgent: urgentCount ?? 0,
+      unread: unreadCount ?? 0,
+    };
+  });
+
 // ---------- My unread count ----------
 
 export const getSupportUnreadCount = createServerFn({ method: "GET" })

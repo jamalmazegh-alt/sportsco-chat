@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getPlatformStats, getFinanceOverview } from "@/lib/superadmin.functions";
+import { getSupportStats } from "@/lib/support.functions";
 import {
   Loader2,
   TrendingUp,
@@ -11,6 +12,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   CircleDollarSign,
+  LifeBuoy,
+  MessageSquare,
+  Inbox,
 } from "lucide-react";
 import { formatMoney, StatusBadge } from "@/lib/superadmin/ui";
 
@@ -24,6 +28,7 @@ type Finance = Awaited<ReturnType<typeof getFinanceOverview>>;
 function SuperAdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [finance, setFinance] = useState<Finance | null>(null);
+  const [supportStats, setSupportStats] = useState<{ open: number; urgent: number; unread: number } | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,6 +38,9 @@ function SuperAdminDashboard() {
     getFinanceOverview()
       .then(setFinance)
       .catch((e) => console.error("finance", e));
+    getSupportStats()
+      .then(setSupportStats)
+      .catch((e) => console.error("support stats", e));
   }, []);
 
   return (
@@ -132,6 +140,49 @@ function SuperAdminDashboard() {
             <OpTile label="Expiring < 7 days" value={stats.subs_expiring_7d} />
             <OpTile label="Events (30d)" value={stats.events_30d} />
             <OpTile label="Call-ups (30d)" value={stats.convocations_30d} />
+          </div>
+        )}
+      </section>
+
+      {/* ============== Support tickets ============== */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <LifeBuoy className="h-4 w-4" /> Support tickets
+          </h2>
+          <Link
+            to="/superadmin/support-tickets"
+            className="text-xs text-primary hover:underline"
+          >
+            All tickets →
+          </Link>
+        </div>
+
+        {supportStats === null ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading support stats…
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <BigTile
+              icon={<Inbox className="h-4 w-4" />}
+              label="Open tickets"
+              primary={String(supportStats.open)}
+              secondary={`${supportStats.unread} unread`}
+            />
+            <BigTile
+              icon={<AlertTriangle className="h-4 w-4 text-destructive" />}
+              label="Urgent tickets"
+              primary={String(supportStats.urgent)}
+              secondary="Requires immediate attention"
+              accent="primary"
+            />
+            <BigTile
+              icon={<MessageSquare className="h-4 w-4" />}
+              label="Total unread"
+              primary={String(supportStats.unread)}
+              secondary="Staff unread count"
+            />
           </div>
         )}
       </section>
