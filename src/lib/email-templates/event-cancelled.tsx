@@ -4,6 +4,8 @@ import {
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
+type Locale = "fr" | "en";
+
 interface Props {
   recipientFirstName?: string;
   playerName?: string;
@@ -14,7 +16,39 @@ interface Props {
   teamName?: string;
   clubName?: string;
   clubLogoUrl?: string;
+  locale?: Locale;
 }
+
+const T = {
+  fr: {
+    subject: (title: string, date?: string) => `❌ Annulé : ${title}${date ? ` — ${date}` : ""}`,
+    preview: (title: string, date?: string) => `Événement annulé : ${title}${date ? ` — ${date}` : ""}`,
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    intro: "L'événement",
+    forWhich: (n: string) => <> auquel <strong>{n}</strong> était convoqué·e</>,
+    withTeam: (n: string) => <> avec <strong>{n}</strong></>,
+    hasBeen: <> a été <strong>annulé</strong>.</>,
+    kicker: "ANNULÉ",
+    reasonLabel: "Raison de l'annulation",
+    foot: "Aucune action n'est requise de votre part. Vous serez prévenu·e en cas de reprogrammation.",
+    sentBy: "Envoyé par",
+    via: "via Clubero",
+  },
+  en: {
+    subject: (title: string, date?: string) => `❌ Cancelled: ${title}${date ? ` — ${date}` : ""}`,
+    preview: (title: string, date?: string) => `Event cancelled: ${title}${date ? ` — ${date}` : ""}`,
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    intro: "The event",
+    forWhich: (n: string) => <> that <strong>{n}</strong> was called up to</>,
+    withTeam: (n: string) => <> with <strong>{n}</strong></>,
+    hasBeen: <> has been <strong>cancelled</strong>.</>,
+    kicker: "CANCELLED",
+    reasonLabel: "Cancellation reason",
+    foot: "Nothing else is required from you. We'll let you know if the event is rescheduled.",
+    sentBy: "Sent by",
+    via: "via Clubero",
+  },
+} as const;
 
 const EventCancelledEmail = ({
   recipientFirstName,
@@ -26,13 +60,14 @@ const EventCancelledEmail = ({
   teamName,
   clubName,
   clubLogoUrl,
-}: Props) => (
-  <Html lang="fr" dir="ltr">
+  locale,
+}: Props) => {
+  const l: Locale = locale === "fr" ? "fr" : "en";
+  const t = T[l];
+  return (
+  <Html lang={l} dir="ltr">
     <Head />
-    <Preview>
-      Événement annulé : {eventTitle}
-      {eventDate ? ` — ${eventDate}` : ""}
-    </Preview>
+    <Preview>{t.preview(eventTitle, eventDate)}</Preview>
     <Body style={main}>
       <Container style={container}>
         {clubLogoUrl ? (
@@ -47,56 +82,55 @@ const EventCancelledEmail = ({
           </Section>
         ) : null}
 
-        <Heading style={h1}>
-          {recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
-        </Heading>
+        <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
-          L'événement
-          {playerName ? <> auquel <strong>{playerName}</strong> était convoqué·e</> : null}
-          {teamName ? <> avec <strong>{teamName}</strong></> : null}
-          {" "}a été <strong>annulé</strong>.
+          {t.intro}
+          {playerName ? t.forWhich(playerName) : null}
+          {teamName ? t.withTeam(teamName) : null}
+          {t.hasBeen}
         </Text>
 
         <Section style={card}>
-          <Text style={cardKicker}>ANNULÉ</Text>
+          <Text style={cardKicker}>{t.kicker}</Text>
           <Text style={cardTitle}>{eventTitle}</Text>
           {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
           {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
         </Section>
 
         <Section style={reasonCard}>
-          <Text style={reasonLabel}>Raison de l'annulation</Text>
+          <Text style={reasonLabel}>{t.reasonLabel}</Text>
           <Text style={reasonText}>{reason}</Text>
         </Section>
 
-        <Text style={smallText}>
-          Aucune action n'est requise de votre part. Vous serez prévenu·e en cas de
-          reprogrammation.
-        </Text>
+        <Text style={smallText}>{t.foot}</Text>
 
         <Text style={footer}>
-          Envoyé par <strong>{clubName ?? "Clubero"}</strong> via Clubero
+          {t.sentBy} <strong>{clubName ?? "Clubero"}</strong> {t.via}
         </Text>
       </Container>
     </Body>
   </Html>
-);
+  );
+};
 
 export const template = {
   component: EventCancelledEmail,
-  subject: (d) =>
-    `❌ Annulé : ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`,
+  subject: (d) => {
+    const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
+    return T[l].subject(d.eventTitle as string, d.eventDate as string | undefined);
+  },
   displayName: "Event cancelled",
   previewData: {
     recipientFirstName: "Sophie",
-    playerName: "Léo Dupont",
-    eventTitle: "vs FC Exemple",
-    eventDate: "samedi 24 mai à 15h00",
-    eventLocation: "Stade Municipal, Paris",
-    reason: "Terrain impraticable suite aux intempéries.",
-    teamName: "U13 Garçons",
+    playerName: "Leo Dupont",
+    eventTitle: "vs FC Example",
+    eventDate: "Saturday, May 24 at 3:00 PM",
+    eventLocation: "Municipal Stadium, Paris",
+    reason: "Pitch unplayable due to weather.",
+    teamName: "U13 Boys",
     clubName: "AS Clubero",
+    locale: "en",
   },
 } satisfies TemplateEntry;
 

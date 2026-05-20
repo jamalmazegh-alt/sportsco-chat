@@ -4,6 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { domToPng } from "modern-screenshot";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
+
+const emailLocale = (): "fr" | "en" => ((i18n.language ?? "en").toLowerCase().startsWith("fr") ? "fr" : "en");
 import { fmt } from "@/lib/date-locale";
 import {
   ChevronLeft, MapPin, Calendar, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus,
@@ -588,6 +591,7 @@ function EventDetail() {
               teamName,
               clubName,
               clubLogoUrl,
+              locale: emailLocale(),
             },
           } as any).catch(() => undefined);
 
@@ -813,6 +817,7 @@ function EventDetail() {
             clubLogoUrl,
             respondUrl: `${origin}/r/${token}`,
             lineup: lineupEmail,
+            locale: emailLocale(),
           },
         });
 
@@ -1033,6 +1038,7 @@ function EventDetail() {
             teamName,
             clubName,
             clubLogoUrl,
+            locale: emailLocale(),
           },
         }).catch(() => undefined);
 
@@ -1190,6 +1196,7 @@ function EventDetail() {
             teamName,
             clubName,
             clubLogoUrl,
+            locale: emailLocale(),
           },
         }).catch(() => undefined);
 
@@ -1233,7 +1240,7 @@ function EventDetail() {
   async function resendConvocations() {
     if (!event || !user) return;
     if (!convocations || convocations.length === 0) {
-      toast.error("Aucune convocation à renvoyer");
+      toast.error(t("events.resend.noConvocations", { defaultValue: "No call-up to resend" }));
       return;
     }
     const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
@@ -1304,6 +1311,7 @@ function EventDetail() {
             isUpdate: true,
             changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
             lineup: lineupEmail,
+            locale: emailLocale(),
           },
 
         }).catch(() => undefined);
@@ -1332,10 +1340,10 @@ function EventDetail() {
             user_id: uid,
             type: "convocation",
             title: `🔄 ${event.title}`,
-            body: changes.length > 0
-              ? `Convocation mise à jour : ${changes.map((ch) => ch.label).join(", ")}`
-              : "Convocation renvoyée",
-            link: `/events/${event.id}`,
+              body: changes.length > 0
+                ? t("events.resend.notifUpdated", { defaultValue: "Call-up updated: {{fields}}", fields: changes.map((ch) => ch.label).join(", ") })
+                : t("events.resend.notifResent", { defaultValue: "Call-up resent" }),
+              link: `/events/${event.id}`,
           })),
         );
       }
@@ -1346,11 +1354,11 @@ function EventDetail() {
         .update({ convocation_sent_snapshot: buildConvocSnapshot(event), convocation_last_sent_at: new Date().toISOString() })
         .eq("id", event.id);
 
-      toast.success(`Convocation renvoyée à ${convocations.length} joueur(s)`);
+      toast.success(t("events.resend.success", { defaultValue: "Call-up resent to {{count}} player(s)", count: convocations.length }));
       setResendOpen(false);
       refetchEvent();
     } catch (e: any) {
-      toast.error(e?.message ?? "Erreur lors du renvoi");
+      toast.error(e?.message ?? t("events.resend.error", { defaultValue: "Error while resending" }));
     } finally {
       setResendSubmitting(false);
     }
@@ -1848,16 +1856,16 @@ function EventDetail() {
       <Dialog open={resendOpen} onOpenChange={(o) => { if (!resendSubmitting) setResendOpen(o); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Renvoyer la convocation</DialogTitle>
+            <DialogTitle>{t("events.resend.title", { defaultValue: "Resend call-up" })}</DialogTitle>
             <DialogDescription>
               {convocChanges.length > 0
-                ? `${convocChanges.length} modification(s) détectée(s) depuis le dernier envoi. Le mail mettra en évidence les changements.`
-                : "Aucun changement détecté depuis le dernier envoi. La convocation sera tout de même renvoyée à tous les joueurs."}
+                ? t("events.resend.descChanges", { defaultValue: "{{count}} change(s) detected since the last send. The email will highlight what changed.", count: convocChanges.length })
+                : t("events.resend.descNoChanges", { defaultValue: "No changes detected since the last send. The call-up will still be resent to all players." })}
             </DialogDescription>
           </DialogHeader>
           {convocChanges.length > 0 && (
             <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2 max-h-64 overflow-auto">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">Modifications</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">{t("events.resend.changesHeader", { defaultValue: "Changes" })}</p>
               {convocChanges.map((c) => (
                 <div key={c.field} className="text-sm">
                   <span className="font-medium text-amber-900">{c.label} : </span>
@@ -1869,7 +1877,7 @@ function EventDetail() {
             </div>
           )}
           <p className="text-xs text-muted-foreground">
-            Envoyé à {convocations?.length ?? 0} joueur(s) (+ parents). Les réponses existantes sont conservées.
+            {t("events.resend.recipientsHint", { defaultValue: "Sent to {{count}} player(s) (+ parents). Existing responses are preserved.", count: convocations?.length ?? 0 })}
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setResendOpen(false)} disabled={resendSubmitting}>
@@ -1878,7 +1886,7 @@ function EventDetail() {
             <Button onClick={resendConvocations} disabled={resendSubmitting}>
               {resendSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               <Send className="h-4 w-4" />
-              Renvoyer
+              {t("events.resend.confirm", { defaultValue: "Resend" })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2170,12 +2178,12 @@ function EventDetail() {
               >
                 <Send className="h-4 w-4" />
                 {convocChanges.length > 0
-                  ? `Renvoyer la convocation (${convocChanges.length} màj)`
-                  : "Renvoyer la convocation"}
+                  ? t("events.resend.buttonWithChanges", { defaultValue: "Resend call-up ({{count}} update(s))", count: convocChanges.length })
+                  : t("events.resend.button", { defaultValue: "Resend call-up" })}
               </Button>
               {convocChanges.length > 0 && (
                 <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
-                  Des modifications ont été détectées depuis le dernier envoi.
+                  {t("events.resend.changesDetected", { defaultValue: "Changes were detected since the last send." })}
                 </p>
               )}
             </div>

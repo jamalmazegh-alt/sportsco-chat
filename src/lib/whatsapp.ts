@@ -2,7 +2,120 @@
 // We rely on `https://wa.me/?text=...` which opens WhatsApp's share-sheet so
 // the coach picks the destination (team group / contact) and taps Send.
 
-import { fmt } from "@/lib/date-locale";
+import { format as dfFormat } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
+import i18n from "@/lib/i18n";
+
+export type WaLocale = "fr" | "en";
+
+function resolveLocale(locale?: WaLocale): WaLocale {
+  if (locale) return locale;
+  const lang = (i18n.language ?? "en").toLowerCase();
+  return lang.startsWith("fr") ? "fr" : "en";
+}
+
+type Dict = {
+  convocation: string;
+  reminder: string;
+  cancelled: string;
+  rescheduled: string;
+  event: string;
+  home: string;
+  away: string;
+  meetingTime: string; // "Convocation :" label inside message body
+  endTime: string;
+  meetingPoint: string;
+  squad: (n: number) => string;
+  lineup: (formation?: string) => string;
+  startingXI: string;
+  bench: string;
+  documents: string;
+  document: string;
+  sentVia: string;
+  reason: string;
+  previousDate: string;
+  newDate: string;
+  responses: string;
+  present: string;
+  absent: string;
+  uncertain: string;
+  notRespondedYet: (n: number) => string;
+  thanksConfirm: string;
+  datePattern: string;
+  timePattern: string;
+};
+
+const DICTS: Record<WaLocale, Dict> = {
+  fr: {
+    convocation: "Convocation",
+    reminder: "Rappel",
+    cancelled: "Annulé",
+    rescheduled: "Reporté",
+    event: "Événement",
+    home: "🏠 Domicile",
+    away: "✈️ Extérieur",
+    meetingTime: "Convocation",
+    endTime: "Fin prévue",
+    meetingPoint: "RDV",
+    squad: (n) => `👥 *Convoqués (${n})*`,
+    lineup: (f) => `⚽ *Composition prévue${f ? ` (${f})` : ""}*`,
+    startingXI: "_XI de départ_",
+    bench: "_Remplaçants_",
+    documents: "📎 Documents :",
+    document: "Document",
+    sentVia: "— envoyé via Clubero",
+    reason: "Motif",
+    previousDate: "Ancienne date",
+    newDate: "Nouvelle date",
+    responses: "📊 *Réponses*",
+    present: "Présents",
+    absent: "Absents",
+    uncertain: "Incertains",
+    notRespondedYet: (n) => `⏳ *Pas encore répondu (${n})*`,
+    thanksConfirm: "Merci de confirmer votre présence 🙏",
+    datePattern: "EEEE d MMMM 'à' HH'h'mm",
+    timePattern: "HH'h'mm",
+  },
+  en: {
+    convocation: "Call-up",
+    reminder: "Reminder",
+    cancelled: "Cancelled",
+    rescheduled: "Rescheduled",
+    event: "Event",
+    home: "🏠 Home",
+    away: "✈️ Away",
+    meetingTime: "Meeting time",
+    endTime: "Ends at",
+    meetingPoint: "Meeting point",
+    squad: (n) => `👥 *Squad (${n})*`,
+    lineup: (f) => `⚽ *Planned line-up${f ? ` (${f})` : ""}*`,
+    startingXI: "_Starting XI_",
+    bench: "_Bench_",
+    documents: "📎 Documents:",
+    document: "Document",
+    sentVia: "— sent via Clubero",
+    reason: "Reason",
+    previousDate: "Previous date",
+    newDate: "New date",
+    responses: "📊 *Responses*",
+    present: "Present",
+    absent: "Absent",
+    uncertain: "Uncertain",
+    notRespondedYet: (n) => `⏳ *Not yet responded (${n})*`,
+    thanksConfirm: "Please confirm your attendance 🙏",
+    datePattern: "EEEE, MMMM d 'at' h:mm a",
+    timePattern: "h:mm a",
+  },
+};
+
+function fmtWith(iso: string | null | undefined, pattern: string, locale: WaLocale) {
+  if (!iso) return null;
+  try {
+    return dfFormat(new Date(iso), pattern, { locale: locale === "fr" ? fr : enUS });
+  } catch {
+    return iso;
+  }
+}
 
 export type WhatsAppLineupPlayer = {
   name: string;
@@ -44,6 +157,7 @@ export type WhatsAppEventInput = {
     uncertain?: string[];
     pending?: string[];
   } | null;
+  locale?: WaLocale;
 };
 
 function mapsUrlFor(location?: string | null, locationUrl?: string | null) {
@@ -64,24 +178,6 @@ function pushNavLinks(lines: string[], location?: string | null, locationUrl?: s
   if (w) lines.push(`🚗 Waze : ${w}`);
 }
 
-function fmtDate(iso?: string | null) {
-  if (!iso) return null;
-  try {
-    return fmt(iso, "EEEE d MMMM 'à' HH'h'mm");
-  } catch {
-    return iso;
-  }
-}
-
-function fmtTime(iso?: string | null) {
-  if (!iso) return null;
-  try {
-    return fmt(iso, "HH'h'mm");
-  } catch {
-    return iso;
-  }
-}
-
 function emojiForType(type?: string | null) {
   switch (type) {
     case "match": return "⚽";
@@ -94,34 +190,36 @@ function emojiForType(type?: string | null) {
 }
 
 export function buildConvocationMessage(input: WhatsAppEventInput): string {
+  const loc = resolveLocale(input.locale);
+  const d = DICTS[loc];
   const lines: string[] = [];
   const emoji = emojiForType(input.type);
   const header = input.type === "match" && input.opponent
     ? `${emoji} *${input.teamName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}*`
-    : `${emoji} *${input.title ?? "Convocation"}*`;
+    : `${emoji} *${input.title ?? d.convocation}*`;
   lines.push(header);
   if (input.clubName || input.teamName) {
     lines.push(`_${[input.clubName, input.teamName].filter(Boolean).join(" · ")}_`);
   }
   if (input.competitionLabel) lines.push(`🏅 ${input.competitionLabel}`);
   if (input.type === "match" && input.isHome != null) {
-    lines.push(input.isHome ? "🏠 Domicile" : "✈️ Extérieur");
+    lines.push(input.isHome ? d.home : d.away);
   }
   lines.push("");
 
-  const date = fmtDate(input.startsAt);
+  const date = fmtWith(input.startsAt, d.datePattern, loc);
   if (date) lines.push(`📅 ${date}`);
-  const convoc = fmtTime(input.convocationTime);
-  if (convoc) lines.push(`⏰ Convocation : ${convoc}`);
-  const end = fmtTime(input.endsAt);
-  if (end) lines.push(`🕒 Fin prévue : ${end}`);
+  const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
+  if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
+  const end = fmtWith(input.endsAt, d.timePattern, loc);
+  if (end) lines.push(`🕒 ${d.endTime} : ${end}`);
 
   if (input.location) {
     lines.push(`📍 ${input.location}`);
     pushNavLinks(lines, input.location, input.locationUrl);
   }
   if (input.meetingPoint) {
-    lines.push(`🚌 RDV : ${input.meetingPoint}`);
+    lines.push(`🚌 ${d.meetingPoint} : ${input.meetingPoint}`);
   }
 
   if (input.description) {
@@ -131,16 +229,16 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
 
   if (input.selectedPlayers && input.selectedPlayers.length > 0) {
     lines.push("");
-    lines.push(`👥 *Convoqués (${input.selectedPlayers.length})*`);
+    lines.push(d.squad(input.selectedPlayers.length));
     for (const n of input.selectedPlayers) lines.push(`• ${n}`);
   }
 
   const lu = input.lineup;
   if (lu && ((lu.starting?.length ?? 0) > 0 || (lu.bench?.length ?? 0) > 0)) {
     lines.push("");
-    lines.push(`⚽ *Composition prévue${lu.formation ? ` (${lu.formation})` : ""}*`);
+    lines.push(d.lineup(lu.formation ?? undefined));
     if (lu.starting && lu.starting.length > 0) {
-      lines.push(`_XI de départ_`);
+      lines.push(d.startingXI);
       for (const p of lu.starting) {
         const num = p.jersey != null ? `#${p.jersey} ` : "";
         const role = p.role ? `[${p.role}] ` : "";
@@ -149,7 +247,7 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
       }
     }
     if (lu.bench && lu.bench.length > 0) {
-      lines.push(`_Remplaçants_`);
+      lines.push(d.bench);
       for (const p of lu.bench) {
         const num = p.jersey != null ? `#${p.jersey} ` : "";
         lines.push(`• ${num}${p.name}`);
@@ -161,43 +259,47 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   const att = (input.attachments ?? []).filter((a) => a?.url);
   if (att.length > 0) {
     lines.push("");
-    lines.push("📎 Documents :");
-    for (const a of att) lines.push(`• ${a.name ?? "Document"} — ${a.url}`);
+    lines.push(d.documents);
+    for (const a of att) lines.push(`• ${a.name ?? d.document} — ${a.url}`);
   }
 
   lines.push("");
-  lines.push("— envoyé via Clubero");
+  lines.push(d.sentVia);
 
   return lines.join("\n");
 }
 
 export function buildCancellationMessage(input: WhatsAppEventInput): string {
+  const loc = resolveLocale(input.locale);
+  const d = DICTS[loc];
   const lines: string[] = [];
-  lines.push(`❌ *Annulé* — ${input.title ?? "Événement"}`);
+  lines.push(`❌ *${d.cancelled}* — ${input.title ?? d.event}`);
   if (input.clubName || input.teamName) {
     lines.push(`_${[input.clubName, input.teamName].filter(Boolean).join(" · ")}_`);
   }
-  const date = fmtDate(input.startsAt);
+  const date = fmtWith(input.startsAt, d.datePattern, loc);
   if (date) lines.push(`📅 ${date}`);
   if (input.cancellationReason) {
     lines.push("");
-    lines.push(`Motif : ${input.cancellationReason}`);
+    lines.push(`${d.reason} : ${input.cancellationReason}`);
   }
   lines.push("");
-  lines.push("— envoyé via Clubero");
+  lines.push(d.sentVia);
   return lines.join("\n");
 }
 
 export function buildRescheduleMessage(input: WhatsAppEventInput): string {
+  const loc = resolveLocale(input.locale);
+  const d = DICTS[loc];
   const lines: string[] = [];
-  lines.push(`🔁 *Reporté* — ${input.title ?? "Événement"}`);
+  lines.push(`🔁 *${d.rescheduled}* — ${input.title ?? d.event}`);
   if (input.clubName || input.teamName) {
     lines.push(`_${[input.clubName, input.teamName].filter(Boolean).join(" · ")}_`);
   }
-  const prev = fmtDate(input.previousStart);
-  const next = fmtDate(input.startsAt);
-  if (prev) lines.push(`Ancienne date : ${prev}`);
-  if (next) lines.push(`Nouvelle date : ${next}`);
+  const prev = fmtWith(input.previousStart, d.datePattern, loc);
+  const next = fmtWith(input.startsAt, d.datePattern, loc);
+  if (prev) lines.push(`${d.previousDate} : ${prev}`);
+  if (next) lines.push(`${d.newDate} : ${next}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
     pushNavLinks(lines, input.location, input.locationUrl);
@@ -207,17 +309,19 @@ export function buildRescheduleMessage(input: WhatsAppEventInput): string {
     lines.push(input.cancellationReason);
   }
   lines.push("");
-  lines.push("— envoyé via Clubero");
+  lines.push(d.sentVia);
   return lines.join("\n");
 }
 
 export function buildReminderMessage(input: WhatsAppEventInput): string {
+  const loc = resolveLocale(input.locale);
+  const d = DICTS[loc];
   const lines: string[] = [];
-  lines.push(`🔔 *Rappel* — ${input.title ?? "Événement"}`);
-  const date = fmtDate(input.startsAt);
+  lines.push(`🔔 *${d.reminder}* — ${input.title ?? d.event}`);
+  const date = fmtWith(input.startsAt, d.datePattern, loc);
   if (date) lines.push(`📅 ${date}`);
-  const convoc = fmtTime(input.convocationTime);
-  if (convoc) lines.push(`⏰ Convocation : ${convoc}`);
+  const convoc = fmtWith(input.convocationTime, d.timePattern, loc);
+  if (convoc) lines.push(`⏰ ${d.meetingTime} : ${convoc}`);
   if (input.location) {
     lines.push(`📍 ${input.location}`);
     pushNavLinks(lines, input.location, input.locationUrl);
@@ -231,23 +335,23 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
     const pending = r.pending ?? [];
     if (present.length + absent.length + uncertain.length + pending.length > 0) {
       lines.push("");
-      lines.push("📊 *Réponses*");
-      if (present.length) lines.push(`✅ Présents (${present.length}) : ${present.join(", ")}`);
-      if (absent.length) lines.push(`❌ Absents (${absent.length}) : ${absent.join(", ")}`);
-      if (uncertain.length) lines.push(`❔ Incertains (${uncertain.length}) : ${uncertain.join(", ")}`);
+      lines.push(d.responses);
+      if (present.length) lines.push(`✅ ${d.present} (${present.length}) : ${present.join(", ")}`);
+      if (absent.length) lines.push(`❌ ${d.absent} (${absent.length}) : ${absent.join(", ")}`);
+      if (uncertain.length) lines.push(`❔ ${d.uncertain} (${uncertain.length}) : ${uncertain.join(", ")}`);
       if (pending.length) {
         lines.push("");
-        lines.push(`⏳ *Pas encore répondu (${pending.length})*`);
+        lines.push(d.notRespondedYet(pending.length));
         for (const n of pending) lines.push(`• ${n}`);
         lines.push("");
-        lines.push("Merci de confirmer votre présence 🙏");
+        lines.push(d.thanksConfirm);
       }
     }
   } else {
     lines.push("");
-    lines.push("Merci de confirmer votre présence 🙏");
+    lines.push(d.thanksConfirm);
   }
-  lines.push("— envoyé via Clubero");
+  lines.push(d.sentVia);
   return lines.join("\n");
 }
 

@@ -4,6 +4,8 @@ import {
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
+type Locale = "fr" | "en";
+
 interface Props {
   recipientFirstName?: string;
   playerName?: string;
@@ -15,7 +17,39 @@ interface Props {
   teamName?: string;
   clubName?: string;
   clubLogoUrl?: string;
+  locale?: Locale;
 }
+
+const T = {
+  fr: {
+    subject: (title: string, newDate: string) => `🔁 Reporté : ${title} — ${newDate}`,
+    preview: (title: string, newDate: string) => `Événement reporté : ${title} — ${newDate}`,
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    intro: "L'événement",
+    forWhich: (n: string) => <> auquel <strong>{n}</strong> est convoqué·e</>,
+    withTeam: (n: string) => <> avec <strong>{n}</strong></>,
+    hasBeen: <> a été <strong>reporté</strong>.</>,
+    kicker: "REPORTÉ",
+    reasonLabel: "Raison du report",
+    foot: "Merci de mettre à jour votre réponse à la convocation si nécessaire.",
+    sentBy: "Envoyé par",
+    via: "via Clubero",
+  },
+  en: {
+    subject: (title: string, newDate: string) => `🔁 Rescheduled: ${title} — ${newDate}`,
+    preview: (title: string, newDate: string) => `Event rescheduled: ${title} — ${newDate}`,
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    intro: "The event",
+    forWhich: (n: string) => <> that <strong>{n}</strong> is called up to</>,
+    withTeam: (n: string) => <> with <strong>{n}</strong></>,
+    hasBeen: <> has been <strong>rescheduled</strong>.</>,
+    kicker: "RESCHEDULED",
+    reasonLabel: "Reason",
+    foot: "Please update your call-up response if needed.",
+    sentBy: "Sent by",
+    via: "via Clubero",
+  },
+} as const;
 
 const EventRescheduledEmail = ({
   recipientFirstName,
@@ -28,12 +62,14 @@ const EventRescheduledEmail = ({
   teamName,
   clubName,
   clubLogoUrl,
-}: Props) => (
-  <Html lang="fr" dir="ltr">
+  locale,
+}: Props) => {
+  const l: Locale = locale === "fr" ? "fr" : "en";
+  const t = T[l];
+  return (
+  <Html lang={l} dir="ltr">
     <Head />
-    <Preview>
-      Événement reporté : {eventTitle} — {newDate}
-    </Preview>
+    <Preview>{t.preview(eventTitle, newDate)}</Preview>
     <Body style={main}>
       <Container style={container}>
         {clubLogoUrl ? (
@@ -48,19 +84,17 @@ const EventRescheduledEmail = ({
           </Section>
         ) : null}
 
-        <Heading style={h1}>
-          {recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
-        </Heading>
+        <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
-          L'événement
-          {playerName ? <> auquel <strong>{playerName}</strong> est convoqué·e</> : null}
-          {teamName ? <> avec <strong>{teamName}</strong></> : null}
-          {" "}a été <strong>reporté</strong>.
+          {t.intro}
+          {playerName ? t.forWhich(playerName) : null}
+          {teamName ? t.withTeam(teamName) : null}
+          {t.hasBeen}
         </Text>
 
         <Section style={card}>
-          <Text style={cardKicker}>REPORTÉ</Text>
+          <Text style={cardKicker}>{t.kicker}</Text>
           <Text style={cardTitle}>{eventTitle}</Text>
           {previousDate ? (
             <Text style={cardMetaOld}>📅 <span style={strike}>{previousDate}</span></Text>
@@ -71,38 +105,40 @@ const EventRescheduledEmail = ({
 
         {reason ? (
           <Section style={reasonCard}>
-            <Text style={reasonLabel}>Raison du report</Text>
+            <Text style={reasonLabel}>{t.reasonLabel}</Text>
             <Text style={reasonText}>{reason}</Text>
           </Section>
         ) : null}
 
-        <Text style={smallText}>
-          Merci de mettre à jour votre réponse à la convocation si nécessaire.
-        </Text>
+        <Text style={smallText}>{t.foot}</Text>
 
         <Text style={footer}>
-          Envoyé par <strong>{clubName ?? "Clubero"}</strong> via Clubero
+          {t.sentBy} <strong>{clubName ?? "Clubero"}</strong> {t.via}
         </Text>
       </Container>
     </Body>
   </Html>
-);
+  );
+};
 
 export const template = {
   component: EventRescheduledEmail,
-  subject: (d) =>
-    `🔁 Reporté : ${d.eventTitle} — ${d.newDate}`,
+  subject: (d) => {
+    const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
+    return T[l].subject(d.eventTitle as string, d.newDate as string);
+  },
   displayName: "Event rescheduled",
   previewData: {
     recipientFirstName: "Sophie",
-    playerName: "Léo Dupont",
-    eventTitle: "vs FC Exemple",
-    previousDate: "samedi 24 mai à 15h00",
-    newDate: "dimanche 1er juin à 15h00",
-    eventLocation: "Stade Municipal, Paris",
-    reason: "Terrain indisponible.",
-    teamName: "U13 Garçons",
+    playerName: "Leo Dupont",
+    eventTitle: "vs FC Example",
+    previousDate: "Saturday, May 24 at 3:00 PM",
+    newDate: "Sunday, June 1 at 3:00 PM",
+    eventLocation: "Municipal Stadium, Paris",
+    reason: "Pitch unavailable.",
+    teamName: "U13 Boys",
     clubName: "AS Clubero",
+    locale: "en",
   },
 } satisfies TemplateEntry;
 
