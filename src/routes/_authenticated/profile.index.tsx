@@ -325,6 +325,22 @@ function ProfilePage() {
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
       </Link>
 
+      <Link
+        to="/support"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
+      >
+        <div className="flex items-center gap-3">
+          <LifeBuoy className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("support.menu", { defaultValue: "Support" })}</div>
+            <p className="text-xs text-muted-foreground">
+              {t("support.menuSubtitle", { defaultValue: "Signaler un problème ou suivre vos demandes" })}
+            </p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
+
       <a
         href="https://clubero.app"
         target="_blank"
