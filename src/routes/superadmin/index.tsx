@@ -144,6 +144,49 @@ function SuperAdminDashboard() {
         )}
       </section>
 
+      {/* ============== Support tickets ============== */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <LifeBuoy className="h-4 w-4" /> Support tickets
+          </h2>
+          <Link
+            to="/superadmin/support-tickets"
+            className="text-xs text-primary hover:underline"
+          >
+            All tickets →
+          </Link>
+        </div>
+
+        {supportStats === null ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading support stats…
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <BigTile
+              icon={<Inbox className="h-4 w-4" />}
+              label="Open tickets"
+              primary={String(supportStats.open)}
+              secondary={`${supportStats.unread} unread`}
+            />
+            <BigTile
+              icon={<AlertTriangle className="h-4 w-4 text-destructive" />}
+              label="Urgent tickets"
+              primary={String(supportStats.urgent)}
+              secondary="Requires immediate attention"
+              accent="primary"
+            />
+            <BigTile
+              icon={<MessageSquare className="h-4 w-4" />}
+              label="Total unread"
+              primary={String(supportStats.unread)}
+              secondary="Staff unread count"
+            />
+          </div>
+        )}
+      </section>
+
       {(stats?.generated_at || finance?.generated_at) && (
         <div className="text-xs text-muted-foreground">
           Generated at{" "}
