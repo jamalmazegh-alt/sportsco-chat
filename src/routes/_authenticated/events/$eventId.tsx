@@ -2032,6 +2032,26 @@ function EventDetail() {
           </header>
 
           {/* Coach: send convocations the first time */}
+          {isCoach && event.status !== "cancelled" && event.convocations_sent && (
+            <div className="p-4 border-b border-border">
+              <Button
+                onClick={() => setResendOpen(true)}
+                variant={convocChanges.length > 0 ? "default" : "outline"}
+                className="w-full h-11"
+              >
+                <Send className="h-4 w-4" />
+                {convocChanges.length > 0
+                  ? `Renvoyer la convocation (${convocChanges.length} màj)`
+                  : "Renvoyer la convocation"}
+              </Button>
+              {convocChanges.length > 0 && (
+                <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
+                  Des modifications ont été détectées depuis le dernier envoi.
+                </p>
+              )}
+            </div>
+          )}
+
           {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
             <div className="p-4">
               <Button onClick={() => openPicker()} className="w-full h-11">
