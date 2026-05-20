@@ -42,6 +42,19 @@ export function PublishedLineupCard({ eventId, teamId }: { eventId: string; team
     },
   });
 
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border bg-card overflow-hidden shadow-sm">
+        <div className="p-4 flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+        <Skeleton className="aspect-[2/3] max-h-[60vh] w-full rounded-none" />
+      </div>
+    );
+  }
   if (!data) return null;
   const slots = (data.slots as unknown as Slot[]) ?? [];
   const bench = (data.bench as unknown as string[]) ?? [];
