@@ -16,7 +16,7 @@ interface Slot {
 
 export function PublishedLineupCard({ eventId, teamId }: { eventId: string; teamId: string }) {
   const { t } = useTranslation();
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["published-lineup", eventId],
     queryFn: async () => {
       const { data: l } = await supabase
