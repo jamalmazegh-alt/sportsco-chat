@@ -156,9 +156,9 @@ export function ReviewRefineDialog({
                 })}
               </p>
               <ul className="mt-2 space-y-1 text-xs">
-                <li>· « Résume en 5 phrases »</li>
-                <li>· « Insiste davantage sur le mental »</li>
-                <li>· « Ajoute une recommandation sur le placement »</li>
+                <li>· « {t("feedback.refineExample1", "Résume en 5 phrases")} »</li>
+                <li>· « {t("feedback.refineExample2", "Insiste davantage sur le mental")} »</li>
+                <li>· « {t("feedback.refineExample3", "Ajoute une recommandation sur le placement")} »</li>
               </ul>
             </div>
           )}
