@@ -30,8 +30,11 @@ export function ResponsiveFormDialog({ open, onOpenChange, trigger, title, child
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-        <SheetContent side="bottom" className="rounded-t-3xl">
-          <SheetHeader>
+        <SheetContent
+          side="bottom"
+          className="rounded-t-3xl max-h-[92dvh] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
+        >
+          <SheetHeader className="sticky top-0 z-10 -mx-6 -mt-6 mb-2 bg-background px-6 pt-6 pb-3 rounded-t-3xl">
             <SheetTitle>{title}</SheetTitle>
           </SheetHeader>
           {children}
