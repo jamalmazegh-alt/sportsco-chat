@@ -120,7 +120,7 @@ function LineupPage() {
   const [captain, setCaptain] = useState<string | null>(null);
   const [gk, setGk] = useState<string | null>(null);
   const [visibility, setVisibility] = useState<"draft" | "staff" | "selected_players" | "team">("draft");
-  // include_in_convocation: always true now (config retiré côté UI)
+  
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [selectedPid, setSelectedPid] = useState<string | null>(null);
@@ -304,7 +304,7 @@ function LineupPage() {
           captain_player_id: captain,
           gk_player_id: gk,
           visibility: publish && visibility === "draft" ? "team" : visibility,
-          include_in_convocation: true,
+          
           publish,
         },
       });

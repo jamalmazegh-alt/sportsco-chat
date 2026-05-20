@@ -18,7 +18,7 @@ const UpsertSchema = z.object({
   captain_player_id: z.string().uuid().nullable().optional(),
   gk_player_id: z.string().uuid().nullable().optional(),
   visibility: z.enum(["draft", "staff", "selected_players", "team"]),
-  include_in_convocation: z.boolean(),
+  
   publish: z.boolean().optional(),
 });
 
@@ -84,7 +84,7 @@ export const upsertLineup = createServerFn({ method: "POST" })
       captain_player_id: data.captain_player_id ?? null,
       gk_player_id: data.gk_player_id ?? null,
       visibility: data.visibility,
-      include_in_convocation: data.include_in_convocation,
+      
       published_at: data.publish ? new Date().toISOString() : undefined,
       created_by: userId,
     };

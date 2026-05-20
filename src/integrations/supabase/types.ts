@@ -438,7 +438,6 @@ export type Database = {
           formation: string
           gk_player_id: string | null
           id: string
-          include_in_convocation: boolean
           published_at: string | null
           slots: Json
           team_id: string
@@ -455,7 +454,6 @@ export type Database = {
           formation?: string
           gk_player_id?: string | null
           id?: string
-          include_in_convocation?: boolean
           published_at?: string | null
           slots?: Json
           team_id: string
@@ -472,7 +470,6 @@ export type Database = {
           formation?: string
           gk_player_id?: string | null
           id?: string
-          include_in_convocation?: boolean
           published_at?: string | null
           slots?: Json
           team_id?: string
