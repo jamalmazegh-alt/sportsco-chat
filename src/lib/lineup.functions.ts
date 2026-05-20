@@ -59,6 +59,21 @@ export const upsertLineup = createServerFn({ method: "POST" })
       throw new Error("Lineup only available for football");
     }
 
+    // Explicit permission check: must be a coach of the team or a club admin.
+    // RLS is the backstop, but we want a clear business error rather than a
+    // silent failure when someone without the right role calls this fn.
+    const [{ data: isCoach }, { data: isAdmin }] = await Promise.all([
+      supabase.rpc("is_team_coach", { _user_id: userId, _team_id: event.team_id }),
+      supabase.rpc("has_club_role", {
+        _user_id: userId,
+        _club_id: team.club_id,
+        _role: "admin",
+      }),
+    ]);
+    if (!isCoach && !isAdmin) {
+      throw new Error("Forbidden: only team coaches or club admins can edit the lineup");
+    }
+
     const payload = {
       event_id: data.eventId,
       team_id: event.team_id,
