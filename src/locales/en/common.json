@@ -362,7 +362,23 @@
     "rescheduleSameDate": "The new date must differ from the current one.",
     "eventRescheduled": "Event rescheduled",
     "previousDate": "Previous date",
-    "newDate": "New date"
+    "newDate": "New date",
+    "resend": {
+      "title": "Resend call-up",
+      "descChanges": "{{count}} change(s) detected since the last send. The email will highlight what changed.",
+      "descNoChanges": "No changes detected since the last send. The call-up will still be resent to all players.",
+      "changesHeader": "Changes",
+      "recipientsHint": "Sent to {{count}} player(s) (+ parents). Existing responses are preserved.",
+      "confirm": "Resend",
+      "button": "Resend call-up",
+      "buttonWithChanges": "Resend call-up ({{count}} update(s))",
+      "changesDetected": "Changes were detected since the last send.",
+      "noConvocations": "No call-up to resend",
+      "notifUpdated": "Call-up updated: {{fields}}",
+      "notifResent": "Call-up resent",
+      "success": "Call-up resent to {{count}} player(s)",
+      "error": "Error while resending"
+    }
   },
   "followUps": {
     "title": "Follow-ups",

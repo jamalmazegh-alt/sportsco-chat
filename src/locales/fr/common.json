@@ -362,7 +362,23 @@
     "rescheduleSameDate": "La nouvelle date doit être différente de l'actuelle.",
     "eventRescheduled": "Événement reporté",
     "previousDate": "Date précédente",
-    "newDate": "Nouvelle date"
+    "newDate": "Nouvelle date",
+    "resend": {
+      "title": "Renvoyer la convocation",
+      "descChanges": "{{count}} changement(s) détecté(s) depuis le dernier envoi. L'email mettra en évidence ce qui a changé.",
+      "descNoChanges": "Aucun changement détecté depuis le dernier envoi. La convocation sera tout de même renvoyée à tous les joueurs.",
+      "changesHeader": "Changements",
+      "recipientsHint": "Envoyé à {{count}} joueur(s) (+ parents). Les réponses existantes sont conservées.",
+      "confirm": "Renvoyer",
+      "button": "Renvoyer la convocation",
+      "buttonWithChanges": "Renvoyer la convocation ({{count}} màj)",
+      "changesDetected": "Des changements ont été détectés depuis le dernier envoi.",
+      "noConvocations": "Aucune convocation à renvoyer",
+      "notifUpdated": "Convocation mise à jour : {{fields}}",
+      "notifResent": "Convocation renvoyée",
+      "success": "Convocation renvoyée à {{count}} joueur(s)",
+      "error": "Erreur lors du renvoi"
+    }
   },
   "followUps": {
     "title": "À relancer",
