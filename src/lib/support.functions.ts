@@ -34,7 +34,7 @@ async function notifySuperAdmins(opts: {
 async function getUserProfile(userId: string) {
   const { data } = await supabaseAdmin
     .from("profiles")
-    .select("full_name, first_name")
+    .select("full_name, first_name, preferred_language")
     .eq("id", userId)
     .maybeSingle();
   return data ?? null;
