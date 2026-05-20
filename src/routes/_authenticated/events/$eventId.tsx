@@ -1695,7 +1695,7 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
-          lineup: lineupData?.include_in_convocation
+          lineup: lineupData
             ? {
                 formation: lineupData.formation,
                 starting: (lineupData as any)._starting ?? [],
@@ -1703,6 +1703,20 @@ function EventDetail() {
               }
             : null,
         };
+        const respondents = (() => {
+          const buckets: { present: string[]; absent: string[]; uncertain: string[]; pending: string[] } = {
+            present: [], absent: [], uncertain: [], pending: [],
+          };
+          for (const c of (convocations ?? []) as any[]) {
+            const p = c.players ?? {};
+            const name = [p.first_name, p.last_name].filter(Boolean).join(" ") || "—";
+            if (c.status === "present") buckets.present.push(name);
+            else if (c.status === "absent") buckets.absent.push(name);
+            else if (c.status === "uncertain") buckets.uncertain.push(name);
+            else buckets.pending.push(name);
+          }
+          return buckets;
+        })();
         const isCancelled = event.status === "cancelled";
         const msg = isCancelled
           ? buildCancellationMessage(base)
