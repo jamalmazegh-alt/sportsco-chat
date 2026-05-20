@@ -219,12 +219,21 @@ function RespondPage() {
         {isResponded && currentConfig && (
           <section
             className={cn(
-              "rounded-2xl p-5 flex items-center gap-3",
-              currentConfig.bg,
-              currentConfig.color,
+              "rounded-2xl p-5 flex items-center gap-3 border",
+              currentConfig.activeBg,
+              currentConfig.activeBorder,
+              currentConfig.activeLabel,
             )}
           >
-            <currentConfig.icon className="h-7 w-7 shrink-0" />
+            <div
+              className={cn(
+                "h-11 w-11 rounded-full flex items-center justify-center shrink-0",
+                currentConfig.activeIconBg,
+                currentConfig.activeIconText,
+              )}
+            >
+              <currentConfig.icon className="h-6 w-6" />
+            </div>
             <div className="min-w-0">
               <p className="font-semibold">Réponse enregistrée : {currentConfig.label}</p>
               {info.responded_at && (
@@ -240,8 +249,8 @@ function RespondPage() {
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {isResponded ? "Modifier votre réponse" : "Votre réponse"}
           </p>
-          <div className="grid grid-cols-3 gap-2">
-            {(Object.keys(STATUS_CONFIG) as Status[]).map((s) => {
+          <div className="flex gap-3">
+            {STATUS_ORDER.map((s) => {
               const cfg = STATUS_CONFIG[s];
               const active = info.status === s;
               const isLoading = submitting === s;
@@ -252,19 +261,31 @@ function RespondPage() {
                   disabled={!!submitting}
                   onClick={() => submit(s)}
                   className={cn(
-                    "rounded-xl border-2 py-4 px-2 flex flex-col items-center gap-1.5 transition-all",
+                    "group relative flex-1 flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl border bg-card shadow-sm transition-all active:scale-95 cursor-pointer",
                     active
-                      ? cn(cfg.bg, cfg.color, "border-current font-semibold")
-                      : "border-border bg-card hover:border-primary/40",
+                      ? cn(cfg.activeBorder, cfg.activeBg, cfg.activeRing, "shadow-md")
+                      : cn(cfg.border, cfg.hoverBorder, "hover:shadow-md"),
                     submitting && !isLoading && "opacity-50",
                   )}
+                  aria-pressed={active}
                 >
-                  {isLoading ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  ) : (
-                    <cfg.icon className="h-6 w-6" />
-                  )}
-                  <span className="text-xs">{cfg.label}</span>
+                  <div
+                    className={cn(
+                      "w-11 h-11 flex items-center justify-center rounded-full transition-colors",
+                      active
+                        ? cn(cfg.activeIconBg, cfg.activeIconText)
+                        : cn(cfg.iconBg, cfg.iconText, cfg.iconHoverBg),
+                    )}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <cfg.icon className="h-6 w-6" strokeWidth={2.25} />
+                    )}
+                  </div>
+                  <span className={cn("text-sm font-semibold tracking-tight", cfg.labelText)}>
+                    {cfg.label}
+                  </span>
                 </button>
               );
             })}
