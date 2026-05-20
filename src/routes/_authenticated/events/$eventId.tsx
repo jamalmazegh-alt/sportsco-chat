@@ -237,6 +237,51 @@ function EventDetail() {
     },
   });
 
+  // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
+  const { data: lineupData } = useQuery({
+    queryKey: ["event-lineup-wa", eventId],
+    enabled: !!event,
+    queryFn: async () => {
+      const { data: l } = await supabase
+        .from("event_lineups")
+        .select("formation, slots, bench, captain_player_id, gk_player_id, published_at")
+        .eq("event_id", eventId)
+        .not("published_at", "is", null)
+        .maybeSingle();
+      if (!l) return null;
+      const slots = (l.slots as any[]) ?? [];
+      const benchIds = (l.bench as any[]) ?? [];
+      const ids = new Set<string>();
+      slots.forEach((s: any) => s.player_id && ids.add(s.player_id));
+      benchIds.forEach((id: any) => id && ids.add(id));
+      if (ids.size === 0) return { ...l, _starting: [], _bench: [] };
+      const { data: players } = await supabase
+        .from("players")
+        .select("id, first_name, last_name, jersey_number")
+        .in("id", Array.from(ids));
+      const byId = new Map<string, any>((players ?? []).map((p: any) => [p.id, p]));
+      const name = (p: any) => `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
+      const starting = slots
+        .filter((s: any) => s.player_id)
+        .sort((a: any, b: any) => a.y - b.y || a.x - b.x)
+        .map((s: any) => {
+          const p = byId.get(s.player_id);
+          return {
+            name: name(p),
+            jersey: p?.jersey_number ?? null,
+            role: s.role,
+            isCaptain: l.captain_player_id === s.player_id,
+            isGK: l.gk_player_id === s.player_id,
+          };
+        });
+      const bench = benchIds.map((id: any) => {
+        const p = byId.get(id);
+        return { name: name(p), jersey: p?.jersey_number ?? null };
+      });
+      return { formation: l.formation, _starting: starting, _bench: bench };
+    },
+  });
+
   // Realtime
   useEffect(() => {
     const channel = supabase
