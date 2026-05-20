@@ -215,35 +215,38 @@ function LineupPage() {
 
   function placePlayer(playerId: string, target: { kind: "slot"; slotId: string } | { kind: "bench" } | { kind: "available" }) {
     setDirty(true);
-    // Remove from any current location first (snapshot prior slot)
-    let priorSlot: LineupSlot | undefined;
-    setSlots((prev) => {
-      priorSlot = prev.find((s) => s.player_id === playerId);
-      return prev.map((s) => (s.player_id === playerId ? { ...s, player_id: null } : s));
-    });
-    setBench((prev) => prev.filter((id) => id !== playerId));
 
-    if (target.kind === "slot") {
-      const { slotId } = target;
-      setSlots((prev) => {
-        const targetSlot = prev.find((s) => s.id === slotId);
-        const displaced = targetSlot?.player_id ?? null;
-        const next = prev.map((s) => (s.id === slotId ? { ...s, player_id: playerId } : s));
-        if (displaced && displaced !== playerId) {
-          setBench((b) => (b.includes(displaced) ? b : [...b, displaced]));
+    // Compute next slots + displaced player synchronously from current state,
+    // then commit slots and bench in independent setters (no nested updates).
+    let displaced: string | null = null;
+    let droppedOnGk = false;
+    const nextSlots = slots.map((s) => {
+      // First, clear the player from any slot it currently occupies
+      const cleared = s.player_id === playerId ? { ...s, player_id: null } : s;
+      if (target.kind === "slot" && cleared.id === target.slotId) {
+        if (cleared.player_id && cleared.player_id !== playerId) {
+          displaced = cleared.player_id;
         }
-        return next;
-      });
-      // Auto-set GK if dropped on GK slot
-      const targetSlot = slots.find((s) => s.id === slotId);
-      if (targetSlot?.role === "GK") setGk(playerId);
-    } else if (target.kind === "bench") {
-      setBench((prev) => (prev.includes(playerId) ? prev : [...prev, playerId]));
-    }
+        if (cleared.role === "GK") droppedOnGk = true;
+        return { ...cleared, player_id: playerId };
+      }
+      return cleared;
+    });
+
+    setSlots(nextSlots);
+    setBench((prev) => {
+      // Remove the moved player from bench first
+      let next = prev.filter((id) => id !== playerId);
+      if (target.kind === "bench") {
+        if (!next.includes(playerId)) next = [...next, playerId];
+      }
+      if (displaced && !next.includes(displaced)) next = [...next, displaced];
+      return next;
+    });
+    if (droppedOnGk) setGk(playerId);
+
     setSelectedPid(null);
     setActionPid(null);
-    // priorSlot reference suppresses lint "unused" while keeping the snapshot for future undo
-    void priorSlot;
   }
 
   function handleDragEnd(e: DragEndEvent) {
@@ -258,16 +261,24 @@ function LineupPage() {
   }
 
   function handleChipTap(playerId: string, location: "available" | "slot" | "bench") {
+    // If a player is already selected and the user taps a different chip,
+    // perform a swap/placement instead of opening the action panel.
     if (selectedPid && selectedPid !== playerId) {
-      // user has another player selected → swap by moving this position not relevant; treat as place selected onto same area
-      // If tapping a placed chip while another player is selected: replace target → place selected at that slot
-      // Easier: open action panel if the tapped chip is already placed (slot/bench). For available, just switch selection.
-      if (location === "available") {
+      if (location === "slot") {
+        // Find the slot occupied by the tapped chip and drop the selected player there
+        const targetSlot = slots.find((s) => s.player_id === playerId);
+        if (targetSlot) {
+          placePlayer(selectedPid, { kind: "slot", slotId: targetSlot.id });
+          return;
+        }
+      } else if (location === "bench") {
+        placePlayer(selectedPid, { kind: "bench" });
+        return;
+      } else if (location === "available") {
+        // Tapping another available player just switches selection
         setSelectedPid(playerId);
         return;
       }
-      setActionPid(playerId);
-      return;
     }
     if (selectedPid === playerId) {
       setSelectedPid(null);
