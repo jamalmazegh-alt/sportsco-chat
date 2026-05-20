@@ -137,7 +137,7 @@ export function TicketThread({
         <Textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Écrire une réponse…"
+          placeholder={t("thread.reply_placeholder")}
           rows={3}
           maxLength={10000}
         />
