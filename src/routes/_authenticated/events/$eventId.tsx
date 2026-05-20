@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { toPng } from "html-to-image";
+import { domToPng } from "modern-screenshot";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
@@ -155,9 +155,8 @@ function EventDetail() {
     }
     setSharingLineup(true);
     try {
-      const dataUrl = await toPng(node, {
-        cacheBust: true,
-        pixelRatio: 2,
+      const dataUrl = await domToPng(node, {
+        scale: 2,
         backgroundColor: "#ffffff",
       });
       const blob = await (await fetch(dataUrl)).blob();
