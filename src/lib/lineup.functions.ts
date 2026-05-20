@@ -22,7 +22,7 @@ const UpsertSchema = z.object({
   publish: z.boolean().optional(),
 });
 
-export const getLineup = createServerFn({ method: "POST" })
+export const getLineup = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { eventId: string }) =>
     z.object({ eventId: z.string().uuid() }).parse(input),
