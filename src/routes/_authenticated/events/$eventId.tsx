@@ -1695,14 +1695,15 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
-          lineup: lineupData
-            ? {
-                formation: lineupData.formation,
-                starting: (lineupData as any)._starting ?? [],
-                bench: (lineupData as any)._bench ?? [],
-              }
-            : null,
+          lineup: null,
         };
+        const lineupBlock = lineupData
+          ? {
+              formation: lineupData.formation,
+              starting: (lineupData as any)._starting ?? [],
+              bench: (lineupData as any)._bench ?? [],
+            }
+          : null;
         const respondents = (() => {
           const buckets: { present: string[]; absent: string[]; uncertain: string[]; pending: string[] } = {
             present: [], absent: [], uncertain: [], pending: [],
@@ -1718,9 +1719,11 @@ function EventDetail() {
           return buckets;
         })();
         const isCancelled = event.status === "cancelled";
-        const msg = isCancelled
+        const convocMsg = isCancelled
           ? buildCancellationMessage(base)
           : buildConvocationMessage(base);
+        const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
+        const reminderMsg = buildReminderMessage({ ...base, respondents });
         return (
           <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-3 space-y-2">
             <div className="flex items-center justify-between gap-2">
