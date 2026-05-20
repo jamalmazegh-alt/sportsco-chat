@@ -244,11 +244,11 @@ function EventDetail() {
     queryFn: async () => {
       const { data: l } = await supabase
         .from("event_lineups")
-        .select("formation, slots, bench, captain_player_id, gk_player_id, published_at")
+        .select("formation, slots, bench, captain_player_id, gk_player_id, published_at, include_in_convocation")
         .eq("event_id", eventId)
         .not("published_at", "is", null)
         .maybeSingle();
-      if (!l) return null;
+      if (!l || !l.include_in_convocation) return null;
       const slots = (l.slots as any[]) ?? [];
       const benchIds = (l.bench as any[]) ?? [];
       const ids = new Set<string>();
