@@ -1536,7 +1536,6 @@ function EventDetail() {
         const team = teams?.[0] as any;
         if (!team) return null;
         const mode = (team.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
-        if (mode === "app") return null;
         const groupUrl = normalizeGroupUrl(team.whatsapp_group_url);
         const clubName = team.clubs?.name ?? undefined;
         const teamName = team.name ?? undefined;
@@ -1575,7 +1574,7 @@ function EventDetail() {
                 <MessageCircle className="h-4 w-4 text-[#25D366]" />
                 <span>WhatsApp</span>
                 <span className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                  {mode === "whatsapp" ? "WhatsApp uniquement" : "Hybride"}
+                  {mode === "whatsapp" ? "WhatsApp uniquement" : mode === "hybrid" ? "Hybride" : "Partage rapide"}
                 </span>
               </div>
               {groupUrl && (
