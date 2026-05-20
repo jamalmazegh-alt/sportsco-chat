@@ -265,6 +265,18 @@
     "autoInviteParentSent": "Invitation sent to the parent."
   },
   "events": {
+    "whatsappShare": {
+      "modeWhatsappOnly": "WhatsApp only",
+      "modeHybrid": "Hybrid",
+      "modeQuickShare": "Quick share",
+      "openGroup": "Open group",
+      "shareCancellation": "Share cancellation",
+      "shareConvoc": "Share call-up",
+      "shareConvocWithLineup": "Share call-up + lineup",
+      "reminder": "Reminder",
+      "reminderHint": "The reminder includes player statuses (attending, absent, no reply).",
+      "reminderHintWithLineup": "The reminder includes player statuses (attending, absent, no reply). The lineup is attached as an image on mobile."
+    },
     "title": "Events",
     "create": "New event",
     "name": "Event name",

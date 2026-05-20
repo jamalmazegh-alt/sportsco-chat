@@ -265,6 +265,18 @@
     "autoInviteParentSent": "Invitation envoyée au parent."
   },
   "events": {
+    "whatsappShare": {
+      "modeWhatsappOnly": "WhatsApp uniquement",
+      "modeHybrid": "Hybride",
+      "modeQuickShare": "Partage rapide",
+      "openGroup": "Ouvrir le groupe",
+      "shareCancellation": "Partager l'annulation",
+      "shareConvoc": "Partager la convoc",
+      "shareConvocWithLineup": "Partager la convoc + compo",
+      "reminder": "Rappel",
+      "reminderHint": "Le rappel inclut le statut des joueurs (présents, absents, sans réponse).",
+      "reminderHintWithLineup": "Le rappel inclut le statut des joueurs (présents, absents, sans réponse). La compo est jointe en image sur mobile."
+    },
     "title": "Événements",
     "create": "Nouvel événement",
     "name": "Nom de l'événement",
