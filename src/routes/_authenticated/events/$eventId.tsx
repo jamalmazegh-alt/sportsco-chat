@@ -1980,7 +1980,6 @@ function EventDetail() {
             {isCoach && event.status !== "cancelled" && event.convocations_sent && (
               <div className="flex items-center gap-1 shrink-0">
                 <DropdownMenu>
-                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
                       <MoreVertical className="h-4 w-4" />
