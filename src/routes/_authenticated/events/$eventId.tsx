@@ -1695,7 +1695,7 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
-          lineup: lineupData
+          lineup: lineupData?.include_in_convocation
             ? {
                 formation: lineupData.formation,
                 starting: (lineupData as any)._starting ?? [],
