@@ -125,6 +125,27 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
   component: EventDetailRoute,
 });
 
+async function waitForShareAssets(node: HTMLElement) {
+  const fontsReady = (document as Document & { fonts?: FontFaceSet }).fonts?.ready.catch(() => undefined);
+  const imagesReady = Array.from(node.querySelectorAll("img")).map((img) => {
+    if (img.complete) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      img.addEventListener("load", () => resolve(), { once: true });
+      img.addEventListener("error", () => resolve(), { once: true });
+    });
+  });
+  await Promise.allSettled([fontsReady, ...imagesReady].filter(Boolean));
+}
+
+function dataUrlToBlob(dataUrl: string) {
+  const [header, payload] = dataUrl.split(",");
+  const mime = header?.match(/data:(.*?);/)?.[1] ?? "image/png";
+  const binary = atob(payload ?? "");
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
 function EventDetailRoute() {
   const { eventId } = Route.useParams();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -155,29 +176,56 @@ function EventDetail() {
     }
     setSharingLineup(true);
     try {
+      await waitForShareAssets(node);
       const dataUrl = await domToPng(node, {
         scale: 2,
         backgroundColor: "#ffffff",
       });
-      const blob = await (await fetch(dataUrl)).blob();
+      const blob = dataUrlToBlob(dataUrl);
       const file = new File([blob], "composition.png", { type: "image/png" });
-      const nav = navigator as any;
-      if (nav.canShare && nav.canShare({ files: [file] })) {
-        await nav.share({ files: [file], text: messageText });
+      const nav = navigator as Navigator & {
+        canShare?: (data: ShareData) => boolean;
+        share?: (data: ShareData) => Promise<void>;
+      };
+      const nativeShare = typeof nav.share === "function" ? nav.share.bind(nav) : null;
+      const sharePayload: ShareData = { files: [file], text: messageText, title: "Composition Clubero" };
+      const canShareFull = typeof nav.canShare === "function" ? nav.canShare(sharePayload) : true;
+      const canShareFileOnly = typeof nav.canShare === "function" ? nav.canShare({ files: [file] }) : true;
+      const canNativeShare = !!nativeShare && (canShareFull || canShareFileOnly);
+
+      if (nativeShare && canNativeShare) {
+        if (!canShareFull) await navigator.clipboard?.writeText(messageText).catch(() => undefined);
+        try {
+          await nativeShare(canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" });
+        } catch (shareError: any) {
+          if (shareError?.name === "AbortError") return;
+          const a = document.createElement("a");
+          a.href = dataUrl;
+          a.download = "composition.png";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          await navigator.clipboard?.writeText(messageText).catch(() => undefined);
+          window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
+          toast.success("Image téléchargée, message copié — attachez l’image dans WhatsApp");
+          return;
+        }
+        toast.success("Partage prêt — choisissez WhatsApp");
       } else {
-        // Fallback: download image + open WhatsApp with text
+        // Browser fallback: WhatsApp deep-links cannot auto-attach files.
         const a = document.createElement("a");
         a.href = dataUrl;
         a.download = "composition.png";
         document.body.appendChild(a);
         a.click();
         a.remove();
+        await navigator.clipboard?.writeText(messageText).catch(() => undefined);
         window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
-        toast.success("Image téléchargée — attachez-la dans WhatsApp");
+        toast.success("Image téléchargée, message copié — attachez l’image dans WhatsApp");
       }
     } catch (e: any) {
       if (e?.name !== "AbortError") {
-        toast.error("Impossible de générer l'image");
+        toast.error("Impossible de partager l'image");
       }
     } finally {
       setSharingLineup(false);
@@ -288,7 +336,7 @@ function EventDetail() {
         .eq("event_id", eventId)
         .not("published_at", "is", null)
         .maybeSingle();
-      if (!l || !l.include_in_convocation) return null;
+      if (!l) return null;
       const slots = (l.slots as any[]) ?? [];
       const benchIds = (l.bench as any[]) ?? [];
       const ids = new Set<string>();
@@ -318,7 +366,7 @@ function EventDetail() {
         const p = byId.get(id);
         return { name: name(p), jersey: p?.jersey_number ?? null };
       });
-      return { formation: l.formation, _starting: starting, _bench: bench };
+      return { formation: l.formation, include_in_convocation: l.include_in_convocation, _starting: starting, _bench: bench };
     },
   });
 
@@ -1647,7 +1695,7 @@ function EventDetail() {
           attachments: (event.attachments as any) ?? [],
           selectedPlayers,
           cancellationReason: event.cancellation_reason,
-          lineup: lineupData
+          lineup: lineupData?.include_in_convocation
             ? {
                 formation: lineupData.formation,
                 starting: (lineupData as any)._starting ?? [],
@@ -1680,15 +1728,27 @@ function EventDetail() {
                 </a>
               )}
             </div>
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(msg)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
-            >
-              <MessageCircle className="h-4 w-4" />
-              {isCancelled ? "Partager l'annulation sur WhatsApp" : "Envoyer via WhatsApp"}
-            </a>
+            {!isCancelled && lineupData ? (
+              <button
+                type="button"
+                onClick={() => shareLineupAsImage(msg)}
+                disabled={sharingLineup}
+                className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium disabled:opacity-60"
+              >
+                {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                Partager sur WhatsApp avec la compo
+              </button>
+            ) : (
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(msg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {isCancelled ? "Partager l'annulation sur WhatsApp" : "Envoyer via WhatsApp"}
+              </a>
+            )}
             {!isCancelled && (
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(buildReminderMessage(base))}`}
@@ -1700,19 +1760,10 @@ function EventDetail() {
                 Envoyer un rappel WhatsApp
               </a>
             )}
-            {!isCancelled && lineupData && (
-              <button
-                type="button"
-                onClick={() => shareLineupAsImage(msg)}
-                disabled={sharingLineup}
-                className="inline-flex items-center justify-center gap-2 w-full h-9 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium disabled:opacity-60"
-              >
-                {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                Partager la compo (image)
-              </button>
-            )}
             <p className="text-[11px] text-muted-foreground">
-              WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer.{lineupData ? " Pour la compo en image, utilisez le bouton dédié." : ""}
+              {lineupData && !isCancelled
+                ? "Le partage mobile joint l’image de la compo avec le message. Si votre navigateur ne le permet pas, l’image est téléchargée et le message copié."
+                : "WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer."}
             </p>
           </div>
         );
