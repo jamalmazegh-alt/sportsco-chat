@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Star, Hand, CircleDot } from "lucide-react";
 import { PitchSvg } from "@/components/lineup/pitch-svg";
 import { PlayerChip, type PlayerLite } from "@/components/lineup/pitch-pieces";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Slot {
   id: string;
