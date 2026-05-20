@@ -858,6 +858,10 @@
     "unavailable": "Lineup is only available for football matches.",
     "captain": "Captain",
     "gk": "Goalkeeper",
+    "move": "Move",
+    "remove": "Remove",
+    "tapHint": "💡 <b>Mobile tip:</b> tap a player then tap a slot (or the bench) to place them. Tap an already-placed player to move them or set captain/goalkeeper.",
+    "customLabel": "Custom",
     "vis": {
       "draft": "Private draft",
       "staff": "Staff only",
