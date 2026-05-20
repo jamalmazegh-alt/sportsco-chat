@@ -94,15 +94,15 @@ function formatSnapshotValue(field: string, value: any, t: (k: string) => string
 function diffSnapshot(prev: Record<string, any> | null | undefined, current: any, t: (k: string) => string): Array<{ field: string; label: string; previous?: string; current?: string }> {
   if (!prev) return [];
   const labels: Record<string, string> = {
-    title: "Titre",
-    description: "Description",
-    starts_at: "Date / heure",
-    ends_at: "Fin",
-    convocation_time: "Heure de RDV",
-    location: "Lieu",
-    meeting_point: "Point de RDV",
-    competition_name: "Compétition",
-    type: "Type",
+    title: t("events.fields.title" as any) || "Title",
+    description: t("events.fields.description" as any) || "Description",
+    starts_at: t("events.fields.starts_at" as any) || "Date / time",
+    ends_at: t("events.fields.ends_at" as any) || "End",
+    convocation_time: t("events.fields.convocation_time" as any) || "Meeting time",
+    location: t("events.fields.location" as any) || "Location",
+    meeting_point: t("events.fields.meeting_point" as any) || "Meeting point",
+    competition_name: t("events.fields.competition_name" as any) || "Competition",
+    type: t("events.fields.type" as any) || "Type",
   };
   const out: Array<{ field: string; label: string; previous?: string; current?: string }> = [];
   for (const k of CONVOC_SNAPSHOT_FIELDS) {
