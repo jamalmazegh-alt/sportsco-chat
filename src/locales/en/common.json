@@ -275,7 +275,11 @@
       "shareConvocWithLineup": "Share call-up + lineup",
       "reminder": "Reminder",
       "reminderHint": "The reminder includes player statuses (attending, absent, no reply).",
-      "reminderHintWithLineup": "The reminder includes player statuses (attending, absent, no reply). The lineup is attached as an image on mobile."
+      "reminderHintWithLineup": "The reminder includes player statuses (attending, absent, no reply). The lineup is attached as an image on mobile.",
+      "imageDownloadedAttach": "Image downloaded, message copied — attach the image in WhatsApp",
+      "shareReady": "Share ready — pick WhatsApp",
+      "shareImageFailed": "Unable to share the image",
+      "convocationsCreated": "Call-ups created — share now via WhatsApp below"
     },
     "title": "Events",
     "create": "New event",
@@ -377,7 +381,19 @@
       "notifUpdated": "Call-up updated: {{fields}}",
       "notifResent": "Call-up resent",
       "success": "Call-up resent to {{count}} player(s)",
-      "error": "Error while resending"
+      "error": "Error while resending",
+      "updatesBadge": "{{count}} update(s)"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "starts_at": "Date / time",
+      "ends_at": "End",
+      "convocation_time": "Meeting time",
+      "location": "Location",
+      "meeting_point": "Meeting point",
+      "competition_name": "Competition",
+      "type": "Type"
     }
   },
   "followUps": {
@@ -444,7 +460,10 @@
       "Family",
       "Minor health issue"
     ],
-    "suggestedReasons": "Suggestions"
+    "suggestedReasons": "Suggestions",
+    "forceResponseTitle": "Force response?",
+    "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
+    "notSentYet": "Not sent yet"
   },
   "stats": {
     "title": "Stats",
