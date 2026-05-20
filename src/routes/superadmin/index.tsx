@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getPlatformStats, getFinanceOverview } from "@/lib/superadmin.functions";
+import { getSupportStats } from "@/lib/support.functions";
 import {
   Loader2,
   TrendingUp,
@@ -11,6 +12,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   CircleDollarSign,
+  LifeBuoy,
+  MessageSquare,
+  Inbox,
 } from "lucide-react";
 import { formatMoney, StatusBadge } from "@/lib/superadmin/ui";
 
