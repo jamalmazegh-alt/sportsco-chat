@@ -808,7 +808,31 @@
       "focus": "Concentration",
       "physical": "Physique",
       "technical": "Technique"
-    }
+    },
+    "allSaved": "Tout est à jour",
+    "bulkHint": "Note rapide pour tous les joueurs. Tout est enregistré en une fois.",
+    "bulkPartial": "{{ok}} enregistré(s), {{ko}} en échec.",
+    "bulkSaved": "{{count}} retour(s) enregistré(s).",
+    "creditsExhausted": "Crédits IA épuisés.",
+    "currentSynthesis": "Synthèse actuelle",
+    "dirtyCount": "{{count}} modification(s) en attente",
+    "noPlayers": "Aucun joueur convoqué.",
+    "notePlaceholder": "Note rapide (forces, axes de progrès…)",
+    "postMatchTitle": "Retours coach",
+    "rateLimit": "Trop de requêtes, réessaie dans un instant.",
+    "refineChatFooter": "Chaque message met à jour la synthèse affichée. L'historique de cet échange n'est pas sauvegardé.",
+    "refineChatHint": "Décris ce que tu veux changer (ton, longueur, structure…). Tu verras la synthèse se mettre à jour à chaque échange.",
+    "refineChatPlaceholder": "Que veux-tu changer ?",
+    "refineChatTitle": "Affiner la synthèse avec l'IA",
+    "refineDoneFallback": "Synthèse mise à jour selon ta demande.",
+    "refineFailed": "Je n'ai pas pu appliquer ta demande. La synthèse n'a pas été modifiée.",
+    "refineUpdated": "Synthèse mise à jour",
+    "refineWelcome": "Salut 👋 Dis-moi ce que tu veux ajuster : longueur, ton, structure, focus particulier… Je réécris la synthèse à chaque message.",
+    "refineWithAi": "Affiner avec l'IA",
+    "refineWorking": "L'IA réécrit la synthèse…",
+    "saveAll": "Tout enregistrer",
+    "saved": "Enregistré",
+    "send": "Envoyer"
   },
   "lineup": {
     "title": "Composition",
@@ -839,6 +863,13 @@
       "staff": "Staff uniquement",
       "selected": "Joueurs convoqués",
       "team": "Toute l'équipe"
-    }
+    },
+    "convocFromLineup": {
+      "cta": "Créer la convoc",
+      "desc": "{{count}} joueur(s) placés seront pré-sélectionnés.",
+      "empty": "Placez des joueurs sur le terrain ou le banc d'abord.",
+      "title": "Créer la convocation depuis cette compo"
+    },
+    "noPlayersForConvoc": "Ajoutez d'abord des joueurs à la compo."
   }
 }

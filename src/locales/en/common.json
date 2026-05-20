@@ -808,7 +808,31 @@
       "focus": "Focus",
       "physical": "Physical",
       "technical": "Technical"
-    }
+    },
+    "allSaved": "All up to date",
+    "bulkHint": "Quick note for every player. Everything is saved in one go.",
+    "bulkPartial": "{{ok}} saved, {{ko}} failed.",
+    "bulkSaved": "{{count}} feedback(s) saved.",
+    "creditsExhausted": "AI credits exhausted.",
+    "currentSynthesis": "Current summary",
+    "dirtyCount": "{{count}} unsaved change(s)",
+    "noPlayers": "No players called up.",
+    "notePlaceholder": "Quick note (strengths, areas to improve…)",
+    "postMatchTitle": "Coach feedback",
+    "rateLimit": "Too many requests, try again shortly.",
+    "refineChatFooter": "Every message updates the displayed summary. This chat history is not saved.",
+    "refineChatHint": "Describe what you'd like to change (tone, length, structure…). The summary updates after each message.",
+    "refineChatPlaceholder": "What would you like to change?",
+    "refineChatTitle": "Refine summary with AI",
+    "refineDoneFallback": "Summary updated based on your request.",
+    "refineFailed": "I couldn't apply your request. The summary wasn't changed.",
+    "refineUpdated": "Summary updated",
+    "refineWelcome": "Hi 👋 Tell me what to tweak: length, tone, structure, specific focus… I'll rewrite the summary with each message.",
+    "refineWithAi": "Refine with AI",
+    "refineWorking": "AI is rewriting the summary…",
+    "saveAll": "Save all",
+    "saved": "Saved",
+    "send": "Send"
   },
   "lineup": {
     "title": "Lineup",
@@ -839,6 +863,13 @@
       "staff": "Staff only",
       "selected": "Called-up players",
       "team": "Whole team"
-    }
+    },
+    "convocFromLineup": {
+      "cta": "Create call-up",
+      "desc": "{{count}} placed player(s) will be pre-selected.",
+      "empty": "Place players on the pitch or bench first.",
+      "title": "Create the call-up from this lineup"
+    },
+    "noPlayersForConvoc": "Add players to the lineup first."
   }
 }
