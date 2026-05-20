@@ -565,6 +565,54 @@ function LineupPage() {
             {published ? t("lineup.update", "Mettre à jour") : t("lineup.publish", "Publier")}
           </Button>
         </div>
+
+        {/* Floating selection banner */}
+        {selectedPid && (
+          <div className="fixed left-1/2 -translate-x-1/2 bottom-24 z-40 flex items-center gap-2 rounded-full bg-amber-500 text-white shadow-lg px-4 py-2 text-sm font-medium animate-in fade-in slide-in-from-bottom-2">
+            <Move className="h-4 w-4" />
+            <span className="truncate max-w-[180px]">
+              {playerById.get(selectedPid)?.first_name} {playerById.get(selectedPid)?.last_name}
+            </span>
+            <span className="opacity-90 hidden xs:inline">— touche une case</span>
+            <button onClick={() => setSelectedPid(null)} className="ml-1 rounded-full hover:bg-white/20 p-0.5">
+              <XIcon className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Action sheet for a placed/bench player */}
+        {actionPid && playerById.get(actionPid) && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center" onClick={() => setActionPid(null)}>
+            <div onClick={(e) => e.stopPropagation()} className="w-full sm:max-w-sm bg-background rounded-t-2xl sm:rounded-2xl p-4 space-y-2 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <p className="font-semibold text-sm">
+                  {playerById.get(actionPid)!.first_name} {playerById.get(actionPid)!.last_name}
+                </p>
+                <button onClick={() => setActionPid(null)} className="text-muted-foreground"><XIcon className="h-4 w-4" /></button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Button variant="outline" onClick={() => { setSelectedPid(actionPid); setActionPid(null); }}>
+                  <Move className="h-4 w-4" /> Déplacer
+                </Button>
+                <Button
+                  variant={captain === actionPid ? "default" : "outline"}
+                  onClick={() => { setCaptain(captain === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
+                >
+                  <Star className="h-4 w-4" /> Capitaine
+                </Button>
+                <Button
+                  variant={gk === actionPid ? "default" : "outline"}
+                  onClick={() => { setGk(gk === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
+                >
+                  <Hand className="h-4 w-4" /> Gardien
+                </Button>
+                <Button variant="destructive" onClick={() => { removePlayer(actionPid); setDirty(true); setActionPid(null); }}>
+                  <XIcon className="h-4 w-4" /> Retirer
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DndContext>
   );
