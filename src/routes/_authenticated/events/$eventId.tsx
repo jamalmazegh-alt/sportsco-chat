@@ -155,9 +155,8 @@ function EventDetail() {
     }
     setSharingLineup(true);
     try {
-      const dataUrl = await toPng(node, {
-        cacheBust: true,
-        pixelRatio: 2,
+      const dataUrl = await domToPng(node, {
+        scale: 2,
         backgroundColor: "#ffffff",
       });
       const blob = await (await fetch(dataUrl)).blob();
