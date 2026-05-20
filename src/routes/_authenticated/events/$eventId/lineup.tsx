@@ -10,7 +10,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus } from "lucide-react";
+import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus, X as XIcon, Move } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
