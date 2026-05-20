@@ -830,6 +830,9 @@
     "refineWelcome": "Salut 👋 Dis-moi ce que tu veux ajuster : longueur, ton, structure, focus particulier… Je réécris la synthèse à chaque message.",
     "refineWithAi": "Affiner avec l'IA",
     "refineWorking": "L'IA réécrit la synthèse…",
+    "refineExample1": "Résume en 5 phrases",
+    "refineExample2": "Insiste davantage sur le mental",
+    "refineExample3": "Ajoute une recommandation sur le placement",
     "saveAll": "Tout enregistrer",
     "saved": "Enregistré",
     "send": "Envoyer"
@@ -858,6 +861,10 @@
     "unavailable": "La composition est disponible uniquement pour les matchs de football.",
     "captain": "Capitaine",
     "gk": "Gardien",
+    "move": "Déplacer",
+    "remove": "Retirer",
+    "tapHint": "💡 <b>Astuce mobile :</b> touche un joueur puis touche une case (ou le banc) pour le placer. Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.",
+    "customLabel": "Personnalisée",
     "vis": {
       "draft": "Brouillon privé",
       "staff": "Staff uniquement",

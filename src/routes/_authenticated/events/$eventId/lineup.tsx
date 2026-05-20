@@ -386,10 +386,13 @@ function LineupPage() {
         </div>
 
         {/* Tap-to-place hint */}
-        <div className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-          💡 <strong>Astuce mobile :</strong> touche un joueur puis touche une case (ou le banc) pour le placer.
-          Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.
-        </div>
+        <div
+          className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
+          dangerouslySetInnerHTML={{
+            __html: t("lineup.tapHint", "💡 <b>Astuce mobile :</b> touche un joueur puis touche une case (ou le banc) pour le placer. Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien."),
+          }}
+        />
+
 
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-3">
@@ -402,7 +405,7 @@ function LineupPage() {
               <SelectContent>
                 {FORMATIONS.map((f) => (
                   <SelectItem key={f.key} value={f.key}>
-                    {f.label}
+                    {f.key === "custom" ? t("lineup.customLabel", "Personnalisée") : f.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -599,22 +602,22 @@ function LineupPage() {
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <Button variant="outline" onClick={() => { setSelectedPid(actionPid); setActionPid(null); }}>
-                  <Move className="h-4 w-4" /> Déplacer
+                  <Move className="h-4 w-4" /> {t("lineup.move", "Déplacer")}
                 </Button>
                 <Button
                   variant={captain === actionPid ? "default" : "outline"}
                   onClick={() => { setCaptain(captain === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
                 >
-                  <Star className="h-4 w-4" /> Capitaine
+                  <Star className="h-4 w-4" /> {t("lineup.captain", "Capitaine")}
                 </Button>
                 <Button
                   variant={gk === actionPid ? "default" : "outline"}
                   onClick={() => { setGk(gk === actionPid ? null : actionPid); setDirty(true); setActionPid(null); }}
                 >
-                  <Hand className="h-4 w-4" /> Gardien
+                  <Hand className="h-4 w-4" /> {t("lineup.gk", "Gardien")}
                 </Button>
                 <Button variant="destructive" onClick={() => { removePlayer(actionPid); setDirty(true); setActionPid(null); }}>
-                  <XIcon className="h-4 w-4" /> Retirer
+                  <XIcon className="h-4 w-4" /> {t("lineup.remove", "Retirer")}
                 </Button>
               </div>
             </div>
