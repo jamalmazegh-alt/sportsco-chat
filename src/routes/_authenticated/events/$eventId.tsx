@@ -126,7 +126,7 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
 });
 
 async function waitForShareAssets(node: HTMLElement) {
-  const fontsReady = "fonts" in document ? (document as any).fonts.ready.catch(() => undefined) : undefined;
+  const fontsReady = (document as Document & { fonts?: FontFaceSet }).fonts?.ready.catch(() => undefined);
   const imagesReady = Array.from(node.querySelectorAll("img")).map((img) => {
     if (img.complete) return Promise.resolve();
     return new Promise<void>((resolve) => {
@@ -139,8 +139,8 @@ async function waitForShareAssets(node: HTMLElement) {
 
 function dataUrlToBlob(dataUrl: string) {
   const [header, payload] = dataUrl.split(",");
-  const mime = header.match(/data:(.*?);/)?.[1] ?? "image/png";
-  const binary = atob(payload);
+  const mime = header?.match(/data:(.*?);/)?.[1] ?? "image/png";
+  const binary = atob(payload ?? "");
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
   return new Blob([bytes], { type: mime });
