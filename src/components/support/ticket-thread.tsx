@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Paperclip, X, Lock, Send, Download } from "lucide-react";
@@ -30,6 +31,7 @@ export function TicketThread({
   isStaffView: boolean;
   onReplied: () => void;
 }) {
+  const { t } = useTranslation("support");
   const { user } = useAuth();
   const [body, setBody] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -40,7 +42,9 @@ export function TicketThread({
       if (!user) throw new Error("not_authenticated");
       const paths: string[] = [];
       for (const f of files) {
-        if (f.size > 5 * 1024 * 1024) throw new Error(`${f.name} dépasse 5 Mo`);
+        if (f.size > 5 * 1024 * 1024) {
+          throw new Error(t("form.file_too_large", { name: f.name }));
+        }
         const ext = f.name.split(".").pop() || "bin";
         const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error } = await supabase.storage
@@ -64,7 +68,7 @@ export function TicketThread({
       setInternalNote(false);
       onReplied();
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
+    onError: (e) => toast.error(e instanceof Error ? e.message : t("form.error")),
   });
 
   const openAttachment = async (path: string) => {
@@ -72,7 +76,7 @@ export function TicketThread({
       const { url } = await getSupportAttachmentUrl({ data: { path } });
       window.open(url, "_blank");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Lien indisponible");
+      toast.error(e instanceof Error ? e.message : t("thread.link_unavailable"));
     }
   };
 
@@ -96,11 +100,11 @@ export function TicketThread({
               >
                 {m.is_internal_note && (
                   <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide opacity-70 mb-1">
-                    <Lock className="h-3 w-3" /> Note interne
+                    <Lock className="h-3 w-3" /> {t("thread.internal_note")}
                   </div>
                 )}
                 {!m.is_internal_note && isStaff && !mine && (
-                  <div className="text-[10px] uppercase tracking-wide opacity-70 mb-1">Équipe Clubero</div>
+                  <div className="text-[10px] uppercase tracking-wide opacity-70 mb-1">{t("thread.staff_label")}</div>
                 )}
                 <div>{m.body}</div>
                 {m.attachment_paths.length > 0 && (
@@ -133,7 +137,7 @@ export function TicketThread({
         <Textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Écrire une réponse…"
+          placeholder={t("thread.reply_placeholder")}
           rows={3}
           maxLength={10000}
         />
@@ -175,7 +179,7 @@ export function TicketThread({
                   checked={internalNote}
                   onChange={(e) => setInternalNote(e.target.checked)}
                 />
-                Note interne
+                {t("thread.internal_note")}
               </label>
             )}
           </div>
@@ -185,7 +189,7 @@ export function TicketThread({
             size="sm"
           >
             {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Envoyer
+            {t("thread.send")}
           </Button>
         </div>
       </div>

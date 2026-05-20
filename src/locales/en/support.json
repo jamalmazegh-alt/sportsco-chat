@@ -1,0 +1,61 @@
+{
+  "page": {
+    "title": "My requests",
+    "subtitle": "Track your support requests and report a new issue.",
+    "new": "New",
+    "empty": "No requests yet.",
+    "report": "Report an issue",
+    "back": "My requests"
+  },
+  "form": {
+    "title": "Report an issue",
+    "subject": "Subject",
+    "subject_placeholder": "Describe the issue in a few words",
+    "category": "Category",
+    "description": "Description",
+    "description_placeholder": "Be as specific as possible…",
+    "intent": "What were you trying to do?",
+    "intent_optional": "(optional)",
+    "intent_placeholder": "e.g. create an event",
+    "attachments": "Screenshots",
+    "attachments_hint": "(max 5, 5 MB)",
+    "add_file": "Add a file",
+    "cancel": "Cancel",
+    "send": "Send",
+    "sent": "Request sent",
+    "sent_desc": "We'll get back to you shortly. You can follow up under \"My requests\".",
+    "close": "Close",
+    "view": "View ticket",
+    "file_too_large": "{{name}} is larger than 5 MB",
+    "error": "Error"
+  },
+  "thread": {
+    "internal_note": "Internal note",
+    "staff_label": "Clubero team",
+    "reply_placeholder": "Write a reply…",
+    "send": "Send",
+    "link_unavailable": "Link unavailable"
+  },
+  "status": {
+    "open": "Open",
+    "in_progress": "In progress",
+    "waiting_user": "Waiting on you",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "priority": {
+    "low": "Low",
+    "normal": "Normal",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "category": {
+    "bug": "Bug",
+    "payment": "Payment",
+    "account": "Account",
+    "team": "Teams / Players",
+    "event": "Events",
+    "feature_request": "Feature request",
+    "other": "Other"
+  }
+}

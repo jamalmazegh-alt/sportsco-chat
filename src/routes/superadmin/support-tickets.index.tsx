@@ -5,28 +5,23 @@ import { listAllSupportTickets } from "@/lib/support.functions";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Search, LifeBuoy, ChevronRight } from "lucide-react";
+import {
+  SUPPORT_STATUSES,
+  SUPPORT_PRIORITIES,
+  SUPPORT_CATEGORIES,
+  STATUS_BADGE_CLASS,
+  PRIORITY_BADGE_CLASS,
+  type SupportStatus,
+  type SupportPriority,
+} from "@/lib/support-constants";
 
 export const Route = createFileRoute("/superadmin/support-tickets/")({
   component: AdminTicketsPage,
 });
 
-const STATUSES = ["all", "open", "in_progress", "waiting_user", "resolved", "closed"] as const;
-const PRIORITIES = ["all", "low", "normal", "high", "urgent"] as const;
-const CATEGORIES = ["all", "bug", "payment", "account", "team", "event", "feature_request", "other"] as const;
-
-const STATUS_CLS: Record<string, string> = {
-  open: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200",
-  in_progress: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200",
-  waiting_user: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200",
-  resolved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
-  closed: "bg-muted text-muted-foreground",
-};
-const PRIORITY_CLS: Record<string, string> = {
-  low: "bg-muted text-muted-foreground",
-  normal: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200",
-  high: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200",
-  urgent: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200",
-};
+const STATUSES = ["all", ...SUPPORT_STATUSES] as const;
+const PRIORITIES = ["all", ...SUPPORT_PRIORITIES] as const;
+const CATEGORIES = ["all", ...SUPPORT_CATEGORIES] as const;
 
 function AdminTicketsPage() {
   const [search, setSearch] = useState("");
@@ -115,8 +110,8 @@ function AdminTicketsPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground flex-wrap">
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CLS[t.status] ?? ""}`}>{t.status}</span>
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${PRIORITY_CLS[t.priority] ?? ""}`}>{t.priority}</span>
+                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_BADGE_CLASS[t.status as SupportStatus] ?? ""}`}>{t.status}</span>
+                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${PRIORITY_BADGE_CLASS[t.priority as SupportPriority] ?? ""}`}>{t.priority}</span>
                     <span>· {t.category}</span>
                     <span>· #{t.id.slice(0, 6).toUpperCase()}</span>
                     {t.user_full_name && <span>· {t.user_full_name}</span>}

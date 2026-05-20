@@ -4,6 +4,8 @@ import enCommon from "@/locales/en/common.json";
 import frCommon from "@/locales/fr/common.json";
 import enMarketing from "@/locales/en/marketing.json";
 import frMarketing from "@/locales/fr/marketing.json";
+import enSupport from "@/locales/en/support.json";
+import frSupport from "@/locales/fr/support.json";
 
 function detectBrowserLang(): "fr" | "en" {
   if (typeof navigator === "undefined") return "en";
@@ -17,13 +19,13 @@ function detectBrowserLang(): "fr" | "en" {
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
-      en: { common: enCommon, marketing: enMarketing },
-      fr: { common: frCommon, marketing: frMarketing },
+      en: { common: enCommon, marketing: enMarketing, support: enSupport },
+      fr: { common: frCommon, marketing: frMarketing, support: frSupport },
     },
     lng: "en",
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "marketing"],
+    ns: ["common", "marketing", "support"],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
