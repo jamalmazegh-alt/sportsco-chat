@@ -32,19 +32,19 @@ interface Slot {
 
 /**
  * Charge la composition publiée d'un event, formate pour l'email.
- * Renvoie undefined si pas de compo publiée OU si include_in_convocation = false.
+ * Renvoie undefined si pas de compo publiée.
  */
 export async function loadLineupForConvocationEmail(
   eventId: string,
 ): Promise<LineupEmailData | undefined> {
   const { data: lineup } = await supabase
     .from("event_lineups")
-    .select("formation, slots, bench, captain_player_id, gk_player_id, published_at, include_in_convocation")
+    .select("formation, slots, bench, captain_player_id, gk_player_id, published_at")
     .eq("event_id", eventId)
     .not("published_at", "is", null)
     .maybeSingle();
 
-  if (!lineup || !lineup.include_in_convocation) return undefined;
+  if (!lineup) return undefined;
 
   const slots = (lineup.slots as unknown as Slot[]) ?? [];
   const benchIds = (lineup.bench as unknown as string[]) ?? [];

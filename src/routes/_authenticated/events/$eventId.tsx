@@ -335,7 +335,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data: l } = await supabase
         .from("event_lineups")
-        .select("formation, slots, bench, captain_player_id, gk_player_id, published_at, include_in_convocation")
+        .select("formation, slots, bench, captain_player_id, gk_player_id, published_at")
         .eq("event_id", eventId)
         .not("published_at", "is", null)
         .maybeSingle();
@@ -369,7 +369,7 @@ function EventDetail() {
         const p = byId.get(id);
         return { name: name(p), jersey: p?.jersey_number ?? null };
       });
-      return { formation: l.formation, include_in_convocation: l.include_in_convocation, _starting: starting, _bench: bench };
+      return { formation: l.formation, _starting: starting, _bench: bench };
     },
   });
 
@@ -767,7 +767,7 @@ function EventDetail() {
         })
         .filter(Boolean);
 
-      // Composition (si publiée + include_in_convocation = true)
+      // Composition (si publiée)
       const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined);
 
 
