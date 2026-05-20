@@ -110,8 +110,8 @@ function AdminTicketsPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground flex-wrap">
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_CLS[t.status] ?? ""}`}>{t.status}</span>
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${PRIORITY_CLS[t.priority] ?? ""}`}>{t.priority}</span>
+                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${STATUS_BADGE_CLASS[t.status as SupportStatus] ?? ""}`}>{t.status}</span>
+                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${PRIORITY_BADGE_CLASS[t.priority as SupportPriority] ?? ""}`}>{t.priority}</span>
                     <span>· {t.category}</span>
                     <span>· #{t.id.slice(0, 6).toUpperCase()}</span>
                     {t.user_full_name && <span>· {t.user_full_name}</span>}
