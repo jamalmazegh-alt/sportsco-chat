@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toPng } from "html-to-image";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
 import {
@@ -1455,7 +1456,7 @@ function EventDetail() {
           })()}
         </div>
         {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
-          <div className="mt-4">
+          <div className="mt-4" ref={lineupCardRef}>
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>
         )}
