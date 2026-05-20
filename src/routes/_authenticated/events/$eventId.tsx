@@ -1736,7 +1736,7 @@ function EventDetail() {
                 className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium disabled:opacity-60"
               >
                 {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
-                Partager sur WhatsApp avec la compo
+                Partager la convocation (avec la compo)
               </button>
             ) : (
               <a
@@ -1746,25 +1746,36 @@ function EventDetail() {
                 className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
               >
                 <MessageCircle className="h-4 w-4" />
-                {isCancelled ? "Partager l'annulation sur WhatsApp" : "Envoyer via WhatsApp"}
+                {isCancelled ? "Partager l'annulation" : "Partager la convocation"}
               </a>
             )}
             {!isCancelled && (
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(buildReminderMessage(base))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full h-9 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium"
-              >
-                <Bell className="h-4 w-4" />
-                Envoyer un rappel WhatsApp
-              </a>
+              <p className="text-[11px] text-muted-foreground pl-1">
+                Message complet : date, lieu, point de RDV, joueurs convoqués{lineupData ? " et compo" : ""}.
+              </p>
             )}
-            <p className="text-[11px] text-muted-foreground">
-              {lineupData && !isCancelled
-                ? "Le partage mobile joint l’image de la compo avec le message. Si votre navigateur ne le permet pas, l’image est téléchargée et le message copié."
-                : "WhatsApp s'ouvre avec le message pré-rempli. Choisissez le groupe de l'équipe et appuyez sur Envoyer."}
-            </p>
+            {!isCancelled && (
+              <>
+                <div className="h-px bg-border/60 my-1" />
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(buildReminderMessage(base))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full h-9 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium"
+                >
+                  <Bell className="h-4 w-4" />
+                  Envoyer un rappel (J-1 / jour J)
+                </a>
+                <p className="text-[11px] text-muted-foreground pl-1">
+                  Message court pour relancer les joueurs qui n'ont pas encore répondu.
+                </p>
+              </>
+            )}
+            {lineupData && !isCancelled && (
+              <p className="text-[11px] text-muted-foreground pt-1 border-t border-border/40">
+                Sur mobile, l'image de la compo est jointe automatiquement. Sinon elle est téléchargée et le message copié.
+              </p>
+            )}
           </div>
         );
       })()}
