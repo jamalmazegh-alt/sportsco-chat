@@ -188,12 +188,13 @@ function EventDetail() {
         share?: (data: ShareData) => Promise<void>;
       };
       const sharePayload: ShareData = { files: [file], text: messageText, title: "Composition Clubero" };
-      const canNativeShare =
-        typeof nav.share === "function" &&
-        (typeof nav.canShare !== "function" || nav.canShare(sharePayload) || nav.canShare({ files: [file] }));
+      const canShareFull = typeof nav.canShare === "function" ? nav.canShare(sharePayload) : true;
+      const canShareFileOnly = typeof nav.canShare === "function" ? nav.canShare({ files: [file] }) : true;
+      const canNativeShare = typeof nav.share === "function" && (canShareFull || canShareFileOnly);
 
       if (canNativeShare) {
-        await nav.share(sharePayload);
+        if (!canShareFull) await navigator.clipboard?.writeText(messageText).catch(() => undefined);
+        await nav.share(canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" });
         toast.success("Partage prêt — choisissez WhatsApp");
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
