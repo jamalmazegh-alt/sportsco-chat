@@ -229,15 +229,20 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       }
     }
 
-    const { error: insErr } = await context.supabase.from("support_messages").insert({
-      ticket_id: data.ticket_id,
-      sender_id: userId,
-      sender_role: senderRole,
-      body: data.body,
-      attachment_paths: data.attachment_paths ?? [],
-      is_internal_note: !!data.internal_note,
-    });
+    const { data: inserted, error: insErr } = await context.supabase
+      .from("support_messages")
+      .insert({
+        ticket_id: data.ticket_id,
+        sender_id: userId,
+        sender_role: senderRole,
+        body: data.body,
+        attachment_paths: data.attachment_paths ?? [],
+        is_internal_note: !!data.internal_note,
+      })
+      .select("id")
+      .single();
     if (insErr) throw new Error(insErr.message);
+    const messageId = inserted.id;
 
     if (!data.internal_note && senderRole === "staff") {
       // Notify ticket owner
@@ -251,6 +256,7 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
       const profile = await getUserProfile(ticket.user_id);
       const email = await getUserEmail(ticket.user_id);
       if (email) {
+        const locale = profile?.preferred_language === "en" ? "en" : "fr";
         await enqueueTransactionalEmailServer({
           templateName: "support-ticket-reply",
           recipientEmail: email,
@@ -260,8 +266,10 @@ export const replyToSupportTicket = createServerFn({ method: "POST" })
             ticketShortId: shortId(ticket.id),
             messagePreview: data.body.slice(0, 400),
             ticketUrl: `${APP_BASE_URL}/support/${ticket.id}`,
+            locale,
           },
-          idempotencyKey: `support-reply-${ticket.id}-${Date.now()}`,
+          // Use the inserted message id so retries stay idempotent.
+          idempotencyKey: `support-reply-${messageId}`,
         }).catch((e) => console.error("[support] reply email failed", e));
       }
     }
