@@ -1936,63 +1936,55 @@ function EventDetail() {
                   <Send className="h-3.5 w-3.5" />
                   {convocChanges.length > 0 ? `Renvoyer (${convocChanges.length})` : "Renvoyer"}
                 </Button>
-              </div>
-            )}
-            {isCoach && event.status !== "cancelled" && event.convocations_sent && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 -mt-1 -mr-1 shrink-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  {counts.pending > 0 && (
-                    <DropdownMenuItem onClick={remindAllPending}>
-                      <Bell className="h-4 w-4" /> {t("attendance.remindAll")}
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem onClick={() => setResendOpen(true)}>
-                    <Send className="h-4 w-4" />
-                    {convocChanges.length > 0
-                      ? `Renvoyer (${convocChanges.length} màj)`
-                      : "Renvoyer la convocation"}
-                  </DropdownMenuItem>
-                  {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
-                    <DropdownMenuItem onClick={() => openPicker()}>
-                      <UserPlus className="h-4 w-4" /> {t("attendance.addMorePlayers")}
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={toggleLock}>
-                    {event.responses_locked ? (
-                      <><Unlock className="h-4 w-4" /> Déverrouiller les réponses</>
-                    ) : (
-                      <><Lock className="h-4 w-4" /> Verrouiller les réponses</>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {counts.pending > 0 && (
+                      <DropdownMenuItem onClick={remindAllPending}>
+                        <Bell className="h-4 w-4" /> {t("attendance.remindAll")}
+                      </DropdownMenuItem>
                     )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      const rows = (convocations ?? []).map((c: any) => ({
-                        last_name: c.players?.last_name ?? "",
-                        first_name: c.players?.first_name ?? "",
-                        jersey_number: c.players?.jersey_number ?? "",
-                        status: c.status,
-                        comment: c.comment ?? "",
-                      }));
-                      const csv = toCsv(rows, [
-                        { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
-                        { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
-                        { key: "jersey_number", header: "#" },
-                        { key: "status", header: t("attendance.status", { defaultValue: "Status" }) },
-                        { key: "comment", header: t("common.comment", { defaultValue: "Comment" }) },
-                      ]);
-                      downloadCsv(`${event.title}-attendance`, csv);
-                    }}
-                  >
-                    <Download className="h-4 w-4" /> {t("common.exportCsv", { defaultValue: "Export CSV" })}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
+                      <DropdownMenuItem onClick={() => openPicker()}>
+                        <UserPlus className="h-4 w-4" /> {t("attendance.addMorePlayers")}
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={toggleLock}>
+                      {event.responses_locked ? (
+                        <><Unlock className="h-4 w-4" /> Déverrouiller les réponses</>
+                      ) : (
+                        <><Lock className="h-4 w-4" /> Verrouiller les réponses</>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        const rows = (convocations ?? []).map((c: any) => ({
+                          last_name: c.players?.last_name ?? "",
+                          first_name: c.players?.first_name ?? "",
+                          jersey_number: c.players?.jersey_number ?? "",
+                          status: c.status,
+                          comment: c.comment ?? "",
+                        }));
+                        const csv = toCsv(rows, [
+                          { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
+                          { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                          { key: "jersey_number", header: "#" },
+                          { key: "status", header: t("attendance.status", { defaultValue: "Status" }) },
+                          { key: "comment", header: t("common.comment", { defaultValue: "Comment" }) },
+                        ]);
+                        downloadCsv(`${event.title}-attendance`, csv);
+                      }}
+                    >
+                      <Download className="h-4 w-4" /> {t("common.exportCsv", { defaultValue: "Export CSV" })}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             )}
           </header>
 
