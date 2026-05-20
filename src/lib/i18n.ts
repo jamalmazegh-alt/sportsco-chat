@@ -19,13 +19,13 @@ function detectBrowserLang(): "fr" | "en" {
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
-      en: { common: enCommon, marketing: enMarketing },
-      fr: { common: frCommon, marketing: frMarketing },
+      en: { common: enCommon, marketing: enMarketing, support: enSupport },
+      fr: { common: frCommon, marketing: frMarketing, support: frSupport },
     },
     lng: "en",
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "marketing"],
+    ns: ["common", "marketing", "support"],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
