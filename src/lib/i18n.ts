@@ -4,6 +4,8 @@ import enCommon from "@/locales/en/common.json";
 import frCommon from "@/locales/fr/common.json";
 import enMarketing from "@/locales/en/marketing.json";
 import frMarketing from "@/locales/fr/marketing.json";
+import enSupport from "@/locales/en/support.json";
+import frSupport from "@/locales/fr/support.json";
 
 function detectBrowserLang(): "fr" | "en" {
   if (typeof navigator === "undefined") return "en";
