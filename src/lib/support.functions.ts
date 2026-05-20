@@ -387,11 +387,12 @@ export const getSupportUnreadCount = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
     if (isAdmin) {
-      const { data } = await supabaseAdmin
+      // With head:true, Supabase returns `count` and `data` is null.
+      const { count } = await supabaseAdmin
         .from("support_tickets")
         .select("id", { count: "exact", head: true })
         .gt("staff_unread_count", 0);
-      return { count: (data as any) ?? 0 };
+      return { count: count ?? 0 };
     }
     const { count } = await context.supabase
       .from("support_tickets")
