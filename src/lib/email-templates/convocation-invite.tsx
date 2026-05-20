@@ -4,6 +4,8 @@ import {
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
+type Locale = "fr" | "en";
+
 interface LineupPlayer {
   name: string;
   jersey?: number | null;
@@ -42,8 +44,79 @@ interface Props {
     starting?: LineupPlayer[];
     bench?: LineupPlayer[];
   };
+  locale?: Locale;
 }
 
+const T = {
+  fr: {
+    update: "Mise à jour — ",
+    reminder: "Rappel — ",
+    convocation: "Convocation",
+    subjUpdate: "🔄 Mise à jour — ",
+    subjReminder: "⏰ Rappel — ",
+    subjDefault: "📣 ",
+    headingUpdate: "🔄 Mise à jour de la convocation",
+    headingReminder: (h?: number) => `⏰ Rappel — réponse attendue${h ? ` (${h}h avant)` : ""}`,
+    helloName: (n: string) => `Bonjour ${n},`,
+    helloDefault: "Bonjour,",
+    yourPlayer: "Votre joueur",
+    bodyUpdate: "— les informations de la convocation ont été mises à jour. Merci de vérifier et de confirmer votre réponse.",
+    bodyReminder: "n'a pas encore répondu à la convocation",
+    bodyDefault: "est convoqué·e",
+    withTeam: "avec",
+    changesTitle: "⚠️ Ce qui a changé",
+    cardKickerDefault: "ÉVÉNEMENT",
+    meetingTime: "Heure de RDV",
+    meetingPointLabel: "Point de RDV",
+    coachLabel: "Coach",
+    respondPrompt: "Répondez en un clic :",
+    btnPresent: "✅ Présent",
+    btnUncertain: "❔ Incertain",
+    btnAbsent: "❌ Absent",
+    squadTitle: (n: number) => `Joueurs convoqués (${n})`,
+    lineupTitle: "⚽ Composition prévue",
+    formationLabel: "Formation",
+    startingXI: "XI de départ",
+    benchTitle: "Remplaçants",
+    foot: "Pas besoin de vous connecter — votre réponse est enregistrée automatiquement et vous pourrez la modifier plus tard.",
+    sentBy: "Envoyé par",
+    via: "via Clubero",
+  },
+  en: {
+    update: "Update — ",
+    reminder: "Reminder — ",
+    convocation: "Call-up",
+    subjUpdate: "🔄 Update — ",
+    subjReminder: "⏰ Reminder — ",
+    subjDefault: "📣 ",
+    headingUpdate: "🔄 Call-up updated",
+    headingReminder: (h?: number) => `⏰ Reminder — response needed${h ? ` (${h}h before)` : ""}`,
+    helloName: (n: string) => `Hi ${n},`,
+    helloDefault: "Hi,",
+    yourPlayer: "Your player",
+    bodyUpdate: "— the call-up details have been updated. Please review and confirm your response.",
+    bodyReminder: "hasn't responded to the call-up yet",
+    bodyDefault: "has been called up",
+    withTeam: "with",
+    changesTitle: "⚠️ What changed",
+    cardKickerDefault: "EVENT",
+    meetingTime: "Meeting time",
+    meetingPointLabel: "Meeting point",
+    coachLabel: "Coach",
+    respondPrompt: "Reply in one tap:",
+    btnPresent: "✅ Present",
+    btnUncertain: "❔ Uncertain",
+    btnAbsent: "❌ Absent",
+    squadTitle: (n: number) => `Squad (${n})`,
+    lineupTitle: "⚽ Planned line-up",
+    formationLabel: "Formation",
+    startingXI: "Starting XI",
+    benchTitle: "Bench",
+    foot: "No need to sign in — your response is saved automatically and you can change it later.",
+    sentBy: "Sent by",
+    via: "via Clubero",
+  },
+} as const;
 
 const ConvocationInviteEmail = ({
   recipientFirstName,
@@ -69,12 +142,16 @@ const ConvocationInviteEmail = ({
   isUpdate,
   changes,
   lineup,
-}: Props) => (
+  locale,
+}: Props) => {
+  const l: Locale = locale === "fr" ? "fr" : "en";
+  const t = T[l];
+  return (
 
-  <Html lang="fr" dir="ltr">
+  <Html lang={l} dir="ltr">
     <Head />
     <Preview>
-      {isUpdate ? "Mise à jour — " : isReminder ? "Rappel — " : ""}Convocation : {eventTitle}
+      {isUpdate ? t.update : isReminder ? t.reminder : ""}{t.convocation}: {eventTitle}
       {eventDate ? ` — ${eventDate}` : ""}
     </Preview>
     <Body style={main}>
@@ -93,15 +170,15 @@ const ConvocationInviteEmail = ({
 
         <Heading style={h1}>
           {isUpdate
-            ? `🔄 Mise à jour de la convocation`
+            ? t.headingUpdate
             : isReminder
-            ? `⏰ Rappel — réponse attendue${reminderHoursBefore ? ` (${reminderHoursBefore}h avant)` : ""}`
-            : recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
+            ? t.headingReminder(reminderHoursBefore)
+            : recipientFirstName ? t.helloName(recipientFirstName) : t.helloDefault}
         </Heading>
 
         {isUpdate && changes && changes.length > 0 ? (
           <Section style={changesCard}>
-            <Text style={changesTitle}>⚠️ Ce qui a changé</Text>
+            <Text style={changesTitle}>{t.changesTitle}</Text>
             {changes.map((c, i) => (
               <Text key={i} style={changesLine}>
                 <strong>{c.label} :</strong>{" "}
@@ -114,20 +191,20 @@ const ConvocationInviteEmail = ({
         ) : null}
 
         <Text style={text}>
-          {playerName ? <strong>{playerName}</strong> : "Votre joueur"} {isUpdate ? "— les informations de la convocation ont été mises à jour. Merci de vérifier et de confirmer votre réponse." : isReminder ? "n'a pas encore répondu à la convocation" : "est convoqué·e"}
-          {teamName ? <> avec <strong>{teamName}</strong></> : null}
+          {playerName ? <strong>{playerName}</strong> : t.yourPlayer} {isUpdate ? t.bodyUpdate : isReminder ? t.bodyReminder : t.bodyDefault}
+          {teamName ? <> {t.withTeam} <strong>{teamName}</strong></> : null}
           {clubName ? <> ({clubName})</> : null}.
         </Text>
 
         <Section style={card}>
           <Text style={cardKicker}>
-            {(eventType?.toUpperCase() ?? "ÉVÉNEMENT")}
+            {(eventType?.toUpperCase() ?? t.cardKickerDefault)}
             {competitionName ? ` · ${competitionName}` : ""}
           </Text>
           <Text style={cardTitle}>{eventTitle}</Text>
           {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
           {convocationTime ? (
-            <Text style={cardMeta}>⏰ Heure de RDV : <strong>{convocationTime}</strong></Text>
+            <Text style={cardMeta}>⏰ {t.meetingTime}: <strong>{convocationTime}</strong></Text>
           ) : null}
           {eventLocation ? (
             <Text style={cardMeta}>
@@ -140,14 +217,14 @@ const ConvocationInviteEmail = ({
           ) : null}
           {meetingPoint ? (
             <Text style={cardMeta}>
-              🚌 Point de RDV : {meetingPoint}
+              🚌 {t.meetingPointLabel}: {meetingPoint}
               <br />
               <a href={meetingPointMapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingPoint)}`} style={mapsLink}>🗺️ Google Maps</a>
               {" · "}
               <a href={`https://www.waze.com/ul?q=${encodeURIComponent(meetingPoint)}&navigate=yes`} style={mapsLink}>🚗 Waze</a>
             </Text>
           ) : null}
-          {coachName ? <Text style={cardMeta}>👤 Coach : {coachName}</Text> : null}
+          {coachName ? <Text style={cardMeta}>👤 {t.coachLabel}: {coachName}</Text> : null}
           {eventDescription ? (
             <Text style={{ ...cardMeta, marginTop: 10, whiteSpace: "pre-wrap" as const, color: "#0f172a" }}>
               📝 {eventDescription}
@@ -155,23 +232,23 @@ const ConvocationInviteEmail = ({
           ) : null}
         </Section>
 
-        <Text style={text}>Répondez en un clic :</Text>
+        <Text style={text}>{t.respondPrompt}</Text>
 
         <Section style={{ margin: "0 0 12px" }}>
           <Row>
             <Column style={{ width: "33%", paddingRight: 6 }}>
               <Button style={btnPresent} href={`${respondUrl}?s=present`}>
-                ✅ Présent
+                {t.btnPresent}
               </Button>
             </Column>
             <Column style={{ width: "34%", paddingRight: 6 }}>
               <Button style={btnUncertain} href={`${respondUrl}?s=uncertain`}>
-                ❔ Incertain
+                {t.btnUncertain}
               </Button>
             </Column>
             <Column style={{ width: "33%" }}>
               <Button style={btnAbsent} href={`${respondUrl}?s=absent`}>
-                ❌ Absent
+                {t.btnAbsent}
               </Button>
             </Column>
           </Row>
@@ -179,9 +256,7 @@ const ConvocationInviteEmail = ({
 
         {squadList && squadList.length > 0 ? (
           <Section style={squadCard}>
-            <Text style={squadTitle}>
-              Joueurs convoqués ({squadList.length})
-            </Text>
+            <Text style={squadTitle}>{t.squadTitle(squadList.length)}</Text>
             {squadList.map((name, i) => (
               <Text key={i} style={squadLine}>• {name}</Text>
             ))}
@@ -190,20 +265,16 @@ const ConvocationInviteEmail = ({
 
         {lineup && ((lineup.starting?.length ?? 0) > 0 || (lineup.bench?.length ?? 0) > 0) ? (
           <Section style={lineupCard}>
-            <Text style={lineupKicker}>⚽ Composition prévue</Text>
+            <Text style={lineupKicker}>{t.lineupTitle}</Text>
             {lineup.formation ? (
-              <Text style={lineupFormation}>Formation : <strong>{lineup.formation}</strong></Text>
+              <Text style={lineupFormation}>{t.formationLabel}: <strong>{lineup.formation}</strong></Text>
             ) : null}
             {lineup.starting && lineup.starting.some((p) => p.x != null && p.y != null) ? (
               <div style={pitchWrap}>
                 <div style={pitch}>
-                  {/* halfway line */}
                   <div style={pitchHalfway} />
-                  {/* center circle */}
                   <div style={pitchCircle} />
-                  {/* top penalty area */}
                   <div style={pitchPenaltyTop} />
-                  {/* bottom penalty area */}
                   <div style={pitchPenaltyBottom} />
                   {lineup.starting.map((p, i) => {
                     if (p.x == null || p.y == null) return null;
@@ -258,7 +329,7 @@ const ConvocationInviteEmail = ({
             ) : null}
             {lineup.starting && lineup.starting.length > 0 ? (
               <>
-                <Text style={lineupSectionTitle}>XI de départ</Text>
+                <Text style={lineupSectionTitle}>{t.startingXI}</Text>
                 {lineup.starting.map((p, i) => (
                   <Text key={`s-${i}`} style={lineupLine}>
                     {p.role ? <span style={lineupRole}>{p.role}</span> : null}
@@ -272,7 +343,7 @@ const ConvocationInviteEmail = ({
             ) : null}
             {lineup.bench && lineup.bench.length > 0 ? (
               <>
-                <Text style={lineupSectionTitle}>Remplaçants</Text>
+                <Text style={lineupSectionTitle}>{t.benchTitle}</Text>
                 {lineup.bench.map((p, i) => (
                   <Text key={`b-${i}`} style={lineupLine}>
                     {p.jersey != null ? <strong>#{p.jersey} </strong> : null}
@@ -285,40 +356,43 @@ const ConvocationInviteEmail = ({
         ) : null}
 
 
-        <Text style={smallText}>
-          Pas besoin de vous connecter — votre réponse est enregistrée automatiquement et
-          vous pourrez la modifier plus tard.
-        </Text>
+        <Text style={smallText}>{t.foot}</Text>
 
         <Text style={footer}>
-          Envoyé par <strong>{clubName ?? "Clubero"}</strong> via Clubero
+          {t.sentBy} <strong>{clubName ?? "Clubero"}</strong> {t.via}
         </Text>
       </Container>
     </Body>
   </Html>
-);
+  );
+};
 
 export const template = {
   component: ConvocationInviteEmail,
-  subject: (d) =>
-    `${d.isUpdate ? "🔄 Mise à jour — " : d.isReminder ? "⏰ Rappel — " : "📣 "}Convocation : ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`,
+  subject: (d) => {
+    const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
+    const t = T[l];
+    const prefix = d.isUpdate ? t.subjUpdate : d.isReminder ? t.subjReminder : t.subjDefault;
+    return `${prefix}${t.convocation}: ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`;
+  },
   displayName: "Convocation invite",
   previewData: {
     recipientFirstName: "Sophie",
-    playerName: "Léo Dupont",
-    eventTitle: "vs FC Exemple",
+    playerName: "Leo Dupont",
+    eventTitle: "vs FC Example",
     eventType: "Match",
-    eventDate: "samedi 24 mai à 15h00",
-    eventLocation: "Stade Municipal, Paris",
+    eventDate: "Saturday, May 24 at 3:00 PM",
+    eventLocation: "Municipal Stadium, Paris",
     locationMapsUrl: "https://www.google.com/maps/search/?api=1&query=Stade+Municipal+Paris",
-    meetingPoint: "Parking du club à 14h",
+    meetingPoint: "Club car park at 2:00 PM",
     meetingPointMapsUrl: "https://www.google.com/maps/search/?api=1&query=Parking+du+club",
-    competitionName: "Championnat U13",
+    competitionName: "U13 League",
     coachName: "Marc Lefèvre",
-    squadList: ["Léo Dupont", "Hugo Martin", "Nathan Bernard", "Théo Petit"],
-    teamName: "U13 Garçons",
+    squadList: ["Leo Dupont", "Hugo Martin", "Nathan Bernard", "Theo Petit"],
+    teamName: "U13 Boys",
     clubName: "AS Clubero",
     respondUrl: "https://app.clubero.app/r/sample-token",
+    locale: "en",
   },
 } satisfies TemplateEntry;
 
@@ -365,7 +439,6 @@ const squadCard = {
   margin: "0 0 16px",
 };
 const squadTitle = { fontSize: "12px", fontWeight: "bold" as const, color: "#475569", margin: "0 0 6px", textTransform: "uppercase" as const, letterSpacing: "0.5px" };
-const squadText = { fontSize: "13px", color: "#334155", lineHeight: "1.5", margin: 0 };
 const squadLine = { fontSize: "13px", color: "#334155", lineHeight: "1.6", margin: "0 0 2px" };
 const changesCard = {
   backgroundColor: "#fef3c7",
