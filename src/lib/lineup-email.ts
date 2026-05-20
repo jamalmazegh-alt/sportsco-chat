@@ -1,3 +1,9 @@
+// NOTE: This module imports the anon Supabase client and is consumed by
+// lineup-email.server.ts (re-exported through lineup-email.functions.ts).
+// It is intentionally safe to bundle client-side: it only performs anon
+// reads (RLS-protected) on published lineups — no service-role key, no
+// secret leak. Do NOT add admin/service-role logic here; create a
+// `*.server.ts` module instead. See knowledge: tanstack-supabase-import-graph.
 import { supabase } from "@/integrations/supabase/client";
 
 export interface LineupEmailPlayer {
