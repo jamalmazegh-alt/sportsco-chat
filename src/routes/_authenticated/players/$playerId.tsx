@@ -237,6 +237,7 @@ function PlayerProfile() {
         first_name: first,
         last_name: last,
         jersey_number: jersey ? Number(jersey) : null,
+        license_number: license.trim() || null,
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
