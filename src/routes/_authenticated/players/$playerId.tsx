@@ -143,6 +143,7 @@ function PlayerProfile() {
     setFirst(player.first_name ?? "");
     setLast(player.last_name ?? "");
     setJersey(player.jersey_number?.toString() ?? "");
+    setLicense((player as any).license_number ?? "");
     setPosition(player.preferred_position ?? "");
     setPhone(player.phone ?? "");
     setEmail(player.email ?? "");
