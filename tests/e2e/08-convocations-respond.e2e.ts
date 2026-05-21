@@ -45,6 +45,13 @@ test.describe("Convocations — respond", () => {
       })
       .eq("id", conv2);
     expect(error).toBeNull();
+    const { data } = await admin
+      .from("convocations")
+      .select("status, comment")
+      .eq("id", conv2)
+      .single();
+    expect(data?.status).toBe("absent");
+    expect(data?.comment).toBe("Malade");
   });
 
   test("coach overrides player1 to absent", async () => {
