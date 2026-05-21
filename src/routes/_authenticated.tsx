@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { AssistantFab } from "@/components/assistant-fab";
+import { SupportFab } from "@/components/support-fab";
 import { ConsentGate } from "@/components/consent-gate";
 import { GlobalSearch } from "@/components/global-search";
 import { TrialBanner } from "@/components/trial-banner";
@@ -69,6 +70,7 @@ function AuthLayout() {
           </div>
         </div>
         <OnboardingWizard />
+        <SupportFab />
         <AssistantFab />
         <BottomNav />
       </div>
