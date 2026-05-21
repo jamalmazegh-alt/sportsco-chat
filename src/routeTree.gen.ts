@@ -34,6 +34,7 @@ import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedTournamentsRouteImport } from './routes/_authenticated/tournaments'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
@@ -56,6 +57,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
+import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
@@ -201,6 +203,12 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTournamentsRoute =
+  AuthenticatedTournamentsRouteImport.update({
+    id: '/tournaments',
+    path: '/tournaments',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
@@ -315,6 +323,12 @@ const ApiPublicInquiryRoute = ApiPublicInquiryRouteImport.update({
   path: '/api/public/inquiry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTournamentsTournamentIdRoute =
+  AuthenticatedTournamentsTournamentIdRouteImport.update({
+    id: '/$tournamentId',
+    path: '/$tournamentId',
+    getParentRoute: () => AuthenticatedTournamentsRoute,
+  } as any)
 const AuthenticatedTeamsTeamIdRoute =
   AuthenticatedTeamsTeamIdRouteImport.update({
     id: '/$teamId',
@@ -457,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/stats': typeof AuthenticatedStatsRoute
   '/support': typeof AuthenticatedSupportRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -476,6 +491,7 @@ export interface FileRoutesByFullPath {
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -521,6 +537,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof AuthenticatedInboxRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -540,6 +557,7 @@ export interface FileRoutesByTo {
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -591,6 +609,7 @@ export interface FileRoutesById {
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/support': typeof AuthenticatedSupportRouteWithChildren
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/_authenticated/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -610,6 +629,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -661,6 +681,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/support'
     | '/teams'
+    | '/tournaments'
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
@@ -680,6 +701,7 @@ export interface FileRouteTypes {
     | '/profile/privacy'
     | '/support/$ticketId'
     | '/teams/$teamId'
+    | '/tournaments/$tournamentId'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -725,6 +747,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/stats'
     | '/teams'
+    | '/tournaments'
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
@@ -744,6 +767,7 @@ export interface FileRouteTypes {
     | '/profile/privacy'
     | '/support/$ticketId'
     | '/teams/$teamId'
+    | '/tournaments/$tournamentId'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -794,6 +818,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stats'
     | '/_authenticated/support'
     | '/_authenticated/teams'
+    | '/_authenticated/tournaments'
     | '/api/chat'
     | '/email/unsubscribe'
     | '/legal/$kind'
@@ -813,6 +838,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/privacy'
     | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
+    | '/_authenticated/tournaments/$tournamentId'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1050,6 +1076,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tournaments': {
+      id: '/_authenticated/tournaments'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof AuthenticatedTournamentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/teams': {
       id: '/_authenticated/teams'
       path: '/teams'
@@ -1203,6 +1236,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/inquiry'
       preLoaderRoute: typeof ApiPublicInquiryRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tournaments/$tournamentId': {
+      id: '/_authenticated/tournaments/$tournamentId'
+      path: '/$tournamentId'
+      fullPath: '/tournaments/$tournamentId'
+      preLoaderRoute: typeof AuthenticatedTournamentsTournamentIdRouteImport
+      parentRoute: typeof AuthenticatedTournamentsRoute
     }
     '/_authenticated/teams/$teamId': {
       id: '/_authenticated/teams/$teamId'
@@ -1444,6 +1484,21 @@ const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
 const AuthenticatedTeamsRouteWithChildren =
   AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
 
+interface AuthenticatedTournamentsRouteChildren {
+  AuthenticatedTournamentsTournamentIdRoute: typeof AuthenticatedTournamentsTournamentIdRoute
+}
+
+const AuthenticatedTournamentsRouteChildren: AuthenticatedTournamentsRouteChildren =
+  {
+    AuthenticatedTournamentsTournamentIdRoute:
+      AuthenticatedTournamentsTournamentIdRoute,
+  }
+
+const AuthenticatedTournamentsRouteWithChildren =
+  AuthenticatedTournamentsRoute._addFileChildren(
+    AuthenticatedTournamentsRouteChildren,
+  )
+
 interface AuthenticatedPlayersPlayerIdRouteChildren {
   AuthenticatedPlayersPlayerIdFeedbackRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRoute
 }
@@ -1470,6 +1525,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRouteWithChildren
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
+  AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
 }
 
@@ -1484,6 +1540,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRouteWithChildren,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
+  AuthenticatedTournamentsRoute: AuthenticatedTournamentsRouteWithChildren,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
 }
