@@ -24,6 +24,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
+import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
@@ -50,6 +51,7 @@ import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/cl
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
 import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
@@ -152,6 +154,11 @@ const SuperadminIndexRoute = SuperadminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const TSlugRoute = TSlugRouteImport.update({
+  id: '/t/$slug',
+  path: '/t/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SuperadminUsersRoute = SuperadminUsersRouteImport.update({
   id: '/users',
@@ -286,6 +293,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const TSlugTvRoute = TSlugTvRouteImport.update({
+  id: '/tv',
+  path: '/tv',
+  getParentRoute: () => TSlugRoute,
 } as any)
 const SuperadminUsersUserIdRoute = SuperadminUsersUserIdRouteImport.update({
   id: '/$userId',
@@ -482,6 +494,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/t/$slug': typeof TSlugRouteWithChildren
   '/superadmin/': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -499,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/tv': typeof TSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/support/': typeof AuthenticatedSupportIndexRoute
@@ -548,6 +562,7 @@ export interface FileRoutesByTo {
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/t/$slug': typeof TSlugRouteWithChildren
   '/superadmin': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -565,6 +580,7 @@ export interface FileRoutesByTo {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/tv': typeof TSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/support': typeof AuthenticatedSupportIndexRoute
@@ -620,6 +636,7 @@ export interface FileRoutesById {
   '/superadmin/settings': typeof SuperadminSettingsRoute
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/t/$slug': typeof TSlugRouteWithChildren
   '/superadmin/': typeof SuperadminIndexRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -637,6 +654,7 @@ export interface FileRoutesById {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/tv': typeof TSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
@@ -692,6 +710,7 @@ export interface FileRouteTypes {
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
+    | '/t/$slug'
     | '/superadmin/'
     | '/admin/billing'
     | '/admin/users'
@@ -709,6 +728,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
+    | '/t/$slug/tv'
     | '/admin/'
     | '/profile/'
     | '/support/'
@@ -758,6 +778,7 @@ export interface FileRouteTypes {
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
+    | '/t/$slug'
     | '/superadmin'
     | '/admin/billing'
     | '/admin/users'
@@ -775,6 +796,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
+    | '/t/$slug/tv'
     | '/admin'
     | '/profile'
     | '/support'
@@ -829,6 +851,7 @@ export interface FileRouteTypes {
     | '/superadmin/settings'
     | '/superadmin/support'
     | '/superadmin/users'
+    | '/t/$slug'
     | '/superadmin/'
     | '/_authenticated/admin/billing'
     | '/_authenticated/admin/users'
@@ -846,6 +869,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
+    | '/t/$slug/tv'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
     | '/_authenticated/support/'
@@ -885,6 +909,7 @@ export interface RootRouteChildren {
   LegalKindRoute: typeof LegalKindRoute
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
+  TSlugRoute: typeof TSlugRouteWithChildren
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -1005,6 +1030,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/'
       preLoaderRoute: typeof SuperadminIndexRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/t/$slug': {
+      id: '/t/$slug'
+      path: '/t/$slug'
+      fullPath: '/t/$slug'
+      preLoaderRoute: typeof TSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/superadmin/users': {
       id: '/superadmin/users'
@@ -1187,6 +1219,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/t/$slug/tv': {
+      id: '/t/$slug/tv'
+      path: '/tv'
+      fullPath: '/t/$slug/tv'
+      preLoaderRoute: typeof TSlugTvRouteImport
+      parentRoute: typeof TSlugRoute
     }
     '/superadmin/users/$userId': {
       id: '/superadmin/users/$userId'
@@ -1591,6 +1630,16 @@ const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
   SuperadminRouteChildren,
 )
 
+interface TSlugRouteChildren {
+  TSlugTvRoute: typeof TSlugTvRoute
+}
+
+const TSlugRouteChildren: TSlugRouteChildren = {
+  TSlugTvRoute: TSlugTvRoute,
+}
+
+const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1611,6 +1660,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalKindRoute: LegalKindRoute,
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
+  TSlugRoute: TSlugRouteWithChildren,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
