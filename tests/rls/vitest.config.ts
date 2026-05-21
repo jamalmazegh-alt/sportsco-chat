@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
-    include: ["tests/rls/**/*.test.ts"],
+    include: ["tests/rls/**/*.rls.ts"],
     globalSetup: ["./tests/rls/_global-setup.ts"],
     testTimeout: 30_000,
     hookTimeout: 120_000,
@@ -17,3 +17,4 @@ export default defineConfig({
     alias: { "@": resolve(__dirname, "./src") },
   },
 });
+

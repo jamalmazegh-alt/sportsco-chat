@@ -10,8 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "vitest run",
-    "test:rls": "vitest run --config vitest.rls.config.ts"
+    "test": "vitest run --config vitest.config.ts",
+    "test:rls": "vitest run --config tests/rls/vitest.config.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.47",
