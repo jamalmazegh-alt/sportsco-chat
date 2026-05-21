@@ -19,7 +19,7 @@ if (!BASE_URL) {
 export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: /.*\.e2e\.ts$/,
-  timeout: 90_000,
+  timeout: process.env.E2E_UI === "1" ? 90_000 : 30_000,
   expect: { timeout: 15_000 },
   fullyParallel: false, // shared seed → run sequentially in V1
   forbidOnly: !!process.env.CI,
