@@ -7,9 +7,14 @@ import { defineConfig, devices } from "@playwright/test";
  * - Tests live in tests/e2e/ as *.e2e.ts files.
  * - Uses Chromium only in V1 (Firefox/WebKit can be re-enabled when needed).
  */
-const BASE_URL =
-  process.env.E2E_BASE_URL ??
-  "https://id-preview--619b13f2-91ef-4dee-b96c-f49b38d86b39.lovable.app";
+const BASE_URL = process.env.E2E_BASE_URL;
+if (!BASE_URL) {
+  throw new Error(
+    "E2E_BASE_URL is required. Set it to the preview URL, e.g.\n" +
+    "  export E2E_BASE_URL=https://id-preview--<project-id>.lovable.app\n" +
+    "or in CI as a repo secret. See docs/dev/e2e.md.",
+  );
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",
