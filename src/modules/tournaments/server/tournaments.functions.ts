@@ -350,7 +350,7 @@ export const recordMatchScore = createServerFn({ method: "POST" })
         match_id: z.string().uuid(),
         score_a: z.number().int().min(0).max(999),
         score_b: z.number().int().min(0).max(999),
-        status: z.enum(["in_progress", "completed"]).default("completed"),
+        status: z.enum(["live", "completed"]).default("completed"),
       })
       .parse(input),
   )
@@ -510,11 +510,11 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
       match_number: 1000 + idx,
       team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
       team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
-      team_a_source: m.teamASource,
-      team_b_source: m.teamBSource,
-      status: "scheduled",
+      team_a_source: m.teamASource as any,
+      team_b_source: m.teamBSource as any,
+      status: "scheduled" as const,
     }));
-    const { error } = await supabase.from("tournament_matches").insert(rows);
+    const { error } = await supabase.from("tournament_matches").insert(rows as any);
     if (error) throw new Response(error.message, { status: 400 });
 
     return { matches_created: rows.length };
