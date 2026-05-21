@@ -70,6 +70,7 @@ function AuthLayout() {
           </div>
         </div>
         <OnboardingWizard />
+        <SupportFab />
         <AssistantFab />
         <BottomNav />
       </div>
