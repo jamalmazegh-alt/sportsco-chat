@@ -108,7 +108,7 @@ function PlayerProfile() {
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, jersey_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status")
+        .select("id, first_name, last_name, jersey_number, license_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status")
         .eq("id", playerId)
         .single();
       return data;
@@ -129,6 +129,7 @@ function PlayerProfile() {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
+  const [license, setLicense] = useState("");
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -142,6 +143,7 @@ function PlayerProfile() {
     setFirst(player.first_name ?? "");
     setLast(player.last_name ?? "");
     setJersey(player.jersey_number?.toString() ?? "");
+    setLicense((player as any).license_number ?? "");
     setPosition(player.preferred_position ?? "");
     setPhone(player.phone ?? "");
     setEmail(player.email ?? "");
@@ -235,6 +237,7 @@ function PlayerProfile() {
         first_name: first,
         last_name: last,
         jersey_number: jersey ? Number(jersey) : null,
+        license_number: license.trim() || null,
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
@@ -476,6 +479,10 @@ function PlayerProfile() {
             <Label>{t("players.preferredPosition")}</Label>
             <Input value={position} onChange={(e) => setPosition(e.target.value)} disabled={!isCoach} />
           </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label>{t("players.licenseNumber")}</Label>
+          <Input value={license} onChange={(e) => setLicense(e.target.value)} disabled={!isCoach} placeholder="FFF-2025-12345" />
         </div>
         {canSeePrivate && (
           <>

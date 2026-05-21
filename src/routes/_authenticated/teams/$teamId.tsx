@@ -57,7 +57,7 @@ function TeamDetail() {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id, email, phone)")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone)")
         .eq("team_id", teamId)
         .eq("role", "player");
       const seen = new Set<string>();
@@ -91,6 +91,7 @@ function TeamDetail() {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
+  const [license, setLicense] = useState("");
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -163,7 +164,7 @@ function TeamDetail() {
   }
 
   function reset() {
-    setFirst(""); setLast(""); setJersey(""); setPosition("");
+    setFirst(""); setLast(""); setJersey(""); setLicense(""); setPosition("");
     setPhone(""); setEmail(""); setBirthDate("");
     setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
@@ -341,6 +342,7 @@ function TeamDetail() {
         first_name: first,
         last_name: last,
         jersey_number: jersey ? Number(jersey) : null,
+        license_number: license.trim() || null,
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
@@ -537,6 +539,7 @@ function TeamDetail() {
                           last_name: p.last_name ?? "",
                           first_name: p.first_name ?? "",
                           jersey_number: p.jersey_number ?? "",
+                          license_number: p.license_number ?? "",
                           position: p.preferred_position ?? "",
                           email: p.email ?? "",
                           phone: p.phone ?? "",
@@ -546,6 +549,7 @@ function TeamDetail() {
                           { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
                           { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
                           { key: "jersey_number", header: "#" },
+                          { key: "license_number", header: t("players.licenseNumber", { defaultValue: "License #" }) },
                           { key: "position", header: t("players.position", { defaultValue: "Position" }) },
                           { key: "email", header: "Email" },
                           { key: "phone", header: t("players.phone", { defaultValue: "Phone" }) },
@@ -618,6 +622,11 @@ function TeamDetail() {
                     <Label>{t("players.preferredPosition")}</Label>
                     <Input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="GK / DF / MF / FW" />
                   </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{t("players.licenseNumber")}</Label>
+                  <Input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="FFF-2025-12345" />
                 </div>
 
                 <div className="space-y-1.5">

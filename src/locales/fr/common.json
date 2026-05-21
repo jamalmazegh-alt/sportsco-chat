@@ -223,6 +223,7 @@
     "firstName": "Prénom",
     "lastName": "Nom",
     "jerseyNumber": "N°",
+    "licenseNumber": "N° de licence",
     "position": "Poste",
     "preferredPosition": "Poste préféré",
     "photo": "Photo du joueur",
