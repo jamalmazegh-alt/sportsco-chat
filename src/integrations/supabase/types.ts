@@ -1816,6 +1816,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["feedback_visibility"]
         }[]
       }
+      users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "coach" | "parent" | "player" | "dirigeant"
