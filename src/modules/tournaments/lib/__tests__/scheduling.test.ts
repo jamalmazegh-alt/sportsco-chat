@@ -1,18 +1,18 @@
 import { describe, it, expect } from "vitest";
-import { generateRoundRobin, distributeIntoGroups } from "../lib/scheduling";
-import { computeStandings } from "../lib/standings";
-import { generateKnockoutBracket } from "../lib/bracket";
+import { generateRoundRobin, distributeIntoGroups, type Pairing } from "../scheduling";
+import { computeStandings } from "../standings";
+import { generateKnockoutBracket, type BracketMatch } from "../bracket";
 
 describe("scheduling", () => {
   it("round-robin: 4 teams → 6 matches, 3 rounds", () => {
     const p = generateRoundRobin(["a", "b", "c", "d"]);
     expect(p).toHaveLength(6);
-    expect(Math.max(...p.map((x) => x.round))).toBe(3);
+    expect(Math.max(...p.map((x: Pairing) => x.round))).toBe(3);
   });
   it("round-robin: 5 teams (odd) → 10 matches, 5 rounds with byes", () => {
     const p = generateRoundRobin(["a", "b", "c", "d", "e"]);
     expect(p).toHaveLength(10);
-    expect(Math.max(...p.map((x) => x.round))).toBe(5);
+    expect(Math.max(...p.map((x: Pairing) => x.round))).toBe(5);
   });
   it("round-robin: each pair appears exactly once", () => {
     const teams = ["a", "b", "c", "d", "e", "f"];
@@ -63,17 +63,17 @@ describe("bracket", () => {
   it("4 équipes → 3 matchs (2 SF + 1 final)", () => {
     const b = generateKnockoutBracket(["s1", "s2", "s3", "s4"]);
     expect(b).toHaveLength(3);
-    expect(b.filter((m) => m.round === "sf")).toHaveLength(2);
-    expect(b.filter((m) => m.round === "final")).toHaveLength(1);
+    expect(b.filter((m: BracketMatch) => m.round === "sf")).toHaveLength(2);
+    expect(b.filter((m: BracketMatch) => m.round === "final")).toHaveLength(1);
   });
   it("4 équipes + 3e place → 4 matchs", () => {
     const b = generateKnockoutBracket(["s1", "s2", "s3", "s4"], { thirdPlace: true });
     expect(b).toHaveLength(4);
-    expect(b.filter((m) => m.round === "third_place")).toHaveLength(1);
+    expect(b.filter((m: BracketMatch) => m.round === "third_place")).toHaveLength(1);
   });
   it("8 équipes : seed 1 affronte seed 8 au QF", () => {
     const b = generateKnockoutBracket(["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"]);
-    const qfs = b.filter((m) => m.round === "qf");
+    const qfs = b.filter((m: BracketMatch) => m.round === "qf");
     expect(qfs).toHaveLength(4);
     const first = qfs[0];
     const ids = [first.teamASource, first.teamBSource].map((s) =>
