@@ -952,6 +952,7 @@ export type Database = {
           id: string
           jersey_number: number | null
           last_name: string
+          license_number: string | null
           media_consent_status: Database["public"]["Enums"]["media_consent_status"]
           phone: string | null
           photo_url: string | null
@@ -971,6 +972,7 @@ export type Database = {
           id?: string
           jersey_number?: number | null
           last_name: string
+          license_number?: string | null
           media_consent_status?: Database["public"]["Enums"]["media_consent_status"]
           phone?: string | null
           photo_url?: string | null
@@ -990,6 +992,7 @@ export type Database = {
           id?: string
           jersey_number?: number | null
           last_name?: string
+          license_number?: string | null
           media_consent_status?: Database["public"]["Enums"]["media_consent_status"]
           phone?: string | null
           photo_url?: string | null
