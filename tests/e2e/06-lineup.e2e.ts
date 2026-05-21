@@ -4,7 +4,7 @@
  * Crée une compo via la server function upsertLineup et la publie.
  */
 import { test, expect } from "@playwright/test";
-import { admin } from "./_fixtures/admin";
+
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
