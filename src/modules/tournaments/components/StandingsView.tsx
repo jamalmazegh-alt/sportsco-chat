@@ -73,10 +73,10 @@ export function StandingsView({ tournamentId }: Props) {
                     <td className="px-1 py-2 text-center tabular-nums">
                       {r.played}
                     </td>
-                    <td className="px-1 py-2 text-center tabular-nums">{r.wins}</td>
-                    <td className="px-1 py-2 text-center tabular-nums">{r.draws}</td>
+                    <td className="px-1 py-2 text-center tabular-nums">{r.won}</td>
+                    <td className="px-1 py-2 text-center tabular-nums">{r.drawn}</td>
                     <td className="px-1 py-2 text-center tabular-nums">
-                      {r.losses}
+                      {r.lost}
                     </td>
                     <td className="px-1 py-2 text-center tabular-nums">
                       {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
