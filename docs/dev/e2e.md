@@ -26,8 +26,9 @@ bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 | `SUPABASE_URL` | `https://woawmhuntajpiezmmgzm.supabase.co` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Lovable Cloud → Backend (secret) |
 | `SUPABASE_PUBLISHABLE_KEY` | `.env` (publique) |
-| `E2E_BASE_URL` | optionnel — défaut: preview Lovable |
-| `E2E_REAL_AI` | `1` pour appeler la vraie IA, sinon mock |
+| `E2E_BASE_URL` | **obligatoire** — URL preview Lovable |
+| `E2E_REAL_AI` | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
+| `E2E_UI` | `1` pour passer le timeout global à 90s (sinon 30s) |
 
 ## Stratégie
 
