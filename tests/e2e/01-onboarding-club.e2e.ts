@@ -43,25 +43,35 @@ test.describe("Onboarding club", () => {
     if (await confirm.count()) await confirm.first().fill(PASSWORD);
     await page.getByRole("button", { name: /cr[ée]er|sign ?up|inscription/i }).first().click();
 
-    // Wait for auth.users entry instead of relying on UI state.
+    // Poll auth.users once until the new user appears (cheap by-email lookup).
+    await expect
+      .poll(
+        async () => {
+          const { data: list } = await admin.auth.admin.listUsers();
+          const u = list.users.find((x) => x.email === email);
+          if (u) userId = u.id;
+          return !!userId;
+        },
+        { timeout: 20_000, intervals: [1000, 1500, 2000] },
+      )
+      .toBe(true);
+
+    expect(userId).toBeDefined();
+
+    // Then poll the profile row (no more listUsers in the loop).
     await expect
       .poll(
         async () => {
           const { data } = await admin
             .from("profiles")
             .select("id")
-            .eq("id", (await admin.auth.admin.listUsers()).data.users.find((u) => u.email === email)?.id ?? "")
+            .eq("id", userId!)
             .maybeSingle();
           return !!data;
         },
-        { timeout: 20_000 },
+        { timeout: 10_000 },
       )
       .toBe(true);
-
-    const { data: list } = await admin.auth.admin.listUsers();
-    const u = list.users.find((x) => x.email === email);
-    expect(u).toBeDefined();
-    userId = u!.id;
 
     // Confirmation email logged (template may vary; we just check any was sent)
     try {

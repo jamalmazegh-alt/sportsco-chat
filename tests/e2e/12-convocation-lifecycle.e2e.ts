@@ -31,6 +31,14 @@ test.describe("Convocation lifecycle", () => {
   });
 
   test("coach resends convocation", async () => {
+    // Confirm the previous one is really gone (avoid unique-constraint races).
+    const { data: gone } = await admin
+      .from("convocations")
+      .select("id")
+      .eq("id", convId)
+      .maybeSingle();
+    expect(gone).toBeNull();
+
     const c = await clientFor(club.coach);
     const { data, error } = await c
       .from("convocations")

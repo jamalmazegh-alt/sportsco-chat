@@ -4,7 +4,7 @@
  * Crée une compo via la server function upsertLineup et la publie.
  */
 import { test, expect } from "@playwright/test";
-import { admin } from "./_fixtures/admin";
+
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
@@ -54,8 +54,5 @@ test.describe("Lineup", () => {
       .maybeSingle();
     expect(data?.formation).toBe("4-4-2");
   });
-
-  test.afterAll(async () => {
-    await admin.from("event_lineups").delete().eq("event_id", club.eventId);
-  });
+  // Note: event_lineups cleanup is handled by club.cleanup() via createTestClub.
 });
