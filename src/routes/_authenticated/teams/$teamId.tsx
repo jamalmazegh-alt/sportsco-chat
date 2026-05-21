@@ -164,7 +164,7 @@ function TeamDetail() {
   }
 
   function reset() {
-    setFirst(""); setLast(""); setJersey(""); setPosition("");
+    setFirst(""); setLast(""); setJersey(""); setLicense(""); setPosition("");
     setPhone(""); setEmail(""); setBirthDate("");
     setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
