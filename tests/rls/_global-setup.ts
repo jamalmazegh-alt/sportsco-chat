@@ -201,22 +201,28 @@ async function seedAll(): Promise<Fixtures> {
   // them on club insert, so we upsert/fetch instead of failing on the unique
   // subscriptions_club_id_key.
   async function ensureSubscription(clubId: string): Promise<string> {
-    const { data: existing } = await admin
-      .from("subscriptions")
-      .select("id")
-      .eq("club_id", clubId)
-      .maybeSingle();
-    if (existing) return existing.id;
+    // Upsert handles the case where a DB trigger auto-created the subscription
+    // right after the club insert. onConflict on club_id (unique) keeps it idempotent.
     const { data, error } = await admin
       .from("subscriptions")
-      .insert({ club_id: clubId, status: "trialing" })
+      .upsert({ club_id: clubId, status: "trialing" }, { onConflict: "club_id" })
       .select("id")
       .single();
-    if (error || !data) throw new Error(`subscriptions insert: ${error?.message}`);
+    if (error || !data) {
+      // Fallback: just read whatever is there.
+      const { data: existing } = await admin
+        .from("subscriptions")
+        .select("id")
+        .eq("club_id", clubId)
+        .maybeSingle();
+      if (!existing) throw new Error(`subscriptions ensure: ${error?.message}`);
+      return existing.id;
+    }
     return data.id;
   }
   const subscriptionA = await ensureSubscription(clubA);
   const subscriptionB = await ensureSubscription(clubB);
+
 
 
   // 14. Support tickets (one from adminA, one from playerA)
