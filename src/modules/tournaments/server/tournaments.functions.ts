@@ -9,7 +9,7 @@ import { generateKnockoutBracket } from "../lib/bracket";
 
 // ---------- Schemas
 
-const tournamentFormat = z.enum(["group", "knockout", "mixed", "round_robin", "swiss", "league"]);
+const tournamentFormat = z.enum(["group", "knockout", "mixed"]);
 const tournamentStatus = z.enum(["draft", "published", "in_progress", "completed", "cancelled"]);
 
 const createSchema = z.object({
