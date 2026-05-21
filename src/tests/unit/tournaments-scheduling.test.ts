@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { generateRoundRobin, distributeIntoGroups, type Pairing } from "../scheduling";
-import { computeStandings } from "../standings";
-import { generateKnockoutBracket, type BracketMatch } from "../bracket";
+import { generateRoundRobin, distributeIntoGroups, type Pairing } from "@/modules/tournaments/lib/scheduling";
+import { computeStandings } from "@/modules/tournaments/lib/standings";
+import { generateKnockoutBracket, type BracketMatch } from "@/modules/tournaments/lib/bracket";
 
 describe("scheduling", () => {
   it("round-robin: 4 teams → 6 matches, 3 rounds", () => {
