@@ -5,7 +5,9 @@ import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { waShareUrl } from "@/lib/whatsapp";
+// Inlined to avoid pulling app i18n (with JSON imports) into Node test runtime.
+const waShareUrl = (message: string) =>
+  `https://wa.me/?text=${encodeURIComponent(message)}`;
 
 test.describe("Convocations — send", () => {
   let club: SeededClub;
