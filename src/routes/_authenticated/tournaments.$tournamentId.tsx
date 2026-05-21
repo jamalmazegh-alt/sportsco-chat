@@ -27,6 +27,7 @@ import { GroupsAndFixtures } from "@/modules/tournaments/components/GroupsAndFix
 import { MatchesList } from "@/modules/tournaments/components/MatchesList";
 import { StandingsView } from "@/modules/tournaments/components/StandingsView";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
+import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
