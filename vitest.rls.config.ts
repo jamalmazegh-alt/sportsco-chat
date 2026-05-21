@@ -1,13 +1,3 @@
-/**
- * Vitest config for RLS integration tests.
- *
- * These tests hit the real Supabase project, authenticate as seeded users,
- * and verify that Row-Level Security correctly isolates cross-club data and
- * enforces role permissions. They are intentionally separated from the fast
- * unit-test suite (vitest.config.ts).
- *
- * Run with: bun run test:rls
- */
 import { defineConfig } from "vitest/config";
 import { resolve } from "path";
 
@@ -18,10 +8,9 @@ export default defineConfig({
     include: ["tests/rls/**/*.test.ts"],
     globalSetup: ["./tests/rls/_global-setup.ts"],
     testTimeout: 30_000,
-    hookTimeout: 60_000,
-    // Run sequentially in a single worker so seeded fixtures are shared safely.
+    hookTimeout: 120_000,
     pool: "forks",
-    poolOptions: { forks: { singleFork: true } },
+    isolate: false,
     fileParallelism: false,
   },
   resolve: {
