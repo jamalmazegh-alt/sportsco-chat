@@ -130,9 +130,9 @@ async function seedAll(): Promise<Fixtures> {
   // 8. team_members
   {
     const { error } = await admin.from("team_members").insert([
-      { team_id: teamA, player_id: playerA, role: "player" },
+      { team_id: teamA, player_id: playerA, user_id: users.playerA.userId, role: "player" },
       { team_id: teamA, user_id: users.coachA.userId, role: "coach" },
-      { team_id: teamB, player_id: playerB, role: "player" },
+      { team_id: teamB, player_id: playerB, user_id: users.playerB.userId, role: "player" },
       { team_id: teamB, user_id: users.coachB.userId, role: "coach" },
     ]);
     if (error) throw new Error(`team_members insert: ${error.message}`);
