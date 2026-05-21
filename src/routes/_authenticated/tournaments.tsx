@@ -23,7 +23,7 @@ function TournamentsRoute() {
 function TournamentsList() {
   const { activeClubId } = useAuth();
   const role = useActiveRole();
-  const canManage = role === "admin" || role === "dirigeant";
+  const canManage = role === "admin" || (role as string) === "dirigeant";
   const [open, setOpen] = useState(false);
 
   const fn = useServerFn(listMyTournaments);
