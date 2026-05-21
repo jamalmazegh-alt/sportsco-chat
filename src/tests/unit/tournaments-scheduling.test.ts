@@ -49,8 +49,6 @@ describe("standings", () => {
       { teamAId: "a", teamBId: "c", scoreA: 1, scoreB: 1, status: "completed" },
     ];
     const s = computeStandings(teams, matches);
-    expect(s[0].teamId).toBe("b"); // 3pts, +1
-    expect(s[1].teamId).toBe("a"); // 4pts wait
     // a: W vs b, D vs c → 4pts ; b: L vs a, W vs c → 3pts ; c: D, L → 1pt
     expect(s[0].teamId).toBe("a");
     expect(s[0].points).toBe(4);
