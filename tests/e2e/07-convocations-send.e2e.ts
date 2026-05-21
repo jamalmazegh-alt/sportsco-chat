@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { waShareUrl } from "@/lib/whatsapp";
 
 test.describe("Convocations — send", () => {
   let club: SeededClub;
@@ -25,12 +25,9 @@ test.describe("Convocations — send", () => {
     expect(data?.length).toBe(2);
   });
 
-  test("whatsapp link is valid wa.me URL", async () => {
-    const link = buildWhatsAppLink({
-      phone: "+33600000000",
-      message: `Convocation ${club.prefix}`,
-    });
+  test("whatsapp share URL is well-formed", async () => {
+    const link = waShareUrl(`Convocation ${club.prefix}`);
     expect(link).toMatch(/^https:\/\/(api\.whatsapp\.com|wa\.me)\//);
-    expect(link).toContain("33600000000");
+    expect(decodeURIComponent(link)).toContain(club.prefix);
   });
 });
