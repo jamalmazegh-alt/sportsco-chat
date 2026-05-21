@@ -65,7 +65,7 @@ describe("RLS: support_tickets", () => {
     const c = await signInAs("superadmin");
     const { data, error } = await c
       .from("support_tickets")
-      .update({ status: "pending" })
+      .update({ status: "in_progress" })
       .eq("id", fx.ticketA)
       .select();
     if (error || !data || data.length === 0) {
