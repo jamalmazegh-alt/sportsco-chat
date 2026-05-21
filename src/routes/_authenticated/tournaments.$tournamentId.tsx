@@ -133,17 +133,7 @@ function TournamentDetailPage() {
                 Clôturer
               </Button>
             )}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                navigator.clipboard.writeText(publicUrl);
-                toast.success("Lien copié");
-              }}
-            >
-              <Share2 className="h-4 w-4" />
-              Partager
-            </Button>
+            <ShareDialog url={publicUrl} title={tournament.name} />
             <Button size="sm" variant="ghost" asChild>
               <a href={`/t/${tournament.slug}`} target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4" />
