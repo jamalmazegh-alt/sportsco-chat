@@ -207,6 +207,9 @@ function TournamentDetailPage() {
           />
         )}
         {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
+        {tab === "bracket" && (
+          <BracketView matches={matches as any} teams={teams as any} />
+        )}
       </div>
     </div>
   );
