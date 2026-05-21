@@ -12,7 +12,7 @@ import {
   Shuffle,
   ListOrdered,
   Calendar,
-  Share2,
+  
   Eye,
   GitBranch,
 } from "lucide-react";
@@ -27,6 +27,7 @@ import { GroupsAndFixtures } from "@/modules/tournaments/components/GroupsAndFix
 import { MatchesList } from "@/modules/tournaments/components/MatchesList";
 import { StandingsView } from "@/modules/tournaments/components/StandingsView";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
+import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
@@ -132,17 +133,7 @@ function TournamentDetailPage() {
                 Clôturer
               </Button>
             )}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                navigator.clipboard.writeText(publicUrl);
-                toast.success("Lien copié");
-              }}
-            >
-              <Share2 className="h-4 w-4" />
-              Partager
-            </Button>
+            <ShareDialog url={publicUrl} title={tournament.name} />
             <Button size="sm" variant="ghost" asChild>
               <a href={`/t/${tournament.slug}`} target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4" />
