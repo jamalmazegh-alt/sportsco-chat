@@ -197,17 +197,27 @@ async function seedAll(): Promise<Fixtures> {
   if (notifErr || !notif) throw new Error(`notifications insert: ${notifErr?.message}`);
   const notificationA = notif.id;
 
-  // 13. Subscriptions (one per club)
-  const { data: subs, error: subsErr } = await admin
-    .from("subscriptions")
-    .insert([
-      { club_id: clubA, status: "trialing" },
-      { club_id: clubB, status: "trialing" },
-    ])
-    .select("id, club_id");
-  if (subsErr || !subs) throw new Error(`subscriptions insert: ${subsErr?.message}`);
-  const subscriptionA = subs.find((s) => s.club_id === clubA)!.id;
-  const subscriptionB = subs.find((s) => s.club_id === clubB)!.id;
+  // 13. Subscriptions (one per club) — a trigger may have already created
+  // them on club insert, so we upsert/fetch instead of failing on the unique
+  // subscriptions_club_id_key.
+  async function ensureSubscription(clubId: string): Promise<string> {
+    const { data: existing } = await admin
+      .from("subscriptions")
+      .select("id")
+      .eq("club_id", clubId)
+      .maybeSingle();
+    if (existing) return existing.id;
+    const { data, error } = await admin
+      .from("subscriptions")
+      .insert({ club_id: clubId, status: "trialing" })
+      .select("id")
+      .single();
+    if (error || !data) throw new Error(`subscriptions insert: ${error?.message}`);
+    return data.id;
+  }
+  const subscriptionA = await ensureSubscription(clubA);
+  const subscriptionB = await ensureSubscription(clubB);
+
 
   // 14. Support tickets (one from adminA, one from playerA)
   const { data: tickets, error: ticketsErr } = await admin
