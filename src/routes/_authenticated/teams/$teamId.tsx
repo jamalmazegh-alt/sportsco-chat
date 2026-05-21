@@ -623,6 +623,11 @@ function TeamDetail() {
                 </div>
 
                 <div className="space-y-1.5">
+                  <Label>{t("players.licenseNumber")}</Label>
+                  <Input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="FFF-2025-12345" />
+                </div>
+
+                <div className="space-y-1.5">
                   <Label>{t("players.birthDate")}</Label>
                   <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
                 </div>
