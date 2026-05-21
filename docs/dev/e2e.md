@@ -56,6 +56,7 @@ nettoie en `afterAll`. Aucune dépendance entre fichiers.
 | 11 | `match-result-stats` | Score, buts, cartons, vérif stats |
 | 12 | `convocation-lifecycle` | Annuler / renvoyer / reporter |
 | 13 | `player-profile` | MAJ profil par coach + consent parent |
+| 14 | `assistant-chat` | Appel /api/chat authentifié (skippé sans `E2E_REAL_AI=1`) |
 
 ## CI
 
