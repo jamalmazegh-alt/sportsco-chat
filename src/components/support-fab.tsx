@@ -17,7 +17,7 @@ export function SupportFab() {
       to="/support"
       aria-label={t("fab", { defaultValue: "Support" })}
       className={cn(
-        "fixed left-4 z-30 h-12 w-12 rounded-full bg-accent text-accent-foreground shadow-lg",
+        "fixed left-4 z-30 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-lg",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
         "bottom-[calc(env(safe-area-inset-bottom)+76px)]"
       )}
