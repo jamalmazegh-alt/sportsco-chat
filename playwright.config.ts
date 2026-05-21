@@ -16,9 +16,17 @@ if (!BASE_URL) {
   );
 }
 
+const HAS_SUPABASE_E2E_CONFIG = Boolean(
+  (process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL) &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY &&
+    (process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY),
+);
+
 export default defineConfig({
   testDir: "./tests/e2e",
-  testMatch: /.*\.e2e\.ts$/,
+  testMatch: HAS_SUPABASE_E2E_CONFIG
+    ? /.*\.e2e\.ts$/
+    : /00-missing-supabase-config\.e2e\.ts$/,
   timeout: process.env.E2E_UI === "1" ? 90_000 : 30_000,
   expect: { timeout: 15_000 },
   fullyParallel: false, // shared seed → run sequentially in V1
