@@ -50,18 +50,8 @@ async function assertCanManage(
   return { tournament: data };
 }
 
-async function uniqueSlug(supabaseAdmin: any, base: string): Promise<string> {
-  for (let i = 0; i < 5; i++) {
-    const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
-    const { data } = await supabaseAdmin
-      .from("tournaments")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (!data) return slug;
-  }
-  return `${base}-${shortRandomSuffix()}`;
-}
+// uniqueSlug moved to ./lib/slug.ts as uniqueTournamentSlug (shared with passes.functions.ts)
+
 
 // ---------- CRUD
 
