@@ -1580,6 +1580,65 @@ export type Database = {
           },
         ]
       }
+      tournament_passes: {
+        Row: {
+          amount_total: number | null
+          created_at: string
+          currency: string | null
+          email: string
+          expires_at: string | null
+          id: string
+          paid_at: string | null
+          status: Database["public"]["Enums"]["tournament_pass_status"]
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          tournament_id: string | null
+          updated_at: string
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          email: string
+          expires_at?: string | null
+          id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["tournament_pass_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string
+          expires_at?: string | null
+          id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["tournament_pass_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_passes_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_teams: {
         Row: {
           contact_email: string | null
@@ -2195,6 +2254,7 @@ export type Database = {
         | "final"
         | "third_place"
       tournament_match_status: "scheduled" | "live" | "completed" | "cancelled"
+      tournament_pass_status: "pending" | "paid" | "used" | "refunded"
       tournament_status:
         | "draft"
         | "published"
@@ -2397,6 +2457,7 @@ export const Constants = {
         "third_place",
       ],
       tournament_match_status: ["scheduled", "live", "completed", "cancelled"],
+      tournament_pass_status: ["pending", "paid", "used", "refunded"],
       tournament_status: [
         "draft",
         "published",
