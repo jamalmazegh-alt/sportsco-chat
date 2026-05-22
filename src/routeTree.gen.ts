@@ -55,6 +55,7 @@ import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug.tv'
+import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug.register'
 import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
 import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
@@ -321,6 +322,11 @@ const TournamentSlugTvRoute = TournamentSlugTvRouteImport.update({
   path: '/tv',
   getParentRoute: () => TournamentSlugRoute,
 } as any)
+const TournamentSlugRegisterRoute = TournamentSlugRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => TournamentSlugRoute,
+} as any)
 const TSlugTvRoute = TSlugTvRouteImport.update({
   id: '/tv',
   path: '/tv',
@@ -563,6 +569,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
@@ -638,6 +645,7 @@ export interface FileRoutesByTo {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
@@ -719,6 +727,7 @@ export interface FileRoutesById {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
@@ -800,6 +809,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
+    | '/tournament/$slug/register'
     | '/tournament/$slug/tv'
     | '/admin/'
     | '/profile/'
@@ -875,6 +885,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
+    | '/tournament/$slug/register'
     | '/tournament/$slug/tv'
     | '/admin'
     | '/profile'
@@ -955,6 +966,7 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
+    | '/tournament/$slug/register'
     | '/tournament/$slug/tv'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
@@ -1336,6 +1348,13 @@ declare module '@tanstack/react-router' {
       path: '/tv'
       fullPath: '/tournament/$slug/tv'
       preLoaderRoute: typeof TournamentSlugTvRouteImport
+      parentRoute: typeof TournamentSlugRoute
+    }
+    '/tournament/$slug/register': {
+      id: '/tournament/$slug/register'
+      path: '/register'
+      fullPath: '/tournament/$slug/register'
+      preLoaderRoute: typeof TournamentSlugRegisterRouteImport
       parentRoute: typeof TournamentSlugRoute
     }
     '/t/$slug/tv': {
@@ -1785,10 +1804,12 @@ const TSlugRouteChildren: TSlugRouteChildren = {
 const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
 
 interface TournamentSlugRouteChildren {
+  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRoute
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
 }
 
 const TournamentSlugRouteChildren: TournamentSlugRouteChildren = {
+  TournamentSlugRegisterRoute: TournamentSlugRegisterRoute,
   TournamentSlugTvRoute: TournamentSlugTvRoute,
 }
 
