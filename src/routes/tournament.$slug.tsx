@@ -338,7 +338,8 @@ function Overview({
   scoring: ScoringRules;
   eventsByMatch: Map<string, any[]>;
 }) {
-  const teamMap = new Map(teams.map((t: any) => [t.id, t]));
+  const { t } = useTranslation("tournaments");
+  const teamMap = new Map(teams.map((tm: any) => [tm.id, tm]));
   const live = matches.filter((m: any) => m.status === "live");
   const upcoming = matches.filter((m: any) => m.status === "scheduled").slice(0, 5);
   const recent = matches.filter((m: any) => m.status === "completed").slice(-5).reverse();
@@ -347,7 +348,7 @@ function Overview({
     <div className="grid gap-5 md:grid-cols-2">
       {live.length > 0 && (
         <div className="md:col-span-2">
-          <Card title="En direct" empty="">
+          <Card title={t("public.sections.live")} empty="">
             {live.map((m: any) => (
               <MatchRow
                 key={m.id}
@@ -360,7 +361,10 @@ function Overview({
           </Card>
         </div>
       )}
-      <Card title="Prochains matchs" empty="Aucun match programmé">
+      <Card
+        title={t("public.sections.upcoming")}
+        empty={t("public.sections.noUpcoming")}
+      >
         {upcoming.map((m: any) => (
           <MatchRow
             key={m.id}
@@ -371,7 +375,10 @@ function Overview({
           />
         ))}
       </Card>
-      <Card title="Derniers résultats" empty="Aucun résultat pour le moment">
+      <Card
+        title={t("public.sections.recent")}
+        empty={t("public.sections.noRecent")}
+      >
         {recent.map((m: any) => (
           <MatchRow
             key={m.id}
@@ -382,10 +389,14 @@ function Overview({
           />
         ))}
       </Card>
-      <Card title="Format">
+      <Card title={t("public.sections.format")}>
         <p className="text-sm text-muted-foreground p-3">
-          {groups.length} poule{groups.length > 1 ? "s" : ""} · {teams.length}{" "}
-          équipes · {matches.length} matchs
+          {t("public.sections.formatSummary", {
+            count: groups.length,
+            groupCount: groups.length,
+            teamCount: teams.length,
+            matchCount: matches.length,
+          })}
         </p>
       </Card>
     </div>
@@ -426,6 +437,20 @@ const EVENT_LABELS: Record<string, string> = {
   penalty: "Penalty",
   foul: "Faute",
 };
+
+function useEventLabels(): Record<string, string> {
+  const { t } = useTranslation("tournaments");
+  return {
+    goal: t("public.events.goal"),
+    own_goal: t("public.events.own_goal"),
+    assist: t("public.events.assist"),
+    yellow: t("public.events.yellow"),
+    red: t("public.events.red"),
+    second_yellow: t("public.events.second_yellow"),
+    penalty: t("public.events.penalty"),
+    foul: t("public.events.foul"),
+  };
+}
 
 const EVENT_EMOJI: Record<string, string> = {
   goal: "⚽",
