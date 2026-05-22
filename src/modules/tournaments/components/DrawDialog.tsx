@@ -408,22 +408,22 @@ export function DrawDialog({
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="auto" disabled={drawing}>
                     <Sparkles className="mr-1 h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Auto</span>
+                    <span className="hidden sm:inline">{t("draw.tabAuto")}</span>
                   </TabsTrigger>
                   <TabsTrigger value="progressive" disabled={drawing && pool.length === 0}>
                     <Shuffle className="mr-1 h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Progressif</span>
+                    <span className="hidden sm:inline">{t("draw.tabProgressive")}</span>
                   </TabsTrigger>
                   <TabsTrigger value="manual" disabled={drawing}>
                     <Hand className="mr-1 h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Manuel</span>
+                    <span className="hidden sm:inline">{t("draw.tabManual")}</span>
                   </TabsTrigger>
                 </TabsList>
 
                 {/* AUTO */}
                 <TabsContent value="auto" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Tirage aléatoire complet en une seule fois.
+                    {t("draw.autoDesc")}
                   </p>
                   <Button
                     onClick={() => maybeConfirm(runAuto)}
@@ -435,7 +435,7 @@ export function DrawDialog({
                     ) : (
                       <>
                         <Sparkles className="h-4 w-4" />
-                        Lancer le tirage au sort
+                        {t("draw.launch")}
                       </>
                     )}
                   </Button>
@@ -444,7 +444,7 @@ export function DrawDialog({
                 {/* PROGRESSIVE */}
                 <TabsContent value="progressive" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Révèle les équipes une par une avec animation.
+                    {t("draw.progressiveDesc")}
                   </p>
 
                   {!drawing && revealed.length === 0 && !finished && (
@@ -454,9 +454,10 @@ export function DrawDialog({
                       className="w-full"
                     >
                       <Shuffle className="h-4 w-4" />
-                      Lancer le tirage au sort
+                      {t("draw.launch")}
                     </Button>
                   )}
+
 
                   {drawing && (
                     <div className="space-y-3">
