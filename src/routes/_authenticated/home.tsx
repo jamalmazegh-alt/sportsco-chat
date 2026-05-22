@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3 } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3, Trophy } from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
 import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
@@ -227,6 +227,12 @@ function HomePage() {
             <Link to="/teams">
               <Users className="h-4 w-4" />
               {t("dashboard.viewTeams")}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="flex-1 h-11">
+            <Link to="/tournaments">
+              <Trophy className="h-4 w-4" />
+              Tournois
             </Link>
           </Button>
         </div>
