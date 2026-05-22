@@ -20,6 +20,8 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
+    const { getStripe, STRIPE_PRICE_TOURNAMENT } = await import("@/lib/stripe.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const stripe = getStripe();
     const origin = getOrigin();
 
