@@ -88,7 +88,10 @@
     "send": "Envoyer",
     "all": "Tous",
     "optional": "facultatif",
-    "saved": "Enregistré"
+    "saved": "Enregistré",
+    "errorTitle": "Une erreur est survenue",
+    "errorSubtitle": "Quelque chose s'est mal passé. Vous pouvez réessayer ou revenir à l'accueil.",
+    "retry": "Réessayer"
   },
   "privacy": {
     "title": "Confidentialité & données",

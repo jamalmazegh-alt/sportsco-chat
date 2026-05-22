@@ -88,7 +88,10 @@
     "send": "Send",
     "all": "All",
     "optional": "optional",
-    "saved": "Saved"
+    "saved": "Saved",
+    "errorTitle": "Something went wrong",
+    "errorSubtitle": "Something went wrong. You can try again or go back home.",
+    "retry": "Try again"
   },
   "privacy": {
     "title": "Privacy & data",
