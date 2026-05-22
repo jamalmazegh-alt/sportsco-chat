@@ -1437,6 +1437,62 @@ export type Database = {
           },
         ]
       }
+      tournament_collaborators: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          display_name: string | null
+          email: string
+          id: string
+          invitation_token: string
+          invited_at: string
+          invited_by: string
+          revoked_at: string | null
+          role: Database["public"]["Enums"]["tournament_collaborator_role"]
+          tournament_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          display_name?: string | null
+          email: string
+          id?: string
+          invitation_token?: string
+          invited_at?: string
+          invited_by: string
+          revoked_at?: string | null
+          role: Database["public"]["Enums"]["tournament_collaborator_role"]
+          tournament_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          id?: string
+          invitation_token?: string
+          invited_at?: string
+          invited_by?: string
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["tournament_collaborator_role"]
+          tournament_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_collaborators_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_documents: {
         Row: {
           file_url: string
@@ -1587,6 +1643,8 @@ export type Database = {
           overtime_score_b: number | null
           penalty_score_a: number | null
           penalty_score_b: number | null
+          referee_name: string | null
+          referee_user_id: string | null
           round: Database["public"]["Enums"]["tournament_match_round"]
           scheduled_at: string | null
           score_a: number | null
@@ -1618,6 +1676,8 @@ export type Database = {
           overtime_score_b?: number | null
           penalty_score_a?: number | null
           penalty_score_b?: number | null
+          referee_name?: string | null
+          referee_user_id?: string | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
           scheduled_at?: string | null
           score_a?: number | null
@@ -1649,6 +1709,8 @@ export type Database = {
           overtime_score_b?: number | null
           penalty_score_a?: number | null
           penalty_score_b?: number | null
+          referee_name?: string | null
+          referee_user_id?: string | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
           scheduled_at?: string | null
           score_a?: number | null
@@ -2231,6 +2293,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_tournament_invite: { Args: { _token: string }; Returns: Json }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
@@ -2334,6 +2397,10 @@ export type Database = {
         }[]
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_tournament_invite_by_token: {
+        Args: { _token: string }
+        Returns: Json
+      }
       has_club_role: {
         Args: {
           _club_id: string
@@ -2347,6 +2414,10 @@ export type Database = {
         Args: { _club_id: string; _user_id: string }
         Returns: boolean
       }
+      is_match_referee: {
+        Args: { _match_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_parent_of_player: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
@@ -2357,6 +2428,18 @@ export type Database = {
       }
       is_team_coach: {
         Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_tournament_co_organizer: {
+        Args: { _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_tournament_owner: {
+        Args: { _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_tournament_referee: {
+        Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
       log_superadmin_action: {
@@ -2499,6 +2582,7 @@ export type Database = {
         | "waiting_user"
         | "resolved"
         | "closed"
+      tournament_collaborator_role: "co_organizer" | "referee"
       tournament_event_kind:
         | "goal"
         | "own_goal"
@@ -2724,6 +2808,7 @@ export const Constants = {
         "resolved",
         "closed",
       ],
+      tournament_collaborator_role: ["co_organizer", "referee"],
       tournament_event_kind: [
         "goal",
         "own_goal",
