@@ -66,6 +66,8 @@ interface Match {
   team_b_id: string | null;
   score_a: number | null;
   score_b: number | null;
+  penalty_score_a?: number | null;
+  penalty_score_b?: number | null;
   sets?: SetScore[] | null;
   status: string;
   scheduled_at: string | null;
@@ -75,6 +77,7 @@ interface Match {
   referee_user_id?: string | null;
   referee_name?: string | null;
 }
+
 interface MatchEvent {
   id: string;
   match_id: string;
