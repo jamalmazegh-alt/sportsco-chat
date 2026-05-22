@@ -58,7 +58,6 @@ function AuthLayout() {
   if (!session) return <Navigate to="/login" replace />;
 
   const { tournamentOnly } = useTournamentOnlyMode();
-  const { activeClubId } = useAuth();
   const { isActive: clubSubActive, isLoading: subLoading } =
     useClubSubscriptionActive(activeClubId);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
