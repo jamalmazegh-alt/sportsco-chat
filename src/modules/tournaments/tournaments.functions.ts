@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { slugify, shortRandomSuffix } from "./lib/slug";
+import { slugify, uniqueTournamentSlug } from "./lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
 import { computeStandings, type Tiebreaker, type MatchEventInput } from "./lib/standings";
 import { generateKnockoutBracket } from "./lib/bracket";
 import { mergeRules, DEFAULT_RULES } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
+
 
 
 // ---------- Schemas
@@ -49,18 +50,8 @@ async function assertCanManage(
   return { tournament: data };
 }
 
-async function uniqueSlug(supabaseAdmin: any, base: string): Promise<string> {
-  for (let i = 0; i < 5; i++) {
-    const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
-    const { data } = await supabaseAdmin
-      .from("tournaments")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (!data) return slug;
-  }
-  return `${base}-${shortRandomSuffix()}`;
-}
+// uniqueSlug moved to ./lib/slug.ts as uniqueTournamentSlug (shared with passes.functions.ts)
+
 
 // ---------- CRUD
 
@@ -82,7 +73,7 @@ export const createTournament = createServerFn({ method: "POST" })
       throw new Response("Forbidden — admin/dirigeant required", { status: 403 });
     }
 
-    const slug = await uniqueSlug(supabaseAdmin, slugify(data.name));
+    const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
     const { data: row, error } = await supabase
       .from("tournaments")
       .insert({

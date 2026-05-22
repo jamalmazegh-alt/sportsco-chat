@@ -13,3 +13,24 @@ export function slugify(input: string): string {
 export function shortRandomSuffix(): string {
   return Math.random().toString(36).slice(2, 7);
 }
+
+/**
+ * Retourne un slug unique pour la table `tournaments`. Essaie d'abord `base`,
+ * puis ajoute un suffixe aléatoire si le slug est déjà pris.
+ * Source unique partagée entre tournaments.functions.ts et passes.functions.ts.
+ */
+export async function uniqueTournamentSlug(
+  supabaseAdmin: { from: (t: string) => any },
+  base: string,
+): Promise<string> {
+  for (let i = 0; i < 5; i++) {
+    const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
+    const { data } = await supabaseAdmin
+      .from("tournaments")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (!data) return slug;
+  }
+  return `${base}-${shortRandomSuffix()}`;
+}
