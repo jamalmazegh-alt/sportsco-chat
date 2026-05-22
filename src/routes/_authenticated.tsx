@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
 
 // Routes accessible to tournament-only users (no club). Everything else
 // under /_authenticated is redirected to /tournaments.
