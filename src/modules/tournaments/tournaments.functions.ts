@@ -744,22 +744,27 @@ export const autoScheduleMatches = createServerFn({ method: "POST" })
         fields: z.array(z.string().min(1).max(60)).min(1).max(20),
         lunch_start_time: z.string().optional(), // HH:MM
         lunch_end_time: z.string().optional(), // HH:MM
+        min_rest_min: z.number().int().min(0).max(720).optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+
+    const rules = mergeRules(tournament.settings);
+    const minRest =
+      data.min_rest_min !== undefined ? data.min_rest_min : rules.forfeit.minRestMinutes;
 
     const { data: matches, error } = await supabase
       .from("tournament_matches")
-      .select("id, round, match_number")
+      .select("id, round, match_number, team_a_id, team_b_id")
       .eq("tournament_id", data.tournament_id)
       .order("round")
       .order("match_number");
     if (error) throw new Response(error.message, { status: 400 });
     if (!matches || matches.length === 0) {
-      return { scheduled: 0 };
+      return { scheduled: 0, skipped: 0 };
     }
 
     const toMin = (hhmm: string) => {
@@ -797,36 +802,58 @@ export const autoScheduleMatches = createServerFn({ method: "POST" })
       throw new Response("Aucun créneau disponible avec ces réglages", { status: 400 });
     }
 
+    // Slot-by-slot assignment with min-rest enforcement
+    const remaining = [...matches];
+    const lastEndByTeam = new Map<string, number>(); // epoch ms
     const updates: Promise<any>[] = [];
-    let cursor = 0; // global match cursor
-    for (const match of matches) {
-      const slotsPerDay = validStartMins.length * numFields;
-      const dayIdx = Math.floor(cursor / slotsPerDay);
-      const idxInDay = cursor % slotsPerDay;
-      const timeIdx = Math.floor(idxInDay / numFields);
-      const fieldIdx = idxInDay % numFields;
-      const minOfDay = validStartMins[timeIdx];
+    const MAX_DAYS = 60;
+    let scheduled = 0;
 
-      const at = new Date(baseDate);
-      at.setDate(at.getDate() + dayIdx);
-      at.setHours(0, minOfDay, 0, 0);
+    outer: for (let dayIdx = 0; dayIdx < MAX_DAYS; dayIdx++) {
+      for (const minOfDay of validStartMins) {
+        for (let fieldIdx = 0; fieldIdx < numFields; fieldIdx++) {
+          if (remaining.length === 0) break outer;
+          const at = new Date(baseDate);
+          at.setDate(at.getDate() + dayIdx);
+          at.setHours(0, minOfDay, 0, 0);
+          const startMs = at.getTime();
 
-      updates.push(
-        supabase
-          .from("tournament_matches")
-          .update({
-            scheduled_at: at.toISOString(),
-            field: data.fields[fieldIdx],
-            duration_min: data.match_duration_min,
-          })
-          .eq("id", match.id)
-          .then(() => null) as any,
-      );
-      cursor++;
+          // Find first match where both teams have rested enough
+          let pickIdx = -1;
+          for (let i = 0; i < remaining.length; i++) {
+            const m = remaining[i] as any;
+            const lastA = m.team_a_id ? lastEndByTeam.get(m.team_a_id) : undefined;
+            const lastB = m.team_b_id ? lastEndByTeam.get(m.team_b_id) : undefined;
+            const restMs = minRest * 60_000;
+            if (lastA !== undefined && startMs - lastA < restMs) continue;
+            if (lastB !== undefined && startMs - lastB < restMs) continue;
+            pickIdx = i;
+            break;
+          }
+          if (pickIdx === -1) continue; // skip slot
+          const match = remaining.splice(pickIdx, 1)[0] as any;
+          const endMs = startMs + data.match_duration_min * 60_000;
+          if (match.team_a_id) lastEndByTeam.set(match.team_a_id, endMs);
+          if (match.team_b_id) lastEndByTeam.set(match.team_b_id, endMs);
+
+          updates.push(
+            supabase
+              .from("tournament_matches")
+              .update({
+                scheduled_at: at.toISOString(),
+                field: data.fields[fieldIdx],
+                duration_min: data.match_duration_min,
+              })
+              .eq("id", match.id)
+              .then(() => null) as any,
+          );
+          scheduled++;
+        }
+      }
     }
 
     await Promise.all(updates);
-    return { scheduled: matches.length };
+    return { scheduled, skipped: remaining.length };
   });
 
 // ---------- Manual match assignment (field + scheduled_at)
