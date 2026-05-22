@@ -17,6 +17,9 @@ const NEXT = "/tournaments/new-from-pass";
 
 export const Route = createFileRoute("/tournaments/start")({
   component: StartPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    auth_error: typeof s.auth_error === "string" ? s.auth_error : undefined,
+  }),
   head: () => ({
     meta: [
       { title: i18n.t("tournaments.start.metaTitle", { ns: "marketing" }) },
@@ -27,6 +30,7 @@ export const Route = createFileRoute("/tournaments/start")({
     ],
   }),
 });
+
 
 function StartPage() {
   const { session, loading } = useAuth();
