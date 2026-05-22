@@ -26,9 +26,14 @@ import {
   AlertTriangle,
   ChevronDown,
   Plus,
+  Minus,
   Trash2,
   Flag,
+  Radio,
+  Zap,
 } from "lucide-react";
+import { ScoreStepper } from "@/components/score-stepper";
+
 import { toast } from "sonner";
 import {
   recordMatchScore,
