@@ -762,7 +762,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!t) return null;
 
-    const [gRes, teamRes, mRes] = await Promise.all([
+    const [gRes, teamRes, mRes, eRes] = await Promise.all([
       supabaseAdmin
         .from("tournament_groups")
         .select("id, name, sort_order, qualifiers_count")
@@ -779,6 +779,11 @@ export const getPublicTournament = createServerFn({ method: "POST" })
         )
         .eq("tournament_id", t.id)
         .order("scheduled_at", { nullsFirst: false }),
+      supabaseAdmin
+        .from("tournament_match_events")
+        .select("id, match_id, team_id, kind, player_name, minute, created_at")
+        .eq("tournament_id", t.id)
+        .order("created_at"),
     ]);
 
     return {
@@ -786,8 +791,10 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],
+      events: eRes.data ?? [],
     };
   });
+
 
 
 // ---------- Auto-schedule (assigns scheduled_at and field to each match)
