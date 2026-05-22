@@ -23,6 +23,7 @@ import {
   getTournament,
   updateTournament,
 } from "@/modules/tournaments/tournaments.functions";
+import { resolveScoring } from "@/modules/tournaments/lib/formats";
 import { TeamsManager } from "@/modules/tournaments/components/TeamsManager";
 import { GroupsAndFixtures } from "@/modules/tournaments/components/GroupsAndFixtures";
 import { MatchesList } from "@/modules/tournaments/components/MatchesList";
