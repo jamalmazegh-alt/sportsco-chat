@@ -134,7 +134,7 @@ function NewFromPassPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Sport *</Label>
-            <SportSelect value={sport} onChange={setSport} />
+            <SportSelect value={sport} onValueChange={setSport} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Catégorie</Label>
