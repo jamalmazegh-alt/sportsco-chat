@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { notifySubscriptionAdmin } from "@/lib/subscription-notify.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 type SubStatus =
   | "trialing"
@@ -143,6 +144,21 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                       paid_at: new Date().toISOString(),
                     })
                     .eq("stripe_session_id", session.id);
+                  try {
+                    await enqueueTransactionalEmailServer({
+                      templateName: "tournament-pass-purchased",
+                      idempotencyKey: `tournament-pass-${session.id}`,
+                      templateData: {
+                        buyerEmail,
+                        amount: session.amount_total ?? 4000,
+                        currency: session.currency ?? "eur",
+                        sessionId: session.id,
+                        paymentIntentId,
+                      },
+                    });
+                  } catch (e) {
+                    console.error("Failed to notify admin of tournament pass purchase", e);
+                  }
                 }
                 break;
               }

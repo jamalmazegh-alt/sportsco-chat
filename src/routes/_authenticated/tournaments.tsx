@@ -13,6 +13,7 @@ import {
 import { listMyAvailablePasses } from "@/modules/tournaments/passes.functions";
 import { TournamentWizard } from "@/modules/tournaments/components/TournamentWizard";
 import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
+import { TournamentUpgradeCard } from "@/modules/tournaments/components/TournamentUpgradeCard";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/tournaments")({
@@ -69,7 +70,14 @@ function TournamentsList() {
           Tournois
         </h1>
         {canManage && (
-          <>
+          <div className="flex items-center gap-2">
+            {noClub && (
+              <TournamentPassButton
+                variant="outline"
+                className="h-9"
+                label="Acheter un pass"
+              />
+            )}
             {noClub ? (
               hasPass ? (
                 <Button size="sm" className="h-9" asChild>
@@ -94,7 +102,7 @@ function TournamentsList() {
                 </>
               )
             )}
-          </>
+          </div>
         )}
       </div>
 
@@ -105,14 +113,22 @@ function TournamentsList() {
             Achetez un pass à 40 € par tournoi (paiement à l'événement). Aucun
             abonnement requis.
           </p>
-          {hasPass && (
-            <p className="mt-2 text-primary font-medium">
-              {availablePasses.length} pass disponible
-              {availablePasses.length > 1 ? "s" : ""} prêt à l'emploi.
-            </p>
-          )}
+          <p className="mt-3 flex items-center gap-2 text-sm">
+            <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
+              {availablePasses.length}
+            </span>
+            <span className={availablePasses.length > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
+              {availablePasses.length > 1
+                ? "pass disponibles prêts à l'emploi."
+                : availablePasses.length === 1
+                  ? "pass disponible prêt à l'emploi."
+                  : "aucun pass disponible. Achetez-en un pour créer un tournoi."}
+            </span>
+          </p>
         </div>
       )}
+
+      {(tournamentOnly || noClub) && <TournamentUpgradeCard />}
 
       {q.isLoading ? (
         <div className="space-y-2">
@@ -139,12 +155,7 @@ function TournamentsList() {
                       Créer un tournoi
                     </Link>
                   </Button>
-                ) : (
-                  <TournamentPassButton
-                    variant="default"
-                    label="Acheter un pass 40 €"
-                  />
-                )
+                ) : null
               ) : (
                 <Button size="sm" onClick={() => setOpen(true)}>
                   <Plus className="h-4 w-4" />
