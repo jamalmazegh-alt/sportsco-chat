@@ -178,12 +178,15 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>Lieu</Label>
-              <Textarea
+              <LocationAutocomplete
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Stade municipal, terrain 1 et 2"
-                rows={2}
+                onChange={setLocation}
+                placeholder="Stade municipal, ville…"
               />
+              <p className="text-[11px] text-muted-foreground">
+                Recherche d'adresse mondiale (OpenStreetMap). Sélectionne une suggestion ou saisis librement.
+              </p>
+
             </div>
           </div>
         )}
