@@ -20,6 +20,10 @@ function toIso(ts?: number | null): string | null {
 
 function planFromPriceId(priceId?: string | null): "monthly" | "yearly" | null {
   if (!priceId) return null;
+  // Current prices (49 € / 490 €)
+  if (priceId === "price_1TZluSH9mBVlmKXfUr87LvQ9") return "monthly";
+  if (priceId === "price_1TZluTH9mBVlmKXfmVWWcG4Q") return "yearly";
+  // Legacy prices (39 € / 390 €) — existing subscribers
   if (priceId === "price_1TXT6NH9mBVlmKXfZBVjgvnb") return "monthly";
   if (priceId === "price_1TXT6NH9mBVlmKXfZxGQJz3R") return "yearly";
   return null;
