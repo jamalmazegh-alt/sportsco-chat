@@ -1012,3 +1012,72 @@ export const listMatchEvents = createServerFn({ method: "POST" })
     if (error) throw error;
     return { events: rows ?? [] };
   });
+
+// ---------- Tournament documents (rules PDF)
+
+export const generateRulesPdf = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+    const { mergeRules } = await import("./lib/rules");
+    const { buildRulesPdf } = await import("./lib/rules-pdf");
+    const rules = mergeRules(tournament.settings);
+    const bytes = await buildRulesPdf(
+      {
+        name: tournament.name,
+        sport: tournament.sport,
+        category: tournament.category,
+        starts_on: tournament.starts_on,
+        ends_on: tournament.ends_on,
+        location: tournament.location,
+        format: tournament.format,
+        num_teams: tournament.num_teams,
+      },
+      rules,
+    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const ts = Date.now();
+    const path = `${tournament.id}/rules-${rules.language}-${ts}.pdf`;
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("tournament-documents")
+      .upload(path, bytes, { contentType: "application/pdf", upsert: false });
+    if (upErr) throw new Response(upErr.message, { status: 500 });
+    const { data: pub } = supabaseAdmin.storage
+      .from("tournament-documents")
+      .getPublicUrl(path);
+    const file_url = pub.publicUrl;
+    const { data: row, error: insErr } = await supabaseAdmin
+      .from("tournament_documents")
+      .insert({
+        tournament_id: tournament.id,
+        kind: "rules",
+        language: rules.language,
+        file_url,
+        storage_path: path,
+        generated_by: userId,
+      })
+      .select("*")
+      .single();
+    if (insErr) throw new Response(insErr.message, { status: 500 });
+    return { document: row };
+  });
+
+export const listTournamentDocuments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("tournament_documents")
+      .select("*")
+      .eq("tournament_id", data.tournament_id)
+      .order("generated_at", { ascending: false });
+    if (error) throw error;
+    return { documents: rows ?? [] };
+  });
