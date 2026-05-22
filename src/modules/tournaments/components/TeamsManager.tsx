@@ -64,7 +64,7 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
       setOpen(false);
       setName("");
       setShortName("");
-      setLogoUrl("");
+      setLogo([]);
       setSeed("");
       setSelectedTeamId("");
     },
