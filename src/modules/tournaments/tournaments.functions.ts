@@ -482,6 +482,8 @@ export const recordMatchScore = createServerFn({ method: "POST" })
         match_id: z.string().uuid(),
         score_a: z.number().int().min(0).max(999),
         score_b: z.number().int().min(0).max(999),
+        penalty_score_a: z.number().int().min(0).max(99).nullable().optional(),
+        penalty_score_b: z.number().int().min(0).max(99).nullable().optional(),
         sets: z
           .array(
             z.object({
@@ -504,6 +506,8 @@ export const recordMatchScore = createServerFn({ method: "POST" })
       .update({
         score_a: data.score_a,
         score_b: data.score_b,
+        penalty_score_a: data.penalty_score_a ?? null,
+        penalty_score_b: data.penalty_score_b ?? null,
         sets: data.sets ?? null,
         status: data.status,
       } as any)
@@ -514,6 +518,7 @@ export const recordMatchScore = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     return { match: row };
   });
+
 
 // ---------- Standings (server-computed, RLS-aware)
 
@@ -775,7 +780,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       supabaseAdmin
         .from("tournament_matches")
         .select(
-          "id, group_id, round, bracket_position, match_number, team_a_id, team_b_id, team_a_source, team_b_source, scheduled_at, field, status, score_a, score_b, sets, winner_team_id",
+          "id, group_id, round, bracket_position, match_number, team_a_id, team_b_id, team_a_source, team_b_source, scheduled_at, field, status, score_a, score_b, penalty_score_a, penalty_score_b, sets, winner_team_id",
         )
         .eq("tournament_id", t.id)
         .order("scheduled_at", { nullsFirst: false }),

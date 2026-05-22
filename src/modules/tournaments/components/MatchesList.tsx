@@ -66,6 +66,8 @@ interface Match {
   team_b_id: string | null;
   score_a: number | null;
   score_b: number | null;
+  penalty_score_a?: number | null;
+  penalty_score_b?: number | null;
   sets?: SetScore[] | null;
   status: string;
   scheduled_at: string | null;
@@ -75,6 +77,7 @@ interface Match {
   referee_user_id?: string | null;
   referee_name?: string | null;
 }
+
 interface MatchEvent {
   id: string;
   match_id: string;
@@ -221,9 +224,15 @@ function MatchCard({
   const [editOpen, setEditOpen] = useState(false);
   const [a, setA] = useState(match.score_a ?? 0);
   const [b, setB] = useState(match.score_b ?? 0);
+  const [penA, setPenA] = useState(match.penalty_score_a ?? 0);
+  const [penB, setPenB] = useState(match.penalty_score_b ?? 0);
   const [sets, setSets] = useState<SetScore[]>(
     (match.sets ?? []).map((s) => ({ a: s.a, b: s.b })),
   );
+  const isKnockout = match.round !== "group";
+  const tied = a === b;
+  const hasPenalty = (match.penalty_score_a ?? null) !== null && (match.penalty_score_b ?? null) !== null;
+
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
   const valFn = useServerFn(validateMatch);
@@ -258,11 +267,14 @@ function MatchCard({
           match_id: match.id,
           score_a: a,
           score_b: b,
+          penalty_score_a: isKnockout && a === b ? penA : null,
+          penalty_score_b: isKnockout && a === b ? penB : null,
           sets: null,
           status: "completed",
         },
       });
     },
+
     onSuccess: () => {
       toast.success("Score enregistré");
       invalidateAll();
@@ -556,11 +568,17 @@ function MatchCard({
               </span>
               <span className="font-semibold tabular-nums text-lg">
                 {match.score_a ?? "–"} : {match.score_b ?? "–"}
+                {hasPenalty && (
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    (tab {match.penalty_score_a}-{match.penalty_score_b})
+                  </span>
+                )}
               </span>
               <span className="truncate text-sm font-medium">
                 {teamB?.name ?? "À déterminer"}
               </span>
             </button>
+
             {setsMode && match.sets && match.sets.length > 0 && (
               <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
                 {formatSets(match.sets)}
@@ -834,9 +852,37 @@ function MatchCard({
               />
             </div>
           )}
+          {!setsMode && isKnockout && tied && teamA && teamB && (
+            <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 text-center">
+                Égalité — saisir les tirs au but pour désigner le vainqueur
+              </p>
+              <div className="flex items-center justify-around gap-3">
+                <ScoreStepper
+                  label={`Tab ${teamA.short_name ?? teamA.name}`}
+                  value={penA}
+                  onChange={setPenA}
+                  size="md"
+                />
+                <span className="text-xl text-muted-foreground">:</span>
+                <ScoreStepper
+                  label={`Tab ${teamB.short_name ?? teamB.name}`}
+                  value={penB}
+                  onChange={setPenB}
+                  size="md"
+                />
+              </div>
+              {penA !== penB && (
+                <p className="text-center text-xs text-emerald-700 dark:text-emerald-300">
+                  Vainqueur : {penA > penB ? teamA.name : teamB.name}
+                </p>
+              )}
+            </div>
+          )}
+
           <Button
             onClick={() => save.mutate()}
-            disabled={save.isPending || (setsMode && sets.length === 0)}
+            disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
             className="w-full h-12"
           >
             {save.isPending ? (
