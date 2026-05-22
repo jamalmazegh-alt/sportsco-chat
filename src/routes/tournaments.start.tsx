@@ -17,6 +17,9 @@ const NEXT = "/tournaments/new-from-pass";
 
 export const Route = createFileRoute("/tournaments/start")({
   component: StartPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    auth_error: typeof s.auth_error === "string" ? s.auth_error : undefined,
+  }),
   head: () => ({
     meta: [
       { title: i18n.t("tournaments.start.metaTitle", { ns: "marketing" }) },
@@ -28,10 +31,12 @@ export const Route = createFileRoute("/tournaments/start")({
   }),
 });
 
+
 function StartPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation("marketing");
+  const { auth_error } = Route.useSearch();
 
   useEffect(() => {
     if (!loading && session) {
@@ -67,6 +72,10 @@ function StartPage() {
           </p>
         </div>
 
+        {auth_error ? <ExpiredLinkBlock /> : null}
+
+
+
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <Tabs defaultValue="signup" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
@@ -98,6 +107,63 @@ function StartPage() {
   );
 }
 
+function ExpiredLinkBlock() {
+  const { t } = useTranslation("marketing");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  async function resend(e: FormEvent) {
+    e.preventDefault();
+    if (!email) return;
+    setBusy(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/tournaments/start`,
+      },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setSent(true);
+    toast.success(t("tournaments.start.resendSent"));
+  }
+
+  return (
+    <div className="mb-5 rounded-2xl border border-destructive/30 bg-destructive/5 p-4">
+      <p className="text-sm font-medium text-destructive">
+        {t("tournaments.start.expiredTitle")}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {t("tournaments.start.expiredBody")}
+      </p>
+      {sent ? (
+        <p className="mt-3 text-xs text-foreground">
+          {t("tournaments.start.resendSent")}
+        </p>
+      ) : (
+        <form onSubmit={resend} className="mt-3 flex gap-2">
+          <Input
+            type="email"
+            required
+            placeholder={t("tournaments.start.email")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Button type="submit" disabled={busy} size="sm">
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("tournaments.start.resendCta")}
+          </Button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+
 function SignupForm() {
   const navigate = useNavigate();
   const { t } = useTranslation("marketing");
@@ -121,7 +187,7 @@ function SignupForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}${NEXT}`,
+        emailRedirectTo: `${window.location.origin}/tournaments/start`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),

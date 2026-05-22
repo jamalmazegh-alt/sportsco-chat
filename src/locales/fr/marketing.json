@@ -124,7 +124,12 @@
       "checkEmail": "Vérifiez votre email pour confirmer votre compte.",
       "loginCta": "Se connecter et continuer",
       "invalidCreds": "Email ou mot de passe incorrect",
-      "forgotPassword": "Mot de passe oublié ?"
+      "forgotPassword": "Mot de passe oublié ?",
+      "expiredTitle": "Lien de confirmation expiré",
+      "expiredBody": "Votre lien de confirmation email n'est plus valide. Saisissez votre email pour recevoir un nouveau lien.",
+      "resendCta": "Renvoyer",
+      "resendSent": "Email de confirmation renvoyé. Vérifiez votre boîte de réception."
+
     }
   }
 }

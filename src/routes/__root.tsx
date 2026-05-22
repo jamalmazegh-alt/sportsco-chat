@@ -95,7 +95,18 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
     bootstrapTheme();
+    // Catch Supabase auth error redirects (e.g. expired confirmation link)
+    // and route to a friendly resend screen instead of dumping users on a
+    // protected route with an unreadable URL hash.
+    if (typeof window !== "undefined" && window.location.hash) {
+      const h = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      if (h.get("error") || h.get("error_code")) {
+        const code = h.get("error_code") ?? h.get("error") ?? "auth_error";
+        window.location.replace(`/tournaments/start?auth_error=${encodeURIComponent(code)}`);
+      }
+    }
   }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
