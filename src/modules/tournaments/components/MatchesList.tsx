@@ -920,20 +920,20 @@ function MatchCard({
 
 
 
-      <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title="Terrain & horaire">
+      <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title={t("matches.scheduleTitle")}>
         <div className="space-y-4 mt-4 pb-6">
           <div className="space-y-1.5">
-            <Label>Terrain</Label>
+            <Label>{t("matches.field")}</Label>
             {fields.length > 0 ? (
               <Select
                 value={editField || "__none__"}
                 onValueChange={(v) => setEditField(v === "__none__" ? "" : v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Aucun" />
+                  <SelectValue placeholder={t("matches.refereeNone")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">Aucun</SelectItem>
+                  <SelectItem value="__none__">{t("matches.refereeNone")}</SelectItem>
                   {fields.map((f) => (
                     <SelectItem key={f} value={f}>
                       {f}
@@ -945,22 +945,22 @@ function MatchCard({
               <Input
                 value={editField}
                 onChange={(e) => setEditField(e.target.value)}
-                placeholder="Terrain 1"
+                placeholder={t("matches.fieldPlaceholder")}
               />
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Date</Label>
+              <Label>{t("matches.date")}</Label>
               <Input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Heure</Label>
+              <Label>{t("matches.time")}</Label>
               <Input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} />
             </div>
           </div>
           <Button onClick={() => saveSched.mutate()} disabled={saveSched.isPending} className="w-full">
-            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer terrain & heure"}
+            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("matches.saveSchedule")}
           </Button>
 
           <div className="pt-4 border-t border-border space-y-3">
