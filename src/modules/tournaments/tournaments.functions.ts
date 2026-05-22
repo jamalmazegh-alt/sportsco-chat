@@ -873,7 +873,7 @@ export const updateTournamentRules = createServerFn({ method: "POST" })
     };
     const { error } = await supabase
       .from("tournaments")
-      .update(patch)
+      .update(patch as any)
       .eq("id", data.tournament_id);
     if (error) throw new Response(error.message, { status: 400 });
     return { rules: merged };
