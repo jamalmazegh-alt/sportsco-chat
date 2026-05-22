@@ -232,6 +232,19 @@ function MatchCard({
     },
   });
 
+  const statusFn = useServerFn(setMatchStatus);
+  const statusM = useMutation({
+    mutationFn: (status: string) =>
+      statusFn({
+        data: { tournament_id: tournamentId, match_id: match.id, status: status as any },
+      }),
+    onSuccess: () => {
+      toast.success("Statut du match mis à jour");
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
   const initialDate = match.scheduled_at ? new Date(match.scheduled_at) : null;
   const pad = (n: number) => String(n).padStart(2, "0");
   const [editField, setEditField] = useState<string>(match.field ?? "");
