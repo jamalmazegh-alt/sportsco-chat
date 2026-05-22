@@ -30,7 +30,7 @@
     "metaDesc": "Follow {{name}} live: teams, schedule, results and standings{{locationSuffix}}.",
     "metaDescFallback": "Follow this tournament live: teams, schedule, results and standings.",
     "unavailableTitle": "Tournament unavailable",
-    "unavailableBody": "This tournament hasn't been published yet, or the link has expired. If you're the organizer, open your tournament and click <1>Publish</1>.",
+    "unavailableBody": "This tournament is not published yet, or the link has expired. If you are the organizer, open your tournament and click <1>Publish</1>.",
     "backHome": "Back to home",
     "register": "Register",
     "tvSlideshow": "TV slideshow",
@@ -68,8 +68,8 @@
     "sponsorsTitleDefault": "With the support of our partners"
   },
   "register": {
-    "metaTitle": "Registration — Tournament {{slug}} · Clubero",
-    "unavailableTitle": "Registrations unavailable",
+    "metaTitle": "Register — Tournament {{slug}} · Clubero",
+    "unavailableTitle": "Registration unavailable",
     "unavailableBody": "Registrations are not open for this tournament.",
     "backTournament": "Back to tournament",
     "opensOn": "Registrations open on {{date}}.",
@@ -81,7 +81,7 @@
     "fields": {
       "teamName": "Team name *",
       "shortName": "Short name",
-      "contactName": "Contact name *",
+      "contactName": "Contact (name) *",
       "phone": "Phone",
       "email": "Email *",
       "players": "Players ({{count}})",
@@ -92,12 +92,12 @@
       "notes": "Notes (optional)"
     },
     "addPlayer": "Add",
-    "submit": "Send registration"
+    "submit": "Submit registration"
   },
   "tv": {
     "metaTitle": "Slideshow — {{slug}} · Clubero",
     "unavailableTitle": "Slideshow unavailable",
-    "unavailableBody": "This tournament hasn't been published yet or doesn't exist.",
+    "unavailableBody": "This tournament is not published yet or does not exist.",
     "slides": {
       "recent": "Latest results",
       "upcoming": "Upcoming matches",
@@ -128,14 +128,14 @@
   },
   "invite": {
     "invalidTitle": "Invalid invitation",
-    "invalidBody": "This invitation link doesn't exist or has been removed.",
+    "invalidBody": "This invitation link does not exist or has been removed.",
     "revokedTitle": "Invitation revoked",
     "revokedBody": "This invitation was cancelled by the organizer.",
     "roleCoOrganizer": "Co-organizer",
     "roleReferee": "Referee",
     "heading": "Tournament invitation",
-    "intro": "You're invited as <1>{{role}}</1> for",
-    "invitedEmail": "Invited email: {{email}}",
+    "intro": "You are invited as <1>{{role}}</1> for",
+    "invitedEmail": "Invited address: {{email}}",
     "alreadyAccepted": "Invitation already accepted",
     "viewTournament": "View tournament",
     "loginPrompt": "Sign in to accept this invitation.",
@@ -146,8 +146,53 @@
   "passSuccess": {
     "metaTitle": "Tournament pass confirmed — Clubero",
     "heading": "Tournament pass confirmed",
-    "body": "Thanks for your purchase. Your receipt is on its way by email. Sign in (or create your account with the same email address) to create your tournament.",
+    "body": "Thanks for your purchase. You will receive your receipt by email. Sign in (or create your account with the same email) to create your tournament.",
     "createAccount": "Create my account",
     "haveAccount": "I already have an account"
+  },
+  "share": {
+    "title": "Share tournament",
+    "trigger": "Share",
+    "qrHint": "Scan the QR code to open the public tournament page",
+    "qrCode": "QR code",
+    "linkCopied": "Link copied"
+  },
+  "standings": {
+    "noGroupsPhase": "No group stage.",
+    "noGroupsYet": "No groups generated yet.",
+    "qualifiers_one": "{{count}} qualifier",
+    "qualifiers_other": "{{count}} qualifiers",
+    "topQualifiers_one": "Top {{count}} qualifier",
+    "topQualifiers_other": "Top {{count}} qualifiers",
+    "team": "Team",
+    "played": "P",
+    "won": "W",
+    "drawn": "D",
+    "lost": "L",
+    "diff": "+/-",
+    "points": "Pts"
+  },
+  "pass": {
+    "buyLabel": "Buy a pass €40",
+    "dialogTitle": "Tournament Pass — €40",
+    "dialogDesc": "One-time payment per tournament. Enter the email that will be used to create your organizer account.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "continuePay": "Continue to payment",
+    "paymentImpossible": "Unable to start payment.",
+    "paymentError": "Error while creating payment."
+  },
+  "upgrade": {
+    "heading": "Unlock all features",
+    "body": "Upgrade to the Clubero plan to manage teams, events, call-ups, stats and more — unlimited tournaments included.",
+    "ctaSubscribe": "Subscribe to Clubero plan",
+    "dialogTitle": "Create your club",
+    "dialogDesc": "To activate the subscription, we first create your club. You will be the administrator and be redirected to the payment screen.",
+    "clubNameLabel": "Club name",
+    "clubNamePlaceholder": "FC United",
+    "continue": "Continue",
+    "creationImpossible": "Creation failed",
+    "clubCreated": "Club created. Redirecting to subscription…",
+    "creationError": "Error while creating the club."
   }
 }

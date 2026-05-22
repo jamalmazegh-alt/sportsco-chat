@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import {
   Dialog,
@@ -19,11 +20,12 @@ interface Props {
 }
 
 export function ShareDialog({ url, title, trigger }: Props) {
+  const { t } = useTranslation("tournaments");
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const copy = async () => {
     await navigator.clipboard.writeText(url);
-    toast.success("Lien copié");
+    toast.success(t("share.linkCopied"));
   };
 
   const download = () => {
@@ -53,13 +55,13 @@ export function ShareDialog({ url, title, trigger }: Props) {
         {trigger ?? (
           <Button size="sm" variant="outline">
             <Share2 className="h-4 w-4" />
-            Partager
+            {t("share.trigger")}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Partager le tournoi</DialogTitle>
+          <DialogTitle>{t("share.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div
@@ -74,7 +76,7 @@ export function ShareDialog({ url, title, trigger }: Props) {
             />
           </div>
           <p className="text-xs text-center text-muted-foreground">
-            Scannez le QR code pour ouvrir la page publique du tournoi
+            {t("share.qrHint")}
           </p>
           <div className="flex gap-2">
             <Input value={url} readOnly className="text-xs" />
@@ -85,11 +87,11 @@ export function ShareDialog({ url, title, trigger }: Props) {
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1" onClick={download}>
               <Download className="h-4 w-4" />
-              QR code
+              {t("share.qrCode")}
             </Button>
             <Button className="flex-1" onClick={nativeShare}>
               <Share2 className="h-4 w-4" />
-              Partager
+              {t("share.trigger")}
             </Button>
           </div>
         </div>

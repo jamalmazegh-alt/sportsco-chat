@@ -14,7 +14,8 @@
     "test:rls": "vitest run --config tests/rls/vitest.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "check:i18n": "node scripts/check-i18n-parity.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.47",

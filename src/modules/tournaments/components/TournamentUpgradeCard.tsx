@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import { useAuth } from "@/lib/auth-context";
  * unlocks all admin features.
  */
 export function TournamentUpgradeCard() {
+  const { t } = useTranslation("tournaments");
   const { user, refreshMemberships } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -38,16 +40,16 @@ export function TournamentUpgradeCard() {
         .insert({ name: clubName.trim(), created_by: user.id })
         .select("id")
         .single();
-      if (error || !club) throw new Error(error?.message ?? "Création impossible");
+      if (error || !club) throw new Error(error?.message ?? t("upgrade.creationImpossible"));
       const { error: mErr } = await supabase
         .from("club_members")
         .insert({ club_id: club.id, user_id: user.id, role: "admin" });
       if (mErr) throw new Error(mErr.message);
       await refreshMemberships();
-      toast.success("Club créé. Redirection vers l'abonnement…");
+      toast.success(t("upgrade.clubCreated"));
       navigate({ to: "/admin/billing" });
     } catch (err: any) {
-      toast.error(err?.message ?? "Erreur lors de la création du club.");
+      toast.error(err?.message ?? t("upgrade.creationError"));
       setBusy(false);
     }
   }
@@ -60,10 +62,9 @@ export function TournamentUpgradeCard() {
             <Sparkles className="h-5 w-5 text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold">Débloquez toutes les fonctionnalités</p>
+            <p className="font-semibold">{t("upgrade.heading")}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Passez au plan Clubero pour gérer équipes, événements, convocations,
-              stats et plus encore — tournois illimités inclus.
+              {t("upgrade.body")}
             </p>
             <Button
               size="sm"
@@ -71,7 +72,7 @@ export function TournamentUpgradeCard() {
               onClick={() => setOpen(true)}
             >
               <Sparkles className="h-4 w-4" />
-              S'abonner au plan Clubero
+              {t("upgrade.ctaSubscribe")}
             </Button>
           </div>
         </div>
@@ -80,29 +81,28 @@ export function TournamentUpgradeCard() {
       <Dialog open={open} onOpenChange={(v) => !busy && setOpen(v)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Créer votre club</DialogTitle>
+            <DialogTitle>{t("upgrade.dialogTitle")}</DialogTitle>
             <DialogDescription>
-              Pour activer l'abonnement, nous créons d'abord votre club. Vous en
-              serez l'administrateur et serez redirigé vers l'écran de paiement.
+              {t("upgrade.dialogDesc")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="club-name">Nom du club</Label>
+              <Label htmlFor="club-name">{t("upgrade.clubNameLabel")}</Label>
               <Input
                 id="club-name"
                 autoFocus
                 required
                 value={clubName}
                 onChange={(e) => setClubName(e.target.value)}
-                placeholder="FC United"
+                placeholder={t("upgrade.clubNamePlaceholder")}
                 disabled={busy}
               />
             </div>
             <DialogFooter>
               <Button type="submit" className="w-full" disabled={busy || !clubName.trim()}>
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Continuer
+                {t("upgrade.continue")}
               </Button>
             </DialogFooter>
           </form>

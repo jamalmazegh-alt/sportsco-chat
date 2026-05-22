@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { getGroupStandings } from "../tournaments.functions";
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function StandingsView({ tournamentId }: Props) {
+  const { t } = useTranslation("tournaments");
   const fn = useServerFn(getGroupStandings);
   const q = useQuery({
     queryKey: ["tournament-standings", tournamentId],
@@ -26,7 +28,7 @@ export function StandingsView({ tournamentId }: Props) {
   if (standings.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        Pas de poule générée pour le moment.
+        {t("standings.noGroupsYet")}
       </div>
     );
   }
@@ -38,20 +40,20 @@ export function StandingsView({ tournamentId }: Props) {
           <header className="px-3 py-2 border-b border-border bg-muted/40 flex items-center justify-between">
             <h3 className="font-medium text-sm">{group.name}</h3>
             <span className="text-xs text-muted-foreground">
-              {group.qualifiers_count} qualifié{group.qualifiers_count > 1 ? "s" : ""}
+              {t("standings.qualifiers", { count: group.qualifiers_count })}
             </span>
           </header>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-muted-foreground">
                 <th className="text-left px-3 py-1.5 w-8">#</th>
-                <th className="text-left px-1 py-1.5">Équipe</th>
-                <th className="px-1 py-1.5 w-8">J</th>
-                <th className="px-1 py-1.5 w-8">G</th>
-                <th className="px-1 py-1.5 w-8">N</th>
-                <th className="px-1 py-1.5 w-8">P</th>
-                <th className="px-1 py-1.5 w-10">+/-</th>
-                <th className="px-2 py-1.5 w-10 font-semibold">Pts</th>
+                <th className="text-left px-1 py-1.5">{t("standings.team")}</th>
+                <th className="px-1 py-1.5 w-8">{t("standings.played")}</th>
+                <th className="px-1 py-1.5 w-8">{t("standings.won")}</th>
+                <th className="px-1 py-1.5 w-8">{t("standings.drawn")}</th>
+                <th className="px-1 py-1.5 w-8">{t("standings.lost")}</th>
+                <th className="px-1 py-1.5 w-10">{t("standings.diff")}</th>
+                <th className="px-2 py-1.5 w-10 font-semibold">{t("standings.points")}</th>
               </tr>
             </thead>
             <tbody>

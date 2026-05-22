@@ -149,5 +149,50 @@
     "body": "Merci pour votre achat. Vous allez recevoir votre reçu par e-mail. Connectez-vous (ou créez votre compte avec la même adresse e-mail) pour créer votre tournoi.",
     "createAccount": "Créer mon compte",
     "haveAccount": "J'ai déjà un compte"
+  },
+  "share": {
+    "title": "Partager le tournoi",
+    "trigger": "Partager",
+    "qrHint": "Scannez le QR code pour ouvrir la page publique du tournoi",
+    "qrCode": "QR code",
+    "linkCopied": "Lien copié"
+  },
+  "standings": {
+    "noGroupsPhase": "Pas de phase de groupes.",
+    "noGroupsYet": "Pas de poule générée pour le moment.",
+    "qualifiers_one": "{{count}} qualifié",
+    "qualifiers_other": "{{count}} qualifiés",
+    "topQualifiers_one": "Top {{count}} qualifié",
+    "topQualifiers_other": "Top {{count}} qualifiés",
+    "team": "Équipe",
+    "played": "J",
+    "won": "G",
+    "drawn": "N",
+    "lost": "P",
+    "diff": "+/-",
+    "points": "Pts"
+  },
+  "pass": {
+    "buyLabel": "Acheter un pass 40 €",
+    "dialogTitle": "Pass Tournoi — 40 €",
+    "dialogDesc": "Un paiement unique par tournoi. Indiquez l'e-mail qui servira à créer votre compte organisateur.",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "continuePay": "Continuer vers le paiement",
+    "paymentImpossible": "Impossible de démarrer le paiement.",
+    "paymentError": "Erreur lors de la création du paiement."
+  },
+  "upgrade": {
+    "heading": "Débloquez toutes les fonctionnalités",
+    "body": "Passez au plan Clubero pour gérer équipes, événements, convocations, stats et plus encore — tournois illimités inclus.",
+    "ctaSubscribe": "S'abonner au plan Clubero",
+    "dialogTitle": "Créer votre club",
+    "dialogDesc": "Pour activer l'abonnement, nous créons d'abord votre club. Vous en serez l'administrateur et serez redirigé vers l'écran de paiement.",
+    "clubNameLabel": "Nom du club",
+    "clubNamePlaceholder": "FC United",
+    "continue": "Continuer",
+    "creationImpossible": "Création impossible",
+    "clubCreated": "Club créé. Redirection vers l'abonnement…",
+    "creationError": "Erreur lors de la création du club."
   }
 }
