@@ -536,7 +536,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       .eq("slug", data.slug)
       .in("status", ["published", "in_progress", "completed"])
       .maybeSingle();
-    if (!t) throw new Response("Not found", { status: 404 });
+    if (!t) return null;
 
     const [gRes, teamRes, mRes] = await Promise.all([
       supabaseAdmin
@@ -564,3 +564,4 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       matches: mRes.data ?? [],
     };
   });
+
