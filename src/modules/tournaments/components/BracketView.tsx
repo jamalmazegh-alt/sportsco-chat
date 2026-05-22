@@ -132,7 +132,7 @@ function resolveLabel(
   if (!source) return "À déterminer";
   if ("teamId" in source) return "À déterminer";
   const src = matchByCounter.get(source.fromMatch);
-  const num = src?.match_number ?? 999 + source.fromMatch;
+  const num = src?.match_number ?? source.fromMatch;
   return source.outcome === "loser" ? `Perdant M${num}` : `Vainqueur M${num}`;
 }
 
