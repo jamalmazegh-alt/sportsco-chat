@@ -24,18 +24,19 @@ function PassSuccessPage() {
           Pass tournoi confirmé
         </h1>
         <p className="mt-4 text-muted-foreground">
-          Merci pour votre achat. Vous allez recevoir votre reçu par e-mail et un
-          lien pour créer votre tournoi avec Clubero Tournaments.
+          Merci pour votre achat. Vous allez recevoir votre reçu par e-mail.
+          Connectez-vous (ou créez votre compte avec la même adresse e-mail) pour
+          créer votre tournoi.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Button asChild className="h-11">
             <Link to="/register">
               <Trophy className="h-4 w-4" />
-              Créer mon tournoi
+              Créer mon compte
             </Link>
           </Button>
           <Button asChild variant="outline" className="h-11">
-            <Link to="/">Retour à l'accueil</Link>
+            <Link to="/login">J'ai déjà un compte</Link>
           </Button>
         </div>
       </section>
