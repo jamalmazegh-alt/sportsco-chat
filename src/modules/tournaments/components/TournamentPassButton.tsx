@@ -9,12 +9,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { createTournamentPassCheckout } from "@/modules/tournaments/passes.functions";
+import { useAuth } from "@/lib/auth-context";
 
 interface TournamentPassButtonProps {
   className?: string;
@@ -27,17 +27,17 @@ export function TournamentPassButton({
   variant = "outline",
   label = "Acheter un pass 40 €",
 }: TournamentPassButtonProps) {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const checkout = useServerFn(createTournamentPassCheckout);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function startCheckout(emailToUse: string) {
     if (busy) return;
     setBusy(true);
     try {
-      const res = await checkout({ data: { email: email.trim() } });
+      const res = await checkout({ data: { email: emailToUse.trim() } });
       if (res.url) {
         window.location.href = res.url;
       } else {
@@ -50,23 +50,43 @@ export function TournamentPassButton({
     }
   }
 
+  // Logged-in: skip dialog, go straight to Stripe using the account email.
+  if (user?.email) {
+    return (
+      <Button
+        variant={variant}
+        className={className}
+        disabled={busy}
+        onClick={() => startCheckout(user.email!)}
+      >
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trophy className="h-4 w-4" />}
+        {label}
+      </Button>
+    );
+  }
+
+  // Anonymous: ask for an email so we can attach the pass when they sign up.
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={variant} className={className}>
-          <Trophy className="h-4 w-4" />
-          {label}
-        </Button>
-      </DialogTrigger>
+      <Button variant={variant} className={className} onClick={() => setOpen(true)}>
+        <Trophy className="h-4 w-4" />
+        {label}
+      </Button>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Pass Tournoi — 40 €</DialogTitle>
           <DialogDescription>
-            Un paiement unique pour organiser un tournoi complet avec Clubero Tournaments.
-            Reçois ton lien d'organisateur par e-mail.
+            Un paiement unique par tournoi. Indiquez l'e-mail qui servira à
+            créer votre compte organisateur.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            startCheckout(email);
+          }}
+          className="space-y-4"
+        >
           <div className="space-y-2">
             <Label htmlFor="pass-email">E-mail</Label>
             <Input
