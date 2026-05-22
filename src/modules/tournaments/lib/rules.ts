@@ -17,6 +17,17 @@ export interface QualificationRules {
   wildcards?: string[];
 }
 
+export interface ForfeitRules {
+  /** Score attribué au vainqueur du forfait. */
+  winnerScore: number;
+  /** Score attribué au perdant du forfait. */
+  loserScore: number;
+  /** Si true, un match abandonné compte comme forfait pour l'équipe responsable. */
+  abandonedAsForfeit: boolean;
+  /** Repos minimum (en minutes) entre 2 matchs d'une même équipe (PR6). */
+  minRestMinutes: number;
+}
+
 export interface TournamentRules {
   points: PointsConfig;
   tiebreakers: Tiebreaker[];
@@ -25,6 +36,7 @@ export interface TournamentRules {
   overtime: { enabled: boolean; minutes?: number };
   penaltyShootout: { enabled: boolean };
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
+  forfeit: ForfeitRules;
   language: TournamentLanguage;
   branding: { primaryColor?: string; organizerName?: string };
 }
@@ -37,6 +49,12 @@ export const DEFAULT_RULES: TournamentRules = {
   overtime: { enabled: false, minutes: 10 },
   penaltyShootout: { enabled: true },
   matchValidation: { requireValidation: false },
+  forfeit: {
+    winnerScore: 3,
+    loserScore: 0,
+    abandonedAsForfeit: true,
+    minRestMinutes: 30,
+  },
   language: "fr",
   branding: {},
 };
