@@ -28,6 +28,16 @@ export interface ForfeitRules {
   minRestMinutes: number;
 }
 
+export interface RegistrationRules {
+  enabled: boolean;
+  opensAt?: string | null;   // ISO datetime
+  closesAt?: string | null;  // ISO datetime
+  maxTeams?: number | null;
+  requiresApproval: boolean;
+  collectPlayers: boolean;
+  publicMessage?: string;
+}
+
 export interface TournamentRules {
   points: PointsConfig;
   tiebreakers: Tiebreaker[];
@@ -37,6 +47,7 @@ export interface TournamentRules {
   penaltyShootout: { enabled: boolean };
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
   forfeit: ForfeitRules;
+  registration: RegistrationRules;
   language: TournamentLanguage;
   branding: { primaryColor?: string; organizerName?: string };
 }
