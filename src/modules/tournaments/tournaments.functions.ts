@@ -1547,3 +1547,170 @@ export const decideRegistration = createServerFn({ method: "POST" })
 
     return { ok: true, tournament_team_id: team.id };
   });
+
+// ---------- Tirage au sort (Draw): applique une composition fournie par le client (auto/progressif/manuel)
+
+const drawGroupsSchema = z.object({
+  tournament_id: z.string().uuid(),
+  mode: z.literal("groups"),
+  num_groups: z.number().int().min(1).max(16),
+  qualifiers_per_group: z.number().int().min(1).max(8).default(2),
+  assignments: z
+    .array(
+      z.object({
+        team_id: z.string().uuid(),
+        group_index: z.number().int().min(0).max(15),
+      }),
+    )
+    .min(2)
+    .max(64),
+});
+
+const drawKnockoutSchema = z.object({
+  tournament_id: z.string().uuid(),
+  mode: z.literal("knockout"),
+  bracket_order: z.array(z.string().uuid()).min(2).max(32),
+  third_place: z.boolean().default(false),
+});
+
+export const applyTeamDraw = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.union([drawGroupsSchema, drawKnockoutSchema]).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { data: teams, error: teamsErr } = await supabase
+      .from("tournament_teams")
+      .select("id")
+      .eq("tournament_id", data.tournament_id);
+    if (teamsErr) throw teamsErr;
+    const teamIds = new Set((teams ?? []).map((t: any) => t.id));
+    if (teamIds.size < 2) {
+      throw new Response("Au moins 2 équipes requises", { status: 400 });
+    }
+
+    if (data.mode === "groups") {
+      if (tournament.format === "knockout") {
+        throw new Response(
+          "Ce tournoi est en élimination directe, choisis le mode bracket.",
+          { status: 400 },
+        );
+      }
+      for (const a of data.assignments) {
+        if (!teamIds.has(a.team_id)) {
+          throw new Response("Équipe inconnue dans le tirage", { status: 400 });
+        }
+        if (a.group_index >= data.num_groups) {
+          throw new Response("Index de poule invalide", { status: 400 });
+        }
+      }
+
+      // Wipe existing groups + group matches
+      await supabase
+        .from("tournament_matches")
+        .delete()
+        .eq("tournament_id", data.tournament_id)
+        .eq("round", "group");
+      await supabase
+        .from("tournament_groups")
+        .delete()
+        .eq("tournament_id", data.tournament_id);
+
+      // Create groups
+      const groupRows = [];
+      for (let i = 0; i < data.num_groups; i++) {
+        groupRows.push({
+          tournament_id: data.tournament_id,
+          name: `Poule ${String.fromCharCode(65 + i)}`,
+          qualifiers_count: data.qualifiers_per_group,
+          sort_order: i,
+        });
+      }
+      const { data: groups, error: gErr } = await supabase
+        .from("tournament_groups")
+        .insert(groupRows)
+        .select("*");
+      if (gErr) throw gErr;
+
+      const groupsByIdx = (groups ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order);
+      const teamUpdates: Promise<any>[] = [];
+      const matchRows: any[] = [];
+      let matchNum = 0;
+
+      for (let i = 0; i < groupsByIdx.length; i++) {
+        const g = groupsByIdx[i];
+        const ids = data.assignments.filter((a) => a.group_index === i).map((a) => a.team_id);
+        for (const tid of ids) {
+          teamUpdates.push(
+            supabase
+              .from("tournament_teams")
+              .update({ group_id: g.id })
+              .eq("id", tid)
+              .then(() => null) as any,
+          );
+        }
+        const pairings = generateRoundRobin(ids);
+        for (const p of pairings) {
+          matchNum++;
+          matchRows.push({
+            tournament_id: data.tournament_id,
+            group_id: g.id,
+            round: "group",
+            match_number: matchNum,
+            team_a_id: p.teamAId,
+            team_b_id: p.teamBId,
+            status: "scheduled",
+          });
+        }
+      }
+      await Promise.all(teamUpdates);
+      if (matchRows.length) {
+        const { error: mErr } = await supabase.from("tournament_matches").insert(matchRows);
+        if (mErr) throw mErr;
+      }
+      return { groups_created: groupsByIdx.length, matches_created: matchRows.length };
+    }
+
+    // mode === "knockout"
+    if (tournament.format === "group") {
+      throw new Response(
+        "Ce tournoi est en poules, choisis le mode poules.",
+        { status: 400 },
+      );
+    }
+    for (const id of data.bracket_order) {
+      if (!teamIds.has(id)) {
+        throw new Response("Équipe inconnue dans le tirage", { status: 400 });
+      }
+    }
+    const bracket = generateKnockoutBracket(data.bracket_order, {
+      thirdPlace: data.third_place,
+    });
+
+    // Wipe existing non-group matches
+    await supabase
+      .from("tournament_matches")
+      .delete()
+      .eq("tournament_id", data.tournament_id)
+      .neq("round", "group");
+
+    const rows = bracket.map((m, idx) => ({
+      tournament_id: data.tournament_id,
+      round: m.round,
+      bracket_position: m.bracketPosition,
+      match_number: 1000 + idx,
+      team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
+      team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
+      team_a_source: m.teamASource as any,
+      team_b_source: m.teamBSource as any,
+      status: "scheduled" as const,
+    }));
+    if (rows.length) {
+      const { error } = await supabase.from("tournament_matches").insert(rows as any);
+      if (error) throw new Response(error.message, { status: 400 });
+    }
+    return { matches_created: rows.length };
+  });
