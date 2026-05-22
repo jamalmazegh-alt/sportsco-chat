@@ -34,8 +34,18 @@ const CLUBERO_FEATURES = [
   "Notifications",
   "Statistiques",
   "Événements",
+  "Module Tournois inclus",
   "Accès mobile / PWA",
   "Rôles coach & manager",
+];
+
+const TOURNAMENTS_FEATURES = [
+  "Tournois illimités",
+  "Phases de poules & élimination directe",
+  "Pages publiques & mode TV",
+  "Partage QR code",
+  "Équipes externes autorisées",
+  "Classements en temps réel",
 ];
 
 function PricingPage() {
