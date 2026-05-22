@@ -165,38 +165,41 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
       ))}
       {matches.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          Aucun match programmé. Génère les poules ou le bracket pour commencer.
+          {t("matches.empty")}
         </div>
       )}
     </div>
   );
 }
 
-function roundLabel(r: string) {
-  const map: Record<string, string> = {
-    r32: "32es de finale",
-    r16: "8es de finale",
-    qf: "Quarts de finale",
-    sf: "Demi-finales",
-    final: "Finale",
-    third_place: "3e place",
+function roundLabel(r: string, t: (k: string) => string) {
+  const keys: Record<string, string> = {
+    r32: "matches.rounds.r32",
+    r16: "matches.rounds.r16",
+    qf: "matches.rounds.qf",
+    sf: "matches.rounds.sf",
+    final: "matches.rounds.final",
+    third_place: "matches.rounds.third_place",
   };
-  return map[r] ?? r;
+  return keys[r] ? t(keys[r]) : r;
 }
 
-const EVENT_KINDS: { value: string; label: string; emoji: string }[] = [
-  { value: "goal", label: "But", emoji: "⚽" },
-  { value: "own_goal", label: "CSC", emoji: "🥅" },
-  { value: "assist", label: "Passe déc.", emoji: "🅰️" },
-  { value: "yellow_card", label: "Jaune", emoji: "🟨" },
-  { value: "second_yellow", label: "2e jaune", emoji: "🟨🟨" },
-  { value: "red_card", label: "Rouge", emoji: "🟥" },
-  { value: "penalty", label: "Penalty", emoji: "🎯" },
-  { value: "foul", label: "Faute", emoji: "⚠️" },
-];
+const EVENT_KIND_VALUES = [
+  { value: "goal", emoji: "⚽" },
+  { value: "own_goal", emoji: "🥅" },
+  { value: "assist", emoji: "🅰️" },
+  { value: "yellow_card", emoji: "🟨" },
+  { value: "second_yellow", emoji: "🟨🟨" },
+  { value: "red_card", emoji: "🟥" },
+  { value: "penalty", emoji: "🎯" },
+  { value: "foul", emoji: "⚠️" },
+] as const;
 
-function eventMeta(kind: string) {
-  return EVENT_KINDS.find((k) => k.value === kind) ?? { emoji: "•", label: kind };
+function eventMeta(kind: string, t: (k: string) => string) {
+  const found = EVENT_KIND_VALUES.find((k) => k.value === kind);
+  return found
+    ? { emoji: found.emoji, label: t(`matches.events.${found.value}`) }
+    : { emoji: "•", label: kind };
 }
 
 function MatchCard({
