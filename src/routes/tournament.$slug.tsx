@@ -234,6 +234,13 @@ function PublicTournamentPage() {
             <BracketView matches={matches as any} teams={teams as any} />
           )}
         </div>
+
+        <div className="pb-8">
+          <SponsorsStrip
+            sponsors={rules.branding.sponsors}
+            title={rules.branding.sponsorsTitle || "Avec le soutien de nos partenaires"}
+          />
+        </div>
       </div>
     </div>
   );
