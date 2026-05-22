@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import {
   DndContext,
   closestCenter,
@@ -60,7 +61,14 @@ interface Props {
   sport?: string | null;
 }
 
+function tbLabel(key: Tiebreaker, lang: string): string {
+  const meta = ALL_TIEBREAKERS.find((t) => t.key === key)!;
+  return lang.startsWith("en") ? meta.labelEn : meta.labelFr;
+}
+
 export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) {
+  const { t, i18n } = useTranslation("tournaments");
+  const lang = i18n.language || "fr";
   const initial = useMemo(() => mergeRules(settings), [settings]);
   const [rules, setRules] = useState<TournamentRules>(initial);
   const scoring: ScoringRules = useMemo(
@@ -76,11 +84,11 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     mutationFn: () =>
       updateFn({ data: { tournament_id: tournamentId, rules: rules as any } }),
     onSuccess: () => {
-      toast.success("Règles enregistrées");
+      toast.success(t("rules.savedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("rules.errorToast")),
   });
 
   const genPdfFn = useServerFn(generateRulesPdf);
@@ -92,11 +100,11 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
   const generate = useMutation({
     mutationFn: () => genPdfFn({ data: { tournament_id: tournamentId } }),
     onSuccess: (res: any) => {
-      toast.success("Règlement PDF généré");
+      toast.success(t("rules.pdfGeneratedToast"));
       qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
       if (res?.document?.file_url) window.open(res.document.file_url, "_blank");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("rules.errorToast")),
   });
 
   const sensors = useSensors(
@@ -105,7 +113,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
   );
 
   const activeTBs = rules.tiebreakers;
-  const inactiveTBs = ALL_TIEBREAKERS.map((t) => t.key).filter(
+  const inactiveTBs = ALL_TIEBREAKERS.map((tb) => tb.key).filter(
     (k) => !activeTBs.includes(k),
   );
 
@@ -119,7 +127,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
   }
 
   function removeTB(key: Tiebreaker) {
-    if (key === "points") return; // points always required
+    if (key === "points") return;
     setRules({ ...rules, tiebreakers: activeTBs.filter((k) => k !== key) });
   }
 
@@ -128,28 +136,30 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     setRules({ ...rules, tiebreakers: [...activeTBs, key] });
   }
 
+  const defaultScoreMode = sport === "volleyball" ? t("rules.scoreModeSets") : t("rules.scoreModeSimple");
+
   return (
     <div className="space-y-4">
       {/* Points */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Points</CardTitle>
+          <CardTitle className="text-base">{t("rules.pointsTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-3 gap-3">
           <NumberField
-            label="Victoire"
+            label={t("rules.win")}
             value={rules.points.win}
             onChange={(v) => setRules({ ...rules, points: { ...rules.points, win: v } })}
           />
           <NumberField
-            label="Nul"
+            label={t("rules.draw")}
             value={rules.points.draw}
             onChange={(v) =>
               setRules({ ...rules, points: { ...rules.points, draw: v } })
             }
           />
           <NumberField
-            label="Défaite"
+            label={t("rules.loss")}
             value={rules.points.loss}
             onChange={(v) =>
               setRules({ ...rules, points: { ...rules.points, loss: v } })
@@ -161,11 +171,11 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* Scoring */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Score</CardTitle>
+          <CardTitle className="text-base">{t("rules.scoreTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1.5">
-            <Label>Mode de comptage</Label>
+            <Label>{t("rules.scoreMode")}</Label>
             <Select
               value={scoring.mode}
               onValueChange={(v) =>
@@ -176,19 +186,18 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="simple">Score simple (buts/points)</SelectItem>
-                <SelectItem value="sets">Score par sets (volley)</SelectItem>
+                <SelectItem value="simple">{t("rules.scoreModeSimple")}</SelectItem>
+                <SelectItem value="sets">{t("rules.scoreModeSets")}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Défaut pour ce sport :{" "}
-              {sport === "volleyball" ? "sets" : "simple"}.
+              {t("rules.scoreModeDefault", { mode: defaultScoreMode })}
             </p>
           </div>
           {scoring.mode === "sets" && (
             <div className="grid grid-cols-3 gap-3 pt-2">
               <div className="space-y-1.5">
-                <Label>Best of</Label>
+                <Label>{t("rules.bestOf")}</Label>
                 <Select
                   value={String(scoring.sets.bestOf)}
                   onValueChange={(v) =>
@@ -202,13 +211,13 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="3">3 sets</SelectItem>
-                    <SelectItem value="5">5 sets</SelectItem>
+                    <SelectItem value="3">{t("rules.setsCount", { n: 3 })}</SelectItem>
+                    <SelectItem value="5">{t("rules.setsCount", { n: 5 })}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <NumberField
-                label="Pts / set"
+                label={t("rules.pointsPerSet")}
                 value={scoring.sets.pointsToWin}
                 onChange={(v) =>
                   setScoring({
@@ -218,7 +227,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                 }
               />
               <NumberField
-                label="Tie-break"
+                label={t("rules.tieBreak")}
                 value={scoring.sets.tieBreakPoints}
                 onChange={(v) =>
                   setScoring({
@@ -232,14 +241,10 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
-
-
       {/* Tie-breakers */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            Critères de départage (ordre)
-          </CardTitle>
+          <CardTitle className="text-base">{t("rules.tiebreakersTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -250,6 +255,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                     key={k}
                     id={k}
                     index={i + 1}
+                    label={tbLabel(k, lang)}
                     canRemove={k !== "points"}
                     onRemove={() => removeTB(k)}
                   />
@@ -260,23 +266,20 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
 
           {inactiveTBs.length > 0 && (
             <div className="pt-2">
-              <p className="text-xs text-muted-foreground mb-1.5">Ajouter un critère :</p>
+              <p className="text-xs text-muted-foreground mb-1.5">{t("rules.addCriterion")}</p>
               <div className="flex flex-wrap gap-1.5">
-                {inactiveTBs.map((k) => {
-                  const meta = ALL_TIEBREAKERS.find((t) => t.key === k)!;
-                  return (
-                    <Button
-                      key={k}
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => addTB(k)}
-                    >
-                      <Plus className="h-3 w-3" />
-                      {meta.labelFr}
-                    </Button>
-                  );
-                })}
+                {inactiveTBs.map((k) => (
+                  <Button
+                    key={k}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addTB(k)}
+                  >
+                    <Plus className="h-3 w-3" />
+                    {tbLabel(k, lang)}
+                  </Button>
+                ))}
               </div>
             </div>
           )}
@@ -286,11 +289,11 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* Qualification */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Qualification</CardTitle>
+          <CardTitle className="text-base">{t("rules.qualificationTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           <NumberField
-            label="Qualifiés par poule"
+            label={t("rules.qualifiersPerGroup")}
             value={rules.qualification.perGroup}
             min={1}
             onChange={(v) =>
@@ -301,7 +304,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             }
           />
           <NumberField
-            label="Meilleurs Nèmes (ex: 3èmes)"
+            label={t("rules.bestThirds")}
             value={rules.qualification.bestThirds ?? 0}
             min={0}
             onChange={(v) =>
@@ -318,7 +321,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
-            Fair-play
+            {t("rules.fairPlayTitle")}
             <Switch
               checked={rules.fairPlay.enabled}
               onCheckedChange={(v) =>
@@ -330,14 +333,14 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         {rules.fairPlay.enabled && (
           <CardContent className="grid grid-cols-3 gap-3">
             <NumberField
-              label="Carton jaune (pts)"
+              label={t("rules.yellowCard")}
               value={rules.fairPlay.yellow}
               onChange={(v) =>
                 setRules({ ...rules, fairPlay: { ...rules.fairPlay, yellow: v } })
               }
             />
             <NumberField
-              label="2e jaune (pts)"
+              label={t("rules.secondYellowCard")}
               value={rules.fairPlay.secondYellow ?? 0}
               onChange={(v) =>
                 setRules({
@@ -347,7 +350,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               }
             />
             <NumberField
-              label="Carton rouge (pts)"
+              label={t("rules.redCard")}
               value={rules.fairPlay.red}
               onChange={(v) =>
                 setRules({ ...rules, fairPlay: { ...rules.fairPlay, red: v } })
@@ -360,11 +363,11 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* Overtime + Penalty */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Prolongations & tirs au but</CardTitle>
+          <CardTitle className="text-base">{t("rules.otTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label>Prolongations en cas d'égalité</Label>
+            <Label>{t("rules.otOnTie")}</Label>
             <Switch
               checked={rules.overtime.enabled}
               onCheckedChange={(v) =>
@@ -374,7 +377,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           </div>
           {rules.overtime.enabled && (
             <NumberField
-              label="Durée (min)"
+              label={t("rules.otDuration")}
               value={rules.overtime.minutes ?? 10}
               min={1}
               onChange={(v) =>
@@ -383,7 +386,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             />
           )}
           <div className="flex items-center justify-between pt-2 border-t border-border">
-            <Label>Tirs au but si toujours égalité</Label>
+            <Label>{t("rules.shootoutIfStillTied")}</Label>
             <Switch
               checked={rules.penaltyShootout.enabled}
               onCheckedChange={(v) =>
@@ -397,14 +400,14 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* Validation */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Validation des scores</CardTitle>
+          <CardTitle className="text-base">{t("rules.validationTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <Label>N'inclure que les matchs validés au classement</Label>
+              <Label>{t("rules.validationLabel")}</Label>
               <p className="text-xs text-muted-foreground mt-1">
-                Sinon, tous les matchs avec score saisi comptent.
+                {t("rules.validationHint")}
               </p>
             </div>
             <Switch
@@ -420,17 +423,17 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
-      {/* Inscriptions (PR9) */}
+      {/* Registration */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Inscriptions publiques</CardTitle>
+          <CardTitle className="text-base">{t("rules.registrationTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <Label>Activer les inscriptions en ligne</Label>
+              <Label>{t("rules.registrationEnable")}</Label>
               <p className="text-xs text-muted-foreground mt-1">
-                Un formulaire public permet aux équipes de s'inscrire depuis la page du tournoi.
+                {t("rules.registrationHint")}
               </p>
             </div>
             <Switch
@@ -448,7 +451,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Ouverture</Label>
+                  <Label>{t("rules.opensAt")}</Label>
                   <Input
                     type="datetime-local"
                     value={rules.registration.opensAt ?? ""}
@@ -464,7 +467,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Clôture</Label>
+                  <Label>{t("rules.closesAt")}</Label>
                   <Input
                     type="datetime-local"
                     value={rules.registration.closesAt ?? ""}
@@ -483,7 +486,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Nombre max. d'équipes (0 = illimité)</Label>
+                  <Label>{t("rules.maxTeams")}</Label>
                   <Input
                     type="number"
                     min={0}
@@ -501,7 +504,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center justify-between text-sm">
-                    <span>Validation par l'organisateur</span>
+                    <span>{t("rules.approval")}</span>
                     <Switch
                       checked={rules.registration.requiresApproval}
                       onCheckedChange={(v) =>
@@ -516,7 +519,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                     />
                   </label>
                   <label className="flex items-center justify-between text-sm">
-                    <span>Demander la liste des joueurs</span>
+                    <span>{t("rules.collectPlayers")}</span>
                     <Switch
                       checked={rules.registration.collectPlayers}
                       onCheckedChange={(v) =>
@@ -534,7 +537,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               </div>
 
               <div className="space-y-1.5">
-                <Label>Message affiché sur le formulaire (optionnel)</Label>
+                <Label>{t("rules.publicMessage")}</Label>
                 <Input
                   value={rules.registration.publicMessage ?? ""}
                   onChange={(e) =>
@@ -547,7 +550,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                     })
                   }
                   maxLength={300}
-                  placeholder="Frais d'inscription, contact, etc."
+                  placeholder={t("rules.publicMessagePlaceholder")}
                 />
               </div>
             </>
@@ -555,15 +558,15 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
-      {/* Langue & branding */}
+      {/* Language & branding */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Langue & branding</CardTitle>
+          <CardTitle className="text-base">{t("rules.brandingTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Langue du règlement</Label>
+              <Label>{t("rules.language")}</Label>
               <Select
                 value={rules.language}
                 onValueChange={(v) =>
@@ -580,7 +583,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Organisateur</Label>
+              <Label>{t("rules.organizer")}</Label>
               <Input
                 value={rules.branding.organizerName ?? ""}
                 onChange={(e) =>
@@ -592,7 +595,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Couleur d'accent</Label>
+              <Label>{t("rules.accentColor")}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="color"
@@ -619,10 +622,10 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Titre bloc sponsors</Label>
+              <Label>{t("rules.sponsorsTitle")}</Label>
               <Input
                 value={rules.branding.sponsorsTitle ?? ""}
-                placeholder="Avec le soutien de nos partenaires"
+                placeholder={t("rules.sponsorsTitlePlaceholder")}
                 onChange={(e) =>
                   setRules({
                     ...rules,
@@ -639,7 +642,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* Sponsors */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Sponsors & partenaires</CardTitle>
+          <CardTitle className="text-base">{t("rules.sponsorsBlockTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <SponsorsEditor
@@ -658,12 +661,11 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* PDF generation */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Règlement PDF</CardTitle>
+          <CardTitle className="text-base">{t("rules.pdfTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Génère un PDF officiel basé sur les règles enregistrées. Pense à
-            sauvegarder tes modifications avant de générer.
+            {t("rules.pdfHint")}
           </p>
           <Button
             type="button"
@@ -676,7 +678,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             ) : (
               <FileDown className="h-4 w-4" />
             )}
-            Générer le PDF
+            {t("rules.generatePdf")}
           </Button>
           {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
             <ul className="space-y-1.5 pt-2">
@@ -689,7 +691,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                     <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
                       {d.language}
                     </span>
-                    {new Date(d.generated_at).toLocaleString("fr-FR")}
+                    {new Date(d.generated_at).toLocaleString(lang.startsWith("en") ? "en-US" : "fr-FR")}
                   </span>
                   <a
                     href={d.file_url}
@@ -697,7 +699,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                     rel="noreferrer"
                     className="text-primary hover:underline inline-flex items-center gap-1 text-xs"
                   >
-                    Ouvrir <ExternalLink className="h-3 w-3" />
+                    {t("rules.open")} <ExternalLink className="h-3 w-3" />
                   </a>
                 </li>
               ))}
@@ -714,7 +716,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           ) : (
             <Save className="h-4 w-4" />
           )}
-          Enregistrer
+          {t("rules.save")}
         </Button>
         <Button
           type="button"
@@ -722,7 +724,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           onClick={() => setRules(DEFAULT_RULES)}
         >
           <RotateCcw className="h-4 w-4" />
-          Réinitialiser
+          {t("rules.reset")}
         </Button>
       </div>
     </div>
@@ -759,17 +761,18 @@ function NumberField({
 function SortableTB({
   id,
   index,
+  label,
   canRemove,
   onRemove,
 }: {
   id: Tiebreaker;
   index: number;
+  label: string;
   canRemove: boolean;
   onRemove: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
-  const meta = ALL_TIEBREAKERS.find((t) => t.key === id)!;
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -790,7 +793,7 @@ function SortableTB({
         <GripVertical className="h-4 w-4" />
       </button>
       <span className="text-xs font-mono text-muted-foreground w-5">{index}.</span>
-      <span className="text-sm flex-1">{meta.labelFr}</span>
+      <span className="text-sm flex-1">{label}</span>
       {canRemove && (
         <Button type="button" size="sm" variant="ghost" onClick={onRemove}>
           ×
