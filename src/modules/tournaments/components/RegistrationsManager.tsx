@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -43,6 +44,7 @@ interface Reg {
 }
 
 export function RegistrationsManager({ tournamentId }: { tournamentId: string }) {
+  const { t, i18n } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [filter, setFilter] = useState<Status | "all">("pending");
   const listFn = useServerFn(listTournamentRegistrations);
@@ -70,12 +72,12 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
       }),
     onSuccess: (_res, vars) => {
       toast.success(
-        vars.action === "approve" ? "Inscription validée" : "Inscription refusée",
+        vars.action === "approve" ? t("registrations.approved") : t("registrations.rejected"),
       );
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
 
   const regs = (q.data?.registrations ?? []) as Reg[];
@@ -90,7 +92,7 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-medium text-muted-foreground">
-          {regs.length} inscription{regs.length > 1 ? "s" : ""}
+          {t("registrations.count", { count: regs.length })}
         </h2>
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
@@ -99,11 +101,11 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pending">En attente</SelectItem>
-              <SelectItem value="approved">Validées</SelectItem>
-              <SelectItem value="rejected">Refusées</SelectItem>
-              <SelectItem value="cancelled">Annulées</SelectItem>
-              <SelectItem value="all">Toutes</SelectItem>
+              <SelectItem value="pending">{t("registrations.filter.pending")}</SelectItem>
+              <SelectItem value="approved">{t("registrations.filter.approved")}</SelectItem>
+              <SelectItem value="rejected">{t("registrations.filter.rejected")}</SelectItem>
+              <SelectItem value="cancelled">{t("registrations.filter.cancelled")}</SelectItem>
+              <SelectItem value="all">{t("registrations.filter.all")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -115,7 +117,9 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
         </div>
       ) : regs.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Aucune inscription {filter !== "all" ? `(${filter})` : ""}.
+          {t("registrations.empty", {
+            suffix: filter !== "all" ? ` (${t(`registrations.filter.${filter}`)})` : "",
+          })}
         </div>
       ) : (
         <ul className="space-y-2">
@@ -158,17 +162,20 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                 {Array.isArray(r.players) && r.players.length > 0 && (
                   <span className="flex items-center gap-1">
                     <Users className="h-3 w-3" />
-                    {r.players.length} joueur{r.players.length > 1 ? "s" : ""}
+                    {t("registrations.players", { count: r.players.length })}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {new Date(r.created_at).toLocaleString("fr-FR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {new Date(r.created_at).toLocaleString(
+                    i18n.language === "fr" ? "fr-FR" : "en-US",
+                    {
+                      day: "2-digit",
+                      month: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    },
+                  )}
                 </span>
               </div>
 
@@ -186,14 +193,14 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                     disabled={decide.isPending}
                   >
                     <Check className="h-4 w-4" />
-                    Valider
+                    {t("registrations.approve")}
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => {
                       const note = window.prompt(
-                        "Motif du refus (optionnel)",
+                        t("registrations.rejectPrompt"),
                         "",
                       );
                       if (note === null) return;
@@ -206,14 +213,14 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                     disabled={decide.isPending}
                   >
                     <X className="h-4 w-4" />
-                    Refuser
+                    {t("registrations.reject")}
                   </Button>
                 </div>
               )}
 
               {r.decision_note && (
                 <p className="text-[11px] text-muted-foreground">
-                  Note : {r.decision_note}
+                  {t("registrations.note", { note: r.decision_note })}
                 </p>
               )}
             </li>
@@ -222,38 +229,29 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
       )}
 
       <p className="text-[11px] text-muted-foreground text-center pt-2">
-        En attente : {counts.pending} · Validées : {counts.approved} · Refusées :{" "}
-        {counts.rejected}
+        {t("registrations.summary", {
+          pending: counts.pending,
+          approved: counts.approved,
+          rejected: counts.rejected,
+        })}
       </p>
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: Status }) {
-  const map: Record<Status, { label: string; cls: string }> = {
-    pending: {
-      label: "En attente",
-      cls: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-    },
-    approved: {
-      label: "Validée",
-      cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-    },
-    rejected: {
-      label: "Refusée",
-      cls: "bg-destructive/15 text-destructive",
-    },
-    cancelled: {
-      label: "Annulée",
-      cls: "bg-muted text-muted-foreground",
-    },
+  const { t } = useTranslation("tournaments");
+  const cls: Record<Status, string> = {
+    pending: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    approved: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+    rejected: "bg-destructive/15 text-destructive",
+    cancelled: "bg-muted text-muted-foreground",
   };
-  const m = map[status];
   return (
     <span
-      className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${m.cls}`}
+      className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${cls[status]}`}
     >
-      {m.label}
+      {t(`registrations.status.${status}`)}
     </span>
   );
 }
