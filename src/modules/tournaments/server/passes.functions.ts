@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getStripe, STRIPE_PRICE_TOURNAMENT } from "@/lib/stripe.server";
 import { slugify, shortRandomSuffix } from "../lib/slug";
 
 function getOrigin(): string {
@@ -22,6 +20,8 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
+    const { getStripe, STRIPE_PRICE_TOURNAMENT } = await import("@/lib/stripe.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const stripe = getStripe();
     const origin = getOrigin();
 
@@ -64,6 +64,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
 export const listMyAvailablePasses = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId, claims } = context;
     const email = (claims as { email?: string }).email ?? null;
 
@@ -92,7 +93,10 @@ export const listMyAvailablePasses = createServerFn({ method: "POST" })
     return { passes: data ?? [] };
   });
 
-async function uniqueSlug(base: string): Promise<string> {
+async function uniqueSlug(
+  supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"],
+  base: string,
+): Promise<string> {
   for (let i = 0; i < 5; i++) {
     const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
     const { data } = await supabaseAdmin
@@ -126,6 +130,7 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId, claims } = context;
     const email = (claims as { email?: string }).email ?? null;
 
@@ -150,7 +155,7 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       throw new Response("Ce pass n'appartient pas à votre compte", { status: 403 });
     }
 
-    const slug = await uniqueSlug(slugify(data.name));
+    const slug = await uniqueSlug(supabaseAdmin, slugify(data.name));
 
     const { data: tournament, error: tErr } = await supabaseAdmin
       .from("tournaments")
