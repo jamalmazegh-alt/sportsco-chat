@@ -1826,54 +1826,69 @@ export type Database = {
       }
       tournament_registrations: {
         Row: {
+          amount_paid_cents: number | null
           contact_email: string
           contact_name: string
           contact_phone: string | null
           created_at: string
+          currency: string | null
           decided_at: string | null
           decided_by: string | null
           decision_note: string | null
           id: string
           notes: string | null
+          payment_status: string
           players: Json
           short_name: string | null
           status: Database["public"]["Enums"]["tournament_registration_status"]
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
           team_name: string
           tournament_id: string
           tournament_team_id: string | null
           updated_at: string
         }
         Insert: {
+          amount_paid_cents?: number | null
           contact_email: string
           contact_name: string
           contact_phone?: string | null
           created_at?: string
+          currency?: string | null
           decided_at?: string | null
           decided_by?: string | null
           decision_note?: string | null
           id?: string
           notes?: string | null
+          payment_status?: string
           players?: Json
           short_name?: string | null
           status?: Database["public"]["Enums"]["tournament_registration_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           team_name: string
           tournament_id: string
           tournament_team_id?: string | null
           updated_at?: string
         }
         Update: {
+          amount_paid_cents?: number | null
           contact_email?: string
           contact_name?: string
           contact_phone?: string | null
           created_at?: string
+          currency?: string | null
           decided_at?: string | null
           decided_by?: string | null
           decision_note?: string | null
           id?: string
           notes?: string | null
+          payment_status?: string
           players?: Json
           short_name?: string | null
           status?: Database["public"]["Enums"]["tournament_registration_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           team_name?: string
           tournament_id?: string
           tournament_team_id?: string | null
