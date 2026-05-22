@@ -977,7 +977,7 @@ export const setMatchStatus = createServerFn({ method: "POST" })
     }
     const { error } = await supabase
       .from("tournament_matches")
-      .update(patch)
+      .update(patch as any)
       .eq("id", data.match_id)
       .eq("tournament_id", data.tournament_id);
     if (error) throw new Response(error.message, { status: 400 });
