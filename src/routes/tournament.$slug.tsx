@@ -73,6 +73,7 @@ type Tab = "overview" | "teams" | "matches" | "standings" | "bracket";
 
 function PublicTournamentPage() {
   const { slug } = Route.useParams();
+  const { t } = useTranslation("tournaments");
   const initial = Route.useLoaderData().initial;
   const fn = useServerFn(getPublicTournament);
   const q = useQuery({
@@ -101,12 +102,16 @@ function PublicTournamentPage() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center space-y-2 max-w-md">
           <Trophy className="h-10 w-10 mx-auto text-muted-foreground" />
-          <p className="text-lg font-medium">Tournoi indisponible</p>
+          <p className="text-lg font-medium">{t("public.unavailableTitle")}</p>
           <p className="text-sm text-muted-foreground">
-            Ce tournoi n'est pas encore publié, ou le lien est expiré. Si tu es l'organisateur, ouvre ton tournoi puis clique sur <strong>Publier</strong>.
+            <Trans
+              i18nKey="public.unavailableBody"
+              t={t}
+              components={{ 1: <strong /> }}
+            />
           </p>
           <Link to="/" className="text-sm text-primary underline">
-            Retour à l'accueil
+            {t("public.backHome")}
           </Link>
         </div>
       </div>
