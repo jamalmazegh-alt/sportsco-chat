@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit, ClipboardList, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -6,13 +7,6 @@ import coachShot from "@/assets/features/coach-attendance.png";
 import parentShot from "@/assets/features/parent-convocation.png";
 import clubShot from "@/assets/features/club-dashboard.png";
 import playerShot from "@/assets/features/player-home.png";
-
-const SCREENSHOTS = [
-  { src: coachShot, title: "Coach — Suivi des présences", body: "Vue consolidée des entraînements et matchs, par joueur et par période." },
-  { src: parentShot, title: "Parent — Convocation", body: "Réponse en un clic, motif facultatif, calendrier familial unifié." },
-  { src: clubShot, title: "Club — Tableau de bord", body: "Multi-équipes, membres, communication centralisée." },
-  { src: playerShot, title: "Joueur — Accueil", body: "Prochain événement, confirmation de présence, mur d'équipe." },
-];
 
 export const Route = createFileRoute("/features")({
   component: FeaturesPage,
@@ -34,149 +28,31 @@ export const Route = createFileRoute("/features")({
   }),
 });
 
-const PILLARS = [
-  {
-    icon: CalendarCheck,
-    title: "Convocations & Événements",
-    body: "Créez matchs, entraînements et tournois en quelques secondes. Les convocations atteignent les bons joueurs et parents instantanément.",
-  },
-  {
-    icon: Users,
-    title: "Équipe & Effectif",
-    body: "Gérez joueurs, numéros, postes et liens parents. Photo, date de naissance, contact — tout sur une seule fiche.",
-  },
-  {
-    icon: Bell,
-    title: "Rappels",
-    body: "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire.",
-  },
-  {
-    icon: ClipboardList,
-    title: "Retours coach par joueur",
-    body: "Après chaque match ou entraînement, le coach saisit en quelques secondes : note, forces, axes de progrès, tags adaptés au sport. Historique privé conservé sur la fiche du joueur.",
-  },
-  {
-    icon: Wand2,
-    title: "Synthèses IA itératives",
-    body: "Génère en un clic un bilan de saison, un rapport de développement ou une préparation d'entretien à partir des retours coachs et des stats. Affine ensuite la synthèse en dialoguant avec l'IA jusqu'au rendu parfait.",
-  },
-  {
-    icon: BrainCircuit,
-    title: "Assistant IA intégré",
-    body: "Un assistant en français, connecté à vos données de club. Posez vos questions sur les présences, les convocations, les stats. Réponses instantanées, respect des rôles, hébergé en Europe.",
-  },
-  {
-    icon: MessageCircle,
-    title: "WhatsApp & email en option",
-    body: "Tout est géré dans Clubero. Pour ceux qui préfèrent rester sur WhatsApp ou par email, partagez le message formaté en un clic — sans perdre le suivi dans l'appli.",
-  },
-  {
-    icon: MessageSquareText,
-    title: "Communication interne",
-    body: "Mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes. Chat temps réel par événement.",
-  },
-  {
-    icon: BarChart3,
-    title: "Suivi des présences",
-    body: "Marquez les présences en un clic. Visualisez les tendances par joueur et par équipe sur toute la saison.",
-  },
-  {
-    icon: Trophy,
-    title: "Tournois clés en main",
-    body: "Créez un tournoi en quelques minutes : poules, brackets, calendrier auto, classements en direct. Page publique TV partageable pour suivre les scores.",
-  },
-  {
-    icon: Trophy,
-    title: "Résultats & stats par sport",
-    body: "Saisissez le score et les statistiques joueurs (buts, essais, paniers à 3 pts, arrêts…) adaptées au sport de chaque équipe.",
-  },
-  {
-    icon: Search,
-    title: "Recherche globale",
-    body: "Cmd/Ctrl + K pour sauter instantanément à un joueur, une équipe ou un événement.",
-  },
-  {
-    icon: Download,
-    title: "Exports CSV",
-    body: "Exportez l'effectif d'une équipe ou les présences d'un événement en un clic — prêt pour Excel.",
-  },
-  {
-    icon: Undo2,
-    title: "Corbeille 7 jours",
-    body: "Une suppression accidentelle ? Restaurez posts, événements et joueurs pendant 7 jours.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Rôles & Permissions",
-    body: "Admins, coachs, joueurs et parents voient exactement ce qu'il leur faut — et rien d'autre.",
-  },
-];
+const PILLAR_ICONS = [CalendarCheck, Users, Bell, ClipboardList, Wand2, BrainCircuit, MessageCircle, MessageSquareText, BarChart3, Trophy, Trophy, Search, Download, Undo2, ShieldCheck];
 
-const AUDIENCES = [
-  {
-    title: "Pour les clubs",
-    color: "var(--brand-blue-deep)",
-    points: [
-      "Tableau de bord multi-équipes",
-      "Annuaire des membres et gestion des rôles",
-      "Recherche globale (Cmd + K) sur tout le club",
-      "Exports CSV (effectifs, présences) prêts pour Excel",
-      "Canal de communication centralisé",
-      "Conforme RGPD, hébergement européen",
-    ],
-  },
-  {
-    title: "Pour les coachs",
-    color: "var(--brand-blue)",
-    points: [
-      "Convocation prête en moins d'une minute",
-      "Réponses de présence en temps réel",
-      "Saisie des résultats de match avec stats joueurs adaptées au sport",
-      "Retours individuels par joueur (note, forces, axes de progrès, tags propres à votre sport)",
-      "Synthèses IA bilan / entretien / développement, affinables au fil d'un dialogue avec l'IA",
-      "Chat par événement avec joueurs et parents",
-      "@mentions et accusés de lecture sur le mur",
-      "Gestion des remplaçants et attribution des numéros",
-    ],
-  },
-  {
-    title: "Pour les parents",
-    color: "var(--secondary)",
-    points: [
-      "Un clic pour confirmer ou décliner",
-      "Calendrier familial avec tous les événements de vos enfants",
-      "Recevez les convocations dans l'appli Clubero, par email ou via WhatsApp — comme votre club préfère",
-      "Messagerie directe avec le coach",
-      "Gestion des autorisations pour les mineurs",
-    ],
-  },
-  {
-    title: "Pour les joueurs",
-    color: "var(--primary)",
-    points: [
-      "Visualisez votre prochain match en un coup d'œil",
-      "Confirmation rapide de présence",
-      "Chat d'équipe sans bruit",
-      "Historique personnel des présences",
-      "Profil, photo et stats",
-    ],
-  },
-];
+const SCREENSHOTS = [coachShot, parentShot, clubShot, playerShot];
+
+const SPORTS = ["Football", "Futsal", "Basketball", "Rugby", "Handball", "Volleyball", "Ice hockey", "Field hockey"];
+
+const AUDIENCE_COLORS = ["var(--brand-blue-deep)", "var(--brand-blue)", "var(--secondary)", "var(--primary)"];
 
 function FeaturesPage() {
+  const { t } = useTranslation("marketing");
+  const pillars = t("features.pillars", { returnObjects: true }) as { t: string; b: string }[];
+  const audiences = t("features.audiences", { returnObjects: true }) as { t: string; p: string[] }[];
+
   return (
     <MarketingLayout>
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-4xl px-5 py-16 text-center lg:px-8 lg:py-24">
           <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
-            Fonctionnalités
+            {t("features.kicker")}
           </p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-            Une appli pour toute la saison.
+            {t("features.title")}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            De la première convocation au bilan de fin de saison — Clubero couvre
-            tout ce qui compte pour les clubs amateurs.
+            {t("features.subtitle")}
           </p>
         </div>
       </section>
@@ -184,15 +60,18 @@ function FeaturesPage() {
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {PILLARS.map((f) => (
-              <div key={f.title} className="rounded-2xl border border-border bg-card p-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
-                  <f.icon className="h-5 w-5" />
+            {pillars.map((f, i) => {
+              const Icon = PILLAR_ICONS[i] ?? CalendarCheck;
+              return (
+                <div key={f.t} className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h2 className="mt-5 font-display text-lg font-semibold">{f.t}</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.b}</p>
                 </div>
-                <h2 className="mt-5 font-display text-lg font-semibold">{f.title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -201,29 +80,33 @@ function FeaturesPage() {
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Aperçu de l'application.
+              {t("features.screenshotsTitle")}
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Une expérience pensée pour chaque rôle, sur mobile en priorité.
+              {t("features.screenshotsSubtitle")}
             </p>
           </div>
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {SCREENSHOTS.map((s) => (
-              <figure key={s.title} className="space-y-3">
-                <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-                  <img
-                    src={s.src}
-                    alt={s.title}
-                    className="aspect-[4/5] w-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <figcaption>
-                  <p className="font-display text-sm font-semibold">{s.title}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{s.body}</p>
-                </figcaption>
-              </figure>
-            ))}
+            {SCREENSHOTS.map((src, i) => {
+              const title = t(`features.shot${i + 1}Title`);
+              const body = t(`features.shot${i + 1}Body`);
+              return (
+                <figure key={i} className="space-y-3">
+                  <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+                    <img
+                      src={src}
+                      alt={title}
+                      className="aspect-[4/5] w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <figcaption>
+                    <p className="font-display text-sm font-semibold">{title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{body}</p>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -232,23 +115,14 @@ function FeaturesPage() {
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Sports couverts en V1
+              {t("features.sportsTitle")}
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Saisie de score et stats joueurs adaptées au sport de chaque équipe.
+              {t("features.sportsBody")}
             </p>
           </div>
           <div className="mt-10 flex flex-wrap justify-center gap-2.5">
-            {[
-              "Football",
-              "Futsal",
-              "Basketball",
-              "Rugby",
-              "Handball",
-              "Volley-ball",
-              "Hockey sur glace",
-              "Hockey sur gazon",
-            ].map((s) => (
+            {SPORTS.map((s) => (
               <span
                 key={s}
                 className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-foreground/80"
@@ -258,9 +132,9 @@ function FeaturesPage() {
             ))}
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            Un autre sport vous intéresse ?{" "}
+            {t("features.sportsAskPre")}
             <Link to="/contact" className="underline underline-offset-2 hover:text-foreground">
-              Dites-le nous
+              {t("features.sportsAskLink")}
             </Link>
             .
           </p>
@@ -271,25 +145,25 @@ function FeaturesPage() {
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              Pensé pour chaque rôle dans le club.
+              {t("features.rolesTitle")}
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Chaque utilisateur dispose d&apos;une expérience adaptée à ses besoins.
+              {t("features.rolesBody")}
             </p>
           </div>
 
           <div className="mt-14 grid gap-6 lg:grid-cols-2">
-            {AUDIENCES.map((a) => (
-              <div key={a.title} className="rounded-3xl border border-border bg-card p-8">
+            {audiences.map((a, i) => (
+              <div key={a.t} className="rounded-3xl border border-border bg-card p-8">
                 <div className="flex items-center gap-3">
                   <span
                     className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: a.color }}
+                    style={{ backgroundColor: AUDIENCE_COLORS[i] }}
                   />
-                  <h3 className="font-display text-2xl font-bold">{a.title}</h3>
+                  <h3 className="font-display text-2xl font-bold">{a.t}</h3>
                 </div>
                 <ul className="mt-6 space-y-3">
-                  {a.points.map((p) => (
+                  {a.p.map((p) => (
                     <li key={p} className="flex items-start gap-3 text-sm">
                       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                       <span className="text-foreground/80">{p}</span>
@@ -303,11 +177,11 @@ function FeaturesPage() {
           <div className="mt-16 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg" className="h-12 px-6">
               <Link to="/demo">
-                Demander une démo <ArrowRight className="ml-1.5 h-4 w-4" />
+                {t("features.ctaDemo")} <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6">
-              <Link to="/pricing">Voir les tarifs</Link>
+              <Link to="/pricing">{t("features.ctaPricing")}</Link>
             </Button>
           </div>
         </div>
