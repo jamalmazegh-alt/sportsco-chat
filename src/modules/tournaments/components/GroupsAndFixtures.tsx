@@ -18,6 +18,7 @@ import { DrawDialog } from "./DrawDialog";
 interface Props {
   tournamentId: string;
   format: "group" | "knockout" | "mixed";
+  status: string;
   numTeams: number;
   groupsCount: number;
   matchesCount: number;
@@ -28,6 +29,7 @@ interface Props {
   dailyEndTime?: string | null;
   fields?: string[] | null;
   settings?: Record<string, any> | null;
+  teams: Array<{ id: string; name: string; short_name?: string | null; logo_url?: string | null }>;
 }
 
 export function GroupsAndFixtures({
