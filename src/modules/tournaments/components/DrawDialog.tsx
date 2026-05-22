@@ -561,35 +561,34 @@ export function DrawDialog({
                 {/* MANUAL */}
                 <TabsContent value="manual" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Assigne chaque équipe à{" "}
-                    {drawMode === "groups" ? "une poule" : "une position du tableau"}.
+                    {drawMode === "groups" ? t("draw.manualDescGroups") : t("draw.manualDescKnockout")}
                   </p>
                   <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-                    {teams.map((t) => (
+                    {teams.map((team) => (
                       <div
-                        key={t.id}
+                        key={team.id}
                         className="flex items-center gap-2 rounded-lg border border-border p-2"
                       >
                         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs shrink-0">
-                          {t.logo_url ? (
+                          {team.logo_url ? (
                             <img
-                              src={t.logo_url}
+                              src={team.logo_url}
                               alt=""
                               className="h-8 w-8 rounded-full object-cover"
                             />
                           ) : (
-                            initials(t.name)
+                            initials(team.name)
                           )}
                         </div>
-                        <span className="flex-1 text-sm truncate">{t.name}</span>
+                        <span className="flex-1 text-sm truncate">{team.name}</span>
                         <Select
                           value={
-                            manualAssign[t.id] !== null && manualAssign[t.id] !== undefined
-                              ? String(manualAssign[t.id])
+                            manualAssign[team.id] !== null && manualAssign[team.id] !== undefined
+                              ? String(manualAssign[team.id])
                               : ""
                           }
                           onValueChange={(v) =>
-                            setManualAssign((m) => ({ ...m, [t.id]: parseInt(v, 10) }))
+                            setManualAssign((m) => ({ ...m, [team.id]: parseInt(v, 10) }))
                           }
                         >
                           <SelectTrigger className="w-[140px]">
@@ -616,11 +615,12 @@ export function DrawDialog({
                     ) : (
                       <>
                         <Hand className="h-4 w-4" />
-                        Valider la composition
+                        {t("draw.validateManual")}
                       </>
                     )}
                   </Button>
                 </TabsContent>
+
               </Tabs>
 
               {finished && (
