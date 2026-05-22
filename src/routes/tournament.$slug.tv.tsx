@@ -225,6 +225,7 @@ function TvSlideshowPage() {
     });
     return out;
   }, [data, scoring]);
+  // sponsors derived from data so it's covered above; eslint-disable not needed
 
   // Auto-rotation
   useEffect(() => {
