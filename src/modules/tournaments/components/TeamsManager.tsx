@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
-import { Plus, Trash2, Users, Loader2 } from "lucide-react";
+import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { Plus, Trash2, Users, Loader2, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   addTournamentTeam,
   removeTournamentTeam,
 } from "../tournaments.functions";
+
 
 interface Props {
   tournamentId: string;
