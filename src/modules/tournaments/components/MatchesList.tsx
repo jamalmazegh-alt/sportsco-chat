@@ -424,6 +424,14 @@ function MatchCard({
                 {match.field}
               </span>
             )}
+            {(match.referee_user_id || match.referee_name) && (
+              <span className="inline-flex items-center gap-1">
+                <Flag className="h-3 w-3" />
+                {match.referee_name ||
+                  refereeOptions.find((r) => r.user_id === match.referee_user_id)?.label ||
+                  "Arbitre"}
+              </span>
+            )}
             {done && !validated && (
               <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">
                 <Check className="h-3 w-3" />
