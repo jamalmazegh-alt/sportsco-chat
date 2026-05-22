@@ -1759,6 +1759,66 @@ export type Database = {
           },
         ]
       }
+      tournament_team_players: {
+        Row: {
+          birth_date: string | null
+          created_at: string
+          first_name: string
+          id: string
+          is_captain: boolean
+          jersey_number: number | null
+          last_name: string
+          license_number: string | null
+          position: string | null
+          tournament_id: string
+          tournament_team_id: string
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          created_at?: string
+          first_name: string
+          id?: string
+          is_captain?: boolean
+          jersey_number?: number | null
+          last_name: string
+          license_number?: string | null
+          position?: string | null
+          tournament_id: string
+          tournament_team_id: string
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          created_at?: string
+          first_name?: string
+          id?: string
+          is_captain?: boolean
+          jersey_number?: number | null
+          last_name?: string
+          license_number?: string | null
+          position?: string | null
+          tournament_id?: string
+          tournament_team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_team_players_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_team_players_tournament_team_id_fkey"
+            columns: ["tournament_team_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_teams: {
         Row: {
           contact_email: string | null
