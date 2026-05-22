@@ -25,6 +25,7 @@ interface Props {
   dailyStartTime?: string | null;
   dailyEndTime?: string | null;
   fields?: string[] | null;
+  settings?: Record<string, any> | null;
 }
 
 export function GroupsAndFixtures({
@@ -39,6 +40,7 @@ export function GroupsAndFixtures({
   dailyStartTime,
   dailyEndTime,
   fields,
+  settings,
 }: Props) {
   const qc = useQueryClient();
   const [numGroups, setNumGroups] = useState(2);
@@ -53,6 +55,9 @@ export function GroupsAndFixtures({
   const [fieldsText, setFieldsText] = useState(
     (fields ?? ["Terrain 1"]).join(", "),
   );
+  const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
+  const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
+  const [lunchEnd, setLunchEnd] = useState<string>(settings?.lunch_end ?? "13:30");
 
   useEffect(() => {
     setDuration(matchDurationMin ?? 20);
@@ -60,7 +65,10 @@ export function GroupsAndFixtures({
     setStartTime(dailyStartTime ?? "09:00");
     setEndTime(dailyEndTime ?? "18:00");
     setFieldsText((fields ?? ["Terrain 1"]).join(", "));
-  }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields]);
+    setLunchEnabled(!!settings?.lunch_start);
+    setLunchStart(settings?.lunch_start ?? "12:00");
+    setLunchEnd(settings?.lunch_end ?? "13:30");
+  }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields, settings]);
 
   const genGroupsFn = useServerFn(autoCreateGroupsAndFixtures);
   const genKnockoutFn = useServerFn(generateKnockoutFromGroups);
