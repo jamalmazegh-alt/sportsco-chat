@@ -100,6 +100,7 @@ export function mergeRules(settings: unknown): TournamentRules {
     overtime: { ...DEFAULT_RULES.overtime, ...(s.overtime ?? {}) },
     penaltyShootout: { ...DEFAULT_RULES.penaltyShootout, ...(s.penaltyShootout ?? {}) },
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
+    forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
     language: (s.language as TournamentLanguage) ?? DEFAULT_RULES.language,
     branding: { ...DEFAULT_RULES.branding, ...(s.branding ?? {}) },
   };
