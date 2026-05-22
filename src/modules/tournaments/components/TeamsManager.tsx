@@ -341,22 +341,31 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="flex items-center gap-1.5">
-                    Seed
+                    Tête de série
                     <span
                       className="text-muted-foreground"
-                      title="Le seed (tête de série) indique le classement de départ. Seed 1 = meilleure équipe ; elle est placée pour ne rencontrer le seed 2 qu'en finale."
+                      title="La tête de série (seed) indique le rang de l'équipe au classement de départ. La n°1 est la plus forte ; elle est placée de manière à ne rencontrer la n°2 qu'en finale."
                     >
                       <HelpCircle className="h-3.5 w-3.5" />
                     </span>
                   </Label>
-                  <Input
-                    type="number"
-                    min={1}
+                  <select
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                     value={seed}
                     onChange={(e) => setSeed(e.target.value)}
-                    placeholder="1"
-                  />
+                  >
+                    <option value="">Non classée</option>
+                    {Array.from({ length: Math.max(teams.length + 1, maxTeams ?? 16) }).map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        N°{i + 1}{i === 0 ? " (meilleure équipe)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-muted-foreground">
+                    Optionnel — utilisé pour le tirage et l'ordre dans le bracket.
+                  </p>
                 </div>
+
               </div>
 
               <Button type="submit" className="w-full" disabled={add.isPending}>
