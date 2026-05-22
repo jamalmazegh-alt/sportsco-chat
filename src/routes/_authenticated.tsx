@@ -37,7 +37,19 @@ function AuthLayout() {
   }
   if (!session) return <Navigate to="/login" replace />;
 
+  const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
+  const isTournamentOrganizer = signupRole === "tournament_organizer";
+
   if (memberships.length === 0) {
+    // Tournament organizers don't need a club — render the route directly
+    // without the club onboarding screen, consent gate, or onboarding wizard.
+    if (isTournamentOrganizer) {
+      return (
+        <div className="min-h-screen bg-background">
+          <Outlet />
+        </div>
+      );
+    }
     return <NoMembershipScreen
       clubName={clubName}
       setClubName={setClubName}
