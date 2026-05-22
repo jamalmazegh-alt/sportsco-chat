@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthLayout() {
-  const { session, loading, memberships, refreshMemberships, user } = useAuth();
+  const { session, loading, memberships, refreshMemberships, user, activeClubId } = useAuth();
   const { t } = useTranslation();
   const [clubName, setClubName] = useState("");
   const [busy, setBusy] = useState(false);
