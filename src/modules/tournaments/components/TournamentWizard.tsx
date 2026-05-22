@@ -32,14 +32,16 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [location, setLocation] = useState("");
   const [format, setFormat] = useState<Format>("mixed");
   const [numTeams, setNumTeams] = useState(8);
+  const [logo, setLogo] = useState<Attachment[]>([]);
 
   const navigate = useNavigate();
   const qc = useQueryClient();
   const fn = useServerFn(createTournament);
+  const updateFn = useServerFn(updateTournament);
 
   const create = useMutation({
-    mutationFn: () =>
-      fn({
+    mutationFn: async () => {
+      const res = await fn({
         data: {
           club_id: clubId,
           name: name.trim(),
@@ -51,7 +53,18 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           num_teams: numTeams,
           location: location || null,
         },
-      }),
+      });
+      // Apply cover image after creation (if uploaded)
+      if (logo[0]?.url) {
+        await updateFn({
+          data: {
+            tournament_id: res.tournament.id,
+            patch: { cover_image_url: logo[0].url },
+          },
+        });
+      }
+      return res;
+    },
     onSuccess: (res) => {
       toast.success("Tournoi créé");
       qc.invalidateQueries({ queryKey: ["tournaments", clubId] });
@@ -74,7 +87,9 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     setLocation("");
     setFormat("mixed");
     setNumTeams(8);
+    setLogo([]);
   }
+
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
