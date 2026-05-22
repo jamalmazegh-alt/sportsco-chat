@@ -34,7 +34,7 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
   const [mode, setMode] = useState<"external" | "internal">("external");
   const [name, setName] = useState("");
   const [shortName, setShortName] = useState("");
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logo, setLogo] = useState<Attachment[]>([]);
   const [seed, setSeed] = useState("");
   const [selectedTeamId, setSelectedTeamId] = useState("");
 
