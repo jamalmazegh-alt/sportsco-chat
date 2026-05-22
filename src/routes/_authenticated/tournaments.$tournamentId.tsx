@@ -82,6 +82,9 @@ function TournamentDetailPage() {
   const tabs: { id: Tab; icon: any; label: string }[] = [
     { id: "teams", icon: Users, label: "Équipes" },
     { id: "fixtures", icon: Shuffle, label: "Format" },
+    ...(canManage
+      ? [{ id: "fields" as const, icon: MapPin, label: "Terrains" }]
+      : []),
     { id: "matches", icon: Calendar, label: "Matchs" },
     { id: "standings", icon: ListOrdered, label: "Classement" },
     { id: "bracket", icon: GitBranch, label: "Bracket" },
