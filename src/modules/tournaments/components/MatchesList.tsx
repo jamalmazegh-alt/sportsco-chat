@@ -848,11 +848,11 @@ function MatchCard({
                 disabled={sets.length >= 7}
               >
                 <Plus className="h-4 w-4" />
-                Ajouter un set
+                {t("matches.addSet")}
               </Button>
               {sets.length > 0 && (
                 <p className="text-center text-sm font-medium">
-                  Sets gagnés :{" "}
+                  {t("matches.setsWon")}{" "}
                   <span className="tabular-nums">
                     {aggregateSetsScore(sets).score_a} - {aggregateSetsScore(sets).score_b}
                   </span>
