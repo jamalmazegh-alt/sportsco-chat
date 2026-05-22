@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         const { data: tournament, error: tErr } = await supabase
           .from("tournaments")
-          .select("id, status, settings")
+          .select("id, status, settings, num_teams")
           .eq("slug", parsed.tournament_slug)
           .maybeSingle();
         if (tErr) {
@@ -83,7 +83,15 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           );
         }
 
-        if (typeof reg.maxTeams === "number" && reg.maxTeams > 0) {
+        // Capacity cap: explicit reg.maxTeams takes precedence, otherwise fall
+        // back to the tournament's num_teams to prevent unbounded registrations.
+        const capRaw =
+          typeof reg.maxTeams === "number" && reg.maxTeams > 0
+            ? reg.maxTeams
+            : typeof tournament.num_teams === "number" && tournament.num_teams > 0
+              ? tournament.num_teams
+              : null;
+        if (capRaw !== null) {
           const [{ count: approved }, { count: pending }] = await Promise.all([
             supabase
               .from("tournament_teams")
@@ -95,13 +103,14 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
               .eq("tournament_id", tournament.id)
               .eq("status", "pending"),
           ]);
-          if ((approved ?? 0) + (pending ?? 0) >= reg.maxTeams) {
+          if ((approved ?? 0) + (pending ?? 0) >= capRaw) {
             return Response.json(
               { error: "Registrations full" },
               { status: 400 },
             );
           }
         }
+
 
         const players = reg.collectPlayers ? parsed.players : [];
 
