@@ -73,7 +73,7 @@ export const createTournament = createServerFn({ method: "POST" })
       throw new Response("Forbidden — admin/dirigeant required", { status: 403 });
     }
 
-    const slug = await uniqueSlug(supabaseAdmin, slugify(data.name));
+    const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
     const { data: row, error } = await supabase
       .from("tournaments")
       .insert({
