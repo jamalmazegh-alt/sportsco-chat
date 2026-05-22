@@ -91,12 +91,13 @@ export function GroupsAndFixtures({
     const v = newField.trim();
     if (!v) return;
     if (fieldsList.includes(v)) {
-      toast.error("Ce terrain existe déjà");
+      toast.error(t("groups.fieldDuplicate"));
       return;
     }
     setFieldsList([...fieldsList, v]);
     setNewField("");
   }
+
   function removeField(name: string) {
     setFieldsList(fieldsList.filter((f) => f !== name));
   }
