@@ -48,6 +48,10 @@ function AuthLayout() {
   const { t } = useTranslation();
   const [clubName, setClubName] = useState("");
   const [busy, setBusy] = useState(false);
+  const { tournamentOnly } = useTournamentOnlyMode();
+  const { isActive: clubSubActive, isLoading: subLoading } =
+    useClubSubscriptionActive(activeClubId);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (loading) {
     return (
@@ -57,11 +61,6 @@ function AuthLayout() {
     );
   }
   if (!session) return <Navigate to="/login" replace />;
-
-  const { tournamentOnly } = useTournamentOnlyMode();
-  const { isActive: clubSubActive, isLoading: subLoading } =
-    useClubSubscriptionActive(activeClubId);
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
   const isTournamentOrganizer = signupRole === "tournament_organizer";
@@ -81,6 +80,7 @@ function AuthLayout() {
   ) {
     return <Navigate to="/admin/billing" replace />;
   }
+
 
 
   if (memberships.length === 0) {
