@@ -412,7 +412,7 @@ function BillingPage() {
               className="rounded-xl border-2 border-border hover:border-primary p-4 text-left transition-colors disabled:opacity-50"
             >
               <p className="text-sm text-muted-foreground">{t("billing.monthly")}</p>
-              <p className="font-display text-2xl font-bold mt-1">39 €</p>
+              <p className="font-display text-2xl font-bold mt-1">49 €</p>
               <p className="text-xs text-muted-foreground">{t("billing.perMonth")}</p>
               {busy === "monthly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
             </button>
@@ -425,7 +425,7 @@ function BillingPage() {
                 {t("billing.twoMonthsFree")}
               </span>
               <p className="text-sm text-muted-foreground">{t("billing.yearly")}</p>
-              <p className="font-display text-2xl font-bold mt-1">390 €</p>
+              <p className="font-display text-2xl font-bold mt-1">490 €</p>
               <p className="text-xs text-muted-foreground">{t("billing.perYear")}</p>
               {busy === "yearly" && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
             </button>
