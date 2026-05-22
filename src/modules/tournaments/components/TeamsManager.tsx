@@ -151,13 +151,16 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Logo URL (optionnel)</Label>
-                  <Input
-                    value={logoUrl}
-                    onChange={(e) => setLogoUrl(e.target.value)}
-                    placeholder="https://…"
+                  <Label>Logo de l'équipe (optionnel)</Label>
+                  <AttachmentPicker
+                    value={logo}
+                    onChange={setLogo}
+                    prefix="tournament-team-logo"
+                    accept="image/*"
+                    max={1}
                   />
                 </div>
+
               </>
             ) : (
               <div className="space-y-1.5">
