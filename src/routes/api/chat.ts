@@ -657,7 +657,184 @@ export const Route = createFileRoute("/api/chat")({
               };
             },
           }),
+
+          listMyTournaments: tool({
+            description:
+              "Liste les tournois liés à l'utilisateur : ceux qu'il organise (créateur, admin/dirigeant du club organisateur, co-organisateur ou arbitre invité) et ceux où l'une de ses équipes est inscrite. Renvoie id, slug, nom, lieu, dates, sport, statut et rôle de l'utilisateur. Utile pour répondre à 'Quels tournois j'ai ?', 'Mon prochain tournoi', etc.",
+            inputSchema: z.object({}),
+            execute: async () => {
+              const [
+                { data: createdRows },
+                { data: collabRows },
+                { data: clubRoles },
+              ] = await Promise.all([
+                supabase
+                  .from("tournaments")
+                  .select("id, slug, name, location, starts_on, ends_on, sport, status, club_id")
+                  .eq("created_by", userId),
+                supabase
+                  .from("tournament_collaborators")
+                  .select("role, tournament:tournament_id(id, slug, name, location, starts_on, ends_on, sport, status, club_id)")
+                  .eq("user_id", userId)
+                  .not("accepted_at", "is", null)
+                  .is("revoked_at", null),
+                supabase
+                  .from("club_members")
+                  .select("club_id, role")
+                  .eq("user_id", userId)
+                  .in("role", ["admin", "dirigeant"]),
+              ]);
+
+              const map = new Map<string, any>();
+              const add = (t: any, role: string) => {
+                if (!t?.id) return;
+                const existing = map.get(t.id);
+                if (existing) {
+                  if (!existing.roles.includes(role)) existing.roles.push(role);
+                  return;
+                }
+                map.set(t.id, {
+                  id: t.id,
+                  slug: t.slug,
+                  name: t.name,
+                  location: t.location,
+                  starts_on: t.starts_on,
+                  ends_on: t.ends_on,
+                  sport: t.sport,
+                  status: t.status,
+                  public_link: `/tournament/${t.slug}`,
+                  manage_link: `/tournaments/${t.id}`,
+                  roles: [role],
+                });
+              };
+
+              (createdRows ?? []).forEach((t: any) => add(t, "créateur"));
+              (collabRows ?? []).forEach((c: any) => add(c.tournament, c.role === "co_organizer" ? "co-organisateur" : "arbitre"));
+
+              const adminClubIds = (clubRoles ?? []).map((c: any) => c.club_id);
+              if (adminClubIds.length > 0) {
+                const { data: clubTournaments } = await supabase
+                  .from("tournaments")
+                  .select("id, slug, name, location, starts_on, ends_on, sport, status, club_id")
+                  .in("club_id", adminClubIds);
+                (clubTournaments ?? []).forEach((t: any) => add(t, "organisateur club"));
+              }
+
+              return {
+                tournaments: Array.from(map.values()).sort(
+                  (a, b) => new Date(b.starts_on).getTime() - new Date(a.starts_on).getTime(),
+                ),
+              };
+            },
+          }),
+
+          getTournamentDetails: tool({
+            description:
+              "Récupère les détails d'un tournoi : équipes inscrites, classements de poules, matchs à venir, prochains matchs en cours/en direct, et résumé du bracket. Identifie le tournoi par son `tournamentId` (UUID) ou son `slug`. Utilise d'abord `listMyTournaments` si tu ne connais pas l'id.",
+            inputSchema: z.object({
+              tournamentId: z.string().uuid().optional(),
+              slug: z.string().min(1).max(80).optional(),
+            }),
+            execute: async ({ tournamentId, slug }) => {
+              if (!tournamentId && !slug) {
+                return { note: "Précise un tournamentId ou un slug." };
+              }
+              let q = supabase
+                .from("tournaments")
+                .select("id, slug, name, location, starts_on, ends_on, sport, status, format, num_teams");
+              q = tournamentId ? q.eq("id", tournamentId) : q.eq("slug", slug!);
+              const { data: tournament } = await q.maybeSingle();
+              if (!tournament) {
+                return { note: "Tournoi introuvable ou non accessible." };
+              }
+
+              const [{ data: teams }, { data: matches }, { data: groups }] = await Promise.all([
+                supabase
+                  .from("tournament_teams")
+                  .select("id, name, short_name, seed, group_id")
+                  .eq("tournament_id", tournament.id),
+                supabase
+                  .from("tournament_matches")
+                  .select("id, round, match_number, team_a_id, team_b_id, score_a, score_b, penalty_score_a, penalty_score_b, status, scheduled_at, field, winner_team_id, group_id")
+                  .eq("tournament_id", tournament.id)
+                  .order("scheduled_at", { ascending: true, nullsFirst: false }),
+                supabase
+                  .from("tournament_groups")
+                  .select("id, name, sort_order")
+                  .eq("tournament_id", tournament.id)
+                  .order("sort_order"),
+              ]);
+
+              const teamMap = new Map((teams ?? []).map((t: any) => [t.id, t]));
+              const fmtMatch = (m: any) => ({
+                round: m.round,
+                match_number: m.match_number,
+                team_a: m.team_a_id ? (teamMap.get(m.team_a_id) as any)?.name : "À déterminer",
+                team_b: m.team_b_id ? (teamMap.get(m.team_b_id) as any)?.name : "À déterminer",
+                score: m.score_a != null && m.score_b != null
+                  ? `${m.score_a}-${m.score_b}${
+                      m.penalty_score_a != null && m.penalty_score_b != null
+                        ? ` (tab ${m.penalty_score_a}-${m.penalty_score_b})`
+                        : ""
+                    }`
+                  : null,
+                status: m.status,
+                scheduled_at: m.scheduled_at,
+                field: m.field,
+                winner: m.winner_team_id ? (teamMap.get(m.winner_team_id) as any)?.name : null,
+              });
+
+              const now = Date.now();
+              const allMatches = (matches ?? []) as any[];
+              const live = allMatches.filter((m) => m.status === "live").map(fmtMatch);
+              const upcoming = allMatches
+                .filter((m) => m.status === "scheduled" && (!m.scheduled_at || new Date(m.scheduled_at).getTime() >= now - 3600_000))
+                .slice(0, 10)
+                .map(fmtMatch);
+              const recentDone = allMatches
+                .filter((m) => m.status === "completed")
+                .slice(-5)
+                .map(fmtMatch);
+
+              // Group standings (lightweight)
+              const standings = (groups ?? []).map((g: any) => {
+                const groupTeams = (teams ?? []).filter((t: any) => t.group_id === g.id);
+                const rows = groupTeams.map((t: any) => {
+                  let pts = 0, w = 0, d = 0, l = 0, gf = 0, ga = 0;
+                  for (const m of allMatches) {
+                    if (m.round !== "group" || m.group_id !== g.id || m.status !== "completed") continue;
+                    if (m.team_a_id !== t.id && m.team_b_id !== t.id) continue;
+                    const isA = m.team_a_id === t.id;
+                    const my = isA ? m.score_a : m.score_b;
+                    const opp = isA ? m.score_b : m.score_a;
+                    if (my == null || opp == null) continue;
+                    gf += my; ga += opp;
+                    if (my > opp) { w++; pts += 3; }
+                    else if (my === opp) { d++; pts += 1; }
+                    else { l++; }
+                  }
+                  return { team: t.name, pts, w, d, l, gf, ga, diff: gf - ga };
+                }).sort((a, b) => b.pts - a.pts || b.diff - a.diff || b.gf - a.gf);
+                return { group: g.name, table: rows };
+              });
+
+              return {
+                tournament: {
+                  ...tournament,
+                  public_link: `/tournament/${tournament.slug}`,
+                  manage_link: `/tournaments/${tournament.id}`,
+                },
+                teams_count: (teams ?? []).length,
+                teams: (teams ?? []).map((t: any) => ({ name: t.name, seed: t.seed })),
+                standings,
+                live_matches: live,
+                upcoming_matches: upcoming,
+                recent_results: recentDone,
+              };
+            },
+          }),
         };
+
 
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
