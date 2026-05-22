@@ -49,11 +49,11 @@ function PublicTournamentPage() {
   if (q.isError || !q.data) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-2 max-w-md">
           <Trophy className="h-10 w-10 mx-auto text-muted-foreground" />
-          <p className="text-lg font-medium">Tournoi introuvable</p>
+          <p className="text-lg font-medium">Tournoi indisponible</p>
           <p className="text-sm text-muted-foreground">
-            Le lien est peut-être expiré ou ce tournoi n'a pas encore été publié.
+            Ce tournoi n'est pas encore publié, ou le lien est expiré. Si tu es l'organisateur, ouvre ton tournoi puis clique sur <strong>Publier</strong>.
           </p>
           <Link to="/" className="text-sm text-primary underline">
             Retour à l'accueil
@@ -62,6 +62,7 @@ function PublicTournamentPage() {
       </div>
     );
   }
+
 
   const { tournament, groups, teams, matches } = q.data;
 
