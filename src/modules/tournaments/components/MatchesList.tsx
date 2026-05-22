@@ -852,6 +852,34 @@ function MatchCard({
               />
             </div>
           )}
+          {!setsMode && isKnockout && tied && teamA && teamB && (
+            <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 text-center">
+                Égalité — saisir les tirs au but pour désigner le vainqueur
+              </p>
+              <div className="flex items-center justify-around gap-3">
+                <ScoreStepper
+                  label={`Tab ${teamA.short_name ?? teamA.name}`}
+                  value={penA}
+                  onChange={setPenA}
+                  size="md"
+                />
+                <span className="text-xl text-muted-foreground">:</span>
+                <ScoreStepper
+                  label={`Tab ${teamB.short_name ?? teamB.name}`}
+                  value={penB}
+                  onChange={setPenB}
+                  size="md"
+                />
+              </div>
+              {penA !== penB && (
+                <p className="text-center text-xs text-emerald-700 dark:text-emerald-300">
+                  Vainqueur : {penA > penB ? teamA.name : teamB.name}
+                </p>
+              )}
+            </div>
+          )}
+
           <Button
             onClick={() => save.mutate()}
             disabled={save.isPending || (setsMode && sets.length === 0)}
