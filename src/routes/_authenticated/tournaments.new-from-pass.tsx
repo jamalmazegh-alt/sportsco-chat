@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SportSelect } from "@/components/sport-select";
+import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 import {
   listMyAvailablePasses,
   createTournamentFromPass,
