@@ -410,10 +410,10 @@ function MatchCard({
       });
     },
     onSuccess: () => {
-      toast.success("Arbitre mis à jour");
+      toast.success(t("matches.refereeUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   // Add event form
