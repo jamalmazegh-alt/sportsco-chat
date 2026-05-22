@@ -414,6 +414,7 @@ function MatchesGrid({
   scoring: ScoringRules;
   finished?: boolean;
 }) {
+  const { t } = useTranslation("tournaments");
   return (
     <ul className="h-full grid grid-cols-1 md:grid-cols-2 gap-3 auto-rows-fr content-start">
       {matches.map((m) => {
@@ -429,7 +430,7 @@ function MatchesGrid({
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>
                 {m.scheduled_at
-                  ? new Date(m.scheduled_at).toLocaleString("fr-FR", {
+                  ? new Date(m.scheduled_at).toLocaleString(i18n.language, {
                       weekday: "short",
                       hour: "2-digit",
                       minute: "2-digit",
@@ -440,22 +441,22 @@ function MatchesGrid({
               {live && (
                 <span className="flex items-center gap-1 text-red-600 font-semibold">
                   <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse" />
-                  LIVE
+                  {t("common.live").toUpperCase()}
                 </span>
               )}
               {finished && !live && (
-                <span className="text-emerald-600 font-semibold">FT</span>
+                <span className="text-emerald-600 font-semibold">{t("common.ft")}</span>
               )}
             </div>
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 my-2">
               <span className="truncate text-right text-2xl font-semibold">
-                {a?.name ?? "TBD"}
+                {a?.name ?? t("common.tbd")}
               </span>
               <span className="tabular-nums font-black text-4xl">
                 {m.score_a ?? "–"} : {m.score_b ?? "–"}
               </span>
               <span className="truncate text-2xl font-semibold">
-                {b?.name ?? "TBD"}
+                {b?.name ?? t("common.tbd")}
               </span>
             </div>
             {setsLine && (
@@ -470,6 +471,7 @@ function MatchesGrid({
   );
 }
 
+
 function StandingsTable({
   rows,
   teamMap,
@@ -479,19 +481,20 @@ function StandingsTable({
   teamMap: Map<string, TvTeam>;
   qualifiers: number;
 }) {
+  const { t } = useTranslation("tournaments");
   return (
     <div className="h-full overflow-auto">
       <table className="w-full text-lg">
         <thead className="text-xs uppercase text-muted-foreground border-b border-border">
           <tr>
-            <th className="text-left px-3 py-2 w-10">#</th>
-            <th className="text-left px-3 py-2">Équipe</th>
-            <th className="text-right px-2 py-2 w-12">J</th>
-            <th className="text-right px-2 py-2 w-12">G</th>
-            <th className="text-right px-2 py-2 w-12">N</th>
-            <th className="text-right px-2 py-2 w-12">P</th>
-            <th className="text-right px-2 py-2 w-16">+/-</th>
-            <th className="text-right px-3 py-2 w-14 font-bold">Pts</th>
+            <th className="text-left px-3 py-2 w-10">{t("tv.table.rank")}</th>
+            <th className="text-left px-3 py-2">{t("tv.table.team")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.played")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.won")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.drawn")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.lost")}</th>
+            <th className="text-right px-2 py-2 w-16">{t("tv.table.diff")}</th>
+            <th className="text-right px-3 py-2 w-14 font-bold">{t("tv.table.points")}</th>
           </tr>
         </thead>
         <tbody>
