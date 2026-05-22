@@ -53,6 +53,7 @@ import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
+import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
 import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
@@ -307,6 +308,11 @@ const TSlugTvRoute = TSlugTvRouteImport.update({
   path: '/tv',
   getParentRoute: () => TSlugRoute,
 } as any)
+const TSlugRegisterRoute = TSlugRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => TSlugRoute,
+} as any)
 const SuperadminUsersUserIdRoute = SuperadminUsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -535,6 +541,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
@@ -606,6 +613,7 @@ export interface FileRoutesByTo {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
@@ -683,6 +691,7 @@ export interface FileRoutesById {
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
@@ -760,6 +769,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
+    | '/t/$slug/register'
     | '/t/$slug/tv'
     | '/admin/'
     | '/profile/'
@@ -831,6 +841,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
+    | '/t/$slug/register'
     | '/t/$slug/tv'
     | '/admin'
     | '/profile'
@@ -907,6 +918,7 @@ export interface FileRouteTypes {
     | '/superadmin/clubs/$clubId'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
+    | '/t/$slug/register'
     | '/t/$slug/tv'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
@@ -1272,6 +1284,13 @@ declare module '@tanstack/react-router' {
       path: '/tv'
       fullPath: '/t/$slug/tv'
       preLoaderRoute: typeof TSlugTvRouteImport
+      parentRoute: typeof TSlugRoute
+    }
+    '/t/$slug/register': {
+      id: '/t/$slug/register'
+      path: '/register'
+      fullPath: '/t/$slug/register'
+      preLoaderRoute: typeof TSlugRegisterRouteImport
       parentRoute: typeof TSlugRoute
     }
     '/superadmin/users/$userId': {
@@ -1695,10 +1714,12 @@ const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
 )
 
 interface TSlugRouteChildren {
+  TSlugRegisterRoute: typeof TSlugRegisterRoute
   TSlugTvRoute: typeof TSlugTvRoute
 }
 
 const TSlugRouteChildren: TSlugRouteChildren = {
+  TSlugRegisterRoute: TSlugRegisterRoute,
   TSlugTvRoute: TSlugTvRoute,
 }
 
