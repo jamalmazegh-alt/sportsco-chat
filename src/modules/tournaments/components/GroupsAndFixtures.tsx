@@ -60,6 +60,9 @@ export function GroupsAndFixtures({
   const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
   const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
   const [lunchEnd, setLunchEnd] = useState<string>(settings?.lunch_end ?? "13:30");
+  const [minRest, setMinRest] = useState<number>(
+    settings?.forfeit?.minRestMinutes ?? 30,
+  );
 
   useEffect(() => {
     setDuration(matchDurationMin ?? 20);
@@ -70,6 +73,7 @@ export function GroupsAndFixtures({
     setLunchEnabled(!!settings?.lunch_start);
     setLunchStart(settings?.lunch_start ?? "12:00");
     setLunchEnd(settings?.lunch_end ?? "13:30");
+    setMinRest(settings?.forfeit?.minRestMinutes ?? 30);
   }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields, settings]);
 
   function addField() {
@@ -132,6 +136,10 @@ export function GroupsAndFixtures({
         ...(settings ?? {}),
         lunch_start: lunchEnabled ? lunchStart : null,
         lunch_end: lunchEnabled ? lunchEnd : null,
+        forfeit: {
+          ...(settings?.forfeit ?? {}),
+          minRestMinutes: minRest,
+        },
       };
       return updateFn({
         data: {
@@ -171,11 +179,17 @@ export function GroupsAndFixtures({
           fields: fl,
           lunch_start_time: lunchEnabled ? lunchStart : undefined,
           lunch_end_time: lunchEnabled ? lunchEnd : undefined,
+          min_rest_min: minRest,
         },
       });
     },
     onSuccess: (res: any) => {
-      toast.success(`${res.scheduled} matchs programmés`);
+      const skipped = res?.skipped ?? 0;
+      toast.success(
+        skipped > 0
+          ? `${res.scheduled} matchs programmés · ${skipped} non placés (contrainte de repos)`
+          : `${res.scheduled} matchs programmés`,
+      );
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
@@ -325,6 +339,19 @@ export function GroupsAndFixtures({
               onChange={(e) => setEndTime(e.target.value)}
             />
           </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Repos min. entre 2 matchs d'une même équipe (min)</Label>
+          <Input
+            type="number"
+            min={0}
+            max={720}
+            value={minRest}
+            onChange={(e) => setMinRest(parseInt(e.target.value || "0", 10))}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Lors de la programmation auto, une équipe ne sera jamais reprogrammée avant ce délai. 0 = désactivé.
+          </p>
         </div>
         <div className="space-y-2">
           <Label className="flex items-center gap-1.5">
