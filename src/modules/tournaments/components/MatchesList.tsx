@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
@@ -101,9 +102,10 @@ interface Props {
 }
 
 export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
+  const { t } = useTranslation("tournaments");
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const grouped = matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const key = m.round === "group" ? "Phase de groupes" : roundLabel(m.round);
+    const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
     (acc[key] ??= []).push(m);
     return acc;
   }, {});
@@ -163,38 +165,41 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
       ))}
       {matches.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          Aucun match programmé. Génère les poules ou le bracket pour commencer.
+          {t("matches.empty")}
         </div>
       )}
     </div>
   );
 }
 
-function roundLabel(r: string) {
-  const map: Record<string, string> = {
-    r32: "32es de finale",
-    r16: "8es de finale",
-    qf: "Quarts de finale",
-    sf: "Demi-finales",
-    final: "Finale",
-    third_place: "3e place",
+function roundLabel(r: string, t: (k: string) => string) {
+  const keys: Record<string, string> = {
+    r32: "matches.rounds.r32",
+    r16: "matches.rounds.r16",
+    qf: "matches.rounds.qf",
+    sf: "matches.rounds.sf",
+    final: "matches.rounds.final",
+    third_place: "matches.rounds.third_place",
   };
-  return map[r] ?? r;
+  return keys[r] ? t(keys[r]) : r;
 }
 
-const EVENT_KINDS: { value: string; label: string; emoji: string }[] = [
-  { value: "goal", label: "But", emoji: "⚽" },
-  { value: "own_goal", label: "CSC", emoji: "🥅" },
-  { value: "assist", label: "Passe déc.", emoji: "🅰️" },
-  { value: "yellow_card", label: "Jaune", emoji: "🟨" },
-  { value: "second_yellow", label: "2e jaune", emoji: "🟨🟨" },
-  { value: "red_card", label: "Rouge", emoji: "🟥" },
-  { value: "penalty", label: "Penalty", emoji: "🎯" },
-  { value: "foul", label: "Faute", emoji: "⚠️" },
-];
+const EVENT_KIND_VALUES = [
+  { value: "goal", emoji: "⚽" },
+  { value: "own_goal", emoji: "🥅" },
+  { value: "assist", emoji: "🅰️" },
+  { value: "yellow_card", emoji: "🟨" },
+  { value: "second_yellow", emoji: "🟨🟨" },
+  { value: "red_card", emoji: "🟥" },
+  { value: "penalty", emoji: "🎯" },
+  { value: "foul", emoji: "⚠️" },
+] as const;
 
-function eventMeta(kind: string) {
-  return EVENT_KINDS.find((k) => k.value === kind) ?? { emoji: "•", label: kind };
+function eventMeta(kind: string, t: (k: string) => string) {
+  const found = EVENT_KIND_VALUES.find((k) => k.value === kind);
+  return found
+    ? { emoji: found.emoji, label: t(`matches.events.${found.value}`) }
+    : { emoji: "•", label: kind };
 }
 
 function MatchCard({
@@ -218,6 +223,7 @@ function MatchCard({
   scoring?: ScoringRules;
   refereeOptions: RefereeOption[];
 }) {
+  const { t } = useTranslation("tournaments");
   const setsMode = scoring?.mode === "sets";
   const setsRules = scoring?.sets ?? DEFAULT_SETS_RULES;
   const [open, setOpen] = useState(false);
@@ -284,11 +290,11 @@ function MatchCard({
     },
 
     onSuccess: () => {
-      toast.success("Score enregistré et validé");
+      toast.success(t("matches.scoreSavedValidated"));
       invalidateAll();
       setOpen(false);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   // Quick inline live score update (no dialog, keeps status "live")
@@ -305,7 +311,7 @@ function MatchCard({
         },
       }),
     onSuccess: () => invalidateAll(),
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
 
@@ -315,10 +321,10 @@ function MatchCard({
         data: { tournament_id: tournamentId, match_id: match.id, validated },
       }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("matches.statusUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   const disputeM = useMutation({
@@ -327,7 +333,7 @@ function MatchCard({
         data: { tournament_id: tournamentId, match_id: match.id, dispute },
       }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("matches.statusUpdated"));
       invalidateAll();
     },
   });
@@ -339,10 +345,10 @@ function MatchCard({
         data: { tournament_id: tournamentId, match_id: match.id, status: status as any },
       }),
     onSuccess: () => {
-      toast.success("Statut du match mis à jour");
+      toast.success(t("matches.matchStatusUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   const initialDate = match.scheduled_at ? new Date(match.scheduled_at) : null;
@@ -373,11 +379,11 @@ function MatchCard({
       });
     },
     onSuccess: () => {
-      toast.success("Match mis à jour");
+      toast.success(t("matches.matchUpdated"));
       invalidateAll();
       setEditOpen(false);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   // Referee assignment
@@ -404,10 +410,10 @@ function MatchCard({
       });
     },
     onSuccess: () => {
-      toast.success("Arbitre mis à jour");
+      toast.success(t("matches.refereeUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   // Add event form
@@ -433,7 +439,7 @@ function MatchCard({
       setEvMinute("");
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   const removeEvent = useMutation({
@@ -472,48 +478,48 @@ function MatchCard({
                 <Flag className="h-3 w-3" />
                 {match.referee_name ||
                   refereeOptions.find((r) => r.user_id === match.referee_user_id)?.label ||
-                  "Arbitre"}
+                  t("matches.referee")}
               </span>
             )}
             {done && !validated && (
               <span
                 className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300"
-                title="Score saisi, en attente de validation par l'organisateur"
+                title={t("matches.pendingValidationTitle")}
               >
                 <Check className="h-3 w-3" />
-                À valider
+                {t("matches.pendingValidation")}
               </span>
             )}
 
             {validated && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
                 <ShieldCheck className="h-3 w-3" />
-                Validé
+                {t("matches.validated")}
               </span>
             )}
             {disputed && (
               <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-destructive">
                 <AlertTriangle className="h-3 w-3" />
-                Litige
+                {t("matches.dispute")}
               </span>
             )}
             {match.status === "cancelled" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">Annulé</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">{t("matches.statusLabels.cancelled")}</span>
             )}
             {match.status === "forfeit_a" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait A</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.forfeit_a")}</span>
             )}
             {match.status === "forfeit_b" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait B</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.forfeit_b")}</span>
             )}
             {match.status === "no_show_a" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">A absente</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.no_show_a")}</span>
             )}
             {match.status === "no_show_b" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">B absente</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.no_show_b")}</span>
             )}
             {match.status === "abandoned" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">Abandonné</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">{t("matches.statusLabels.abandoned")}</span>
             )}
           </div>
         </div>
@@ -522,14 +528,14 @@ function MatchCard({
             <div className="flex items-center justify-between mb-2">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
                 <Radio className="h-3 w-3 animate-pulse" />
-                Score en direct
+                {t("matches.liveScore")}
               </span>
               <button
                 type="button"
                 onClick={() => setOpen(true)}
                 className="text-[11px] text-muted-foreground underline"
               >
-                Saisie complète
+                {t("matches.fullEntry")}
               </button>
             </div>
             <div className="flex items-center justify-around gap-2">
@@ -564,7 +570,7 @@ function MatchCard({
               disabled={save.isPending}
             >
               <Check className="h-4 w-4" />
-              Terminer le match
+              {t("matches.finishMatch")}
             </Button>
           </div>
         ) : (
@@ -576,18 +582,18 @@ function MatchCard({
               className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-70"
             >
               <span className="truncate text-sm font-medium text-right">
-                {teamA?.name ?? "À déterminer"}
+                {teamA?.name ?? t("matches.tbd")}
               </span>
               <span className="font-semibold tabular-nums text-lg">
                 {match.score_a ?? "–"} : {match.score_b ?? "–"}
                 {hasPenalty && (
                   <span className="ml-1 text-xs text-muted-foreground">
-                    (tab {match.penalty_score_a}-{match.penalty_score_b})
+                    ({t("matches.penShort")} {match.penalty_score_a}-{match.penalty_score_b})
                   </span>
                 )}
               </span>
               <span className="truncate text-sm font-medium">
-                {teamB?.name ?? "À déterminer"}
+                {teamB?.name ?? t("matches.tbd")}
               </span>
             </button>
 
@@ -609,7 +615,7 @@ function MatchCard({
                   disabled={statusM.isPending}
                 >
                   <Zap className="h-3.5 w-3.5" />
-                  Démarrer le match en direct
+                  {t("matches.startLive")}
                 </Button>
               )}
           </>
@@ -620,7 +626,7 @@ function MatchCard({
         {events.length > 0 && (
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {events.map((ev) => {
-              const meta = eventMeta(ev.kind);
+              const meta = eventMeta(ev.kind, t);
               const isA = ev.team_id === match.team_a_id;
               return (
                 <li
@@ -638,7 +644,7 @@ function MatchCard({
                       type="button"
                       onClick={() => removeEvent.mutate(ev.id)}
                       className="text-muted-foreground hover:text-destructive ml-0.5"
-                      aria-label="Supprimer"
+                      aria-label={t("matches.events.deleteAria")}
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
@@ -655,7 +661,7 @@ function MatchCard({
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-7 text-xs">
                   <ChevronDown className="h-3 w-3" />
-                  Événements
+                  {t("matches.events.toggle")}
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="w-full mt-2 rounded-lg border border-border bg-muted/30 p-2 space-y-2">
@@ -665,16 +671,16 @@ function MatchCard({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {EVENT_KINDS.map((k) => (
+                      {EVENT_KIND_VALUES.map((k) => (
                         <SelectItem key={k.value} value={k.value}>
-                          {k.emoji} {k.label}
+                          {k.emoji} {t(`matches.events.${k.value}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <Select value={evTeam} onValueChange={setEvTeam}>
                     <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Équipe" />
+                      <SelectValue placeholder={t("matches.events.team")} />
                     </SelectTrigger>
                     <SelectContent>
                       {teamA && (
@@ -687,7 +693,7 @@ function MatchCard({
                   </Select>
                   <Input
                     className="h-8 text-xs"
-                    placeholder="Joueur"
+                    placeholder={t("matches.events.player")}
                     value={evPlayer}
                     onChange={(e) => setEvPlayer(e.target.value)}
                   />
@@ -696,7 +702,7 @@ function MatchCard({
                     type="number"
                     min={0}
                     max={200}
-                    placeholder="Min."
+                    placeholder={t("matches.events.minute")}
                     value={evMinute}
                     onChange={(e) => setEvMinute(e.target.value)}
                   />
@@ -712,7 +718,7 @@ function MatchCard({
                   ) : (
                     <Plus className="h-3 w-3" />
                   )}
-                  Ajouter l'événement
+                  {t("matches.events.add")}
                 </Button>
               </CollapsibleContent>
             </Collapsible>
@@ -723,7 +729,7 @@ function MatchCard({
               className="h-7 text-xs"
               onClick={() => setEditOpen(true)}
             >
-              Terrain / heure
+              {t("matches.fieldAndTime")}
             </Button>
             {done && (
               <Button
@@ -736,10 +742,10 @@ function MatchCard({
                 }
                 onClick={() => validateM.mutate(!validated)}
                 disabled={validateM.isPending}
-                title={validated ? "Revenir à un score à valider (corriger une erreur)" : "Valider le score définitif"}
+                title={validated ? t("matches.unvalidateTitle") : t("matches.validateTitle")}
               >
                 <ShieldCheck className="h-3 w-3" />
-                {validated ? "Dévalider" : "Valider le score"}
+                {validated ? t("matches.unvalidate") : t("matches.validate")}
               </Button>
             )}
 
@@ -751,43 +757,43 @@ function MatchCard({
               disabled={disputeM.isPending}
             >
               <AlertTriangle className="h-3 w-3" />
-              {disputed ? "Lever litige" : "Signaler litige"}
+              {disputed ? t("matches.liftDispute") : t("matches.raiseDispute")}
             </Button>
             <select
               className="h-7 rounded-md border border-input bg-background px-2 text-xs"
               value={match.status}
               disabled={statusM.isPending}
               onChange={(e) => statusM.mutate(e.target.value)}
-              aria-label="État du match"
+              aria-label={t("matches.statusAria")}
             >
-              <option value="scheduled">Prévu</option>
-              <option value="live">En cours</option>
-              <option value="completed">Terminé</option>
-              <option value="forfeit_a">Forfait équipe A</option>
-              <option value="forfeit_b">Forfait équipe B</option>
-              <option value="no_show_a">Équipe A absente</option>
-              <option value="no_show_b">Équipe B absente</option>
-              <option value="abandoned">Abandonné</option>
-              <option value="cancelled">Annulé</option>
+              <option value="scheduled">{t("matches.statusOptions.scheduled")}</option>
+              <option value="live">{t("matches.statusOptions.live")}</option>
+              <option value="completed">{t("matches.statusOptions.completed")}</option>
+              <option value="forfeit_a">{t("matches.statusOptions.forfeit_a")}</option>
+              <option value="forfeit_b">{t("matches.statusOptions.forfeit_b")}</option>
+              <option value="no_show_a">{t("matches.statusOptions.no_show_a")}</option>
+              <option value="no_show_b">{t("matches.statusOptions.no_show_b")}</option>
+              <option value="abandoned">{t("matches.statusOptions.abandoned")}</option>
+              <option value="cancelled">{t("matches.statusOptions.cancelled")}</option>
             </select>
           </div>
         )}
       </div>
 
 
-      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title="Saisir le score">
+      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("matches.title")}>
         <div className="space-y-4 mt-4 pb-6">
           {setsMode ? (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                Best of {setsRules.bestOf} · sets à {setsRules.pointsToWin} pts
+                {t("matches.bestOfSets", { bestOf: setsRules.bestOf, points: setsRules.pointsToWin })}
                 {setsRules.tieBreakPoints !== setsRules.pointsToWin
-                  ? ` (tie-break ${setsRules.tieBreakPoints})`
+                  ? t("matches.tieBreak", { points: setsRules.tieBreakPoints })
                   : ""}
               </p>
               {sets.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-2">
-                  Aucun set saisi.
+                  {t("matches.noSets")}
                 </p>
               )}
               {sets.map((s, i) => (
@@ -797,7 +803,7 @@ function MatchCard({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-muted-foreground">
-                      Set {i + 1}
+                      {t("matches.setLabel", { n: i + 1 })}
                     </span>
                     <Button
                       type="button"
@@ -842,11 +848,11 @@ function MatchCard({
                 disabled={sets.length >= 7}
               >
                 <Plus className="h-4 w-4" />
-                Ajouter un set
+                {t("matches.addSet")}
               </Button>
               {sets.length > 0 && (
                 <p className="text-center text-sm font-medium">
-                  Sets gagnés :{" "}
+                  {t("matches.setsWon")}{" "}
                   <span className="tabular-nums">
                     {aggregateSetsScore(sets).score_a} - {aggregateSetsScore(sets).score_b}
                   </span>
@@ -873,18 +879,18 @@ function MatchCard({
           {!setsMode && isKnockout && tied && teamA && teamB && (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3 space-y-2">
               <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 text-center">
-                Égalité — saisir les tirs au but pour désigner le vainqueur
+                {t("matches.tied")}
               </p>
               <div className="flex items-center justify-around gap-3">
                 <ScoreStepper
-                  label={`Tab ${teamA.short_name ?? teamA.name}`}
+                  label={t("matches.tab", { team: teamA.short_name ?? teamA.name })}
                   value={penA}
                   onChange={setPenA}
                   size="md"
                 />
                 <span className="text-xl text-muted-foreground">:</span>
                 <ScoreStepper
-                  label={`Tab ${teamB.short_name ?? teamB.name}`}
+                  label={t("matches.tab", { team: teamB.short_name ?? teamB.name })}
                   value={penB}
                   onChange={setPenB}
                   size="md"
@@ -892,7 +898,7 @@ function MatchCard({
               </div>
               {penA !== penB && (
                 <p className="text-center text-xs text-emerald-700 dark:text-emerald-300">
-                  Vainqueur : {penA > penB ? teamA.name : teamB.name}
+                  {t("matches.winner", { team: penA > penB ? teamA.name : teamB.name })}
                 </p>
               )}
             </div>
@@ -906,7 +912,7 @@ function MatchCard({
             {save.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Enregistrer et valider"
+              t("matches.saveAndValidate")
             )}
           </Button>
         </div>
@@ -914,20 +920,20 @@ function MatchCard({
 
 
 
-      <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title="Terrain & horaire">
+      <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title={t("matches.scheduleTitle")}>
         <div className="space-y-4 mt-4 pb-6">
           <div className="space-y-1.5">
-            <Label>Terrain</Label>
+            <Label>{t("matches.field")}</Label>
             {fields.length > 0 ? (
               <Select
                 value={editField || "__none__"}
                 onValueChange={(v) => setEditField(v === "__none__" ? "" : v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Aucun" />
+                  <SelectValue placeholder={t("matches.refereeNone")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">Aucun</SelectItem>
+                  <SelectItem value="__none__">{t("matches.refereeNone")}</SelectItem>
                   {fields.map((f) => (
                     <SelectItem key={f} value={f}>
                       {f}
@@ -939,39 +945,39 @@ function MatchCard({
               <Input
                 value={editField}
                 onChange={(e) => setEditField(e.target.value)}
-                placeholder="Terrain 1"
+                placeholder={t("matches.fieldPlaceholder")}
               />
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Date</Label>
+              <Label>{t("matches.date")}</Label>
               <Input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Heure</Label>
+              <Label>{t("matches.time")}</Label>
               <Input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} />
             </div>
           </div>
           <Button onClick={() => saveSched.mutate()} disabled={saveSched.isPending} className="w-full">
-            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer terrain & heure"}
+            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("matches.saveSchedule")}
           </Button>
 
           <div className="pt-4 border-t border-border space-y-3">
             <div className="space-y-1.5">
-              <Label>Arbitre</Label>
+              <Label>{t("matches.referee")}</Label>
               <Select value={refMode} onValueChange={setRefMode}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">Aucun</SelectItem>
+                  <SelectItem value="__none__">{t("matches.refereeNone")}</SelectItem>
                   {refereeOptions.map((r) => (
                     <SelectItem key={r.user_id} value={`user:${r.user_id}`}>
                       {r.label}
                     </SelectItem>
                   ))}
-                  <SelectItem value="free">Nom libre…</SelectItem>
+                  <SelectItem value="free">{t("matches.refereeFree")}</SelectItem>
                 </SelectContent>
               </Select>
               {refMode === "free" && (
@@ -979,12 +985,12 @@ function MatchCard({
                   className="mt-2"
                   value={refFreeName}
                   onChange={(e) => setRefFreeName(e.target.value)}
-                  placeholder="Nom de l'arbitre"
+                  placeholder={t("matches.refereePlaceholder")}
                 />
               )}
               {refereeOptions.length === 0 && refMode !== "free" && refMode !== "__none__" && (
                 <p className="text-[11px] text-muted-foreground">
-                  Aucun arbitre n'a encore accepté son invitation.
+                  {t("matches.refereeNoAccepted")}
                 </p>
               )}
             </div>
@@ -995,7 +1001,7 @@ function MatchCard({
               onClick={() => saveRef.mutate()}
               disabled={saveRef.isPending || (refMode === "free" && !refFreeName.trim())}
             >
-              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Assigner l'arbitre"}
+              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("matches.assignReferee")}
             </Button>
           </div>
         </div>
