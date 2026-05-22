@@ -136,7 +136,7 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
             onRevoke={(id) => revoke.mutate(id)}
           />
           <Section
-            icon={<Whistle className="h-4 w-4 text-primary" />}
+            icon={<Flag className="h-4 w-4 text-primary" />}
             title="Arbitres"
             subtitle="Peuvent saisir scores et valider les matchs qui leur sont assignés."
             items={referees}
