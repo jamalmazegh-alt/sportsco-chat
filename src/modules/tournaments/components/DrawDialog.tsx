@@ -501,9 +501,9 @@ export function DrawDialog({
                           size="lg"
                         >
                           <Dices className="h-4 w-4" />
-                          Tirer l'équipe suivante ({pool.length} restante
-                          {pool.length > 1 ? "s" : ""})
+                          {t("draw.drawNextRemaining", { count: pool.length })}
                         </Button>
+
                       </div>
                     </div>
                   )}
