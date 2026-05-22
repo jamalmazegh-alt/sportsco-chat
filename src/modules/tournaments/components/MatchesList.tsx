@@ -38,6 +38,8 @@ import {
   recordMatchEvent,
   deleteMatchEvent,
   listMatchEvents,
+  listTournamentCollaborators,
+  assignMatchReferee,
 } from "../tournaments.functions";
 
 import type { ScoringRules, SetScore } from "../lib/formats";
@@ -64,6 +66,8 @@ interface Match {
   field?: string | null;
   validated_at?: string | null;
   dispute_flag?: boolean | null;
+  referee_user_id?: string | null;
+  referee_name?: string | null;
 }
 interface MatchEvent {
   id: string;
@@ -72,6 +76,10 @@ interface MatchEvent {
   kind: string;
   player_name: string | null;
   minute: number | null;
+}
+interface RefereeOption {
+  user_id: string;
+  label: string;
 }
 
 interface Props {
