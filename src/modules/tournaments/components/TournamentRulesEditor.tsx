@@ -40,6 +40,8 @@ import {
   mergeRules,
   type TournamentRules,
 } from "../lib/rules";
+import type { Sponsor } from "../lib/rules";
+import { SponsorsEditor } from "./SponsorsEditor";
 import type { Tiebreaker } from "../lib/standings";
 import {
   resolveScoring,
