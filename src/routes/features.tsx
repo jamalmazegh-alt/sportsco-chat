@@ -82,6 +82,11 @@ const PILLARS = [
   },
   {
     icon: Trophy,
+    title: "Tournois clés en main",
+    body: "Créez un tournoi en quelques minutes : poules, brackets, calendrier auto, classements en direct. Page publique TV partageable pour suivre les scores.",
+  },
+  {
+    icon: Trophy,
     title: "Résultats & stats par sport",
     body: "Saisissez le score et les statistiques joueurs (buts, essais, paniers à 3 pts, arrêts…) adaptées au sport de chaque équipe.",
   },
