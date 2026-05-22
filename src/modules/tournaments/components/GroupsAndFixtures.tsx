@@ -53,9 +53,10 @@ export function GroupsAndFixtures({
   const [pause, setPause] = useState(breakMin ?? 5);
   const [startTime, setStartTime] = useState(dailyStartTime ?? "09:00");
   const [endTime, setEndTime] = useState(dailyEndTime ?? "18:00");
-  const [fieldsText, setFieldsText] = useState(
-    (fields ?? ["Terrain 1"]).join(", "),
+  const [fieldsList, setFieldsList] = useState<string[]>(
+    fields && fields.length ? fields : ["Terrain 1"],
   );
+  const [newField, setNewField] = useState("");
   const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
   const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
   const [lunchEnd, setLunchEnd] = useState<string>(settings?.lunch_end ?? "13:30");
@@ -65,11 +66,31 @@ export function GroupsAndFixtures({
     setPause(breakMin ?? 5);
     setStartTime(dailyStartTime ?? "09:00");
     setEndTime(dailyEndTime ?? "18:00");
-    setFieldsText((fields ?? ["Terrain 1"]).join(", "));
+    setFieldsList(fields && fields.length ? fields : ["Terrain 1"]);
     setLunchEnabled(!!settings?.lunch_start);
     setLunchStart(settings?.lunch_start ?? "12:00");
     setLunchEnd(settings?.lunch_end ?? "13:30");
   }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields, settings]);
+
+  function addField() {
+    const v = newField.trim();
+    if (!v) return;
+    if (fieldsList.includes(v)) {
+      toast.error("Ce terrain existe déjà");
+      return;
+    }
+    setFieldsList([...fieldsList, v]);
+    setNewField("");
+  }
+  function removeField(name: string) {
+    setFieldsList(fieldsList.filter((f) => f !== name));
+  }
+  function onFieldKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addField();
+    }
+  }
 
   const genGroupsFn = useServerFn(autoCreateGroupsAndFixtures);
   const genKnockoutFn = useServerFn(generateKnockoutFromGroups);
