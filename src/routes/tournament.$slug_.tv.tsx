@@ -104,7 +104,8 @@ function TvSlideshowPage() {
     const { tournament, groups, teams, matches } = data;
     const rules = mergeRules((tournament as any).settings);
     const sponsors = rules.branding.sponsors ?? [];
-    const sponsorsTitle = rules.branding.sponsorsTitle || "Nos partenaires";
+    const sponsorsTitle =
+      rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault");
     const teamMap = new Map<string, TvTeam>(
       teams.map((t: any) => [t.id, t as TvTeam]),
     );
@@ -123,22 +124,22 @@ function TvSlideshowPage() {
     const out: Slide[] = [];
     out.push({
       key: "results",
-      title: "Derniers résultats",
+      title: t("tv.slides.recent"),
       icon: <Trophy className="h-7 w-7" />,
       render: () =>
         recent.length === 0 ? (
-          <EmptyBig>Aucun résultat pour le moment</EmptyBig>
+          <EmptyBig>{t("tv.slides.noRecent")}</EmptyBig>
         ) : (
           <MatchesGrid matches={recent} teamMap={teamMap} scoring={scoring} finished />
         ),
     });
     out.push({
       key: "upcoming",
-      title: "Prochains matchs",
+      title: t("tv.slides.upcoming"),
       icon: <Calendar className="h-7 w-7" />,
       render: () =>
         upcoming.length === 0 ? (
-          <EmptyBig>Aucun match programmé</EmptyBig>
+          <EmptyBig>{t("tv.slides.noUpcoming")}</EmptyBig>
         ) : (
           <MatchesGrid matches={upcoming} teamMap={teamMap} scoring={scoring} />
         ),
@@ -160,7 +161,7 @@ function TvSlideshowPage() {
         const rows = computeStandings(ids, gMatches);
         out.push({
           key: `standings-${g.id}`,
-          title: `Classement · ${g.name}`,
+          title: t("tv.slides.standings", { group: g.name }),
           icon: <ListOrdered className="h-7 w-7" />,
           render: () => (
             <StandingsTable
@@ -175,7 +176,7 @@ function TvSlideshowPage() {
     if (hasBracket) {
       out.push({
         key: "bracket",
-        title: "Phase finale",
+        title: t("tv.slides.bracket"),
         icon: <GitBranch className="h-7 w-7" />,
         render: () => (
           <div className="h-full w-full overflow-auto px-2">
@@ -198,6 +199,7 @@ function TvSlideshowPage() {
         ),
       });
     }
+
     // Always close on tournament title
     out.unshift({
       key: "intro",
