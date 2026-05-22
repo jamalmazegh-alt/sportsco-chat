@@ -102,6 +102,7 @@ function TournamentDetailPage() {
     ...(canManage
       ? [
           { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
+          { id: "team_staff" as const, icon: UserPlus, label: "Équipe" },
           { id: "rules" as const, icon: Settings2, label: "Règles" },
         ]
       : []),
