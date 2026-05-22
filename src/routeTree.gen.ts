@@ -24,6 +24,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
+import { Route as TournamentsStartRouteImport } from './routes/tournaments.start'
 import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
@@ -158,6 +159,11 @@ const SuperadminIndexRoute = SuperadminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const TournamentsStartRoute = TournamentsStartRouteImport.update({
+  id: '/tournaments/start',
+  path: '/tournaments/start',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TournamentsPassSuccessRoute = TournamentsPassSuccessRouteImport.update({
   id: '/tournaments/pass-success',
@@ -522,6 +528,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
+  '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -594,6 +601,7 @@ export interface FileRoutesByTo {
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
+  '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -672,6 +680,7 @@ export interface FileRoutesById {
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
+  '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -750,6 +759,7 @@ export interface FileRouteTypes {
     | '/superadmin/users'
     | '/t/$slug'
     | '/tournaments/pass-success'
+    | '/tournaments/start'
     | '/superadmin/'
     | '/admin/billing'
     | '/admin/users'
@@ -822,6 +832,7 @@ export interface FileRouteTypes {
     | '/superadmin/users'
     | '/t/$slug'
     | '/tournaments/pass-success'
+    | '/tournaments/start'
     | '/superadmin'
     | '/admin/billing'
     | '/admin/users'
@@ -899,6 +910,7 @@ export interface FileRouteTypes {
     | '/superadmin/users'
     | '/t/$slug'
     | '/tournaments/pass-success'
+    | '/tournaments/start'
     | '/superadmin/'
     | '/_authenticated/admin/billing'
     | '/_authenticated/admin/users'
@@ -961,6 +973,7 @@ export interface RootRouteChildren {
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
+  TournamentsStartRoute: typeof TournamentsStartRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -1082,6 +1095,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/'
       preLoaderRoute: typeof SuperadminIndexRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/tournaments/start': {
+      id: '/tournaments/start'
+      path: '/tournaments/start'
+      fullPath: '/tournaments/start'
+      preLoaderRoute: typeof TournamentsStartRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/tournaments/pass-success': {
       id: '/tournaments/pass-success'
@@ -1747,6 +1767,7 @@ const rootRouteChildren: RootRouteChildren = {
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
+  TournamentsStartRoute: TournamentsStartRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
@@ -1764,13 +1785,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

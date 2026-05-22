@@ -112,7 +112,7 @@ function TournamentsSection() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
-                <Link to="/demo">
+                <Link to="/tournaments/start">
                   Lancer un tournoi <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
