@@ -177,6 +177,20 @@ function TvSlideshowPage() {
         ),
       });
     }
+    if (sponsors.length > 0) {
+      out.push({
+        key: "sponsors",
+        title: sponsorsTitle,
+        icon: <Trophy className="h-7 w-7" />,
+        render: () => (
+          <div className="h-full flex items-center justify-center">
+            <div className="w-full max-w-6xl">
+              <SponsorsStrip sponsors={sponsors} title={sponsorsTitle} />
+            </div>
+          </div>
+        ),
+      });
+    }
     // Always close on tournament title
     out.unshift({
       key: "intro",
