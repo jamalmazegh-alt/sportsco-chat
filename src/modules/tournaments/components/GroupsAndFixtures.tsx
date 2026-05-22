@@ -340,6 +340,19 @@ export function GroupsAndFixtures({
             />
           </div>
         </div>
+        <div className="space-y-1.5">
+          <Label>Repos min. entre 2 matchs d'une même équipe (min)</Label>
+          <Input
+            type="number"
+            min={0}
+            max={720}
+            value={minRest}
+            onChange={(e) => setMinRest(parseInt(e.target.value || "0", 10))}
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Lors de la programmation auto, une équipe ne sera jamais reprogrammée avant ce délai. 0 = désactivé.
+          </p>
+        </div>
         <div className="space-y-2">
           <Label className="flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
