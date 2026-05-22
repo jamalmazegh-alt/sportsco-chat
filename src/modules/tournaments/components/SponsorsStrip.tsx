@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { Sponsor, SponsorTier } from "../lib/rules";
 
 const TIER_ORDER: Record<SponsorTier, number> = {
@@ -15,13 +16,15 @@ const TIER_SIZE: Record<SponsorTier, string> = {
 
 export function SponsorsStrip({
   sponsors,
-  title = "Avec le soutien de nos partenaires",
+  title,
   compact = false,
 }: {
   sponsors: Sponsor[] | undefined;
   title?: string;
   compact?: boolean;
 }) {
+  const { t } = useTranslation("tournaments");
+  const resolvedTitle = title ?? t("public.sponsorsTitleDefault");
   if (!sponsors || sponsors.length === 0) return null;
   const sorted = [...sponsors].sort(
     (a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier],
