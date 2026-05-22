@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
-import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil, UsersRound } from "lucide-react";
+import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil, UsersRound, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   addTournamentTeam,
@@ -148,6 +148,24 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
     e.target.value = "";
   }
 
+  function downloadCsvTemplate() {
+    const csv =
+      "nom,nom_court,seed\n" +
+      "FC United,FCU,1\n" +
+      "Real Madrid,RMA,2\n" +
+      "Atlético,ATM,\n" +
+      "Olympique Lyonnais,OL,\n";
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "modele-equipes-clubero.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (mode === "internal") {
@@ -198,6 +216,15 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
             title="Importer plusieurs équipes"
           >
             <form onSubmit={onBulkSubmit} className="space-y-4 mt-4 pb-6">
+              <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3 flex items-center justify-between gap-3">
+                <div className="text-xs text-muted-foreground">
+                  Pas encore de fichier ? Télécharge le modèle.
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={downloadCsvTemplate}>
+                  <Download className="h-4 w-4" />
+                  Modèle CSV
+                </Button>
+              </div>
               <div className="space-y-1.5">
                 <Label>Fichier CSV</Label>
                 <Input
@@ -206,9 +233,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                   onChange={onCsvFile}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire).
+                  Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire). Compatible Excel / Numbers / Google Sheets.
                 </p>
               </div>
+
               <div className="space-y-1.5">
                 <Label>Ou colle ta liste</Label>
                 <Textarea
@@ -313,22 +341,31 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="flex items-center gap-1.5">
-                    Seed
+                    Tête de série
                     <span
                       className="text-muted-foreground"
-                      title="Le seed (tête de série) indique le classement de départ. Seed 1 = meilleure équipe ; elle est placée pour ne rencontrer le seed 2 qu'en finale."
+                      title="La tête de série (seed) indique le rang de l'équipe au classement de départ. La n°1 est la plus forte ; elle est placée de manière à ne rencontrer la n°2 qu'en finale."
                     >
                       <HelpCircle className="h-3.5 w-3.5" />
                     </span>
                   </Label>
-                  <Input
-                    type="number"
-                    min={1}
+                  <select
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                     value={seed}
                     onChange={(e) => setSeed(e.target.value)}
-                    placeholder="1"
-                  />
+                  >
+                    <option value="">Non classée</option>
+                    {Array.from({ length: Math.max(teams.length + 1, maxTeams ?? 16) }).map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        N°{i + 1}{i === 0 ? " (meilleure équipe)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-muted-foreground">
+                    Optionnel — utilisé pour le tirage et l'ordre dans le bracket.
+                  </p>
                 </div>
+
               </div>
 
               <Button type="submit" className="w-full" disabled={add.isPending}>
@@ -506,14 +543,21 @@ function EditTeamDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Seed</Label>
-            <Input
-              type="number"
-              min={1}
+            <Label>Tête de série</Label>
+            <select
+              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               value={editSeed}
               onChange={(e) => setEditSeed(e.target.value)}
-            />
+            >
+              <option value="">Non classée</option>
+              {Array.from({ length: 32 }).map((_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  N°{i + 1}{i === 0 ? " (meilleure équipe)" : ""}
+                </option>
+              ))}
+            </select>
           </div>
+
         </div>
         <Button type="submit" className="w-full" disabled={save.isPending}>
           {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}

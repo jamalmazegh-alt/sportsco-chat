@@ -693,28 +693,32 @@ function ForEveryone() {
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {AUDIENCES.map((a) => (
-            <div
-              key={a.title}
-              className="group relative rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:shadow-elevated"
-            >
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-primary text-white shadow-sm group-hover:scale-110 transition-transform">
-                  <a.icon className="h-4 w-4" />
+          {(t("home.audiences", { returnObjects: true }) as { t: string; p: string[] }[]).map((a, i) => {
+            const Icon = AUDIENCE_META[i]?.icon ?? Trophy;
+            return (
+              <div
+                key={a.t}
+                className="group relative rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:shadow-elevated"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-primary text-white shadow-sm group-hover:scale-110 transition-transform">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <h3 className="font-display text-xl font-bold">{a.t}</h3>
                 </div>
-                <h3 className="font-display text-xl font-bold">{a.title}</h3>
+                <ul className="mt-4 space-y-2.5">
+                  {a.p.map((p: string) => (
+                    <li key={p} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <span>{p}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="mt-4 space-y-2.5">
-                {a.points.map((p) => (
-                  <li key={p} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            );
+          })}
         </div>
+
       </div>
     </section>
   );

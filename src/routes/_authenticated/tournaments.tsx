@@ -69,42 +69,25 @@ function TournamentsList() {
           <Trophy className="h-6 w-6 text-primary" />
           Tournois
         </h1>
-        {canManage && (
+        {canManage && noClub && (
           <div className="flex items-center gap-2">
-            {noClub && (
-              <TournamentPassButton
-                variant="outline"
-                className="h-9"
-                label="Acheter un pass"
-              />
-            )}
-            {noClub ? (
-              hasPass ? (
-                <Button size="sm" className="h-9" asChild>
-                  <Link to="/tournaments/new-from-pass">
-                    <Plus className="h-4 w-4" />
-                    Créer
-                  </Link>
-                </Button>
-              ) : null
-            ) : (
-              activeClubId && (
-                <>
-                  <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
-                    <Plus className="h-4 w-4" />
-                    Créer
-                  </Button>
-                  <TournamentWizard
-                    clubId={activeClubId}
-                    open={open}
-                    onOpenChange={setOpen}
-                  />
-                </>
-              )
-            )}
+            <TournamentPassButton
+              variant="outline"
+              className="h-9"
+              label="Acheter un pass"
+            />
           </div>
         )}
       </div>
+
+      {canManage && !noClub && activeClubId && (
+        <TournamentWizard
+          clubId={activeClubId}
+          open={open}
+          onOpenChange={setOpen}
+        />
+      )}
+
 
       {noClub && (
         <div className="rounded-2xl border border-border bg-card p-4 text-sm">
@@ -202,6 +185,29 @@ function TournamentsList() {
           ))}
         </ul>
       )}
+
+      {canManage && tournaments.length > 0 && (
+        <div className="pt-2">
+          {noClub ? (
+            hasPass ? (
+              <Button size="sm" variant="outline" className="w-full" asChild>
+                <Link to="/tournaments/new-from-pass">
+                  <Plus className="h-4 w-4" />
+                  Créer un tournoi
+                </Link>
+              </Button>
+            ) : null
+          ) : (
+            activeClubId && (
+              <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Créer un tournoi
+              </Button>
+            )
+          )}
+        </div>
+      )}
+
     </div>
   );
 }

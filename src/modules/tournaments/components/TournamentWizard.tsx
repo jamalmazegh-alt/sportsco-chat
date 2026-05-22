@@ -5,10 +5,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { Loader2, ChevronRight, ChevronLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { createTournament, updateTournament } from "../tournaments.functions";
@@ -177,12 +178,15 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>Lieu</Label>
-              <Textarea
+              <LocationAutocomplete
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Stade municipal, terrain 1 et 2"
-                rows={2}
+                onChange={setLocation}
+                placeholder="Stade municipal, ville…"
               />
+              <p className="text-[11px] text-muted-foreground">
+                Recherche d'adresse mondiale (OpenStreetMap). Sélectionne une suggestion ou saisis librement.
+              </p>
+
             </div>
           </div>
         )}
