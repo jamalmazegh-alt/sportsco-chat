@@ -148,8 +148,8 @@ export const getTournament = createServerFn({ method: "POST" })
     z.object({ tournament_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
-    const [tRes, gRes, teamRes, mRes] = await Promise.all([
+    const { supabase, userId } = context;
+    const [tRes, gRes, teamRes, mRes, canRes] = await Promise.all([
       supabase.from("tournaments").select("*").eq("id", data.tournament_id).maybeSingle(),
       supabase
         .from("tournament_groups")
@@ -166,6 +166,10 @@ export const getTournament = createServerFn({ method: "POST" })
         .select("*")
         .eq("tournament_id", data.tournament_id)
         .order("scheduled_at", { nullsFirst: false }),
+      supabase.rpc("can_manage_tournament", {
+        _user_id: userId,
+        _tournament_id: data.tournament_id,
+      }),
     ]);
     if (tRes.error) throw tRes.error;
     if (!tRes.data) throw new Response("Not found", { status: 404 });
@@ -174,6 +178,7 @@ export const getTournament = createServerFn({ method: "POST" })
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],
+      canManage: Boolean(canRes.data),
     };
   });
 
