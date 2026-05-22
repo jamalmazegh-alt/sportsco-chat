@@ -17,7 +17,7 @@ import {
   Loader2,
   Plus,
   ShieldCheck,
-  Whistle,
+  Flag,
   Copy,
   Trash2,
   CheckCircle2,
