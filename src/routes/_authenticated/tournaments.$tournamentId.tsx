@@ -31,6 +31,8 @@ import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 import { TournamentRulesEditor } from "@/modules/tournaments/components/TournamentRulesEditor";
 import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
+import { RegistrationsManager } from "@/modules/tournaments/components/RegistrationsManager";
+import { ClipboardList } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
