@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ interface Props {
 }
 
 export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
+  const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -74,7 +76,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
   const add = useMutation({
     mutationFn: (input: any) => addFn({ data: input }),
     onSuccess: () => {
-      toast.success("Équipe ajoutée");
+      toast.success(t("teams.addedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       setOpen(false);
       setName("");
@@ -83,7 +85,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
       setSeed("");
       setSelectedTeamId("");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
 
   const remove = useMutation({
@@ -98,12 +100,12 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
     mutationFn: (rows: Array<{ name: string; short_name?: string | null; seed?: number | null }>) =>
       bulkFn({ data: { tournament_id: tournamentId, teams: rows } }),
     onSuccess: (res: any) => {
-      toast.success(`${res.inserted} équipe(s) importée(s)`);
+      toast.success(t("teams.importedToast", { count: res.inserted }));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       setBulkOpen(false);
       setBulkText("");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
 
   // Parse CSV / line list. Format per line: name[,short_name[,seed]]
@@ -131,7 +133,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
     e.preventDefault();
     const rows = parseBulk(bulkText);
     if (rows.length === 0) {
-      toast.error("Aucune équipe détectée");
+      toast.error(t("teams.noneDetected"));
       return;
     }
     bulk.mutate(rows);
@@ -169,15 +171,15 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (mode === "internal") {
-      const t = clubTeams.data?.find((x) => x.id === selectedTeamId);
-      if (!t) {
-        toast.error("Choisis une équipe");
+      const team = clubTeams.data?.find((x) => x.id === selectedTeamId);
+      if (!team) {
+        toast.error(t("teams.pickTeam"));
         return;
       }
       add.mutate({
         tournament_id: tournamentId,
-        team_id: t.id,
-        name: t.name,
+        team_id: team.id,
+        name: team.name,
         short_name: shortName || null,
         seed: seed ? parseInt(seed, 10) : null,
       });
@@ -195,13 +197,14 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
   const atLimit =
     typeof maxTeams === "number" && maxTeams > 0 && teams.length >= maxTeams;
 
+  const limitSuffix =
+    typeof maxTeams === "number" && maxTeams > 0 ? ` / ${maxTeams}` : "";
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-sm font-medium text-muted-foreground">
-          {teams.length}
-          {typeof maxTeams === "number" && maxTeams > 0 ? ` / ${maxTeams}` : ""}{" "}
-          équipe{teams.length > 1 ? "s" : ""}
+          {t("teams.count", { count: teams.length, limit: limitSuffix })}
         </h2>
         <div className="flex gap-2">
           <ResponsiveFormDialog
@@ -210,35 +213,36 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
             trigger={
               <Button size="sm" variant="outline" disabled={atLimit}>
                 <Upload className="h-4 w-4" />
-                Importer
+                {t("teams.import")}
               </Button>
             }
-            title="Importer plusieurs équipes"
+            title={t("teams.dialog.bulkTitle")}
           >
             <form onSubmit={onBulkSubmit} className="space-y-4 mt-4 pb-6">
               <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3 flex items-center justify-between gap-3">
                 <div className="text-xs text-muted-foreground">
-                  Pas encore de fichier ? Télécharge le modèle.
+                  {t("teams.dialog.templateHint")}
                 </div>
                 <Button type="button" size="sm" variant="outline" onClick={downloadCsvTemplate}>
                   <Download className="h-4 w-4" />
-                  Modèle CSV
+                  {t("teams.dialog.csvTemplate")}
                 </Button>
               </div>
               <div className="space-y-1.5">
-                <Label>Fichier CSV</Label>
+                <Label>{t("teams.dialog.csvFileLabel")}</Label>
                 <Input
                   type="file"
                   accept=".csv,text/csv,text/plain"
                   onChange={onCsvFile}
                 />
-                <p className="text-[11px] text-muted-foreground">
-                  Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire). Compatible Excel / Numbers / Google Sheets.
-                </p>
+                <p
+                  className="text-[11px] text-muted-foreground"
+                  dangerouslySetInnerHTML={{ __html: t("teams.dialog.csvHint") }}
+                />
               </div>
 
               <div className="space-y-1.5">
-                <Label>Ou colle ta liste</Label>
+                <Label>{t("teams.dialog.pasteLabel")}</Label>
                 <Textarea
                   value={bulkText}
                   onChange={(e) => setBulkText(e.target.value)}
@@ -251,11 +255,11 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                 {bulk.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Importer"
+                  t("teams.import")
                 )}
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
-                Les logos peuvent être ajoutés ensuite équipe par équipe.
+                {t("teams.dialog.logoHint")}
               </p>
             </form>
           </ResponsiveFormDialog>
@@ -266,10 +270,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
             trigger={
               <Button size="sm" disabled={atLimit}>
                 <Plus className="h-4 w-4" />
-                Ajouter
+                {t("teams.add")}
               </Button>
             }
-            title="Ajouter une équipe"
+            title={t("teams.dialog.addTitle")}
           >
             <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-6">
               <div className="grid grid-cols-2 gap-2">
@@ -278,21 +282,21 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                   variant={mode === "external" ? "default" : "outline"}
                   onClick={() => setMode("external")}
                 >
-                  Équipe externe
+                  {t("teams.dialog.external")}
                 </Button>
                 <Button
                   type="button"
                   variant={mode === "internal" ? "default" : "outline"}
                   onClick={() => setMode("internal")}
                 >
-                  Équipe Clubero
+                  {t("teams.dialog.internal")}
                 </Button>
               </div>
 
               {mode === "external" ? (
                 <>
                   <div className="space-y-1.5">
-                    <Label>Nom</Label>
+                    <Label>{t("teams.dialog.name")}</Label>
                     <Input
                       required
                       value={name}
@@ -300,7 +304,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Logo de l'équipe (optionnel)</Label>
+                    <Label>{t("teams.dialog.logo")}</Label>
                     <AttachmentPicker
                       value={logo}
                       onChange={setLogo}
@@ -312,17 +316,17 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                 </>
               ) : (
                 <div className="space-y-1.5">
-                  <Label>Équipe du club</Label>
+                  <Label>{t("teams.dialog.clubTeam")}</Label>
                   <select
                     className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                     value={selectedTeamId}
                     onChange={(e) => setSelectedTeamId(e.target.value)}
                     required
                   >
-                    <option value="">— Sélectionner —</option>
-                    {clubTeams.data?.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
+                    <option value="">{t("teams.dialog.selectPlaceholder")}</option>
+                    {clubTeams.data?.map((ct) => (
+                      <option key={ct.id} value={ct.id}>
+                        {ct.name}
                       </option>
                     ))}
                   </select>
@@ -331,20 +335,20 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label>Nom court</Label>
+                  <Label>{t("teams.dialog.shortName")}</Label>
                   <Input
                     value={shortName}
                     onChange={(e) => setShortName(e.target.value)}
-                    placeholder="FCU"
+                    placeholder={t("teams.dialog.shortPlaceholder")}
                     maxLength={20}
                   />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="flex items-center gap-1.5">
-                    Tête de série
+                    {t("teams.dialog.seed")}
                     <span
                       className="text-muted-foreground"
-                      title="La tête de série (seed) indique le rang de l'équipe au classement de départ. La n°1 est la plus forte ; elle est placée de manière à ne rencontrer la n°2 qu'en finale."
+                      title={t("teams.dialog.seedTooltip")}
                     >
                       <HelpCircle className="h-3.5 w-3.5" />
                     </span>
@@ -354,15 +358,16 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                     value={seed}
                     onChange={(e) => setSeed(e.target.value)}
                   >
-                    <option value="">Non classée</option>
+                    <option value="">{t("teams.dialog.seedNone")}</option>
                     {Array.from({ length: Math.max(teams.length + 1, maxTeams ?? 16) }).map((_, i) => (
                       <option key={i + 1} value={i + 1}>
-                        N°{i + 1}{i === 0 ? " (meilleure équipe)" : ""}
+                        {t("teams.dialog.seedOption", { n: i + 1 })}
+                        {i === 0 ? t("teams.dialog.seedBest") : ""}
                       </option>
                     ))}
                   </select>
                   <p className="text-[11px] text-muted-foreground">
-                    Optionnel — utilisé pour le tirage et l'ordre dans le bracket.
+                    {t("teams.dialog.seedHint")}
                   </p>
                 </div>
 
@@ -372,7 +377,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                 {add.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Ajouter"
+                  t("teams.add")
                 )}
               </Button>
             </form>
@@ -383,20 +388,20 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
       {teams.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
           <Users className="h-6 w-6 mx-auto mb-2 opacity-60" />
-          Aucune équipe inscrite
+          {t("teams.empty")}
         </div>
       ) : (
         <ul className="space-y-2">
-          {teams.map((t) => (
+          {teams.map((tm) => (
             <li
-              key={t.id}
+              key={tm.id}
               className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
             >
               <div className="h-10 w-10 rounded-lg bg-muted shrink-0 overflow-hidden flex items-center justify-center">
-                {t.logo_url ? (
+                {tm.logo_url ? (
                   <img
-                    src={t.logo_url}
-                    alt={t.name}
+                    src={tm.logo_url}
+                    alt={tm.name}
                     className="h-full w-full object-cover"
                   />
                 ) : (
@@ -404,32 +409,32 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium truncate text-sm">{t.name}</p>
+                <p className="font-medium truncate text-sm">{tm.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {t.seed ? `Seed ${t.seed}` : "—"}
-                  {t.team_id ? " · Clubero" : " · Externe"}
+                  {tm.seed ? t("teams.row.seed", { n: tm.seed }) : t("teams.row.noSeed")}
+                  {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
                 </p>
               </div>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => setRosterTeam(t)}
-                title="Joueurs"
+                onClick={() => setRosterTeam(tm)}
+                title={t("teams.row.players")}
               >
                 <UsersRound className="h-4 w-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => setEditing(t)}
-                title="Modifier"
+                onClick={() => setEditing(tm)}
+                title={t("teams.row.edit")}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => remove.mutate(t.id)}
+                onClick={() => remove.mutate(tm.id)}
                 disabled={remove.isPending}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
@@ -476,6 +481,7 @@ function EditTeamDialog({
   onSaved: () => void;
   updateFn: (args: { data: any }) => Promise<any>;
 }) {
+  const { t } = useTranslation("tournaments");
   const [editName, setEditName] = useState(team.name);
   const [editShort, setEditShort] = useState(team.short_name ?? "");
   const [editSeed, setEditSeed] = useState(team.seed ? String(team.seed) : "");
@@ -500,17 +506,17 @@ function EditTeamDialog({
         },
       }),
     onSuccess: () => {
-      toast.success("Équipe mise à jour");
+      toast.success(t("teams.updatedToast"));
       onSaved();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
 
   return (
     <ResponsiveFormDialog
       open={true}
       onOpenChange={(v) => !v && onClose()}
-      title={`Modifier ${team.name}`}
+      title={t("teams.dialog.editTitle", { name: team.name })}
     >
       <form
         onSubmit={(e) => {
@@ -520,11 +526,11 @@ function EditTeamDialog({
         className="space-y-4 mt-4 pb-6"
       >
         <div className="space-y-1.5">
-          <Label>Nom</Label>
+          <Label>{t("teams.dialog.name")}</Label>
           <Input required value={editName} onChange={(e) => setEditName(e.target.value)} />
         </div>
         <div className="space-y-1.5">
-          <Label>Logo</Label>
+          <Label>{t("teams.dialog.logoEdit")}</Label>
           <AttachmentPicker
             value={editLogo}
             onChange={setEditLogo}
@@ -535,7 +541,7 @@ function EditTeamDialog({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label>Nom court</Label>
+            <Label>{t("teams.dialog.shortName")}</Label>
             <Input
               value={editShort}
               onChange={(e) => setEditShort(e.target.value)}
@@ -543,16 +549,17 @@ function EditTeamDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Tête de série</Label>
+            <Label>{t("teams.dialog.seed")}</Label>
             <select
               className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               value={editSeed}
               onChange={(e) => setEditSeed(e.target.value)}
             >
-              <option value="">Non classée</option>
+              <option value="">{t("teams.dialog.seedNone")}</option>
               {Array.from({ length: 32 }).map((_, i) => (
                 <option key={i + 1} value={i + 1}>
-                  N°{i + 1}{i === 0 ? " (meilleure équipe)" : ""}
+                  {t("teams.dialog.seedOption", { n: i + 1 })}
+                  {i === 0 ? t("teams.dialog.seedBest") : ""}
                 </option>
               ))}
             </select>
@@ -560,7 +567,7 @@ function EditTeamDialog({
 
         </div>
         <Button type="submit" className="w-full" disabled={save.isPending}>
-          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.dialog.save")}
         </Button>
       </form>
     </ResponsiveFormDialog>

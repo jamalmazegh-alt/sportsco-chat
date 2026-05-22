@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, Trash2, Loader2, Upload, Star, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ type Player = {
 };
 
 export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props) {
+  const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const listFn = useServerFn(listTeamPlayers);
   const upsertFn = useServerFn(upsertTeamPlayer);
@@ -54,7 +56,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["team-roster", tournamentTeamId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("roster.errorToast")),
   });
 
   const players = (q.data?.players ?? []) as Player[];
@@ -63,17 +65,17 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
     <ResponsiveFormDialog
       open={true}
       onOpenChange={(v) => !v && onClose()}
-      title={`Joueurs · ${teamName}`}
+      title={t("roster.title", { team: teamName })}
     >
       <div className="space-y-3 mt-3 pb-6">
         <div className="flex gap-2 justify-end">
           <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}>
             <Upload className="h-4 w-4" />
-            Importer
+            {t("roster.import")}
           </Button>
           <Button size="sm" onClick={() => setAdding(true)}>
             <Plus className="h-4 w-4" />
-            Ajouter
+            {t("roster.add")}
           </Button>
         </div>
 
@@ -83,7 +85,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
           </div>
         ) : players.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-6">
-            Aucun joueur. Ajoute des joueurs ou importe une liste.
+            {t("roster.empty")}
           </p>
         ) : (
           <ul className="space-y-1.5">
@@ -112,7 +114,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
                   size="icon"
                   variant="ghost"
                   onClick={() => setEditing(p)}
-                  aria-label="Modifier"
+                  aria-label={t("roster.edit")}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -121,7 +123,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
                   variant="ghost"
                   onClick={() => remove.mutate(p.id)}
                   disabled={remove.isPending}
-                  aria-label="Supprimer"
+                  aria-label={t("roster.remove")}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
@@ -176,6 +178,7 @@ function PlayerFormDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useTranslation("tournaments");
   const [firstName, setFirstName] = useState(player?.first_name ?? "");
   const [lastName, setLastName] = useState(player?.last_name ?? "");
   const [jersey, setJersey] = useState(
@@ -202,23 +205,23 @@ function PlayerFormDialog({
         },
       }),
     onSuccess: () => {
-      toast.success(player ? "Joueur mis à jour" : "Joueur ajouté");
+      toast.success(player ? t("roster.form.updated") : t("roster.form.added"));
       onSaved();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("roster.errorToast")),
   });
 
   return (
     <ResponsiveFormDialog
       open={true}
       onOpenChange={(v) => !v && onClose()}
-      title={player ? "Modifier le joueur" : "Ajouter un joueur"}
+      title={player ? t("roster.form.editTitle") : t("roster.form.addTitle")}
     >
       <form
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           if (!firstName.trim() || !lastName.trim()) {
-            toast.error("Nom et prénom requis");
+            toast.error(t("roster.form.requiredNames"));
             return;
           }
           save.mutate();
@@ -227,7 +230,7 @@ function PlayerFormDialog({
       >
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1.5">
-            <Label>Prénom</Label>
+            <Label>{t("roster.form.firstName")}</Label>
             <Input
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -237,7 +240,7 @@ function PlayerFormDialog({
           </div>
           <div className="space-y-1.5">
             <Label className="flex items-center justify-between">
-              <span>Nom</span>
+              <span>{t("roster.form.lastName")}</span>
               <button
                 type="button"
                 onClick={() =>
@@ -247,7 +250,7 @@ function PlayerFormDialog({
                 }
                 className="text-[11px] text-primary hover:underline"
               >
-                Anonymiser
+                {t("roster.form.anonymize")}
               </button>
             </Label>
             <Input
@@ -255,13 +258,13 @@ function PlayerFormDialog({
               onChange={(e) => setLastName(e.target.value)}
               required
               maxLength={80}
-              placeholder="Dupont ou D."
+              placeholder={t("roster.form.lastNamePlaceholder")}
             />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1.5">
-            <Label>N°</Label>
+            <Label>{t("roster.form.jersey")}</Label>
             <Input
               type="number"
               min={0}
@@ -271,17 +274,17 @@ function PlayerFormDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Poste</Label>
+            <Label>{t("roster.form.position")}</Label>
             <Input
               value={position}
               onChange={(e) => setPosition(e.target.value)}
               maxLength={40}
-              placeholder="GK, DEF, MID, ATT…"
+              placeholder={t("roster.form.positionPlaceholder")}
             />
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>N° de licence (optionnel)</Label>
+          <Label>{t("roster.form.license")}</Label>
           <Input
             value={license}
             onChange={(e) => setLicense(e.target.value)}
@@ -293,13 +296,13 @@ function PlayerFormDialog({
             checked={captain}
             onCheckedChange={(v) => setCaptain(!!v)}
           />
-          Capitaine
+          {t("roster.form.captain")}
         </label>
         <Button type="submit" className="w-full" disabled={save.isPending}>
           {save.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            "Enregistrer"
+            t("roster.form.save")
           )}
         </Button>
       </form>
@@ -352,6 +355,7 @@ function BulkRosterDialog({
   onClose: () => void;
   onDone: () => void;
 }) {
+  const { t } = useTranslation("tournaments");
   const [text, setText] = useState("");
   const [replace, setReplace] = useState(false);
 
@@ -365,10 +369,10 @@ function BulkRosterDialog({
         },
       }),
     onSuccess: (res: any) => {
-      toast.success(`${res.inserted} joueur(s) importé(s)`);
+      toast.success(t("roster.bulk.imported", { count: res.inserted }));
       onDone();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("roster.errorToast")),
   });
 
   function onFile(e: ChangeEvent<HTMLInputElement>) {
@@ -384,7 +388,7 @@ function BulkRosterDialog({
     e.preventDefault();
     const rows = parseRoster(text);
     if (rows.length === 0) {
-      toast.error("Aucun joueur détecté");
+      toast.error(t("roster.bulk.noneDetected"));
       return;
     }
     mut.mutate(rows);
@@ -394,23 +398,23 @@ function BulkRosterDialog({
     <ResponsiveFormDialog
       open={true}
       onOpenChange={(v) => !v && onClose()}
-      title="Importer une liste de joueurs"
+      title={t("roster.bulk.title")}
     >
       <form onSubmit={onSubmit} className="space-y-3 mt-3 pb-6">
         <div className="space-y-1.5">
-          <Label>Fichier CSV</Label>
+          <Label>{t("roster.bulk.fileLabel")}</Label>
           <Input
             type="file"
             accept=".csv,text/csv,text/plain"
             onChange={onFile}
           />
-          <p className="text-[11px] text-muted-foreground">
-            Colonnes : <code>prénom, nom, n°, poste, capitaine, licence</code>{" "}
-            (les 2 premières obligatoires). Capitaine : 1/oui/c.
-          </p>
+          <p
+            className="text-[11px] text-muted-foreground"
+            dangerouslySetInnerHTML={{ __html: t("roster.bulk.hint") }}
+          />
         </div>
         <div className="space-y-1.5">
-          <Label>Ou colle ta liste</Label>
+          <Label>{t("roster.bulk.pasteLabel")}</Label>
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -424,13 +428,13 @@ function BulkRosterDialog({
             checked={replace}
             onCheckedChange={(v) => setReplace(!!v)}
           />
-          Remplacer la liste existante
+          {t("roster.bulk.replace")}
         </label>
         <Button type="submit" className="w-full" disabled={mut.isPending}>
           {mut.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            "Importer"
+            t("roster.bulk.submit")
           )}
         </Button>
       </form>
