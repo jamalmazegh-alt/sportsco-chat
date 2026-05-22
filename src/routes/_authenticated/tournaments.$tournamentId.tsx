@@ -91,7 +91,10 @@ function TournamentDetailPage() {
     { id: "standings", icon: ListOrdered, label: "Classement" },
     { id: "bracket", icon: GitBranch, label: "Bracket" },
     ...(canManage
-      ? [{ id: "rules" as const, icon: Settings2, label: "Règles" }]
+      ? [
+          { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
+          { id: "rules" as const, icon: Settings2, label: "Règles" },
+        ]
       : []),
   ];
 
