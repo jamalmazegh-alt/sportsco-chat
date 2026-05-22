@@ -157,10 +157,7 @@ export function GroupsAndFixtures({
   const schedule = useMutation({
     mutationFn: async () => {
       if (!startsOn) throw new Error("Date de début manquante");
-      const fieldsList = fieldsText
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const fl = fieldsList.length ? fieldsList : ["Terrain 1"];
       // Save settings first so they persist
       await saveSettings.mutateAsync();
       return scheduleFn({
@@ -171,7 +168,7 @@ export function GroupsAndFixtures({
           daily_end_time: endTime,
           match_duration_min: duration,
           break_min: pause,
-          fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+          fields: fl,
           lunch_start_time: lunchEnabled ? lunchStart : undefined,
           lunch_end_time: lunchEnabled ? lunchEnd : undefined,
         },
