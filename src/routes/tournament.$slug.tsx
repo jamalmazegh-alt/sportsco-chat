@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Trophy,
   Calendar,
@@ -13,9 +13,12 @@ import {
   GitBranch,
   CalendarDays,
   UserPlus,
+  Radio,
+  Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
 import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
@@ -65,9 +68,15 @@ function PublicTournamentPage() {
     queryKey: ["public-tournament", slug],
     queryFn: () => fn({ data: { slug } }),
     initialData: initial ?? undefined,
-    refetchInterval: 30_000,
+    refetchInterval: (query) => {
+      const d: any = query.state.data;
+      const hasLive = Array.isArray(d?.matches) && d.matches.some((m: any) => m.status === "live");
+      return hasLive ? 10_000 : 30_000;
+    },
   });
   const [tab, setTab] = useState<Tab>("overview");
+  const [teamFilter, setTeamFilter] = useState<string>("all");
+
 
   if (q.isLoading && !q.data) {
     return (
@@ -94,6 +103,23 @@ function PublicTournamentPage() {
   }
 
   const { tournament, groups, teams, matches } = q.data;
+  const events = ((q.data as any).events ?? []) as any[];
+  const eventsByMatch = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const e of events) {
+      const arr = map.get(e.match_id) ?? [];
+      arr.push(e);
+      map.set(e.match_id, arr);
+    }
+    return map;
+  }, [events]);
+  const filteredMatches = useMemo(() => {
+    if (teamFilter === "all") return matches;
+    return (matches as any[]).filter(
+      (m) => m.team_a_id === teamFilter || m.team_b_id === teamFilter,
+    );
+  }, [matches, teamFilter]);
+
   const rules = mergeRules((tournament as any).settings);
   const scoring = resolveScoring(
     (tournament as any).sport,
@@ -215,14 +241,47 @@ function PublicTournamentPage() {
           </div>
         </nav>
 
-        <div className="py-5">
+        <div className="py-5 space-y-4">
+          {(tab === "overview" || tab === "matches") && teams.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <label className="text-xs text-muted-foreground">Filtrer par équipe</label>
+              <select
+                value={teamFilter}
+                onChange={(e) => setTeamFilter(e.target.value)}
+                className="text-sm rounded-md border border-input bg-background px-2 py-1"
+              >
+                <option value="all">Toutes les équipes</option>
+                {(teams as any[])
+                  .slice()
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
           {tab === "overview" && (
-            <Overview groups={groups} teams={teams} matches={matches} scoring={scoring} />
+            <Overview
+              groups={groups}
+              teams={teams}
+              matches={filteredMatches}
+              scoring={scoring}
+              eventsByMatch={eventsByMatch}
+            />
           )}
           {tab === "teams" && <TeamsGrid teams={teams as any} />}
           {tab === "matches" && (
-            <PublicMatches matches={matches as any} teams={teams as any} scoring={scoring} />
+            <PublicMatches
+              matches={filteredMatches as any}
+              teams={teams as any}
+              scoring={scoring}
+              eventsByMatch={eventsByMatch}
+            />
           )}
+
           {tab === "standings" && (
             <PublicStandings
               groups={groups as any}
@@ -251,26 +310,56 @@ function Overview({
   teams,
   matches,
   scoring,
+  eventsByMatch,
 }: {
   groups: any[];
   teams: any[];
   matches: any[];
   scoring: ScoringRules;
+  eventsByMatch: Map<string, any[]>;
 }) {
   const teamMap = new Map(teams.map((t: any) => [t.id, t]));
+  const live = matches.filter((m: any) => m.status === "live");
   const upcoming = matches.filter((m: any) => m.status === "scheduled").slice(0, 5);
   const recent = matches.filter((m: any) => m.status === "completed").slice(-5).reverse();
 
   return (
     <div className="grid gap-5 md:grid-cols-2">
+      {live.length > 0 && (
+        <div className="md:col-span-2">
+          <Card title="En direct" empty="">
+            {live.map((m: any) => (
+              <MatchRow
+                key={m.id}
+                match={m}
+                teamMap={teamMap}
+                scoring={scoring}
+                events={eventsByMatch.get(m.id) ?? []}
+              />
+            ))}
+          </Card>
+        </div>
+      )}
       <Card title="Prochains matchs" empty="Aucun match programmé">
         {upcoming.map((m: any) => (
-          <MatchRow key={m.id} match={m} teamMap={teamMap} scoring={scoring} />
+          <MatchRow
+            key={m.id}
+            match={m}
+            teamMap={teamMap}
+            scoring={scoring}
+            events={eventsByMatch.get(m.id) ?? []}
+          />
         ))}
       </Card>
       <Card title="Derniers résultats" empty="Aucun résultat pour le moment">
         {recent.map((m: any) => (
-          <MatchRow key={m.id} match={m} teamMap={teamMap} scoring={scoring} />
+          <MatchRow
+            key={m.id}
+            match={m}
+            teamMap={teamMap}
+            scoring={scoring}
+            events={eventsByMatch.get(m.id) ?? []}
+          />
         ))}
       </Card>
       <Card title="Format">
@@ -307,24 +396,98 @@ function Card({
   );
 }
 
+const EVENT_LABELS: Record<string, string> = {
+  goal: "But",
+  own_goal: "But CSC",
+  assist: "Passe D.",
+  yellow: "Carton jaune",
+  red: "Carton rouge",
+  second_yellow: "2e jaune",
+  penalty: "Penalty",
+  foul: "Faute",
+};
+
+const EVENT_EMOJI: Record<string, string> = {
+  goal: "⚽",
+  own_goal: "🥅",
+  assist: "🅰️",
+  yellow: "🟨",
+  red: "🟥",
+  second_yellow: "🟨🟥",
+  penalty: "🎯",
+  foul: "⚠️",
+};
+
+function EventsList({
+  events,
+  teamMap,
+}: {
+  events: any[];
+  teamMap: Map<string, any>;
+}) {
+  if (!events || events.length === 0) return null;
+  const sorted = [...events].sort((a, b) => {
+    const ma = a.minute ?? 9999;
+    const mb = b.minute ?? 9999;
+    if (ma !== mb) return ma - mb;
+    return (a.created_at ?? "").localeCompare(b.created_at ?? "");
+  });
+  return (
+    <ul className="mt-2 space-y-1 border-t border-border/60 pt-2">
+      {sorted.map((e) => {
+        const team = e.team_id ? teamMap.get(e.team_id) : null;
+        return (
+          <li
+            key={e.id}
+            className="flex items-center gap-2 text-[11px] text-muted-foreground"
+          >
+            <span className="tabular-nums w-7 text-right">
+              {e.minute != null ? `${e.minute}'` : "—"}
+            </span>
+            <span>{EVENT_EMOJI[e.kind] ?? "•"}</span>
+            <span className="font-medium text-foreground">
+              {EVENT_LABELS[e.kind] ?? e.kind}
+            </span>
+            {e.player_name && <span>· {e.player_name}</span>}
+            {team && <span>· {team.short_name ?? team.name}</span>}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function LiveBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+      <Radio className="h-2.5 w-2.5 animate-pulse" />
+      Live
+    </span>
+  );
+}
+
 function MatchRow({
   match,
   teamMap,
   scoring,
+  events,
 }: {
   match: any;
   teamMap: Map<string, any>;
   scoring: ScoringRules;
+  events?: any[];
 }) {
   const a = match.team_a_id ? teamMap.get(match.team_a_id) : null;
   const b = match.team_b_id ? teamMap.get(match.team_b_id) : null;
   const setsLine = scoring.mode === "sets" ? formatSets(match.sets) : "";
+  const isLive = match.status === "live";
   return (
-    <li className="px-3 py-2 text-sm">
+    <li className={cn("px-3 py-2 text-sm", isLive && "bg-red-500/5")}>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <span className="truncate text-right">{a?.name ?? "TBD"}</span>
-        <span className="tabular-nums font-semibold">
+        <span className="tabular-nums font-semibold flex items-center gap-1.5">
           {match.score_a ?? "–"} : {match.score_b ?? "–"}
+          {isLive && <LiveBadge />}
         </span>
         <span className="truncate">{b?.name ?? "TBD"}</span>
       </div>
@@ -333,6 +496,7 @@ function MatchRow({
           {setsLine}
         </div>
       )}
+      <EventsList events={events ?? []} teamMap={teamMap} />
     </li>
   );
 }
@@ -370,10 +534,12 @@ function PublicMatches({
   matches,
   teams,
   scoring,
+  eventsByMatch,
 }: {
   matches: any[];
   teams: any[];
   scoring: ScoringRules;
+  eventsByMatch: Map<string, any[]>;
 }) {
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   if (matches.length === 0) {
@@ -387,30 +553,48 @@ function PublicMatches({
     <ul className="space-y-2">
       {matches.map((m) => {
         const setsLine = scoring.mode === "sets" ? formatSets(m.sets) : "";
+        const isLive = m.status === "live";
+        const evts = eventsByMatch.get(m.id) ?? [];
         return (
           <li
             key={m.id}
-            className="rounded-xl border border-border bg-card p-3"
+            className={cn(
+              "rounded-xl border border-border bg-card p-3",
+              isLive && "border-red-500/40 bg-red-500/5",
+            )}
           >
             <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
               <span className="truncate text-right text-sm font-medium">
                 {teamMap.get(m.team_a_id)?.name ?? "TBD"}
               </span>
-              <span className="tabular-nums font-bold">
+              <span className="tabular-nums font-bold flex items-center gap-1.5">
                 {m.score_a ?? "–"} : {m.score_b ?? "–"}
+                {isLive && <LiveBadge />}
               </span>
               <span className="truncate text-sm font-medium">
                 {teamMap.get(m.team_b_id)?.name ?? "TBD"}
               </span>
             </div>
+            {(m.scheduled_at || m.field) && (
+              <div className="text-[11px] text-muted-foreground text-center mt-1">
+                {m.scheduled_at && new Date(m.scheduled_at).toLocaleString("fr-FR", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+                {m.scheduled_at && m.field ? " · " : ""}
+                {m.field && `Terrain ${m.field}`}
+              </div>
+            )}
             {setsLine && (
               <div className="text-xs text-muted-foreground text-center mt-1 tabular-nums">
                 {setsLine}
               </div>
             )}
+            <EventsList events={evts} teamMap={teamMap} />
           </li>
         );
       })}
     </ul>
   );
 }
+
