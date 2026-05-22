@@ -204,8 +204,41 @@ export function GroupsAndFixtures({
   const supportsGroups = format !== "knockout";
   const supportsKnockout = format !== "group";
 
+  const hasExistingDraw = groupsCount > 0 || matchesCount > 0;
+
   return (
     <div className="space-y-4">
+      <section className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Dices className="h-4 w-4 text-primary" />
+          <h3 className="font-medium">Tirage au sort</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {numTeams < 2
+            ? "Ajoutez des équipes avant de lancer le tirage au sort."
+            : "Auto, progressif (animation) ou manuel — répartit les équipes dans les poules ou le bracket."}
+        </p>
+        <Button
+          onClick={() => setDrawOpen(true)}
+          disabled={numTeams < 2}
+          className="w-full"
+          variant={hasExistingDraw ? "outline" : "default"}
+        >
+          <Dices className="h-4 w-4" />
+          {hasExistingDraw ? "Relancer le tirage au sort" : "Lancer le tirage au sort"}
+        </Button>
+      </section>
+
+      <DrawDialog
+        open={drawOpen}
+        onOpenChange={setDrawOpen}
+        tournamentId={tournamentId}
+        format={format}
+        status={status}
+        teams={teams}
+        hasExistingDraw={hasExistingDraw}
+      />
+
       {supportsGroups && (
         <section className="rounded-xl border border-border bg-card p-4 space-y-3">
           <div className="flex items-center gap-2">
