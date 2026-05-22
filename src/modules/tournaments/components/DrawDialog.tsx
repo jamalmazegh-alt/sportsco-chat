@@ -324,12 +324,10 @@ export function DrawDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Dices className="h-5 w-5 text-primary" />
-              Tirage au sort
+              {t("draw.title")}
             </DialogTitle>
             <DialogDescription>
-              {drawMode === "groups"
-                ? "Répartis les équipes dans les poules"
-                : "Place les équipes dans le tableau à élimination directe"}
+              {drawMode === "groups" ? t("draw.descGroups") : t("draw.descKnockout")}
             </DialogDescription>
           </DialogHeader>
 
@@ -337,16 +335,17 @@ export function DrawDialog({
             <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
               <Dices className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                Ajoutez des équipes avant de lancer le tirage au sort.
+                {t("draw.emptyHint")}
               </p>
             </div>
           )}
 
           {canDraw && tournamentStarted && (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300">
-              ⚠ Le tournoi a déjà commencé. Lancer un nouveau tirage va écraser la structure actuelle.
+              {t("draw.startedWarn")}
             </div>
           )}
+
 
           {canDraw && (
             <>
