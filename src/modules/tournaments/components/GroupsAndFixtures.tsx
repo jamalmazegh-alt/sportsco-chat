@@ -60,6 +60,9 @@ export function GroupsAndFixtures({
   const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
   const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
   const [lunchEnd, setLunchEnd] = useState<string>(settings?.lunch_end ?? "13:30");
+  const [minRest, setMinRest] = useState<number>(
+    settings?.forfeit?.minRestMinutes ?? 30,
+  );
 
   useEffect(() => {
     setDuration(matchDurationMin ?? 20);
@@ -70,6 +73,7 @@ export function GroupsAndFixtures({
     setLunchEnabled(!!settings?.lunch_start);
     setLunchStart(settings?.lunch_start ?? "12:00");
     setLunchEnd(settings?.lunch_end ?? "13:30");
+    setMinRest(settings?.forfeit?.minRestMinutes ?? 30);
   }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields, settings]);
 
   function addField() {
