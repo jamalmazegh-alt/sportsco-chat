@@ -41,7 +41,11 @@ import {
   type TournamentRules,
 } from "../lib/rules";
 import type { Tiebreaker } from "../lib/standings";
-import { updateTournamentRules } from "../tournaments.functions";
+import {
+  updateTournamentRules,
+  generateRulesPdf,
+  listTournamentDocuments,
+} from "../tournaments.functions";
 
 interface Props {
   tournamentId: string;
