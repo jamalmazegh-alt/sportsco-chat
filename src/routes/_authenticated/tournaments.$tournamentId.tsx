@@ -216,6 +216,12 @@ function TournamentDetailPage() {
         {tab === "bracket" && (
           <BracketView matches={matches as any} teams={teams as any} />
         )}
+        {tab === "rules" && canManage && (
+          <TournamentRulesEditor
+            tournamentId={tournament.id}
+            settings={(tournament as any).settings}
+          />
+        )}
       </div>
     </div>
   );
