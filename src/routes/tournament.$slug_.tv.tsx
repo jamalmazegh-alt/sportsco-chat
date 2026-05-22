@@ -242,13 +242,28 @@ function TvSlideshowPage() {
     if (idx >= slides.length && slides.length > 0) setIdx(0);
   }, [idx, slides.length]);
 
-  if (q.isLoading || !data) {
+  if (q.isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
+
+  // Draft / archived / unknown tournament: getPublicTournament returns null.
+  // Don't expose any internal state — just show a neutral "not available" screen.
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-3 p-6 text-center">
+        <Trophy className="h-12 w-12 text-muted-foreground" />
+        <h1 className="text-2xl font-bold">Diaporama indisponible</h1>
+        <p className="text-muted-foreground max-w-md">
+          Ce tournoi n'est pas encore publié ou n'existe pas.
+        </p>
+      </div>
+    );
+  }
+
 
   const slide = slides[idx];
 
