@@ -64,8 +64,9 @@ export function GroupsAndFixtures({
   const [startTime, setStartTime] = useState(dailyStartTime ?? "09:00");
   const [endTime, setEndTime] = useState(dailyEndTime ?? "18:00");
   const [fieldsList, setFieldsList] = useState<string[]>(
-    fields && fields.length ? fields : ["Terrain 1"],
+    fields && fields.length ? fields : [t("groups.defaultFieldName")],
   );
+
   const [newField, setNewField] = useState("");
   const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
   const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
