@@ -336,6 +336,36 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
+  // Referee assignment
+  const refFn = useServerFn(assignMatchReferee);
+  const initialRefValue = match.referee_user_id
+    ? `user:${match.referee_user_id}`
+    : match.referee_name
+      ? "free"
+      : "__none__";
+  const [refMode, setRefMode] = useState<string>(initialRefValue);
+  const [refFreeName, setRefFreeName] = useState<string>(match.referee_name ?? "");
+  const saveRef = useMutation({
+    mutationFn: () => {
+      let payload: { referee_user_id: string | null; referee_name: string | null };
+      if (refMode === "__none__") {
+        payload = { referee_user_id: null, referee_name: null };
+      } else if (refMode === "free") {
+        payload = { referee_user_id: null, referee_name: refFreeName.trim() || null };
+      } else {
+        payload = { referee_user_id: refMode.replace(/^user:/, ""), referee_name: null };
+      }
+      return refFn({
+        data: { tournament_id: tournamentId, match_id: match.id, ...payload },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Arbitre mis à jour");
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
   // Add event form
   const [evTeam, setEvTeam] = useState<string>(match.team_a_id ?? "");
   const [evKind, setEvKind] = useState<string>("yellow_card");
