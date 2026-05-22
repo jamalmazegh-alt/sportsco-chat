@@ -308,6 +308,93 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled"
     }
+  },
+  "teams": {
+    "count_one": "{{count}}{{limit}} team",
+    "count_other": "{{count}}{{limit}} teams",
+    "import": "Import",
+    "add": "Add",
+    "empty": "No teams registered",
+    "addedToast": "Team added",
+    "updatedToast": "Team updated",
+    "errorToast": "Error",
+    "importedToast_one": "{{count}} team imported",
+    "importedToast_other": "{{count}} teams imported",
+    "noneDetected": "No teams detected",
+    "pickTeam": "Pick a team",
+    "dialog": {
+      "bulkTitle": "Import multiple teams",
+      "addTitle": "Add a team",
+      "editTitle": "Edit {{name}}",
+      "templateHint": "No file yet? Download the template.",
+      "csvTemplate": "CSV template",
+      "csvFileLabel": "CSV file",
+      "csvHint": "One team per line. Columns: <code>name, short_name, seed</code> (only name is required). Compatible with Excel / Numbers / Google Sheets.",
+      "pasteLabel": "Or paste your list",
+      "logoHint": "Logos can be added later, team by team.",
+      "external": "External team",
+      "internal": "Clubero team",
+      "name": "Name",
+      "logo": "Team logo (optional)",
+      "logoEdit": "Logo",
+      "clubTeam": "Club team",
+      "selectPlaceholder": "— Select —",
+      "shortName": "Short name",
+      "shortPlaceholder": "FCU",
+      "seed": "Seed",
+      "seedTooltip": "The seed indicates the team's starting rank. #1 is the strongest; placed so it only meets #2 in the final.",
+      "seedNone": "Unseeded",
+      "seedOption": "#{{n}}",
+      "seedBest": " (top team)",
+      "seedHint": "Optional — used for the draw and bracket ordering.",
+      "save": "Save"
+    },
+    "row": {
+      "seed": "Seed {{n}}",
+      "noSeed": "—",
+      "clubero": " · Clubero",
+      "external": " · External",
+      "players": "Players",
+      "edit": "Edit"
+    }
+  },
+  "roster": {
+    "title": "Players · {{team}}",
+    "import": "Import",
+    "add": "Add",
+    "empty": "No players. Add players or import a list.",
+    "edit": "Edit",
+    "remove": "Remove",
+    "errorToast": "Error",
+    "form": {
+      "addTitle": "Add a player",
+      "editTitle": "Edit player",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "anonymize": "Anonymize",
+      "lastNamePlaceholder": "Smith or S.",
+      "jersey": "#",
+      "position": "Position",
+      "positionPlaceholder": "GK, DEF, MID, ATT…",
+      "license": "License # (optional)",
+      "captain": "Captain",
+      "save": "Save",
+      "requiredNames": "First and last name required",
+      "added": "Player added",
+      "updated": "Player updated"
+    },
+    "bulk": {
+      "title": "Import a roster",
+      "fileLabel": "CSV file",
+      "hint": "Columns: <code>first_name, last_name, #, position, captain, license</code> (first two required). Captain: 1/yes/c.",
+      "pasteLabel": "Or paste your list",
+      "replace": "Replace existing roster",
+      "submit": "Import",
+      "imported_one": "{{count}} player imported",
+      "imported_other": "{{count}} players imported",
+      "noneDetected": "No players detected"
+    }
   }
 }
+
 
