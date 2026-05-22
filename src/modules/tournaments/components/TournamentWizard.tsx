@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
+import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import { Loader2, ChevronRight, ChevronLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
-import { createTournament } from "../tournaments.functions";
+import { createTournament, updateTournament } from "../tournaments.functions";
+
 
 type Format = "group" | "knockout" | "mixed";
 
