@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
+import { useTranslation, Trans } from "react-i18next";
+import i18n from "@/lib/i18n";
 import {
   Trophy,
   Calendar,
@@ -33,15 +35,24 @@ export const Route = createFileRoute("/tournament/$slug")({
     return { initial: data };
   },
   head: ({ loaderData, params }) => {
-    const t = loaderData?.initial?.tournament as any;
-    const title = t?.name
-      ? `${t.name} — Tournoi ${t.sport ?? ""}`.trim() + " · Clubero"
-      : `Tournoi ${params.slug} — Clubero`;
-    const desc = t
-      ? `Suivez ${t.name} en direct : équipes, calendrier, résultats et classements${
-          t.location ? ` · ${t.location}` : ""
-        }.`
-      : "Suivez ce tournoi en direct : équipes, calendrier, résultats et classements.";
+    const data = loaderData?.initial?.tournament as any;
+    const title = data?.name
+      ? i18n.t("public.metaTitle", {
+          ns: "tournaments",
+          name: data.name,
+          sport: data.sport ?? "",
+        }).trim() + " · Clubero"
+      : i18n.t("public.metaTitleFallback", {
+          ns: "tournaments",
+          slug: params.slug,
+        });
+    const desc = data
+      ? i18n.t("public.metaDesc", {
+          ns: "tournaments",
+          name: data.name,
+          locationSuffix: data.location ? ` · ${data.location}` : "",
+        })
+      : i18n.t("public.metaDescFallback", { ns: "tournaments" });
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },
@@ -50,9 +61,9 @@ export const Route = createFileRoute("/tournament/$slug")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ];
-    if (t?.cover_image_url) {
-      meta.push({ property: "og:image", content: t.cover_image_url });
-      meta.push({ name: "twitter:image", content: t.cover_image_url });
+    if (data?.cover_image_url) {
+      meta.push({ property: "og:image", content: data.cover_image_url });
+      meta.push({ name: "twitter:image", content: data.cover_image_url });
     }
     return { meta };
   },
@@ -62,6 +73,7 @@ type Tab = "overview" | "teams" | "matches" | "standings" | "bracket";
 
 function PublicTournamentPage() {
   const { slug } = Route.useParams();
+  const { t } = useTranslation("tournaments");
   const initial = Route.useLoaderData().initial;
   const fn = useServerFn(getPublicTournament);
   const q = useQuery({
@@ -90,12 +102,16 @@ function PublicTournamentPage() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center space-y-2 max-w-md">
           <Trophy className="h-10 w-10 mx-auto text-muted-foreground" />
-          <p className="text-lg font-medium">Tournoi indisponible</p>
+          <p className="text-lg font-medium">{t("public.unavailableTitle")}</p>
           <p className="text-sm text-muted-foreground">
-            Ce tournoi n'est pas encore publié, ou le lien est expiré. Si tu es l'organisateur, ouvre ton tournoi puis clique sur <strong>Publier</strong>.
+            <Trans
+              i18nKey="public.unavailableBody"
+              t={t}
+              components={{ 1: <strong /> }}
+            />
           </p>
           <Link to="/" className="text-sm text-primary underline">
-            Retour à l'accueil
+            {t("public.backHome")}
           </Link>
         </div>
       </div>
@@ -134,11 +150,11 @@ function PublicTournamentPage() {
     (closes === null || now <= closes);
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: "overview", label: "Aperçu", icon: CalendarDays },
-    { id: "teams", label: "Équipes", icon: Users },
-    { id: "matches", label: "Matchs", icon: Calendar },
-    { id: "standings", label: "Classement", icon: ListOrdered },
-    { id: "bracket", label: "Bracket", icon: GitBranch },
+    { id: "overview", label: t("public.tabs.overview"), icon: CalendarDays },
+    { id: "teams", label: t("public.tabs.teams"), icon: Users },
+    { id: "matches", label: t("public.tabs.matches"), icon: Calendar },
+    { id: "standings", label: t("public.tabs.standings"), icon: ListOrdered },
+    { id: "bracket", label: t("public.tabs.bracket"), icon: GitBranch },
   ];
 
   const accent = rules.branding.primaryColor;
@@ -200,14 +216,14 @@ function PublicTournamentPage() {
                   <Button asChild size="sm">
                     <Link to="/tournament/$slug/register" params={{ slug }}>
                       <UserPlus className="h-4 w-4" />
-                      S'inscrire
+                      {t("public.register")}
                     </Link>
                   </Button>
                 )}
                 <Button asChild size="sm" variant="outline">
                   <Link to="/tournament/$slug/tv" params={{ slug }}>
                     <Tv className="h-4 w-4" />
-                    Diaporama TV
+                    {t("public.tvSlideshow")}
                   </Link>
                 </Button>
               </div>
@@ -219,13 +235,13 @@ function PublicTournamentPage() {
       <div className="max-w-3xl mx-auto px-5 mt-5">
         <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
           <div className="flex gap-1 overflow-x-auto">
-            {tabs.map((t) => {
-              const Icon = t.icon;
-              const active = tab === t.id;
+            {tabs.map((tabItem) => {
+              const Icon = tabItem.icon;
+              const active = tab === tabItem.id;
               return (
                 <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
+                  key={tabItem.id}
+                  onClick={() => setTab(tabItem.id)}
                   className={cn(
                     "min-w-fit flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                     active
@@ -234,7 +250,7 @@ function PublicTournamentPage() {
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {t.label}
+                  {tabItem.label}
                 </button>
               );
             })}
@@ -245,19 +261,21 @@ function PublicTournamentPage() {
           {(tab === "overview" || tab === "matches") && teams.length > 0 && (
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <label className="text-xs text-muted-foreground">Filtrer par équipe</label>
+              <label className="text-xs text-muted-foreground">
+                {t("public.filterByTeam")}
+              </label>
               <select
                 value={teamFilter}
                 onChange={(e) => setTeamFilter(e.target.value)}
                 className="text-sm rounded-md border border-input bg-background px-2 py-1"
               >
-                <option value="all">Toutes les équipes</option>
+                <option value="all">{t("public.allTeams")}</option>
                 {(teams as any[])
                   .slice()
                   .sort((a, b) => a.name.localeCompare(b.name))
-                  .map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
+                  .map((teamOpt) => (
+                    <option key={teamOpt.id} value={teamOpt.id}>
+                      {teamOpt.name}
                     </option>
                   ))}
               </select>
@@ -297,7 +315,9 @@ function PublicTournamentPage() {
         <div className="pb-8">
           <SponsorsStrip
             sponsors={rules.branding.sponsors}
-            title={rules.branding.sponsorsTitle || "Avec le soutien de nos partenaires"}
+            title={
+              rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault")
+            }
           />
         </div>
       </div>
@@ -318,7 +338,8 @@ function Overview({
   scoring: ScoringRules;
   eventsByMatch: Map<string, any[]>;
 }) {
-  const teamMap = new Map(teams.map((t: any) => [t.id, t]));
+  const { t } = useTranslation("tournaments");
+  const teamMap = new Map(teams.map((tm: any) => [tm.id, tm]));
   const live = matches.filter((m: any) => m.status === "live");
   const upcoming = matches.filter((m: any) => m.status === "scheduled").slice(0, 5);
   const recent = matches.filter((m: any) => m.status === "completed").slice(-5).reverse();
@@ -327,7 +348,7 @@ function Overview({
     <div className="grid gap-5 md:grid-cols-2">
       {live.length > 0 && (
         <div className="md:col-span-2">
-          <Card title="En direct" empty="">
+          <Card title={t("public.sections.live")} empty="">
             {live.map((m: any) => (
               <MatchRow
                 key={m.id}
@@ -340,7 +361,10 @@ function Overview({
           </Card>
         </div>
       )}
-      <Card title="Prochains matchs" empty="Aucun match programmé">
+      <Card
+        title={t("public.sections.upcoming")}
+        empty={t("public.sections.noUpcoming")}
+      >
         {upcoming.map((m: any) => (
           <MatchRow
             key={m.id}
@@ -351,7 +375,10 @@ function Overview({
           />
         ))}
       </Card>
-      <Card title="Derniers résultats" empty="Aucun résultat pour le moment">
+      <Card
+        title={t("public.sections.recent")}
+        empty={t("public.sections.noRecent")}
+      >
         {recent.map((m: any) => (
           <MatchRow
             key={m.id}
@@ -362,10 +389,14 @@ function Overview({
           />
         ))}
       </Card>
-      <Card title="Format">
+      <Card title={t("public.sections.format")}>
         <p className="text-sm text-muted-foreground p-3">
-          {groups.length} poule{groups.length > 1 ? "s" : ""} · {teams.length}{" "}
-          équipes · {matches.length} matchs
+          {t("public.sections.formatSummary", {
+            count: groups.length,
+            groupCount: groups.length,
+            teamCount: teams.length,
+            matchCount: matches.length,
+          })}
         </p>
       </Card>
     </div>
@@ -396,16 +427,19 @@ function Card({
   );
 }
 
-const EVENT_LABELS: Record<string, string> = {
-  goal: "But",
-  own_goal: "But CSC",
-  assist: "Passe D.",
-  yellow: "Carton jaune",
-  red: "Carton rouge",
-  second_yellow: "2e jaune",
-  penalty: "Penalty",
-  foul: "Faute",
-};
+function useEventLabels(): Record<string, string> {
+  const { t } = useTranslation("tournaments");
+  return {
+    goal: t("public.events.goal"),
+    own_goal: t("public.events.own_goal"),
+    assist: t("public.events.assist"),
+    yellow: t("public.events.yellow"),
+    red: t("public.events.red"),
+    second_yellow: t("public.events.second_yellow"),
+    penalty: t("public.events.penalty"),
+    foul: t("public.events.foul"),
+  };
+}
 
 const EVENT_EMOJI: Record<string, string> = {
   goal: "⚽",
@@ -425,6 +459,7 @@ function EventsList({
   events: any[];
   teamMap: Map<string, any>;
 }) {
+  const EVENT_LABELS = useEventLabels();
   if (!events || events.length === 0) return null;
   const sorted = [...events].sort((a, b) => {
     const ma = a.minute ?? 9999;
@@ -458,10 +493,11 @@ function EventsList({
 }
 
 function LiveBadge() {
+  const { t } = useTranslation("tournaments");
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
       <Radio className="h-2.5 w-2.5 animate-pulse" />
-      Live
+      {t("common.live")}
     </span>
   );
 }
@@ -477,6 +513,7 @@ function MatchRow({
   scoring: ScoringRules;
   events?: any[];
 }) {
+  const { t } = useTranslation("tournaments");
   const a = match.team_a_id ? teamMap.get(match.team_a_id) : null;
   const b = match.team_b_id ? teamMap.get(match.team_b_id) : null;
   const setsLine = scoring.mode === "sets" ? formatSets(match.sets) : "";
@@ -484,12 +521,12 @@ function MatchRow({
   return (
     <li className={cn("px-3 py-2 text-sm", isLive && "bg-red-500/5")}>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <span className="truncate text-right">{a?.name ?? "TBD"}</span>
+        <span className="truncate text-right">{a?.name ?? t("common.tbd")}</span>
         <span className="tabular-nums font-semibold flex items-center gap-1.5">
           {match.score_a ?? "–"} : {match.score_b ?? "–"}
           {isLive && <LiveBadge />}
         </span>
-        <span className="truncate">{b?.name ?? "TBD"}</span>
+        <span className="truncate">{b?.name ?? t("common.tbd")}</span>
       </div>
       {setsLine && (
         <div className="text-[11px] text-muted-foreground text-center mt-0.5 tabular-nums">
@@ -502,28 +539,33 @@ function MatchRow({
 }
 
 function TeamsGrid({ teams }: { teams: any[] }) {
+  const { t } = useTranslation("tournaments");
   if (teams.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
-        Aucune équipe inscrite.
+        {t("public.sections.noTeams")}
       </p>
     );
   }
   return (
     <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {teams.map((t) => (
+      {teams.map((teamItem) => (
         <li
-          key={t.id}
+          key={teamItem.id}
           className="rounded-xl border border-border bg-card p-3 text-center"
         >
           <div className="h-12 w-12 mx-auto rounded-lg bg-muted overflow-hidden flex items-center justify-center mb-2">
-            {t.logo_url ? (
-              <img src={t.logo_url} alt={t.name} className="h-full w-full object-cover" />
+            {teamItem.logo_url ? (
+              <img
+                src={teamItem.logo_url}
+                alt={teamItem.name}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <Users className="h-5 w-5 text-muted-foreground" />
             )}
           </div>
-          <p className="text-sm font-medium truncate">{t.name}</p>
+          <p className="text-sm font-medium truncate">{teamItem.name}</p>
         </li>
       ))}
     </ul>
@@ -541,11 +583,12 @@ function PublicMatches({
   scoring: ScoringRules;
   eventsByMatch: Map<string, any[]>;
 }) {
-  const teamMap = new Map(teams.map((t) => [t.id, t]));
+  const { t } = useTranslation("tournaments");
+  const teamMap = new Map(teams.map((tm) => [tm.id, tm]));
   if (matches.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
-        Aucun match programmé.
+        {t("public.sections.noMatches")}
       </p>
     );
   }
@@ -565,24 +608,25 @@ function PublicMatches({
           >
             <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
               <span className="truncate text-right text-sm font-medium">
-                {teamMap.get(m.team_a_id)?.name ?? "TBD"}
+                {teamMap.get(m.team_a_id)?.name ?? t("common.tbd")}
               </span>
               <span className="tabular-nums font-bold flex items-center gap-1.5">
                 {m.score_a ?? "–"} : {m.score_b ?? "–"}
                 {isLive && <LiveBadge />}
               </span>
               <span className="truncate text-sm font-medium">
-                {teamMap.get(m.team_b_id)?.name ?? "TBD"}
+                {teamMap.get(m.team_b_id)?.name ?? t("common.tbd")}
               </span>
             </div>
             {(m.scheduled_at || m.field) && (
               <div className="text-[11px] text-muted-foreground text-center mt-1">
-                {m.scheduled_at && new Date(m.scheduled_at).toLocaleString("fr-FR", {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })}
+                {m.scheduled_at &&
+                  new Date(m.scheduled_at).toLocaleString(i18n.language, {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
                 {m.scheduled_at && m.field ? " · " : ""}
-                {m.field && `Terrain ${m.field}`}
+                {m.field && `${t("common.field")} ${m.field}`}
               </div>
             )}
             {setsLine && (

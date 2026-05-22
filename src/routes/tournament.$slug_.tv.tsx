@@ -7,6 +7,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import {
   Trophy,
   Calendar,
@@ -49,13 +51,18 @@ export const Route = createFileRoute("/tournament/$slug_/tv")({
         : 12,
   }),
   head: ({ params }) => ({
-    meta: [{ title: `Diaporama — ${params.slug} · Clubero` }],
+    meta: [
+      {
+        title: i18n.t("tv.metaTitle", { ns: "tournaments", slug: params.slug }),
+      },
+    ],
   }),
 });
 
 function TvSlideshowPage() {
   const { slug } = Route.useParams();
   const { refresh } = Route.useSearch();
+  const { t } = useTranslation("tournaments");
   const fn = useServerFn(getPublicTournament);
   const q = useQuery({
     queryKey: ["public-tournament-tv", slug],
@@ -97,7 +104,8 @@ function TvSlideshowPage() {
     const { tournament, groups, teams, matches } = data;
     const rules = mergeRules((tournament as any).settings);
     const sponsors = rules.branding.sponsors ?? [];
-    const sponsorsTitle = rules.branding.sponsorsTitle || "Nos partenaires";
+    const sponsorsTitle =
+      rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault");
     const teamMap = new Map<string, TvTeam>(
       teams.map((t: any) => [t.id, t as TvTeam]),
     );
@@ -116,22 +124,22 @@ function TvSlideshowPage() {
     const out: Slide[] = [];
     out.push({
       key: "results",
-      title: "Derniers résultats",
+      title: t("tv.slides.recent"),
       icon: <Trophy className="h-7 w-7" />,
       render: () =>
         recent.length === 0 ? (
-          <EmptyBig>Aucun résultat pour le moment</EmptyBig>
+          <EmptyBig>{t("tv.slides.noRecent")}</EmptyBig>
         ) : (
           <MatchesGrid matches={recent} teamMap={teamMap} scoring={scoring} finished />
         ),
     });
     out.push({
       key: "upcoming",
-      title: "Prochains matchs",
+      title: t("tv.slides.upcoming"),
       icon: <Calendar className="h-7 w-7" />,
       render: () =>
         upcoming.length === 0 ? (
-          <EmptyBig>Aucun match programmé</EmptyBig>
+          <EmptyBig>{t("tv.slides.noUpcoming")}</EmptyBig>
         ) : (
           <MatchesGrid matches={upcoming} teamMap={teamMap} scoring={scoring} />
         ),
@@ -153,7 +161,7 @@ function TvSlideshowPage() {
         const rows = computeStandings(ids, gMatches);
         out.push({
           key: `standings-${g.id}`,
-          title: `Classement · ${g.name}`,
+          title: t("tv.slides.standings", { group: g.name }),
           icon: <ListOrdered className="h-7 w-7" />,
           render: () => (
             <StandingsTable
@@ -168,7 +176,7 @@ function TvSlideshowPage() {
     if (hasBracket) {
       out.push({
         key: "bracket",
-        title: "Phase finale",
+        title: t("tv.slides.bracket"),
         icon: <GitBranch className="h-7 w-7" />,
         render: () => (
           <div className="h-full w-full overflow-auto px-2">
@@ -191,6 +199,7 @@ function TvSlideshowPage() {
         ),
       });
     }
+
     // Always close on tournament title
     out.unshift({
       key: "intro",
@@ -224,7 +233,7 @@ function TvSlideshowPage() {
       ),
     });
     return out;
-  }, [data, scoring]);
+  }, [data, scoring, t]);
 
   // Auto-rotation
   useEffect(() => {
@@ -256,10 +265,8 @@ function TvSlideshowPage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-3 p-6 text-center">
         <Trophy className="h-12 w-12 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Diaporama indisponible</h1>
-        <p className="text-muted-foreground max-w-md">
-          Ce tournoi n'est pas encore publié ou n'existe pas.
-        </p>
+        <h1 className="text-2xl font-bold">{t("tv.unavailableTitle")}</h1>
+        <p className="text-muted-foreground max-w-md">{t("tv.unavailableBody")}</p>
       </div>
     );
   }
@@ -296,14 +303,14 @@ function TvSlideshowPage() {
         </div>
         <div className="text-right tabular-nums">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            {clock.toLocaleDateString("fr-FR", {
+            {clock.toLocaleDateString(i18n.language, {
               weekday: "long",
               day: "numeric",
               month: "long",
             })}
           </p>
           <p className="text-2xl font-semibold">
-            {clock.toLocaleTimeString("fr-FR", {
+            {clock.toLocaleTimeString(i18n.language, {
               hour: "2-digit",
               minute: "2-digit",
             })}
@@ -323,7 +330,7 @@ function TvSlideshowPage() {
             onClick={() =>
               setIdx((i) => (i - 1 + slides.length) % slides.length)
             }
-            aria-label="Précédent"
+            aria-label={t("tv.controls.previous")}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -331,7 +338,7 @@ function TvSlideshowPage() {
             size="icon"
             variant="ghost"
             onClick={() => setPaused((p) => !p)}
-            aria-label={paused ? "Reprendre" : "Pause"}
+            aria-label={paused ? t("tv.controls.resume") : t("tv.controls.pause")}
           >
             {paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
           </Button>
@@ -339,7 +346,7 @@ function TvSlideshowPage() {
             size="icon"
             variant="ghost"
             onClick={() => setIdx((i) => (i + 1) % slides.length)}
-            aria-label="Suivant"
+            aria-label={t("tv.controls.next")}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
@@ -360,17 +367,19 @@ function TvSlideshowPage() {
           size="sm"
           variant="ghost"
           onClick={goFullscreen}
-          aria-label={isFs ? "Quitter plein écran" : "Plein écran"}
+          aria-label={
+            isFs ? t("tv.controls.exitFullscreen") : t("tv.controls.fullscreen")
+          }
         >
           {isFs ? (
             <>
               <Minimize2 className="h-4 w-4" />
-              Quitter
+              {t("tv.controls.exit")}
             </>
           ) : (
             <>
               <Maximize2 className="h-4 w-4" />
-              Plein écran
+              {t("tv.controls.fullscreen")}
             </>
           )}
         </Button>
@@ -405,6 +414,7 @@ function MatchesGrid({
   scoring: ScoringRules;
   finished?: boolean;
 }) {
+  const { t } = useTranslation("tournaments");
   return (
     <ul className="h-full grid grid-cols-1 md:grid-cols-2 gap-3 auto-rows-fr content-start">
       {matches.map((m) => {
@@ -420,7 +430,7 @@ function MatchesGrid({
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>
                 {m.scheduled_at
-                  ? new Date(m.scheduled_at).toLocaleString("fr-FR", {
+                  ? new Date(m.scheduled_at).toLocaleString(i18n.language, {
                       weekday: "short",
                       hour: "2-digit",
                       minute: "2-digit",
@@ -431,22 +441,22 @@ function MatchesGrid({
               {live && (
                 <span className="flex items-center gap-1 text-red-600 font-semibold">
                   <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse" />
-                  LIVE
+                  {t("common.live").toUpperCase()}
                 </span>
               )}
               {finished && !live && (
-                <span className="text-emerald-600 font-semibold">FT</span>
+                <span className="text-emerald-600 font-semibold">{t("common.ft")}</span>
               )}
             </div>
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 my-2">
               <span className="truncate text-right text-2xl font-semibold">
-                {a?.name ?? "TBD"}
+                {a?.name ?? t("common.tbd")}
               </span>
               <span className="tabular-nums font-black text-4xl">
                 {m.score_a ?? "–"} : {m.score_b ?? "–"}
               </span>
               <span className="truncate text-2xl font-semibold">
-                {b?.name ?? "TBD"}
+                {b?.name ?? t("common.tbd")}
               </span>
             </div>
             {setsLine && (
@@ -461,6 +471,7 @@ function MatchesGrid({
   );
 }
 
+
 function StandingsTable({
   rows,
   teamMap,
@@ -470,19 +481,20 @@ function StandingsTable({
   teamMap: Map<string, TvTeam>;
   qualifiers: number;
 }) {
+  const { t } = useTranslation("tournaments");
   return (
     <div className="h-full overflow-auto">
       <table className="w-full text-lg">
         <thead className="text-xs uppercase text-muted-foreground border-b border-border">
           <tr>
-            <th className="text-left px-3 py-2 w-10">#</th>
-            <th className="text-left px-3 py-2">Équipe</th>
-            <th className="text-right px-2 py-2 w-12">J</th>
-            <th className="text-right px-2 py-2 w-12">G</th>
-            <th className="text-right px-2 py-2 w-12">N</th>
-            <th className="text-right px-2 py-2 w-12">P</th>
-            <th className="text-right px-2 py-2 w-16">+/-</th>
-            <th className="text-right px-3 py-2 w-14 font-bold">Pts</th>
+            <th className="text-left px-3 py-2 w-10">{t("tv.table.rank")}</th>
+            <th className="text-left px-3 py-2">{t("tv.table.team")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.played")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.won")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.drawn")}</th>
+            <th className="text-right px-2 py-2 w-12">{t("tv.table.lost")}</th>
+            <th className="text-right px-2 py-2 w-16">{t("tv.table.diff")}</th>
+            <th className="text-right px-3 py-2 w-14 font-bold">{t("tv.table.points")}</th>
           </tr>
         </thead>
         <tbody>

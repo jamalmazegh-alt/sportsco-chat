@@ -1,0 +1,153 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "error": "Erreur",
+    "networkError": "Erreur réseau",
+    "required": "Obligatoire",
+    "optional": "optionnel",
+    "team": "Équipe",
+    "teams": "Équipes",
+    "match": "Match",
+    "matches": "Matchs",
+    "group": "Poule",
+    "groups": "Poules",
+    "tbd": "TBD",
+    "live": "Live",
+    "ft": "FT",
+    "field": "Terrain"
+  },
+  "public": {
+    "metaTitle": "{{name}} — Tournoi {{sport}} · Clubero",
+    "metaTitleFallback": "Tournoi {{slug}} — Clubero",
+    "metaDesc": "Suivez {{name}} en direct : équipes, calendrier, résultats et classements{{locationSuffix}}.",
+    "metaDescFallback": "Suivez ce tournoi en direct : équipes, calendrier, résultats et classements.",
+    "unavailableTitle": "Tournoi indisponible",
+    "unavailableBody": "Ce tournoi n'est pas encore publié, ou le lien est expiré. Si tu es l'organisateur, ouvre ton tournoi puis clique sur <1>Publier</1>.",
+    "backHome": "Retour à l'accueil",
+    "register": "S'inscrire",
+    "tvSlideshow": "Diaporama TV",
+    "filterByTeam": "Filtrer par équipe",
+    "allTeams": "Toutes les équipes",
+    "tabs": {
+      "overview": "Aperçu",
+      "teams": "Équipes",
+      "matches": "Matchs",
+      "standings": "Classement",
+      "bracket": "Bracket"
+    },
+    "sections": {
+      "live": "En direct",
+      "upcoming": "Prochains matchs",
+      "recent": "Derniers résultats",
+      "format": "Format",
+      "noUpcoming": "Aucun match programmé",
+      "noRecent": "Aucun résultat pour le moment",
+      "noTeams": "Aucune équipe inscrite.",
+      "noMatches": "Aucun match programmé.",
+      "formatSummary_one": "{{groupCount}} poule · {{teamCount}} équipes · {{matchCount}} matchs",
+      "formatSummary_other": "{{groupCount}} poules · {{teamCount}} équipes · {{matchCount}} matchs"
+    },
+    "events": {
+      "goal": "But",
+      "own_goal": "But CSC",
+      "assist": "Passe D.",
+      "yellow": "Carton jaune",
+      "red": "Carton rouge",
+      "second_yellow": "2e jaune",
+      "penalty": "Penalty",
+      "foul": "Faute"
+    },
+    "sponsorsTitleDefault": "Avec le soutien de nos partenaires"
+  },
+  "register": {
+    "metaTitle": "Inscription — Tournoi {{slug}} · Clubero",
+    "unavailableTitle": "Inscriptions indisponibles",
+    "unavailableBody": "Les inscriptions ne sont pas ouvertes pour ce tournoi.",
+    "backTournament": "Retour au tournoi",
+    "opensOn": "Les inscriptions ouvrent le {{date}}.",
+    "closed": "Inscriptions closes.",
+    "heading": "Inscription — {{name}}",
+    "missingRequired": "Champs obligatoires manquants",
+    "pending": "Inscription envoyée — en attente de validation",
+    "confirmed": "Inscription confirmée !",
+    "fields": {
+      "teamName": "Nom de l'équipe *",
+      "shortName": "Nom court",
+      "contactName": "Contact (nom) *",
+      "phone": "Téléphone",
+      "email": "Email *",
+      "players": "Joueurs ({{count}})",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "jerseyShort": "N°",
+      "position": "Poste",
+      "notes": "Notes (optionnel)"
+    },
+    "addPlayer": "Ajouter",
+    "submit": "Envoyer l'inscription"
+  },
+  "tv": {
+    "metaTitle": "Diaporama — {{slug}} · Clubero",
+    "unavailableTitle": "Diaporama indisponible",
+    "unavailableBody": "Ce tournoi n'est pas encore publié ou n'existe pas.",
+    "slides": {
+      "recent": "Derniers résultats",
+      "upcoming": "Prochains matchs",
+      "noRecent": "Aucun résultat pour le moment",
+      "noUpcoming": "Aucun match programmé",
+      "standings": "Classement · {{group}}",
+      "bracket": "Phase finale"
+    },
+    "controls": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pause": "Pause",
+      "resume": "Reprendre",
+      "fullscreen": "Plein écran",
+      "exitFullscreen": "Quitter plein écran",
+      "exit": "Quitter"
+    },
+    "table": {
+      "rank": "#",
+      "team": "Équipe",
+      "played": "J",
+      "won": "G",
+      "drawn": "N",
+      "lost": "P",
+      "diff": "+/-",
+      "points": "Pts"
+    }
+  },
+  "invite": {
+    "invalidTitle": "Invitation invalide",
+    "invalidBody": "Ce lien d'invitation n'existe pas ou a été supprimé.",
+    "revokedTitle": "Invitation révoquée",
+    "revokedBody": "Cette invitation a été annulée par l'organisateur.",
+    "roleCoOrganizer": "Co-organisateur",
+    "roleReferee": "Arbitre",
+    "heading": "Invitation au tournoi",
+    "intro": "Tu es invité·e en tant que <1>{{role}}</1> pour",
+    "invitedEmail": "Adresse invitée : {{email}}",
+    "alreadyAccepted": "Invitation déjà acceptée",
+    "viewTournament": "Voir le tournoi",
+    "loginPrompt": "Connecte-toi pour accepter cette invitation.",
+    "signIn": "Se connecter",
+    "accept": "Accepter l'invitation",
+    "accepted": "Invitation acceptée"
+  },
+  "passSuccess": {
+    "metaTitle": "Pass tournoi confirmé — Clubero",
+    "heading": "Pass tournoi confirmé",
+    "body": "Merci pour votre achat. Vous allez recevoir votre reçu par e-mail. Connectez-vous (ou créez votre compte avec la même adresse e-mail) pour créer votre tournoi.",
+    "createAccount": "Créer mon compte",
+    "haveAccount": "J'ai déjà un compte"
+  }
+}

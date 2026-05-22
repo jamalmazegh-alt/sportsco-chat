@@ -1,0 +1,153 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "error": "Error",
+    "networkError": "Network error",
+    "required": "Required",
+    "optional": "optional",
+    "team": "Team",
+    "teams": "Teams",
+    "match": "Match",
+    "matches": "Matches",
+    "group": "Group",
+    "groups": "Groups",
+    "tbd": "TBD",
+    "live": "Live",
+    "ft": "FT",
+    "field": "Field"
+  },
+  "public": {
+    "metaTitle": "{{name}} — {{sport}} tournament · Clubero",
+    "metaTitleFallback": "Tournament {{slug}} — Clubero",
+    "metaDesc": "Follow {{name}} live: teams, schedule, results and standings{{locationSuffix}}.",
+    "metaDescFallback": "Follow this tournament live: teams, schedule, results and standings.",
+    "unavailableTitle": "Tournament unavailable",
+    "unavailableBody": "This tournament hasn't been published yet, or the link has expired. If you're the organizer, open your tournament and click <1>Publish</1>.",
+    "backHome": "Back to home",
+    "register": "Register",
+    "tvSlideshow": "TV slideshow",
+    "filterByTeam": "Filter by team",
+    "allTeams": "All teams",
+    "tabs": {
+      "overview": "Overview",
+      "teams": "Teams",
+      "matches": "Matches",
+      "standings": "Standings",
+      "bracket": "Bracket"
+    },
+    "sections": {
+      "live": "Live",
+      "upcoming": "Upcoming matches",
+      "recent": "Latest results",
+      "format": "Format",
+      "noUpcoming": "No matches scheduled",
+      "noRecent": "No results yet",
+      "noTeams": "No teams registered.",
+      "noMatches": "No matches scheduled.",
+      "formatSummary_one": "{{groupCount}} group · {{teamCount}} teams · {{matchCount}} matches",
+      "formatSummary_other": "{{groupCount}} groups · {{teamCount}} teams · {{matchCount}} matches"
+    },
+    "events": {
+      "goal": "Goal",
+      "own_goal": "Own goal",
+      "assist": "Assist",
+      "yellow": "Yellow card",
+      "red": "Red card",
+      "second_yellow": "2nd yellow",
+      "penalty": "Penalty",
+      "foul": "Foul"
+    },
+    "sponsorsTitleDefault": "With the support of our partners"
+  },
+  "register": {
+    "metaTitle": "Registration — Tournament {{slug}} · Clubero",
+    "unavailableTitle": "Registrations unavailable",
+    "unavailableBody": "Registrations are not open for this tournament.",
+    "backTournament": "Back to tournament",
+    "opensOn": "Registrations open on {{date}}.",
+    "closed": "Registrations closed.",
+    "heading": "Registration — {{name}}",
+    "missingRequired": "Required fields missing",
+    "pending": "Registration sent — awaiting approval",
+    "confirmed": "Registration confirmed!",
+    "fields": {
+      "teamName": "Team name *",
+      "shortName": "Short name",
+      "contactName": "Contact name *",
+      "phone": "Phone",
+      "email": "Email *",
+      "players": "Players ({{count}})",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "jerseyShort": "#",
+      "position": "Position",
+      "notes": "Notes (optional)"
+    },
+    "addPlayer": "Add",
+    "submit": "Send registration"
+  },
+  "tv": {
+    "metaTitle": "Slideshow — {{slug}} · Clubero",
+    "unavailableTitle": "Slideshow unavailable",
+    "unavailableBody": "This tournament hasn't been published yet or doesn't exist.",
+    "slides": {
+      "recent": "Latest results",
+      "upcoming": "Upcoming matches",
+      "noRecent": "No results yet",
+      "noUpcoming": "No matches scheduled",
+      "standings": "Standings · {{group}}",
+      "bracket": "Knockout stage"
+    },
+    "controls": {
+      "previous": "Previous",
+      "next": "Next",
+      "pause": "Pause",
+      "resume": "Resume",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit fullscreen",
+      "exit": "Exit"
+    },
+    "table": {
+      "rank": "#",
+      "team": "Team",
+      "played": "P",
+      "won": "W",
+      "drawn": "D",
+      "lost": "L",
+      "diff": "+/-",
+      "points": "Pts"
+    }
+  },
+  "invite": {
+    "invalidTitle": "Invalid invitation",
+    "invalidBody": "This invitation link doesn't exist or has been removed.",
+    "revokedTitle": "Invitation revoked",
+    "revokedBody": "This invitation was cancelled by the organizer.",
+    "roleCoOrganizer": "Co-organizer",
+    "roleReferee": "Referee",
+    "heading": "Tournament invitation",
+    "intro": "You're invited as <1>{{role}}</1> for",
+    "invitedEmail": "Invited email: {{email}}",
+    "alreadyAccepted": "Invitation already accepted",
+    "viewTournament": "View tournament",
+    "loginPrompt": "Sign in to accept this invitation.",
+    "signIn": "Sign in",
+    "accept": "Accept invitation",
+    "accepted": "Invitation accepted"
+  },
+  "passSuccess": {
+    "metaTitle": "Tournament pass confirmed — Clubero",
+    "heading": "Tournament pass confirmed",
+    "body": "Thanks for your purchase. Your receipt is on its way by email. Sign in (or create your account with the same email address) to create your tournament.",
+    "createAccount": "Create my account",
+    "haveAccount": "I already have an account"
+  }
+}
