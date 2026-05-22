@@ -169,6 +169,11 @@ export const updateTournament = createServerFn({ method: "POST" })
             cover_image_url: z.string().url().nullable().optional(),
             ends_on: z.string().nullable().optional(),
             settings: z.record(z.string(), z.any()).optional(),
+            match_duration_min: z.number().int().min(1).max(240).nullable().optional(),
+            break_min: z.number().int().min(0).max(120).nullable().optional(),
+            daily_start_time: z.string().nullable().optional(),
+            daily_end_time: z.string().nullable().optional(),
+            fields: z.array(z.string().min(1).max(60)).max(20).nullable().optional(),
           })
           .strict(),
       })
@@ -186,6 +191,7 @@ export const updateTournament = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     return { tournament: row };
   });
+
 
 // ---------- Teams
 
