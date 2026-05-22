@@ -3,10 +3,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { recordMatchScore } from "../tournaments.functions";
+import { recordMatchScore, updateMatchSchedule } from "../tournaments.functions";
 
 interface Team {
   id: string;
@@ -25,12 +33,15 @@ interface Match {
   score_b: number | null;
   status: string;
   scheduled_at: string | null;
+  field?: string | null;
 }
 
 interface Props {
   tournamentId: string;
   matches: Match[];
   teams: Team[];
+  canManage?: boolean;
+  fields?: string[];
 }
 
 export function MatchesList({ tournamentId, matches, teams }: Props) {
