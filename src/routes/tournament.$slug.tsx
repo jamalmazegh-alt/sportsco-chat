@@ -216,14 +216,14 @@ function PublicTournamentPage() {
                   <Button asChild size="sm">
                     <Link to="/tournament/$slug/register" params={{ slug }}>
                       <UserPlus className="h-4 w-4" />
-                      S'inscrire
+                      {t("public.register")}
                     </Link>
                   </Button>
                 )}
                 <Button asChild size="sm" variant="outline">
                   <Link to="/tournament/$slug/tv" params={{ slug }}>
                     <Tv className="h-4 w-4" />
-                    Diaporama TV
+                    {t("public.tvSlideshow")}
                   </Link>
                 </Button>
               </div>
@@ -235,13 +235,13 @@ function PublicTournamentPage() {
       <div className="max-w-3xl mx-auto px-5 mt-5">
         <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
           <div className="flex gap-1 overflow-x-auto">
-            {tabs.map((t) => {
-              const Icon = t.icon;
-              const active = tab === t.id;
+            {tabs.map((tabItem) => {
+              const Icon = tabItem.icon;
+              const active = tab === tabItem.id;
               return (
                 <button
-                  key={t.id}
-                  onClick={() => setTab(t.id)}
+                  key={tabItem.id}
+                  onClick={() => setTab(tabItem.id)}
                   className={cn(
                     "min-w-fit flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                     active
@@ -250,7 +250,7 @@ function PublicTournamentPage() {
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  {t.label}
+                  {tabItem.label}
                 </button>
               );
             })}
@@ -261,19 +261,21 @@ function PublicTournamentPage() {
           {(tab === "overview" || tab === "matches") && teams.length > 0 && (
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <label className="text-xs text-muted-foreground">Filtrer par équipe</label>
+              <label className="text-xs text-muted-foreground">
+                {t("public.filterByTeam")}
+              </label>
               <select
                 value={teamFilter}
                 onChange={(e) => setTeamFilter(e.target.value)}
                 className="text-sm rounded-md border border-input bg-background px-2 py-1"
               >
-                <option value="all">Toutes les équipes</option>
+                <option value="all">{t("public.allTeams")}</option>
                 {(teams as any[])
                   .slice()
                   .sort((a, b) => a.name.localeCompare(b.name))
-                  .map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
+                  .map((teamOpt) => (
+                    <option key={teamOpt.id} value={teamOpt.id}>
+                      {teamOpt.name}
                     </option>
                   ))}
               </select>
@@ -313,7 +315,9 @@ function PublicTournamentPage() {
         <div className="pb-8">
           <SponsorsStrip
             sponsors={rules.branding.sponsors}
-            title={rules.branding.sponsorsTitle || "Avec le soutien de nos partenaires"}
+            title={
+              rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault")
+            }
           />
         </div>
       </div>
