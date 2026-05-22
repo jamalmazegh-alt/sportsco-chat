@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
 
 // Routes accessible to tournament-only users (no club). Everything else
 // under /_authenticated is redirected to /tournaments.
@@ -13,10 +14,15 @@ const TOURNAMENT_ONLY_ALLOWED = [
   "/profile",
   "/support",
 ];
-function isTournamentOnlyAllowed(pathname: string): boolean {
-  return TOURNAMENT_ONLY_ALLOWED.some(
-    (p) => pathname === p || pathname.startsWith(p + "/"),
-  );
+// When a club has no active subscription, only these prefixes remain
+// accessible (so the admin can subscribe; everyone can still see profile).
+const CLUB_LOCKED_ALLOWED = [
+  "/admin",
+  "/profile",
+  "/support",
+];
+function isPathAllowed(pathname: string, list: string[]): boolean {
+  return list.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 import { AssistantFab } from "@/components/assistant-fab";
 import { SupportFab } from "@/components/support-fab";
@@ -37,7 +43,7 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthLayout() {
-  const { session, loading, memberships, refreshMemberships, user } = useAuth();
+  const { session, loading, memberships, refreshMemberships, user, activeClubId } = useAuth();
   const { t } = useTranslation();
   const [clubName, setClubName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -52,15 +58,29 @@ function AuthLayout() {
   if (!session) return <Navigate to="/login" replace />;
 
   const { tournamentOnly } = useTournamentOnlyMode();
+  const { isActive: clubSubActive, isLoading: subLoading } =
+    useClubSubscriptionActive(activeClubId);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
   const isTournamentOrganizer = signupRole === "tournament_organizer";
 
   // Guard: tournament-only accounts can only reach tournament + profile pages.
-  if (tournamentOnly && !isTournamentOnlyAllowed(pathname)) {
+  if (tournamentOnly && !isPathAllowed(pathname, TOURNAMENT_ONLY_ALLOWED)) {
     return <Navigate to="/tournaments" replace />;
   }
+
+  // Guard: clubs without an active subscription only see Admin + Profile.
+  if (
+    !tournamentOnly &&
+    activeClubId &&
+    !subLoading &&
+    !clubSubActive &&
+    !isPathAllowed(pathname, CLUB_LOCKED_ALLOWED)
+  ) {
+    return <Navigate to="/admin/billing" replace />;
+  }
+
 
   if (memberships.length === 0) {
     // Tournament organizers don't need a club — render the route with just
