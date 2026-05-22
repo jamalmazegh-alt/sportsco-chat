@@ -7,6 +7,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import {
   Trophy,
   Calendar,
@@ -49,13 +51,18 @@ export const Route = createFileRoute("/tournament/$slug_/tv")({
         : 12,
   }),
   head: ({ params }) => ({
-    meta: [{ title: `Diaporama — ${params.slug} · Clubero` }],
+    meta: [
+      {
+        title: i18n.t("tv.metaTitle", { ns: "tournaments", slug: params.slug }),
+      },
+    ],
   }),
 });
 
 function TvSlideshowPage() {
   const { slug } = Route.useParams();
   const { refresh } = Route.useSearch();
+  const { t } = useTranslation("tournaments");
   const fn = useServerFn(getPublicTournament);
   const q = useQuery({
     queryKey: ["public-tournament-tv", slug],
