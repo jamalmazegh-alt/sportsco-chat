@@ -152,11 +152,13 @@ export function computeStandings(
     fairPlay?: FairPlayConfig;
     events?: MatchEventInput[];
     drawLotSalt?: string; // pour rendre draw_lot transparent et stable par tournoi
+    forfeit?: ForfeitConfig;
   } = {},
 ): StandingRow[] {
   const fp = options.fairPlay ?? DEFAULT_FAIR_PLAY;
   const events = options.events ?? [];
   const salt = options.drawLotSalt ?? "";
+  const forfeit = options.forfeit ?? DEFAULT_FORFEIT;
 
   const rows = new Map<string, StandingRow>();
   for (const id of teamIds) {
@@ -175,14 +177,11 @@ export function computeStandings(
     });
   }
 
-  const playedMatches = matches.filter(
-    (m) =>
-      m.status === "completed" &&
-      m.teamAId &&
-      m.teamBId &&
-      m.scoreA !== null &&
-      m.scoreB !== null,
-  );
+  const playedMatches = matches
+    .map((m) =>
+      m.teamAId && m.teamBId ? normalizeSpecialStatus(m, forfeit) : null,
+    )
+    .filter((m): m is MatchInput => m !== null);
 
   for (const m of playedMatches) {
     const a = rows.get(m.teamAId!);
