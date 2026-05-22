@@ -1067,6 +1067,40 @@ export const validateMatch = createServerFn({ method: "POST" })
       _match_id: data.match_id,
     });
     if (!canValidate) throw new Response("Forbidden", { status: 403 });
+
+    // When devalidating, ensure no later match involving either team is already validated.
+    if (!data.validated) {
+      const { data: current } = await supabase
+        .from("tournament_matches")
+        .select("match_number, team_a_id, team_b_id")
+        .eq("id", data.match_id)
+        .eq("tournament_id", data.tournament_id)
+        .maybeSingle();
+      if (current) {
+        const teamIds = [current.team_a_id, current.team_b_id].filter(Boolean) as string[];
+        if (teamIds.length > 0 && current.match_number != null) {
+          const { data: later } = await supabase
+            .from("tournament_matches")
+            .select("match_number")
+            .eq("tournament_id", data.tournament_id)
+            .not("validated_at", "is", null)
+            .gt("match_number", current.match_number)
+            .or(
+              teamIds
+                .map((id) => `team_a_id.eq.${id},team_b_id.eq.${id}`)
+                .join(","),
+            )
+            .limit(1);
+          if (later && later.length > 0) {
+            throw new Response(
+              "Impossible de dévalider : un match suivant impliquant une de ces équipes est déjà validé. Dévalidez d'abord le match suivant.",
+              { status: 400 },
+            );
+          }
+        }
+      }
+    }
+
     const { error } = await supabase
       .from("tournament_matches")
       .update({
