@@ -325,7 +325,21 @@ export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+    const { count } = await supabase
+      .from("tournament_teams")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (
+      typeof tournament.num_teams === "number" &&
+      (count ?? 0) + data.teams.length > tournament.num_teams
+    ) {
+      const remaining = Math.max(0, tournament.num_teams - (count ?? 0));
+      throw new Response(
+        `Limite atteinte : ce tournoi accepte ${tournament.num_teams} équipes (${remaining} place(s) restante(s)).`,
+        { status: 400 },
+      );
+    }
     const rows = data.teams.map((t) => ({
       tournament_id: data.tournament_id,
       name: t.name,
