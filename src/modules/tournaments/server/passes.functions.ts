@@ -64,6 +64,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
 export const listMyAvailablePasses = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId, claims } = context;
     const email = (claims as { email?: string }).email ?? null;
 
