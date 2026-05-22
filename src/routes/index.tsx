@@ -558,16 +558,16 @@ function Hero() {
                     </p>
                   </div>
                   <span className="rounded-full bg-gradient-primary px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
-                    Convocation
+                    {t("home.heroBadgeConvocation")}
                   </span>
                 </div>
                 <div className="space-y-2">
                   {[
-                    { name: "Lucas M.", status: "Présent", c: "bg-primary/15 text-[color:var(--secondary)]" },
-                    { name: "Emma D.", status: "Présent", c: "bg-primary/15 text-[color:var(--secondary)]" },
-                    { name: "Noah B.", status: "Peut-être", c: "bg-amber-500/15 text-amber-700" },
-                    { name: "Léa S.", status: "Absent", c: "bg-red-500/15 text-red-700" },
-                    { name: "Adam K.", status: "En attente", c: "bg-muted text-muted-foreground" },
+                    { name: "Lucas M.", status: t("home.heroStatusPresent"), c: "bg-primary/15 text-[color:var(--secondary)]" },
+                    { name: "Emma D.", status: t("home.heroStatusPresent"), c: "bg-primary/15 text-[color:var(--secondary)]" },
+                    { name: "Noah B.", status: t("home.heroStatusMaybe"), c: "bg-amber-500/15 text-amber-700" },
+                    { name: "Léa S.", status: t("home.heroStatusAbsent"), c: "bg-red-500/15 text-red-700" },
+                    { name: "Adam K.", status: t("home.heroStatusPending"), c: "bg-muted text-muted-foreground" },
                   ].map((p, i) => (
                     <div
                       key={p.name}
@@ -587,7 +587,8 @@ function Hero() {
                   ))}
                 </div>
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">14 sur 18 ont répondu</span>
+                  <span className="text-xs text-muted-foreground">{t("home.heroResponded")}</span>
+
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-16 rounded-full bg-muted overflow-hidden">
                       <div className="h-full w-[78%] bg-gradient-primary rounded-full" />
@@ -604,67 +605,17 @@ function Hero() {
   );
 }
 
-const FEATURES = [
-  {
-    icon: CalendarCheck,
-    title: "Convocations intelligentes",
-    body: "Envoyez vos convocations en quelques secondes. Joueurs et parents répondent en un clic.",
-    accent: "from-[color:var(--brand-blue)] to-[color:var(--secondary)]",
-  },
-  {
-    icon: Users,
-    title: "Gestion d'équipe",
-    body: "Effectifs, liens parents, numéros et postes — tout au même endroit.",
-    accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]",
-  },
-  {
-    icon: Bell,
-    title: "Rappels automatiques",
-    body: "Plus besoin de relancer. Les rappels partent tout seuls.",
-    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
-  },
-  {
-    icon: MessageSquareText,
-    title: "WhatsApp & email en option",
-    body: "Clubero est votre canal principal. Si certains membres préfèrent rester sur WhatsApp ou email, partagez le message formaté en un clic.",
-    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
-  },
-  {
-    icon: Trophy,
-    title: "Tournois clés en main",
-    body: "Créez un tournoi avec poules, brackets, calendrier et classements. Partagez un lien public TV pour suivre les scores en direct.",
-    accent: "from-[color:var(--victory)] to-[color:var(--brand-blue)]",
-  },
-  {
-    icon: Trophy,
-    title: "Résultats & stats par sport",
-    body: "Saisissez le score et les statistiques (buts, essais, paniers à 3 pts) adaptées à chaque sport.",
-    accent: "from-[color:var(--victory)] to-[color:var(--energy)]",
-  },
-  {
-    icon: BarChart3,
-    title: "Suivi des présences",
-    body: "Voyez qui est venu, qui a manqué, et repérez les tendances de la saison.",
-    accent: "from-[color:var(--primary)] to-[color:var(--victory)]",
-  },
-  {
-    icon: BrainCircuit,
-    title: "Assistant IA intégré",
-    body: "Posez vos questions en français — l'assistant connaît votre club, vos équipes, vos stats et vos prochains événements.",
-    accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]",
-  },
-  {
-    icon: Activity,
-    title: "Activité du club en direct",
-    body: "Mur, mentions, accusés de lecture, fichiers — toute la vie du club au même endroit.",
-    accent: "from-[color:var(--brand-blue)] to-[color:var(--energy)]",
-  },
-  {
-    icon: ShieldCheck,
-    title: "RGPD & sécurité",
-    body: "Accès par rôle, contrôle parental et données hébergées en Europe.",
-    accent: "from-[color:var(--secondary)] to-[color:var(--primary)]",
-  },
+const FEATURE_META = [
+  { icon: CalendarCheck, accent: "from-[color:var(--brand-blue)] to-[color:var(--secondary)]" },
+  { icon: Users, accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]" },
+  { icon: Bell, accent: "from-[color:var(--energy)] to-[color:var(--victory)]" },
+  { icon: MessageSquareText, accent: "from-[color:var(--energy)] to-[color:var(--victory)]" },
+  { icon: Trophy, accent: "from-[color:var(--victory)] to-[color:var(--brand-blue)]" },
+  { icon: Trophy, accent: "from-[color:var(--victory)] to-[color:var(--energy)]" },
+  { icon: BarChart3, accent: "from-[color:var(--primary)] to-[color:var(--victory)]" },
+  { icon: BrainCircuit, accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]" },
+  { icon: Activity, accent: "from-[color:var(--brand-blue)] to-[color:var(--energy)]" },
+  { icon: ShieldCheck, accent: "from-[color:var(--secondary)] to-[color:var(--primary)]" },
 ];
 
 function FeaturesGrid() {
@@ -677,7 +628,7 @@ function FeaturesGrid() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
             <Zap className="h-3 w-3 text-[color:var(--energy)]" />
-            Pensé pour les terrains
+            {t("home.featuresChip")}
           </div>
           <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
             {t("home.featuresTitle")}
@@ -690,50 +641,41 @@ function FeaturesGrid() {
         </div>
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-[color:var(--brand-blue)]/40"
-            >
+          {FEATURE_META.map((f, i) => {
+            const title = t(`home.feat${i + 1}Title`);
+            const body = t(`home.feat${i + 1}Body`);
+            const Icon = f.icon;
+            return (
               <div
-                aria-hidden
-                className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--brand-blue)]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${f.accent} text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
-                <f.icon className="h-5 w-5" />
+                key={title}
+                className="group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-[color:var(--brand-blue)]/40"
+              >
+                <div
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--brand-blue)]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${f.accent} text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 font-display text-lg font-bold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
               </div>
-              <h3 className="mt-5 font-display text-lg font-bold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-const AUDIENCES = [
-  {
-    title: "Clubs",
-    icon: Trophy,
-    points: ["Centralisez équipes et membres", "Tableau de bord multi-équipes", "Statistiques sur la saison"],
-  },
-  {
-    title: "Coachs",
-    icon: Zap,
-    points: ["Convocations en quelques secondes", "Présences en temps réel", "Chat dédié à chaque événement"],
-  },
-  {
-    title: "Parents",
-    icon: Bell,
-    points: ["Réponse en un clic", "Calendrier dans la poche", "Zéro surcharge de notifications"],
-  },
-  {
-    title: "Joueurs",
-    icon: Activity,
-    points: ["Voyez votre prochain match", "Confirmez votre présence", "Restez dans la boucle"],
-  },
+
+const AUDIENCE_META = [
+  { key: "Clubs", icon: Trophy, pts: ["audClubsP1", "audClubsP2", "audClubsP3"], titleKey: "audClubs" },
+  { key: "Coaches", icon: Zap, pts: ["audCoachesP1", "audCoachesP2", "audCoachesP3"], titleKey: "audCoaches" },
+  { key: "Parents", icon: Bell, pts: ["audParentsP1", "audParentsP2", "audParentsP3"], titleKey: "audParents" },
+  { key: "Players", icon: Activity, pts: ["audPlayersP1", "audPlayersP2", "audPlayersP3"], titleKey: "audPlayers" },
 ];
+
 
 function ForEveryone() {
   const { t } = useTranslation("marketing");
