@@ -666,41 +666,47 @@ function MatchCard({
                 </p>
               )}
               {sets.map((s, i) => (
-                <div key={i} className="grid grid-cols-[28px_1fr_auto_1fr_auto] items-center gap-2">
-                  <span className="text-xs text-muted-foreground text-center">
-                    S{i + 1}
-                  </span>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={s.a}
-                    onChange={(e) => {
-                      const next = [...sets];
-                      next[i] = { ...next[i], a: parseInt(e.target.value || "0", 10) };
-                      setSets(next);
-                    }}
-                    className="h-10 text-center font-semibold"
-                  />
-                  <span className="text-muted-foreground">:</span>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={s.b}
-                    onChange={(e) => {
-                      const next = [...sets];
-                      next[i] = { ...next[i], b: parseInt(e.target.value || "0", 10) };
-                      setSets(next);
-                    }}
-                    className="h-10 text-center font-semibold"
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setSets(sets.filter((_, j) => j !== i))}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                <div
+                  key={i}
+                  className="rounded-lg border border-border bg-muted/30 p-3"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      Set {i + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7"
+                      onClick={() => setSets(sets.filter((_, j) => j !== i))}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-around gap-2">
+                    <ScoreStepper
+                      label={teamA?.short_name ?? teamA?.name}
+                      value={s.a}
+                      onChange={(v) => {
+                        const next = [...sets];
+                        next[i] = { ...next[i], a: v };
+                        setSets(next);
+                      }}
+                      size="sm"
+                    />
+                    <span className="text-xl text-muted-foreground">:</span>
+                    <ScoreStepper
+                      label={teamB?.short_name ?? teamB?.name}
+                      value={s.b}
+                      onChange={(v) => {
+                        const next = [...sets];
+                        next[i] = { ...next[i], b: v };
+                        setSets(next);
+                      }}
+                      size="sm"
+                    />
+                  </div>
                 </div>
               ))}
               <Button
@@ -723,28 +729,20 @@ function MatchCard({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-              <div className="text-center">
-                <p className="text-sm font-medium mb-2 truncate">{teamA?.name}</p>
-                <Input
-                  type="number"
-                  min={0}
-                  value={a}
-                  onChange={(e) => setA(parseInt(e.target.value || "0", 10))}
-                  className="h-14 text-center text-2xl font-bold"
-                />
-              </div>
-              <span className="text-xl font-semibold text-muted-foreground">:</span>
-              <div className="text-center">
-                <p className="text-sm font-medium mb-2 truncate">{teamB?.name}</p>
-                <Input
-                  type="number"
-                  min={0}
-                  value={b}
-                  onChange={(e) => setB(parseInt(e.target.value || "0", 10))}
-                  className="h-14 text-center text-2xl font-bold"
-                />
-              </div>
+            <div className="flex items-center justify-around gap-3 py-2">
+              <ScoreStepper
+                label={teamA?.name}
+                value={a}
+                onChange={setA}
+                size="lg"
+              />
+              <span className="text-2xl font-semibold text-muted-foreground">:</span>
+              <ScoreStepper
+                label={teamB?.name}
+                value={b}
+                onChange={setB}
+                size="lg"
+              />
             </div>
           )}
           <Button
@@ -760,6 +758,7 @@ function MatchCard({
           </Button>
         </div>
       </ResponsiveFormDialog>
+
 
 
       <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title="Terrain & horaire">
