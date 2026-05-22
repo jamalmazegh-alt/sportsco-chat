@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type KeyboardEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Shuffle, Trophy, Clock, CalendarClock, HelpCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Shuffle, Trophy, Clock, CalendarClock, HelpCircle, Plus, X, MapPin, UtensilsCrossed } from "lucide-react";
 import { toast } from "sonner";
 import {
   autoCreateGroupsAndFixtures,
@@ -52,9 +53,10 @@ export function GroupsAndFixtures({
   const [pause, setPause] = useState(breakMin ?? 5);
   const [startTime, setStartTime] = useState(dailyStartTime ?? "09:00");
   const [endTime, setEndTime] = useState(dailyEndTime ?? "18:00");
-  const [fieldsText, setFieldsText] = useState(
-    (fields ?? ["Terrain 1"]).join(", "),
+  const [fieldsList, setFieldsList] = useState<string[]>(
+    fields && fields.length ? fields : ["Terrain 1"],
   );
+  const [newField, setNewField] = useState("");
   const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
   const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
   const [lunchEnd, setLunchEnd] = useState<string>(settings?.lunch_end ?? "13:30");
@@ -64,11 +66,31 @@ export function GroupsAndFixtures({
     setPause(breakMin ?? 5);
     setStartTime(dailyStartTime ?? "09:00");
     setEndTime(dailyEndTime ?? "18:00");
-    setFieldsText((fields ?? ["Terrain 1"]).join(", "));
+    setFieldsList(fields && fields.length ? fields : ["Terrain 1"]);
     setLunchEnabled(!!settings?.lunch_start);
     setLunchStart(settings?.lunch_start ?? "12:00");
     setLunchEnd(settings?.lunch_end ?? "13:30");
   }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields, settings]);
+
+  function addField() {
+    const v = newField.trim();
+    if (!v) return;
+    if (fieldsList.includes(v)) {
+      toast.error("Ce terrain existe déjà");
+      return;
+    }
+    setFieldsList([...fieldsList, v]);
+    setNewField("");
+  }
+  function removeField(name: string) {
+    setFieldsList(fieldsList.filter((f) => f !== name));
+  }
+  function onFieldKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addField();
+    }
+  }
 
   const genGroupsFn = useServerFn(autoCreateGroupsAndFixtures);
   const genKnockoutFn = useServerFn(generateKnockoutFromGroups);
@@ -105,10 +127,7 @@ export function GroupsAndFixtures({
 
   const saveSettings = useMutation({
     mutationFn: () => {
-      const fieldsList = fieldsText
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const fl = fieldsList.length ? fieldsList : ["Terrain 1"];
       const nextSettings = {
         ...(settings ?? {}),
         lunch_start: lunchEnabled ? lunchStart : null,
@@ -122,7 +141,7 @@ export function GroupsAndFixtures({
             break_min: pause,
             daily_start_time: startTime,
             daily_end_time: endTime,
-            fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+            fields: fl,
             settings: nextSettings,
           },
         },
@@ -138,10 +157,7 @@ export function GroupsAndFixtures({
   const schedule = useMutation({
     mutationFn: async () => {
       if (!startsOn) throw new Error("Date de début manquante");
-      const fieldsList = fieldsText
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const fl = fieldsList.length ? fieldsList : ["Terrain 1"];
       // Save settings first so they persist
       await saveSettings.mutateAsync();
       return scheduleFn({
@@ -152,7 +168,7 @@ export function GroupsAndFixtures({
           daily_end_time: endTime,
           match_duration_min: duration,
           break_min: pause,
-          fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+          fields: fl,
           lunch_start_time: lunchEnabled ? lunchStart : undefined,
           lunch_end_time: lunchEnabled ? lunchEnd : undefined,
         },
@@ -310,47 +326,81 @@ export function GroupsAndFixtures({
             />
           </div>
         </div>
-        <div className="space-y-1.5">
-          <Label>Terrains (séparés par virgule)</Label>
-          <Input
-            value={fieldsText}
-            onChange={(e) => setFieldsText(e.target.value)}
-            placeholder="Terrain 1, Terrain 2"
-          />
+        <div className="space-y-2">
+          <Label className="flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+            Terrains
+          </Label>
+          {fieldsList.length === 0 ? (
+            <p className="text-xs text-muted-foreground italic">Aucun terrain</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {fieldsList.map((f) => (
+                <Badge
+                  key={f}
+                  variant="secondary"
+                  className="gap-1.5 pl-2.5 pr-1 py-1 text-sm font-normal"
+                >
+                  <MapPin className="h-3 w-3 opacity-70" />
+                  {f}
+                  <button
+                    type="button"
+                    onClick={() => removeField(f)}
+                    className="ml-0.5 rounded-sm p-0.5 hover:bg-background/60 transition-colors"
+                    aria-label={`Retirer ${f}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
+              value={newField}
+              onChange={(e) => setNewField(e.target.value)}
+              onKeyDown={onFieldKeyDown}
+              placeholder="Nom du terrain (ex. Court central)"
+            />
+            <Button type="button" variant="outline" size="icon" onClick={addField}>
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
           <p className="text-[11px] text-muted-foreground">
-            Plusieurs terrains = matchs en parallèle. Tu peux aussi réassigner chaque match à un terrain dans l'onglet "Matchs".
+            Plusieurs terrains = matchs en parallèle. Réassignable par match dans l'onglet "Matchs".
           </p>
         </div>
         <div className="space-y-2 rounded-lg border border-border/60 p-3">
           <label className="flex items-center gap-2 text-sm font-medium">
+            <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
             <input
               type="checkbox"
               checked={lunchEnabled}
               onChange={(e) => setLunchEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-input"
             />
-            Pause déjeuner (aucun match)
+            Pause déjeuner (aucun match sur la plage)
           </label>
-          {lunchEnabled && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Début pause</Label>
-                <Input
-                  type="time"
-                  value={lunchStart}
-                  onChange={(e) => setLunchStart(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Fin pause</Label>
-                <Input
-                  type="time"
-                  value={lunchEnd}
-                  onChange={(e) => setLunchEnd(e.target.value)}
-                />
-              </div>
+          <div className={`grid grid-cols-2 gap-3 ${lunchEnabled ? "" : "opacity-50 pointer-events-none"}`}>
+            <div className="space-y-1.5">
+              <Label>Début pause</Label>
+              <Input
+                type="time"
+                value={lunchStart}
+                onChange={(e) => setLunchStart(e.target.value)}
+                disabled={!lunchEnabled}
+              />
             </div>
-          )}
+            <div className="space-y-1.5">
+              <Label>Fin pause</Label>
+              <Input
+                type="time"
+                value={lunchEnd}
+                onChange={(e) => setLunchEnd(e.target.value)}
+                disabled={!lunchEnabled}
+              />
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <Button

@@ -232,6 +232,76 @@ export const addTournamentTeam = createServerFn({ method: "POST" })
     return { team: row };
   });
 
+export const updateTournamentTeam = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        team_id: z.string().uuid(),
+        patch: z.object({
+          name: z.string().min(1).max(120).optional(),
+          short_name: z.string().max(20).nullable().optional(),
+          logo_url: z.string().url().nullable().optional(),
+          seed: z.number().int().min(1).nullable().optional(),
+        }),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { data: row, error } = await supabase
+      .from("tournament_teams")
+      .update(data.patch)
+      .eq("id", data.team_id)
+      .eq("tournament_id", data.tournament_id)
+      .select("*")
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { team: row };
+  });
+
+export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        teams: z
+          .array(
+            z.object({
+              name: z.string().min(1).max(120),
+              short_name: z.string().max(20).nullable().optional(),
+              seed: z.number().int().min(1).nullable().optional(),
+              contact_email: z.string().email().nullable().optional(),
+              contact_phone: z.string().max(40).nullable().optional(),
+            }),
+          )
+          .min(1)
+          .max(128),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const rows = data.teams.map((t) => ({
+      tournament_id: data.tournament_id,
+      name: t.name,
+      short_name: t.short_name ?? null,
+      seed: t.seed ?? null,
+      contact_email: t.contact_email ?? null,
+      contact_phone: t.contact_phone ?? null,
+    }));
+    const { error, data: inserted } = await supabase
+      .from("tournament_teams")
+      .insert(rows)
+      .select("id");
+    if (error) throw new Response(error.message, { status: 400 });
+    return { inserted: inserted?.length ?? 0 };
+  });
+
 export const removeTournamentTeam = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { team_id: string; tournament_id: string }) =>
