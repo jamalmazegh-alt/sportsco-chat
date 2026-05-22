@@ -1711,7 +1711,7 @@ export type Database = {
           archived_at: string | null
           break_min: number
           category: string | null
-          club_id: string
+          club_id: string | null
           cover_image_url: string | null
           created_at: string
           created_by: string
@@ -1741,7 +1741,7 @@ export type Database = {
           archived_at?: string | null
           break_min?: number
           category?: string | null
-          club_id: string
+          club_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           created_by: string
@@ -1771,7 +1771,7 @@ export type Database = {
           archived_at?: string | null
           break_min?: number
           category?: string | null
-          club_id?: string
+          club_id?: string | null
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
