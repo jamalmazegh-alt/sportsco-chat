@@ -528,14 +528,14 @@ function MatchCard({
             <div className="flex items-center justify-between mb-2">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
                 <Radio className="h-3 w-3 animate-pulse" />
-                Score en direct
+                {t("matches.liveScore")}
               </span>
               <button
                 type="button"
                 onClick={() => setOpen(true)}
                 className="text-[11px] text-muted-foreground underline"
               >
-                Saisie complète
+                {t("matches.fullEntry")}
               </button>
             </div>
             <div className="flex items-center justify-around gap-2">
