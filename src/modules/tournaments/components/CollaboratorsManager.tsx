@@ -150,7 +150,6 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
         open={open}
         onOpenChange={setOpen}
         title="Inviter un collaborateur"
-        description="Un lien d'invitation sera généré. Partage-le avec la personne concernée."
       >
         <div className="space-y-4">
           <div className="space-y-1.5">
