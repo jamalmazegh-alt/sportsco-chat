@@ -501,11 +501,21 @@ export const getGroupStandings = createServerFn({ method: "POST" })
         ? rules.tiebreakers
         : (t?.tiebreakers as Tiebreaker[] | null)) ?? DEFAULT_RULES.tiebreakers;
 
+    // Statuts qui doivent atteindre computeStandings (la normalisation forfait s'y fait).
+    const SPECIAL_STATUSES = new Set([
+      "completed",
+      "forfeit_a",
+      "forfeit_b",
+      "no_show_a",
+      "no_show_b",
+      "abandoned",
+    ]);
     const includeMatch = (m: { status: string; validated_at: string | null }) => {
+      if (!SPECIAL_STATUSES.has(m.status)) return false;
       if (rules.matchValidation.requireValidation) {
-        return m.status === "completed" && !!m.validated_at;
+        return !!m.validated_at;
       }
-      return m.status === "completed";
+      return true;
     };
 
     const eventsByMatch = new Map<string, MatchEventInput[]>();
@@ -522,13 +532,13 @@ export const getGroupStandings = createServerFn({ method: "POST" })
     const result = (groups ?? []).map((g) => {
       const groupTeamIds = (teams ?? []).filter((te) => te.group_id === g.id).map((te) => te.id);
       const groupMatches = (matches ?? [])
-        .filter((m) => m.group_id === g.id)
+        .filter((m) => m.group_id === g.id && includeMatch(m))
         .map((m: any) => ({
           teamAId: m.team_a_id,
           teamBId: m.team_b_id,
           scoreA: m.score_a,
           scoreB: m.score_b,
-          status: includeMatch(m) ? "completed" : m.status,
+          status: m.status,
         }));
       const groupEvents = (matches ?? [])
         .filter((m: any) => m.group_id === g.id)
@@ -537,6 +547,7 @@ export const getGroupStandings = createServerFn({ method: "POST" })
         fairPlay: rules.fairPlay,
         events: groupEvents,
         drawLotSalt: data.tournament_id,
+        forfeit: rules.forfeit,
       });
       const teamMap = new Map((teams ?? []).map((te) => [te.id, te]));
       return {
