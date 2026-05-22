@@ -780,7 +780,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       supabaseAdmin
         .from("tournament_matches")
         .select(
-          "id, group_id, round, bracket_position, match_number, team_a_id, team_b_id, team_a_source, team_b_source, scheduled_at, field, status, score_a, score_b, sets, winner_team_id",
+          "id, group_id, round, bracket_position, match_number, team_a_id, team_b_id, team_a_source, team_b_source, scheduled_at, field, status, score_a, score_b, penalty_score_a, penalty_score_b, sets, winner_team_id",
         )
         .eq("tournament_id", t.id)
         .order("scheduled_at", { nullsFirst: false }),
