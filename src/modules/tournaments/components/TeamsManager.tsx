@@ -370,6 +370,14 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
               <Button
                 size="icon"
                 variant="ghost"
+                onClick={() => setRosterTeam(t)}
+                title="Joueurs"
+              >
+                <UsersRound className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
                 onClick={() => setEditing(t)}
                 title="Modifier"
               >
