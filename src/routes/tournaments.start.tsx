@@ -187,7 +187,7 @@ function SignupForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}${NEXT}`,
+        emailRedirectTo: `${window.location.origin}/tournaments/start`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
