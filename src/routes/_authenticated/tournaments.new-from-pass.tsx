@@ -101,6 +101,23 @@ function NewFromPassPage() {
     );
   }
 
+  if (!pass && justPaid) {
+    return (
+      <div className="mx-auto max-w-xl px-5 py-16 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+          <Loader2 className="h-7 w-7 animate-spin text-primary" />
+        </div>
+        <h1 className="mt-5 font-display text-2xl font-bold">
+          Paiement en cours de validation
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Merci pour votre achat. Nous activons votre pass tournoi… cela ne
+          prend que quelques secondes.
+        </p>
+      </div>
+    );
+  }
+
   if (!pass) {
     return (
       <div className="mx-auto max-w-xl px-5 py-16 text-center">
