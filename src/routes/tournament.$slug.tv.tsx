@@ -95,6 +95,9 @@ function TvSlideshowPage() {
   const slides = useMemo(() => {
     if (!data) return [] as Slide[];
     const { tournament, groups, teams, matches } = data;
+    const rules = mergeRules((tournament as any).settings);
+    const sponsors = rules.branding.sponsors ?? [];
+    const sponsorsTitle = rules.branding.sponsorsTitle || "Nos partenaires";
     const teamMap = new Map<string, TvTeam>(
       teams.map((t: any) => [t.id, t as TvTeam]),
     );
