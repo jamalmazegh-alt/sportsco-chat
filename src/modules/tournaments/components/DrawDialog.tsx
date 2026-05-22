@@ -354,7 +354,7 @@ export function DrawDialog({
                 {drawMode === "groups" ? (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label>Nombre de poules</Label>
+                      <Label>{t("draw.numGroups")}</Label>
                       <Input
                         type="number"
                         min={1}
@@ -367,7 +367,7 @@ export function DrawDialog({
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label>Qualifiés / poule</Label>
+                      <Label>{t("draw.qualifiersPerGroup")}</Label>
                       <Input
                         type="number"
                         min={1}
@@ -389,18 +389,20 @@ export function DrawDialog({
                       className="h-4 w-4 rounded border-input"
                       disabled={drawing}
                     />
-                    Match pour la 3e place
+                    {t("draw.thirdPlaceMatch")}
                   </label>
                 )}
                 <p className="text-[11px] text-muted-foreground">
-                  {teams.length} équipe{teams.length > 1 ? "s" : ""} inscrite
-                  {teams.length > 1 ? "s" : ""} · {numSlots}{" "}
-                  {drawMode === "groups" ? "poule(s)" : "positions"}
+                  {t("draw.summary", { count: teams.length })} ·{" "}
+                  {drawMode === "groups"
+                    ? t("draw.slotsGroups", { count: numSlots })
+                    : t("draw.slotsKnockout", { count: numSlots })}
                   {drawMode === "knockout" && numSlots > teams.length
-                    ? ` · ${numSlots - teams.length} bye(s)`
+                    ? ` · ${t("draw.byes", { count: numSlots - teams.length })}`
                     : ""}
                 </p>
               </div>
+
 
               <Tabs value={mode} onValueChange={(v) => setMode(v as DrawMode)} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
