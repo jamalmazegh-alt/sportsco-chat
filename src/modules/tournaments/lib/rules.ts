@@ -28,6 +28,16 @@ export interface ForfeitRules {
   minRestMinutes: number;
 }
 
+export interface RegistrationRules {
+  enabled: boolean;
+  opensAt?: string | null;   // ISO datetime
+  closesAt?: string | null;  // ISO datetime
+  maxTeams?: number | null;
+  requiresApproval: boolean;
+  collectPlayers: boolean;
+  publicMessage?: string;
+}
+
 export interface TournamentRules {
   points: PointsConfig;
   tiebreakers: Tiebreaker[];
@@ -37,6 +47,7 @@ export interface TournamentRules {
   penaltyShootout: { enabled: boolean };
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
   forfeit: ForfeitRules;
+  registration: RegistrationRules;
   language: TournamentLanguage;
   branding: { primaryColor?: string; organizerName?: string };
 }
@@ -54,6 +65,15 @@ export const DEFAULT_RULES: TournamentRules = {
     loserScore: 0,
     abandonedAsForfeit: true,
     minRestMinutes: 30,
+  },
+  registration: {
+    enabled: false,
+    opensAt: null,
+    closesAt: null,
+    maxTeams: null,
+    requiresApproval: true,
+    collectPlayers: false,
+    publicMessage: "",
   },
   language: "fr",
   branding: {},
@@ -101,6 +121,7 @@ export function mergeRules(settings: unknown): TournamentRules {
     penaltyShootout: { ...DEFAULT_RULES.penaltyShootout, ...(s.penaltyShootout ?? {}) },
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
     forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
+    registration: { ...DEFAULT_RULES.registration, ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}) },
     language: (s.language as TournamentLanguage) ?? DEFAULT_RULES.language,
     branding: { ...DEFAULT_RULES.branding, ...(s.branding ?? {}) },
   };

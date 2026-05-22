@@ -1759,6 +1759,78 @@ export type Database = {
           },
         ]
       }
+      tournament_registrations: {
+        Row: {
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          notes: string | null
+          players: Json
+          short_name: string | null
+          status: Database["public"]["Enums"]["tournament_registration_status"]
+          team_name: string
+          tournament_id: string
+          tournament_team_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          notes?: string | null
+          players?: Json
+          short_name?: string | null
+          status?: Database["public"]["Enums"]["tournament_registration_status"]
+          team_name: string
+          tournament_id: string
+          tournament_team_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          notes?: string | null
+          players?: Json
+          short_name?: string | null
+          status?: Database["public"]["Enums"]["tournament_registration_status"]
+          team_name?: string
+          tournament_id?: string
+          tournament_team_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_registrations_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_registrations_tournament_team_id_fkey"
+            columns: ["tournament_team_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_team_players: {
         Row: {
           birth_date: string | null
@@ -2453,6 +2525,11 @@ export type Database = {
         | "no_show_b"
         | "abandoned"
       tournament_pass_status: "pending" | "paid" | "used" | "refunded"
+      tournament_registration_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "cancelled"
       tournament_status:
         | "draft"
         | "published"
@@ -2676,6 +2753,12 @@ export const Constants = {
         "abandoned",
       ],
       tournament_pass_status: ["pending", "paid", "used", "refunded"],
+      tournament_registration_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "cancelled",
+      ],
       tournament_status: [
         "draft",
         "published",

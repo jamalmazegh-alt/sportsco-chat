@@ -693,7 +693,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
     const { data: t } = await supabaseAdmin
       .from("tournaments")
       .select(
-        "id, name, slug, sport, category, starts_on, ends_on, location, format, status, cover_image_url, num_teams",
+        "id, name, slug, sport, category, starts_on, ends_on, location, format, status, cover_image_url, num_teams, settings",
       )
       .eq("slug", data.slug)
       .in("status", ["published", "in_progress", "completed"])
@@ -1309,4 +1309,137 @@ export const bulkImportTeamPlayers = createServerFn({ method: "POST" })
       .select("id");
     if (error) throw error;
     return { inserted: inserted?.length ?? 0 };
+  });
+
+// ---------- Tournament registrations (PR9)
+
+const registrationPlayerSchema = z.object({
+  first_name: z.string().trim().min(1).max(80),
+  last_name: z.string().trim().min(1).max(80),
+  jersey_number: z.number().int().min(0).max(999).nullable().optional(),
+  position: z.string().max(40).nullable().optional(),
+  is_captain: z.boolean().optional(),
+});
+
+export const listTournamentRegistrations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        status: z
+          .enum(["pending", "approved", "rejected", "cancelled"])
+          .nullable()
+          .optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    let q = supabase
+      .from("tournament_registrations")
+      .select("*")
+      .eq("tournament_id", data.tournament_id)
+      .order("created_at", { ascending: false });
+    if (data.status) q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw error;
+    return { registrations: rows ?? [] };
+  });
+
+export const decideRegistration = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        registration_id: z.string().uuid(),
+        action: z.enum(["approve", "reject"]),
+        decision_note: z.string().max(500).optional().nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: reg, error: regErr } = await supabase
+      .from("tournament_registrations")
+      .select("*")
+      .eq("id", data.registration_id)
+      .maybeSingle();
+    if (regErr) throw regErr;
+    if (!reg) throw new Response("Inscription introuvable", { status: 404 });
+
+    await assertCanManage(supabase, userId, reg.tournament_id);
+
+    if (reg.status !== "pending") {
+      throw new Response("Cette inscription a déjà été traitée", { status: 400 });
+    }
+
+    if (data.action === "reject") {
+      const { error } = await supabase
+        .from("tournament_registrations")
+        .update({
+          status: "rejected",
+          decision_note: data.decision_note ?? null,
+          decided_at: new Date().toISOString(),
+          decided_by: userId,
+        })
+        .eq("id", data.registration_id);
+      if (error) throw error;
+      return { ok: true };
+    }
+
+    // approve → create tournament_team + roster
+    const { data: team, error: teamErr } = await supabase
+      .from("tournament_teams")
+      .insert({
+        tournament_id: reg.tournament_id,
+        name: reg.team_name,
+        short_name: reg.short_name,
+        contact_email: reg.contact_email,
+        contact_phone: reg.contact_phone,
+      })
+      .select("id")
+      .single();
+    if (teamErr) throw teamErr;
+
+    const players = Array.isArray(reg.players) ? (reg.players as any[]) : [];
+    if (players.length > 0) {
+      const rows = players
+        .filter(
+          (p) =>
+            p && typeof p.first_name === "string" && typeof p.last_name === "string",
+        )
+        .map((p) => ({
+          tournament_team_id: team.id,
+          tournament_id: reg.tournament_id,
+          first_name: String(p.first_name).slice(0, 80),
+          last_name: String(p.last_name).slice(0, 80),
+          jersey_number:
+            typeof p.jersey_number === "number" ? p.jersey_number : null,
+          position: p.position ? String(p.position).slice(0, 40) : null,
+          is_captain: !!p.is_captain,
+        }));
+      if (rows.length > 0) {
+        const { error: pErr } = await supabase
+          .from("tournament_team_players")
+          .insert(rows);
+        if (pErr) console.error("Failed to insert roster", pErr);
+      }
+    }
+
+    const { error: updErr } = await supabase
+      .from("tournament_registrations")
+      .update({
+        status: "approved",
+        tournament_team_id: team.id,
+        decision_note: data.decision_note ?? null,
+        decided_at: new Date().toISOString(),
+        decided_by: userId,
+      })
+      .eq("id", data.registration_id);
+    if (updErr) throw updErr;
+
+    return { ok: true, tournament_team_id: team.id };
   });

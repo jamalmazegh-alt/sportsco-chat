@@ -330,6 +330,141 @@ export function TournamentRulesEditor({ tournamentId, settings }: Props) {
         </CardContent>
       </Card>
 
+      {/* Inscriptions (PR9) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Inscriptions publiques</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>Activer les inscriptions en ligne</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Un formulaire public permet aux équipes de s'inscrire depuis la page du tournoi.
+              </p>
+            </div>
+            <Switch
+              checked={rules.registration.enabled}
+              onCheckedChange={(v) =>
+                setRules({
+                  ...rules,
+                  registration: { ...rules.registration, enabled: v },
+                })
+              }
+            />
+          </div>
+
+          {rules.registration.enabled && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Ouverture</Label>
+                  <Input
+                    type="datetime-local"
+                    value={rules.registration.opensAt ?? ""}
+                    onChange={(e) =>
+                      setRules({
+                        ...rules,
+                        registration: {
+                          ...rules.registration,
+                          opensAt: e.target.value || null,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Clôture</Label>
+                  <Input
+                    type="datetime-local"
+                    value={rules.registration.closesAt ?? ""}
+                    onChange={(e) =>
+                      setRules({
+                        ...rules,
+                        registration: {
+                          ...rules.registration,
+                          closesAt: e.target.value || null,
+                        },
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Nombre max. d'équipes (0 = illimité)</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={rules.registration.maxTeams ?? 0}
+                    onChange={(e) =>
+                      setRules({
+                        ...rules,
+                        registration: {
+                          ...rules.registration,
+                          maxTeams: parseInt(e.target.value, 10) || null,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center justify-between text-sm">
+                    <span>Validation par l'organisateur</span>
+                    <Switch
+                      checked={rules.registration.requiresApproval}
+                      onCheckedChange={(v) =>
+                        setRules({
+                          ...rules,
+                          registration: {
+                            ...rules.registration,
+                            requiresApproval: v,
+                          },
+                        })
+                      }
+                    />
+                  </label>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>Demander la liste des joueurs</span>
+                    <Switch
+                      checked={rules.registration.collectPlayers}
+                      onCheckedChange={(v) =>
+                        setRules({
+                          ...rules,
+                          registration: {
+                            ...rules.registration,
+                            collectPlayers: v,
+                          },
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Message affiché sur le formulaire (optionnel)</Label>
+                <Input
+                  value={rules.registration.publicMessage ?? ""}
+                  onChange={(e) =>
+                    setRules({
+                      ...rules,
+                      registration: {
+                        ...rules.registration,
+                        publicMessage: e.target.value,
+                      },
+                    })
+                  }
+                  maxLength={300}
+                  placeholder="Frais d'inscription, contact, etc."
+                />
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Langue & branding */}
       <Card>
         <CardHeader>

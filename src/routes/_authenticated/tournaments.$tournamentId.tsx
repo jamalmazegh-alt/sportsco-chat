@@ -31,12 +31,14 @@ import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 import { TournamentRulesEditor } from "@/modules/tournaments/components/TournamentRulesEditor";
 import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
+import { RegistrationsManager } from "@/modules/tournaments/components/RegistrationsManager";
+import { ClipboardList } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "rules";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules";
 
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
@@ -89,7 +91,10 @@ function TournamentDetailPage() {
     { id: "standings", icon: ListOrdered, label: "Classement" },
     { id: "bracket", icon: GitBranch, label: "Bracket" },
     ...(canManage
-      ? [{ id: "rules" as const, icon: Settings2, label: "Règles" }]
+      ? [
+          { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
+          { id: "rules" as const, icon: Settings2, label: "Règles" },
+        ]
       : []),
   ];
 
@@ -230,6 +235,9 @@ function TournamentDetailPage() {
         {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
         {tab === "bracket" && (
           <BracketView matches={matches as any} teams={teams as any} />
+        )}
+        {tab === "registrations" && canManage && (
+          <RegistrationsManager tournamentId={tournament.id} />
         )}
         {tab === "rules" && canManage && (
           <TournamentRulesEditor
