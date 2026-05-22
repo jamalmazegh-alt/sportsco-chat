@@ -100,16 +100,22 @@ function MatchCard({
   tournamentId,
   teamA,
   teamB,
+  canManage,
+  fields,
 }: {
   match: Match;
   tournamentId: string;
   teamA?: Team;
   teamB?: Team;
+  canManage: boolean;
+  fields: string[];
 }) {
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [a, setA] = useState(match.score_a ?? 0);
   const [b, setB] = useState(match.score_b ?? 0);
   const fn = useServerFn(recordMatchScore);
+  const schedFn = useServerFn(updateMatchSchedule);
   const qc = useQueryClient();
   const save = useMutation({
     mutationFn: () =>
@@ -130,28 +136,78 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
+  const initialDate = match.scheduled_at ? new Date(match.scheduled_at) : null;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const [editField, setEditField] = useState<string>(match.field ?? "");
+  const [editDate, setEditDate] = useState<string>(
+    initialDate
+      ? `${initialDate.getFullYear()}-${pad(initialDate.getMonth() + 1)}-${pad(initialDate.getDate())}`
+      : "",
+  );
+  const [editTime, setEditTime] = useState<string>(
+    initialDate ? `${pad(initialDate.getHours())}:${pad(initialDate.getMinutes())}` : "",
+  );
+
+  const saveSched = useMutation({
+    mutationFn: () => {
+      let scheduled_at: string | null = null;
+      if (editDate && editTime) {
+        scheduled_at = new Date(`${editDate}T${editTime}:00`).toISOString();
+      }
+      return schedFn({
+        data: {
+          tournament_id: tournamentId,
+          match_id: match.id,
+          field: editField ? editField : null,
+          scheduled_at,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Match mis à jour");
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      setEditOpen(false);
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
   const done = match.status === "completed";
+  const whenLabel = initialDate
+    ? `${pad(initialDate.getDate())}/${pad(initialDate.getMonth() + 1)} ${pad(initialDate.getHours())}:${pad(initialDate.getMinutes())}`
+    : null;
 
   return (
     <li>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        disabled={!teamA || !teamB}
-        className="w-full rounded-xl border border-border bg-card p-3 text-left active:scale-[0.99] transition disabled:opacity-50"
-      >
+      <div className="w-full rounded-xl border border-border bg-card p-3 text-left">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-muted-foreground">
-            #{match.match_number ?? "—"}
-          </span>
-          {done && (
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              <Check className="h-3 w-3" />
-              Terminé
-            </span>
-          )}
+          <span className="text-xs text-muted-foreground">#{match.match_number ?? "—"}</span>
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            {whenLabel && (
+              <span className="inline-flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {whenLabel}
+              </span>
+            )}
+            {match.field && (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {match.field}
+              </span>
+            )}
+            {done && (
+              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <Check className="h-3 w-3" />
+                Terminé
+              </span>
+            )}
+          </div>
         </div>
-        <div className="mt-1.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          disabled={!teamA || !teamB}
+          className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-50"
+        >
           <span className="truncate text-sm font-medium text-right">
             {teamA?.name ?? "À déterminer"}
           </span>
@@ -161,14 +217,22 @@ function MatchCard({
           <span className="truncate text-sm font-medium">
             {teamB?.name ?? "À déterminer"}
           </span>
-        </div>
-      </button>
+        </button>
+        {canManage && (
+          <div className="mt-2 flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setEditOpen(true)}
+            >
+              Modifier terrain / heure
+            </Button>
+          </div>
+        )}
+      </div>
 
-      <ResponsiveFormDialog
-        open={open}
-        onOpenChange={setOpen}
-        title="Saisir le score"
-      >
+      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title="Saisir le score">
         <div className="space-y-4 mt-4 pb-6">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
             <div className="text-center">
@@ -203,6 +267,51 @@ function MatchCard({
             ) : (
               "Valider le score"
             )}
+          </Button>
+        </div>
+      </ResponsiveFormDialog>
+
+      <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title="Terrain & horaire">
+        <div className="space-y-4 mt-4 pb-6">
+          <div className="space-y-1.5">
+            <Label>Terrain</Label>
+            {fields.length > 0 ? (
+              <Select
+                value={editField || "__none__"}
+                onValueChange={(v) => setEditField(v === "__none__" ? "" : v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Aucun" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Aucun</SelectItem>
+                  {fields.map((f) => (
+                    <SelectItem key={f} value={f}>
+                      {f}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                value={editField}
+                onChange={(e) => setEditField(e.target.value)}
+                placeholder="Terrain 1"
+              />
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Date</Label>
+              <Input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Heure</Label>
+              <Input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} />
+            </div>
+          </div>
+          <Button onClick={() => saveSched.mutate()} disabled={saveSched.isPending} className="w-full">
+            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
           </Button>
         </div>
       </ResponsiveFormDialog>
