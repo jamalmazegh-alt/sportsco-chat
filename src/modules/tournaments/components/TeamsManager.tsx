@@ -413,7 +413,7 @@ function EditTeamDialog({
   tournamentId: string;
   onClose: () => void;
   onSaved: () => void;
-  updateFn: ReturnType<typeof useServerFn<typeof updateTournamentTeam>>;
+  updateFn: (args: { data: any }) => Promise<any>;
 }) {
   const [editName, setEditName] = useState(team.name);
   const [editShort, setEditShort] = useState(team.short_name ?? "");
