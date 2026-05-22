@@ -311,7 +311,7 @@ function MatchCard({
         },
       }),
     onSuccess: () => invalidateAll(),
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
 
