@@ -567,7 +567,21 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
 
-    // Compute standings & take top N from each group
+    const { data: t } = await supabase
+      .from("tournaments")
+      .select("settings, points_win, points_draw, points_loss, tiebreakers")
+      .eq("id", data.tournament_id)
+      .single();
+    const rules = mergeRules(t?.settings ?? {});
+    const pts = {
+      win: t?.points_win ?? rules.points.win,
+      draw: t?.points_draw ?? rules.points.draw,
+      loss: t?.points_loss ?? rules.points.loss,
+    };
+    const tiebreakers = rules.tiebreakers.length
+      ? rules.tiebreakers
+      : ((t?.tiebreakers as Tiebreaker[] | null) ?? DEFAULT_RULES.tiebreakers);
+
     const { data: groups } = await supabase
       .from("tournament_groups")
       .select("id, qualifiers_count, sort_order")
@@ -583,29 +597,51 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
       .eq("tournament_id", data.tournament_id);
     const { data: matches } = await supabase
       .from("tournament_matches")
-      .select("group_id, team_a_id, team_b_id, score_a, score_b, status")
+      .select("group_id, team_a_id, team_b_id, score_a, score_b, status, id")
       .eq("tournament_id", data.tournament_id)
       .eq("round", "group");
+    const { data: events } = await supabase
+      .from("tournament_match_events")
+      .select("match_id, team_id, kind")
+      .eq("tournament_id", data.tournament_id);
 
-    const qualifiers: string[] = [];
-    for (const g of groups) {
-      const ids = (teams ?? []).filter((t) => t.group_id === g.id).map((t) => t.id);
+    const groupStandings = groups.map((g) => {
+      const ids = (teams ?? []).filter((te) => te.group_id === g.id).map((te) => te.id);
       const gMatches = (matches ?? [])
         .filter((m) => m.group_id === g.id)
-        .map((m) => ({
+        .map((m: any) => ({
           teamAId: m.team_a_id,
           teamBId: m.team_b_id,
           scoreA: m.score_a,
           scoreB: m.score_b,
           status: m.status,
         }));
-      const standings = computeStandings(ids, gMatches);
-      qualifiers.push(...standings.slice(0, g.qualifiers_count).map((s) => s.teamId));
-    }
+      const gEvents = (matches ?? [])
+        .filter((m: any) => m.group_id === g.id)
+        .flatMap((m: any) =>
+          (events ?? [])
+            .filter((e: any) => e.match_id === m.id)
+            .map((e: any) => ({
+              matchId: e.match_id,
+              teamId: e.team_id,
+              kind: e.kind as MatchEventInput["kind"],
+            })),
+        );
+      const rows = computeStandings(ids, gMatches, pts, tiebreakers, {
+        fairPlay: rules.fairPlay,
+        events: gEvents,
+        drawLotSalt: data.tournament_id,
+      });
+      return { groupId: g.id, rows };
+    });
+
+    const qualifiedPicks = selectQualified(groupStandings, rules.qualification);
+    const qualifiers = qualifiedPicks.map((q) => q.teamId);
 
     if (qualifiers.length < 2) {
       throw new Response("Pas assez de qualifiés", { status: 400 });
     }
+
 
     const bracket = generateKnockoutBracket(qualifiers, { thirdPlace: data.third_place });
 
