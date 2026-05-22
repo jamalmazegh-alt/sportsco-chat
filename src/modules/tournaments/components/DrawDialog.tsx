@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
+
 import {
   Dialog,
   DialogContent,
@@ -88,8 +90,10 @@ export function DrawDialog({
   teams,
   hasExistingDraw,
 }: Props) {
+  const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const applyFn = useServerFn(applyTeamDraw);
+
 
   const supportsGroups = format !== "knockout";
   const drawMode: "groups" | "knockout" = supportsGroups ? "groups" : "knockout";
@@ -166,12 +170,13 @@ export function DrawDialog({
       });
     },
     onSuccess: () => {
-      toast.success("Tirage au sort terminé");
+      toast.success(t("draw.doneToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       setFinished(true);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur lors du tirage"),
+    onError: (e: any) => toast.error(e?.message ?? t("draw.errorToast")),
   });
+
 
   // ---------- Build a randomized auto-distribution
   function buildRandomAssignments(): { team_id: string; group_index: number }[] {
@@ -269,41 +274,45 @@ export function DrawDialog({
   function runManual() {
     if (drawMode === "groups") {
       const assignments: { team_id: string; group_index: number }[] = [];
-      for (const t of teams) {
-        const g = manualAssign[t.id];
+      for (const team of teams) {
+        const g = manualAssign[team.id];
         if (g === null || g === undefined) {
-          toast.error(`Place toutes les équipes (${t.name} manque)`);
+          toast.error(t("draw.missingTeamError", { name: team.name }));
           return;
         }
-        assignments.push({ team_id: t.id, group_index: g });
+        assignments.push({ team_id: team.id, group_index: g });
       }
       applyMut.mutate({ mode: "groups", assignments });
     } else {
       // Use slotIndex as bracket position (0..numSlots-1)
       const ordered: (string | null)[] = Array.from({ length: teams.length }, () => null);
       const used = new Set<number>();
-      for (const t of teams) {
-        const slot = manualAssign[t.id];
+      for (const team of teams) {
+        const slot = manualAssign[team.id];
         if (slot === null || slot === undefined) {
-          toast.error(`Place toutes les équipes (${t.name} manque)`);
+          toast.error(t("draw.missingTeamError", { name: team.name }));
           return;
         }
         if (used.has(slot)) {
-          toast.error("Deux équipes ne peuvent pas occuper la même position");
+          toast.error(t("draw.duplicatePositionError"));
           return;
         }
         used.add(slot);
-        ordered[slot] = t.id;
+        ordered[slot] = team.id;
       }
       const order = ordered.filter((x): x is string => x !== null);
       applyMut.mutate({ mode: "knockout", bracket_order: order });
     }
   }
 
+
   // ---------- Render
   const slotsArray = Array.from({ length: numSlots }, (_, i) => i);
   const slotLabel = (i: number) =>
-    drawMode === "groups" ? `Poule ${String.fromCharCode(65 + i)}` : `Position ${i + 1}`;
+    drawMode === "groups"
+      ? t("draw.groupLabel", { letter: String.fromCharCode(65 + i) })
+      : t("draw.positionLabel", { n: i + 1 });
+
 
   const canDraw = teams.length >= 2;
   const tournamentStarted = ["in_progress", "completed"].includes(status);
@@ -315,12 +324,10 @@ export function DrawDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Dices className="h-5 w-5 text-primary" />
-              Tirage au sort
+              {t("draw.title")}
             </DialogTitle>
             <DialogDescription>
-              {drawMode === "groups"
-                ? "Répartis les équipes dans les poules"
-                : "Place les équipes dans le tableau à élimination directe"}
+              {drawMode === "groups" ? t("draw.descGroups") : t("draw.descKnockout")}
             </DialogDescription>
           </DialogHeader>
 
@@ -328,16 +335,17 @@ export function DrawDialog({
             <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center">
               <Dices className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
-                Ajoutez des équipes avant de lancer le tirage au sort.
+                {t("draw.emptyHint")}
               </p>
             </div>
           )}
 
           {canDraw && tournamentStarted && (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-300">
-              ⚠ Le tournoi a déjà commencé. Lancer un nouveau tirage va écraser la structure actuelle.
+              {t("draw.startedWarn")}
             </div>
           )}
+
 
           {canDraw && (
             <>
@@ -346,7 +354,7 @@ export function DrawDialog({
                 {drawMode === "groups" ? (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label>Nombre de poules</Label>
+                      <Label>{t("draw.numGroups")}</Label>
                       <Input
                         type="number"
                         min={1}
@@ -359,7 +367,7 @@ export function DrawDialog({
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label>Qualifiés / poule</Label>
+                      <Label>{t("draw.qualifiersPerGroup")}</Label>
                       <Input
                         type="number"
                         min={1}
@@ -381,39 +389,41 @@ export function DrawDialog({
                       className="h-4 w-4 rounded border-input"
                       disabled={drawing}
                     />
-                    Match pour la 3e place
+                    {t("draw.thirdPlaceMatch")}
                   </label>
                 )}
                 <p className="text-[11px] text-muted-foreground">
-                  {teams.length} équipe{teams.length > 1 ? "s" : ""} inscrite
-                  {teams.length > 1 ? "s" : ""} · {numSlots}{" "}
-                  {drawMode === "groups" ? "poule(s)" : "positions"}
+                  {t("draw.summary", { count: teams.length })} ·{" "}
+                  {drawMode === "groups"
+                    ? t("draw.slotsGroups", { count: numSlots })
+                    : t("draw.slotsKnockout", { count: numSlots })}
                   {drawMode === "knockout" && numSlots > teams.length
-                    ? ` · ${numSlots - teams.length} bye(s)`
+                    ? ` · ${t("draw.byes", { count: numSlots - teams.length })}`
                     : ""}
                 </p>
               </div>
+
 
               <Tabs value={mode} onValueChange={(v) => setMode(v as DrawMode)} className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="auto" disabled={drawing}>
                     <Sparkles className="mr-1 h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Auto</span>
+                    <span className="hidden sm:inline">{t("draw.tabAuto")}</span>
                   </TabsTrigger>
                   <TabsTrigger value="progressive" disabled={drawing && pool.length === 0}>
                     <Shuffle className="mr-1 h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Progressif</span>
+                    <span className="hidden sm:inline">{t("draw.tabProgressive")}</span>
                   </TabsTrigger>
                   <TabsTrigger value="manual" disabled={drawing}>
                     <Hand className="mr-1 h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Manuel</span>
+                    <span className="hidden sm:inline">{t("draw.tabManual")}</span>
                   </TabsTrigger>
                 </TabsList>
 
                 {/* AUTO */}
                 <TabsContent value="auto" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Tirage aléatoire complet en une seule fois.
+                    {t("draw.autoDesc")}
                   </p>
                   <Button
                     onClick={() => maybeConfirm(runAuto)}
@@ -425,7 +435,7 @@ export function DrawDialog({
                     ) : (
                       <>
                         <Sparkles className="h-4 w-4" />
-                        Lancer le tirage au sort
+                        {t("draw.launch")}
                       </>
                     )}
                   </Button>
@@ -434,7 +444,7 @@ export function DrawDialog({
                 {/* PROGRESSIVE */}
                 <TabsContent value="progressive" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Révèle les équipes une par une avec animation.
+                    {t("draw.progressiveDesc")}
                   </p>
 
                   {!drawing && revealed.length === 0 && !finished && (
@@ -444,17 +454,19 @@ export function DrawDialog({
                       className="w-full"
                     >
                       <Shuffle className="h-4 w-4" />
-                      Lancer le tirage au sort
+                      {t("draw.launch")}
                     </Button>
                   )}
+
 
                   {drawing && (
                     <div className="space-y-3">
                       {/* Roulette */}
                       <div className="rounded-xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 text-center overflow-hidden">
                         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                          Équipe en cours
+                          {t("draw.currentTeam")}
                         </p>
+
                         <div className="relative h-20 flex items-center justify-center">
                           <div
                             key={`${rouletteIdx}-${pool.length}`}
@@ -489,9 +501,9 @@ export function DrawDialog({
                           size="lg"
                         >
                           <Dices className="h-4 w-4" />
-                          Tirer l'équipe suivante ({pool.length} restante
-                          {pool.length > 1 ? "s" : ""})
+                          {t("draw.drawNextRemaining", { count: pool.length })}
                         </Button>
+
                       </div>
                     </div>
                   )}
@@ -514,7 +526,8 @@ export function DrawDialog({
                               <p className="text-xs text-muted-foreground/60 italic">—</p>
                             ) : (
                               items.map((it) => {
-                                const team = teams.find((t) => t.id === it.teamId);
+                                const team = teams.find((tm) => tm.id === it.teamId);
+
                                 return (
                                   <div
                                     key={it.teamId}
@@ -548,35 +561,34 @@ export function DrawDialog({
                 {/* MANUAL */}
                 <TabsContent value="manual" className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Assigne chaque équipe à{" "}
-                    {drawMode === "groups" ? "une poule" : "une position du tableau"}.
+                    {drawMode === "groups" ? t("draw.manualDescGroups") : t("draw.manualDescKnockout")}
                   </p>
                   <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-                    {teams.map((t) => (
+                    {teams.map((team) => (
                       <div
-                        key={t.id}
+                        key={team.id}
                         className="flex items-center gap-2 rounded-lg border border-border p-2"
                       >
                         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs shrink-0">
-                          {t.logo_url ? (
+                          {team.logo_url ? (
                             <img
-                              src={t.logo_url}
+                              src={team.logo_url}
                               alt=""
                               className="h-8 w-8 rounded-full object-cover"
                             />
                           ) : (
-                            initials(t.name)
+                            initials(team.name)
                           )}
                         </div>
-                        <span className="flex-1 text-sm truncate">{t.name}</span>
+                        <span className="flex-1 text-sm truncate">{team.name}</span>
                         <Select
                           value={
-                            manualAssign[t.id] !== null && manualAssign[t.id] !== undefined
-                              ? String(manualAssign[t.id])
+                            manualAssign[team.id] !== null && manualAssign[team.id] !== undefined
+                              ? String(manualAssign[team.id])
                               : ""
                           }
                           onValueChange={(v) =>
-                            setManualAssign((m) => ({ ...m, [t.id]: parseInt(v, 10) }))
+                            setManualAssign((m) => ({ ...m, [team.id]: parseInt(v, 10) }))
                           }
                         >
                           <SelectTrigger className="w-[140px]">
@@ -603,17 +615,18 @@ export function DrawDialog({
                     ) : (
                       <>
                         <Hand className="h-4 w-4" />
-                        Valider la composition
+                        {t("draw.validateManual")}
                       </>
                     )}
                   </Button>
                 </TabsContent>
+
               </Tabs>
 
               {finished && (
                 <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-300 animate-fade-in">
                   <CheckCircle2 className="h-4 w-4" />
-                  Tirage au sort terminé. Tu peux encore l'ajuster manuellement si besoin.
+                  {t("draw.doneBanner")}
                 </div>
               )}
             </>
@@ -632,11 +645,11 @@ export function DrawDialog({
                 disabled={applyMut.isPending || !canDraw}
               >
                 <RotateCcw className="h-4 w-4" />
-                Relancer
+                {t("draw.relaunch")}
               </Button>
             )}
             <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={drawing}>
-              Fermer
+              {t("draw.close")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -645,15 +658,13 @@ export function DrawDialog({
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Écraser le tirage existant ?</AlertDialogTitle>
+            <AlertDialogTitle>{t("draw.overwriteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {tournamentStarted
-                ? "Le tournoi a déjà commencé. Cette action va supprimer la structure actuelle (poules/bracket) et les scores des matchs concernés. Les équipes inscrites sont conservées."
-                : "Cette action va supprimer la composition actuelle (poules/bracket) et les matchs associés. Les équipes inscrites sont conservées."}
+              {tournamentStarted ? t("draw.overwriteDescStarted") : t("draw.overwriteDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t("draw.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 const action = pendingAction;
@@ -662,11 +673,12 @@ export function DrawDialog({
                 if (action) action();
               }}
             >
-              Confirmer et relancer
+              {t("draw.confirmRelaunch")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </>
   );
 }
