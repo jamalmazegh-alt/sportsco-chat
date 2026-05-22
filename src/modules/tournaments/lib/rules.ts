@@ -66,6 +66,15 @@ export const DEFAULT_RULES: TournamentRules = {
     abandonedAsForfeit: true,
     minRestMinutes: 30,
   },
+  registration: {
+    enabled: false,
+    opensAt: null,
+    closesAt: null,
+    maxTeams: null,
+    requiresApproval: true,
+    collectPlayers: false,
+    publicMessage: "",
+  },
   language: "fr",
   branding: {},
 };
