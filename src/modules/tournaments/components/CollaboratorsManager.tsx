@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,7 @@ interface Collaborator {
 }
 
 export function CollaboratorsManager({ tournamentId }: { tournamentId: string }) {
+  const { t } = useTranslation("tournaments");
   const listFn = useServerFn(listTournamentCollaborators);
   const inviteFn = useServerFn(inviteTournamentCollaborator);
   const revokeFn = useServerFn(revokeTournamentCollaborator);
@@ -70,23 +72,23 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
         },
       }),
     onSuccess: () => {
-      toast.success("Invitation envoyée");
+      toast.success(t("collab.toastSent"));
       qc.invalidateQueries({ queryKey: ["tournament-collaborators", tournamentId] });
       setOpen(false);
       setEmail("");
       setDisplayName("");
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("collab.toastError")),
   });
 
   const revoke = useMutation({
     mutationFn: (id: string) =>
       revokeFn({ data: { tournament_id: tournamentId, collaborator_id: id } }),
     onSuccess: () => {
-      toast.success("Retiré");
+      toast.success(t("collab.toastRevoked"));
       qc.invalidateQueries({ queryKey: ["tournament-collaborators", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("collab.toastError")),
   });
 
   const items = (q.data?.collaborators ?? []) as Collaborator[];
@@ -102,22 +104,22 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
     if (typeof navigator === "undefined") return;
     navigator.clipboard
       .writeText(inviteUrl(token))
-      .then(() => toast.success("Lien d'invitation copié"))
-      .catch(() => toast.error("Impossible de copier"));
+      .then(() => toast.success(t("collab.toastLinkCopied")))
+      .catch(() => toast.error(t("collab.toastCopyFail")));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold">Équipe d'organisation</h2>
+          <h2 className="text-base font-semibold">{t("collab.title")}</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Invite des co-organisateurs et des arbitres par email.
+            {t("collab.subtitle")}
           </p>
         </div>
         <Button size="sm" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" />
-          Inviter
+          {t("collab.inviteCta")}
         </Button>
       </div>
 
@@ -129,16 +131,16 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
         <>
           <Section
             icon={<ShieldCheck className="h-4 w-4 text-primary" />}
-            title="Co-organisateurs"
-            subtitle="Droits complets sur le tournoi (sauf suppression)."
+            title={t("collab.coOrganizers")}
+            subtitle={t("collab.coOrganizersDesc")}
             items={coOrgs}
             onCopy={copyLink}
             onRevoke={(id) => revoke.mutate(id)}
           />
           <Section
             icon={<Flag className="h-4 w-4 text-primary" />}
-            title="Arbitres"
-            subtitle="Peuvent saisir scores et valider les matchs qui leur sont assignés."
+            title={t("collab.referees")}
+            subtitle={t("collab.refereesDesc")}
             items={referees}
             onCopy={copyLink}
             onRevoke={(id) => revoke.mutate(id)}
@@ -149,38 +151,38 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
       <ResponsiveFormDialog
         open={open}
         onOpenChange={setOpen}
-        title="Inviter un collaborateur"
+        title={t("collab.dialogTitle")}
       >
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Rôle</Label>
+            <Label>{t("collab.roleLabel")}</Label>
             <Select value={role} onValueChange={(v) => setRole(v as Role)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="co_organizer">Co-organisateur</SelectItem>
-                <SelectItem value="referee">Arbitre</SelectItem>
+                <SelectItem value="co_organizer">{t("collab.roleCoOrganizer")}</SelectItem>
+                <SelectItem value="referee">{t("collab.roleReferee")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="collab-email">Email</Label>
+            <Label htmlFor="collab-email">{t("collab.emailLabel")}</Label>
             <Input
               id="collab-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nom@exemple.com"
+              placeholder={t("collab.emailPlaceholder")}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="collab-name">Nom (optionnel)</Label>
+            <Label htmlFor="collab-name">{t("collab.nameLabel")}</Label>
             <Input
               id="collab-name"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Jean Dupont"
+              placeholder={t("collab.namePlaceholder")}
             />
           </div>
           <Button
@@ -188,7 +190,7 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
             disabled={!email.trim() || invite.isPending}
             onClick={() => invite.mutate()}
           >
-            {invite.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Envoyer l'invitation"}
+            {invite.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("collab.sendInvite")}
           </Button>
         </div>
       </ResponsiveFormDialog>
@@ -211,6 +213,7 @@ function Section({
   onCopy: (token: string) => void;
   onRevoke: (id: string) => void;
 }) {
+  const { t } = useTranslation("tournaments");
   return (
     <section className="space-y-2">
       <div className="flex items-center gap-2">
@@ -221,7 +224,7 @@ function Section({
       <p className="text-xs text-muted-foreground">{subtitle}</p>
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
-          Aucune invitation pour le moment.
+          {t("collab.empty")}
         </div>
       ) : (
         <ul className="space-y-2">
@@ -240,11 +243,11 @@ function Section({
                 <div className="mt-1 flex items-center gap-1.5 text-[11px]">
                   {c.accepted_at ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-400">
-                      <CheckCircle2 className="h-3 w-3" /> Acceptée
+                      <CheckCircle2 className="h-3 w-3" /> {t("collab.accepted")}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-amber-700 dark:text-amber-400">
-                      <Clock className="h-3 w-3" /> En attente
+                      <Clock className="h-3 w-3" /> {t("collab.pending")}
                     </span>
                   )}
                 </div>
@@ -257,14 +260,14 @@ function Section({
                     onClick={() => onCopy(c.invitation_token)}
                   >
                     <Copy className="h-3.5 w-3.5" />
-                    Lien
+                    {t("collab.copyLink")}
                   </Button>
                 )}
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => onRevoke(c.id)}
-                  aria-label="Retirer"
+                  aria-label={t("collab.remove")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

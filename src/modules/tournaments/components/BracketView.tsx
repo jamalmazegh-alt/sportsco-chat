@@ -2,6 +2,7 @@
  * BracketView — affichage visuel d'un bracket à élimination directe.
  * Rendu par colonnes (1 colonne = 1 tour) avec lignes de connexion CSS.
  */
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface Team {
@@ -38,29 +39,21 @@ interface Props {
 }
 
 const ROUND_ORDER = ["r32", "r16", "qf", "sf", "final"];
-const ROUND_LABELS: Record<string, string> = {
-  r32: "32es",
-  r16: "8es",
-  qf: "Quarts",
-  sf: "Demis",
-  final: "Finale",
-  third_place: "3e place",
-};
 
 export function BracketView({ matches, teams }: Props) {
+  const { t } = useTranslation("tournaments");
+  const roundLabel = (r: string) =>
+    t(`bracket.rounds.${r}`, { defaultValue: r });
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const knockout = matches.filter((m) => m.round !== "group");
   if (knockout.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-        Aucun bracket généré pour le moment.
+        {t("bracket.empty")}
       </div>
     );
   }
 
-  // Lookup: fromMatch counter (1-based generation order within bracket) → match.
-  // Knockout matches are inserted in generation order, so sorting by match_number
-  // restores the original idx and counter = idx + 1.
   const matchByCounter = new Map<number, Match>();
   const sortedKnockout = [...knockout].sort(
     (a, b) => (a.match_number ?? 0) - (b.match_number ?? 0),
@@ -90,7 +83,7 @@ export function BracketView({ matches, teams }: Props) {
             return (
               <div key={r} className="flex flex-col gap-3 min-w-[200px]">
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground text-center">
-                  {ROUND_LABELS[r] ?? r}
+                  {roundLabel(r)}
                 </div>
                 <div className="flex flex-col gap-3 justify-around flex-1">
                   {ms.map((m) => (
@@ -110,7 +103,7 @@ export function BracketView({ matches, teams }: Props) {
       {thirdPlace && thirdPlace.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Match pour la 3e place
+            {t("bracket.thirdPlace")}
           </div>
           <div className="max-w-[220px]">
             <BracketMatch
@@ -125,15 +118,17 @@ export function BracketView({ matches, teams }: Props) {
   );
 }
 
-function resolveLabel(
-  source: SourceRef,
-  matchByCounter: Map<number, Match>,
-): string {
-  if (!source) return "À déterminer";
-  if ("teamId" in source) return "À déterminer";
-  const src = matchByCounter.get(source.fromMatch);
-  const num = src?.match_number ?? source.fromMatch;
-  return source.outcome === "loser" ? `Perdant M${num}` : `Vainqueur M${num}`;
+function useResolveLabel() {
+  const { t } = useTranslation("tournaments");
+  return (source: SourceRef, matchByCounter: Map<number, Match>): string => {
+    if (!source) return t("bracket.tbd");
+    if ("teamId" in source) return t("bracket.tbd");
+    const src = matchByCounter.get(source.fromMatch);
+    const num = src?.match_number ?? source.fromMatch;
+    return source.outcome === "loser"
+      ? t("bracket.loserOf", { n: num })
+      : t("bracket.winnerOf", { n: num });
+  };
 }
 
 function BracketMatch({
@@ -145,6 +140,8 @@ function BracketMatch({
   teamMap: Map<string, Team>;
   matchByCounter: Map<number, Match>;
 }) {
+  const { t } = useTranslation("tournaments");
+  const resolveLabel = useResolveLabel();
   const a = match.team_a_id ? teamMap.get(match.team_a_id) : undefined;
   const b = match.team_b_id ? teamMap.get(match.team_b_id) : undefined;
   const winner = match.winner_team_id;
@@ -154,7 +151,7 @@ function BracketMatch({
     <div className="rounded-lg border border-border bg-card overflow-hidden text-sm shadow-sm">
       {match.match_number != null && (
         <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/40 border-b border-border">
-          Match #{match.match_number}
+          {t("bracket.matchNumber", { n: match.match_number })}
         </div>
       )}
       <Side

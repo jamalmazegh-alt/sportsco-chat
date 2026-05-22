@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   Plus,
@@ -56,7 +57,8 @@ export function FieldsManager({
   matches,
   teams,
 }: Props) {
-  const initial = (fields && fields.length > 0 ? fields : ["Terrain 1"]).map(
+  const { t, i18n } = useTranslation("tournaments");
+  const initial = (fields && fields.length > 0 ? fields : [t("common.field") + " 1"]).map(
     (f) => String(f),
   );
   const [localFields, setLocalFields] = useState<string[]>(initial);
@@ -85,10 +87,10 @@ export function FieldsManager({
         },
       }),
     onSuccess: () => {
-      toast.success("Terrains enregistrés");
+      toast.success(t("fields.savedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("fields.errorToast")),
   });
 
   const reassign = useMutation({
@@ -100,10 +102,10 @@ export function FieldsManager({
         },
       }),
     onSuccess: () => {
-      toast.success("Terrain mis à jour");
+      toast.success(t("fields.fieldUpdatedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("fields.errorToast")),
   });
 
   const teamName = (id: string | null) =>
@@ -132,7 +134,7 @@ export function FieldsManager({
     const v = newField.trim();
     if (!v) return;
     if (localFields.includes(v)) {
-      toast.error("Ce terrain existe déjà");
+      toast.error(t("fields.duplicate"));
       return;
     }
     setLocalFields([...localFields, v]);
@@ -149,7 +151,7 @@ export function FieldsManager({
     const f = localFields[idx];
     const used = matches.some((m) => m.field === f);
     if (used) {
-      toast.error("Terrain utilisé par des matchs — réassigne-les d'abord");
+      toast.error(t("fields.removeUsed"));
       return;
     }
     setLocalFields(localFields.filter((_, i) => i !== idx));
@@ -166,7 +168,7 @@ export function FieldsManager({
   const formatTime = (iso: string | null) => {
     if (!iso) return "—";
     const d = new Date(iso);
-    return d.toLocaleString("fr-FR", {
+    return d.toLocaleString(i18n.language === "fr" ? "fr-FR" : "en-US", {
       day: "2-digit",
       month: "2-digit",
       hour: "2-digit",
@@ -180,7 +182,7 @@ export function FieldsManager({
       <section className="rounded-xl border border-border bg-card p-4 space-y-4">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold">Terrains du tournoi</h2>
+          <h2 className="font-semibold">{t("fields.title")}</h2>
         </div>
 
         <div className="space-y-2">
@@ -192,7 +194,7 @@ export function FieldsManager({
                   onClick={() => moveField(i, -1)}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-30"
                   disabled={i === 0}
-                  aria-label="Monter"
+                  aria-label={t("fields.moveUp")}
                 >
                   <GripVertical className="h-3 w-3 rotate-90" />
                 </button>
@@ -208,14 +210,14 @@ export function FieldsManager({
                 size="icon"
                 variant="ghost"
                 onClick={() => removeField(i)}
-                aria-label="Supprimer"
+                aria-label={t("fields.remove")}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
           ))}
           {localFields.length === 0 && (
-            <p className="text-xs text-muted-foreground">Aucun terrain défini.</p>
+            <p className="text-xs text-muted-foreground">{t("fields.none")}</p>
           )}
         </div>
 
@@ -223,7 +225,7 @@ export function FieldsManager({
           <Input
             value={newField}
             onChange={(e) => setNewField(e.target.value)}
-            placeholder="Nouveau terrain (ex: Terrain 4)"
+            placeholder={t("fields.newPlaceholder")}
             maxLength={60}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -234,13 +236,13 @@ export function FieldsManager({
           />
           <Button type="button" variant="outline" onClick={addField}>
             <Plus className="h-4 w-4" />
-            Ajouter
+            {t("fields.add")}
           </Button>
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-2">
           <div>
-            <Label className="text-xs">Début de journée</Label>
+            <Label className="text-xs">{t("fields.dayStart")}</Label>
             <Input
               type="time"
               value={startTime}
@@ -248,7 +250,7 @@ export function FieldsManager({
             />
           </div>
           <div>
-            <Label className="text-xs">Fin de journée</Label>
+            <Label className="text-xs">{t("fields.dayEnd")}</Label>
             <Input
               type="time"
               value={endTime}
@@ -265,7 +267,7 @@ export function FieldsManager({
             {saveSettings.isPending && (
               <Loader2 className="h-4 w-4 animate-spin" />
             )}
-            Enregistrer
+            {t("fields.save")}
           </Button>
         </div>
       </section>
@@ -274,7 +276,7 @@ export function FieldsManager({
       <section className="space-y-4">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold">Planning par terrain</h2>
+          <h2 className="font-semibold">{t("fields.planningTitle")}</h2>
         </div>
 
         {localFields.map((f) => {
@@ -287,12 +289,12 @@ export function FieldsManager({
               <div className="px-4 py-2 bg-muted/40 flex items-center justify-between">
                 <span className="font-medium text-sm">{f}</span>
                 <span className="text-xs text-muted-foreground">
-                  {list.length} match{list.length > 1 ? "s" : ""}
+                  {t("fields.matchCount", { count: list.length })}
                 </span>
               </div>
               {list.length === 0 ? (
                 <p className="px-4 py-3 text-xs text-muted-foreground">
-                  Aucun match assigné.
+                  {t("fields.noneAssigned")}
                 </p>
               ) : (
                 <ul className="divide-y divide-border">
@@ -326,7 +328,7 @@ export function FieldsManager({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value={UNASSIGNED}>
-                            Non assigné
+                            {t("fields.unassigned")}
                           </SelectItem>
                           {localFields.map((ff) => (
                             <SelectItem key={ff} value={ff}>
@@ -346,7 +348,7 @@ export function FieldsManager({
         {(matchesByField.get(UNASSIGNED) ?? []).length > 0 && (
           <div className="rounded-xl border border-dashed border-border bg-card overflow-hidden">
             <div className="px-4 py-2 bg-muted/20 flex items-center justify-between">
-              <span className="font-medium text-sm">Non assignés</span>
+              <span className="font-medium text-sm">{t("fields.unassignedSection")}</span>
               <span className="text-xs text-muted-foreground">
                 {(matchesByField.get(UNASSIGNED) ?? []).length}
               </span>
@@ -375,10 +377,10 @@ export function FieldsManager({
                     }
                   >
                     <SelectTrigger className="h-8 w-32 text-xs">
-                      <SelectValue placeholder="Assigner" />
+                      <SelectValue placeholder={t("fields.assignPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={UNASSIGNED}>Non assigné</SelectItem>
+                      <SelectItem value={UNASSIGNED}>{t("fields.unassigned")}</SelectItem>
                       {localFields.map((ff) => (
                         <SelectItem key={ff} value={ff}>
                           {ff}
