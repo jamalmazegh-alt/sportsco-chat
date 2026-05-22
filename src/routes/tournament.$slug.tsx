@@ -115,6 +115,8 @@ function PublicTournamentPage() {
     { id: "bracket", label: "Bracket", icon: GitBranch },
   ];
 
+  const accent = rules.branding.primaryColor;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="relative">
@@ -127,7 +129,18 @@ function PublicTournamentPage() {
             />
           </div>
         ) : (
-          <div className="h-32 w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background" />
+          <div
+            className="h-32 w-full"
+            style={
+              accent
+                ? { background: `linear-gradient(135deg, ${accent}33, ${accent}11, transparent)` }
+                : undefined
+            }
+          >
+            {!accent && (
+              <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background" />
+            )}
+          </div>
         )}
         <div className="max-w-3xl mx-auto px-5 -mt-10 relative">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
