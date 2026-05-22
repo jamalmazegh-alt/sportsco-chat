@@ -40,6 +40,9 @@ import {
   listMatchEvents,
 } from "../tournaments.functions";
 
+import type { ScoringRules, SetScore } from "../lib/formats";
+import { aggregateSetsScore, formatSets, DEFAULT_SETS_RULES } from "../lib/formats";
+
 interface Team {
   id: string;
   name: string;
@@ -55,6 +58,7 @@ interface Match {
   team_b_id: string | null;
   score_a: number | null;
   score_b: number | null;
+  sets?: SetScore[] | null;
   status: string;
   scheduled_at: string | null;
   field?: string | null;
@@ -76,9 +80,10 @@ interface Props {
   teams: Team[];
   canManage?: boolean;
   fields?: string[];
+  scoring?: ScoringRules;
 }
 
-export function MatchesList({ tournamentId, matches, teams, canManage, fields }: Props) {
+export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const grouped = matches.reduce<Record<string, Match[]>>((acc, m) => {
     const key = m.round === "group" ? "Phase de groupes" : roundLabel(m.round);
@@ -115,6 +120,7 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields }:
                 canManage={!!canManage}
                 fields={fields ?? []}
                 events={eventsByMatch.get(m.id) ?? []}
+                scoring={scoring}
               />
             ))}
           </ul>
@@ -164,6 +170,7 @@ function MatchCard({
   canManage,
   fields,
   events,
+  scoring,
 }: {
   match: Match;
   tournamentId: string;
@@ -172,11 +179,17 @@ function MatchCard({
   canManage: boolean;
   fields: string[];
   events: MatchEvent[];
+  scoring?: ScoringRules;
 }) {
+  const setsMode = scoring?.mode === "sets";
+  const setsRules = scoring?.sets ?? DEFAULT_SETS_RULES;
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [a, setA] = useState(match.score_a ?? 0);
   const [b, setB] = useState(match.score_b ?? 0);
+  const [sets, setSets] = useState<SetScore[]>(
+    (match.sets ?? []).map((s) => ({ a: s.a, b: s.b })),
+  );
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
   const valFn = useServerFn(validateMatch);
@@ -191,16 +204,31 @@ function MatchCard({
   };
 
   const save = useMutation({
-    mutationFn: () =>
-      fn({
+    mutationFn: () => {
+      if (setsMode && sets.length > 0) {
+        const agg = aggregateSetsScore(sets);
+        return fn({
+          data: {
+            tournament_id: tournamentId,
+            match_id: match.id,
+            score_a: agg.score_a,
+            score_b: agg.score_b,
+            sets,
+            status: "completed",
+          },
+        });
+      }
+      return fn({
         data: {
           tournament_id: tournamentId,
           match_id: match.id,
           score_a: a,
           score_b: b,
+          sets: null,
           status: "completed",
         },
-      }),
+      });
+    },
     onSuccess: () => {
       toast.success("Score enregistré");
       invalidateAll();
