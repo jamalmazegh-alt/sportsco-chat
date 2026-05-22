@@ -6,8 +6,14 @@ import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
 import { Plus, Trophy, ChevronRight, Calendar } from "lucide-react";
-import { listMyTournaments } from "@/modules/tournaments/tournaments.functions";
+import {
+  listMyTournaments,
+  listMyPersonalTournaments,
+} from "@/modules/tournaments/tournaments.functions";
+import { listMyAvailablePasses } from "@/modules/tournaments/passes.functions";
 import { TournamentWizard } from "@/modules/tournaments/components/TournamentWizard";
+import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/tournaments")({
   component: TournamentsRoute,
@@ -21,41 +27,98 @@ function TournamentsRoute() {
 }
 
 function TournamentsList() {
-  const { activeClubId } = useAuth();
+  const { activeClubId, memberships } = useAuth();
   const role = useActiveRole();
-  const canManage = role === "admin" || (role as string) === "dirigeant";
+  const { tournamentOnly } = useTournamentOnlyMode();
+  const noClub = memberships.length === 0;
+  const canManage = role === "admin" || (role as string) === "dirigeant" || noClub;
   const [open, setOpen] = useState(false);
 
-  const fn = useServerFn(listMyTournaments);
+  const clubFn = useServerFn(listMyTournaments);
+  const personalFn = useServerFn(listMyPersonalTournaments);
+
   const q = useQuery({
-    queryKey: ["tournaments", activeClubId],
-    enabled: !!activeClubId,
-    queryFn: () => fn({ data: { club_id: activeClubId! } }),
+    queryKey: noClub
+      ? ["tournaments", "personal"]
+      : ["tournaments", activeClubId],
+    enabled: noClub ? true : !!activeClubId,
+    queryFn: () =>
+      noClub
+        ? personalFn({ data: undefined as never })
+        : clubFn({ data: { club_id: activeClubId! } }),
   });
+
+  // For tournament-only organizers: check available passes to decide whether
+  // to show "Create" or "Buy a pass" CTAs.
+  const passesFn = useServerFn(listMyAvailablePasses);
+  const passesQ = useQuery({
+    queryKey: ["my-tournament-passes"],
+    enabled: tournamentOnly || noClub,
+    queryFn: () => passesFn({ data: undefined as never }),
+  });
+  const availablePasses = passesQ.data?.passes ?? [];
+  const hasPass = availablePasses.length > 0;
 
   const tournaments = q.data?.tournaments ?? [];
 
   return (
     <div className="px-5 pt-8 space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold flex items-center gap-2">
           <Trophy className="h-6 w-6 text-primary" />
           Tournois
         </h1>
-        {canManage && activeClubId && (
+        {canManage && (
           <>
-            <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Créer
-            </Button>
-            <TournamentWizard
-              clubId={activeClubId}
-              open={open}
-              onOpenChange={setOpen}
-            />
+            {noClub ? (
+              hasPass ? (
+                <Button size="sm" className="h-9" asChild>
+                  <Link to="/tournaments/new-from-pass">
+                    <Plus className="h-4 w-4" />
+                    Créer
+                  </Link>
+                </Button>
+              ) : (
+                <TournamentPassButton
+                  className="h-9"
+                  variant="default"
+                  label="Acheter un pass 40 €"
+                />
+              )
+            ) : (
+              activeClubId && (
+                <>
+                  <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+                    <Plus className="h-4 w-4" />
+                    Créer
+                  </Button>
+                  <TournamentWizard
+                    clubId={activeClubId}
+                    open={open}
+                    onOpenChange={setOpen}
+                  />
+                </>
+              )
+            )}
           </>
         )}
       </div>
+
+      {noClub && (
+        <div className="rounded-2xl border border-border bg-card p-4 text-sm">
+          <p className="font-medium">Mode organisateur de tournoi</p>
+          <p className="mt-1 text-muted-foreground">
+            Achetez un pass à 40 € par tournoi (paiement à l'événement). Aucun
+            abonnement requis.
+          </p>
+          {hasPass && (
+            <p className="mt-2 text-primary font-medium">
+              {availablePasses.length} pass disponible
+              {availablePasses.length > 1 ? "s" : ""} prêt à l'emploi.
+            </p>
+          )}
+        </div>
+      )}
 
       {q.isLoading ? (
         <div className="space-y-2">
@@ -74,10 +137,26 @@ function TournamentsList() {
           }
           action={
             canManage ? (
-              <Button size="sm" onClick={() => setOpen(true)}>
-                <Plus className="h-4 w-4" />
-                Créer un tournoi
-              </Button>
+              noClub ? (
+                hasPass ? (
+                  <Button size="sm" asChild>
+                    <Link to="/tournaments/new-from-pass">
+                      <Plus className="h-4 w-4" />
+                      Créer un tournoi
+                    </Link>
+                  </Button>
+                ) : (
+                  <TournamentPassButton
+                    variant="default"
+                    label="Acheter un pass 40 €"
+                  />
+                )
+              ) : (
+                <Button size="sm" onClick={() => setOpen(true)}>
+                  <Plus className="h-4 w-4" />
+                  Créer un tournoi
+                </Button>
+              )
             ) : null
           }
         />
