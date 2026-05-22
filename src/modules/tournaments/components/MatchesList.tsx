@@ -102,9 +102,10 @@ interface Props {
 }
 
 export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
+  const { t } = useTranslation("tournaments");
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const grouped = matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const key = m.round === "group" ? "Phase de groupes" : roundLabel(m.round);
+    const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
     (acc[key] ??= []).push(m);
     return acc;
   }, {});
