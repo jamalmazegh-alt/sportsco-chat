@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€/mois pour le module Tournois seul.",
+          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€ par tournoi pour le module Tournois seul.",
       },
       { property: "og:title", content: "Tarifs — Clubero" },
       {
