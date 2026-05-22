@@ -626,7 +626,7 @@ function MatchCard({
         {events.length > 0 && (
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {events.map((ev) => {
-              const meta = eventMeta(ev.kind);
+              const meta = eventMeta(ev.kind, t);
               const isA = ev.team_id === match.team_a_id;
               return (
                 <li
