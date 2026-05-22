@@ -1038,7 +1038,7 @@ export const validateMatch = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     // Allow organizer, co-organizer OR assigned referee for this match.
-    const { data: canValidate } = await supabase.rpc("can_validate_match", {
+    const { data: canValidate } = await (supabase as any).rpc("can_validate_match", {
       _user_id: userId,
       _match_id: data.match_id,
     });
