@@ -478,48 +478,48 @@ function MatchCard({
                 <Flag className="h-3 w-3" />
                 {match.referee_name ||
                   refereeOptions.find((r) => r.user_id === match.referee_user_id)?.label ||
-                  "Arbitre"}
+                  t("matches.referee")}
               </span>
             )}
             {done && !validated && (
               <span
                 className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300"
-                title="Score saisi, en attente de validation par l'organisateur"
+                title={t("matches.pendingValidationTitle")}
               >
                 <Check className="h-3 w-3" />
-                À valider
+                {t("matches.pendingValidation")}
               </span>
             )}
 
             {validated && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
                 <ShieldCheck className="h-3 w-3" />
-                Validé
+                {t("matches.validated")}
               </span>
             )}
             {disputed && (
               <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-destructive">
                 <AlertTriangle className="h-3 w-3" />
-                Litige
+                {t("matches.dispute")}
               </span>
             )}
             {match.status === "cancelled" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">Annulé</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">{t("matches.statusLabels.cancelled")}</span>
             )}
             {match.status === "forfeit_a" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait A</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.forfeit_a")}</span>
             )}
             {match.status === "forfeit_b" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait B</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.forfeit_b")}</span>
             )}
             {match.status === "no_show_a" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">A absente</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.no_show_a")}</span>
             )}
             {match.status === "no_show_b" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">B absente</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.no_show_b")}</span>
             )}
             {match.status === "abandoned" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">Abandonné</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">{t("matches.statusLabels.abandoned")}</span>
             )}
           </div>
         </div>
