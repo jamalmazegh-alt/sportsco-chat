@@ -109,13 +109,13 @@ function PricingPage() {
 
               <div className="mt-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display text-5xl font-bold">39 €</span>
+                  <span className="font-display text-5xl font-bold">49 €</span>
                   <span className="text-muted-foreground">{t("pricing.priceMonthly")}</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {t("pricing.monthlyAlt")}{" "}
                   <span className="font-semibold text-foreground">
-                    390 € {t("pricing.priceYearly")}
+                    490 € {t("pricing.priceYearly")}
                   </span>{" "}
                   <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                     {t("pricing.yearlyDiscount")}
@@ -127,10 +127,48 @@ function PricingPage() {
                 <Link to="/register">{t("pricing.ctaStart")}</Link>
               </Button>
 
-              <ul className="mt-8 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <ul className="mt-8 grid grid-cols-1 gap-2.5">
                 {CLUBERO_FEATURES.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-foreground/80">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Tournaments-only Plan */}
+            <div className="flex flex-col rounded-3xl border border-border bg-card p-8">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+                  <Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-bold">Tournois</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Pour les organisateurs hors club Clubero.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-display text-5xl font-bold">40 €</span>
+                  <span className="text-muted-foreground">{t("pricing.priceMonthly")}</span>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Accès au module Clubero Tournaments uniquement.
+                </p>
+              </div>
+
+              <Button asChild variant="outline" className="mt-6 w-full h-11">
+                <Link to="/register">Démarrer</Link>
+              </Button>
+
+              <ul className="mt-8 grid grid-cols-1 gap-2.5">
+                {TOURNAMENTS_FEATURES.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <span className="text-foreground/80">{f}</span>
                   </li>
                 ))}
