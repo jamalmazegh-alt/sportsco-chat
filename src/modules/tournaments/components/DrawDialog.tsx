@@ -626,7 +626,7 @@ export function DrawDialog({
               {finished && (
                 <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-300 animate-fade-in">
                   <CheckCircle2 className="h-4 w-4" />
-                  Tirage au sort terminé. Tu peux encore l'ajuster manuellement si besoin.
+                  {t("draw.doneBanner")}
                 </div>
               )}
             </>
@@ -645,11 +645,11 @@ export function DrawDialog({
                 disabled={applyMut.isPending || !canDraw}
               >
                 <RotateCcw className="h-4 w-4" />
-                Relancer
+                {t("draw.relaunch")}
               </Button>
             )}
             <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={drawing}>
-              Fermer
+              {t("draw.close")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -658,15 +658,13 @@ export function DrawDialog({
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Écraser le tirage existant ?</AlertDialogTitle>
+            <AlertDialogTitle>{t("draw.overwriteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {tournamentStarted
-                ? "Le tournoi a déjà commencé. Cette action va supprimer la structure actuelle (poules/bracket) et les scores des matchs concernés. Les équipes inscrites sont conservées."
-                : "Cette action va supprimer la composition actuelle (poules/bracket) et les matchs associés. Les équipes inscrites sont conservées."}
+              {tournamentStarted ? t("draw.overwriteDescStarted") : t("draw.overwriteDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t("draw.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 const action = pendingAction;
@@ -675,11 +673,12 @@ export function DrawDialog({
                 if (action) action();
               }}
             >
-              Confirmer et relancer
+              {t("draw.confirmRelaunch")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </>
   );
 }
