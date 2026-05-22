@@ -290,11 +290,11 @@ function MatchCard({
     },
 
     onSuccess: () => {
-      toast.success("Score enregistré et validé");
+      toast.success(t("matches.scoreSavedValidated"));
       invalidateAll();
       setOpen(false);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   // Quick inline live score update (no dialog, keeps status "live")
