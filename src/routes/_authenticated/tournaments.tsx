@@ -78,13 +78,7 @@ function TournamentsList() {
                     Créer
                   </Link>
                 </Button>
-              ) : (
-                <TournamentPassButton
-                  className="h-9"
-                  variant="default"
-                  label="Acheter un pass 40 €"
-                />
-              )
+              ) : null
             ) : (
               activeClubId && (
                 <>
