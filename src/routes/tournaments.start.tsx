@@ -36,6 +36,7 @@ function StartPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation("marketing");
+  const { auth_error } = Route.useSearch();
 
   useEffect(() => {
     if (!loading && session) {
@@ -70,6 +71,10 @@ function StartPage() {
             {t("tournaments.start.subheading")}
           </p>
         </div>
+
+        {auth_error ? <ExpiredLinkBlock /> : null}
+
+
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <Tabs defaultValue="signup" className="w-full">
