@@ -543,14 +543,21 @@ function EditTeamDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Seed</Label>
-            <Input
-              type="number"
-              min={1}
+            <Label>Tête de série</Label>
+            <select
+              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               value={editSeed}
               onChange={(e) => setEditSeed(e.target.value)}
-            />
+            >
+              <option value="">Non classée</option>
+              {Array.from({ length: 32 }).map((_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  N°{i + 1}{i === 0 ? " (meilleure équipe)" : ""}
+                </option>
+              ))}
+            </select>
           </div>
+
         </div>
         <Button type="submit" className="w-full" disabled={save.isPending}>
           {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
