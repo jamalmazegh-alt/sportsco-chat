@@ -15,6 +15,7 @@ import {
   Settings2,
   Eye,
   GitBranch,
+  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -29,12 +30,13 @@ import { StandingsView } from "@/modules/tournaments/components/StandingsView";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 import { TournamentRulesEditor } from "@/modules/tournaments/components/TournamentRulesEditor";
+import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
 });
 
-type Tab = "teams" | "fixtures" | "matches" | "standings" | "bracket" | "rules";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "rules";
 
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
@@ -80,6 +82,9 @@ function TournamentDetailPage() {
   const tabs: { id: Tab; icon: any; label: string }[] = [
     { id: "teams", icon: Users, label: "Équipes" },
     { id: "fixtures", icon: Shuffle, label: "Format" },
+    ...(canManage
+      ? [{ id: "fields" as const, icon: MapPin, label: "Terrains" }]
+      : []),
     { id: "matches", icon: Calendar, label: "Matchs" },
     { id: "standings", icon: ListOrdered, label: "Classement" },
     { id: "bracket", icon: GitBranch, label: "Bracket" },
@@ -202,6 +207,16 @@ function TournamentDetailPage() {
           <p className="text-sm text-muted-foreground">
             Seuls les admins et dirigeants peuvent configurer le format.
           </p>
+        )}
+        {tab === "fields" && canManage && (
+          <FieldsManager
+            tournamentId={tournament.id}
+            fields={(tournament as any).fields}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            matches={matches as any}
+            teams={teams as any}
+          />
         )}
         {tab === "matches" && (
           <MatchesList
