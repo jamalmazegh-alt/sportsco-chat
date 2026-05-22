@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Sparkles, Building2 } from "lucide-react";
+import { Check, Sparkles, Building2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -12,12 +12,12 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Essai gratuit de 30 jours. Puis 39€/mois pour un accès illimité. Entreprise sur mesure.",
+          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€/mois pour le module Tournois seul.",
       },
       { property: "og:title", content: "Tarifs — Clubero" },
       {
         property: "og:description",
-        content: "30 jours gratuits. 39€/mois ensuite. Tout inclus.",
+        content: "30 jours gratuits. 49€/mois ensuite. Module Tournois inclus.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/pricing" }],
@@ -34,8 +34,18 @@ const CLUBERO_FEATURES = [
   "Notifications",
   "Statistiques",
   "Événements",
+  "Module Tournois inclus",
   "Accès mobile / PWA",
   "Rôles coach & manager",
+];
+
+const TOURNAMENTS_FEATURES = [
+  "Tournois illimités",
+  "Phases de poules & élimination directe",
+  "Pages publiques & mode TV",
+  "Partage QR code",
+  "Équipes externes autorisées",
+  "Classements en temps réel",
 ];
 
 function PricingPage() {
@@ -78,8 +88,8 @@ function PricingPage() {
 
       {/* Main Pricing */}
       <section className="border-b border-border/60">
-        <div className="mx-auto max-w-5xl px-5 py-16 lg:px-8 lg:py-20">
-          <div className="grid gap-8 lg:grid-cols-2">
+        <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-20">
+          <div className="grid gap-8 lg:grid-cols-3">
             {/* CLUBERO Plan */}
             <div className="relative rounded-3xl border border-primary bg-card p-8 shadow-xl shadow-primary/5">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
@@ -99,13 +109,13 @@ function PricingPage() {
 
               <div className="mt-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display text-5xl font-bold">39 €</span>
+                  <span className="font-display text-5xl font-bold">49 €</span>
                   <span className="text-muted-foreground">{t("pricing.priceMonthly")}</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {t("pricing.monthlyAlt")}{" "}
                   <span className="font-semibold text-foreground">
-                    390 € {t("pricing.priceYearly")}
+                    490 € {t("pricing.priceYearly")}
                   </span>{" "}
                   <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                     {t("pricing.yearlyDiscount")}
@@ -117,10 +127,48 @@ function PricingPage() {
                 <Link to="/register">{t("pricing.ctaStart")}</Link>
               </Button>
 
-              <ul className="mt-8 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <ul className="mt-8 grid grid-cols-1 gap-2.5">
                 {CLUBERO_FEATURES.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-foreground/80">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Tournaments-only Plan */}
+            <div className="flex flex-col rounded-3xl border border-border bg-card p-8">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+                  <Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <h2 className="font-display text-xl font-bold">Tournois</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Pour les organisateurs hors club Clubero.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-display text-5xl font-bold">40 €</span>
+                  <span className="text-muted-foreground">{t("pricing.priceMonthly")}</span>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Accès au module Clubero Tournaments uniquement.
+                </p>
+              </div>
+
+              <Button asChild variant="outline" className="mt-6 w-full h-11">
+                <Link to="/register">Démarrer</Link>
+              </Button>
+
+              <ul className="mt-8 grid grid-cols-1 gap-2.5">
+                {TOURNAMENTS_FEATURES.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <span className="text-foreground/80">{f}</span>
                   </li>
                 ))}
