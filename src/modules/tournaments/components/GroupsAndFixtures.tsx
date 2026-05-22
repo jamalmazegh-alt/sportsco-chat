@@ -144,7 +144,7 @@ export function GroupsAndFixtures({
 
   const saveSettings = useMutation({
     mutationFn: () => {
-      const fl = fieldsList.length ? fieldsList : ["Terrain 1"];
+      const fl = fieldsList.length ? fieldsList : [t("groups.defaultFieldName")];
       const nextSettings = {
         ...(settings ?? {}),
         lunch_start: lunchEnabled ? lunchStart : null,
@@ -169,16 +169,16 @@ export function GroupsAndFixtures({
       });
     },
     onSuccess: () => {
-      toast.success("Réglages enregistrés");
+      toast.success(t("groups.settingsSavedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
 
   const schedule = useMutation({
     mutationFn: async () => {
-      if (!startsOn) throw new Error("Date de début manquante");
-      const fl = fieldsList.length ? fieldsList : ["Terrain 1"];
+      if (!startsOn) throw new Error(t("groups.missingStartDate"));
+      const fl = fieldsList.length ? fieldsList : [t("groups.defaultFieldName")];
       // Save settings first so they persist
       await saveSettings.mutateAsync();
       return scheduleFn({
@@ -200,13 +200,14 @@ export function GroupsAndFixtures({
       const skipped = res?.skipped ?? 0;
       toast.success(
         skipped > 0
-          ? `${res.scheduled} matchs programmés · ${skipped} non placés (contrainte de repos)`
-          : `${res.scheduled} matchs programmés`,
+          ? t("groups.scheduledWithSkippedToast", { count: res.scheduled, skipped })
+          : t("groups.scheduledToast", { count: res.scheduled }),
       );
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
+
 
   const supportsGroups = format !== "knockout";
   const supportsKnockout = format !== "group";
