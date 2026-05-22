@@ -439,7 +439,7 @@ function MatchCard({
       setEvMinute("");
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   const removeEvent = useMutation({
