@@ -719,16 +719,22 @@ function MatchCard({
             </Button>
             {done && (
               <Button
-                variant={validated ? "outline" : "default"}
+                variant={validated ? "ghost" : "default"}
                 size="sm"
-                className="h-7 text-xs"
+                className={
+                  validated
+                    ? "h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                    : "h-7 text-xs"
+                }
                 onClick={() => validateM.mutate(!validated)}
                 disabled={validateM.isPending}
+                title={validated ? "Revenir à un score à valider (corriger une erreur)" : "Valider le score définitif"}
               >
                 <ShieldCheck className="h-3 w-3" />
-                {validated ? "Annuler validation" : "Valider"}
+                {validated ? "Dévalider" : "Valider le score"}
               </Button>
             )}
+
             <Button
               variant={disputed ? "destructive" : "ghost"}
               size="sm"
