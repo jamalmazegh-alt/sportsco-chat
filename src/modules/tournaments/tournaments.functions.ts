@@ -573,3 +573,100 @@ export const getPublicTournament = createServerFn({ method: "POST" })
     };
   });
 
+
+// ---------- Auto-schedule (assigns scheduled_at and field to each match)
+
+export const autoScheduleMatches = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        starts_on: z.string(), // ISO date e.g. 2026-06-01
+        daily_start_time: z.string(), // HH:MM
+        daily_end_time: z.string().optional(),
+        match_duration_min: z.number().int().min(1).max(240),
+        break_min: z.number().int().min(0).max(120),
+        fields: z.array(z.string().min(1).max(60)).min(1).max(20),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { data: matches, error } = await supabase
+      .from("tournament_matches")
+      .select("id, round, match_number")
+      .eq("tournament_id", data.tournament_id)
+      .order("round")
+      .order("match_number");
+    if (error) throw new Response(error.message, { status: 400 });
+    if (!matches || matches.length === 0) {
+      return { scheduled: 0 };
+    }
+
+    const [h, m] = data.daily_start_time.split(":").map((x) => parseInt(x, 10));
+    const slotMin = data.match_duration_min + data.break_min;
+    const dayStartMin = h * 60 + m;
+    const dayEndMin = data.daily_end_time
+      ? (() => {
+          const [eh, em] = data.daily_end_time!.split(":").map((x) => parseInt(x, 10));
+          return eh * 60 + em;
+        })()
+      : 24 * 60;
+    const baseDate = new Date(`${data.starts_on}T00:00:00`);
+
+    let day = 0;
+    let slotIdx = 0;
+    const numFields = data.fields.length;
+    const updates: Promise<any>[] = [];
+
+    for (const match of matches) {
+      const fieldIdx = slotIdx % numFields;
+      const slotInDay = Math.floor(slotIdx / numFields);
+      const minOfDay = dayStartMin + slotInDay * slotMin;
+
+      if (minOfDay + data.match_duration_min > dayEndMin) {
+        // Next day
+        day++;
+        slotIdx = 0;
+        const dayMinNew = dayStartMin;
+        const at = new Date(baseDate);
+        at.setDate(at.getDate() + day);
+        at.setMinutes(dayMinNew);
+        updates.push(
+          supabase
+            .from("tournament_matches")
+            .update({
+              scheduled_at: at.toISOString(),
+              field: data.fields[0],
+              duration_min: data.match_duration_min,
+            })
+            .eq("id", match.id)
+            .then(() => null) as any,
+        );
+        slotIdx = 1;
+        continue;
+      }
+
+      const at = new Date(baseDate);
+      at.setDate(at.getDate() + day);
+      at.setMinutes(minOfDay);
+      updates.push(
+        supabase
+          .from("tournament_matches")
+          .update({
+            scheduled_at: at.toISOString(),
+            field: data.fields[fieldIdx],
+            duration_min: data.match_duration_min,
+          })
+          .eq("id", match.id)
+          .then(() => null) as any,
+      );
+      slotIdx++;
+    }
+
+    await Promise.all(updates);
+    return { scheduled: matches.length };
+  });
