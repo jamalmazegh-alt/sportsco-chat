@@ -93,7 +93,10 @@ export const listMyAvailablePasses = createServerFn({ method: "POST" })
     return { passes: data ?? [] };
   });
 
-async function uniqueSlug(base: string): Promise<string> {
+async function uniqueSlug(
+  supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"],
+  base: string,
+): Promise<string> {
   for (let i = 0; i < 5; i++) {
     const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
     const { data } = await supabaseAdmin
@@ -127,6 +130,7 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId, claims } = context;
     const email = (claims as { email?: string }).email ?? null;
 
