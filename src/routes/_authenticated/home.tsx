@@ -229,6 +229,12 @@ function HomePage() {
               {t("dashboard.viewTeams")}
             </Link>
           </Button>
+          <Button asChild variant="outline" className="flex-1 h-11">
+            <Link to="/tournaments">
+              <Trophy className="h-4 w-4" />
+              Tournois
+            </Link>
+          </Button>
         </div>
       )}
 
