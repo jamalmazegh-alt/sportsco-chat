@@ -40,6 +40,10 @@ const CLUBERO_FEATURES = [
   "Rôles coach & manager",
 ];
 
+  "Accès mobile / PWA",
+  "Rôles coach & manager",
+];
+
 const TOURNAMENTS_FEATURES = [
   "Tournois illimités",
   "Phases de poules & élimination directe",
