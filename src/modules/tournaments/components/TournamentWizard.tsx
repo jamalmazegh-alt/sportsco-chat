@@ -5,7 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
