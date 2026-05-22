@@ -427,17 +427,6 @@ function Card({
   );
 }
 
-const EVENT_LABELS: Record<string, string> = {
-  goal: "But",
-  own_goal: "But CSC",
-  assist: "Passe D.",
-  yellow: "Carton jaune",
-  red: "Carton rouge",
-  second_yellow: "2e jaune",
-  penalty: "Penalty",
-  foul: "Faute",
-};
-
 function useEventLabels(): Record<string, string> {
   const { t } = useTranslation("tournaments");
   return {
@@ -470,6 +459,7 @@ function EventsList({
   events: any[];
   teamMap: Map<string, any>;
 }) {
+  const EVENT_LABELS = useEventLabels();
   if (!events || events.length === 0) return null;
   const sorted = [...events].sort((a, b) => {
     const ma = a.minute ?? 9999;
