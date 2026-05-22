@@ -161,9 +161,10 @@ function PricingPage() {
                 </p>
               </div>
 
-              <Button asChild variant="outline" className="mt-6 w-full h-11">
-                <Link to="/register">Créer un tournoi</Link>
-              </Button>
+              <TournamentPassButton
+                className="mt-6 w-full h-11"
+                label="Acheter un pass tournoi"
+              />
 
               <ul className="mt-8 grid grid-cols-1 gap-2.5">
                 {TOURNAMENTS_FEATURES.map((f) => (
