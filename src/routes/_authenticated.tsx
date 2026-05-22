@@ -13,6 +13,7 @@ const TOURNAMENT_ONLY_ALLOWED = [
   "/tournaments",
   "/profile",
   "/support",
+  "/assistant",
 ];
 // When a club has no active subscription, only these prefixes remain
 // accessible (so the admin can subscribe; everyone can still see profile).
