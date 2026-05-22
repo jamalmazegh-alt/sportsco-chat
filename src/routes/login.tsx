@@ -67,6 +67,15 @@ function LoginPage() {
             );
           })}
         </div>
+        <a
+          href="https://www.clubero.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          {t("auth.backToWebsite")}
+        </a>
         <div className="mb-8 text-center">
           <img src={logo} alt="Clubero" width={176} height={88} className="mx-auto mb-3 h-20 w-44 object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-2" />
           <p className="mt-1 text-sm text-muted-foreground">{t("app.tagline")}</p>
