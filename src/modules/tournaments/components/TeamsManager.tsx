@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
-import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil } from "lucide-react";
+import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import {
   addTournamentTeam,
@@ -16,6 +16,7 @@ import {
   updateTournamentTeam,
   bulkAddTournamentTeams,
 } from "../tournaments.functions";
+import { TeamRosterDialog } from "./TeamRosterDialog";
 
 
 interface TeamRow {
@@ -38,6 +39,7 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState<TeamRow | null>(null);
+  const [rosterTeam, setRosterTeam] = useState<TeamRow | null>(null);
   const [mode, setMode] = useState<"external" | "internal">("external");
   const [name, setName] = useState("");
   const [shortName, setShortName] = useState("");
@@ -368,6 +370,14 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
               <Button
                 size="icon"
                 variant="ghost"
+                onClick={() => setRosterTeam(t)}
+                title="Joueurs"
+              >
+                <UsersRound className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
                 onClick={() => setEditing(t)}
                 title="Modifier"
               >
@@ -396,6 +406,14 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
             qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
           }}
           updateFn={updateFn}
+        />
+      )}
+
+      {rosterTeam && (
+        <TeamRosterDialog
+          tournamentTeamId={rosterTeam.id}
+          teamName={rosterTeam.name}
+          onClose={() => setRosterTeam(null)}
         />
       )}
     </div>
