@@ -464,7 +464,7 @@ export const getGroupStandings = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: t } = await supabase
       .from("tournaments")
-      .select("points_win, points_draw, points_loss, tiebreakers")
+      .select("points_win, points_draw, points_loss, tiebreakers, settings")
       .eq("id", data.tournament_id)
       .single();
     const { data: teams } = await supabase
@@ -473,7 +473,9 @@ export const getGroupStandings = createServerFn({ method: "POST" })
       .eq("tournament_id", data.tournament_id);
     const { data: matches } = await supabase
       .from("tournament_matches")
-      .select("group_id, team_a_id, team_b_id, score_a, score_b, status")
+      .select(
+        "group_id, team_a_id, team_b_id, score_a, score_b, status, validated_at, dispute_flag",
+      )
       .eq("tournament_id", data.tournament_id)
       .eq("round", "group");
     const { data: groups } = await supabase
@@ -481,31 +483,61 @@ export const getGroupStandings = createServerFn({ method: "POST" })
       .select("id, name, sort_order, qualifiers_count")
       .eq("tournament_id", data.tournament_id)
       .order("sort_order");
+    const { data: events } = await supabase
+      .from("tournament_match_events")
+      .select("match_id, team_id, kind")
+      .eq("tournament_id", data.tournament_id);
 
-    const tiebreakers = (t?.tiebreakers as Tiebreaker[] | null) ?? [
-      "points",
-      "goal_diff",
-      "goals_for",
-      "head_to_head",
-    ];
+    const rules = mergeRules(t?.settings ?? {});
+    // DB columns win over settings for legacy compat
     const pts = {
-      win: t?.points_win ?? 3,
-      draw: t?.points_draw ?? 1,
-      loss: t?.points_loss ?? 0,
+      win: t?.points_win ?? rules.points.win,
+      draw: t?.points_draw ?? rules.points.draw,
+      loss: t?.points_loss ?? rules.points.loss,
+      bonusWin: rules.points.bonusWin,
     };
+    const tiebreakers =
+      (rules.tiebreakers && rules.tiebreakers.length > 0
+        ? rules.tiebreakers
+        : (t?.tiebreakers as Tiebreaker[] | null)) ?? DEFAULT_RULES.tiebreakers;
+
+    const includeMatch = (m: { status: string; validated_at: string | null }) => {
+      if (rules.matchValidation.requireValidation) {
+        return m.status === "completed" && !!m.validated_at;
+      }
+      return m.status === "completed";
+    };
+
+    const eventsByMatch = new Map<string, MatchEventInput[]>();
+    for (const ev of events ?? []) {
+      const arr = eventsByMatch.get(ev.match_id) ?? [];
+      arr.push({
+        matchId: ev.match_id,
+        teamId: ev.team_id,
+        kind: ev.kind as MatchEventInput["kind"],
+      });
+      eventsByMatch.set(ev.match_id, arr);
+    }
 
     const result = (groups ?? []).map((g) => {
       const groupTeamIds = (teams ?? []).filter((te) => te.group_id === g.id).map((te) => te.id);
       const groupMatches = (matches ?? [])
         .filter((m) => m.group_id === g.id)
-        .map((m) => ({
+        .map((m: any) => ({
           teamAId: m.team_a_id,
           teamBId: m.team_b_id,
           scoreA: m.score_a,
           scoreB: m.score_b,
-          status: m.status,
+          status: includeMatch(m) ? "completed" : m.status,
         }));
-      const standings = computeStandings(groupTeamIds, groupMatches, pts, tiebreakers);
+      const groupEvents = (matches ?? [])
+        .filter((m: any) => m.group_id === g.id)
+        .flatMap((m: any) => eventsByMatch.get(m.id) ?? []);
+      const standings = computeStandings(groupTeamIds, groupMatches, pts, tiebreakers, {
+        fairPlay: rules.fairPlay,
+        events: groupEvents,
+        drawLotSalt: data.tournament_id,
+      });
       const teamMap = new Map((teams ?? []).map((te) => [te.id, te]));
       return {
         group: g,
@@ -515,8 +547,9 @@ export const getGroupStandings = createServerFn({ method: "POST" })
         })),
       };
     });
-    return { standings: result };
+    return { standings: result, rules };
   });
+
 
 // ---------- Knockout generation from group qualifiers
 
