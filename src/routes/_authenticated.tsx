@@ -51,8 +51,16 @@ function AuthLayout() {
   }
   if (!session) return <Navigate to="/login" replace />;
 
+  const { tournamentOnly } = useTournamentOnlyMode();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
   const isTournamentOrganizer = signupRole === "tournament_organizer";
+
+  // Guard: tournament-only accounts can only reach tournament + profile pages.
+  if (tournamentOnly && !isTournamentOnlyAllowed(pathname)) {
+    return <Navigate to="/tournaments" replace />;
+  }
 
   if (memberships.length === 0) {
     // Tournament organizers don't need a club — render the route with just
@@ -82,6 +90,7 @@ function AuthLayout() {
 
   return (
     <ConsentGate>
+
       <div className="min-h-screen bg-background pb-24">
         <div className="mx-auto max-w-xl">
           <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
