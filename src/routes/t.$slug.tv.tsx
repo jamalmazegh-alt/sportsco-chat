@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { ReactNode } from "react";
 import { Trophy, Calendar, Loader2 } from "lucide-react";
-import { getPublicTournament } from "@/modules/tournaments/server/tournaments.functions";
+import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { computeStandings } from "@/modules/tournaments/lib/standings";
 
 type TvTeam = { id: string; name: string; group_id: string | null };

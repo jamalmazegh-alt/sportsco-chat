@@ -6,7 +6,7 @@ import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
 import { Plus, Trophy, ChevronRight, Calendar } from "lucide-react";
-import { listMyTournaments } from "@/modules/tournaments/server/tournaments.functions";
+import { listMyTournaments } from "@/modules/tournaments/tournaments.functions";
 import { TournamentWizard } from "@/modules/tournaments/components/TournamentWizard";
 
 export const Route = createFileRoute("/_authenticated/tournaments")({

@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { createTournamentPassCheckout } from "@/modules/tournaments/server/passes.functions";
+import { createTournamentPassCheckout } from "@/modules/tournaments/passes.functions";
 
 interface TournamentPassButtonProps {
   className?: string;

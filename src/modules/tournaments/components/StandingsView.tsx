@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
-import { getGroupStandings } from "../server/tournaments.functions";
+import { getGroupStandings } from "../tournaments.functions";
 
 interface Props {
   tournamentId: string;

@@ -10,7 +10,7 @@ import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
 import { Loader2, ChevronRight, ChevronLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
-import { createTournament } from "../server/tournaments.functions";
+import { createTournament } from "../tournaments.functions";
 
 type Format = "group" | "knockout" | "mixed";
 

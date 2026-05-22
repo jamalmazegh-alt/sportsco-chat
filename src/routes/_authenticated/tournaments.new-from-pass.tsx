@@ -11,7 +11,7 @@ import { SportSelect } from "@/components/sport-select";
 import {
   listMyAvailablePasses,
   createTournamentFromPass,
-} from "@/modules/tournaments/server/passes.functions";
+} from "@/modules/tournaments/passes.functions";
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
   component: NewFromPassPage,

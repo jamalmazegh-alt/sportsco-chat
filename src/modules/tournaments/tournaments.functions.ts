@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { slugify, shortRandomSuffix } from "../lib/slug";
-import { distributeIntoGroups, generateRoundRobin } from "../lib/scheduling";
-import { computeStandings, type Tiebreaker } from "../lib/standings";
-import { generateKnockoutBracket } from "../lib/bracket";
+import { slugify, shortRandomSuffix } from "./lib/slug";
+import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
+import { computeStandings, type Tiebreaker } from "./lib/standings";
+import { generateKnockoutBracket } from "./lib/bracket";
 
 // ---------- Schemas
 

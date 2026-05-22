@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { slugify, shortRandomSuffix } from "../lib/slug";
+import { slugify, shortRandomSuffix } from "./lib/slug";
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
