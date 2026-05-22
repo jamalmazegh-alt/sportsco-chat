@@ -12,12 +12,12 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Essai gratuit de 30 jours. Puis 39€/mois pour un accès illimité. Entreprise sur mesure.",
+          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€/mois pour le module Tournois seul.",
       },
       { property: "og:title", content: "Tarifs — Clubero" },
       {
         property: "og:description",
-        content: "30 jours gratuits. 39€/mois ensuite. Tout inclus.",
+        content: "30 jours gratuits. 49€/mois ensuite. Module Tournois inclus.",
       },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/pricing" }],
