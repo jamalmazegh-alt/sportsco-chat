@@ -803,7 +803,7 @@ function MatchCard({
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-muted-foreground">
-                      Set {i + 1}
+                      {t("matches.setLabel", { n: i + 1 })}
                     </span>
                     <Button
                       type="button"
