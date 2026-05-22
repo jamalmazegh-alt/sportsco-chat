@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
+  const { t } = useTranslation("tournaments");
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [sport, setSport] = useState("football");
@@ -55,7 +57,6 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           location: location || null,
         },
       });
-      // Apply cover image after creation (if uploaded)
       if (logo[0]?.url) {
         await updateFn({
           data: {
@@ -67,7 +68,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
       return res;
     },
     onSuccess: (res) => {
-      toast.success("Tournoi créé");
+      toast.success(t("wizard.createdToast"));
       qc.invalidateQueries({ queryKey: ["tournaments", clubId] });
       onOpenChange(false);
       reset();
@@ -76,7 +77,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
         params: { tournamentId: res.tournament.id },
       });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("wizard.errorToast")),
   });
 
   function reset() {
@@ -101,6 +102,12 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const canNext1 = !!startsOn;
   const canNext2 = !!format && numTeams >= 2;
 
+  const formatOptions: { v: Format; label: string; desc: string }[] = [
+    { v: "group", label: t("wizard.formatGroup"), desc: t("wizard.formatGroupDesc") },
+    { v: "knockout", label: t("wizard.formatKnockout"), desc: t("wizard.formatKnockoutDesc") },
+    { v: "mixed", label: t("wizard.formatMixed"), desc: t("wizard.formatMixedDesc") },
+  ];
+
   return (
     <ResponsiveFormDialog
       open={open}
@@ -108,7 +115,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
         onOpenChange(v);
         if (!v) reset();
       }}
-      title="Nouveau tournoi"
+      title={t("wizard.title")}
     >
       <form onSubmit={onSubmit} className="space-y-5 mt-4 pb-6">
         <Stepper step={step} total={4} />
@@ -117,31 +124,31 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           <div className="space-y-4">
             <h3 className="font-medium flex items-center gap-2">
               <Trophy className="h-4 w-4 text-primary" />
-              Identité
+              {t("wizard.identity")}
             </h3>
             <div className="space-y-1.5">
-              <Label>Nom du tournoi</Label>
+              <Label>{t("wizard.name")}</Label>
               <Input
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Tournoi de Printemps U13"
+                placeholder={t("wizard.namePlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Sport</Label>
+              <Label>{t("wizard.sport")}</Label>
               <SportSelect value={sport} onValueChange={setSport} />
             </div>
             <div className="space-y-1.5">
-              <Label>Catégorie (optionnel)</Label>
+              <Label>{t("wizard.categoryOptional")}</Label>
               <Input
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="U13, Senior, Mixte…"
+                placeholder={t("wizard.categoryPlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Logo / image de couverture (optionnel)</Label>
+              <Label>{t("wizard.logoOptional")}</Label>
               <AttachmentPicker
                 value={logo}
                 onChange={setLogo}
@@ -156,10 +163,10 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
 
         {step === 1 && (
           <div className="space-y-4">
-            <h3 className="font-medium">Dates & lieu</h3>
+            <h3 className="font-medium">{t("wizard.datesAndPlace")}</h3>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Début</Label>
+                <Label>{t("wizard.start")}</Label>
                 <Input
                   type="date"
                   required
@@ -168,7 +175,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Fin</Label>
+                <Label>{t("wizard.end")}</Label>
                 <Input
                   type="date"
                   value={endsOn}
@@ -177,14 +184,14 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Lieu</Label>
+              <Label>{t("wizard.place")}</Label>
               <LocationAutocomplete
                 value={location}
                 onChange={setLocation}
-                placeholder="Stade municipal, ville…"
+                placeholder={t("wizard.placePlaceholder")}
               />
               <p className="text-[11px] text-muted-foreground">
-                Recherche d'adresse mondiale (OpenStreetMap). Sélectionne une suggestion ou saisis librement.
+                {t("wizard.placeHint")}
               </p>
 
             </div>
@@ -193,15 +200,9 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
 
         {step === 2 && (
           <div className="space-y-4">
-            <h3 className="font-medium">Format</h3>
+            <h3 className="font-medium">{t("wizard.format")}</h3>
             <div className="grid grid-cols-1 gap-2">
-              {(
-                [
-                  { v: "group", label: "Poules uniquement", desc: "Toutes les équipes se rencontrent dans des poules" },
-                  { v: "knockout", label: "Élimination directe", desc: "Bracket à élimination simple" },
-                  { v: "mixed", label: "Poules + Élimination", desc: "Phase de groupes, puis bracket des qualifiés" },
-                ] as { v: Format; label: string; desc: string }[]
-              ).map((f) => (
+              {formatOptions.map((f) => (
                 <button
                   type="button"
                   key={f.v}
@@ -218,7 +219,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
               ))}
             </div>
             <div className="space-y-1.5">
-              <Label>Nombre d'équipes prévu</Label>
+              <Label>{t("wizard.numTeams")}</Label>
               <Input
                 type="number"
                 min={2}
@@ -232,19 +233,19 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
 
         {step === 3 && (
           <div className="space-y-4">
-            <h3 className="font-medium">Récapitulatif</h3>
+            <h3 className="font-medium">{t("wizard.summary")}</h3>
             <dl className="rounded-xl border border-border bg-card divide-y divide-border text-sm">
-              <Row label="Nom" value={name} />
-              <Row label="Sport" value={sport} />
-              {category && <Row label="Catégorie" value={category} />}
-              <Row label="Début" value={startsOn} />
-              {endsOn && <Row label="Fin" value={endsOn} />}
-              <Row label="Format" value={format} />
-              <Row label="Équipes" value={String(numTeams)} />
-              {location && <Row label="Lieu" value={location} />}
+              <Row label={t("wizard.rowName")} value={name} />
+              <Row label={t("wizard.rowSport")} value={sport} />
+              {category && <Row label={t("wizard.rowCategory")} value={category} />}
+              <Row label={t("wizard.rowStart")} value={startsOn} />
+              {endsOn && <Row label={t("wizard.rowEnd")} value={endsOn} />}
+              <Row label={t("wizard.rowFormat")} value={format} />
+              <Row label={t("wizard.rowTeams")} value={String(numTeams)} />
+              {location && <Row label={t("wizard.rowPlace")} value={location} />}
             </dl>
             <p className="text-xs text-muted-foreground">
-              Tu pourras ensuite ajouter les équipes, créer les poules et générer le calendrier.
+              {t("wizard.summaryHint")}
             </p>
           </div>
         )}
@@ -257,7 +258,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
               onClick={() => setStep((s) => s - 1)}
             >
               <ChevronLeft className="h-4 w-4" />
-              Précédent
+              {t("wizard.previous")}
             </Button>
           ) : (
             <div />
@@ -272,7 +273,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 (step === 2 && !canNext2)
               }
             >
-              Suivant
+              {t("wizard.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -280,7 +281,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
               {create.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                "Créer le tournoi"
+                t("wizard.create")
               )}
             </Button>
           )}
