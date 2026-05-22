@@ -125,16 +125,27 @@ function PublicTournamentPage() {
                   </p>
                 </div>
               </div>
-              <Button asChild size="sm" variant="outline">
-                <Link to="/t/$slug/tv" params={{ slug }}>
-                  <Tv className="h-4 w-4" />
-                  TV
-                </Link>
-              </Button>
+              <div className="flex flex-col gap-2 shrink-0">
+                {registrationOpen && (
+                  <Button asChild size="sm">
+                    <Link to="/t/$slug/register" params={{ slug }}>
+                      <UserPlus className="h-4 w-4" />
+                      S'inscrire
+                    </Link>
+                  </Button>
+                )}
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/t/$slug/tv" params={{ slug }}>
+                    <Tv className="h-4 w-4" />
+                    TV
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
 
       <div className="max-w-3xl mx-auto px-5 mt-5">
         <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
