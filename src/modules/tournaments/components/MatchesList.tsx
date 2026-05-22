@@ -44,7 +44,7 @@ interface Props {
   fields?: string[];
 }
 
-export function MatchesList({ tournamentId, matches, teams }: Props) {
+export function MatchesList({ tournamentId, matches, teams, canManage, fields }: Props) {
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const grouped = matches.reduce<Record<string, Match[]>>((acc, m) => {
     const key = m.round === "group" ? "Phase de groupes" : roundLabel(m.round);
@@ -67,6 +67,8 @@ export function MatchesList({ tournamentId, matches, teams }: Props) {
                 tournamentId={tournamentId}
                 teamA={m.team_a_id ? teamMap.get(m.team_a_id) : undefined}
                 teamB={m.team_b_id ? teamMap.get(m.team_b_id) : undefined}
+                canManage={!!canManage}
+                fields={fields ?? []}
               />
             ))}
           </ul>
