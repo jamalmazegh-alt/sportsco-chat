@@ -16,6 +16,11 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     z
       .object({
         email: z.string().email().max(255),
+        return_to: z
+          .string()
+          .max(200)
+          .regex(/^\/[a-zA-Z0-9/_-]*$/)
+          .optional(),
       })
       .parse(input),
   )
@@ -25,6 +30,15 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     const stripe = getStripe();
     const origin = getOrigin();
 
+    // Only allow safe in-app return paths
+    const safeReturnTo =
+      data.return_to && data.return_to.startsWith("/tournaments/")
+        ? data.return_to
+        : null;
+    const successPath = safeReturnTo
+      ? `${safeReturnTo}?pass=success&session_id={CHECKOUT_SESSION_ID}`
+      : `/tournaments/pass-success?session_id={CHECKOUT_SESSION_ID}`;
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: data.email,
@@ -33,7 +47,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
       tax_id_collection: { enabled: true },
       automatic_tax: { enabled: true },
       allow_promotion_codes: true,
-      success_url: `${origin}/tournaments/pass-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}${successPath}`,
       cancel_url: `${origin}/pricing?pass=canceled`,
       metadata: {
         purpose: "tournament_pass",
