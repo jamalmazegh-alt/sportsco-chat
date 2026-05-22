@@ -161,16 +161,19 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
                 className="col-span-3"
                 placeholder="Nom"
                 value={s.name}
-                onChange={(e) => updateSponsor(s.id, { name: e.target.value })}
+                onChange={(e) => updateLocal(s.id, { name: e.target.value })}
+                onBlur={() => persist.mutate(sponsors)}
                 maxLength={80}
               />
               <Input
                 className="col-span-4"
                 placeholder="https://site.com"
                 value={s.website ?? ""}
-                onChange={(e) => updateSponsor(s.id, { website: e.target.value })}
+                onChange={(e) => updateLocal(s.id, { website: e.target.value })}
+                onBlur={() => persist.mutate(sponsors)}
                 maxLength={255}
               />
+
               <Select
                 value={s.tier}
                 onValueChange={(v) =>
