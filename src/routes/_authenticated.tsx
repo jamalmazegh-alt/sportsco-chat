@@ -1,9 +1,23 @@
-import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Navigate, useRouterState } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+
+// Routes accessible to tournament-only users (no club). Everything else
+// under /_authenticated is redirected to /tournaments.
+const TOURNAMENT_ONLY_ALLOWED = [
+  "/tournaments",
+  "/profile",
+  "/support",
+];
+function isTournamentOnlyAllowed(pathname: string): boolean {
+  return TOURNAMENT_ONLY_ALLOWED.some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
+}
 import { AssistantFab } from "@/components/assistant-fab";
 import { SupportFab } from "@/components/support-fab";
 import { ConsentGate } from "@/components/consent-gate";
