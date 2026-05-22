@@ -271,6 +271,24 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
+  // Quick inline live score update (no dialog, keeps status "live")
+  const liveUpdate = useMutation({
+    mutationFn: (next: { score_a: number; score_b: number }) =>
+      fn({
+        data: {
+          tournament_id: tournamentId,
+          match_id: match.id,
+          score_a: next.score_a,
+          score_b: next.score_b,
+          sets: null,
+          status: "live",
+        },
+      }),
+    onSuccess: () => invalidateAll(),
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+
   const validateM = useMutation({
     mutationFn: (validated: boolean) =>
       valFn({
