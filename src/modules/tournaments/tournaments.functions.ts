@@ -1804,6 +1804,48 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
+
+    // Best-effort: send invitation email
+    try {
+      const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const [{ data: tournament }, { data: inviter }] = await Promise.all([
+        supabaseAdmin
+          .from("tournaments")
+          .select("name")
+          .eq("id", data.tournament_id)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("profiles")
+          .select("first_name, last_name, full_name")
+          .eq("id", userId)
+          .maybeSingle(),
+      ]);
+      const inviterName =
+        (inviter as any)?.full_name ||
+        [(inviter as any)?.first_name, (inviter as any)?.last_name]
+          .filter(Boolean)
+          .join(" ")
+          .trim() ||
+        null;
+      const baseUrl = process.env.SITE_URL || "https://app.clubero.app";
+      await enqueueTransactionalEmailServer({
+        templateName: "tournament-invite",
+        recipientEmail: email,
+        idempotencyKey: `tournament-invite-${row.id}`,
+        templateData: {
+          displayName: data.display_name ?? null,
+          tournamentName: (tournament as any)?.name ?? null,
+          roleLabel: data.role === "co_organizer" ? "co-organisateur" : "arbitre",
+          inviterName,
+          inviteUrl: `${baseUrl}/tournament-invite/${row.invitation_token}`,
+        },
+      });
+    } catch (e) {
+      // Email is best-effort; the link remains copiable from the UI.
+      console.error("[tournament-invite email] failed", e);
+    }
+
     return { collaborator: row };
   });
 
