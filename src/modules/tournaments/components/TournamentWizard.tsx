@@ -139,8 +139,19 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 placeholder="U13, Senior, Mixte…"
               />
             </div>
+            <div className="space-y-1.5">
+              <Label>Logo / image de couverture (optionnel)</Label>
+              <AttachmentPicker
+                value={logo}
+                onChange={setLogo}
+                prefix="tournament-cover"
+                accept="image/*"
+                max={1}
+              />
+            </div>
           </div>
         )}
+
 
         {step === 1 && (
           <div className="space-y-4">
