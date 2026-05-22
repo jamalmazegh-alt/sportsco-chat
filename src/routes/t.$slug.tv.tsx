@@ -6,9 +6,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import type { ReactNode } from "react";
 import { Trophy, Calendar, Loader2 } from "lucide-react";
 import { getPublicTournament } from "@/modules/tournaments/server/tournaments.functions";
 import { computeStandings } from "@/modules/tournaments/lib/standings";
+
+type TvTeam = { id: string; name: string; group_id: string | null };
 
 export const Route = createFileRoute("/t/$slug/tv")({
   component: TvModePage,
@@ -35,7 +38,7 @@ function TvModePage() {
   }
 
   const { tournament, groups, teams, matches } = q.data;
-  const teamMap = new Map(teams.map((t: any) => [t.id, t]));
+  const teamMap = new Map<string, TvTeam>(teams.map((t: any) => [t.id, t as TvTeam]));
 
   const upcoming = matches
     .filter((m: any) => m.status === "scheduled" || m.status === "live")
@@ -166,8 +169,8 @@ function Section({
   children,
 }: {
   title: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
+  icon: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <section>
@@ -180,7 +183,7 @@ function Section({
   );
 }
 
-function Empty({ children }: { children: React.ReactNode }) {
+function Empty({ children }: { children: ReactNode }) {
   return (
     <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
       {children}

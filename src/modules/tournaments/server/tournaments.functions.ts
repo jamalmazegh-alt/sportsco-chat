@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { slugify, shortRandomSuffix } from "../lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "../lib/scheduling";
 import { computeStandings, type Tiebreaker } from "../lib/standings";
@@ -47,7 +46,7 @@ async function assertCanManage(
   return { tournament: data };
 }
 
-async function uniqueSlug(base: string): Promise<string> {
+async function uniqueSlug(supabaseAdmin: any, base: string): Promise<string> {
   for (let i = 0; i < 5; i++) {
     const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
     const { data } = await supabaseAdmin
@@ -66,6 +65,7 @@ export const createTournament = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => createSchema.parse(input))
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { supabase, userId } = context;
     // Must be admin or dirigeant of the club
     const { data: role } = await supabase
@@ -79,7 +79,7 @@ export const createTournament = createServerFn({ method: "POST" })
       throw new Response("Forbidden — admin/dirigeant required", { status: 403 });
     }
 
-    const slug = await uniqueSlug(slugify(data.name));
+    const slug = await uniqueSlug(supabaseAdmin, slugify(data.name));
     const { data: row, error } = await supabase
       .from("tournaments")
       .insert({
@@ -527,6 +527,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
     z.object({ slug: z.string().min(1).max(80) }).parse(input),
   )
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: t } = await supabaseAdmin
       .from("tournaments")
       .select(
