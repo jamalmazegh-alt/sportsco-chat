@@ -693,7 +693,7 @@ function ForEveryone() {
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {(t("home.audiences", { returnObjects: true }) as { t: string; p: string[] }[]).map((a, i) => {
+          {(t("features.audiences", { returnObjects: true }) as { t: string; p: string[] }[]).map((a, i) => {
             const Icon = AUDIENCE_META[i]?.icon ?? Trophy;
             return (
               <div

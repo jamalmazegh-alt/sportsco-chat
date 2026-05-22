@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 
-export const Route = createFileRoute("/tournament/$slug/register")({
+export const Route = createFileRoute("/tournament/$slug_/register")({
   component: RegisterPage,
   head: ({ params }) => ({
     meta: [{ title: `Inscription — Tournoi ${params.slug} · Clubero` }],

@@ -40,7 +40,7 @@ type TvTeam = {
   group_id: string | null;
 };
 
-export const Route = createFileRoute("/tournament/$slug/tv")({
+export const Route = createFileRoute("/tournament/$slug_/tv")({
   component: TvSlideshowPage,
   validateSearch: (search: Record<string, unknown>) => ({
     refresh:
