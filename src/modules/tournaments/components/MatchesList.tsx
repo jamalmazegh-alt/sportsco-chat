@@ -223,6 +223,7 @@ function MatchCard({
   scoring?: ScoringRules;
   refereeOptions: RefereeOption[];
 }) {
+  const { t } = useTranslation("tournaments");
   const setsMode = scoring?.mode === "sets";
   const setsRules = scoring?.sets ?? DEFAULT_SETS_RULES;
   const [open, setOpen] = useState(false);
