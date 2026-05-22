@@ -150,11 +150,11 @@ function PublicTournamentPage() {
     (closes === null || now <= closes);
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: "overview", label: "Aperçu", icon: CalendarDays },
-    { id: "teams", label: "Équipes", icon: Users },
-    { id: "matches", label: "Matchs", icon: Calendar },
-    { id: "standings", label: "Classement", icon: ListOrdered },
-    { id: "bracket", label: "Bracket", icon: GitBranch },
+    { id: "overview", label: t("public.tabs.overview"), icon: CalendarDays },
+    { id: "teams", label: t("public.tabs.teams"), icon: Users },
+    { id: "matches", label: t("public.tabs.matches"), icon: Calendar },
+    { id: "standings", label: t("public.tabs.standings"), icon: ListOrdered },
+    { id: "bracket", label: t("public.tabs.bracket"), icon: GitBranch },
   ];
 
   const accent = rules.branding.primaryColor;
