@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Shuffle, Trophy } from "lucide-react";
+import { Loader2, Shuffle, Trophy, Clock, CalendarClock, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   autoCreateGroupsAndFixtures,
   generateKnockoutFromGroups,
+  updateTournament,
+  autoScheduleMatches,
 } from "../tournaments.functions";
 
 interface Props {
@@ -17,6 +19,12 @@ interface Props {
   numTeams: number;
   groupsCount: number;
   matchesCount: number;
+  startsOn?: string;
+  matchDurationMin?: number | null;
+  breakMin?: number | null;
+  dailyStartTime?: string | null;
+  dailyEndTime?: string | null;
+  fields?: string[] | null;
 }
 
 export function GroupsAndFixtures({
@@ -25,14 +33,39 @@ export function GroupsAndFixtures({
   numTeams,
   groupsCount,
   matchesCount,
+  startsOn,
+  matchDurationMin,
+  breakMin,
+  dailyStartTime,
+  dailyEndTime,
+  fields,
 }: Props) {
   const qc = useQueryClient();
   const [numGroups, setNumGroups] = useState(2);
   const [qualifiers, setQualifiers] = useState(2);
   const [thirdPlace, setThirdPlace] = useState(false);
 
+  // Match scheduling settings
+  const [duration, setDuration] = useState(matchDurationMin ?? 20);
+  const [pause, setPause] = useState(breakMin ?? 5);
+  const [startTime, setStartTime] = useState(dailyStartTime ?? "09:00");
+  const [endTime, setEndTime] = useState(dailyEndTime ?? "18:00");
+  const [fieldsText, setFieldsText] = useState(
+    (fields ?? ["Terrain 1"]).join(", "),
+  );
+
+  useEffect(() => {
+    setDuration(matchDurationMin ?? 20);
+    setPause(breakMin ?? 5);
+    setStartTime(dailyStartTime ?? "09:00");
+    setEndTime(dailyEndTime ?? "18:00");
+    setFieldsText((fields ?? ["Terrain 1"]).join(", "));
+  }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields]);
+
   const genGroupsFn = useServerFn(autoCreateGroupsAndFixtures);
   const genKnockoutFn = useServerFn(generateKnockoutFromGroups);
+  const updateFn = useServerFn(updateTournament);
+  const scheduleFn = useServerFn(autoScheduleMatches);
 
   const genGroups = useMutation({
     mutationFn: () =>
@@ -57,6 +90,60 @@ export function GroupsAndFixtures({
       }),
     onSuccess: (res) => {
       toast.success(`${res.matches_created} matchs de bracket créés`);
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+  const saveSettings = useMutation({
+    mutationFn: () => {
+      const fieldsList = fieldsText
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      return updateFn({
+        data: {
+          tournament_id: tournamentId,
+          patch: {
+            match_duration_min: duration,
+            break_min: pause,
+            daily_start_time: startTime,
+            daily_end_time: endTime,
+            fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+          },
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Réglages enregistrés");
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+  const schedule = useMutation({
+    mutationFn: async () => {
+      if (!startsOn) throw new Error("Date de début manquante");
+      const fieldsList = fieldsText
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      // Save settings first so they persist
+      await saveSettings.mutateAsync();
+      return scheduleFn({
+        data: {
+          tournament_id: tournamentId,
+          starts_on: startsOn,
+          daily_start_time: startTime,
+          daily_end_time: endTime,
+          match_duration_min: duration,
+          break_min: pause,
+          fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+        },
+      });
+    },
+    onSuccess: (res: any) => {
+      toast.success(`${res.scheduled} matchs programmés`);
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
@@ -122,7 +209,15 @@ export function GroupsAndFixtures({
         <section className="rounded-xl border border-border bg-card p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-primary" />
-            <h3 className="font-medium">Phase finale</h3>
+            <h3 className="font-medium flex items-center gap-1.5">
+              Phase finale
+              <span
+                className="text-muted-foreground"
+                title="Le bracket est le tableau à élimination directe : quarts → demis → finale. Affiché en arbre."
+              >
+                <HelpCircle className="h-3.5 w-3.5" />
+              </span>
+            </h3>
           </div>
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -154,6 +249,94 @@ export function GroupsAndFixtures({
           )}
         </section>
       )}
+
+      {/* Match scheduling */}
+      <section className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-primary" />
+          <h3 className="font-medium">Durée & horaires des matchs</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label>Durée d'un match (min)</Label>
+            <Input
+              type="number"
+              min={1}
+              max={240}
+              value={duration}
+              onChange={(e) => setDuration(parseInt(e.target.value || "0", 10))}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Pause entre matchs (min)</Label>
+            <Input
+              type="number"
+              min={0}
+              max={120}
+              value={pause}
+              onChange={(e) => setPause(parseInt(e.target.value || "0", 10))}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Début de journée</Label>
+            <Input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Fin de journée</Label>
+            <Input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Terrains (séparés par virgule)</Label>
+          <Input
+            value={fieldsText}
+            onChange={(e) => setFieldsText(e.target.value)}
+            placeholder="Terrain 1, Terrain 2"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            Plusieurs terrains = matchs en parallèle.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            onClick={() => saveSettings.mutate()}
+            disabled={saveSettings.isPending}
+          >
+            {saveSettings.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Enregistrer"
+            )}
+          </Button>
+          <Button
+            onClick={() => schedule.mutate()}
+            disabled={schedule.isPending || matchesCount === 0 || !startsOn}
+          >
+            {schedule.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <CalendarClock className="h-4 w-4" />
+                Programmer auto
+              </>
+            )}
+          </Button>
+        </div>
+        {matchesCount === 0 && (
+          <p className="text-[11px] text-muted-foreground">
+            Génère d'abord les poules ou le bracket avant de programmer.
+          </p>
+        )}
+      </section>
     </div>
   );
 }
