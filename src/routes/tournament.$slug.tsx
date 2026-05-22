@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
+import { useTranslation, Trans } from "react-i18next";
+import i18n from "@/lib/i18n";
 import {
   Trophy,
   Calendar,
@@ -33,15 +35,24 @@ export const Route = createFileRoute("/tournament/$slug")({
     return { initial: data };
   },
   head: ({ loaderData, params }) => {
-    const t = loaderData?.initial?.tournament as any;
-    const title = t?.name
-      ? `${t.name} — Tournoi ${t.sport ?? ""}`.trim() + " · Clubero"
-      : `Tournoi ${params.slug} — Clubero`;
-    const desc = t
-      ? `Suivez ${t.name} en direct : équipes, calendrier, résultats et classements${
-          t.location ? ` · ${t.location}` : ""
-        }.`
-      : "Suivez ce tournoi en direct : équipes, calendrier, résultats et classements.";
+    const data = loaderData?.initial?.tournament as any;
+    const title = data?.name
+      ? i18n.t("public.metaTitle", {
+          ns: "tournaments",
+          name: data.name,
+          sport: data.sport ?? "",
+        }).trim() + " · Clubero"
+      : i18n.t("public.metaTitleFallback", {
+          ns: "tournaments",
+          slug: params.slug,
+        });
+    const desc = data
+      ? i18n.t("public.metaDesc", {
+          ns: "tournaments",
+          name: data.name,
+          locationSuffix: data.location ? ` · ${data.location}` : "",
+        })
+      : i18n.t("public.metaDescFallback", { ns: "tournaments" });
     const meta: Array<Record<string, string>> = [
       { title },
       { name: "description", content: desc },
@@ -50,9 +61,9 @@ export const Route = createFileRoute("/tournament/$slug")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ];
-    if (t?.cover_image_url) {
-      meta.push({ property: "og:image", content: t.cover_image_url });
-      meta.push({ name: "twitter:image", content: t.cover_image_url });
+    if (data?.cover_image_url) {
+      meta.push({ property: "og:image", content: data.cover_image_url });
+      meta.push({ name: "twitter:image", content: data.cover_image_url });
     }
     return { meta };
   },
