@@ -26,6 +26,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
 import { Route as TournamentsStartRouteImport } from './routes/tournaments.start'
 import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
+import { Route as TournamentSlugRouteImport } from './routes/tournament.$slug'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
@@ -53,6 +54,8 @@ import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/cl
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug.tv'
+import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug.register'
 import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
 import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
@@ -168,6 +171,11 @@ const TournamentsStartRoute = TournamentsStartRouteImport.update({
 const TournamentsPassSuccessRoute = TournamentsPassSuccessRouteImport.update({
   id: '/tournaments/pass-success',
   path: '/tournaments/pass-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentSlugRoute = TournamentSlugRouteImport.update({
+  id: '/tournament/$slug',
+  path: '/tournament/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TSlugRoute = TSlugRouteImport.update({
@@ -308,6 +316,16 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const TournamentSlugTvRoute = TournamentSlugTvRouteImport.update({
+  id: '/tv',
+  path: '/tv',
+  getParentRoute: () => TournamentSlugRoute,
+} as any)
+const TournamentSlugRegisterRoute = TournamentSlugRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => TournamentSlugRoute,
 } as any)
 const TSlugTvRoute = TSlugTvRouteImport.update({
   id: '/tv',
@@ -527,6 +545,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
@@ -550,6 +569,8 @@ export interface FileRoutesByFullPath {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/support/': typeof AuthenticatedSupportIndexRoute
@@ -600,6 +621,7 @@ export interface FileRoutesByTo {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin': typeof SuperadminIndexRoute
@@ -623,6 +645,8 @@ export interface FileRoutesByTo {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/support': typeof AuthenticatedSupportIndexRoute
@@ -679,6 +703,7 @@ export interface FileRoutesById {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
@@ -702,6 +727,8 @@ export interface FileRoutesById {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
@@ -758,6 +785,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
     | '/superadmin/'
@@ -781,6 +809,8 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
+    | '/tournament/$slug/register'
+    | '/tournament/$slug/tv'
     | '/admin/'
     | '/profile/'
     | '/support/'
@@ -831,6 +861,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
     | '/superadmin'
@@ -854,6 +885,8 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
+    | '/tournament/$slug/register'
+    | '/tournament/$slug/tv'
     | '/admin'
     | '/profile'
     | '/support'
@@ -909,6 +942,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
     | '/superadmin/'
@@ -932,6 +966,8 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
+    | '/tournament/$slug/register'
+    | '/tournament/$slug/tv'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
     | '/_authenticated/support/'
@@ -972,6 +1008,7 @@ export interface RootRouteChildren {
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
+  TournamentSlugRoute: typeof TournamentSlugRouteWithChildren
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
@@ -1108,6 +1145,13 @@ declare module '@tanstack/react-router' {
       path: '/tournaments/pass-success'
       fullPath: '/tournaments/pass-success'
       preLoaderRoute: typeof TournamentsPassSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament/$slug': {
+      id: '/tournament/$slug'
+      path: '/tournament/$slug'
+      fullPath: '/tournament/$slug'
+      preLoaderRoute: typeof TournamentSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/t/$slug': {
@@ -1298,6 +1342,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/tournament/$slug/tv': {
+      id: '/tournament/$slug/tv'
+      path: '/tv'
+      fullPath: '/tournament/$slug/tv'
+      preLoaderRoute: typeof TournamentSlugTvRouteImport
+      parentRoute: typeof TournamentSlugRoute
+    }
+    '/tournament/$slug/register': {
+      id: '/tournament/$slug/register'
+      path: '/register'
+      fullPath: '/tournament/$slug/register'
+      preLoaderRoute: typeof TournamentSlugRegisterRouteImport
+      parentRoute: typeof TournamentSlugRoute
     }
     '/t/$slug/tv': {
       id: '/t/$slug/tv'
@@ -1745,6 +1803,20 @@ const TSlugRouteChildren: TSlugRouteChildren = {
 
 const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
 
+interface TournamentSlugRouteChildren {
+  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRoute
+  TournamentSlugTvRoute: typeof TournamentSlugTvRoute
+}
+
+const TournamentSlugRouteChildren: TournamentSlugRouteChildren = {
+  TournamentSlugRegisterRoute: TournamentSlugRegisterRoute,
+  TournamentSlugTvRoute: TournamentSlugTvRoute,
+}
+
+const TournamentSlugRouteWithChildren = TournamentSlugRoute._addFileChildren(
+  TournamentSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1766,6 +1838,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
+  TournamentSlugRoute: TournamentSlugRouteWithChildren,
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
