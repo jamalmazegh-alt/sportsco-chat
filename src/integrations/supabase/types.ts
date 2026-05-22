@@ -1437,6 +1437,47 @@ export type Database = {
           },
         ]
       }
+      tournament_documents: {
+        Row: {
+          file_url: string
+          generated_at: string
+          generated_by: string | null
+          id: string
+          kind: string
+          language: string
+          storage_path: string | null
+          tournament_id: string
+        }
+        Insert: {
+          file_url: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          kind: string
+          language?: string
+          storage_path?: string | null
+          tournament_id: string
+        }
+        Update: {
+          file_url?: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          kind?: string
+          language?: string
+          storage_path?: string | null
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_documents_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_groups: {
         Row: {
           created_at: string
@@ -1472,17 +1513,80 @@ export type Database = {
           },
         ]
       }
+      tournament_match_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: Database["public"]["Enums"]["tournament_event_kind"]
+          match_id: string
+          minute: number | null
+          player_name: string | null
+          team_id: string | null
+          tournament_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["tournament_event_kind"]
+          match_id: string
+          minute?: number | null
+          player_name?: string | null
+          team_id?: string | null
+          tournament_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["tournament_event_kind"]
+          match_id?: string
+          minute?: number | null
+          player_name?: string | null
+          team_id?: string | null
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_match_events_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_match_events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_match_events_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_matches: {
         Row: {
           bracket_position: number | null
           created_at: string
           details: Json
+          dispute_flag: boolean
           duration_min: number | null
           field: string | null
           group_id: string | null
           id: string
           match_number: number | null
           notes: string | null
+          overtime_score_a: number | null
+          overtime_score_b: number | null
+          penalty_score_a: number | null
+          penalty_score_b: number | null
           round: Database["public"]["Enums"]["tournament_match_round"]
           scheduled_at: string | null
           score_a: number | null
@@ -1494,18 +1598,25 @@ export type Database = {
           team_b_source: Json | null
           tournament_id: string
           updated_at: string
+          validated_at: string | null
+          validated_by: string | null
           winner_team_id: string | null
         }
         Insert: {
           bracket_position?: number | null
           created_at?: string
           details?: Json
+          dispute_flag?: boolean
           duration_min?: number | null
           field?: string | null
           group_id?: string | null
           id?: string
           match_number?: number | null
           notes?: string | null
+          overtime_score_a?: number | null
+          overtime_score_b?: number | null
+          penalty_score_a?: number | null
+          penalty_score_b?: number | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
           scheduled_at?: string | null
           score_a?: number | null
@@ -1517,18 +1628,25 @@ export type Database = {
           team_b_source?: Json | null
           tournament_id: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
           winner_team_id?: string | null
         }
         Update: {
           bracket_position?: number | null
           created_at?: string
           details?: Json
+          dispute_flag?: boolean
           duration_min?: number | null
           field?: string | null
           group_id?: string | null
           id?: string
           match_number?: number | null
           notes?: string | null
+          overtime_score_a?: number | null
+          overtime_score_b?: number | null
+          penalty_score_a?: number | null
+          penalty_score_b?: number | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
           scheduled_at?: string | null
           score_a?: number | null
@@ -1540,6 +1658,8 @@ export type Database = {
           team_b_source?: Json | null
           tournament_id?: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
           winner_team_id?: string | null
         }
         Relationships: [
@@ -2244,6 +2364,15 @@ export type Database = {
         | "waiting_user"
         | "resolved"
         | "closed"
+      tournament_event_kind:
+        | "goal"
+        | "own_goal"
+        | "assist"
+        | "yellow_card"
+        | "red_card"
+        | "second_yellow"
+        | "penalty"
+        | "foul"
       tournament_format: "group" | "knockout" | "mixed"
       tournament_match_round:
         | "group"
@@ -2445,6 +2574,16 @@ export const Constants = {
         "waiting_user",
         "resolved",
         "closed",
+      ],
+      tournament_event_kind: [
+        "goal",
+        "own_goal",
+        "assist",
+        "yellow_card",
+        "red_card",
+        "second_yellow",
+        "penalty",
+        "foul",
       ],
       tournament_format: ["group", "knockout", "mixed"],
       tournament_match_round: [
