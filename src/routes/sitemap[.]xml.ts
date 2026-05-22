@@ -27,6 +27,30 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/legal/cookies", changefreq: "yearly", priority: "0.3" },
         ];
 
+        try {
+          const { supabaseAdmin } = await import(
+            "@/integrations/supabase/client.server"
+          );
+          const { data } = await supabaseAdmin
+            .from("tournaments")
+            .select("slug")
+            .in("status", ["published", "in_progress", "completed"])
+            .not("slug", "is", null)
+            .limit(1000);
+          for (const t of data ?? []) {
+            if (t.slug) {
+              entries.push({
+                path: `/tournament/${t.slug}`,
+                changefreq: "daily",
+                priority: "0.7",
+              });
+            }
+          }
+        } catch {
+          /* sitemap stays static if DB unreachable */
+        }
+
+
         const urls = entries.map((e) =>
           [
             `  <url>`,
