@@ -986,7 +986,7 @@ const sponsorSchema = z.object({
   id: z.string().min(1).max(64),
   name: z.string().min(1).max(120),
   logo_url: z.string().url().max(1000),
-  website: z.string().url().max(500).nullable().optional().or(z.literal("")),
+  website: z.string().max(500).nullable().optional(),
   tier: sponsorTierEnum,
 });
 
