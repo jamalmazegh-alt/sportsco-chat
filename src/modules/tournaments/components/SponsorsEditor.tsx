@@ -1,9 +1,10 @@
 import { useRef, useState } from "react";
-import { Loader2, Plus, Trash2, Upload, ExternalLink } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, Trash2, Upload, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -12,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { updateTournamentSponsors } from "../tournaments.functions";
 import type { Sponsor, SponsorTier } from "../lib/rules";
 
 interface Props {
@@ -30,6 +32,18 @@ const TIER_LABEL: Record<SponsorTier, string> = {
 export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const saveFn = useServerFn(updateTournamentSponsors);
+  const persist = useMutation({
+    mutationFn: (next: Sponsor[]) =>
+      saveFn({ data: { tournament_id: tournamentId, sponsors: next } }),
+    onError: (e: any) => toast.error(e?.message ?? "Erreur d'enregistrement"),
+  });
+
+  // Met à jour l'état parent + persiste immédiatement en base.
+  const commit = (next: Sponsor[]) => {
+    onChange(next);
+    persist.mutate(next);
+  };
 
   const handleUpload = async (file: File) => {
     if (file.size > 2 * 1024 * 1024) {
@@ -51,11 +65,11 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
         id: crypto.randomUUID(),
         name: file.name.replace(/\.[^.]+$/, ""),
         logo_url: pub.publicUrl,
-        website: "",
+        website: null,
         tier: "partner",
       };
-      onChange([...sponsors, newSponsor]);
-      toast.success("Logo ajouté");
+      commit([...sponsors, newSponsor]);
+      toast.success("Sponsor ajouté");
     } catch (e: any) {
       toast.error(e?.message ?? "Erreur upload");
     } finally {
@@ -64,21 +78,40 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
     }
   };
 
-  const updateSponsor = (id: string, patch: Partial<Sponsor>) => {
+  // Édition locale (sans persistance) — utilisée pendant la frappe.
+  const updateLocal = (id: string, patch: Partial<Sponsor>) => {
     onChange(sponsors.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   };
+  // Édition + persistance immédiate — pour tier, blur, suppression.
+  const updateSponsor = (id: string, patch: Partial<Sponsor>) => {
+    commit(sponsors.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+
   const removeSponsor = (id: string) => {
-    onChange(sponsors.filter((s) => s.id !== id));
+    const target = sponsors.find((s) => s.id === id);
+    commit(sponsors.filter((s) => s.id !== id));
+    // best-effort: supprime le logo du storage
+    if (target?.logo_url) {
+      const marker = "/tournament-documents/";
+      const idx = target.logo_url.indexOf(marker);
+      if (idx >= 0) {
+        const path = target.logo_url.slice(idx + marker.length);
+        supabase.storage.from("tournament-documents").remove([path]).catch(() => {});
+      }
+    }
   };
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
-          Ajoute les logos de tes sponsors. Ils apparaîtront sur la page publique
-          du tournoi et dans le diaporama TV.
+          Les sponsors sont enregistrés automatiquement et affichés sur la page
+          publique du tournoi et le diaporama TV.
         </p>
-        <div>
+        <div className="flex items-center gap-2">
+          {persist.isPending && (
+            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+          )}
           <input
             ref={fileRef}
             type="file"
@@ -128,16 +161,19 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
                 className="col-span-3"
                 placeholder="Nom"
                 value={s.name}
-                onChange={(e) => updateSponsor(s.id, { name: e.target.value })}
+                onChange={(e) => updateLocal(s.id, { name: e.target.value })}
+                onBlur={() => persist.mutate(sponsors)}
                 maxLength={80}
               />
               <Input
                 className="col-span-4"
                 placeholder="https://site.com"
                 value={s.website ?? ""}
-                onChange={(e) => updateSponsor(s.id, { website: e.target.value })}
+                onChange={(e) => updateLocal(s.id, { website: e.target.value })}
+                onBlur={() => persist.mutate(sponsors)}
                 maxLength={255}
               />
+
               <Select
                 value={s.tier}
                 onValueChange={(v) =>

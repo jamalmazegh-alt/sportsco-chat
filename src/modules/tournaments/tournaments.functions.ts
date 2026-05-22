@@ -980,6 +980,48 @@ export const updateTournamentRules = createServerFn({ method: "POST" })
     return { rules: merged };
   });
 
+// Persistance immédiate des sponsors (utilisée par SponsorsEditor)
+const sponsorTierEnum = z.enum(["main", "gold", "silver", "partner"]);
+const sponsorSchema = z.object({
+  id: z.string().min(1).max(64),
+  name: z.string().min(1).max(120),
+  logo_url: z.string().url().max(1000),
+  website: z.string().max(500).nullable().optional(),
+  tier: sponsorTierEnum,
+});
+
+export const updateTournamentSponsors = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        sponsors: z.array(sponsorSchema).max(50),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+    const current = mergeRules(tournament.settings);
+    const sanitized = data.sponsors.map((s) => ({
+      ...s,
+      website: s.website && s.website.length > 0 ? s.website : null,
+    }));
+    const merged = mergeRules({
+      ...current,
+      branding: { ...current.branding, sponsors: sanitized },
+    });
+    const { error } = await supabase
+      .from("tournaments")
+      .update({ settings: merged } as any)
+      .eq("id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { sponsors: merged.branding.sponsors ?? [] };
+  });
+
+
+
 // ---------- Match validation & dispute
 
 export const validateMatch = createServerFn({ method: "POST" })
