@@ -79,8 +79,12 @@ function TournamentDetailPage() {
   const { tournament, groups, teams, matches } = q.data;
   const publicUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/t/${tournament.slug}`
-      : `/t/${tournament.slug}`;
+      ? `${window.location.origin}/tournament/${tournament.slug}`
+      : `/tournament/${tournament.slug}`;
+  const scoring = resolveScoring(
+    (tournament as any).sport,
+    ((tournament as any).settings as any)?.scoring,
+  );
 
   const tabs: { id: Tab; icon: any; label: string }[] = [
     { id: "teams", icon: Users, label: "Équipes" },
@@ -150,7 +154,7 @@ function TournamentDetailPage() {
             )}
             <ShareDialog url={publicUrl} title={tournament.name} />
             <Button size="sm" variant="ghost" asChild>
-              <a href={`/t/${tournament.slug}`} target="_blank" rel="noreferrer">
+              <a href={`/tournament/${tournament.slug}`} target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4" />
                 Voir la page publique
               </a>
@@ -231,6 +235,7 @@ function TournamentDetailPage() {
             teams={teams as any}
             canManage={canManage}
             fields={((tournament as any).fields as string[] | null) ?? []}
+            scoring={scoring}
           />
         )}
         {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
@@ -244,9 +249,11 @@ function TournamentDetailPage() {
           <TournamentRulesEditor
             tournamentId={tournament.id}
             settings={(tournament as any).settings}
+            sport={(tournament as any).sport}
           />
         )}
       </div>
     </div>
   );
 }
+
