@@ -467,9 +467,9 @@ function StandingsTable({
                   {t?.name ?? "—"}
                 </td>
                 <td className="px-2 py-2 text-right tabular-nums">{r.played}</td>
-                <td className="px-2 py-2 text-right tabular-nums">{r.wins}</td>
-                <td className="px-2 py-2 text-right tabular-nums">{r.draws}</td>
-                <td className="px-2 py-2 text-right tabular-nums">{r.losses}</td>
+                <td className="px-2 py-2 text-right tabular-nums">{r.won}</td>
+                <td className="px-2 py-2 text-right tabular-nums">{r.drawn}</td>
+                <td className="px-2 py-2 text-right tabular-nums">{r.lost}</td>
                 <td className="px-2 py-2 text-right tabular-nums">
                   {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
                 </td>
