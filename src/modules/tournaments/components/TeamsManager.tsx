@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
-import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil, UsersRound } from "lucide-react";
+import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil, UsersRound, Download } from "lucide-react";
 import { toast } from "sonner";
 import {
   addTournamentTeam,
