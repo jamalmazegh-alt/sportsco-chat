@@ -42,6 +42,11 @@ import {
 } from "../lib/rules";
 import type { Tiebreaker } from "../lib/standings";
 import {
+  resolveScoring,
+  type ScoringMode,
+  type ScoringRules,
+} from "../lib/formats";
+import {
   updateTournamentRules,
   generateRulesPdf,
   listTournamentDocuments,
@@ -50,11 +55,18 @@ import {
 interface Props {
   tournamentId: string;
   settings: unknown;
+  sport?: string | null;
 }
 
-export function TournamentRulesEditor({ tournamentId, settings }: Props) {
+export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) {
   const initial = useMemo(() => mergeRules(settings), [settings]);
   const [rules, setRules] = useState<TournamentRules>(initial);
+  const scoring: ScoringRules = useMemo(
+    () => resolveScoring(sport, rules.scoring),
+    [sport, rules.scoring],
+  );
+  const setScoring = (next: ScoringRules) =>
+    setRules({ ...rules, scoring: next });
   const updateFn = useServerFn(updateTournamentRules);
   const qc = useQueryClient();
 
@@ -143,6 +155,82 @@ export function TournamentRulesEditor({ tournamentId, settings }: Props) {
           />
         </CardContent>
       </Card>
+
+      {/* Scoring */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Score</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="space-y-1.5">
+            <Label>Mode de comptage</Label>
+            <Select
+              value={scoring.mode}
+              onValueChange={(v) =>
+                setScoring({ ...scoring, mode: v as ScoringMode })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="simple">Score simple (buts/points)</SelectItem>
+                <SelectItem value="sets">Score par sets (volley)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Défaut pour ce sport :{" "}
+              {sport === "volleyball" ? "sets" : "simple"}.
+            </p>
+          </div>
+          {scoring.mode === "sets" && (
+            <div className="grid grid-cols-3 gap-3 pt-2">
+              <div className="space-y-1.5">
+                <Label>Best of</Label>
+                <Select
+                  value={String(scoring.sets.bestOf)}
+                  onValueChange={(v) =>
+                    setScoring({
+                      ...scoring,
+                      sets: { ...scoring.sets, bestOf: parseInt(v, 10) as 3 | 5 },
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3">3 sets</SelectItem>
+                    <SelectItem value="5">5 sets</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <NumberField
+                label="Pts / set"
+                value={scoring.sets.pointsToWin}
+                onChange={(v) =>
+                  setScoring({
+                    ...scoring,
+                    sets: { ...scoring.sets, pointsToWin: v },
+                  })
+                }
+              />
+              <NumberField
+                label="Tie-break"
+                value={scoring.sets.tieBreakPoints}
+                onChange={(v) =>
+                  setScoring({
+                    ...scoring,
+                    sets: { ...scoring.sets, tieBreakPoints: v },
+                  })
+                }
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+
 
       {/* Tie-breakers */}
       <Card>

@@ -1,82 +1,123 @@
+## Plan — Sprints A & B (priorités 1, 4, 5 + diaporama)
 
-# Compléments moteur tournoi — Plan PR5 → PR9
+Périmètre verrouillé suite à tes réponses :
+- **Sports couverts** : Football, Futsal, Basketball, Rugby, Handball, Volleyball, Hockey sur glace, Hockey sur gazon (= `TOP_SPORTS ∪ COLLECTIVE_SPORTS` actuels).
+- **Paiement public** : reporté. Sprint C (inscription publique + Stripe) est mis de côté pour plus tard.
+- **URL publique** : `clubero.app/tournament/$slug` (on migre l'actuel `/t/$slug` → `/tournament/$slug`, avec redirection de l'ancien).
+- **Diaporama (#3)** : intégré au Sprint B.
 
-Suite des PR1-PR4 déjà livrées (règles, validation matchs, événements, PDF règlement). Voici ce qui reste à couvrir.
+---
 
-## État actuel — déjà en place
-- ✅ Saisie score organisateur (`MatchesList`)
-- ✅ Validation match + statut Provisoire/Validé/Litige (PR3)
-- ✅ Auto-scheduling basique (terrains, durée match, pause déjeuner, plages horaires)
-- ✅ Page publique `/t/$slug` (équipes, calendrier, classement, bracket)
-- ✅ PDF règlement (PR4)
-- ✅ Mode "tournoi uniquement" + QR / partage via `ShareDialog`
+### Sprint A — Formats flexibles & score par sets (#1, #5)
 
-## Manquant — à livrer
+**Objectif** : un moteur de format modulaire par sport + saisie de score adaptée (sets pour volley/hockey, score simple pour les autres).
 
-### **PR5 — Statuts spéciaux des matchs**
-- Étendre `tournament_matches.status` : ajouter `forfeit_a`, `forfeit_b`, `abandoned`, `cancelled`, `no_show_a`, `no_show_b`
-- DB : valeur `forfeit_score` configurable dans `settings.rules` (ex. 3-0 défaut)
-- UI dans `MatchesList` : menu "État du match" → boutons rapides Forfait A/B, Abandon, Annulé, Équipe absente
-- Standings (`standings.ts`) : prendre en compte ces statuts (équipe absente = défaite forfait, match annulé = ignoré, abandon = score figé au moment de l'abandon ou forfait selon settings)
-- Badge visuel dans page publique + admin
+**Base de données**
+- Enrichir `tournaments.settings` (JSONB déjà existant) avec un bloc `scoring` :
+  - `mode`: `"simple"` | `"sets"`
+  - `sets`: `{ bestOf: 3 | 5, pointsToWin: 21|25, tieBreakPoints?: 15, winBy: 2 }`
+  - `periods` (pour hockey/rugby) : `{ count, durationMin }`
+- Enrichir `matches` :
+  - colonne `sets` (JSONB) : `[{ a: 25, b: 23 }, { a: 22, b: 25 }, ...]`
+  - `score_a` / `score_b` restent (= sets gagnés en mode sets, ou score brut en mode simple)
 
-### **PR6 — Repos minimum entre 2 matchs d'une même équipe**
-- Settings : `minRestMinutes` (défaut 30)
-- `scheduling.ts` : lors de la génération auto, garantir l'écart min entre 2 matchs d'une même équipe (pousser au créneau suivant si conflit)
-- UI : champ "Repos minimum (min)" dans `GroupsAndFixtures`
-- Warning affiché si planning violé manuellement après édition
+**Moteur de formats** (`src/modules/tournaments/lib/formats.ts`)
+- Profils par sport déterminant le mode par défaut :
+  - Sets : `volleyball`
+  - Mi-temps / périodes : `football`, `futsal`, `basketball`, `rugby`, `handball`, `ice_hockey`, `field_hockey`
+  - Score simple universel disponible en fallback.
+- Helpers : `defaultScoringForSport(sport)`, `computeWinnerFromSets(sets, rules)`.
 
-### **PR7 — Gestion des terrains (UI dédiée)**
-- Onglet "Terrains" dans tournament detail (déjà `fields: string[]` en DB)
-- CRUD terrains (nom, dispo plages horaires)
-- Vue calendrier par terrain (timeline horaire jour par jour) → visualiser occupation
-- Drag pour réassigner un match à un autre terrain/horaire (optionnel V1 → édition simple via dropdown sur chaque match)
-- Bouton "Recalculer planning" qui réutilise scheduling avec contraintes terrains + repos
+**UI**
+- `MatchesList` / saisie de score : nouvelle variante "score par sets" (volley uniquement pour V1), avec ajout/retrait de sets, validation auto du vainqueur.
+- `TournamentRulesEditor` : section "Scoring" pilotée par le sport sélectionné.
 
-### **PR8 — Roster joueurs par équipe + import CSV/XLSX**
-- Nouvelle table `tournament_team_players` : `id, team_id, first_name, last_name, jersey_number, position?, birth_date?, license_number?`
-- RLS : lecture publique via `can_view_tournament`, écriture via `can_manage_tournament`
-- UI dans `TeamsManager` :
-  - Bouton "Joueurs" sur chaque équipe → drawer/sheet avec liste + ajout manuel
-  - Bouton "Importer CSV" : template téléchargeable (`team,first_name,last_name,jersey_number,position`)
-  - Parsing client avec `papaparse` (déjà compatible Worker)
-  - Upload XLSX via `xlsx` lib (vérifier compat Worker, sinon CSV only)
-- Export feuille de match PDF par équipe (réutilise `pdf-lib`)
-- Affichage roster public sur page tournoi (toggle dans settings)
+**Restriction** : on garde `SportSelect` actuel, on ne touche pas aux sports listés.
 
-### **PR9 — Process inscription + validation organisateur**
-- Nouvelle table `tournament_registrations` : `id, tournament_id, team_name, contact_name, contact_email, contact_phone, category?, status ('pending'|'approved'|'rejected'|'waitlist'), notes, submitted_at, reviewed_at, reviewed_by, rejection_reason?`
-- Settings : `registration.enabled`, `registration.opens_at`, `registration.closes_at`, `registration.max_teams`, `registration.requires_approval` (défaut true), `registration.fields_required` (contact, catégorie, etc.)
-- Page publique `/t/$slug/register` : formulaire d'inscription (anon ou connecté)
-- Server route `/api/public/tournaments/$slug/register` (POST) avec validation Zod + rate-limit basique
-- Email de confirmation à l'organisateur via `send.server` (template `tournament-registration.tsx`)
-- Onglet "Inscriptions" dans admin : liste, filtres par statut, actions Approuver/Refuser/Liste d'attente
-- À l'approbation : création automatique de l'équipe dans `tournament_teams`
-- Compteur sur page publique : "X / Y places — inscriptions ouvertes jusqu'au …"
+---
 
-## Découpage techniques transverses
+### Sprint B — Site public + diaporama (#4 + #3)
 
-**i18n** : ajouter clés dans `tournament-rules` (ou nouveau namespace `tournament-special`) pour tous les nouveaux états et libellés.
+**Objectif** : chaque tournoi publié a une URL partageable, SEO friendly, plus un mode TV plein écran auto-rotatif.
 
-**Migration unique par PR** (préférable à une mega-migration), avec :
-- enum étendu pour `match_status`
-- nouvelles tables `tournament_team_players` + `tournament_registrations`
-- index sur `(tournament_id, status)` pour registrations
+**Routing**
+- Nouvelle route : `src/routes/tournament.$slug.tsx` (remplace `t.$slug.tsx`).
+- Nouvelle route : `src/routes/tournament.$slug.tv.tsx` (remplace `t.$slug.tv.tsx`).
+- Ancienne route `t.$slug` : redirection 301 vers `/tournament/$slug` (compat liens existants).
+- Mise à jour des liens internes (`ShareDialog`, `tournaments.$tournamentId.tsx`, sitemap).
 
-**Page publique enrichie** (touchée par PR5/PR8/PR9) :
-- Badge "Inscription ouverte" + lien
-- Section "Roster" déplible par équipe
-- Bouton "Règlement PDF" déjà existant via `tournament_documents`
-- QR code généré côté admin (déjà via `ShareDialog`)
+**Page publique `/tournament/$slug`**
+- SSR via `getPublicTournament` (déjà existant), enrichi : `og:image` dynamique (cover ou fallback dérivé), `og:title`, `og:description` spécifiques au tournoi.
+- Onglets existants conservés : Aperçu / Équipes / Matchs / Classement / Bracket.
+- Affichage score : adapté au mode (sets visibles sous forme `25-22, 23-25, 15-12`).
+- Bouton "TV / Diaporama" en évidence.
+- Sitemap `sitemap.xml` : ajout des tournois publiés.
 
-**Paiements** : explicitement HORS SCOPE (confirmé par l'utilisateur).
+**Diaporama `/tournament/$slug/tv`**
+- Plein écran, fond sombre, auto-rotation des écrans toutes N secondes (configurable via `?refresh=15`) :
+  - Slide 1 : derniers résultats
+  - Slide 2 : prochains matchs
+  - Slide 3 : classement (par poule, paginé si > 1 poule)
+  - Slide 4 : bracket (phase finale si présente)
+- Refetch live toutes les 30 s (`refetchInterval` déjà en place).
+- Logo Clubero discret + nom tournoi + horloge.
+- Bouton plein écran natif (`requestFullscreen`).
 
-## Ordre de livraison proposé
+---
 
-1. **PR5** (statuts spéciaux) — base la plus impactante pour la cohérence des standings
-2. **PR6** (repos min) — petite étoffe, dépend de scheduling existant
-3. **PR7** (UI terrains) — autonome
-4. **PR8** (roster + CSV) — autonome, gros volet UI
-5. **PR9** (inscriptions) — le plus gros, nouvelle table + page publique + emails
+### Détails techniques
 
-Confirme l'ordre, ou indique si tu veux fusionner / réordonner. On part directement sur **PR5** si OK.
+**Sports couverts (verrouillé)**
+
+```ts
+// src/lib/sports.ts — inchangé
+TOP_SPORTS = ["football", "basketball"]
+COLLECTIVE_SPORTS = ["handball", "volleyball", "rugby", "futsal",
+                    "ice_hockey", "field_hockey"]
+```
+
+**Scoring par défaut**
+
+```text
+football, futsal, basketball, rugby, handball,
+ice_hockey, field_hockey   → mode "simple" (score brut)
+volleyball                  → mode "sets" (3 sets gagnants à 25, tie-break 15)
+```
+
+L'orga peut surcharger via `TournamentRulesEditor`.
+
+**Migrations DB**
+1. `ALTER TABLE matches ADD COLUMN sets jsonb;`
+2. Pas de nouveau type — `settings.scoring` vit dans le JSONB existant.
+
+**Redirection ancienne URL**
+- `src/routes/t.$slug.tsx` devient un simple `<Navigate to="/tournament/$slug" replace />`.
+- Idem `t.$slug.tv.tsx` et `t.$slug.register.tsx` (cette dernière sera désactivée tant que Sprint C n'est pas livré).
+
+**Tests**
+- Unit : `formats.test.ts` (defaults par sport, calcul vainqueur sets).
+- E2E : étendre `15-clubero-pack-purchase` ou nouveau `16-public-tournament.e2e.ts` (publication → URL publique accessible non-auth → TV s'ouvre).
+
+---
+
+### Livrables par sprint
+
+**Sprint A**
+- Migration `matches.sets`
+- `src/modules/tournaments/lib/formats.ts`
+- Mise à jour `MatchesList` (saisie sets pour volley)
+- Section "Scoring" dans `TournamentRulesEditor`
+- Tests unit
+
+**Sprint B**
+- Routes `tournament.$slug.tsx` + `tournament.$slug.tv.tsx`
+- Redirections depuis `t.$slug*`
+- Diaporama TV plein écran auto-rotatif
+- `og:image` dynamique + sitemap mis à jour
+- Mise à jour des liens internes (ShareDialog, etc.)
+
+---
+
+### Hors périmètre (à confirmer plus tard)
+- Inscription publique + paiement Stripe (#6)
+- Sponsors, stats joueur cross-tournois, co-organisateurs, PWA push
