@@ -40,14 +40,6 @@ const CLUBERO_FEATURES = [
   "Rôles coach & manager",
 ];
 
-const TOURNAMENTS_FEATURES = [
-  "Tournois illimités",
-  "Phases de poules & élimination directe",
-  "Pages publiques & mode TV",
-  "Partage QR code",
-  "Équipes externes autorisées",
-  "Classements en temps réel",
-];
 
 function PricingPage() {
   const { t } = useTranslation("marketing");
@@ -145,9 +137,9 @@ function PricingPage() {
                   <Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl font-bold">Tournois</h2>
+                  <h2 className="font-display text-xl font-bold">{t("tournaments.pricing.title")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Pour les organisateurs hors club Clubero.
+                    {t("tournaments.pricing.subtitle")}
                   </p>
                 </div>
               </div>
@@ -155,19 +147,26 @@ function PricingPage() {
               <div className="mt-6">
                 <div className="flex items-baseline gap-2">
                   <span className="font-display text-5xl font-bold">40 €</span>
-                  <span className="text-muted-foreground">/ tournoi</span>
+                  <span className="text-muted-foreground">{t("tournaments.pricing.per")}</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Paiement à l'événement. Aucun abonnement, accès au module Clubero Tournaments pour un tournoi.
+                  {t("tournaments.pricing.info")}
                 </p>
               </div>
 
               <Button asChild className="mt-6 w-full h-11">
-                <Link to="/tournaments/start">Lancer un tournoi</Link>
+                <Link to="/tournaments/start">{t("tournaments.pricing.cta")}</Link>
               </Button>
 
               <ul className="mt-8 grid grid-cols-1 gap-2.5">
-                {TOURNAMENTS_FEATURES.map((f) => (
+                {[
+                  t("tournaments.pricing.feat1"),
+                  t("tournaments.pricing.feat2"),
+                  t("tournaments.pricing.feat3"),
+                  t("tournaments.pricing.feat4"),
+                  t("tournaments.pricing.feat5"),
+                  t("tournaments.pricing.feat6"),
+                ].map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                     <span className="text-foreground/80">{f}</span>
@@ -175,6 +174,7 @@ function PricingPage() {
                 ))}
               </ul>
             </div>
+
 
             {/* Enterprise */}
             <div className="flex flex-col rounded-3xl border border-border bg-card p-8">

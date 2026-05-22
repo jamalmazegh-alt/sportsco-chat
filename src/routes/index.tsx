@@ -72,6 +72,13 @@ function Landing() {
 }
 
 function TournamentsSection() {
+  const { t } = useTranslation("marketing");
+  const features = [
+    { t: t("tournaments.home.feat1Title"), d: t("tournaments.home.feat1Body") },
+    { t: t("tournaments.home.feat2Title"), d: t("tournaments.home.feat2Body") },
+    { t: t("tournaments.home.feat3Title"), d: t("tournaments.home.feat3Body") },
+    { t: t("tournaments.home.feat4Title"), d: t("tournaments.home.feat4Body") },
+  ];
   return (
     <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[color:var(--victory)]/10 via-background to-[color:var(--energy)]/10">
       <div aria-hidden className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--victory)]/20 blur-3xl" />
@@ -82,24 +89,17 @@ function TournamentsSection() {
           <div className="lg:col-span-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--victory)]/40 bg-[color:var(--victory)]/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--victory)]">
               <Trophy className="h-3.5 w-3.5" />
-              Nouveau · Module Tournois
+              {t("tournaments.home.badge")}
             </div>
             <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-              Organisez un <span className="text-gradient-energy">tournoi</span> en quelques minutes.
+              {t("tournaments.home.titlePre")}<span className="text-gradient-energy">{t("tournaments.home.titleHighlight")}</span>{t("tournaments.home.titlePost")}
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Poules, brackets, calendrier, terrains, classements en temps réel et inscriptions
-              en ligne — tout est inclus. Partagez un lien public ou un écran TV pour suivre les
-              scores en direct dans la salle.
+              {t("tournaments.home.subtitle")}
             </p>
 
             <ul className="mt-7 space-y-3">
-              {[
-                { t: "Poules + brackets automatiques", d: "Tirage au sort, calendrier multi-terrains et qualifications calculées toutes seules." },
-                { t: "Classements live", d: "Les scores se mettent à jour en temps réel. Spectateurs et équipes suivent depuis leur téléphone." },
-                { t: "Inscriptions en ligne", d: "Page publique d'inscription, validation par l'organisateur, plafond d'équipes et rosters joueurs." },
-                { t: "Mode TV plein écran", d: "Lien dédié à projeter sur grand écran — matchs en cours, prochains matchs et classements qui défilent." },
-              ].map((p) => (
+              {features.map((p) => (
                 <li key={p.t} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--victory)]" />
                   <div>
@@ -113,11 +113,11 @@ function TournamentsSection() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
                 <Link to="/tournaments/start">
-                  Lancer un tournoi <ArrowRight className="ml-1.5 h-4 w-4" />
+                  {t("tournaments.home.ctaStart")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6">
-                <Link to="/features">Voir toutes les fonctionnalités</Link>
+                <Link to="/features">{t("tournaments.home.ctaFeatures")}</Link>
               </Button>
             </div>
           </div>
@@ -141,8 +141,8 @@ function TournamentsSection() {
                       <Trophy className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold leading-tight">Tournoi de Pâques U13</p>
-                      <p className="text-[11px] text-white/80">Phase de poules · Poule A</p>
+                      <p className="text-sm font-bold leading-tight">{t("tournaments.home.mockTournament")}</p>
+                      <p className="text-[11px] text-white/80">{t("tournaments.home.mockPhase")}</p>
                     </div>
                   </div>
                   <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
@@ -150,7 +150,7 @@ function TournamentsSection() {
                       <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
                       <span className="relative h-1.5 w-1.5 rounded-full bg-white" />
                     </span>
-                    Live
+                    {t("tournaments.home.mockLive")}
                   </span>
                 </div>
 
@@ -174,7 +174,7 @@ function TournamentsSection() {
                 </div>
 
                 <div className="border-t border-border bg-muted/30 px-4 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Match en cours · Terrain 2</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("tournaments.home.mockOngoing")}</p>
                   <div className="mt-1.5 flex items-center justify-between gap-2">
                     <p className="flex-1 text-sm font-bold truncate">FC Riverside</p>
                     <div className="px-3 text-center">
@@ -191,14 +191,14 @@ function TournamentsSection() {
                   <Users className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Équipes inscrites</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("tournaments.home.mockTeamsRegistered")}</p>
                   <p className="text-sm font-bold tabular-nums">16 / 16</p>
                 </div>
               </div>
 
               <div className="absolute -bottom-4 -left-4 z-10 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-elevated">
                 <Sparkles className="h-3.5 w-3.5 text-[color:var(--energy)]" />
-                <span className="text-[11px] font-bold uppercase tracking-wider">Mode TV dispo</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("tournaments.home.mockTvAvailable")}</span>
               </div>
             </div>
           </div>
@@ -207,6 +207,7 @@ function TournamentsSection() {
     </section>
   );
 }
+
 
 
 function WhatsAppHybrid() {

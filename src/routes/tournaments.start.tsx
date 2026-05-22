@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -17,11 +19,10 @@ export const Route = createFileRoute("/tournaments/start")({
   component: StartPage,
   head: () => ({
     meta: [
-      { title: "Lancer un tournoi — Clubero" },
+      { title: i18n.t("tournaments.start.metaTitle", { ns: "marketing" }) },
       {
         name: "description",
-        content:
-          "Créez votre compte Clubero et lancez votre tournoi en quelques minutes. Payez à l'événement, sans abonnement.",
+        content: i18n.t("tournaments.start.metaDesc", { ns: "marketing" }),
       },
     ],
   }),
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/tournaments/start")({
 function StartPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation("marketing");
 
   useEffect(() => {
     if (!loading && session) {
@@ -59,18 +61,17 @@ function StartPage() {
           <div className="mx-auto mt-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Trophy className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="mt-4 font-display text-2xl font-bold">Lancer un tournoi</h1>
+          <h1 className="mt-4 font-display text-2xl font-bold">{t("tournaments.start.heading")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Connectez-vous ou créez votre compte en quelques secondes. Aucun
-            abonnement requis — vous payez à l'événement.
+            {t("tournaments.start.subheading")}
           </p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <Tabs defaultValue="signup" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signup">Créer un compte</TabsTrigger>
-              <TabsTrigger value="login">J'ai un compte</TabsTrigger>
+              <TabsTrigger value="signup">{t("tournaments.start.tabSignup")}</TabsTrigger>
+              <TabsTrigger value="login">{t("tournaments.start.tabLogin")}</TabsTrigger>
             </TabsList>
             <TabsContent value="signup" className="mt-4">
               <SignupForm />
@@ -82,13 +83,13 @@ function StartPage() {
         </div>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
-          En continuant vous acceptez nos{" "}
+          {t("tournaments.start.termsPre")}
           <Link to="/legal/$kind" params={{ kind: "terms" }} className="underline">
-            Conditions
-          </Link>{" "}
-          et notre{" "}
+            {t("tournaments.start.terms")}
+          </Link>
+          {t("tournaments.start.termsMid")}
           <Link to="/legal/$kind" params={{ kind: "privacy" }} className="underline">
-            Politique de confidentialité
+            {t("tournaments.start.privacy")}
           </Link>
           .
         </p>
@@ -99,6 +100,7 @@ function StartPage() {
 
 function SignupForm() {
   const navigate = useNavigate();
+  const { t } = useTranslation("marketing");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -110,9 +112,7 @@ function SignupForm() {
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!passwordValid) {
-      toast.error(
-        "Le mot de passe doit contenir 8 caractères, avec majuscule, minuscule et chiffre."
-      );
+      toast.error(t("tournaments.start.passwordError"));
       return;
     }
     setBusy(true);
@@ -136,12 +136,12 @@ function SignupForm() {
       return;
     }
     if (data.session) {
-      toast.success("Compte créé");
+      toast.success(t("tournaments.start.accountCreated"));
       navigate({ to: NEXT });
       return;
     }
     setBusy(false);
-    toast.success("Vérifiez votre email pour confirmer votre compte.", {
+    toast.success(t("tournaments.start.checkEmail"), {
       duration: 8000,
     });
   }
@@ -150,7 +150,7 @@ function SignupForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="s-first">Prénom</Label>
+          <Label htmlFor="s-first">{t("tournaments.start.firstName")}</Label>
           <Input
             id="s-first"
             required
@@ -159,7 +159,7 @@ function SignupForm() {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="s-last">Nom</Label>
+          <Label htmlFor="s-last">{t("tournaments.start.lastName")}</Label>
           <Input
             id="s-last"
             required
@@ -169,7 +169,7 @@ function SignupForm() {
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="s-email">Email</Label>
+        <Label htmlFor="s-email">{t("tournaments.start.email")}</Label>
         <Input
           id="s-email"
           type="email"
@@ -180,7 +180,7 @@ function SignupForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="s-password">Mot de passe</Label>
+        <Label htmlFor="s-password">{t("tournaments.start.password")}</Label>
         <PasswordInput
           id="s-password"
           required
@@ -196,7 +196,7 @@ function SignupForm() {
               : "text-destructive"
           }`}
         >
-          8 caractères min., 1 majuscule, 1 minuscule, 1 chiffre.
+          {t("tournaments.start.passwordHelp")}
         </p>
       </div>
       <Button type="submit" className="w-full h-11" disabled={busy}>
@@ -205,7 +205,7 @@ function SignupForm() {
         ) : (
           <>
             <Trophy className="h-4 w-4" />
-            Créer mon compte et continuer
+            {t("tournaments.start.signupCta")}
           </>
         )}
       </Button>
@@ -215,6 +215,7 @@ function SignupForm() {
 
 function LoginForm() {
   const navigate = useNavigate();
+  const { t } = useTranslation("marketing");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -225,7 +226,7 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setBusy(false);
-      toast.error("Email ou mot de passe incorrect");
+      toast.error(t("tournaments.start.invalidCreds"));
       return;
     }
     navigate({ to: NEXT });
@@ -234,7 +235,7 @@ function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="l-email">Email</Label>
+        <Label htmlFor="l-email">{t("tournaments.start.email")}</Label>
         <Input
           id="l-email"
           type="email"
@@ -245,7 +246,7 @@ function LoginForm() {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="l-password">Mot de passe</Label>
+        <Label htmlFor="l-password">{t("tournaments.start.password")}</Label>
         <PasswordInput
           id="l-password"
           required
@@ -255,11 +256,11 @@ function LoginForm() {
         />
       </div>
       <Button type="submit" className="w-full h-11" disabled={busy}>
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Se connecter et continuer"}
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("tournaments.start.loginCta")}
       </Button>
       <p className="text-center text-xs">
         <Link to="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
-          Mot de passe oublié ?
+          {t("tournaments.start.forgotPassword")}
         </Link>
       </p>
     </form>
