@@ -965,19 +965,19 @@ function MatchCard({
 
           <div className="pt-4 border-t border-border space-y-3">
             <div className="space-y-1.5">
-              <Label>Arbitre</Label>
+              <Label>{t("matches.referee")}</Label>
               <Select value={refMode} onValueChange={setRefMode}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="__none__">Aucun</SelectItem>
+                  <SelectItem value="__none__">{t("matches.refereeNone")}</SelectItem>
                   {refereeOptions.map((r) => (
                     <SelectItem key={r.user_id} value={`user:${r.user_id}`}>
                       {r.label}
                     </SelectItem>
                   ))}
-                  <SelectItem value="free">Nom libre…</SelectItem>
+                  <SelectItem value="free">{t("matches.refereeFree")}</SelectItem>
                 </SelectContent>
               </Select>
               {refMode === "free" && (
@@ -985,12 +985,12 @@ function MatchCard({
                   className="mt-2"
                   value={refFreeName}
                   onChange={(e) => setRefFreeName(e.target.value)}
-                  placeholder="Nom de l'arbitre"
+                  placeholder={t("matches.refereePlaceholder")}
                 />
               )}
               {refereeOptions.length === 0 && refMode !== "free" && refMode !== "__none__" && (
                 <p className="text-[11px] text-muted-foreground">
-                  Aucun arbitre n'a encore accepté son invitation.
+                  {t("matches.refereeNoAccepted")}
                 </p>
               )}
             </div>
@@ -1001,7 +1001,7 @@ function MatchCard({
               onClick={() => saveRef.mutate()}
               disabled={saveRef.isPending || (refMode === "free" && !refFreeName.trim())}
             >
-              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Assigner l'arbitre"}
+              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("matches.assignReferee")}
             </Button>
           </div>
         </div>
