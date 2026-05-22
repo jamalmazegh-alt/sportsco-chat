@@ -645,7 +645,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           <SponsorsEditor
             tournamentId={tournamentId}
             sponsors={rules.branding.sponsors ?? []}
-            onChange={(sponsors) =>
+            onChange={(sponsors: Sponsor[]) =>
               setRules({
                 ...rules,
                 branding: { ...rules.branding, sponsors },
