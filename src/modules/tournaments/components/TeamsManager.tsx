@@ -174,18 +174,23 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
     }
   }
 
+  const atLimit =
+    typeof maxTeams === "number" && maxTeams > 0 && teams.length >= maxTeams;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-sm font-medium text-muted-foreground">
-          {teams.length} équipe{teams.length > 1 ? "s" : ""}
+          {teams.length}
+          {typeof maxTeams === "number" && maxTeams > 0 ? ` / ${maxTeams}` : ""}{" "}
+          équipe{teams.length > 1 ? "s" : ""}
         </h2>
         <div className="flex gap-2">
           <ResponsiveFormDialog
             open={bulkOpen}
-            onOpenChange={setBulkOpen}
+            onOpenChange={(v) => !atLimit && setBulkOpen(v)}
             trigger={
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" disabled={atLimit}>
                 <Upload className="h-4 w-4" />
                 Importer
               </Button>
