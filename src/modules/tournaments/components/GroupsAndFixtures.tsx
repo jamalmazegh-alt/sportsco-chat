@@ -219,12 +219,10 @@ export function GroupsAndFixtures({
       <section className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Dices className="h-4 w-4 text-primary" />
-          <h3 className="font-medium">Tirage au sort</h3>
+          <h3 className="font-medium">{t("groups.drawTitle")}</h3>
         </div>
         <p className="text-xs text-muted-foreground">
-          {numTeams < 2
-            ? "Ajoutez des équipes avant de lancer le tirage au sort."
-            : "Auto, progressif (animation) ou manuel — répartit les équipes dans les poules ou le bracket."}
+          {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
         </p>
         <Button
           onClick={() => setDrawOpen(true)}
@@ -233,7 +231,7 @@ export function GroupsAndFixtures({
           variant={hasExistingDraw ? "outline" : "default"}
         >
           <Dices className="h-4 w-4" />
-          {hasExistingDraw ? "Relancer le tirage au sort" : "Lancer le tirage au sort"}
+          {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
         </Button>
       </section>
 
@@ -251,15 +249,14 @@ export function GroupsAndFixtures({
         <section className="rounded-xl border border-border bg-card p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Shuffle className="h-4 w-4 text-primary" />
-            <h3 className="font-medium">Poules & calendrier</h3>
+            <h3 className="font-medium">{t("groups.groupsTitle")}</h3>
           </div>
           <p className="text-xs text-muted-foreground">
-            {groupsCount} poule{groupsCount > 1 ? "s" : ""} · {matchesCount} match
-            {matchesCount > 1 ? "s" : ""} programmé{matchesCount > 1 ? "s" : ""}
+            {t("groups.groupsCount", { count: groupsCount })} · {t("groups.matchesCount", { count: matchesCount })}
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Nombre de poules</Label>
+              <Label>{t("groups.numGroups")}</Label>
               <Input
                 type="number"
                 min={1}
@@ -269,7 +266,7 @@ export function GroupsAndFixtures({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Qualifiés / poule</Label>
+              <Label>{t("groups.qualifiersPerGroup")}</Label>
               <Input
                 type="number"
                 min={1}
@@ -287,12 +284,12 @@ export function GroupsAndFixtures({
             {genGroups.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Générer poules + matchs"
+              t("groups.generateGroups")
             )}
           </Button>
           {groupsCount > 0 && (
             <p className="text-xs text-amber-600 dark:text-amber-400">
-              ⚠ Régénérer supprimera les scores existants des matchs de poule.
+              {t("groups.regenerateWarn")}
             </p>
           )}
         </section>
@@ -303,10 +300,10 @@ export function GroupsAndFixtures({
           <div className="flex items-center gap-2">
             <Trophy className="h-4 w-4 text-primary" />
             <h3 className="font-medium flex items-center gap-1.5">
-              Phase finale
+              {t("groups.finalsTitle")}
               <span
                 className="text-muted-foreground"
-                title="Le bracket est le tableau à élimination directe : quarts → demis → finale. Affiché en arbre."
+                title={t("groups.finalsTooltip")}
               >
                 <HelpCircle className="h-3.5 w-3.5" />
               </span>
@@ -319,7 +316,7 @@ export function GroupsAndFixtures({
               onChange={(e) => setThirdPlace(e.target.checked)}
               className="h-4 w-4 rounded border-input"
             />
-            Match pour la 3e place
+            {t("groups.thirdPlaceMatch")}
           </label>
           <Button
             onClick={() => genKnockout.mutate()}
@@ -330,14 +327,14 @@ export function GroupsAndFixtures({
             {genKnockout.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : format === "knockout" ? (
-              "Générer le bracket"
+              t("groups.generateBracket")
             ) : (
-              "Générer le bracket depuis les qualifiés"
+              t("groups.generateBracketFromQualifiers")
             )}
           </Button>
           {format === "mixed" && (
             <p className="text-xs text-muted-foreground">
-              Les meilleurs de chaque poule (selon classement actuel) sont placés dans le bracket.
+              {t("groups.mixedHint")}
             </p>
           )}
         </section>
@@ -347,11 +344,11 @@ export function GroupsAndFixtures({
       <section className="rounded-xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-primary" />
-          <h3 className="font-medium">Durée & horaires des matchs</h3>
+          <h3 className="font-medium">{t("groups.scheduleTitle")}</h3>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label>Durée d'un match (min)</Label>
+            <Label>{t("groups.matchDuration")}</Label>
             <Input
               type="number"
               min={1}
@@ -361,7 +358,7 @@ export function GroupsAndFixtures({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Pause entre matchs (min)</Label>
+            <Label>{t("groups.matchBreak")}</Label>
             <Input
               type="number"
               min={0}
@@ -371,7 +368,7 @@ export function GroupsAndFixtures({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Début de journée</Label>
+            <Label>{t("groups.dayStart")}</Label>
             <Input
               type="time"
               value={startTime}
@@ -379,7 +376,7 @@ export function GroupsAndFixtures({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Fin de journée</Label>
+            <Label>{t("groups.dayEnd")}</Label>
             <Input
               type="time"
               value={endTime}
@@ -388,7 +385,7 @@ export function GroupsAndFixtures({
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>Repos min. entre 2 matchs d'une même équipe (min)</Label>
+          <Label>{t("groups.minRest")}</Label>
           <Input
             type="number"
             min={0}
@@ -397,16 +394,16 @@ export function GroupsAndFixtures({
             onChange={(e) => setMinRest(parseInt(e.target.value || "0", 10))}
           />
           <p className="text-[11px] text-muted-foreground">
-            Lors de la programmation auto, une équipe ne sera jamais reprogrammée avant ce délai. 0 = désactivé.
+            {t("groups.minRestHint")}
           </p>
         </div>
         <div className="space-y-2">
           <Label className="flex items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-            Terrains
+            {t("groups.fieldsLabel")}
           </Label>
           {fieldsList.length === 0 ? (
-            <p className="text-xs text-muted-foreground italic">Aucun terrain</p>
+            <p className="text-xs text-muted-foreground italic">{t("groups.noFields")}</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {fieldsList.map((f) => (
@@ -421,7 +418,7 @@ export function GroupsAndFixtures({
                     type="button"
                     onClick={() => removeField(f)}
                     className="ml-0.5 rounded-sm p-0.5 hover:bg-background/60 transition-colors"
-                    aria-label={`Retirer ${f}`}
+                    aria-label={t("groups.removeField", { name: f })}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -434,14 +431,14 @@ export function GroupsAndFixtures({
               value={newField}
               onChange={(e) => setNewField(e.target.value)}
               onKeyDown={onFieldKeyDown}
-              placeholder="Nom du terrain (ex. Court central)"
+              placeholder={t("groups.newFieldPlaceholder")}
             />
             <Button type="button" variant="outline" size="icon" onClick={addField}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Plusieurs terrains = matchs en parallèle. Réassignable par match dans l'onglet "Matchs".
+            {t("groups.fieldsHint")}
           </p>
         </div>
         <div className="space-y-2 rounded-lg border border-border/60 p-3">
@@ -453,11 +450,11 @@ export function GroupsAndFixtures({
               onChange={(e) => setLunchEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-input"
             />
-            Pause déjeuner (aucun match sur la plage)
+            {t("groups.lunchBreak")}
           </label>
           <div className={`grid grid-cols-2 gap-3 ${lunchEnabled ? "" : "opacity-50 pointer-events-none"}`}>
             <div className="space-y-1.5">
-              <Label>Début pause</Label>
+              <Label>{t("groups.lunchStart")}</Label>
               <Input
                 type="time"
                 value={lunchStart}
@@ -466,7 +463,7 @@ export function GroupsAndFixtures({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Fin pause</Label>
+              <Label>{t("groups.lunchEnd")}</Label>
               <Input
                 type="time"
                 value={lunchEnd}
@@ -485,7 +482,7 @@ export function GroupsAndFixtures({
             {saveSettings.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Enregistrer"
+              t("groups.save")
             )}
           </Button>
           <Button
@@ -497,16 +494,17 @@ export function GroupsAndFixtures({
             ) : (
               <>
                 <CalendarClock className="h-4 w-4" />
-                Programmer auto
+                {t("groups.scheduleAuto")}
               </>
             )}
           </Button>
         </div>
         {matchesCount === 0 && (
           <p className="text-[11px] text-muted-foreground">
-            Génère d'abord les poules ou le bracket avant de programmer.
+            {t("groups.scheduleHint")}
           </p>
         )}
+
       </section>
     </div>
   );
