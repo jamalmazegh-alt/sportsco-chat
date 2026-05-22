@@ -211,55 +211,36 @@ function TournamentsSection() {
 
 
 function WhatsAppHybrid() {
+  const { t } = useTranslation("marketing");
+  const points = [
+    { t: t("whatsapp.p1Title"), d: t("whatsapp.p1Body") },
+    { t: t("whatsapp.p2Title"), d: t("whatsapp.p2Body") },
+    { t: t("whatsapp.p3Title"), d: t("whatsapp.p3Body") },
+    { t: t("whatsapp.p4Title"), d: t("whatsapp.p4Body") },
+  ];
   return (
     <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      <div
-        aria-hidden
-        className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-secondary/10 blur-3xl"
-      />
+      <div aria-hidden className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-secondary/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
           <div className="lg:col-span-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
               <MessageCircle className="h-3.5 w-3.5" />
-              Communication flexible
+              {t("whatsapp.chip")}
             </div>
             <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-              Tout se passe dans Clubero.
+              {t("whatsapp.title1")}
               <br />
-              WhatsApp reste en option.
+              {t("whatsapp.title2")}
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Les convocations qui se perdent dans le fil, les réponses noyées dans les notifications
-              et les parents qui ratent l'info : Clubero centralise tout dans un seul endroit clair.
-              Et pour ceux qui préfèrent rester sur WhatsApp, un bouton partage le message
-              formaté dans le groupe en un clic.
+              {t("whatsapp.body")}
             </p>
 
             <ul className="mt-7 space-y-3">
-              {[
-                {
-                  t: "Tout centralisé dans Clubero",
-                  d: "Convocations, réponses de présence, rappels, stats et chat par événement — un seul endroit, rien ne se perd.",
-                },
-                {
-                  t: "WhatsApp en option, pas en obligation",
-                  d: "Un parent ou joueur préfère rester sur WhatsApp ? Un bouton copie le message formaté prêt à partager. Vous gardez le suivi dans l'appli.",
-                },
-                {
-                  t: "Email pour les résistants au téléphone",
-                  d: "Les convocations peuvent aussi partir par email. Vous couvrez tous les canaux sans effort.",
-                },
-                {
-                  t: "Aucune API, aucun numéro à configurer",
-                  d: "Le partage WhatsApp utilise le natif du téléphone. Rien à installer côté club.",
-                },
-              ].map((p) => (
+              {points.map((p) => (
                 <li key={p.t} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
@@ -271,46 +252,34 @@ function WhatsAppHybrid() {
             </ul>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 px-6 shadow-elevated"
-              >
+              <Button asChild size="lg" className="h-12 px-6 shadow-elevated">
                 <Link to="/demo">
-                  Voir la démo <ArrowRight className="ml-1.5 h-4 w-4" />
+                  {t("whatsapp.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <span className="text-xs text-muted-foreground">
-                Tout dans l'app — WhatsApp et email restent en option
+                {t("whatsapp.ctaNote")}
               </span>
             </div>
           </div>
 
-          {/* WhatsApp preview mock */}
           <div className="lg:col-span-6">
             <div className="relative mx-auto max-w-md">
               <div
                 aria-hidden
                 className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-50 blur-3xl"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #25D36680, #075E5460)",
-                }}
+                style={{ background: "linear-gradient(135deg, #25D36680, #075E5460)" }}
               />
               <div className="rounded-3xl border border-border bg-card shadow-elevated overflow-hidden">
-                {/* WhatsApp-like header */}
                 <div className="flex items-center gap-3 bg-[#075E54] px-4 py-3 text-white">
-                  <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20 text-sm font-bold">
-                    U13
-                  </div>
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-white/20 text-sm font-bold">U13</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">U13 — Saison 25/26</p>
-                    <p className="text-[11px] text-white/70">Coach, 14 joueurs, 9 parents</p>
+                    <p className="text-sm font-semibold truncate">{t("whatsapp.mockGroup")}</p>
+                    <p className="text-[11px] text-white/70">{t("whatsapp.mockMembers")}</p>
                   </div>
                   <MessageCircle className="h-4 w-4 text-white/80" />
                 </div>
 
-                {/* Message bubble */}
                 <div className="bg-[#ECE5DD] px-4 py-5">
                   <div className="ml-auto max-w-[88%] rounded-2xl rounded-tr-sm bg-[#DCF8C6] px-3 py-2.5 shadow-sm">
                     <p className="text-[13px] leading-relaxed text-[#111]">
@@ -318,52 +287,46 @@ function WhatsAppHybrid() {
                       <br />
                       <em className="text-[12px] text-[#333]">FC Clubero · U13</em>
                       <br />
-                      🏅 Championnat · 🏠 Domicile
+                      🏅 {t("whatsapp.mockChampionship")} · 🏠 {t("whatsapp.mockHome")}
                       <br />
                       <br />
-                      📅 samedi 24 mai à 14h30
+                      📅 {t("home.heroDate")}
                       <br />
-                      ⏰ Convocation : 13h45
+                      ⏰ {t("whatsapp.mockConvocation")}
                       <br />
                       📍 Stade Municipal
                       <br />
                       <br />
-                      👥 <strong>Convoqués (12)</strong>
+                      👥 <strong>{t("whatsapp.mockSummoned")}</strong>
                       <br />
                       • Lucas M. • Emma D. • Noah B.
                       <br />
                       • Léa S. • Adam K. • Hugo P.
                       <br />
-                      <span className="text-[#555]">+ 6 autres</span>
+                      <span className="text-[#555]">{t("whatsapp.mockOthers")}</span>
                       <br />
                       <br />
-                      <span className="text-[11px] text-[#666]">— envoyé via Clubero</span>
+                      <span className="text-[11px] text-[#666]">{t("whatsapp.mockSentVia")}</span>
                     </p>
                     <p className="mt-1 text-right text-[10px] text-[#888]">14:32 ✓✓</p>
                   </div>
                 </div>
 
-                {/* "From Clubero" footer strip */}
                 <div className="flex items-center justify-between border-t border-border bg-card px-4 py-2.5">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                     <Zap className="h-3 w-3 text-[color:var(--energy)]" />
-                    Envoyé en 12s depuis Clubero
+                    {t("whatsapp.mockSentIn")}
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#25D366]">
-                    WhatsApp
-                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#25D366]">WhatsApp</span>
                 </div>
               </div>
 
-              {/* Floating "tracking" pill */}
               <div className="absolute -bottom-4 -left-4 z-10 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-elevated">
                 <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-primary text-white">
                   <BarChart3 className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Présences suivies
-                  </p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("whatsapp.mockTracking")}</p>
                   <p className="text-sm font-bold tabular-nums">11 / 12</p>
                 </div>
               </div>
@@ -376,6 +339,13 @@ function WhatsAppHybrid() {
 }
 
 function AIAssistantSection() {
+  const { t } = useTranslation("marketing");
+  const points = [
+    { t: t("ai.p1Title"), d: t("ai.p1Body") },
+    { t: t("ai.p2Title"), d: t("ai.p2Body") },
+    { t: t("ai.p3Title"), d: t("ai.p3Body") },
+    { t: t("ai.p4Title"), d: t("ai.p4Body") },
+  ];
   return (
     <section className="relative border-b border-border/60 overflow-hidden bg-muted/20">
       <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/15 blur-3xl" />
@@ -383,7 +353,6 @@ function AIAssistantSection() {
 
       <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
-          {/* Chat preview mock */}
           <div className="lg:col-span-6 order-2 lg:order-1">
             <div className="relative mx-auto max-w-md">
               <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-50 blur-3xl bg-gradient-primary" />
@@ -393,8 +362,8 @@ function AIAssistantSection() {
                     <BrainCircuit className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">Assistant Clubero</p>
-                    <p className="text-[11px] text-white/80">connecté à votre club</p>
+                    <p className="text-sm font-semibold">{t("ai.mockName")}</p>
+                    <p className="text-[11px] text-white/80">{t("ai.mockConnected")}</p>
                   </div>
                   <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">IA</span>
                 </div>
@@ -402,34 +371,34 @@ function AIAssistantSection() {
                 <div className="space-y-3 bg-background px-4 py-5">
                   <div className="flex justify-end">
                     <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-[13px] text-primary-foreground shadow-sm">
-                      Qui n'a pas encore répondu pour samedi ?
+                      {t("ai.mockQ1")}
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <p className="text-[13px] leading-relaxed text-foreground">
-                      Pour <strong>U13 vs FC Riverside</strong> samedi 14h30, il manque encore <strong>3 réponses</strong> :
+                      {t("ai.mockA1Pre")}<strong>U13 vs FC Riverside</strong>{t("ai.mockA1Mid")}<strong>3</strong>{t("ai.mockA1Post")}
                     </p>
                     <div className="space-y-1.5">
                       {["Adam K.", "Sofiane R.", "Tom L."].map((n) => (
                         <div key={n} className="flex items-center justify-between rounded-lg bg-muted/60 px-2.5 py-1.5">
                           <span className="text-xs font-medium">{n}</span>
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">En attente</span>
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("ai.mockPending")}</span>
                         </div>
                       ))}
                     </div>
-                    <p className="text-[13px] leading-relaxed text-foreground">Veux-tu que je leur envoie un rappel ?</p>
+                    <p className="text-[13px] leading-relaxed text-foreground">{t("ai.mockAskAgain")}</p>
                   </div>
 
                   <div className="flex justify-end">
                     <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-[13px] text-primary-foreground shadow-sm">
-                      Oui, vas-y 👍
+                      {t("ai.mockYes")}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 border-t border-border bg-card px-3 py-2.5">
-                  <div className="flex-1 rounded-full bg-muted px-3 py-2 text-xs text-muted-foreground">Pose ta question...</div>
+                  <div className="flex-1 rounded-full bg-muted px-3 py-2 text-xs text-muted-foreground">{t("ai.mockPlaceholder")}</div>
                   <div className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground">
                     <Send className="h-3.5 w-3.5" />
                   </div>
@@ -438,7 +407,7 @@ function AIAssistantSection() {
 
               <div className="absolute -top-4 -left-4 z-10 flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-elevated">
                 <Sparkles className="h-3.5 w-3.5 text-[color:var(--energy)]" />
-                <span className="text-[11px] font-bold uppercase tracking-wider">Contextuel</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("ai.mockContext")}</span>
               </div>
             </div>
           </div>
@@ -446,22 +415,17 @@ function AIAssistantSection() {
           <div className="lg:col-span-6 order-1 lg:order-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
               <BrainCircuit className="h-3.5 w-3.5" />
-              Nouveau · Assistant IA
+              {t("ai.chip")}
             </div>
             <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
-              Un <span className="text-gradient-primary">assistant</span> qui connaît votre club.
+              {t("ai.titlePre")}<span className="text-gradient-primary">{t("ai.titleHighlight")}</span>{t("ai.titlePost")}
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Posez vos questions en français. L'assistant lit vos données en temps réel — convocations, présences, stats joueurs, prochains événements — et vous répond instantanément.
+              {t("ai.body")}
             </p>
 
             <ul className="mt-7 space-y-3">
-              {[
-                { t: "Connecté à vos données", d: "« Qui manque samedi ? », « Quelle est ma moyenne de présence ? », « Mon prochain match ? »" },
-                { t: "Adapté à votre rôle", d: "Coach, parent, joueur ou admin — l'assistant respecte ce que vous avez le droit de voir." },
-                { t: "Aussi sur le site vitrine", d: "Le widget en bas à droite répond aux questions sur le produit, les tarifs et le process de démo, 24/7." },
-                { t: "Hébergé en Europe", d: "Vos conversations ne servent pas à entraîner un modèle. Conforme RGPD." },
-              ].map((p) => (
+              {points.map((p) => (
                 <li key={p.t} className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
@@ -474,9 +438,9 @@ function AIAssistantSection() {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
-                <Link to="/demo">Essayer l'assistant <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                <Link to="/demo">{t("ai.cta")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
               </Button>
-              <span className="text-xs text-muted-foreground">Inclus dans tous les plans · Aucun setup</span>
+              <span className="text-xs text-muted-foreground">{t("ai.ctaNote")}</span>
             </div>
           </div>
         </div>
@@ -484,6 +448,7 @@ function AIAssistantSection() {
     </section>
   );
 }
+
 
 function Hero() {
   const { t } = useTranslation("marketing");
@@ -593,16 +558,16 @@ function Hero() {
                     </p>
                   </div>
                   <span className="rounded-full bg-gradient-primary px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
-                    Convocation
+                    {t("home.heroBadgeConvocation")}
                   </span>
                 </div>
                 <div className="space-y-2">
                   {[
-                    { name: "Lucas M.", status: "Présent", c: "bg-primary/15 text-[color:var(--secondary)]" },
-                    { name: "Emma D.", status: "Présent", c: "bg-primary/15 text-[color:var(--secondary)]" },
-                    { name: "Noah B.", status: "Peut-être", c: "bg-amber-500/15 text-amber-700" },
-                    { name: "Léa S.", status: "Absent", c: "bg-red-500/15 text-red-700" },
-                    { name: "Adam K.", status: "En attente", c: "bg-muted text-muted-foreground" },
+                    { name: "Lucas M.", status: t("home.heroStatusPresent"), c: "bg-primary/15 text-[color:var(--secondary)]" },
+                    { name: "Emma D.", status: t("home.heroStatusPresent"), c: "bg-primary/15 text-[color:var(--secondary)]" },
+                    { name: "Noah B.", status: t("home.heroStatusMaybe"), c: "bg-amber-500/15 text-amber-700" },
+                    { name: "Léa S.", status: t("home.heroStatusAbsent"), c: "bg-red-500/15 text-red-700" },
+                    { name: "Adam K.", status: t("home.heroStatusPending"), c: "bg-muted text-muted-foreground" },
                   ].map((p, i) => (
                     <div
                       key={p.name}
@@ -622,7 +587,8 @@ function Hero() {
                   ))}
                 </div>
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">14 sur 18 ont répondu</span>
+                  <span className="text-xs text-muted-foreground">{t("home.heroResponded")}</span>
+
                   <div className="flex items-center gap-2">
                     <div className="h-1.5 w-16 rounded-full bg-muted overflow-hidden">
                       <div className="h-full w-[78%] bg-gradient-primary rounded-full" />
@@ -639,67 +605,17 @@ function Hero() {
   );
 }
 
-const FEATURES = [
-  {
-    icon: CalendarCheck,
-    title: "Convocations intelligentes",
-    body: "Envoyez vos convocations en quelques secondes. Joueurs et parents répondent en un clic.",
-    accent: "from-[color:var(--brand-blue)] to-[color:var(--secondary)]",
-  },
-  {
-    icon: Users,
-    title: "Gestion d'équipe",
-    body: "Effectifs, liens parents, numéros et postes — tout au même endroit.",
-    accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]",
-  },
-  {
-    icon: Bell,
-    title: "Rappels automatiques",
-    body: "Plus besoin de relancer. Les rappels partent tout seuls.",
-    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
-  },
-  {
-    icon: MessageSquareText,
-    title: "WhatsApp & email en option",
-    body: "Clubero est votre canal principal. Si certains membres préfèrent rester sur WhatsApp ou email, partagez le message formaté en un clic.",
-    accent: "from-[color:var(--energy)] to-[color:var(--victory)]",
-  },
-  {
-    icon: Trophy,
-    title: "Tournois clés en main",
-    body: "Créez un tournoi avec poules, brackets, calendrier et classements. Partagez un lien public TV pour suivre les scores en direct.",
-    accent: "from-[color:var(--victory)] to-[color:var(--brand-blue)]",
-  },
-  {
-    icon: Trophy,
-    title: "Résultats & stats par sport",
-    body: "Saisissez le score et les statistiques (buts, essais, paniers à 3 pts) adaptées à chaque sport.",
-    accent: "from-[color:var(--victory)] to-[color:var(--energy)]",
-  },
-  {
-    icon: BarChart3,
-    title: "Suivi des présences",
-    body: "Voyez qui est venu, qui a manqué, et repérez les tendances de la saison.",
-    accent: "from-[color:var(--primary)] to-[color:var(--victory)]",
-  },
-  {
-    icon: BrainCircuit,
-    title: "Assistant IA intégré",
-    body: "Posez vos questions en français — l'assistant connaît votre club, vos équipes, vos stats et vos prochains événements.",
-    accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]",
-  },
-  {
-    icon: Activity,
-    title: "Activité du club en direct",
-    body: "Mur, mentions, accusés de lecture, fichiers — toute la vie du club au même endroit.",
-    accent: "from-[color:var(--brand-blue)] to-[color:var(--energy)]",
-  },
-  {
-    icon: ShieldCheck,
-    title: "RGPD & sécurité",
-    body: "Accès par rôle, contrôle parental et données hébergées en Europe.",
-    accent: "from-[color:var(--secondary)] to-[color:var(--primary)]",
-  },
+const FEATURE_META = [
+  { icon: CalendarCheck, accent: "from-[color:var(--brand-blue)] to-[color:var(--secondary)]" },
+  { icon: Users, accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]" },
+  { icon: Bell, accent: "from-[color:var(--energy)] to-[color:var(--victory)]" },
+  { icon: MessageSquareText, accent: "from-[color:var(--energy)] to-[color:var(--victory)]" },
+  { icon: Trophy, accent: "from-[color:var(--victory)] to-[color:var(--brand-blue)]" },
+  { icon: Trophy, accent: "from-[color:var(--victory)] to-[color:var(--energy)]" },
+  { icon: BarChart3, accent: "from-[color:var(--primary)] to-[color:var(--victory)]" },
+  { icon: BrainCircuit, accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]" },
+  { icon: Activity, accent: "from-[color:var(--brand-blue)] to-[color:var(--energy)]" },
+  { icon: ShieldCheck, accent: "from-[color:var(--secondary)] to-[color:var(--primary)]" },
 ];
 
 function FeaturesGrid() {
@@ -712,7 +628,7 @@ function FeaturesGrid() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
             <Zap className="h-3 w-3 text-[color:var(--energy)]" />
-            Pensé pour les terrains
+            {t("home.featuresChip")}
           </div>
           <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
             {t("home.featuresTitle")}
@@ -725,50 +641,41 @@ function FeaturesGrid() {
         </div>
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-[color:var(--brand-blue)]/40"
-            >
+          {FEATURE_META.map((f, i) => {
+            const title = t(`home.feat${i + 1}Title`);
+            const body = t(`home.feat${i + 1}Body`);
+            const Icon = f.icon;
+            return (
               <div
-                aria-hidden
-                className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--brand-blue)]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${f.accent} text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
-                <f.icon className="h-5 w-5" />
+                key={title}
+                className="group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-[color:var(--brand-blue)]/40"
+              >
+                <div
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--brand-blue)]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${f.accent} text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 font-display text-lg font-bold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
               </div>
-              <h3 className="mt-5 font-display text-lg font-bold">{f.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-const AUDIENCES = [
-  {
-    title: "Clubs",
-    icon: Trophy,
-    points: ["Centralisez équipes et membres", "Tableau de bord multi-équipes", "Statistiques sur la saison"],
-  },
-  {
-    title: "Coachs",
-    icon: Zap,
-    points: ["Convocations en quelques secondes", "Présences en temps réel", "Chat dédié à chaque événement"],
-  },
-  {
-    title: "Parents",
-    icon: Bell,
-    points: ["Réponse en un clic", "Calendrier dans la poche", "Zéro surcharge de notifications"],
-  },
-  {
-    title: "Joueurs",
-    icon: Activity,
-    points: ["Voyez votre prochain match", "Confirmez votre présence", "Restez dans la boucle"],
-  },
+
+const AUDIENCE_META = [
+  { key: "Clubs", icon: Trophy, pts: ["audClubsP1", "audClubsP2", "audClubsP3"], titleKey: "audClubs" },
+  { key: "Coaches", icon: Zap, pts: ["audCoachesP1", "audCoachesP2", "audCoachesP3"], titleKey: "audCoaches" },
+  { key: "Parents", icon: Bell, pts: ["audParentsP1", "audParentsP2", "audParentsP3"], titleKey: "audParents" },
+  { key: "Players", icon: Activity, pts: ["audPlayersP1", "audPlayersP2", "audPlayersP3"], titleKey: "audPlayers" },
 ];
+
 
 function ForEveryone() {
   const { t } = useTranslation("marketing");

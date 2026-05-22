@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,16 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { toast } from "sonner";
-
-const ROLES = [
-  "Président·e",
-  "Dirigeant·e",
-  "Coach",
-  "Responsable technique",
-  "Parent",
-  "Joueur·euse",
-  "Autre",
-];
 
 export const Route = createFileRoute("/demo")({
   component: DemoPage,
@@ -39,6 +30,10 @@ export const Route = createFileRoute("/demo")({
 });
 
 function DemoPage() {
+  const { t } = useTranslation("marketing");
+  const roles = t("demo.roles", { returnObjects: true }) as string[];
+  const perks = t("demo.perks", { returnObjects: true }) as string[];
+
   const [club, setClub] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -63,21 +58,14 @@ function DemoPage() {
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
       setClub(""); setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setTeams(""); setNotes("");
-      toast.success("Demande envoyée. Nous revenons vers vous sous 48h ouvrées.");
+      toast.success(t("demo.successToast"));
     } catch (err) {
       console.error(err);
-      toast.error("Envoi impossible. Réessayez ou écrivez à hello@clubero.app.");
+      toast.error(t("demo.errorToast"));
     } finally {
       setSubmitting(false);
     }
   }
-
-  const PERKS = [
-    "Démo personnalisée de 15 minutes",
-    "Nous configurons votre première équipe avec vous",
-    "Essai gratuit, sans carte bancaire",
-    "Aide à la migration depuis votre outil actuel",
-  ];
 
   return (
     <MarketingLayout>
@@ -85,17 +73,18 @@ function DemoPage() {
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-24">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
-              Démo
+              {t("demo.kicker")}
             </p>
             <h1 className="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-              Voyez Clubero en action.
+              {t("demo.title")}
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Parlez-nous un peu de votre club — nous revenons vers vous sous
-              <strong> 48h ouvrées</strong> pour planifier une démo.
+              {t("demo.subtitlePre")}
+              <strong>{t("demo.subtitleStrong")}</strong>
+              {t("demo.subtitlePost")}
             </p>
             <ul className="mt-8 space-y-3">
-              {PERKS.map((p) => (
+              {perks.map((p) => (
                 <li key={p} className="flex items-start gap-3 text-sm">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <span className="text-foreground/80">{p}</span>
@@ -109,71 +98,71 @@ function DemoPage() {
             className="rounded-3xl border border-border bg-card p-6 shadow-xl shadow-[color:var(--brand-blue)]/5 lg:p-8"
           >
             <div className="space-y-1.5">
-              <Label htmlFor="d-club">Nom du club</Label>
+              <Label htmlFor="d-club">{t("demo.clubName")}</Label>
               <Input
                 id="d-club"
                 required
                 value={club}
                 onChange={(e) => setClub(e.target.value)}
-                placeholder="AS Riverside"
+                placeholder={t("demo.clubNamePh")}
               />
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-firstName">Prénom</Label>
+                <Label htmlFor="d-firstName">{t("demo.firstName")}</Label>
                 <Input
                   id="d-firstName"
                   required
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Votre prénom"
+                  placeholder={t("demo.firstNamePh")}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="d-lastName">Nom</Label>
+                <Label htmlFor="d-lastName">{t("demo.lastName")}</Label>
                 <Input
                   id="d-lastName"
                   required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Votre nom"
+                  placeholder={t("demo.lastNamePh")}
                 />
               </div>
             </div>
             <div className="mt-4">
               <div className="space-y-1.5">
-                <Label htmlFor="d-email">E-mail</Label>
+                <Label htmlFor="d-email">{t("demo.email")}</Label>
                 <Input
                   id="d-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="vous@club.fr"
+                  placeholder={t("demo.emailPh")}
                 />
               </div>
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-phone">Téléphone</Label>
+                <Label htmlFor="d-phone">{t("demo.phone")}</Label>
                 <Input
                   id="d-phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+33 6 12 34 56 78"
+                  placeholder={t("demo.phonePh")}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="d-role">Votre rôle</Label>
+                <Label htmlFor="d-role">{t("demo.role")}</Label>
                 <select
                   id="d-role"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="" disabled>Sélectionnez un rôle</option>
-                  {ROLES.map((r) => (
+                  <option value="" disabled>{t("demo.rolePh")}</option>
+                  {roles.map((r) => (
                     <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
@@ -181,30 +170,30 @@ function DemoPage() {
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="d-teams">Nombre d&apos;équipes</Label>
+                <Label htmlFor="d-teams">{t("demo.teams")}</Label>
                 <Input
                   id="d-teams"
                   value={teams}
                   onChange={(e) => setTeams(e.target.value)}
-                  placeholder="ex : 6"
+                  placeholder={t("demo.teamsPh")}
                 />
               </div>
             </div>
             <div className="mt-4 space-y-1.5">
-              <Label htmlFor="d-notes">Quelque chose à savoir ?</Label>
+              <Label htmlFor="d-notes">{t("demo.notes")}</Label>
               <Textarea
                 id="d-notes"
                 rows={4}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Outil actuel, principal point de douleur…"
+                placeholder={t("demo.notesPh")}
               />
             </div>
             <Button type="submit" size="lg" disabled={submitting} className="mt-6 w-full h-12">
-              {submitting ? "Envoi…" : sent ? "Demande envoyée ✓" : "Demander une démo"}
+              {submitting ? t("demo.submitting") : sent ? t("demo.submitted") : t("demo.submit")}
             </Button>
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              Nous ne partageons jamais vos coordonnées. Conforme RGPD.
+              {t("demo.rgpd")}
             </p>
           </form>
         </div>

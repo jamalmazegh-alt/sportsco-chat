@@ -25,24 +25,11 @@ export const Route = createFileRoute("/pricing")({
   }),
 });
 
-const CLUBERO_FEATURES = [
-  "Équipes illimitées",
-  "Joueurs illimités",
-  "Gestion des matchs",
-  "Planning des entraînements",
-  "Suivi des présences",
-  "Communication club",
-  "Notifications",
-  "Statistiques",
-  "Événements",
-  "Module Tournois inclus",
-  "Accès mobile / PWA",
-  "Rôles coach & manager",
-];
-
-
 function PricingPage() {
   const { t } = useTranslation("marketing");
+  const CLUBERO_FEATURES = t("pricing.clubFeatures", { returnObjects: true }) as string[];
+  const ENTERPRISE_FEATURES = t("pricing.enterpriseFeatures", { returnObjects: true }) as string[];
+
 
   return (
     <MarketingLayout>
@@ -204,15 +191,8 @@ function PricingPage() {
               </Button>
 
               <ul className="mt-8 space-y-3">
-                {[
-                  "Multi-clubs, fédérations & districts",
-                  "Académies et centres de formation",
-                  "Ligues et organisations sportives",
-                  "SSO et sécurité avancée",
-                  "Onboarding dédié",
-                  "Exports de données personnalisés",
-                  "SLA et formation",
-                ].map((f) => (
+                {ENTERPRISE_FEATURES.map((f) => (
+
                   <li key={f} className="flex items-start gap-2.5 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <span className="text-foreground/80">{f}</span>
