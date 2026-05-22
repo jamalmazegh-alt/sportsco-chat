@@ -61,6 +61,7 @@ function Landing() {
   return (
     <MarketingLayout>
       <Hero />
+      <TournamentsSection />
       <FeaturesGrid />
       <WhatsAppHybrid />
       <AIAssistantSection />
@@ -69,6 +70,144 @@ function Landing() {
     </MarketingLayout>
   );
 }
+
+function TournamentsSection() {
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[color:var(--victory)]/10 via-background to-[color:var(--energy)]/10">
+      <div aria-hidden className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--victory)]/20 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--energy)]/20 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+          <div className="lg:col-span-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--victory)]/40 bg-[color:var(--victory)]/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--victory)]">
+              <Trophy className="h-3.5 w-3.5" />
+              Nouveau · Module Tournois
+            </div>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+              Organisez un <span className="text-gradient-energy">tournoi</span> en quelques minutes.
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+              Poules, brackets, calendrier, terrains, classements en temps réel et inscriptions
+              en ligne — tout est inclus. Partagez un lien public ou un écran TV pour suivre les
+              scores en direct dans la salle.
+            </p>
+
+            <ul className="mt-7 space-y-3">
+              {[
+                { t: "Poules + brackets automatiques", d: "Tirage au sort, calendrier multi-terrains et qualifications calculées toutes seules." },
+                { t: "Classements live", d: "Les scores se mettent à jour en temps réel. Spectateurs et équipes suivent depuis leur téléphone." },
+                { t: "Inscriptions en ligne", d: "Page publique d'inscription, validation par l'organisateur, plafond d'équipes et rosters joueurs." },
+                { t: "Mode TV plein écran", d: "Lien dédié à projeter sur grand écran — matchs en cours, prochains matchs et classements qui défilent." },
+              ].map((p) => (
+                <li key={p.t} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--victory)]" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                    <p className="text-sm text-muted-foreground">{p.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
+                <Link to="/demo">
+                  Lancer un tournoi <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-6">
+                <Link to="/features">Voir toutes les fonctionnalités</Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Standings / live match mock */}
+          <div className="lg:col-span-6">
+            <div className="relative mx-auto max-w-md">
+              <div
+                aria-hidden
+                className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-60 blur-3xl"
+                style={{
+                  background:
+                    "linear-gradient(135deg, color-mix(in oklab, var(--victory) 55%, transparent), color-mix(in oklab, var(--energy) 45%, transparent))",
+                }}
+              />
+
+              <div className="rounded-3xl border border-border bg-card shadow-elevated overflow-hidden">
+                <div className="flex items-center justify-between bg-gradient-to-r from-[color:var(--victory)] to-[color:var(--energy)] px-4 py-3 text-white">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/20">
+                      <Trophy className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold leading-tight">Tournoi de Pâques U13</p>
+                      <p className="text-[11px] text-white/80">Phase de poules · Poule A</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
+                      <span className="relative h-1.5 w-1.5 rounded-full bg-white" />
+                    </span>
+                    Live
+                  </span>
+                </div>
+
+                <div className="px-4 py-4 space-y-1.5">
+                  {[
+                    { p: 1, t: "FC Riverside", pts: 9, w: 3, d: 0, l: 0, top: true },
+                    { p: 2, t: "AS Montagne", pts: 6, w: 2, d: 0, l: 1, top: true },
+                    { p: 3, t: "Étoile FC", pts: 3, w: 1, d: 0, l: 2, top: false },
+                    { p: 4, t: "Club Atlantique", pts: 0, w: 0, d: 0, l: 3, top: false },
+                  ].map((r) => (
+                    <div
+                      key={r.t}
+                      className={`flex items-center gap-3 rounded-xl px-3 py-2 ${r.top ? "bg-[color:var(--victory)]/10" : "bg-muted/40"}`}
+                    >
+                      <span className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold ${r.top ? "bg-[color:var(--victory)] text-white" : "bg-muted text-muted-foreground"}`}>{r.p}</span>
+                      <span className="flex-1 text-sm font-semibold truncate">{r.t}</span>
+                      <span className="text-[11px] text-muted-foreground tabular-nums">{r.w}V {r.d}N {r.l}D</span>
+                      <span className="w-8 text-right text-sm font-bold tabular-nums">{r.pts}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-border bg-muted/30 px-4 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Match en cours · Terrain 2</p>
+                  <div className="mt-1.5 flex items-center justify-between gap-2">
+                    <p className="flex-1 text-sm font-bold truncate">FC Riverside</p>
+                    <div className="px-3 text-center">
+                      <p className="font-display text-xl font-bold tabular-nums leading-none">2 — 1</p>
+                      <p className="mt-0.5 text-[10px] text-[color:var(--energy)] font-bold uppercase tracking-wider">68'</p>
+                    </div>
+                    <p className="flex-1 text-right text-sm font-bold truncate">AS Montagne</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute -top-4 -right-4 z-10 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-elevated">
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[color:var(--victory)] to-[color:var(--energy)] text-white">
+                  <Users className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Équipes inscrites</p>
+                  <p className="text-sm font-bold tabular-nums">16 / 16</p>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-4 -left-4 z-10 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-elevated">
+                <Sparkles className="h-3.5 w-3.5 text-[color:var(--energy)]" />
+                <span className="text-[11px] font-bold uppercase tracking-wider">Mode TV dispo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 function WhatsAppHybrid() {
   return (
