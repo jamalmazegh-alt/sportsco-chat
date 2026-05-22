@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { Loader2, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +26,15 @@ interface TournamentPassButtonProps {
 export function TournamentPassButton({
   className,
   variant = "outline",
-  label = "Acheter un pass 40 €",
+  label,
 }: TournamentPassButtonProps) {
+  const { t } = useTranslation("tournaments");
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const checkout = useServerFn(createTournamentPassCheckout);
+  const resolvedLabel = label ?? t("pass.buyLabel");
 
   async function startCheckout(emailToUse: string) {
     if (busy) return;
@@ -46,11 +49,11 @@ export function TournamentPassButton({
       if (res.url) {
         window.location.href = res.url;
       } else {
-        toast.error("Impossible de démarrer le paiement.");
+        toast.error(t("pass.paymentImpossible"));
         setBusy(false);
       }
     } catch (err: any) {
-      toast.error(err?.message ?? "Erreur lors de la création du paiement.");
+      toast.error(err?.message ?? t("pass.paymentError"));
       setBusy(false);
     }
   }
@@ -65,7 +68,7 @@ export function TournamentPassButton({
         onClick={() => startCheckout(user.email!)}
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trophy className="h-4 w-4" />}
-        {label}
+        {resolvedLabel}
       </Button>
     );
   }
@@ -75,14 +78,13 @@ export function TournamentPassButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <Button variant={variant} className={className} onClick={() => setOpen(true)}>
         <Trophy className="h-4 w-4" />
-        {label}
+        {resolvedLabel}
       </Button>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Pass Tournoi — 40 €</DialogTitle>
+          <DialogTitle>{t("pass.dialogTitle")}</DialogTitle>
           <DialogDescription>
-            Un paiement unique par tournoi. Indiquez l'e-mail qui servira à
-            créer votre compte organisateur.
+            {t("pass.dialogDesc")}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -93,13 +95,13 @@ export function TournamentPassButton({
           className="space-y-4"
         >
           <div className="space-y-2">
-            <Label htmlFor="pass-email">E-mail</Label>
+            <Label htmlFor="pass-email">{t("pass.emailLabel")}</Label>
             <Input
               id="pass-email"
               type="email"
               required
               autoFocus
-              placeholder="vous@exemple.com"
+              placeholder={t("pass.emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={busy}
@@ -108,7 +110,7 @@ export function TournamentPassButton({
           <DialogFooter>
             <Button type="submit" disabled={busy || !email.includes("@")} className="w-full">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Continuer vers le paiement
+              {t("pass.continuePay")}
             </Button>
           </DialogFooter>
         </form>
