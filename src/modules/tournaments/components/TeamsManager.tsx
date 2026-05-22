@@ -234,9 +234,9 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
 
           <ResponsiveFormDialog
             open={open}
-            onOpenChange={setOpen}
+            onOpenChange={(v) => !atLimit && setOpen(v)}
             trigger={
-              <Button size="sm">
+              <Button size="sm" disabled={atLimit}>
                 <Plus className="h-4 w-4" />
                 Ajouter
               </Button>
