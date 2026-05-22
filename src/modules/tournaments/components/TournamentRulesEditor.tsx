@@ -42,6 +42,11 @@ import {
 } from "../lib/rules";
 import type { Tiebreaker } from "../lib/standings";
 import {
+  resolveScoring,
+  type ScoringMode,
+  type ScoringRules,
+} from "../lib/formats";
+import {
   updateTournamentRules,
   generateRulesPdf,
   listTournamentDocuments,
@@ -50,11 +55,18 @@ import {
 interface Props {
   tournamentId: string;
   settings: unknown;
+  sport?: string | null;
 }
 
-export function TournamentRulesEditor({ tournamentId, settings }: Props) {
+export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) {
   const initial = useMemo(() => mergeRules(settings), [settings]);
   const [rules, setRules] = useState<TournamentRules>(initial);
+  const scoring: ScoringRules = useMemo(
+    () => resolveScoring(sport, rules.scoring),
+    [sport, rules.scoring],
+  );
+  const setScoring = (next: ScoringRules) =>
+    setRules({ ...rules, scoring: next });
   const updateFn = useServerFn(updateTournamentRules);
   const qc = useQueryClient();
 
