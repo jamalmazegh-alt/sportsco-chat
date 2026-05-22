@@ -24,6 +24,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
+import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
@@ -154,6 +155,11 @@ const SuperadminIndexRoute = SuperadminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const TournamentsPassSuccessRoute = TournamentsPassSuccessRouteImport.update({
+  id: '/tournaments/pass-success',
+  path: '/tournaments/pass-success',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TSlugRoute = TSlugRouteImport.update({
   id: '/t/$slug',
@@ -495,6 +501,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -563,6 +570,7 @@ export interface FileRoutesByTo {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/superadmin': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -637,6 +645,7 @@ export interface FileRoutesById {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
@@ -711,6 +720,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournaments/pass-success'
     | '/superadmin/'
     | '/admin/billing'
     | '/admin/users'
@@ -779,6 +789,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournaments/pass-success'
     | '/superadmin'
     | '/admin/billing'
     | '/admin/users'
@@ -852,6 +863,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournaments/pass-success'
     | '/superadmin/'
     | '/_authenticated/admin/billing'
     | '/_authenticated/admin/users'
@@ -910,6 +922,7 @@ export interface RootRouteChildren {
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
+  TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -1030,6 +1043,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/'
       preLoaderRoute: typeof SuperadminIndexRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/tournaments/pass-success': {
+      id: '/tournaments/pass-success'
+      path: '/tournaments/pass-success'
+      fullPath: '/tournaments/pass-success'
+      preLoaderRoute: typeof TournamentsPassSuccessRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/t/$slug': {
       id: '/t/$slug'
@@ -1661,6 +1681,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
+  TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
