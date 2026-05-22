@@ -171,8 +171,9 @@ export const updateTournament = createServerFn({ method: "POST" })
             settings: z.record(z.string(), z.any()).optional(),
             match_duration_min: z.number().int().min(1).max(240).optional(),
             break_min: z.number().int().min(0).max(120).optional(),
-            daily_start_time: z.string().nullable().optional(),
-            daily_end_time: z.string().nullable().optional(),
+            daily_start_time: z.string().optional(),
+            daily_end_time: z.string().optional(),
+
             fields: z.array(z.string().min(1).max(60)).max(20).optional(),
 
           })
