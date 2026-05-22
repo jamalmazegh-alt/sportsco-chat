@@ -60,6 +60,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
+import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './routes/_authenticated/tournaments.new-from-pass'
 import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
 import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
@@ -341,6 +342,12 @@ const ApiPublicInquiryRoute = ApiPublicInquiryRouteImport.update({
   path: '/api/public/inquiry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTournamentsNewFromPassRoute =
+  AuthenticatedTournamentsNewFromPassRouteImport.update({
+    id: '/new-from-pass',
+    path: '/new-from-pass',
+    getParentRoute: () => AuthenticatedTournamentsRoute,
+  } as any)
 const AuthenticatedTournamentsTournamentIdRoute =
   AuthenticatedTournamentsTournamentIdRouteImport.update({
     id: '/$tournamentId',
@@ -512,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
+  '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -581,6 +589,7 @@ export interface FileRoutesByTo {
   '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
+  '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -656,6 +665,7 @@ export interface FileRoutesById {
   '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
+  '/_authenticated/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -731,6 +741,7 @@ export interface FileRouteTypes {
     | '/support/$ticketId'
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
+    | '/tournaments/new-from-pass'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -800,6 +811,7 @@ export interface FileRouteTypes {
     | '/support/$ticketId'
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
+    | '/tournaments/new-from-pass'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -874,6 +886,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
     | '/_authenticated/tournaments/$tournamentId'
+    | '/_authenticated/tournaments/new-from-pass'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1296,6 +1309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInquiryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tournaments/new-from-pass': {
+      id: '/_authenticated/tournaments/new-from-pass'
+      path: '/new-from-pass'
+      fullPath: '/tournaments/new-from-pass'
+      preLoaderRoute: typeof AuthenticatedTournamentsNewFromPassRouteImport
+      parentRoute: typeof AuthenticatedTournamentsRoute
+    }
     '/_authenticated/tournaments/$tournamentId': {
       id: '/_authenticated/tournaments/$tournamentId'
       path: '/$tournamentId'
@@ -1545,12 +1565,15 @@ const AuthenticatedTeamsRouteWithChildren =
 
 interface AuthenticatedTournamentsRouteChildren {
   AuthenticatedTournamentsTournamentIdRoute: typeof AuthenticatedTournamentsTournamentIdRoute
+  AuthenticatedTournamentsNewFromPassRoute: typeof AuthenticatedTournamentsNewFromPassRoute
 }
 
 const AuthenticatedTournamentsRouteChildren: AuthenticatedTournamentsRouteChildren =
   {
     AuthenticatedTournamentsTournamentIdRoute:
       AuthenticatedTournamentsTournamentIdRoute,
+    AuthenticatedTournamentsNewFromPassRoute:
+      AuthenticatedTournamentsNewFromPassRoute,
   }
 
 const AuthenticatedTournamentsRouteWithChildren =

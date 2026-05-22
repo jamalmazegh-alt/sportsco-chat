@@ -15,7 +15,7 @@ import {
 
 interface Props {
   tournamentId: string;
-  clubId: string;
+  clubId: string | null;
   teams: Array<{
     id: string;
     name: string;
@@ -41,7 +41,9 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
 
   const clubTeams = useQuery({
     queryKey: ["club-teams", clubId],
+    enabled: !!clubId,
     queryFn: async () => {
+      if (!clubId) return [];
       const { data } = await supabase
         .from("teams")
         .select("id, name")
