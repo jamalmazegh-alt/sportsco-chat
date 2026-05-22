@@ -32,7 +32,7 @@ export function SponsorsStrip({
   return (
     <section className="rounded-2xl border border-border bg-card px-4 py-5">
       <p className="text-xs uppercase tracking-wider text-muted-foreground text-center mb-4">
-        {title}
+        {resolvedTitle}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
         {sorted.map((s) => {
