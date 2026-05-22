@@ -155,12 +155,7 @@ function TournamentsList() {
                       Créer un tournoi
                     </Link>
                   </Button>
-                ) : (
-                  <TournamentPassButton
-                    variant="default"
-                    label="Acheter un pass 40 €"
-                  />
-                )
+                ) : null
               ) : (
                 <Button size="sm" onClick={() => setOpen(true)}>
                   <Plus className="h-4 w-4" />
