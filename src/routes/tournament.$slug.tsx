@@ -493,10 +493,11 @@ function EventsList({
 }
 
 function LiveBadge() {
+  const { t } = useTranslation("tournaments");
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
       <Radio className="h-2.5 w-2.5 animate-pulse" />
-      Live
+      {t("common.live")}
     </span>
   );
 }
@@ -512,6 +513,7 @@ function MatchRow({
   scoring: ScoringRules;
   events?: any[];
 }) {
+  const { t } = useTranslation("tournaments");
   const a = match.team_a_id ? teamMap.get(match.team_a_id) : null;
   const b = match.team_b_id ? teamMap.get(match.team_b_id) : null;
   const setsLine = scoring.mode === "sets" ? formatSets(match.sets) : "";
@@ -519,12 +521,12 @@ function MatchRow({
   return (
     <li className={cn("px-3 py-2 text-sm", isLive && "bg-red-500/5")}>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <span className="truncate text-right">{a?.name ?? "TBD"}</span>
+        <span className="truncate text-right">{a?.name ?? t("common.tbd")}</span>
         <span className="tabular-nums font-semibold flex items-center gap-1.5">
           {match.score_a ?? "–"} : {match.score_b ?? "–"}
           {isLive && <LiveBadge />}
         </span>
-        <span className="truncate">{b?.name ?? "TBD"}</span>
+        <span className="truncate">{b?.name ?? t("common.tbd")}</span>
       </div>
       {setsLine && (
         <div className="text-[11px] text-muted-foreground text-center mt-0.5 tabular-nums">
@@ -537,28 +539,33 @@ function MatchRow({
 }
 
 function TeamsGrid({ teams }: { teams: any[] }) {
+  const { t } = useTranslation("tournaments");
   if (teams.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
-        Aucune équipe inscrite.
+        {t("public.sections.noTeams")}
       </p>
     );
   }
   return (
     <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {teams.map((t) => (
+      {teams.map((teamItem) => (
         <li
-          key={t.id}
+          key={teamItem.id}
           className="rounded-xl border border-border bg-card p-3 text-center"
         >
           <div className="h-12 w-12 mx-auto rounded-lg bg-muted overflow-hidden flex items-center justify-center mb-2">
-            {t.logo_url ? (
-              <img src={t.logo_url} alt={t.name} className="h-full w-full object-cover" />
+            {teamItem.logo_url ? (
+              <img
+                src={teamItem.logo_url}
+                alt={teamItem.name}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <Users className="h-5 w-5 text-muted-foreground" />
             )}
           </div>
-          <p className="text-sm font-medium truncate">{t.name}</p>
+          <p className="text-sm font-medium truncate">{teamItem.name}</p>
         </li>
       ))}
     </ul>
@@ -576,11 +583,12 @@ function PublicMatches({
   scoring: ScoringRules;
   eventsByMatch: Map<string, any[]>;
 }) {
-  const teamMap = new Map(teams.map((t) => [t.id, t]));
+  const { t } = useTranslation("tournaments");
+  const teamMap = new Map(teams.map((tm) => [tm.id, tm]));
   if (matches.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-8">
-        Aucun match programmé.
+        {t("public.sections.noMatches")}
       </p>
     );
   }
@@ -600,24 +608,25 @@ function PublicMatches({
           >
             <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
               <span className="truncate text-right text-sm font-medium">
-                {teamMap.get(m.team_a_id)?.name ?? "TBD"}
+                {teamMap.get(m.team_a_id)?.name ?? t("common.tbd")}
               </span>
               <span className="tabular-nums font-bold flex items-center gap-1.5">
                 {m.score_a ?? "–"} : {m.score_b ?? "–"}
                 {isLive && <LiveBadge />}
               </span>
               <span className="truncate text-sm font-medium">
-                {teamMap.get(m.team_b_id)?.name ?? "TBD"}
+                {teamMap.get(m.team_b_id)?.name ?? t("common.tbd")}
               </span>
             </div>
             {(m.scheduled_at || m.field) && (
               <div className="text-[11px] text-muted-foreground text-center mt-1">
-                {m.scheduled_at && new Date(m.scheduled_at).toLocaleString("fr-FR", {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })}
+                {m.scheduled_at &&
+                  new Date(m.scheduled_at).toLocaleString(i18n.language, {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
                 {m.scheduled_at && m.field ? " · " : ""}
-                {m.field && `Terrain ${m.field}`}
+                {m.field && `${t("common.field")} ${m.field}`}
               </div>
             )}
             {setsLine && (
