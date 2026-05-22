@@ -8,6 +8,8 @@ import {
   DEFAULT_TIEBREAKERS,
   DEFAULT_FAIR_PLAY,
 } from "./standings";
+import type { ScoringRules } from "./formats";
+import { DEFAULT_SETS_RULES } from "./formats";
 
 export type TournamentLanguage = "fr" | "en";
 
@@ -48,6 +50,7 @@ export interface TournamentRules {
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
   forfeit: ForfeitRules;
   registration: RegistrationRules;
+  scoring?: ScoringRules;
   language: TournamentLanguage;
   branding: { primaryColor?: string; organizerName?: string };
 }
@@ -75,6 +78,7 @@ export const DEFAULT_RULES: TournamentRules = {
     collectPlayers: false,
     publicMessage: "",
   },
+  scoring: { mode: "simple", sets: DEFAULT_SETS_RULES },
   language: "fr",
   branding: {},
 };
@@ -122,6 +126,7 @@ export function mergeRules(settings: unknown): TournamentRules {
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
     forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
     registration: { ...DEFAULT_RULES.registration, ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}) },
+    scoring: (s.scoring as ScoringRules | undefined) ?? undefined,
     language: (s.language as TournamentLanguage) ?? DEFAULT_RULES.language,
     branding: { ...DEFAULT_RULES.branding, ...(s.branding ?? {}) },
   };
