@@ -148,8 +148,8 @@ export const getTournament = createServerFn({ method: "POST" })
     z.object({ tournament_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
-    const [tRes, gRes, teamRes, mRes] = await Promise.all([
+    const { supabase, userId } = context;
+    const [tRes, gRes, teamRes, mRes, canRes] = await Promise.all([
       supabase.from("tournaments").select("*").eq("id", data.tournament_id).maybeSingle(),
       supabase
         .from("tournament_groups")
@@ -166,6 +166,10 @@ export const getTournament = createServerFn({ method: "POST" })
         .select("*")
         .eq("tournament_id", data.tournament_id)
         .order("scheduled_at", { nullsFirst: false }),
+      supabase.rpc("can_manage_tournament", {
+        _user_id: userId,
+        _tournament_id: data.tournament_id,
+      }),
     ]);
     if (tRes.error) throw tRes.error;
     if (!tRes.data) throw new Response("Not found", { status: 404 });
@@ -174,6 +178,7 @@ export const getTournament = createServerFn({ method: "POST" })
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],
+      canManage: Boolean(canRes.data),
     };
   });
 
@@ -235,7 +240,20 @@ export const addTournamentTeam = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => addTeamSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+    const { count } = await supabase
+      .from("tournament_teams")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (
+      typeof tournament.num_teams === "number" &&
+      (count ?? 0) >= tournament.num_teams
+    ) {
+      throw new Response(
+        `Limite atteinte : ce tournoi est configuré pour ${tournament.num_teams} équipes.`,
+        { status: 400 },
+      );
+    }
     const { data: row, error } = await supabase
       .from("tournament_teams")
       .insert({
@@ -307,7 +325,21 @@ export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+    const { count } = await supabase
+      .from("tournament_teams")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (
+      typeof tournament.num_teams === "number" &&
+      (count ?? 0) + data.teams.length > tournament.num_teams
+    ) {
+      const remaining = Math.max(0, tournament.num_teams - (count ?? 0));
+      throw new Response(
+        `Limite atteinte : ce tournoi accepte ${tournament.num_teams} équipes (${remaining} place(s) restante(s)).`,
+        { status: 400 },
+      );
+    }
     const rows = data.teams.map((t) => ({
       tournament_id: data.tournament_id,
       name: t.name,

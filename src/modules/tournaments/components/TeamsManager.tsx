@@ -32,9 +32,10 @@ interface Props {
   tournamentId: string;
   clubId: string | null;
   teams: TeamRow[];
+  maxTeams?: number | null;
 }
 
-export function TeamsManager({ tournamentId, clubId, teams }: Props) {
+export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
@@ -173,18 +174,23 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
     }
   }
 
+  const atLimit =
+    typeof maxTeams === "number" && maxTeams > 0 && teams.length >= maxTeams;
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-sm font-medium text-muted-foreground">
-          {teams.length} équipe{teams.length > 1 ? "s" : ""}
+          {teams.length}
+          {typeof maxTeams === "number" && maxTeams > 0 ? ` / ${maxTeams}` : ""}{" "}
+          équipe{teams.length > 1 ? "s" : ""}
         </h2>
         <div className="flex gap-2">
           <ResponsiveFormDialog
             open={bulkOpen}
-            onOpenChange={setBulkOpen}
+            onOpenChange={(v) => !atLimit && setBulkOpen(v)}
             trigger={
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" disabled={atLimit}>
                 <Upload className="h-4 w-4" />
                 Importer
               </Button>
@@ -228,9 +234,9 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
 
           <ResponsiveFormDialog
             open={open}
-            onOpenChange={setOpen}
+            onOpenChange={(v) => !atLimit && setOpen(v)}
             trigger={
-              <Button size="sm">
+              <Button size="sm" disabled={atLimit}>
                 <Plus className="h-4 w-4" />
                 Ajouter
               </Button>

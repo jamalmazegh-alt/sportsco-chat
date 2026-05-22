@@ -44,7 +44,6 @@ type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket"
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
-  const canManage = role === "admin" || (role as string) === "dirigeant";
 
   const getFn = useServerFn(getTournament);
   const updateFn = useServerFn(updateTournament);
@@ -77,6 +76,10 @@ function TournamentDetailPage() {
   if (!q.data) return null;
 
   const { tournament, groups, teams, matches } = q.data;
+  const canManage =
+    (q.data as any).canManage === true ||
+    role === "admin" ||
+    (role as string) === "dirigeant";
   const publicUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/tournament/${tournament.slug}`
@@ -193,6 +196,7 @@ function TournamentDetailPage() {
             tournamentId={tournament.id}
             clubId={tournament.club_id}
             teams={teams as any}
+            maxTeams={(tournament as any).num_teams ?? null}
           />
         )}
         {tab === "fixtures" && canManage && (
