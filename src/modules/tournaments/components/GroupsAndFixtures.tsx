@@ -326,15 +326,48 @@ export function GroupsAndFixtures({
             />
           </div>
         </div>
-        <div className="space-y-1.5">
-          <Label>Terrains (séparés par virgule)</Label>
-          <Input
-            value={fieldsText}
-            onChange={(e) => setFieldsText(e.target.value)}
-            placeholder="Terrain 1, Terrain 2"
-          />
+        <div className="space-y-2">
+          <Label className="flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+            Terrains
+          </Label>
+          {fieldsList.length === 0 ? (
+            <p className="text-xs text-muted-foreground italic">Aucun terrain</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {fieldsList.map((f) => (
+                <Badge
+                  key={f}
+                  variant="secondary"
+                  className="gap-1.5 pl-2.5 pr-1 py-1 text-sm font-normal"
+                >
+                  <MapPin className="h-3 w-3 opacity-70" />
+                  {f}
+                  <button
+                    type="button"
+                    onClick={() => removeField(f)}
+                    className="ml-0.5 rounded-sm p-0.5 hover:bg-background/60 transition-colors"
+                    aria-label={`Retirer ${f}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
+              value={newField}
+              onChange={(e) => setNewField(e.target.value)}
+              onKeyDown={onFieldKeyDown}
+              placeholder="Nom du terrain (ex. Court central)"
+            />
+            <Button type="button" variant="outline" size="icon" onClick={addField}>
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
           <p className="text-[11px] text-muted-foreground">
-            Plusieurs terrains = matchs en parallèle. Tu peux aussi réassigner chaque match à un terrain dans l'onglet "Matchs".
+            Plusieurs terrains = matchs en parallèle. Réassignable par match dans l'onglet "Matchs".
           </p>
         </div>
         <div className="space-y-2 rounded-lg border border-border/60 p-3">
