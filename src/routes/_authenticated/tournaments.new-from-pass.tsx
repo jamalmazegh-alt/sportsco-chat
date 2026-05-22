@@ -16,6 +16,10 @@ import {
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
   component: NewFromPassPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    pass: typeof s.pass === "string" ? s.pass : undefined,
+    session_id: typeof s.session_id === "string" ? s.session_id : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Créer mon tournoi — Clubero" }],
   }),
@@ -25,12 +29,21 @@ type Format = "group" | "knockout" | "mixed";
 
 function NewFromPassPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const justPaid = search.pass === "success";
   const listFn = useServerFn(listMyAvailablePasses);
   const createFn = useServerFn(createTournamentFromPass);
 
   const passesQ = useQuery({
     queryKey: ["my-tournament-passes"],
     queryFn: () => listFn({ data: undefined as never }),
+    // After Stripe redirect, poll until the webhook marks the pass as paid.
+    refetchInterval: (q) => {
+      const data = q.state.data as { passes?: unknown[] } | undefined;
+      if (!justPaid) return false;
+      if (data?.passes && data.passes.length > 0) return false;
+      return 2000;
+    },
   });
 
   const [name, setName] = useState("");
