@@ -111,10 +111,7 @@ function AcceptInvitePage() {
             Connecte-toi pour accepter cette invitation.
           </p>
           <Button asChild className="w-full">
-            <Link
-              to="/login"
-              search={{ redirect: `/tournament-invite/${token}` }}
-            >
+            <Link to="/login">
               Se connecter
             </Link>
           </Button>
