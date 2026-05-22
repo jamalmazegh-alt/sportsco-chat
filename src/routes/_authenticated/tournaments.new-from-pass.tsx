@@ -16,6 +16,10 @@ import {
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
   component: NewFromPassPage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    pass: typeof s.pass === "string" ? s.pass : undefined,
+    session_id: typeof s.session_id === "string" ? s.session_id : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Créer mon tournoi — Clubero" }],
   }),
@@ -25,12 +29,21 @@ type Format = "group" | "knockout" | "mixed";
 
 function NewFromPassPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
+  const justPaid = search.pass === "success";
   const listFn = useServerFn(listMyAvailablePasses);
   const createFn = useServerFn(createTournamentFromPass);
 
   const passesQ = useQuery({
     queryKey: ["my-tournament-passes"],
     queryFn: () => listFn({ data: undefined as never }),
+    // After Stripe redirect, poll until the webhook marks the pass as paid.
+    refetchInterval: (q) => {
+      const data = q.state.data as { passes?: unknown[] } | undefined;
+      if (!justPaid) return false;
+      if (data?.passes && data.passes.length > 0) return false;
+      return 2000;
+    },
   });
 
   const [name, setName] = useState("");
@@ -84,6 +97,23 @@ function NewFromPassPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!pass && justPaid) {
+    return (
+      <div className="mx-auto max-w-xl px-5 py-16 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+          <Loader2 className="h-7 w-7 animate-spin text-primary" />
+        </div>
+        <h1 className="mt-5 font-display text-2xl font-bold">
+          Paiement en cours de validation
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Merci pour votre achat. Nous activons votre pass tournoi… cela ne
+          prend que quelques secondes.
+        </p>
       </div>
     );
   }

@@ -37,7 +37,12 @@ export function TournamentPassButton({
     if (busy) return;
     setBusy(true);
     try {
-      const res = await checkout({ data: { email: emailToUse.trim() } });
+      const res = await checkout({
+        data: {
+          email: emailToUse.trim(),
+          ...(user?.email ? { return_to: "/tournaments/new-from-pass" } : {}),
+        },
+      });
       if (res.url) {
         window.location.href = res.url;
       } else {
