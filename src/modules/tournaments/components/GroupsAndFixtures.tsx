@@ -123,10 +123,10 @@ export function GroupsAndFixtures({
         },
       }),
     onSuccess: (res) => {
-      toast.success(`${res.groups_created} poules · ${res.matches_created} matchs`);
+      toast.success(t("groups.generatedToast", { groups: res.groups_created, matches: res.matches_created }));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
 
   const genKnockout = useMutation({
@@ -135,11 +135,12 @@ export function GroupsAndFixtures({
         data: { tournament_id: tournamentId, third_place: thirdPlace },
       }),
     onSuccess: (res) => {
-      toast.success(`${res.matches_created} matchs de bracket créés`);
+      toast.success(t("groups.bracketCreatedToast", { count: res.matches_created }));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
+
 
   const saveSettings = useMutation({
     mutationFn: () => {
