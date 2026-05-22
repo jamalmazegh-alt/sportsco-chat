@@ -526,6 +526,12 @@ const FEATURES = [
   },
   {
     icon: Trophy,
+    title: "Tournois clés en main",
+    body: "Créez un tournoi avec poules, brackets, calendrier et classements. Partagez un lien public TV pour suivre les scores en direct.",
+    accent: "from-[color:var(--victory)] to-[color:var(--brand-blue)]",
+  },
+  {
+    icon: Trophy,
     title: "Résultats & stats par sport",
     body: "Saisissez le score et les statistiques (buts, essais, paniers à 3 pts) adaptées à chaque sport.",
     accent: "from-[color:var(--victory)] to-[color:var(--energy)]",
