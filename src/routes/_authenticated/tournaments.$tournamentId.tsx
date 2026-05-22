@@ -189,7 +189,9 @@ function TournamentDetailPage() {
             dailyStartTime={(tournament as any).daily_start_time}
             dailyEndTime={(tournament as any).daily_end_time}
             fields={(tournament as any).fields}
+            settings={(tournament as any).settings}
           />
+
         )}
 
         {tab === "fixtures" && !canManage && (
