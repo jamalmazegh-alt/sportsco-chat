@@ -661,7 +661,7 @@ function MatchCard({
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-7 text-xs">
                   <ChevronDown className="h-3 w-3" />
-                  Événements
+                  {t("matches.events.toggle")}
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="w-full mt-2 rounded-lg border border-border bg-muted/30 p-2 space-y-2">
@@ -671,16 +671,16 @@ function MatchCard({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {EVENT_KINDS.map((k) => (
+                      {EVENT_KIND_VALUES.map((k) => (
                         <SelectItem key={k.value} value={k.value}>
-                          {k.emoji} {k.label}
+                          {k.emoji} {t(`matches.events.${k.value}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <Select value={evTeam} onValueChange={setEvTeam}>
                     <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Équipe" />
+                      <SelectValue placeholder={t("matches.events.team")} />
                     </SelectTrigger>
                     <SelectContent>
                       {teamA && (
