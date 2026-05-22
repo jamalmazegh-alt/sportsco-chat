@@ -1,8 +1,8 @@
 /**
- * Classements de poule — fonction pure.
+ * Classements de poule — fonction pure, déterministe.
  *
  * Calcule un classement à partir des matchs joués selon les règles
- * de points et tiebreakers du tournoi.
+ * de points, fair-play et tiebreakers configurés.
  */
 
 export interface StandingRow {
@@ -15,6 +15,7 @@ export interface StandingRow {
   goalsAgainst: number;
   goalDiff: number;
   points: number;
+  fairPlay: number; // pénalité négative (ex: -3 pour un rouge)
   rank: number;
 }
 
@@ -24,26 +25,87 @@ export interface MatchInput {
   scoreA: number | null;
   scoreB: number | null;
   status: string;
+  penaltyA?: number | null;
+  penaltyB?: number | null;
+}
+
+export interface MatchEventInput {
+  matchId: string;
+  teamId: string | null;
+  kind:
+    | "goal"
+    | "own_goal"
+    | "assist"
+    | "yellow_card"
+    | "red_card"
+    | "second_yellow"
+    | "penalty"
+    | "foul";
 }
 
 export interface PointsConfig {
   win: number;
   draw: number;
   loss: number;
+  bonusWin?: number;
 }
 
-export type Tiebreaker = "points" | "goal_diff" | "goals_for" | "head_to_head" | "wins";
+export interface FairPlayConfig {
+  enabled: boolean;
+  yellow: number; // ex: -1
+  red: number; // ex: -3
+  secondYellow?: number;
+}
 
-/**
- * Calcule le classement d'une poule.
- * Ne prend en compte que les matchs `completed`.
- */
+export type Tiebreaker =
+  | "points"
+  | "head_to_head_points"
+  | "head_to_head_gd"
+  | "head_to_head_gf"
+  | "goal_diff"
+  | "goals_for"
+  | "wins"
+  | "fair_play"
+  | "draw_lot"
+  // legacy alias accepted for backward compat
+  | "head_to_head";
+
+export const DEFAULT_POINTS: PointsConfig = { win: 3, draw: 1, loss: 0 };
+export const DEFAULT_TIEBREAKERS: Tiebreaker[] = [
+  "points",
+  "head_to_head_points",
+  "head_to_head_gd",
+  "goal_diff",
+  "goals_for",
+];
+export const DEFAULT_FAIR_PLAY: FairPlayConfig = {
+  enabled: false,
+  yellow: -1,
+  red: -3,
+  secondYellow: -3,
+};
+
+function djb2(str: string): number {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = (h * 33) ^ str.charCodeAt(i);
+  return h >>> 0;
+}
+
 export function computeStandings(
   teamIds: string[],
   matches: MatchInput[],
-  points: PointsConfig = { win: 3, draw: 1, loss: 0 },
-  tiebreakers: Tiebreaker[] = ["points", "goal_diff", "goals_for", "head_to_head"],
+  points: PointsConfig = DEFAULT_POINTS,
+  tiebreakers: Tiebreaker[] = DEFAULT_TIEBREAKERS,
+  options: {
+    fairPlay?: FairPlayConfig;
+    events?: MatchEventInput[];
+    drawLotSalt?: string; // pour rendre draw_lot transparent et stable par tournoi
+  } = {},
 ): StandingRow[] {
+  const fp = options.fairPlay ?? DEFAULT_FAIR_PLAY;
+  const events = options.events ?? [];
+  const salt = options.drawLotSalt ?? "";
+
   const rows = new Map<string, StandingRow>();
   for (const id of teamIds) {
     rows.set(id, {
@@ -56,6 +118,7 @@ export function computeStandings(
       goalsAgainst: 0,
       goalDiff: 0,
       points: 0,
+      fairPlay: 0,
       rank: 0,
     });
   }
@@ -100,9 +163,24 @@ export function computeStandings(
   }
   for (const row of rows.values()) row.goalDiff = row.goalsFor - row.goalsAgainst;
 
-  // Head-to-head: pré-calcule points entre paires
-  const h2hPoints = new Map<string, number>(); // key = `${a}|${b}` -> points de a contre b
-  const key = (x: string, y: string) => `${x}|${y}`;
+  // Fair play scoring
+  if (fp.enabled) {
+    for (const ev of events) {
+      if (!ev.teamId) continue;
+      const r = rows.get(ev.teamId);
+      if (!r) continue;
+      if (ev.kind === "yellow_card") r.fairPlay += fp.yellow;
+      else if (ev.kind === "red_card") r.fairPlay += fp.red;
+      else if (ev.kind === "second_yellow")
+        r.fairPlay += fp.secondYellow ?? fp.red;
+    }
+  }
+
+  // Pre-compute head-to-head matrices (points / GD / GF)
+  const h2hPts = new Map<string, number>();
+  const h2hGd = new Map<string, number>();
+  const h2hGf = new Map<string, number>();
+  const k = (x: string, y: string) => `${x}|${y}`;
   for (const m of playedMatches) {
     const a = m.teamAId!;
     const b = m.teamBId!;
@@ -110,38 +188,137 @@ export function computeStandings(
     const sb = m.scoreB!;
     const pa = sa > sb ? points.win : sa < sb ? points.loss : points.draw;
     const pb = sb > sa ? points.win : sb < sa ? points.loss : points.draw;
-    h2hPoints.set(key(a, b), (h2hPoints.get(key(a, b)) ?? 0) + pa);
-    h2hPoints.set(key(b, a), (h2hPoints.get(key(b, a)) ?? 0) + pb);
+    h2hPts.set(k(a, b), (h2hPts.get(k(a, b)) ?? 0) + pa);
+    h2hPts.set(k(b, a), (h2hPts.get(k(b, a)) ?? 0) + pb);
+    h2hGd.set(k(a, b), (h2hGd.get(k(a, b)) ?? 0) + (sa - sb));
+    h2hGd.set(k(b, a), (h2hGd.get(k(b, a)) ?? 0) + (sb - sa));
+    h2hGf.set(k(a, b), (h2hGf.get(k(a, b)) ?? 0) + sa);
+    h2hGf.set(k(b, a), (h2hGf.get(k(b, a)) ?? 0) + sb);
   }
 
-  const compare = (a: StandingRow, b: StandingRow): number => {
-    for (const tb of tiebreakers) {
-      let diff = 0;
-      switch (tb) {
-        case "points":
-          diff = b.points - a.points;
-          break;
-        case "goal_diff":
-          diff = b.goalDiff - a.goalDiff;
-          break;
-        case "goals_for":
-          diff = b.goalsFor - a.goalsFor;
-          break;
-        case "wins":
-          diff = b.won - a.won;
-          break;
-        case "head_to_head":
-          diff =
-            (h2hPoints.get(key(b.teamId, a.teamId)) ?? 0) -
-            (h2hPoints.get(key(a.teamId, b.teamId)) ?? 0);
-          break;
+  // Mini-league h2h for groups of ≥3 tied teams: sub-rank using only their
+  // matches between each other (FIFA rule).
+  function miniLeague(teams: StandingRow[]): Map<string, number> {
+    if (teams.length < 3) return new Map();
+    const sub = new Map<string, { pts: number; gd: number; gf: number }>();
+    for (const t of teams) sub.set(t.teamId, { pts: 0, gd: 0, gf: 0 });
+    for (const m of playedMatches) {
+      if (!sub.has(m.teamAId!) || !sub.has(m.teamBId!)) continue;
+      const sa = m.scoreA!;
+      const sb = m.scoreB!;
+      const a = sub.get(m.teamAId!)!;
+      const b = sub.get(m.teamBId!)!;
+      a.gd += sa - sb;
+      b.gd += sb - sa;
+      a.gf += sa;
+      b.gf += sb;
+      if (sa > sb) {
+        a.pts += points.win;
+        b.pts += points.loss;
+      } else if (sa < sb) {
+        b.pts += points.win;
+        a.pts += points.loss;
+      } else {
+        a.pts += points.draw;
+        b.pts += points.draw;
       }
-      if (diff !== 0) return diff;
     }
-    return 0;
+    const ordered = [...sub.entries()].sort((x, y) => {
+      if (y[1].pts !== x[1].pts) return y[1].pts - x[1].pts;
+      if (y[1].gd !== x[1].gd) return y[1].gd - x[1].gd;
+      return y[1].gf - x[1].gf;
+    });
+    const out = new Map<string, number>();
+    ordered.forEach(([id], i) => out.set(id, ordered.length - i));
+    return out;
+  }
+
+  const compareSingle = (a: StandingRow, b: StandingRow, tb: Tiebreaker): number => {
+    switch (tb) {
+      case "points":
+        return b.points - a.points;
+      case "goal_diff":
+        return b.goalDiff - a.goalDiff;
+      case "goals_for":
+        return b.goalsFor - a.goalsFor;
+      case "wins":
+        return b.won - a.won;
+      case "fair_play":
+        return b.fairPlay - a.fairPlay; // higher (less negative) wins
+      case "head_to_head":
+      case "head_to_head_points":
+        return (
+          (h2hPts.get(k(b.teamId, a.teamId)) ?? 0) -
+          (h2hPts.get(k(a.teamId, b.teamId)) ?? 0)
+        );
+      case "head_to_head_gd":
+        return (
+          (h2hGd.get(k(b.teamId, a.teamId)) ?? 0) -
+          (h2hGd.get(k(a.teamId, b.teamId)) ?? 0)
+        );
+      case "head_to_head_gf":
+        return (
+          (h2hGf.get(k(b.teamId, a.teamId)) ?? 0) -
+          (h2hGf.get(k(a.teamId, b.teamId)) ?? 0)
+        );
+      case "draw_lot": {
+        // Deterministic pseudo-random based on team id + salt
+        return djb2(salt + a.teamId) - djb2(salt + b.teamId);
+      }
+    }
   };
 
-  const sorted = [...rows.values()].sort(compare);
+  // Multi-pass sort: detect groups of ties on the *current* criterion and
+  // apply remaining tiebreakers within each group.
+  function sortWith(list: StandingRow[], tbs: Tiebreaker[]): StandingRow[] {
+    if (list.length <= 1 || tbs.length === 0) return list;
+    const [head, ...rest] = tbs;
+    // Special case: mini-league h2h points when ≥3 tied
+    if (head === "head_to_head_points" || head === "head_to_head") {
+      // First sort everyone by raw h2h points
+      const sorted = [...list].sort((x, y) => compareSingle(x, y, head));
+      // Group equals
+      const groups: StandingRow[][] = [];
+      let cur: StandingRow[] = [];
+      for (const r of sorted) {
+        if (cur.length === 0 || compareSingle(cur[0], r, head) === 0) cur.push(r);
+        else {
+          groups.push(cur);
+          cur = [r];
+        }
+      }
+      if (cur.length) groups.push(cur);
+      const out: StandingRow[] = [];
+      for (const g of groups) {
+        if (g.length >= 3) {
+          // mini-league refinement
+          const mini = miniLeague(g);
+          const refined = [...g].sort(
+            (x, y) => (mini.get(y.teamId) ?? 0) - (mini.get(x.teamId) ?? 0),
+          );
+          // recurse into remaining tbs for still-tied subgroups
+          out.push(...sortWith(refined, rest));
+        } else {
+          out.push(...sortWith(g, rest));
+        }
+      }
+      return out;
+    }
+    const sorted = [...list].sort((x, y) => compareSingle(x, y, head));
+    const groups: StandingRow[][] = [];
+    let cur: StandingRow[] = [];
+    for (const r of sorted) {
+      if (cur.length === 0 || compareSingle(cur[0], r, head) === 0) cur.push(r);
+      else {
+        groups.push(cur);
+        cur = [r];
+      }
+    }
+    if (cur.length) groups.push(cur);
+    return groups.flatMap((g) => sortWith(g, rest));
+  }
+
+  const sorted = sortWith([...rows.values()], tiebreakers);
   sorted.forEach((r, i) => (r.rank = i + 1));
   return sorted;
 }
