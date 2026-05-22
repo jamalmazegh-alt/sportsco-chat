@@ -615,7 +615,7 @@ function MatchCard({
                   disabled={statusM.isPending}
                 >
                   <Zap className="h-3.5 w-3.5" />
-                  Démarrer le match en direct
+                  {t("matches.startLive")}
                 </Button>
               )}
           </>
