@@ -731,12 +731,24 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
       .eq("tournament_id", data.tournament_id)
       .neq("round", "group");
 
+    // Compute starting match number after existing group matches
+    const { data: maxRow } = await supabase
+      .from("tournament_matches")
+      .select("match_number")
+      .eq("tournament_id", data.tournament_id)
+      .eq("round", "group")
+      .order("match_number", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const startNumber = ((maxRow?.match_number as number | null) ?? 0) + 1;
+
     // Insert bracket matches (sources stored as jsonb)
     const rows = bracket.map((m, idx) => ({
       tournament_id: data.tournament_id,
       round: m.round,
       bracket_position: m.bracketPosition,
-      match_number: 1000 + idx,
+      match_number: startNumber + idx,
+
       team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
       team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
       team_a_source: m.teamASource as any,
@@ -1714,11 +1726,22 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
       .eq("tournament_id", data.tournament_id)
       .neq("round", "group");
 
+    const { data: maxRow2 } = await supabase
+      .from("tournament_matches")
+      .select("match_number")
+      .eq("tournament_id", data.tournament_id)
+      .eq("round", "group")
+      .order("match_number", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const startNumber2 = ((maxRow2?.match_number as number | null) ?? 0) + 1;
+
     const rows = bracket.map((m, idx) => ({
       tournament_id: data.tournament_id,
       round: m.round,
       bracket_position: m.bracketPosition,
-      match_number: 1000 + idx,
+      match_number: startNumber2 + idx,
+
       team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
       team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
       team_a_source: m.teamASource as any,

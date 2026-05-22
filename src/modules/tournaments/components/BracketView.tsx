@@ -58,15 +58,17 @@ export function BracketView({ matches, teams }: Props) {
     );
   }
 
-  // Lookup: fromMatch counter (1-based generation order) → match.
-  // At generation, match_number = 1000 + idx and counter = idx + 1,
-  // so counter = match_number - 999.
+  // Lookup: fromMatch counter (1-based generation order within bracket) → match.
+  // Knockout matches are inserted in generation order, so sorting by match_number
+  // restores the original idx and counter = idx + 1.
   const matchByCounter = new Map<number, Match>();
-  for (const m of knockout) {
-    if (typeof m.match_number === "number") {
-      matchByCounter.set(m.match_number - 999, m);
-    }
-  }
+  const sortedKnockout = [...knockout].sort(
+    (a, b) => (a.match_number ?? 0) - (b.match_number ?? 0),
+  );
+  sortedKnockout.forEach((m, i) => {
+    matchByCounter.set(i + 1, m);
+  });
+
 
   const byRound = new Map<string, Match[]>();
   for (const m of knockout) {
@@ -130,7 +132,7 @@ function resolveLabel(
   if (!source) return "À déterminer";
   if ("teamId" in source) return "À déterminer";
   const src = matchByCounter.get(source.fromMatch);
-  const num = src?.match_number ?? 999 + source.fromMatch;
+  const num = src?.match_number ?? source.fromMatch;
   return source.outcome === "loser" ? `Perdant M${num}` : `Vainqueur M${num}`;
 }
 
