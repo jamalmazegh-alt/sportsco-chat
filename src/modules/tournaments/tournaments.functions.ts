@@ -1037,7 +1037,12 @@ export const validateMatch = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    // Allow organizer, co-organizer OR assigned referee for this match.
+    const { data: canValidate } = await (supabase as any).rpc("can_validate_match", {
+      _user_id: userId,
+      _match_id: data.match_id,
+    });
+    if (!canValidate) throw new Response("Forbidden", { status: 403 });
     const { error } = await supabase
       .from("tournament_matches")
       .update({
@@ -1713,4 +1718,192 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
       if (error) throw new Response(error.message, { status: 400 });
     }
     return { matches_created: rows.length };
+  });
+
+
+// ============================================================
+// Collaborators (co-organizers & referees) + referee assignment
+// ============================================================
+
+const emailSchema = z.string().trim().email().max(254);
+
+export const listTournamentCollaborators = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Only tournament managers can list collaborators
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { data: rows, error } = await (supabase as any)
+      .from("tournament_collaborators")
+      .select(
+        "id, role, email, display_name, user_id, invitation_token, invited_at, accepted_at, revoked_at",
+      )
+      .eq("tournament_id", data.tournament_id)
+      .order("invited_at", { ascending: false });
+    if (error) throw new Response(error.message, { status: 400 });
+    return { collaborators: rows ?? [] };
+  });
+
+export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        role: z.enum(["co_organizer", "referee"]),
+        email: emailSchema,
+        display_name: z.string().trim().max(120).optional().nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Only the "real" owner (admin/dirigeant/creator) can invite, not a co-orga.
+    const { data: isOwner } = await (supabase as any).rpc("is_tournament_owner", {
+      _user_id: userId,
+      _tournament_id: data.tournament_id,
+    });
+    if (!isOwner) throw new Response("Forbidden", { status: 403 });
+
+    const email = data.email.toLowerCase();
+    // Upsert: re-inviting same email/role reactivates it
+    const { data: existing } = await (supabase as any)
+      .from("tournament_collaborators")
+      .select("id, accepted_at, revoked_at, invitation_token")
+      .eq("tournament_id", data.tournament_id)
+      .eq("role", data.role)
+      .eq("email", email)
+      .maybeSingle();
+
+    if (existing) {
+      const { data: updated, error } = await (supabase as any)
+        .from("tournament_collaborators")
+        .update({
+          display_name: data.display_name ?? null,
+          revoked_at: null,
+        })
+        .eq("id", existing.id)
+        .select("*")
+        .single();
+      if (error) throw new Response(error.message, { status: 400 });
+      return { collaborator: updated };
+    }
+
+    const { data: row, error } = await (supabase as any)
+      .from("tournament_collaborators")
+      .insert({
+        tournament_id: data.tournament_id,
+        role: data.role,
+        email,
+        display_name: data.display_name ?? null,
+        invited_by: userId,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { collaborator: row };
+  });
+
+export const revokeTournamentCollaborator = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        collaborator_id: z.string().uuid(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isOwner } = await (supabase as any).rpc("is_tournament_owner", {
+      _user_id: userId,
+      _tournament_id: data.tournament_id,
+    });
+    if (!isOwner) throw new Response("Forbidden", { status: 403 });
+
+    const { error } = await (supabase as any)
+      .from("tournament_collaborators")
+      .delete()
+      .eq("id", data.collaborator_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+export const acceptTournamentInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ token: z.string().min(8).max(120) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: result, error } = await (supabase as any).rpc(
+      "accept_tournament_invite",
+      { _token: data.token },
+    );
+    if (error) throw new Response(error.message, { status: 400 });
+    return { result };
+  });
+
+export const getTournamentInviteByToken = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ token: z.string().min(8).max(120) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: result, error } = await (supabaseAdmin as any).rpc(
+      "get_tournament_invite_by_token",
+      { _token: data.token },
+    );
+    if (error) throw new Response(error.message, { status: 400 });
+    return { invite: result };
+  });
+
+// ----- Referee assignment per match -----
+
+export const assignMatchReferee = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        // Either pick an existing accepted referee account, or just write a free-text name.
+        referee_user_id: z.string().uuid().nullable().optional(),
+        referee_name: z.string().trim().max(120).nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+
+    // If a user is provided, ensure they are an accepted referee for this tournament.
+    if (data.referee_user_id) {
+      const { data: ref } = await (supabase as any)
+        .from("tournament_collaborators")
+        .select("id, accepted_at, revoked_at")
+        .eq("tournament_id", data.tournament_id)
+        .eq("role", "referee")
+        .eq("user_id", data.referee_user_id)
+        .maybeSingle();
+      if (!ref || !ref.accepted_at || ref.revoked_at) {
+        throw new Response("Referee not part of this tournament", { status: 400 });
+      }
+    }
+
+    const { error } = await (supabase as any)
+      .from("tournament_matches")
+      .update({
+        referee_user_id: data.referee_user_id ?? null,
+        referee_name: data.referee_name ?? null,
+      })
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
   });

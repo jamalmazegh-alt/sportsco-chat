@@ -27,6 +27,7 @@ import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
 import { Route as TournamentsStartRouteImport } from './routes/tournaments.start'
 import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
 import { Route as TournamentSlugRouteImport } from './routes/tournament.$slug'
+import { Route as TournamentInviteTokenRouteImport } from './routes/tournament-invite.$token'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
@@ -176,6 +177,11 @@ const TournamentsPassSuccessRoute = TournamentsPassSuccessRouteImport.update({
 const TournamentSlugRoute = TournamentSlugRouteImport.update({
   id: '/tournament/$slug',
   path: '/tournament/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentInviteTokenRoute = TournamentInviteTokenRouteImport.update({
+  id: '/tournament-invite/$token',
+  path: '/tournament-invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TSlugRoute = TSlugRouteImport.update({
@@ -545,6 +551,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
@@ -621,6 +628,7 @@ export interface FileRoutesByTo {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
@@ -703,6 +711,7 @@ export interface FileRoutesById {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament-invite/$token': typeof TournamentInviteTokenRoute
   '/tournament/$slug': typeof TournamentSlugRouteWithChildren
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
@@ -785,6 +794,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament-invite/$token'
     | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
@@ -861,6 +871,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament-invite/$token'
     | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
@@ -942,6 +953,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament-invite/$token'
     | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
@@ -1008,6 +1020,7 @@ export interface RootRouteChildren {
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
+  TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
   TournamentSlugRoute: typeof TournamentSlugRouteWithChildren
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
@@ -1152,6 +1165,13 @@ declare module '@tanstack/react-router' {
       path: '/tournament/$slug'
       fullPath: '/tournament/$slug'
       preLoaderRoute: typeof TournamentSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament-invite/$token': {
+      id: '/tournament-invite/$token'
+      path: '/tournament-invite/$token'
+      fullPath: '/tournament-invite/$token'
+      preLoaderRoute: typeof TournamentInviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/t/$slug': {
@@ -1838,6 +1858,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
+  TournamentInviteTokenRoute: TournamentInviteTokenRoute,
   TournamentSlugRoute: TournamentSlugRouteWithChildren,
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,

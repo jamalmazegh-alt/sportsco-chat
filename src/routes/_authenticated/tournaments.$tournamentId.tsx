@@ -33,13 +33,14 @@ import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 import { TournamentRulesEditor } from "@/modules/tournaments/components/TournamentRulesEditor";
 import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
 import { RegistrationsManager } from "@/modules/tournaments/components/RegistrationsManager";
-import { ClipboardList } from "lucide-react";
+import { CollaboratorsManager } from "@/modules/tournaments/components/CollaboratorsManager";
+import { ClipboardList, UserPlus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff";
 
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
@@ -101,6 +102,7 @@ function TournamentDetailPage() {
     ...(canManage
       ? [
           { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
+          { id: "team_staff" as const, icon: UserPlus, label: "Équipe" },
           { id: "rules" as const, icon: Settings2, label: "Règles" },
         ]
       : []),
@@ -250,6 +252,9 @@ function TournamentDetailPage() {
         )}
         {tab === "registrations" && canManage && (
           <RegistrationsManager tournamentId={tournament.id} />
+        )}
+        {tab === "team_staff" && canManage && (
+          <CollaboratorsManager tournamentId={tournament.id} />
         )}
         {tab === "rules" && canManage && (
           <TournamentRulesEditor
