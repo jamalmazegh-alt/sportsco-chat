@@ -50,8 +50,10 @@ export function GroupsAndFixtures({
   settings,
   teams,
 }: Props) {
+  const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [drawOpen, setDrawOpen] = useState(false);
+
   const [numGroups, setNumGroups] = useState(2);
   const [qualifiers, setQualifiers] = useState(2);
   const [thirdPlace, setThirdPlace] = useState(false);
