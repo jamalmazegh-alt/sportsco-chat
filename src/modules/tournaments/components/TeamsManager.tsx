@@ -32,9 +32,10 @@ interface Props {
   tournamentId: string;
   clubId: string | null;
   teams: TeamRow[];
+  maxTeams?: number | null;
 }
 
-export function TeamsManager({ tournamentId, clubId, teams }: Props) {
+export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
