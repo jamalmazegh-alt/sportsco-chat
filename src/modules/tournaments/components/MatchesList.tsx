@@ -321,10 +321,10 @@ function MatchCard({
         data: { tournament_id: tournamentId, match_id: match.id, validated },
       }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("matches.statusUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   const disputeM = useMutation({
@@ -333,7 +333,7 @@ function MatchCard({
         data: { tournament_id: tournamentId, match_id: match.id, dispute },
       }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("matches.statusUpdated"));
       invalidateAll();
     },
   });
@@ -345,10 +345,10 @@ function MatchCard({
         data: { tournament_id: tournamentId, match_id: match.id, status: status as any },
       }),
     onSuccess: () => {
-      toast.success("Statut du match mis à jour");
+      toast.success(t("matches.matchStatusUpdated"));
       invalidateAll();
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   const initialDate = match.scheduled_at ? new Date(match.scheduled_at) : null;
