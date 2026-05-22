@@ -12,7 +12,7 @@ import {
   Shuffle,
   ListOrdered,
   Calendar,
-  
+  Settings2,
   Eye,
   GitBranch,
 } from "lucide-react";
@@ -28,12 +28,13 @@ import { MatchesList } from "@/modules/tournaments/components/MatchesList";
 import { StandingsView } from "@/modules/tournaments/components/StandingsView";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
+import { TournamentRulesEditor } from "@/modules/tournaments/components/TournamentRulesEditor";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
 });
 
-type Tab = "teams" | "fixtures" | "matches" | "standings" | "bracket";
+type Tab = "teams" | "fixtures" | "matches" | "standings" | "bracket" | "rules";
 
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
@@ -82,6 +83,9 @@ function TournamentDetailPage() {
     { id: "matches", icon: Calendar, label: "Matchs" },
     { id: "standings", icon: ListOrdered, label: "Classement" },
     { id: "bracket", icon: GitBranch, label: "Bracket" },
+    ...(canManage
+      ? [{ id: "rules" as const, icon: Settings2, label: "Règles" }]
+      : []),
   ];
 
   return (
@@ -211,6 +215,12 @@ function TournamentDetailPage() {
         {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
         {tab === "bracket" && (
           <BracketView matches={matches as any} teams={teams as any} />
+        )}
+        {tab === "rules" && canManage && (
+          <TournamentRulesEditor
+            tournamentId={tournament.id}
+            settings={(tournament as any).settings}
+          />
         )}
       </div>
     </div>
