@@ -303,14 +303,14 @@ function TvSlideshowPage() {
         </div>
         <div className="text-right tabular-nums">
           <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            {clock.toLocaleDateString("fr-FR", {
+            {clock.toLocaleDateString(i18n.language, {
               weekday: "long",
               day: "numeric",
               month: "long",
             })}
           </p>
           <p className="text-2xl font-semibold">
-            {clock.toLocaleTimeString("fr-FR", {
+            {clock.toLocaleTimeString(i18n.language, {
               hour: "2-digit",
               minute: "2-digit",
             })}
@@ -330,7 +330,7 @@ function TvSlideshowPage() {
             onClick={() =>
               setIdx((i) => (i - 1 + slides.length) % slides.length)
             }
-            aria-label="Précédent"
+            aria-label={t("tv.controls.previous")}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -338,7 +338,7 @@ function TvSlideshowPage() {
             size="icon"
             variant="ghost"
             onClick={() => setPaused((p) => !p)}
-            aria-label={paused ? "Reprendre" : "Pause"}
+            aria-label={paused ? t("tv.controls.resume") : t("tv.controls.pause")}
           >
             {paused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
           </Button>
@@ -346,7 +346,7 @@ function TvSlideshowPage() {
             size="icon"
             variant="ghost"
             onClick={() => setIdx((i) => (i + 1) % slides.length)}
-            aria-label="Suivant"
+            aria-label={t("tv.controls.next")}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
@@ -367,17 +367,19 @@ function TvSlideshowPage() {
           size="sm"
           variant="ghost"
           onClick={goFullscreen}
-          aria-label={isFs ? "Quitter plein écran" : "Plein écran"}
+          aria-label={
+            isFs ? t("tv.controls.exitFullscreen") : t("tv.controls.fullscreen")
+          }
         >
           {isFs ? (
             <>
               <Minimize2 className="h-4 w-4" />
-              Quitter
+              {t("tv.controls.exit")}
             </>
           ) : (
             <>
               <Maximize2 className="h-4 w-4" />
-              Plein écran
+              {t("tv.controls.fullscreen")}
             </>
           )}
         </Button>
