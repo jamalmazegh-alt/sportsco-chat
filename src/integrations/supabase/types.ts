@@ -2382,7 +2382,16 @@ export type Database = {
         | "sf"
         | "final"
         | "third_place"
-      tournament_match_status: "scheduled" | "live" | "completed" | "cancelled"
+      tournament_match_status:
+        | "scheduled"
+        | "live"
+        | "completed"
+        | "cancelled"
+        | "forfeit_a"
+        | "forfeit_b"
+        | "no_show_a"
+        | "no_show_b"
+        | "abandoned"
       tournament_pass_status: "pending" | "paid" | "used" | "refunded"
       tournament_status:
         | "draft"
@@ -2595,7 +2604,17 @@ export const Constants = {
         "final",
         "third_place",
       ],
-      tournament_match_status: ["scheduled", "live", "completed", "cancelled"],
+      tournament_match_status: [
+        "scheduled",
+        "live",
+        "completed",
+        "cancelled",
+        "forfeit_a",
+        "forfeit_b",
+        "no_show_a",
+        "no_show_b",
+        "abandoned",
+      ],
       tournament_pass_status: ["pending", "paid", "used", "refunded"],
       tournament_status: [
         "draft",

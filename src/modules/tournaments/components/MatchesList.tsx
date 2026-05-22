@@ -34,6 +34,7 @@ import {
   updateMatchSchedule,
   validateMatch,
   setMatchDispute,
+  setMatchStatus,
   recordMatchEvent,
   deleteMatchEvent,
   listMatchEvents,
@@ -231,6 +232,19 @@ function MatchCard({
     },
   });
 
+  const statusFn = useServerFn(setMatchStatus);
+  const statusM = useMutation({
+    mutationFn: (status: string) =>
+      statusFn({
+        data: { tournament_id: tournamentId, match_id: match.id, status: status as any },
+      }),
+    onSuccess: () => {
+      toast.success("Statut du match mis à jour");
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
   const initialDate = match.scheduled_at ? new Date(match.scheduled_at) : null;
   const pad = (n: number) => String(n).padStart(2, "0");
   const [editField, setEditField] = useState<string>(match.field ?? "");
@@ -340,6 +354,24 @@ function MatchCard({
                 <AlertTriangle className="h-3 w-3" />
                 Litige
               </span>
+            )}
+            {match.status === "cancelled" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">Annulé</span>
+            )}
+            {match.status === "forfeit_a" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait A</span>
+            )}
+            {match.status === "forfeit_b" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait B</span>
+            )}
+            {match.status === "no_show_a" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">A absente</span>
+            )}
+            {match.status === "no_show_b" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">B absente</span>
+            )}
+            {match.status === "abandoned" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">Abandonné</span>
             )}
           </div>
         </div>
@@ -491,9 +523,27 @@ function MatchCard({
               <AlertTriangle className="h-3 w-3" />
               {disputed ? "Lever litige" : "Signaler litige"}
             </Button>
+            <select
+              className="h-7 rounded-md border border-input bg-background px-2 text-xs"
+              value={match.status}
+              disabled={statusM.isPending}
+              onChange={(e) => statusM.mutate(e.target.value)}
+              aria-label="État du match"
+            >
+              <option value="scheduled">Prévu</option>
+              <option value="live">En cours</option>
+              <option value="completed">Terminé</option>
+              <option value="forfeit_a">Forfait équipe A</option>
+              <option value="forfeit_b">Forfait équipe B</option>
+              <option value="no_show_a">Équipe A absente</option>
+              <option value="no_show_b">Équipe B absente</option>
+              <option value="abandoned">Abandonné</option>
+              <option value="cancelled">Annulé</option>
+            </select>
           </div>
         )}
       </div>
+
 
       <ResponsiveFormDialog open={open} onOpenChange={setOpen} title="Saisir le score">
         <div className="space-y-4 mt-4 pb-6">
