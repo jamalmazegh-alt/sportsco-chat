@@ -493,27 +493,98 @@ function MatchCard({
             )}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          disabled={!teamA || !teamB}
-          className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-50"
-        >
-          <span className="truncate text-sm font-medium text-right">
-            {teamA?.name ?? "À déterminer"}
-          </span>
-          <span className="font-semibold tabular-nums">
-            {match.score_a ?? "–"} : {match.score_b ?? "–"}
-          </span>
-          <span className="truncate text-sm font-medium">
-            {teamB?.name ?? "À déterminer"}
-          </span>
-        </button>
-        {setsMode && match.sets && match.sets.length > 0 && (
-          <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
-            {formatSets(match.sets)}
-          </p>
+        {canManage && match.status === "live" && !setsMode && teamA && teamB ? (
+          <div className="mt-2 rounded-lg border border-red-500/40 bg-red-500/5 p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
+                <Radio className="h-3 w-3 animate-pulse" />
+                Score en direct
+              </span>
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="text-[11px] text-muted-foreground underline"
+              >
+                Saisie complète
+              </button>
+            </div>
+            <div className="flex items-center justify-around gap-2">
+              <ScoreStepper
+                label={teamA.short_name ?? teamA.name}
+                value={match.score_a ?? 0}
+                onChange={(v) =>
+                  liveUpdate.mutate({ score_a: v, score_b: match.score_b ?? 0 })
+                }
+                disabled={liveUpdate.isPending}
+                size="md"
+              />
+              <span className="text-xl text-muted-foreground">:</span>
+              <ScoreStepper
+                label={teamB.short_name ?? teamB.name}
+                value={match.score_b ?? 0}
+                onChange={(v) =>
+                  liveUpdate.mutate({ score_a: match.score_a ?? 0, score_b: v })
+                }
+                disabled={liveUpdate.isPending}
+                size="md"
+              />
+            </div>
+            <Button
+              size="sm"
+              className="w-full mt-3 h-9"
+              onClick={() => {
+                setA(match.score_a ?? 0);
+                setB(match.score_b ?? 0);
+                save.mutate();
+              }}
+              disabled={save.isPending}
+            >
+              <Check className="h-4 w-4" />
+              Terminer le match
+            </Button>
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              disabled={!teamA || !teamB || !canManage}
+              className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-70"
+            >
+              <span className="truncate text-sm font-medium text-right">
+                {teamA?.name ?? "À déterminer"}
+              </span>
+              <span className="font-semibold tabular-nums text-lg">
+                {match.score_a ?? "–"} : {match.score_b ?? "–"}
+              </span>
+              <span className="truncate text-sm font-medium">
+                {teamB?.name ?? "À déterminer"}
+              </span>
+            </button>
+            {setsMode && match.sets && match.sets.length > 0 && (
+              <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
+                {formatSets(match.sets)}
+              </p>
+            )}
+            {canManage &&
+              match.status === "scheduled" &&
+              teamA &&
+              teamB && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 w-full h-8 text-xs border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"
+                  onClick={() => statusM.mutate("live")}
+                  disabled={statusM.isPending}
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  Démarrer le match en direct
+                </Button>
+              )}
+          </>
         )}
+
 
         {/* Events summary (always visible if any) */}
         {events.length > 0 && (
