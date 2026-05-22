@@ -247,10 +247,10 @@ function MatchCard({
   };
 
   const save = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (setsMode && sets.length > 0) {
         const agg = aggregateSetsScore(sets);
-        return fn({
+        const result = await fn({
           data: {
             tournament_id: tournamentId,
             match_id: match.id,
@@ -260,8 +260,12 @@ function MatchCard({
             status: "completed",
           },
         });
+        await valFn({
+          data: { tournament_id: tournamentId, match_id: match.id, validated: true },
+        });
+        return result;
       }
-      return fn({
+      const result = await fn({
         data: {
           tournament_id: tournamentId,
           match_id: match.id,
@@ -273,10 +277,14 @@ function MatchCard({
           status: "completed",
         },
       });
+      await valFn({
+        data: { tournament_id: tournamentId, match_id: match.id, validated: true },
+      });
+      return result;
     },
 
     onSuccess: () => {
-      toast.success("Score enregistré");
+      toast.success("Score enregistré et validé");
       invalidateAll();
       setOpen(false);
     },
@@ -898,7 +906,7 @@ function MatchCard({
             {save.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Valider le score"
+              "Enregistrer et valider"
             )}
           </Button>
         </div>
