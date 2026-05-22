@@ -185,6 +185,29 @@ function TournamentsList() {
           ))}
         </ul>
       )}
+
+      {canManage && tournaments.length > 0 && (
+        <div className="pt-2">
+          {noClub ? (
+            hasPass ? (
+              <Button size="sm" variant="outline" className="w-full" asChild>
+                <Link to="/tournaments/new-from-pass">
+                  <Plus className="h-4 w-4" />
+                  Créer un tournoi
+                </Link>
+              </Button>
+            ) : null
+          ) : (
+            activeClubId && (
+              <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Créer un tournoi
+              </Button>
+            )
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
