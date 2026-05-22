@@ -34,6 +34,7 @@ import {
   updateMatchSchedule,
   validateMatch,
   setMatchDispute,
+  setMatchStatus,
   recordMatchEvent,
   deleteMatchEvent,
   listMatchEvents,
