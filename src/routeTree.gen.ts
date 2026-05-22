@@ -26,6 +26,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
 import { Route as TournamentsStartRouteImport } from './routes/tournaments.start'
 import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
+import { Route as TournamentSlugRouteImport } from './routes/tournament.$slug'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
 import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
@@ -168,6 +169,11 @@ const TournamentsStartRoute = TournamentsStartRouteImport.update({
 const TournamentsPassSuccessRoute = TournamentsPassSuccessRouteImport.update({
   id: '/tournaments/pass-success',
   path: '/tournaments/pass-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentSlugRoute = TournamentSlugRouteImport.update({
+  id: '/tournament/$slug',
+  path: '/tournament/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TSlugRoute = TSlugRouteImport.update({
@@ -527,6 +533,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
@@ -600,6 +607,7 @@ export interface FileRoutesByTo {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin': typeof SuperadminIndexRoute
@@ -679,6 +687,7 @@ export interface FileRoutesById {
   '/superadmin/support': typeof SuperadminSupportRoute
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
@@ -758,6 +767,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
     | '/superadmin/'
@@ -831,6 +841,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
     | '/superadmin'
@@ -909,6 +920,7 @@ export interface FileRouteTypes {
     | '/superadmin/support'
     | '/superadmin/users'
     | '/t/$slug'
+    | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
     | '/superadmin/'
@@ -972,6 +984,7 @@ export interface RootRouteChildren {
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
+  TournamentSlugRoute: typeof TournamentSlugRoute
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
@@ -1108,6 +1121,13 @@ declare module '@tanstack/react-router' {
       path: '/tournaments/pass-success'
       fullPath: '/tournaments/pass-success'
       preLoaderRoute: typeof TournamentsPassSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament/$slug': {
+      id: '/tournament/$slug'
+      path: '/tournament/$slug'
+      fullPath: '/tournament/$slug'
+      preLoaderRoute: typeof TournamentSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/t/$slug': {
@@ -1766,6 +1786,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
+  TournamentSlugRoute: TournamentSlugRoute,
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
