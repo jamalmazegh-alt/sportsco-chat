@@ -103,6 +103,23 @@ function PublicTournamentPage() {
   }
 
   const { tournament, groups, teams, matches } = q.data;
+  const events = ((q.data as any).events ?? []) as any[];
+  const eventsByMatch = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const e of events) {
+      const arr = map.get(e.match_id) ?? [];
+      arr.push(e);
+      map.set(e.match_id, arr);
+    }
+    return map;
+  }, [events]);
+  const filteredMatches = useMemo(() => {
+    if (teamFilter === "all") return matches;
+    return (matches as any[]).filter(
+      (m) => m.team_a_id === teamFilter || m.team_b_id === teamFilter,
+    );
+  }, [matches, teamFilter]);
+
   const rules = mergeRules((tournament as any).settings);
   const scoring = resolveScoring(
     (tournament as any).sport,
