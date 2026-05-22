@@ -1,9 +1,10 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Calendar, Users, Megaphone, User, ShieldCheck, BarChart3 } from "lucide-react";
+import { Home, Calendar, Users, Megaphone, User, ShieldCheck, BarChart3, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth, useActiveRole } from "@/lib/auth-context";
 import { useWallUnread } from "@/lib/use-wall-unread";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export function BottomNav() {
   const { t } = useTranslation();
@@ -11,18 +12,24 @@ export function BottomNav() {
   const { activeClubId } = useAuth();
   const role = useActiveRole();
   const { count: wallUnread } = useWallUnread(activeClubId);
+  const { tournamentOnly } = useTournamentOnlyMode();
 
-  const items = [
-    { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
-    { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
-    { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
-    { to: "/stats", icon: BarChart3, label: t("nav.stats"), badge: 0 },
-    { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
-    ...(role === "admin"
-      ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
-      : []),
-    { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
-  ];
+  const items = tournamentOnly
+    ? [
+        { to: "/tournaments", icon: Trophy, label: "Tournois", badge: 0 },
+        { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
+      ]
+    : [
+        { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
+        { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
+        { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
+        { to: "/stats", icon: BarChart3, label: t("nav.stats"), badge: 0 },
+        { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
+        ...(role === "admin"
+          ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
+          : []),
+        { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
+      ];
 
   return (
     <nav
