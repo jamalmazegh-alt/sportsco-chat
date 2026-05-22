@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import {
   getTournament,
   updateTournament,
-} from "@/modules/tournaments/server/tournaments.functions";
+} from "@/modules/tournaments/tournaments.functions";
 import { TeamsManager } from "@/modules/tournaments/components/TeamsManager";
 import { GroupsAndFixtures } from "@/modules/tournaments/components/GroupsAndFixtures";
 import { MatchesList } from "@/modules/tournaments/components/MatchesList";

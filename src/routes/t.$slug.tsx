@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Trophy, Calendar, MapPin, Loader2, Tv, ListOrdered, Users, GitBranch, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { getPublicTournament } from "@/modules/tournaments/server/tournaments.functions";
+import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
 

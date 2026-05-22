@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import {
   addTournamentTeam,
   removeTournamentTeam,
-} from "../server/tournaments.functions";
+} from "../tournaments.functions";
 
 interface Props {
   tournamentId: string;

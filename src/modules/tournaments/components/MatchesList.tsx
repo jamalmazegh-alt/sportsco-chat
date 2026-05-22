@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
-import { recordMatchScore } from "../server/tournaments.functions";
+import { recordMatchScore } from "../tournaments.functions";
 
 interface Team {
   id: string;
