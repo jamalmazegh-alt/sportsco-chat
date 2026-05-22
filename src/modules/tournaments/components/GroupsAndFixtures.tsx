@@ -127,10 +127,7 @@ export function GroupsAndFixtures({
 
   const saveSettings = useMutation({
     mutationFn: () => {
-      const fieldsList = fieldsText
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+      const fl = fieldsList.length ? fieldsList : ["Terrain 1"];
       const nextSettings = {
         ...(settings ?? {}),
         lunch_start: lunchEnabled ? lunchStart : null,
@@ -144,7 +141,7 @@ export function GroupsAndFixtures({
             break_min: pause,
             daily_start_time: startTime,
             daily_end_time: endTime,
-            fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+            fields: fl,
             settings: nextSettings,
           },
         },
