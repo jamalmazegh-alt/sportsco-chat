@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
-import { Loader2, Check, MapPin, Clock } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Loader2,
+  Check,
+  MapPin,
+  Clock,
+  ShieldCheck,
+  AlertTriangle,
+  ChevronDown,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
-import { recordMatchScore, updateMatchSchedule } from "../tournaments.functions";
+import {
+  recordMatchScore,
+  updateMatchSchedule,
+  validateMatch,
+  setMatchDispute,
+  recordMatchEvent,
+  deleteMatchEvent,
+  listMatchEvents,
+} from "../tournaments.functions";
 
 interface Team {
   id: string;
@@ -34,6 +57,16 @@ interface Match {
   status: string;
   scheduled_at: string | null;
   field?: string | null;
+  validated_at?: string | null;
+  dispute_flag?: boolean | null;
+}
+interface MatchEvent {
+  id: string;
+  match_id: string;
+  team_id: string | null;
+  kind: string;
+  player_name: string | null;
+  minute: number | null;
 }
 
 interface Props {
@@ -52,6 +85,17 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields }:
     return acc;
   }, {});
 
+  const listFn = useServerFn(listMatchEvents);
+  const eventsQ = useQuery({
+    queryKey: ["tournament-events", tournamentId],
+    queryFn: () => listFn({ data: { tournament_id: tournamentId } }),
+  });
+  const eventsByMatch = new Map<string, MatchEvent[]>();
+  for (const ev of (eventsQ.data?.events ?? []) as MatchEvent[]) {
+    if (!eventsByMatch.has(ev.match_id)) eventsByMatch.set(ev.match_id, []);
+    eventsByMatch.get(ev.match_id)!.push(ev);
+  }
+
   return (
     <div className="space-y-5">
       {Object.entries(grouped).map(([round, ms]) => (
@@ -69,6 +113,7 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields }:
                 teamB={m.team_b_id ? teamMap.get(m.team_b_id) : undefined}
                 canManage={!!canManage}
                 fields={fields ?? []}
+                events={eventsByMatch.get(m.id) ?? []}
               />
             ))}
           </ul>
@@ -95,6 +140,21 @@ function roundLabel(r: string) {
   return map[r] ?? r;
 }
 
+const EVENT_KINDS: { value: string; label: string; emoji: string }[] = [
+  { value: "goal", label: "But", emoji: "⚽" },
+  { value: "own_goal", label: "CSC", emoji: "🥅" },
+  { value: "assist", label: "Passe déc.", emoji: "🅰️" },
+  { value: "yellow_card", label: "Jaune", emoji: "🟨" },
+  { value: "second_yellow", label: "2e jaune", emoji: "🟨🟨" },
+  { value: "red_card", label: "Rouge", emoji: "🟥" },
+  { value: "penalty", label: "Penalty", emoji: "🎯" },
+  { value: "foul", label: "Faute", emoji: "⚠️" },
+];
+
+function eventMeta(kind: string) {
+  return EVENT_KINDS.find((k) => k.value === kind) ?? { emoji: "•", label: kind };
+}
+
 function MatchCard({
   match,
   tournamentId,
@@ -102,6 +162,7 @@ function MatchCard({
   teamB,
   canManage,
   fields,
+  events,
 }: {
   match: Match;
   tournamentId: string;
@@ -109,6 +170,7 @@ function MatchCard({
   teamB?: Team;
   canManage: boolean;
   fields: string[];
+  events: MatchEvent[];
 }) {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -116,7 +178,17 @@ function MatchCard({
   const [b, setB] = useState(match.score_b ?? 0);
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
+  const valFn = useServerFn(validateMatch);
+  const dispFn = useServerFn(setMatchDispute);
+  const evFn = useServerFn(recordMatchEvent);
+  const evDelFn = useServerFn(deleteMatchEvent);
   const qc = useQueryClient();
+
+  const invalidateAll = () => {
+    qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    qc.invalidateQueries({ queryKey: ["tournament-events", tournamentId] });
+  };
+
   const save = useMutation({
     mutationFn: () =>
       fn({
@@ -130,10 +202,33 @@ function MatchCard({
       }),
     onSuccess: () => {
       toast.success("Score enregistré");
-      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      invalidateAll();
       setOpen(false);
     },
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+  const validateM = useMutation({
+    mutationFn: (validated: boolean) =>
+      valFn({
+        data: { tournament_id: tournamentId, match_id: match.id, validated },
+      }),
+    onSuccess: () => {
+      toast.success("Statut mis à jour");
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+  const disputeM = useMutation({
+    mutationFn: (dispute: boolean) =>
+      dispFn({
+        data: { tournament_id: tournamentId, match_id: match.id, dispute },
+      }),
+    onSuccess: () => {
+      toast.success("Statut mis à jour");
+      invalidateAll();
+    },
   });
 
   const initialDate = match.scheduled_at ? new Date(match.scheduled_at) : null;
@@ -165,13 +260,47 @@ function MatchCard({
     },
     onSuccess: () => {
       toast.success("Match mis à jour");
-      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      invalidateAll();
       setEditOpen(false);
     },
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
+  // Add event form
+  const [evTeam, setEvTeam] = useState<string>(match.team_a_id ?? "");
+  const [evKind, setEvKind] = useState<string>("yellow_card");
+  const [evPlayer, setEvPlayer] = useState("");
+  const [evMinute, setEvMinute] = useState<string>("");
+
+  const addEvent = useMutation({
+    mutationFn: () =>
+      evFn({
+        data: {
+          tournament_id: tournamentId,
+          match_id: match.id,
+          team_id: evTeam || null,
+          kind: evKind as any,
+          player_name: evPlayer || null,
+          minute: evMinute ? parseInt(evMinute, 10) : null,
+        },
+      }),
+    onSuccess: () => {
+      setEvPlayer("");
+      setEvMinute("");
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+  const removeEvent = useMutation({
+    mutationFn: (event_id: string) =>
+      evDelFn({ data: { tournament_id: tournamentId, event_id } }),
+    onSuccess: () => invalidateAll(),
+  });
+
   const done = match.status === "completed";
+  const validated = !!match.validated_at;
+  const disputed = !!match.dispute_flag;
   const whenLabel = initialDate
     ? `${pad(initialDate.getDate())}/${pad(initialDate.getMonth() + 1)} ${pad(initialDate.getHours())}:${pad(initialDate.getMinutes())}`
     : null;
@@ -179,9 +308,9 @@ function MatchCard({
   return (
     <li>
       <div className="w-full rounded-xl border border-border bg-card p-3 text-left">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <span className="text-xs text-muted-foreground">#{match.match_number ?? "—"}</span>
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap justify-end">
             {whenLabel && (
               <span className="inline-flex items-center gap-1">
                 <Clock className="h-3 w-3" />
@@ -194,10 +323,22 @@ function MatchCard({
                 {match.field}
               </span>
             )}
-            {done && (
-              <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            {done && !validated && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">
                 <Check className="h-3 w-3" />
-                Terminé
+                Provisoire
+              </span>
+            )}
+            {validated && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
+                <ShieldCheck className="h-3 w-3" />
+                Validé
+              </span>
+            )}
+            {disputed && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-destructive">
+                <AlertTriangle className="h-3 w-3" />
+                Litige
               </span>
             )}
           </div>
@@ -218,15 +359,137 @@ function MatchCard({
             {teamB?.name ?? "À déterminer"}
           </span>
         </button>
+
+        {/* Events summary (always visible if any) */}
+        {events.length > 0 && (
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {events.map((ev) => {
+              const meta = eventMeta(ev.kind);
+              const isA = ev.team_id === match.team_a_id;
+              return (
+                <li
+                  key={ev.id}
+                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px]"
+                >
+                  <span>{meta.emoji}</span>
+                  {ev.minute != null && <span className="font-mono">{ev.minute}'</span>}
+                  {ev.player_name && <span>{ev.player_name}</span>}
+                  <span className="text-muted-foreground">
+                    {isA ? teamA?.short_name ?? teamA?.name : teamB?.short_name ?? teamB?.name}
+                  </span>
+                  {canManage && (
+                    <button
+                      type="button"
+                      onClick={() => removeEvent.mutate(ev.id)}
+                      className="text-muted-foreground hover:text-destructive ml-0.5"
+                      aria-label="Supprimer"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
         {canManage && (
-          <div className="mt-2 flex justify-end">
+          <div className="mt-2 flex flex-wrap justify-end gap-1">
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 text-xs">
+                  <ChevronDown className="h-3 w-3" />
+                  Événements
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="w-full mt-2 rounded-lg border border-border bg-muted/30 p-2 space-y-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <Select value={evKind} onValueChange={setEvKind}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EVENT_KINDS.map((k) => (
+                        <SelectItem key={k.value} value={k.value}>
+                          {k.emoji} {k.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={evTeam} onValueChange={setEvTeam}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Équipe" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teamA && (
+                        <SelectItem value={teamA.id}>{teamA.name}</SelectItem>
+                      )}
+                      {teamB && (
+                        <SelectItem value={teamB.id}>{teamB.name}</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    className="h-8 text-xs"
+                    placeholder="Joueur"
+                    value={evPlayer}
+                    onChange={(e) => setEvPlayer(e.target.value)}
+                  />
+                  <Input
+                    className="h-8 text-xs"
+                    type="number"
+                    min={0}
+                    max={200}
+                    placeholder="Min."
+                    value={evMinute}
+                    onChange={(e) => setEvMinute(e.target.value)}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  className="h-8 text-xs w-full"
+                  onClick={() => addEvent.mutate()}
+                  disabled={addEvent.isPending || !evTeam}
+                >
+                  {addEvent.isPending ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Plus className="h-3 w-3" />
+                  )}
+                  Ajouter l'événement
+                </Button>
+              </CollapsibleContent>
+            </Collapsible>
+
             <Button
               variant="ghost"
               size="sm"
               className="h-7 text-xs"
               onClick={() => setEditOpen(true)}
             >
-              Modifier terrain / heure
+              Terrain / heure
+            </Button>
+            {done && (
+              <Button
+                variant={validated ? "outline" : "default"}
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => validateM.mutate(!validated)}
+                disabled={validateM.isPending}
+              >
+                <ShieldCheck className="h-3 w-3" />
+                {validated ? "Annuler validation" : "Valider"}
+              </Button>
+            )}
+            <Button
+              variant={disputed ? "destructive" : "ghost"}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => disputeM.mutate(!disputed)}
+              disabled={disputeM.isPending}
+            >
+              <AlertTriangle className="h-3 w-3" />
+              {disputed ? "Lever litige" : "Signaler litige"}
             </Button>
           </div>
         )}
