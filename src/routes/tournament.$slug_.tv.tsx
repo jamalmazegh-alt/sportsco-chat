@@ -233,7 +233,7 @@ function TvSlideshowPage() {
       ),
     });
     return out;
-  }, [data, scoring]);
+  }, [data, scoring, t]);
 
   // Auto-rotation
   useEffect(() => {
@@ -265,10 +265,8 @@ function TvSlideshowPage() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-3 p-6 text-center">
         <Trophy className="h-12 w-12 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">Diaporama indisponible</h1>
-        <p className="text-muted-foreground max-w-md">
-          Ce tournoi n'est pas encore publié ou n'existe pas.
-        </p>
+        <h1 className="text-2xl font-bold">{t("tv.unavailableTitle")}</h1>
+        <p className="text-muted-foreground max-w-md">{t("tv.unavailableBody")}</p>
       </div>
     );
   }
