@@ -94,7 +94,7 @@ export const listMyAvailablePasses = createServerFn({ method: "POST" })
   });
 
 async function uniqueSlug(
-  supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"],
+  supabaseAdmin: any,
   base: string,
 ): Promise<string> {
   for (let i = 0; i < 5; i++) {
