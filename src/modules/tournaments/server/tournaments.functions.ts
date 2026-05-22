@@ -527,6 +527,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
     z.object({ slug: z.string().min(1).max(80) }).parse(input),
   )
   .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: t } = await supabaseAdmin
       .from("tournaments")
       .select(
