@@ -468,11 +468,15 @@ function MatchCard({
               </span>
             )}
             {done && !validated && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300"
+                title="Score saisi, en attente de validation par l'organisateur"
+              >
                 <Check className="h-3 w-3" />
-                Provisoire
+                À valider
               </span>
             )}
+
             {validated && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
                 <ShieldCheck className="h-3 w-3" />
@@ -715,16 +719,22 @@ function MatchCard({
             </Button>
             {done && (
               <Button
-                variant={validated ? "outline" : "default"}
+                variant={validated ? "ghost" : "default"}
                 size="sm"
-                className="h-7 text-xs"
+                className={
+                  validated
+                    ? "h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                    : "h-7 text-xs"
+                }
                 onClick={() => validateM.mutate(!validated)}
                 disabled={validateM.isPending}
+                title={validated ? "Revenir à un score à valider (corriger une erreur)" : "Valider le score définitif"}
               >
                 <ShieldCheck className="h-3 w-3" />
-                {validated ? "Annuler validation" : "Valider"}
+                {validated ? "Dévalider" : "Valider le score"}
               </Button>
             )}
+
             <Button
               variant={disputed ? "destructive" : "ghost"}
               size="sm"
