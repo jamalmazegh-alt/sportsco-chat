@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { computeStandings } from "@/modules/tournaments/lib/standings";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
+import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
+import { mergeRules } from "@/modules/tournaments/lib/rules";
 import {
   resolveScoring,
   formatSets,
@@ -93,6 +95,9 @@ function TvSlideshowPage() {
   const slides = useMemo(() => {
     if (!data) return [] as Slide[];
     const { tournament, groups, teams, matches } = data;
+    const rules = mergeRules((tournament as any).settings);
+    const sponsors = rules.branding.sponsors ?? [];
+    const sponsorsTitle = rules.branding.sponsorsTitle || "Nos partenaires";
     const teamMap = new Map<string, TvTeam>(
       teams.map((t: any) => [t.id, t as TvTeam]),
     );
@@ -168,6 +173,20 @@ function TvSlideshowPage() {
         render: () => (
           <div className="h-full w-full overflow-auto px-2">
             <BracketView matches={matches as any} teams={teams as any} />
+          </div>
+        ),
+      });
+    }
+    if (sponsors.length > 0) {
+      out.push({
+        key: "sponsors",
+        title: sponsorsTitle,
+        icon: <Trophy className="h-7 w-7" />,
+        render: () => (
+          <div className="h-full flex items-center justify-center">
+            <div className="w-full max-w-6xl">
+              <SponsorsStrip sponsors={sponsors} title={sponsorsTitle} />
+            </div>
           </div>
         ),
       });

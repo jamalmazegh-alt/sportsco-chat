@@ -40,6 +40,8 @@ import {
   mergeRules,
   type TournamentRules,
 } from "../lib/rules";
+import type { Sponsor } from "../lib/rules";
+import { SponsorsEditor } from "./SponsorsEditor";
 import type { Tiebreaker } from "../lib/standings";
 import {
   resolveScoring,
@@ -558,36 +560,98 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         <CardHeader>
           <CardTitle className="text-base">Langue & branding</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>Langue du règlement</Label>
-            <Select
-              value={rules.language}
-              onValueChange={(v) =>
-                setRules({ ...rules, language: v as "fr" | "en" })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fr">Français</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-              </SelectContent>
-            </Select>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Langue du règlement</Label>
+              <Select
+                value={rules.language}
+                onValueChange={(v) =>
+                  setRules({ ...rules, language: v as "fr" | "en" })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Organisateur</Label>
+              <Input
+                value={rules.branding.organizerName ?? ""}
+                onChange={(e) =>
+                  setRules({
+                    ...rules,
+                    branding: { ...rules.branding, organizerName: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Couleur d'accent</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="color"
+                  className="h-10 w-14 p-1"
+                  value={rules.branding.primaryColor ?? "#2563eb"}
+                  onChange={(e) =>
+                    setRules({
+                      ...rules,
+                      branding: { ...rules.branding, primaryColor: e.target.value },
+                    })
+                  }
+                />
+                <Input
+                  value={rules.branding.primaryColor ?? ""}
+                  placeholder="#2563eb"
+                  onChange={(e) =>
+                    setRules({
+                      ...rules,
+                      branding: { ...rules.branding, primaryColor: e.target.value },
+                    })
+                  }
+                  maxLength={20}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Titre bloc sponsors</Label>
+              <Input
+                value={rules.branding.sponsorsTitle ?? ""}
+                placeholder="Avec le soutien de nos partenaires"
+                onChange={(e) =>
+                  setRules({
+                    ...rules,
+                    branding: { ...rules.branding, sponsorsTitle: e.target.value },
+                  })
+                }
+                maxLength={120}
+              />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Organisateur</Label>
-            <Input
-              value={rules.branding.organizerName ?? ""}
-              onChange={(e) =>
-                setRules({
-                  ...rules,
-                  branding: { ...rules.branding, organizerName: e.target.value },
-                })
-              }
-            />
-          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sponsors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Sponsors & partenaires</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SponsorsEditor
+            tournamentId={tournamentId}
+            sponsors={rules.branding.sponsors ?? []}
+            onChange={(sponsors: Sponsor[]) =>
+              setRules({
+                ...rules,
+                branding: { ...rules.branding, sponsors },
+              })
+            }
+          />
         </CardContent>
       </Card>
 
