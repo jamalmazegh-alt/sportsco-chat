@@ -2,12 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Trophy, Calendar, MapPin, Loader2, Tv, ListOrdered, Users, GitBranch, CalendarDays } from "lucide-react";
+import { Trophy, Calendar, MapPin, Loader2, Tv, ListOrdered, Users, GitBranch, CalendarDays, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
+import { mergeRules } from "@/modules/tournaments/lib/rules";
+
 
 export const Route = createFileRoute("/t/$slug")({
   component: PublicTournamentPage,
