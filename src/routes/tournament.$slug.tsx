@@ -68,9 +68,15 @@ function PublicTournamentPage() {
     queryKey: ["public-tournament", slug],
     queryFn: () => fn({ data: { slug } }),
     initialData: initial ?? undefined,
-    refetchInterval: 30_000,
+    refetchInterval: (query) => {
+      const d: any = query.state.data;
+      const hasLive = Array.isArray(d?.matches) && d.matches.some((m: any) => m.status === "live");
+      return hasLive ? 10_000 : 30_000;
+    },
   });
   const [tab, setTab] = useState<Tab>("overview");
+  const [teamFilter, setTeamFilter] = useState<string>("all");
+
 
   if (q.isLoading && !q.data) {
     return (
