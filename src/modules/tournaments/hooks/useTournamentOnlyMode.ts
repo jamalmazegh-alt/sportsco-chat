@@ -16,10 +16,14 @@ export function useTournamentOnlyMode(): {
   const { user, memberships } = useAuth();
   const userId = user?.id ?? null;
   const clubIds = memberships.map((m) => m.club_id);
+  const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)
+    ?.signup_role;
+  const isTournamentOrganizer =
+    signupRole === "tournament_organizer" && memberships.length === 0;
 
   const { data, isLoading } = useQuery({
     queryKey: ["tournament-only-mode", userId, clubIds.sort().join(",")],
-    enabled: !!userId,
+    enabled: !!userId && !isTournamentOrganizer,
     staleTime: 60_000,
     queryFn: async () => {
       const [passes, subs] = await Promise.all([
@@ -42,6 +46,8 @@ export function useTournamentOnlyMode(): {
     },
   });
 
-  const tournamentOnly = !!data && data.usedCount > 0 && data.activeSubs === 0;
-  return { isLoading, tournamentOnly };
+  const tournamentOnly =
+    isTournamentOrganizer ||
+    (!!data && data.usedCount > 0 && data.activeSubs === 0);
+  return { isLoading: isLoading && !isTournamentOrganizer, tournamentOnly };
 }

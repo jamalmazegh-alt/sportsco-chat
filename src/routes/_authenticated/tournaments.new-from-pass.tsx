@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SportSelect } from "@/components/sport-select";
+import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 import {
   listMyAvailablePasses,
   createTournamentFromPass,
@@ -95,12 +96,18 @@ function NewFromPassPage() {
         </div>
         <h1 className="mt-5 font-display text-2xl font-bold">Aucun pass disponible</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Vous n'avez pas de pass tournoi actif. Achetez un pass à 40 € pour
-          créer un tournoi sans abonnement.
+          Achetez un pass tournoi à 40 € pour créer votre tournoi. Aucun
+          abonnement requis — un paiement unique par tournoi.
         </p>
-        <Button asChild className="mt-6 h-11">
-          <Link to="/pricing">Voir les offres</Link>
-        </Button>
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <TournamentPassButton
+            variant="default"
+            label="Acheter un pass 40 €"
+          />
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/tournaments">Retour aux tournois</Link>
+          </Button>
+        </div>
       </div>
     );
   }

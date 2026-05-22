@@ -41,12 +41,17 @@ function AuthLayout() {
   const isTournamentOrganizer = signupRole === "tournament_organizer";
 
   if (memberships.length === 0) {
-    // Tournament organizers don't need a club — render the route directly
-    // without the club onboarding screen, consent gate, or onboarding wizard.
+    // Tournament organizers don't need a club — render the route with just
+    // the bottom nav, no club onboarding screen, consent gate, or wizard.
     if (isTournamentOrganizer) {
       return (
-        <div className="min-h-screen bg-background">
-          <Outlet />
+        <div className="min-h-screen bg-background pb-24">
+          <div className="mx-auto max-w-xl">
+            <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+              <Outlet />
+            </div>
+          </div>
+          <BottomNav />
         </div>
       );
     }
