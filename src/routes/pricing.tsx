@@ -12,7 +12,7 @@ export const Route = createFileRoute("/pricing")({
       {
         name: "description",
         content:
-          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€/mois pour le module Tournois seul.",
+          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€ par tournoi pour le module Tournois seul.",
       },
       { property: "og:title", content: "Tarifs — Clubero" },
       {
@@ -154,15 +154,15 @@ function PricingPage() {
               <div className="mt-6">
                 <div className="flex items-baseline gap-2">
                   <span className="font-display text-5xl font-bold">40 €</span>
-                  <span className="text-muted-foreground">{t("pricing.priceMonthly")}</span>
+                  <span className="text-muted-foreground">/ tournoi</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Accès au module Clubero Tournaments uniquement.
+                  Paiement à l'événement. Aucun abonnement, accès au module Clubero Tournaments pour un tournoi.
                 </p>
               </div>
 
               <Button asChild variant="outline" className="mt-6 w-full h-11">
-                <Link to="/register">Démarrer</Link>
+                <Link to="/register">Créer un tournoi</Link>
               </Button>
 
               <ul className="mt-8 grid grid-cols-1 gap-2.5">

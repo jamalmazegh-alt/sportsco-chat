@@ -35,7 +35,7 @@ Connaissance produit :
 Tarifs :
 - Découverte : essai gratuit de 30 jours sans carte bancaire, 1 équipe, jusqu'à 25 membres.
 - Club : 49 €/mois (ou 490 €/an, 2 mois offerts), équipes et membres illimités, mur, stats, exports, module Tournois inclus, support prioritaire.
-- Tournois seul : 40 €/mois pour les organisateurs hors club Clubero (accès au module Clubero Tournaments uniquement).
+- Tournois seul : 40 € par tournoi (paiement à l'événement, sans abonnement) pour les organisateurs hors club Clubero.
 - Fédération : sur mesure (multi-clubs, SSO, onboarding dédié, SLA).
 
 Process démo :
