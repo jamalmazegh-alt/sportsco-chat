@@ -208,6 +208,16 @@ function TournamentDetailPage() {
             Seuls les admins et dirigeants peuvent configurer le format.
           </p>
         )}
+        {tab === "fields" && canManage && (
+          <FieldsManager
+            tournamentId={tournament.id}
+            fields={(tournament as any).fields}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            matches={matches as any}
+            teams={teams as any}
+          />
+        )}
         {tab === "matches" && (
           <MatchesList
             tournamentId={tournament.id}
