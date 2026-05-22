@@ -847,3 +847,168 @@ export const updateMatchSchedule = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     return { match: row };
   });
+
+// ---------- Tournament rules (jsonb settings)
+
+export const updateTournamentRules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        rules: z.record(z.string(), z.any()),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const merged = mergeRules(data.rules);
+    const patch: Record<string, unknown> = {
+      settings: merged,
+      points_win: merged.points.win,
+      points_draw: merged.points.draw,
+      points_loss: merged.points.loss,
+      tiebreakers: merged.tiebreakers,
+    };
+    const { error } = await supabase
+      .from("tournaments")
+      .update(patch)
+      .eq("id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { rules: merged };
+  });
+
+// ---------- Match validation & dispute
+
+export const validateMatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        validated: z.boolean(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { error } = await supabase
+      .from("tournament_matches")
+      .update({
+        validated_at: data.validated ? new Date().toISOString() : null,
+        validated_by: data.validated ? userId : null,
+      })
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+export const setMatchDispute = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        dispute: z.boolean(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { error } = await supabase
+      .from("tournament_matches")
+      .update({ dispute_flag: data.dispute })
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+// ---------- Match events (cards, goals)
+
+export const recordMatchEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        team_id: z.string().uuid().nullable().optional(),
+        kind: z.enum([
+          "goal",
+          "own_goal",
+          "assist",
+          "yellow_card",
+          "red_card",
+          "second_yellow",
+          "penalty",
+          "foul",
+        ]),
+        player_name: z.string().max(120).nullable().optional(),
+        minute: z.number().int().min(0).max(200).nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { data: row, error } = await supabase
+      .from("tournament_match_events")
+      .insert({
+        tournament_id: data.tournament_id,
+        match_id: data.match_id,
+        team_id: data.team_id ?? null,
+        kind: data.kind,
+        player_name: data.player_name ?? null,
+        minute: data.minute ?? null,
+        created_by: userId,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { event: row };
+  });
+
+export const deleteMatchEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        event_id: z.string().uuid(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { error } = await supabase
+      .from("tournament_match_events")
+      .delete()
+      .eq("id", data.event_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+export const listMatchEvents = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { tournament_id: string }) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("tournament_match_events")
+      .select("*")
+      .eq("tournament_id", data.tournament_id)
+      .order("created_at");
+    if (error) throw error;
+    return { events: rows ?? [] };
+  });
