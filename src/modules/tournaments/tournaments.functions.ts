@@ -1163,3 +1163,150 @@ export const listTournamentDocuments = createServerFn({ method: "POST" })
     if (error) throw error;
     return { documents: rows ?? [] };
   });
+
+// ---------- Team roster (players)
+
+const playerInput = z.object({
+  first_name: z.string().min(1).max(80),
+  last_name: z.string().min(1).max(80),
+  jersey_number: z.number().int().min(0).max(999).nullable().optional(),
+  position: z.string().max(40).nullable().optional(),
+  is_captain: z.boolean().optional(),
+  birth_date: z.string().nullable().optional(),
+  license_number: z.string().max(60).nullable().optional(),
+});
+
+export const listTeamPlayers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ tournament_team_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("tournament_team_players")
+      .select("*")
+      .eq("tournament_team_id", data.tournament_team_id)
+      .order("jersey_number", { nullsFirst: false })
+      .order("last_name");
+    if (error) throw error;
+    return { players: rows ?? [] };
+  });
+
+export const upsertTeamPlayer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_team_id: z.string().uuid(),
+        player_id: z.string().uuid().optional(),
+        patch: playerInput,
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    // fetch tournament_id from team
+    const { data: tt, error: tErr } = await supabase
+      .from("tournament_teams")
+      .select("tournament_id")
+      .eq("id", data.tournament_team_id)
+      .maybeSingle();
+    if (tErr) throw tErr;
+    if (!tt) throw new Error("Team not found");
+
+    const payload = {
+      tournament_team_id: data.tournament_team_id,
+      tournament_id: tt.tournament_id,
+      first_name: data.patch.first_name.trim(),
+      last_name: data.patch.last_name.trim(),
+      jersey_number: data.patch.jersey_number ?? null,
+      position: data.patch.position?.trim() || null,
+      is_captain: !!data.patch.is_captain,
+      birth_date: data.patch.birth_date || null,
+      license_number: data.patch.license_number?.trim() || null,
+    };
+
+    if (data.player_id) {
+      const { data: row, error } = await supabase
+        .from("tournament_team_players")
+        .update(payload)
+        .eq("id", data.player_id)
+        .select()
+        .single();
+      if (error) throw error;
+      return { player: row };
+    } else {
+      const { data: row, error } = await supabase
+        .from("tournament_team_players")
+        .insert(payload)
+        .select()
+        .single();
+      if (error) throw error;
+      return { player: row };
+    }
+  });
+
+export const deleteTeamPlayer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ player_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("tournament_team_players")
+      .delete()
+      .eq("id", data.player_id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const bulkImportTeamPlayers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_team_id: z.string().uuid(),
+        replace: z.boolean().optional(),
+        players: z.array(playerInput).min(1).max(100),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: tt, error: tErr } = await supabase
+      .from("tournament_teams")
+      .select("tournament_id")
+      .eq("id", data.tournament_team_id)
+      .maybeSingle();
+    if (tErr) throw tErr;
+    if (!tt) throw new Error("Team not found");
+
+    if (data.replace) {
+      const { error: delErr } = await supabase
+        .from("tournament_team_players")
+        .delete()
+        .eq("tournament_team_id", data.tournament_team_id);
+      if (delErr) throw delErr;
+    }
+
+    const rows = data.players.map((p) => ({
+      tournament_team_id: data.tournament_team_id,
+      tournament_id: tt.tournament_id,
+      first_name: p.first_name.trim(),
+      last_name: p.last_name.trim(),
+      jersey_number: p.jersey_number ?? null,
+      position: p.position?.trim() || null,
+      is_captain: !!p.is_captain,
+      birth_date: p.birth_date || null,
+      license_number: p.license_number?.trim() || null,
+    }));
+
+    const { data: inserted, error } = await supabase
+      .from("tournament_team_players")
+      .insert(rows)
+      .select("id");
+    if (error) throw error;
+    return { inserted: inserted?.length ?? 0 };
+  });
