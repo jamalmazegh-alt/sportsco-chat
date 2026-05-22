@@ -274,36 +274,37 @@ export function DrawDialog({
   function runManual() {
     if (drawMode === "groups") {
       const assignments: { team_id: string; group_index: number }[] = [];
-      for (const t of teams) {
-        const g = manualAssign[t.id];
+      for (const team of teams) {
+        const g = manualAssign[team.id];
         if (g === null || g === undefined) {
-          toast.error(`Place toutes les équipes (${t.name} manque)`);
+          toast.error(t("draw.missingTeamError", { name: team.name }));
           return;
         }
-        assignments.push({ team_id: t.id, group_index: g });
+        assignments.push({ team_id: team.id, group_index: g });
       }
       applyMut.mutate({ mode: "groups", assignments });
     } else {
       // Use slotIndex as bracket position (0..numSlots-1)
       const ordered: (string | null)[] = Array.from({ length: teams.length }, () => null);
       const used = new Set<number>();
-      for (const t of teams) {
-        const slot = manualAssign[t.id];
+      for (const team of teams) {
+        const slot = manualAssign[team.id];
         if (slot === null || slot === undefined) {
-          toast.error(`Place toutes les équipes (${t.name} manque)`);
+          toast.error(t("draw.missingTeamError", { name: team.name }));
           return;
         }
         if (used.has(slot)) {
-          toast.error("Deux équipes ne peuvent pas occuper la même position");
+          toast.error(t("draw.duplicatePositionError"));
           return;
         }
         used.add(slot);
-        ordered[slot] = t.id;
+        ordered[slot] = team.id;
       }
       const order = ordered.filter((x): x is string => x !== null);
       applyMut.mutate({ mode: "knockout", bracket_order: order });
     }
   }
+
 
   // ---------- Render
   const slotsArray = Array.from({ length: numSlots }, (_, i) => i);
