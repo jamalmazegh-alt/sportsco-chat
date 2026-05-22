@@ -420,7 +420,7 @@ function EditTeamDialog({
   const [editSeed, setEditSeed] = useState(team.seed ? String(team.seed) : "");
   const [editLogo, setEditLogo] = useState<Attachment[]>(
     team.logo_url
-      ? [{ url: team.logo_url, name: "logo", mime_type: "image/*", size: 0 } as any]
+      ? [{ url: team.logo_url, path: "", name: "logo", type: "image/*", size: 0 }]
       : [],
   );
 
