@@ -408,6 +408,14 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
           updateFn={updateFn}
         />
       )}
+
+      {rosterTeam && (
+        <TeamRosterDialog
+          tournamentTeamId={rosterTeam.id}
+          teamName={rosterTeam.name}
+          onClose={() => setRosterTeam(null)}
+        />
+      )}
     </div>
   );
 }
