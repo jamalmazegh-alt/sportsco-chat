@@ -6,6 +6,8 @@ import enMarketing from "@/locales/en/marketing.json";
 import frMarketing from "@/locales/fr/marketing.json";
 import enSupport from "@/locales/en/support.json";
 import frSupport from "@/locales/fr/support.json";
+import enTournaments from "@/locales/en/tournaments.json";
+import frTournaments from "@/locales/fr/tournaments.json";
 
 function detectBrowserLang(): "fr" | "en" {
   if (typeof navigator === "undefined") return "en";
@@ -19,13 +21,23 @@ function detectBrowserLang(): "fr" | "en" {
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources: {
-      en: { common: enCommon, marketing: enMarketing, support: enSupport },
-      fr: { common: frCommon, marketing: frMarketing, support: frSupport },
+      en: {
+        common: enCommon,
+        marketing: enMarketing,
+        support: enSupport,
+        tournaments: enTournaments,
+      },
+      fr: {
+        common: frCommon,
+        marketing: frMarketing,
+        support: frSupport,
+        tournaments: frTournaments,
+      },
     },
     lng: "en",
     fallbackLng: "en",
     defaultNS: "common",
-    ns: ["common", "marketing", "support"],
+    ns: ["common", "marketing", "support", "tournaments"],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });
