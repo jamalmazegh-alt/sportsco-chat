@@ -170,12 +170,13 @@ export function DrawDialog({
       });
     },
     onSuccess: () => {
-      toast.success("Tirage au sort terminé");
+      toast.success(t("draw.doneToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       setFinished(true);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur lors du tirage"),
+    onError: (e: any) => toast.error(e?.message ?? t("draw.errorToast")),
   });
+
 
   // ---------- Build a randomized auto-distribution
   function buildRandomAssignments(): { team_id: string; group_index: number }[] {
