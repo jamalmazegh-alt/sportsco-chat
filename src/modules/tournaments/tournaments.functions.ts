@@ -240,7 +240,20 @@ export const addTournamentTeam = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => addTeamSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+    const { count } = await supabase
+      .from("tournament_teams")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (
+      typeof tournament.num_teams === "number" &&
+      (count ?? 0) >= tournament.num_teams
+    ) {
+      throw new Response(
+        `Limite atteinte : ce tournoi est configuré pour ${tournament.num_teams} équipes.`,
+        { status: 400 },
+      );
+    }
     const { data: row, error } = await supabase
       .from("tournament_teams")
       .insert({
