@@ -882,7 +882,7 @@ function MatchCard({
 
           <Button
             onClick={() => save.mutate()}
-            disabled={save.isPending || (setsMode && sets.length === 0)}
+            disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
             className="w-full h-12"
           >
             {save.isPending ? (
