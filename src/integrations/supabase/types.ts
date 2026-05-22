@@ -1591,6 +1591,7 @@ export type Database = {
           scheduled_at: string | null
           score_a: number | null
           score_b: number | null
+          sets: Json | null
           status: Database["public"]["Enums"]["tournament_match_status"]
           team_a_id: string | null
           team_a_source: Json | null
@@ -1621,6 +1622,7 @@ export type Database = {
           scheduled_at?: string | null
           score_a?: number | null
           score_b?: number | null
+          sets?: Json | null
           status?: Database["public"]["Enums"]["tournament_match_status"]
           team_a_id?: string | null
           team_a_source?: Json | null
@@ -1651,6 +1653,7 @@ export type Database = {
           scheduled_at?: string | null
           score_a?: number | null
           score_b?: number | null
+          sets?: Json | null
           status?: Database["public"]["Enums"]["tournament_match_status"]
           team_a_id?: string | null
           team_a_source?: Json | null
