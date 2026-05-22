@@ -110,6 +110,23 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
     eventsByMatch.get(ev.match_id)!.push(ev);
   }
 
+  // Accepted referees (with a user account) — used to populate the per-match selector.
+  const collabFn = useServerFn(listTournamentCollaborators);
+  const collabQ = useQuery({
+    queryKey: ["tournament-collaborators", tournamentId],
+    queryFn: () => collabFn({ data: { tournament_id: tournamentId } }),
+    enabled: !!canManage,
+  });
+  const refereeOptions: RefereeOption[] = ((collabQ.data?.collaborators ?? []) as any[])
+    .filter(
+      (c) =>
+        c.role === "referee" && !!c.accepted_at && !c.revoked_at && !!c.user_id,
+    )
+    .map((c) => ({
+      user_id: c.user_id as string,
+      label: (c.display_name as string | null) || (c.email as string),
+    }));
+
   return (
     <div className="space-y-5">
       {Object.entries(grouped).map(([round, ms]) => (
@@ -129,6 +146,7 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
                 fields={fields ?? []}
                 events={eventsByMatch.get(m.id) ?? []}
                 scoring={scoring}
+                refereeOptions={refereeOptions}
               />
             ))}
           </ul>
