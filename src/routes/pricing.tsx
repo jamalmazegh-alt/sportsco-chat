@@ -3,6 +3,7 @@ import { Check, Sparkles, Building2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
@@ -161,9 +162,10 @@ function PricingPage() {
                 </p>
               </div>
 
-              <Button asChild variant="outline" className="mt-6 w-full h-11">
-                <Link to="/register">Créer un tournoi</Link>
-              </Button>
+              <TournamentPassButton
+                className="mt-6 w-full h-11"
+                label="Acheter un pass tournoi"
+              />
 
               <ul className="mt-8 grid grid-cols-1 gap-2.5">
                 {TOURNAMENTS_FEATURES.map((f) => (

@@ -119,6 +119,33 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
           switch (event.type) {
             case "checkout.session.completed": {
               const session = event.data.object as Stripe.Checkout.Session;
+              // Tournament Pass: one-time payment, no subscription
+              if (
+                session.mode === "payment" &&
+                session.metadata?.purpose === "tournament_pass"
+              ) {
+                const paymentIntentId =
+                  typeof session.payment_intent === "string"
+                    ? session.payment_intent
+                    : session.payment_intent?.id ?? null;
+                const buyerEmail =
+                  session.customer_details?.email ??
+                  session.metadata?.email ??
+                  null;
+                if (buyerEmail) {
+                  await supabaseAdmin
+                    .from("tournament_passes")
+                    .update({
+                      status: "paid",
+                      stripe_payment_intent_id: paymentIntentId,
+                      amount_total: session.amount_total ?? 4000,
+                      currency: session.currency ?? "eur",
+                      paid_at: new Date().toISOString(),
+                    })
+                    .eq("stripe_session_id", session.id);
+                }
+                break;
+              }
               if (session.subscription) {
                 const subId =
                   typeof session.subscription === "string"
