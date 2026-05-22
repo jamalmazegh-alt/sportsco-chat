@@ -192,7 +192,15 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Seed</Label>
+                <Label className="flex items-center gap-1.5">
+                  Seed
+                  <span
+                    className="text-muted-foreground"
+                    title="Le seed (tête de série) indique le classement de départ. Seed 1 = meilleure équipe ; elle est placée pour ne rencontrer le seed 2 qu'en finale."
+                  >
+                    <HelpCircle className="h-3.5 w-3.5" />
+                  </span>
+                </Label>
                 <Input
                   type="number"
                   min={1}
@@ -201,6 +209,7 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
                   placeholder="1"
                 />
               </div>
+
             </div>
 
             <Button type="submit" className="w-full" disabled={add.isPending}>
