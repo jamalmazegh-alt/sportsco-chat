@@ -39,6 +39,7 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState<TeamRow | null>(null);
+  const [rosterTeam, setRosterTeam] = useState<TeamRow | null>(null);
   const [mode, setMode] = useState<"external" | "internal">("external");
   const [name, setName] = useState("");
   const [shortName, setShortName] = useState("");
