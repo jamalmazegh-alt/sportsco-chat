@@ -44,7 +44,6 @@ type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket"
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
-  const canManage = role === "admin" || (role as string) === "dirigeant";
 
   const getFn = useServerFn(getTournament);
   const updateFn = useServerFn(updateTournament);
