@@ -64,6 +64,23 @@ export function TournamentRulesEditor({ tournamentId, settings }: Props) {
     onSuccess: () => {
       toast.success("Règles enregistrées");
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+  const genPdfFn = useServerFn(generateRulesPdf);
+  const listDocsFn = useServerFn(listTournamentDocuments);
+  const docsQuery = useQuery({
+    queryKey: ["tournament-documents", tournamentId],
+    queryFn: () => listDocsFn({ data: { tournament_id: tournamentId } }),
+  });
+  const generate = useMutation({
+    mutationFn: () => genPdfFn({ data: { tournament_id: tournamentId } }),
+    onSuccess: (res: any) => {
+      toast.success("Règlement PDF généré");
+      qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
+      if (res?.document?.file_url) window.open(res.document.file_url, "_blank");
     },
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
