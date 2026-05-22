@@ -464,8 +464,9 @@ export function DrawDialog({
                       {/* Roulette */}
                       <div className="rounded-xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 text-center overflow-hidden">
                         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-                          Équipe en cours
+                          {t("draw.currentTeam")}
                         </p>
+
                         <div className="relative h-20 flex items-center justify-center">
                           <div
                             key={`${rouletteIdx}-${pool.length}`}
