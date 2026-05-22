@@ -241,14 +241,47 @@ function PublicTournamentPage() {
           </div>
         </nav>
 
-        <div className="py-5">
+        <div className="py-5 space-y-4">
+          {(tab === "overview" || tab === "matches") && teams.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <label className="text-xs text-muted-foreground">Filtrer par équipe</label>
+              <select
+                value={teamFilter}
+                onChange={(e) => setTeamFilter(e.target.value)}
+                className="text-sm rounded-md border border-input bg-background px-2 py-1"
+              >
+                <option value="all">Toutes les équipes</option>
+                {(teams as any[])
+                  .slice()
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
           {tab === "overview" && (
-            <Overview groups={groups} teams={teams} matches={matches} scoring={scoring} />
+            <Overview
+              groups={groups}
+              teams={teams}
+              matches={filteredMatches}
+              scoring={scoring}
+              eventsByMatch={eventsByMatch}
+            />
           )}
           {tab === "teams" && <TeamsGrid teams={teams as any} />}
           {tab === "matches" && (
-            <PublicMatches matches={matches as any} teams={teams as any} scoring={scoring} />
+            <PublicMatches
+              matches={filteredMatches as any}
+              teams={teams as any}
+              scoring={scoring}
+              eventsByMatch={eventsByMatch}
+            />
           )}
+
           {tab === "standings" && (
             <PublicStandings
               groups={groups as any}
