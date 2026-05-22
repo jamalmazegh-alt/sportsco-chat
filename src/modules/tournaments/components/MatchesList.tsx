@@ -197,6 +197,7 @@ function MatchCard({
   fields,
   events,
   scoring,
+  refereeOptions,
 }: {
   match: Match;
   tournamentId: string;
@@ -206,6 +207,7 @@ function MatchCard({
   fields: string[];
   events: MatchEvent[];
   scoring?: ScoringRules;
+  refereeOptions: RefereeOption[];
 }) {
   const setsMode = scoring?.mode === "sets";
   const setsRules = scoring?.sets ?? DEFAULT_SETS_RULES;
