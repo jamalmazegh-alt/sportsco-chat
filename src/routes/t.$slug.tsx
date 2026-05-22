@@ -2,12 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Trophy, Calendar, MapPin, Loader2, Tv, ListOrdered, Users, GitBranch, CalendarDays } from "lucide-react";
+import { Trophy, Calendar, MapPin, Loader2, Tv, ListOrdered, Users, GitBranch, CalendarDays, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
+import { mergeRules } from "@/modules/tournaments/lib/rules";
+
 
 export const Route = createFileRoute("/t/$slug")({
   component: PublicTournamentPage,
@@ -65,6 +67,14 @@ function PublicTournamentPage() {
 
 
   const { tournament, groups, teams, matches } = q.data;
+  const rules = mergeRules((tournament as any).settings);
+  const now = Date.now();
+  const opens = rules.registration.opensAt ? new Date(rules.registration.opensAt).getTime() : null;
+  const closes = rules.registration.closesAt ? new Date(rules.registration.closesAt).getTime() : null;
+  const registrationOpen =
+    rules.registration.enabled &&
+    (opens === null || now >= opens) &&
+    (closes === null || now <= closes);
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "overview", label: "Aperçu", icon: CalendarDays },
@@ -115,16 +125,27 @@ function PublicTournamentPage() {
                   </p>
                 </div>
               </div>
-              <Button asChild size="sm" variant="outline">
-                <Link to="/t/$slug/tv" params={{ slug }}>
-                  <Tv className="h-4 w-4" />
-                  TV
-                </Link>
-              </Button>
+              <div className="flex flex-col gap-2 shrink-0">
+                {registrationOpen && (
+                  <Button asChild size="sm">
+                    <Link to="/t/$slug/register" params={{ slug }}>
+                      <UserPlus className="h-4 w-4" />
+                      S'inscrire
+                    </Link>
+                  </Button>
+                )}
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/t/$slug/tv" params={{ slug }}>
+                    <Tv className="h-4 w-4" />
+                    TV
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
 
       <div className="max-w-3xl mx-auto px-5 mt-5">
         <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
