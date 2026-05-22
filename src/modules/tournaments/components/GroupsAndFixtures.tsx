@@ -179,11 +179,17 @@ export function GroupsAndFixtures({
           fields: fl,
           lunch_start_time: lunchEnabled ? lunchStart : undefined,
           lunch_end_time: lunchEnabled ? lunchEnd : undefined,
+          min_rest_min: minRest,
         },
       });
     },
     onSuccess: (res: any) => {
-      toast.success(`${res.scheduled} matchs programmés`);
+      const skipped = res?.skipped ?? 0;
+      toast.success(
+        skipped > 0
+          ? `${res.scheduled} matchs programmés · ${skipped} non placés (contrainte de repos)`
+          : `${res.scheduled} matchs programmés`,
+      );
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
