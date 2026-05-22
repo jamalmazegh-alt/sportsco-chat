@@ -588,6 +588,8 @@ export const autoScheduleMatches = createServerFn({ method: "POST" })
         match_duration_min: z.number().int().min(1).max(240),
         break_min: z.number().int().min(0).max(120),
         fields: z.array(z.string().min(1).max(60)).min(1).max(20),
+        lunch_start_time: z.string().optional(), // HH:MM
+        lunch_end_time: z.string().optional(), // HH:MM
       })
       .parse(input),
   )
