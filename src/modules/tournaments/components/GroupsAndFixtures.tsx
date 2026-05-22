@@ -80,7 +80,7 @@ export function GroupsAndFixtures({
     setPause(breakMin ?? 5);
     setStartTime(dailyStartTime ?? "09:00");
     setEndTime(dailyEndTime ?? "18:00");
-    setFieldsList(fields && fields.length ? fields : ["Terrain 1"]);
+    setFieldsList(fields && fields.length ? fields : [t("groups.defaultFieldName")]);
     setLunchEnabled(!!settings?.lunch_start);
     setLunchStart(settings?.lunch_start ?? "12:00");
     setLunchEnd(settings?.lunch_end ?? "13:30");
