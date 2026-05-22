@@ -40,6 +40,16 @@ export interface RegistrationRules {
   publicMessage?: string;
 }
 
+export type SponsorTier = "main" | "gold" | "silver" | "partner";
+
+export interface Sponsor {
+  id: string;
+  name: string;
+  logo_url: string;
+  website?: string | null;
+  tier: SponsorTier;
+}
+
 export interface TournamentRules {
   points: PointsConfig;
   tiebreakers: Tiebreaker[];
@@ -52,7 +62,12 @@ export interface TournamentRules {
   registration: RegistrationRules;
   scoring?: ScoringRules;
   language: TournamentLanguage;
-  branding: { primaryColor?: string; organizerName?: string };
+  branding: {
+    primaryColor?: string;
+    organizerName?: string;
+    sponsors?: Sponsor[];
+    sponsorsTitle?: string;
+  };
 }
 
 export const DEFAULT_RULES: TournamentRules = {
