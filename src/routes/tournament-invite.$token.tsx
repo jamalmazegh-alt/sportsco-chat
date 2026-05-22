@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation, Trans } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Loader2, ShieldCheck, Flag, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ function AcceptInvitePage() {
   const { token } = Route.useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation("tournaments");
   const getFn = useServerFn(getTournamentInviteByToken);
   const acceptFn = useServerFn(acceptTournamentInvite);
 
@@ -28,12 +30,12 @@ function AcceptInvitePage() {
 
   const accept = useMutation({
     mutationFn: () => acceptFn({ data: { token } }),
-    onSuccess: (res: any) => {
-      toast.success("Invitation acceptée");
+    onSuccess: () => {
+      toast.success(t("invite.accepted"));
       const slug = (q.data?.invite as any)?.tournament_slug;
       if (slug) navigate({ to: `/tournament/${slug}` });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
 
   if (q.isLoading) {
@@ -56,10 +58,8 @@ function AcceptInvitePage() {
   if (!invite) {
     return (
       <div className="max-w-md mx-auto p-6 text-center space-y-3">
-        <h1 className="text-xl font-semibold">Invitation invalide</h1>
-        <p className="text-sm text-muted-foreground">
-          Ce lien d'invitation n'existe pas ou a été supprimé.
-        </p>
+        <h1 className="text-xl font-semibold">{t("invite.invalidTitle")}</h1>
+        <p className="text-sm text-muted-foreground">{t("invite.invalidBody")}</p>
       </div>
     );
   }
@@ -67,17 +67,17 @@ function AcceptInvitePage() {
   if (invite.revoked) {
     return (
       <div className="max-w-md mx-auto p-6 text-center space-y-3">
-        <h1 className="text-xl font-semibold">Invitation révoquée</h1>
-        <p className="text-sm text-muted-foreground">
-          Cette invitation a été annulée par l'organisateur.
-        </p>
+        <h1 className="text-xl font-semibold">{t("invite.revokedTitle")}</h1>
+        <p className="text-sm text-muted-foreground">{t("invite.revokedBody")}</p>
       </div>
     );
   }
 
   const Icon = invite.role === "co_organizer" ? ShieldCheck : Flag;
   const roleLabel =
-    invite.role === "co_organizer" ? "Co-organisateur" : "Arbitre";
+    invite.role === "co_organizer"
+      ? t("invite.roleCoOrganizer")
+      : t("invite.roleReferee");
 
   return (
     <div className="max-w-md mx-auto p-6 space-y-5">
@@ -85,35 +85,40 @@ function AcceptInvitePage() {
         <Icon className="h-7 w-7 text-primary" />
       </div>
       <div className="text-center space-y-1.5">
-        <h1 className="text-xl font-semibold">Invitation au tournoi</h1>
+        <h1 className="text-xl font-semibold">{t("invite.heading")}</h1>
         <p className="text-sm text-muted-foreground">
-          Tu es invité·e en tant que <strong>{roleLabel.toLowerCase()}</strong> pour
+          <Trans
+            i18nKey="invite.intro"
+            t={t}
+            values={{ role: roleLabel.toLowerCase() }}
+            components={{ 1: <strong /> }}
+          />
         </p>
         <p className="text-base font-medium">{invite.tournament_name}</p>
-        <p className="text-xs text-muted-foreground">Adresse invitée : {invite.email}</p>
+        <p className="text-xs text-muted-foreground">
+          {t("invite.invitedEmail", { email: invite.email })}
+        </p>
       </div>
 
       {invite.accepted ? (
         <div className="rounded-xl border border-border bg-card p-4 text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 text-sm text-emerald-700 dark:text-emerald-400">
             <CheckCircle2 className="h-4 w-4" />
-            Invitation déjà acceptée
+            {t("invite.alreadyAccepted")}
           </div>
           <Button asChild className="w-full">
             <Link to={`/tournament/${invite.tournament_slug}`}>
-              Voir le tournoi
+              {t("invite.viewTournament")}
             </Link>
           </Button>
         </div>
       ) : !user ? (
         <div className="space-y-2">
           <p className="text-sm text-center text-muted-foreground">
-            Connecte-toi pour accepter cette invitation.
+            {t("invite.loginPrompt")}
           </p>
           <Button asChild className="w-full">
-            <Link to="/login">
-              Se connecter
-            </Link>
+            <Link to="/login">{t("invite.signIn")}</Link>
           </Button>
         </div>
       ) : (
@@ -125,7 +130,7 @@ function AcceptInvitePage() {
           {accept.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            "Accepter l'invitation"
+            t("invite.accept")
           )}
         </Button>
       )}
