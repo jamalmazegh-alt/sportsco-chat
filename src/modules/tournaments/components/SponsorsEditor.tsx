@@ -78,9 +78,15 @@ export function SponsorsEditor({ tournamentId, sponsors, onChange }: Props) {
     }
   };
 
+  // Édition locale (sans persistance) — utilisée pendant la frappe.
+  const updateLocal = (id: string, patch: Partial<Sponsor>) => {
+    onChange(sponsors.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+  // Édition + persistance immédiate — pour tier, blur, suppression.
   const updateSponsor = (id: string, patch: Partial<Sponsor>) => {
     commit(sponsors.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   };
+
   const removeSponsor = (id: string) => {
     const target = sponsors.find((s) => s.id === id);
     commit(sponsors.filter((s) => s.id !== id));
