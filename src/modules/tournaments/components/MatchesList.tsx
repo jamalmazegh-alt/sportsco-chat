@@ -27,6 +27,7 @@ import {
   ChevronDown,
   Plus,
   Trash2,
+  Flag,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -38,6 +39,8 @@ import {
   recordMatchEvent,
   deleteMatchEvent,
   listMatchEvents,
+  listTournamentCollaborators,
+  assignMatchReferee,
 } from "../tournaments.functions";
 
 import type { ScoringRules, SetScore } from "../lib/formats";
@@ -64,6 +67,8 @@ interface Match {
   field?: string | null;
   validated_at?: string | null;
   dispute_flag?: boolean | null;
+  referee_user_id?: string | null;
+  referee_name?: string | null;
 }
 interface MatchEvent {
   id: string;
@@ -72,6 +77,10 @@ interface MatchEvent {
   kind: string;
   player_name: string | null;
   minute: number | null;
+}
+interface RefereeOption {
+  user_id: string;
+  label: string;
 }
 
 interface Props {
@@ -102,6 +111,23 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
     eventsByMatch.get(ev.match_id)!.push(ev);
   }
 
+  // Accepted referees (with a user account) — used to populate the per-match selector.
+  const collabFn = useServerFn(listTournamentCollaborators);
+  const collabQ = useQuery({
+    queryKey: ["tournament-collaborators", tournamentId],
+    queryFn: () => collabFn({ data: { tournament_id: tournamentId } }),
+    enabled: !!canManage,
+  });
+  const refereeOptions: RefereeOption[] = ((collabQ.data?.collaborators ?? []) as any[])
+    .filter(
+      (c) =>
+        c.role === "referee" && !!c.accepted_at && !c.revoked_at && !!c.user_id,
+    )
+    .map((c) => ({
+      user_id: c.user_id as string,
+      label: (c.display_name as string | null) || (c.email as string),
+    }));
+
   return (
     <div className="space-y-5">
       {Object.entries(grouped).map(([round, ms]) => (
@@ -121,6 +147,7 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
                 fields={fields ?? []}
                 events={eventsByMatch.get(m.id) ?? []}
                 scoring={scoring}
+                refereeOptions={refereeOptions}
               />
             ))}
           </ul>
@@ -171,6 +198,7 @@ function MatchCard({
   fields,
   events,
   scoring,
+  refereeOptions,
 }: {
   match: Match;
   tournamentId: string;
@@ -180,6 +208,7 @@ function MatchCard({
   fields: string[];
   events: MatchEvent[];
   scoring?: ScoringRules;
+  refereeOptions: RefereeOption[];
 }) {
   const setsMode = scoring?.mode === "sets";
   const setsRules = scoring?.sets ?? DEFAULT_SETS_RULES;
@@ -308,6 +337,36 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
+  // Referee assignment
+  const refFn = useServerFn(assignMatchReferee);
+  const initialRefValue = match.referee_user_id
+    ? `user:${match.referee_user_id}`
+    : match.referee_name
+      ? "free"
+      : "__none__";
+  const [refMode, setRefMode] = useState<string>(initialRefValue);
+  const [refFreeName, setRefFreeName] = useState<string>(match.referee_name ?? "");
+  const saveRef = useMutation({
+    mutationFn: () => {
+      let payload: { referee_user_id: string | null; referee_name: string | null };
+      if (refMode === "__none__") {
+        payload = { referee_user_id: null, referee_name: null };
+      } else if (refMode === "free") {
+        payload = { referee_user_id: null, referee_name: refFreeName.trim() || null };
+      } else {
+        payload = { referee_user_id: refMode.replace(/^user:/, ""), referee_name: null };
+      }
+      return refFn({
+        data: { tournament_id: tournamentId, match_id: match.id, ...payload },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Arbitre mis à jour");
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
   // Add event form
   const [evTeam, setEvTeam] = useState<string>(match.team_a_id ?? "");
   const [evKind, setEvKind] = useState<string>("yellow_card");
@@ -363,6 +422,14 @@ function MatchCard({
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {match.field}
+              </span>
+            )}
+            {(match.referee_user_id || match.referee_name) && (
+              <span className="inline-flex items-center gap-1">
+                <Flag className="h-3 w-3" />
+                {match.referee_name ||
+                  refereeOptions.find((r) => r.user_id === match.referee_user_id)?.label ||
+                  "Arbitre"}
               </span>
             )}
             {done && !validated && (
@@ -730,8 +797,50 @@ function MatchCard({
             </div>
           </div>
           <Button onClick={() => saveSched.mutate()} disabled={saveSched.isPending} className="w-full">
-            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer terrain & heure"}
           </Button>
+
+          <div className="pt-4 border-t border-border space-y-3">
+            <div className="space-y-1.5">
+              <Label>Arbitre</Label>
+              <Select value={refMode} onValueChange={setRefMode}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Aucun</SelectItem>
+                  {refereeOptions.map((r) => (
+                    <SelectItem key={r.user_id} value={`user:${r.user_id}`}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="free">Nom libre…</SelectItem>
+                </SelectContent>
+              </Select>
+              {refMode === "free" && (
+                <Input
+                  className="mt-2"
+                  value={refFreeName}
+                  onChange={(e) => setRefFreeName(e.target.value)}
+                  placeholder="Nom de l'arbitre"
+                />
+              )}
+              {refereeOptions.length === 0 && refMode !== "free" && refMode !== "__none__" && (
+                <p className="text-[11px] text-muted-foreground">
+                  Aucun arbitre n'a encore accepté son invitation.
+                </p>
+              )}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => saveRef.mutate()}
+              disabled={saveRef.isPending || (refMode === "free" && !refFreeName.trim())}
+            >
+              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Assigner l'arbitre"}
+            </Button>
+          </div>
         </div>
       </ResponsiveFormDialog>
     </li>
