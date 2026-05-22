@@ -3,8 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { slugify, shortRandomSuffix } from "./lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
-import { computeStandings, type Tiebreaker } from "./lib/standings";
+import { computeStandings, type Tiebreaker, type MatchEventInput } from "./lib/standings";
 import { generateKnockoutBracket } from "./lib/bracket";
+import { mergeRules, DEFAULT_RULES } from "./lib/rules";
+import { selectQualified } from "./lib/qualification";
+
 
 // ---------- Schemas
 
