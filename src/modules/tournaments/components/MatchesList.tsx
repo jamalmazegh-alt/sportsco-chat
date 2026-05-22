@@ -693,7 +693,7 @@ function MatchCard({
                   </Select>
                   <Input
                     className="h-8 text-xs"
-                    placeholder="Joueur"
+                    placeholder={t("matches.events.player")}
                     value={evPlayer}
                     onChange={(e) => setEvPlayer(e.target.value)}
                   />
@@ -702,7 +702,7 @@ function MatchCard({
                     type="number"
                     min={0}
                     max={200}
-                    placeholder="Min."
+                    placeholder={t("matches.events.minute")}
                     value={evMinute}
                     onChange={(e) => setEvMinute(e.target.value)}
                   />
@@ -718,7 +718,7 @@ function MatchCard({
                   ) : (
                     <Plus className="h-3 w-3" />
                   )}
-                  Ajouter l'événement
+                  {t("matches.events.add")}
                 </Button>
               </CollapsibleContent>
             </Collapsible>
@@ -729,7 +729,7 @@ function MatchCard({
               className="h-7 text-xs"
               onClick={() => setEditOpen(true)}
             >
-              Terrain / heure
+              {t("matches.fieldAndTime")}
             </Button>
             {done && (
               <Button
@@ -742,10 +742,10 @@ function MatchCard({
                 }
                 onClick={() => validateM.mutate(!validated)}
                 disabled={validateM.isPending}
-                title={validated ? "Revenir à un score à valider (corriger une erreur)" : "Valider le score définitif"}
+                title={validated ? t("matches.unvalidateTitle") : t("matches.validateTitle")}
               >
                 <ShieldCheck className="h-3 w-3" />
-                {validated ? "Dévalider" : "Valider le score"}
+                {validated ? t("matches.unvalidate") : t("matches.validate")}
               </Button>
             )}
 
@@ -757,43 +757,43 @@ function MatchCard({
               disabled={disputeM.isPending}
             >
               <AlertTriangle className="h-3 w-3" />
-              {disputed ? "Lever litige" : "Signaler litige"}
+              {disputed ? t("matches.liftDispute") : t("matches.raiseDispute")}
             </Button>
             <select
               className="h-7 rounded-md border border-input bg-background px-2 text-xs"
               value={match.status}
               disabled={statusM.isPending}
               onChange={(e) => statusM.mutate(e.target.value)}
-              aria-label="État du match"
+              aria-label={t("matches.statusAria")}
             >
-              <option value="scheduled">Prévu</option>
-              <option value="live">En cours</option>
-              <option value="completed">Terminé</option>
-              <option value="forfeit_a">Forfait équipe A</option>
-              <option value="forfeit_b">Forfait équipe B</option>
-              <option value="no_show_a">Équipe A absente</option>
-              <option value="no_show_b">Équipe B absente</option>
-              <option value="abandoned">Abandonné</option>
-              <option value="cancelled">Annulé</option>
+              <option value="scheduled">{t("matches.statusOptions.scheduled")}</option>
+              <option value="live">{t("matches.statusOptions.live")}</option>
+              <option value="completed">{t("matches.statusOptions.completed")}</option>
+              <option value="forfeit_a">{t("matches.statusOptions.forfeit_a")}</option>
+              <option value="forfeit_b">{t("matches.statusOptions.forfeit_b")}</option>
+              <option value="no_show_a">{t("matches.statusOptions.no_show_a")}</option>
+              <option value="no_show_b">{t("matches.statusOptions.no_show_b")}</option>
+              <option value="abandoned">{t("matches.statusOptions.abandoned")}</option>
+              <option value="cancelled">{t("matches.statusOptions.cancelled")}</option>
             </select>
           </div>
         )}
       </div>
 
 
-      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title="Saisir le score">
+      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("matches.title")}>
         <div className="space-y-4 mt-4 pb-6">
           {setsMode ? (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                Best of {setsRules.bestOf} · sets à {setsRules.pointsToWin} pts
+                {t("matches.bestOfSets", { bestOf: setsRules.bestOf, points: setsRules.pointsToWin })}
                 {setsRules.tieBreakPoints !== setsRules.pointsToWin
-                  ? ` (tie-break ${setsRules.tieBreakPoints})`
+                  ? t("matches.tieBreak", { points: setsRules.tieBreakPoints })
                   : ""}
               </p>
               {sets.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-2">
-                  Aucun set saisi.
+                  {t("matches.noSets")}
                 </p>
               )}
               {sets.map((s, i) => (
