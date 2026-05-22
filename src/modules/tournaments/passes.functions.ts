@@ -93,36 +93,28 @@ export const listMyAvailablePasses = createServerFn({ method: "POST" })
         .ilike("email", email);
     }
 
+    // Build .or() filter safely. Supabase PostgREST .or() uses commas as
+    // separators and parentheses to group — sanitize email accordingly. Also
+    // escape `%`, `_` and `*` to avoid unintended ilike wildcards.
+    const baseFilter = `user_id.eq.${userId}`;
+    let orFilter = baseFilter;
+    if (email) {
+      const safeEmail = email
+        .replace(/[(),]/g, "") // strip PostgREST grouping/separator chars
+        .replace(/[%_*]/g, (m) => `\\${m}`); // escape ilike wildcards
+      orFilter = `${baseFilter},email.ilike.${safeEmail}`;
+    }
+
     const { data, error } = await supabaseAdmin
       .from("tournament_passes")
       .select("id, email, status, paid_at, tournament_id")
       .eq("status", "paid")
       .is("tournament_id", null)
-      .or(
-        email
-          ? `user_id.eq.${userId},email.ilike.${email}`
-          : `user_id.eq.${userId}`,
-      )
+      .or(orFilter)
       .order("paid_at", { ascending: false });
     if (error) throw new Response(error.message, { status: 400 });
     return { passes: data ?? [] };
   });
-
-async function uniqueSlug(
-  supabaseAdmin: any,
-  base: string,
-): Promise<string> {
-  for (let i = 0; i < 5; i++) {
-    const slug = i === 0 ? base : `${base}-${shortRandomSuffix()}`;
-    const { data } = await supabaseAdmin
-      .from("tournaments")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (!data) return slug;
-  }
-  return `${base}-${shortRandomSuffix()}`;
-}
 
 /**
  * Create a personal tournament (no club) by consuming a paid pass.
@@ -170,7 +162,7 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       throw new Response("Ce pass n'appartient pas à votre compte", { status: 403 });
     }
 
-    const slug = await uniqueSlug(supabaseAdmin, slugify(data.name));
+    const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
 
     const { data: tournament, error: tErr } = await supabaseAdmin
       .from("tournaments")
@@ -192,8 +184,10 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       .single();
     if (tErr) throw new Response(tErr.message, { status: 400 });
 
-    // Consume pass
-    await supabaseAdmin
+    // Atomically consume the pass: only succeeds if no one else has claimed it.
+    // The WHERE on tournament_id IS NULL + status = 'paid' guarantees that
+    // concurrent calls cannot both consume the same pass.
+    const { data: consumed, error: consumeErr } = await supabaseAdmin
       .from("tournament_passes")
       .update({
         status: "used",
@@ -201,7 +195,18 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
         used_at: new Date().toISOString(),
         user_id: userId,
       })
-      .eq("id", pass.id);
+      .eq("id", pass.id)
+      .eq("status", "paid")
+      .is("tournament_id", null)
+      .select("id")
+      .maybeSingle();
+
+    if (consumeErr || !consumed) {
+      // Race lost — rollback the created tournament so the pass winner keeps integrity.
+      await supabaseAdmin.from("tournaments").delete().eq("id", tournament.id);
+      throw new Response("Ce pass a déjà été utilisé", { status: 409 });
+    }
 
     return { tournament };
   });
+
