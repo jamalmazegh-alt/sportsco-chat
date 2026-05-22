@@ -372,34 +372,35 @@ export function GroupsAndFixtures({
         </div>
         <div className="space-y-2 rounded-lg border border-border/60 p-3">
           <label className="flex items-center gap-2 text-sm font-medium">
+            <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
             <input
               type="checkbox"
               checked={lunchEnabled}
               onChange={(e) => setLunchEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-input"
             />
-            Pause déjeuner (aucun match)
+            Pause déjeuner (aucun match sur la plage)
           </label>
-          {lunchEnabled && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Début pause</Label>
-                <Input
-                  type="time"
-                  value={lunchStart}
-                  onChange={(e) => setLunchStart(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Fin pause</Label>
-                <Input
-                  type="time"
-                  value={lunchEnd}
-                  onChange={(e) => setLunchEnd(e.target.value)}
-                />
-              </div>
+          <div className={`grid grid-cols-2 gap-3 ${lunchEnabled ? "" : "opacity-50 pointer-events-none"}`}>
+            <div className="space-y-1.5">
+              <Label>Début pause</Label>
+              <Input
+                type="time"
+                value={lunchStart}
+                onChange={(e) => setLunchStart(e.target.value)}
+                disabled={!lunchEnabled}
+              />
             </div>
-          )}
+            <div className="space-y-1.5">
+              <Label>Fin pause</Label>
+              <Input
+                type="time"
+                value={lunchEnd}
+                onChange={(e) => setLunchEnd(e.target.value)}
+                disabled={!lunchEnabled}
+              />
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <Button
