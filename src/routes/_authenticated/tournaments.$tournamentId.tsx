@@ -76,6 +76,10 @@ function TournamentDetailPage() {
   if (!q.data) return null;
 
   const { tournament, groups, teams, matches } = q.data;
+  const canManage =
+    (q.data as any).canManage === true ||
+    role === "admin" ||
+    (role as string) === "dirigeant";
   const publicUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/tournament/${tournament.slug}`
