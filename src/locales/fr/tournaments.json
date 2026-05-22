@@ -261,5 +261,53 @@
     "toastLinkCopied": "Lien d'invitation copié",
     "toastCopyFail": "Impossible de copier",
     "toastError": "Erreur"
+  },
+  "sponsorsEditor": {
+    "hint": "Les sponsors sont enregistrés automatiquement et affichés sur la page publique du tournoi et le diaporama TV.",
+    "addLogo": "Ajouter un logo",
+    "empty": "Aucun sponsor pour le moment.",
+    "tooHeavy": "Logo trop lourd (max 2 Mo)",
+    "added": "Sponsor ajouté",
+    "uploadError": "Erreur upload",
+    "saveError": "Erreur d'enregistrement",
+    "namePlaceholder": "Nom",
+    "websitePlaceholder": "https://site.com",
+    "openSite": "Ouvrir le site",
+    "remove": "Supprimer",
+    "tier": {
+      "main": "Principal",
+      "gold": "Or",
+      "silver": "Argent",
+      "partner": "Partenaire"
+    }
+  },
+  "registrations": {
+    "count_one": "{{count}} inscription",
+    "count_other": "{{count}} inscriptions",
+    "filter": {
+      "pending": "En attente",
+      "approved": "Validées",
+      "rejected": "Refusées",
+      "cancelled": "Annulées",
+      "all": "Toutes"
+    },
+    "empty": "Aucune inscription{{suffix}}.",
+    "players_one": "{{count}} joueur",
+    "players_other": "{{count}} joueurs",
+    "approve": "Valider",
+    "reject": "Refuser",
+    "rejectPrompt": "Motif du refus (optionnel)",
+    "approved": "Inscription validée",
+    "rejected": "Inscription refusée",
+    "errorToast": "Erreur",
+    "note": "Note : {{note}}",
+    "summary": "En attente : {{pending}} · Validées : {{approved}} · Refusées : {{rejected}}",
+    "status": {
+      "pending": "En attente",
+      "approved": "Validée",
+      "rejected": "Refusée",
+      "cancelled": "Annulée"
+    }
   }
 }
+

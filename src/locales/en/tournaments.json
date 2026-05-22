@@ -261,5 +261,53 @@
     "toastLinkCopied": "Invitation link copied",
     "toastCopyFail": "Could not copy",
     "toastError": "Error"
+  },
+  "sponsorsEditor": {
+    "hint": "Sponsors are saved automatically and displayed on the public tournament page and the TV slideshow.",
+    "addLogo": "Add a logo",
+    "empty": "No sponsors yet.",
+    "tooHeavy": "Logo too large (max 2 MB)",
+    "added": "Sponsor added",
+    "uploadError": "Upload error",
+    "saveError": "Save error",
+    "namePlaceholder": "Name",
+    "websitePlaceholder": "https://site.com",
+    "openSite": "Open site",
+    "remove": "Remove",
+    "tier": {
+      "main": "Main",
+      "gold": "Gold",
+      "silver": "Silver",
+      "partner": "Partner"
+    }
+  },
+  "registrations": {
+    "count_one": "{{count}} registration",
+    "count_other": "{{count}} registrations",
+    "filter": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "all": "All"
+    },
+    "empty": "No registrations{{suffix}}.",
+    "players_one": "{{count}} player",
+    "players_other": "{{count}} players",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectPrompt": "Rejection reason (optional)",
+    "approved": "Registration approved",
+    "rejected": "Registration rejected",
+    "errorToast": "Error",
+    "note": "Note: {{note}}",
+    "summary": "Pending: {{pending}} · Approved: {{approved}} · Rejected: {{rejected}}",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    }
   }
 }
+
