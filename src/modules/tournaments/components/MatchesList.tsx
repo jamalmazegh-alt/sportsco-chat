@@ -570,7 +570,7 @@ function MatchCard({
               disabled={save.isPending}
             >
               <Check className="h-4 w-4" />
-              Terminer le match
+              {t("matches.finishMatch")}
             </Button>
           </div>
         ) : (
@@ -582,18 +582,18 @@ function MatchCard({
               className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-70"
             >
               <span className="truncate text-sm font-medium text-right">
-                {teamA?.name ?? "À déterminer"}
+                {teamA?.name ?? t("matches.tbd")}
               </span>
               <span className="font-semibold tabular-nums text-lg">
                 {match.score_a ?? "–"} : {match.score_b ?? "–"}
                 {hasPenalty && (
                   <span className="ml-1 text-xs text-muted-foreground">
-                    (tab {match.penalty_score_a}-{match.penalty_score_b})
+                    ({t("matches.penShort")} {match.penalty_score_a}-{match.penalty_score_b})
                   </span>
                 )}
               </span>
               <span className="truncate text-sm font-medium">
-                {teamB?.name ?? "À déterminer"}
+                {teamB?.name ?? t("matches.tbd")}
               </span>
             </button>
 
