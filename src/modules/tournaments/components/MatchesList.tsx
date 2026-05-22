@@ -26,9 +26,14 @@ import {
   AlertTriangle,
   ChevronDown,
   Plus,
+  Minus,
   Trash2,
   Flag,
+  Radio,
+  Zap,
 } from "lucide-react";
+import { ScoreStepper } from "@/components/score-stepper";
+
 import { toast } from "sonner";
 import {
   recordMatchScore,
@@ -266,6 +271,24 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? "Erreur"),
   });
 
+  // Quick inline live score update (no dialog, keeps status "live")
+  const liveUpdate = useMutation({
+    mutationFn: (next: { score_a: number; score_b: number }) =>
+      fn({
+        data: {
+          tournament_id: tournamentId,
+          match_id: match.id,
+          score_a: next.score_a,
+          score_b: next.score_b,
+          sets: null,
+          status: "live",
+        },
+      }),
+    onSuccess: () => invalidateAll(),
+    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+  });
+
+
   const validateM = useMutation({
     mutationFn: (validated: boolean) =>
       valFn({
@@ -470,27 +493,98 @@ function MatchCard({
             )}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          disabled={!teamA || !teamB}
-          className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-50"
-        >
-          <span className="truncate text-sm font-medium text-right">
-            {teamA?.name ?? "À déterminer"}
-          </span>
-          <span className="font-semibold tabular-nums">
-            {match.score_a ?? "–"} : {match.score_b ?? "–"}
-          </span>
-          <span className="truncate text-sm font-medium">
-            {teamB?.name ?? "À déterminer"}
-          </span>
-        </button>
-        {setsMode && match.sets && match.sets.length > 0 && (
-          <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
-            {formatSets(match.sets)}
-          </p>
+        {canManage && match.status === "live" && !setsMode && teamA && teamB ? (
+          <div className="mt-2 rounded-lg border border-red-500/40 bg-red-500/5 p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
+                <Radio className="h-3 w-3 animate-pulse" />
+                Score en direct
+              </span>
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="text-[11px] text-muted-foreground underline"
+              >
+                Saisie complète
+              </button>
+            </div>
+            <div className="flex items-center justify-around gap-2">
+              <ScoreStepper
+                label={teamA.short_name ?? teamA.name}
+                value={match.score_a ?? 0}
+                onChange={(v) =>
+                  liveUpdate.mutate({ score_a: v, score_b: match.score_b ?? 0 })
+                }
+                disabled={liveUpdate.isPending}
+                size="md"
+              />
+              <span className="text-xl text-muted-foreground">:</span>
+              <ScoreStepper
+                label={teamB.short_name ?? teamB.name}
+                value={match.score_b ?? 0}
+                onChange={(v) =>
+                  liveUpdate.mutate({ score_a: match.score_a ?? 0, score_b: v })
+                }
+                disabled={liveUpdate.isPending}
+                size="md"
+              />
+            </div>
+            <Button
+              size="sm"
+              className="w-full mt-3 h-9"
+              onClick={() => {
+                setA(match.score_a ?? 0);
+                setB(match.score_b ?? 0);
+                save.mutate();
+              }}
+              disabled={save.isPending}
+            >
+              <Check className="h-4 w-4" />
+              Terminer le match
+            </Button>
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              disabled={!teamA || !teamB || !canManage}
+              className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-70"
+            >
+              <span className="truncate text-sm font-medium text-right">
+                {teamA?.name ?? "À déterminer"}
+              </span>
+              <span className="font-semibold tabular-nums text-lg">
+                {match.score_a ?? "–"} : {match.score_b ?? "–"}
+              </span>
+              <span className="truncate text-sm font-medium">
+                {teamB?.name ?? "À déterminer"}
+              </span>
+            </button>
+            {setsMode && match.sets && match.sets.length > 0 && (
+              <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
+                {formatSets(match.sets)}
+              </p>
+            )}
+            {canManage &&
+              match.status === "scheduled" &&
+              teamA &&
+              teamB && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 w-full h-8 text-xs border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"
+                  onClick={() => statusM.mutate("live")}
+                  disabled={statusM.isPending}
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  Démarrer le match en direct
+                </Button>
+              )}
+          </>
         )}
+
 
         {/* Events summary (always visible if any) */}
         {events.length > 0 && (
@@ -661,41 +755,47 @@ function MatchCard({
                 </p>
               )}
               {sets.map((s, i) => (
-                <div key={i} className="grid grid-cols-[28px_1fr_auto_1fr_auto] items-center gap-2">
-                  <span className="text-xs text-muted-foreground text-center">
-                    S{i + 1}
-                  </span>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={s.a}
-                    onChange={(e) => {
-                      const next = [...sets];
-                      next[i] = { ...next[i], a: parseInt(e.target.value || "0", 10) };
-                      setSets(next);
-                    }}
-                    className="h-10 text-center font-semibold"
-                  />
-                  <span className="text-muted-foreground">:</span>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={s.b}
-                    onChange={(e) => {
-                      const next = [...sets];
-                      next[i] = { ...next[i], b: parseInt(e.target.value || "0", 10) };
-                      setSets(next);
-                    }}
-                    className="h-10 text-center font-semibold"
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setSets(sets.filter((_, j) => j !== i))}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                <div
+                  key={i}
+                  className="rounded-lg border border-border bg-muted/30 p-3"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      Set {i + 1}
+                    </span>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7"
+                      onClick={() => setSets(sets.filter((_, j) => j !== i))}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-around gap-2">
+                    <ScoreStepper
+                      label={teamA?.short_name ?? teamA?.name}
+                      value={s.a}
+                      onChange={(v) => {
+                        const next = [...sets];
+                        next[i] = { ...next[i], a: v };
+                        setSets(next);
+                      }}
+                      size="sm"
+                    />
+                    <span className="text-xl text-muted-foreground">:</span>
+                    <ScoreStepper
+                      label={teamB?.short_name ?? teamB?.name}
+                      value={s.b}
+                      onChange={(v) => {
+                        const next = [...sets];
+                        next[i] = { ...next[i], b: v };
+                        setSets(next);
+                      }}
+                      size="sm"
+                    />
+                  </div>
                 </div>
               ))}
               <Button
@@ -718,28 +818,20 @@ function MatchCard({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-              <div className="text-center">
-                <p className="text-sm font-medium mb-2 truncate">{teamA?.name}</p>
-                <Input
-                  type="number"
-                  min={0}
-                  value={a}
-                  onChange={(e) => setA(parseInt(e.target.value || "0", 10))}
-                  className="h-14 text-center text-2xl font-bold"
-                />
-              </div>
-              <span className="text-xl font-semibold text-muted-foreground">:</span>
-              <div className="text-center">
-                <p className="text-sm font-medium mb-2 truncate">{teamB?.name}</p>
-                <Input
-                  type="number"
-                  min={0}
-                  value={b}
-                  onChange={(e) => setB(parseInt(e.target.value || "0", 10))}
-                  className="h-14 text-center text-2xl font-bold"
-                />
-              </div>
+            <div className="flex items-center justify-around gap-3 py-2">
+              <ScoreStepper
+                label={teamA?.name}
+                value={a}
+                onChange={setA}
+                size="lg"
+              />
+              <span className="text-2xl font-semibold text-muted-foreground">:</span>
+              <ScoreStepper
+                label={teamB?.name}
+                value={b}
+                onChange={setB}
+                size="lg"
+              />
             </div>
           )}
           <Button
@@ -755,6 +847,7 @@ function MatchCard({
           </Button>
         </div>
       </ResponsiveFormDialog>
+
 
 
       <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title="Terrain & horaire">
