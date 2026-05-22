@@ -99,7 +99,7 @@ export function TeamsManager({ tournamentId, clubId, teams }: Props) {
         tournament_id: tournamentId,
         name: name.trim(),
         short_name: shortName || null,
-        logo_url: logoUrl || null,
+        logo_url: logo[0]?.url ?? null,
         seed: seed ? parseInt(seed, 10) : null,
       });
     }
