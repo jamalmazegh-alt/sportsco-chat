@@ -90,8 +90,10 @@ export function DrawDialog({
   teams,
   hasExistingDraw,
 }: Props) {
+  const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const applyFn = useServerFn(applyTeamDraw);
+
 
   const supportsGroups = format !== "knockout";
   const drawMode: "groups" | "knockout" = supportsGroups ? "groups" : "knockout";
