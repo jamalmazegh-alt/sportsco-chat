@@ -14,10 +14,15 @@ const TOURNAMENT_ONLY_ALLOWED = [
   "/profile",
   "/support",
 ];
-function isTournamentOnlyAllowed(pathname: string): boolean {
-  return TOURNAMENT_ONLY_ALLOWED.some(
-    (p) => pathname === p || pathname.startsWith(p + "/"),
-  );
+// When a club has no active subscription, only these prefixes remain
+// accessible (so the admin can subscribe; everyone can still see profile).
+const CLUB_LOCKED_ALLOWED = [
+  "/admin",
+  "/profile",
+  "/support",
+];
+function isPathAllowed(pathname: string, list: string[]): boolean {
+  return list.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 import { AssistantFab } from "@/components/assistant-fab";
 import { SupportFab } from "@/components/support-fab";
