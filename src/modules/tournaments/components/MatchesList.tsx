@@ -644,7 +644,7 @@ function MatchCard({
                       type="button"
                       onClick={() => removeEvent.mutate(ev.id)}
                       className="text-muted-foreground hover:text-destructive ml-0.5"
-                      aria-label="Supprimer"
+                      aria-label={t("matches.events.deleteAria")}
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>
