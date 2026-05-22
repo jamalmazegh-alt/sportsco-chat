@@ -912,7 +912,7 @@ function MatchCard({
             {save.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              "Enregistrer et valider"
+              t("matches.saveAndValidate")
             )}
           </Button>
         </div>
