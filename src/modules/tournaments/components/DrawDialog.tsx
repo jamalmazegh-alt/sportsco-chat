@@ -526,7 +526,8 @@ export function DrawDialog({
                               <p className="text-xs text-muted-foreground/60 italic">—</p>
                             ) : (
                               items.map((it) => {
-                                const team = teams.find((t) => t.id === it.teamId);
+                                const team = teams.find((tm) => tm.id === it.teamId);
+
                                 return (
                                   <div
                                     key={it.teamId}
