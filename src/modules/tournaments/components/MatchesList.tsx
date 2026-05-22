@@ -568,11 +568,17 @@ function MatchCard({
               </span>
               <span className="font-semibold tabular-nums text-lg">
                 {match.score_a ?? "–"} : {match.score_b ?? "–"}
+                {hasPenalty && (
+                  <span className="ml-1 text-xs text-muted-foreground">
+                    (tab {match.penalty_score_a}-{match.penalty_score_b})
+                  </span>
+                )}
               </span>
               <span className="truncate text-sm font-medium">
                 {teamB?.name ?? "À déterminer"}
               </span>
             </button>
+
             {setsMode && match.sets && match.sets.length > 0 && (
               <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
                 {formatSets(match.sets)}
