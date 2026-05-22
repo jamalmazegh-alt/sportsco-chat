@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getStripe, STRIPE_PRICE_TOURNAMENT } from "@/lib/stripe.server";
 import { slugify, shortRandomSuffix } from "../lib/slug";
 
 function getOrigin(): string {
