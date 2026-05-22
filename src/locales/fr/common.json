@@ -54,6 +54,7 @@
     "resetSent": "Si un compte existe pour cette adresse, vous recevrez un e-mail dans quelques instants.",
     "resetError": "Impossible d'envoyer l'e-mail. Réessayez plus tard.",
     "backToLogin": "Retour à la connexion",
+    "backToWebsite": "Retour au site Clubero",
     "resetTitle": "Nouveau mot de passe",
     "resetSubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
     "newPassword": "Nouveau mot de passe",
