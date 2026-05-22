@@ -642,6 +642,7 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
         fairPlay: rules.fairPlay,
         events: gEvents,
         drawLotSalt: data.tournament_id,
+        forfeit: rules.forfeit,
       });
       return { groupId: g.id, rows };
     });
