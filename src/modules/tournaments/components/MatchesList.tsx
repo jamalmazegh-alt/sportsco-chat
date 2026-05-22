@@ -419,6 +419,11 @@ function MatchCard({
             {teamB?.name ?? "À déterminer"}
           </span>
         </button>
+        {setsMode && match.sets && match.sets.length > 0 && (
+          <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
+            {formatSets(match.sets)}
+          </p>
+        )}
 
         {/* Events summary (always visible if any) */}
         {events.length > 0 && (
@@ -575,32 +580,104 @@ function MatchCard({
 
       <ResponsiveFormDialog open={open} onOpenChange={setOpen} title="Saisir le score">
         <div className="space-y-4 mt-4 pb-6">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <div className="text-center">
-              <p className="text-sm font-medium mb-2 truncate">{teamA?.name}</p>
-              <Input
-                type="number"
-                min={0}
-                value={a}
-                onChange={(e) => setA(parseInt(e.target.value || "0", 10))}
-                className="h-14 text-center text-2xl font-bold"
-              />
+          {setsMode ? (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Best of {setsRules.bestOf} · sets à {setsRules.pointsToWin} pts
+                {setsRules.tieBreakPoints !== setsRules.pointsToWin
+                  ? ` (tie-break ${setsRules.tieBreakPoints})`
+                  : ""}
+              </p>
+              {sets.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-2">
+                  Aucun set saisi.
+                </p>
+              )}
+              {sets.map((s, i) => (
+                <div key={i} className="grid grid-cols-[28px_1fr_auto_1fr_auto] items-center gap-2">
+                  <span className="text-xs text-muted-foreground text-center">
+                    S{i + 1}
+                  </span>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={s.a}
+                    onChange={(e) => {
+                      const next = [...sets];
+                      next[i] = { ...next[i], a: parseInt(e.target.value || "0", 10) };
+                      setSets(next);
+                    }}
+                    className="h-10 text-center font-semibold"
+                  />
+                  <span className="text-muted-foreground">:</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={s.b}
+                    onChange={(e) => {
+                      const next = [...sets];
+                      next[i] = { ...next[i], b: parseInt(e.target.value || "0", 10) };
+                      setSets(next);
+                    }}
+                    className="h-10 text-center font-semibold"
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setSets(sets.filter((_, j) => j !== i))}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => setSets([...sets, { a: 0, b: 0 }])}
+                disabled={sets.length >= 7}
+              >
+                <Plus className="h-4 w-4" />
+                Ajouter un set
+              </Button>
+              {sets.length > 0 && (
+                <p className="text-center text-sm font-medium">
+                  Sets gagnés :{" "}
+                  <span className="tabular-nums">
+                    {aggregateSetsScore(sets).score_a} - {aggregateSetsScore(sets).score_b}
+                  </span>
+                </p>
+              )}
             </div>
-            <span className="text-xl font-semibold text-muted-foreground">:</span>
-            <div className="text-center">
-              <p className="text-sm font-medium mb-2 truncate">{teamB?.name}</p>
-              <Input
-                type="number"
-                min={0}
-                value={b}
-                onChange={(e) => setB(parseInt(e.target.value || "0", 10))}
-                className="h-14 text-center text-2xl font-bold"
-              />
+          ) : (
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              <div className="text-center">
+                <p className="text-sm font-medium mb-2 truncate">{teamA?.name}</p>
+                <Input
+                  type="number"
+                  min={0}
+                  value={a}
+                  onChange={(e) => setA(parseInt(e.target.value || "0", 10))}
+                  className="h-14 text-center text-2xl font-bold"
+                />
+              </div>
+              <span className="text-xl font-semibold text-muted-foreground">:</span>
+              <div className="text-center">
+                <p className="text-sm font-medium mb-2 truncate">{teamB?.name}</p>
+                <Input
+                  type="number"
+                  min={0}
+                  value={b}
+                  onChange={(e) => setB(parseInt(e.target.value || "0", 10))}
+                  className="h-14 text-center text-2xl font-bold"
+                />
+              </div>
             </div>
-          </div>
+          )}
           <Button
             onClick={() => save.mutate()}
-            disabled={save.isPending}
+            disabled={save.isPending || (setsMode && sets.length === 0)}
             className="w-full h-12"
           >
             {save.isPending ? (
@@ -611,6 +688,7 @@ function MatchCard({
           </Button>
         </div>
       </ResponsiveFormDialog>
+
 
       <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title="Terrain & horaire">
         <div className="space-y-4 mt-4 pb-6">
