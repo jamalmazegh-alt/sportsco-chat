@@ -25,24 +25,11 @@ export const Route = createFileRoute("/pricing")({
   }),
 });
 
-const CLUBERO_FEATURES = [
-  "Équipes illimitées",
-  "Joueurs illimités",
-  "Gestion des matchs",
-  "Planning des entraînements",
-  "Suivi des présences",
-  "Communication club",
-  "Notifications",
-  "Statistiques",
-  "Événements",
-  "Module Tournois inclus",
-  "Accès mobile / PWA",
-  "Rôles coach & manager",
-];
-
-
 function PricingPage() {
   const { t } = useTranslation("marketing");
+  const CLUBERO_FEATURES = t("pricing.clubFeatures", { returnObjects: true }) as string[];
+  const ENTERPRISE_FEATURES = t("pricing.enterpriseFeatures", { returnObjects: true }) as string[];
+
 
   return (
     <MarketingLayout>
