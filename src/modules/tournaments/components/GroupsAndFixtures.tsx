@@ -136,6 +136,10 @@ export function GroupsAndFixtures({
         ...(settings ?? {}),
         lunch_start: lunchEnabled ? lunchStart : null,
         lunch_end: lunchEnabled ? lunchEnd : null,
+        forfeit: {
+          ...(settings?.forfeit ?? {}),
+          minRestMinutes: minRest,
+        },
       };
       return updateFn({
         data: {
