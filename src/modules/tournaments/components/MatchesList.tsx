@@ -797,8 +797,50 @@ function MatchCard({
             </div>
           </div>
           <Button onClick={() => saveSched.mutate()} disabled={saveSched.isPending} className="w-full">
-            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer terrain & heure"}
           </Button>
+
+          <div className="pt-4 border-t border-border space-y-3">
+            <div className="space-y-1.5">
+              <Label>Arbitre</Label>
+              <Select value={refMode} onValueChange={setRefMode}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Aucun</SelectItem>
+                  {refereeOptions.map((r) => (
+                    <SelectItem key={r.user_id} value={`user:${r.user_id}`}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="free">Nom libre…</SelectItem>
+                </SelectContent>
+              </Select>
+              {refMode === "free" && (
+                <Input
+                  className="mt-2"
+                  value={refFreeName}
+                  onChange={(e) => setRefFreeName(e.target.value)}
+                  placeholder="Nom de l'arbitre"
+                />
+              )}
+              {refereeOptions.length === 0 && refMode !== "free" && refMode !== "__none__" && (
+                <p className="text-[11px] text-muted-foreground">
+                  Aucun arbitre n'a encore accepté son invitation.
+                </p>
+              )}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => saveRef.mutate()}
+              disabled={saveRef.isPending || (refMode === "free" && !refFreeName.trim())}
+            >
+              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Assigner l'arbitre"}
+            </Button>
+          </div>
         </div>
       </ResponsiveFormDialog>
     </li>
