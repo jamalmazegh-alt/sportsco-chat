@@ -109,6 +109,11 @@ export function GroupsAndFixtures({
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+      const nextSettings = {
+        ...(settings ?? {}),
+        lunch_start: lunchEnabled ? lunchStart : null,
+        lunch_end: lunchEnabled ? lunchEnd : null,
+      };
       return updateFn({
         data: {
           tournament_id: tournamentId,
@@ -118,6 +123,7 @@ export function GroupsAndFixtures({
             daily_start_time: startTime,
             daily_end_time: endTime,
             fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+            settings: nextSettings,
           },
         },
       });
@@ -147,6 +153,8 @@ export function GroupsAndFixtures({
           match_duration_min: duration,
           break_min: pause,
           fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+          lunch_start_time: lunchEnabled ? lunchStart : undefined,
+          lunch_end_time: lunchEnabled ? lunchEnd : undefined,
         },
       });
     },
