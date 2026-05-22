@@ -183,8 +183,15 @@ function TournamentDetailPage() {
             numTeams={teams.length}
             groupsCount={groups.length}
             matchesCount={matches.length}
+            startsOn={tournament.starts_on}
+            matchDurationMin={(tournament as any).match_duration_min}
+            breakMin={(tournament as any).break_min}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            fields={(tournament as any).fields}
           />
         )}
+
         {tab === "fixtures" && !canManage && (
           <p className="text-sm text-muted-foreground">
             Seuls les admins et dirigeants peuvent configurer le format.

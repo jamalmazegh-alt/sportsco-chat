@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
+import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import { Loader2, ChevronRight, ChevronLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
-import { createTournament } from "../tournaments.functions";
+import { createTournament, updateTournament } from "../tournaments.functions";
+
 
 type Format = "group" | "knockout" | "mixed";
 
@@ -30,14 +32,16 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [location, setLocation] = useState("");
   const [format, setFormat] = useState<Format>("mixed");
   const [numTeams, setNumTeams] = useState(8);
+  const [logo, setLogo] = useState<Attachment[]>([]);
 
   const navigate = useNavigate();
   const qc = useQueryClient();
   const fn = useServerFn(createTournament);
+  const updateFn = useServerFn(updateTournament);
 
   const create = useMutation({
-    mutationFn: () =>
-      fn({
+    mutationFn: async () => {
+      const res = await fn({
         data: {
           club_id: clubId,
           name: name.trim(),
@@ -49,7 +53,18 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           num_teams: numTeams,
           location: location || null,
         },
-      }),
+      });
+      // Apply cover image after creation (if uploaded)
+      if (logo[0]?.url) {
+        await updateFn({
+          data: {
+            tournament_id: res.tournament.id,
+            patch: { cover_image_url: logo[0].url },
+          },
+        });
+      }
+      return res;
+    },
     onSuccess: (res) => {
       toast.success("Tournoi créé");
       qc.invalidateQueries({ queryKey: ["tournaments", clubId] });
@@ -72,7 +87,9 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     setLocation("");
     setFormat("mixed");
     setNumTeams(8);
+    setLogo([]);
   }
+
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -122,8 +139,19 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 placeholder="U13, Senior, Mixte…"
               />
             </div>
+            <div className="space-y-1.5">
+              <Label>Logo / image de couverture (optionnel)</Label>
+              <AttachmentPicker
+                value={logo}
+                onChange={setLogo}
+                prefix="tournament-cover"
+                accept="image/*"
+                max={1}
+              />
+            </div>
           </div>
         )}
+
 
         {step === 1 && (
           <div className="space-y-4">
