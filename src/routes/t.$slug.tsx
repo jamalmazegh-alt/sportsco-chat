@@ -67,6 +67,14 @@ function PublicTournamentPage() {
 
 
   const { tournament, groups, teams, matches } = q.data;
+  const rules = mergeRules((tournament as any).settings);
+  const now = Date.now();
+  const opens = rules.registration.opensAt ? new Date(rules.registration.opensAt).getTime() : null;
+  const closes = rules.registration.closesAt ? new Date(rules.registration.closesAt).getTime() : null;
+  const registrationOpen =
+    rules.registration.enabled &&
+    (opens === null || now >= opens) &&
+    (closes === null || now <= closes);
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "overview", label: "Aperçu", icon: CalendarDays },
