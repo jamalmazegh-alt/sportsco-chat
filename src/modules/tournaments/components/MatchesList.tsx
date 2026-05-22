@@ -523,9 +523,27 @@ function MatchCard({
               <AlertTriangle className="h-3 w-3" />
               {disputed ? "Lever litige" : "Signaler litige"}
             </Button>
+            <select
+              className="h-7 rounded-md border border-input bg-background px-2 text-xs"
+              value={match.status}
+              disabled={statusM.isPending}
+              onChange={(e) => statusM.mutate(e.target.value)}
+              aria-label="État du match"
+            >
+              <option value="scheduled">Prévu</option>
+              <option value="live">En cours</option>
+              <option value="completed">Terminé</option>
+              <option value="forfeit_a">Forfait équipe A</option>
+              <option value="forfeit_b">Forfait équipe B</option>
+              <option value="no_show_a">Équipe A absente</option>
+              <option value="no_show_b">Équipe B absente</option>
+              <option value="abandoned">Abandonné</option>
+              <option value="cancelled">Annulé</option>
+            </select>
           </div>
         )}
       </div>
+
 
       <ResponsiveFormDialog open={open} onOpenChange={setOpen} title="Saisir le score">
         <div className="space-y-4 mt-4 pb-6">
