@@ -20,6 +20,7 @@ import { getPublicTournament } from "@/modules/tournaments/tournaments.functions
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
+import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
 import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
 
 export const Route = createFileRoute("/tournament/$slug")({
