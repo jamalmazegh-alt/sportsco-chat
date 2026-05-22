@@ -309,7 +309,10 @@ export function DrawDialog({
   // ---------- Render
   const slotsArray = Array.from({ length: numSlots }, (_, i) => i);
   const slotLabel = (i: number) =>
-    drawMode === "groups" ? `Poule ${String.fromCharCode(65 + i)}` : `Position ${i + 1}`;
+    drawMode === "groups"
+      ? t("draw.groupLabel", { letter: String.fromCharCode(65 + i) })
+      : t("draw.positionLabel", { n: i + 1 });
+
 
   const canDraw = teams.length >= 2;
   const tournamentStarted = ["in_progress", "completed"].includes(status);
