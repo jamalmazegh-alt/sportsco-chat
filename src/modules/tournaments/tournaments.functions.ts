@@ -692,7 +692,7 @@ export const updateMatchSchedule = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
-    const patch: Record<string, any> = {};
+    const patch: { field?: string | null; scheduled_at?: string | null } = {};
     if (data.field !== undefined) patch.field = data.field;
     if (data.scheduled_at !== undefined) patch.scheduled_at = data.scheduled_at;
     const { data: row, error } = await supabase
