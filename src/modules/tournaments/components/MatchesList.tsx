@@ -267,11 +267,14 @@ function MatchCard({
           match_id: match.id,
           score_a: a,
           score_b: b,
+          penalty_score_a: isKnockout && a === b ? penA : null,
+          penalty_score_b: isKnockout && a === b ? penB : null,
           sets: null,
           status: "completed",
         },
       });
     },
+
     onSuccess: () => {
       toast.success("Score enregistré");
       invalidateAll();
