@@ -236,6 +236,9 @@ function TournamentDetailPage() {
         {tab === "bracket" && (
           <BracketView matches={matches as any} teams={teams as any} />
         )}
+        {tab === "registrations" && canManage && (
+          <RegistrationsManager tournamentId={tournament.id} />
+        )}
         {tab === "rules" && canManage && (
           <TournamentRulesEditor
             tournamentId={tournament.id}
