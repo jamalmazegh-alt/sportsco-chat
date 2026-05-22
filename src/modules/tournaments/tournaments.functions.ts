@@ -3,8 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { slugify, shortRandomSuffix } from "./lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
-import { computeStandings, type Tiebreaker } from "./lib/standings";
+import { computeStandings, type Tiebreaker, type MatchEventInput } from "./lib/standings";
 import { generateKnockoutBracket } from "./lib/bracket";
+import { mergeRules, DEFAULT_RULES } from "./lib/rules";
+import { selectQualified } from "./lib/qualification";
+
 
 // ---------- Schemas
 
@@ -461,7 +464,7 @@ export const getGroupStandings = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: t } = await supabase
       .from("tournaments")
-      .select("points_win, points_draw, points_loss, tiebreakers")
+      .select("points_win, points_draw, points_loss, tiebreakers, settings")
       .eq("id", data.tournament_id)
       .single();
     const { data: teams } = await supabase
@@ -470,7 +473,9 @@ export const getGroupStandings = createServerFn({ method: "POST" })
       .eq("tournament_id", data.tournament_id);
     const { data: matches } = await supabase
       .from("tournament_matches")
-      .select("group_id, team_a_id, team_b_id, score_a, score_b, status")
+      .select(
+        "group_id, team_a_id, team_b_id, score_a, score_b, status, validated_at, dispute_flag",
+      )
       .eq("tournament_id", data.tournament_id)
       .eq("round", "group");
     const { data: groups } = await supabase
@@ -478,31 +483,61 @@ export const getGroupStandings = createServerFn({ method: "POST" })
       .select("id, name, sort_order, qualifiers_count")
       .eq("tournament_id", data.tournament_id)
       .order("sort_order");
+    const { data: events } = await supabase
+      .from("tournament_match_events")
+      .select("match_id, team_id, kind")
+      .eq("tournament_id", data.tournament_id);
 
-    const tiebreakers = (t?.tiebreakers as Tiebreaker[] | null) ?? [
-      "points",
-      "goal_diff",
-      "goals_for",
-      "head_to_head",
-    ];
+    const rules = mergeRules(t?.settings ?? {});
+    // DB columns win over settings for legacy compat
     const pts = {
-      win: t?.points_win ?? 3,
-      draw: t?.points_draw ?? 1,
-      loss: t?.points_loss ?? 0,
+      win: t?.points_win ?? rules.points.win,
+      draw: t?.points_draw ?? rules.points.draw,
+      loss: t?.points_loss ?? rules.points.loss,
+      bonusWin: rules.points.bonusWin,
     };
+    const tiebreakers =
+      (rules.tiebreakers && rules.tiebreakers.length > 0
+        ? rules.tiebreakers
+        : (t?.tiebreakers as Tiebreaker[] | null)) ?? DEFAULT_RULES.tiebreakers;
+
+    const includeMatch = (m: { status: string; validated_at: string | null }) => {
+      if (rules.matchValidation.requireValidation) {
+        return m.status === "completed" && !!m.validated_at;
+      }
+      return m.status === "completed";
+    };
+
+    const eventsByMatch = new Map<string, MatchEventInput[]>();
+    for (const ev of events ?? []) {
+      const arr = eventsByMatch.get(ev.match_id) ?? [];
+      arr.push({
+        matchId: ev.match_id,
+        teamId: ev.team_id,
+        kind: ev.kind as MatchEventInput["kind"],
+      });
+      eventsByMatch.set(ev.match_id, arr);
+    }
 
     const result = (groups ?? []).map((g) => {
       const groupTeamIds = (teams ?? []).filter((te) => te.group_id === g.id).map((te) => te.id);
       const groupMatches = (matches ?? [])
         .filter((m) => m.group_id === g.id)
-        .map((m) => ({
+        .map((m: any) => ({
           teamAId: m.team_a_id,
           teamBId: m.team_b_id,
           scoreA: m.score_a,
           scoreB: m.score_b,
-          status: m.status,
+          status: includeMatch(m) ? "completed" : m.status,
         }));
-      const standings = computeStandings(groupTeamIds, groupMatches, pts, tiebreakers);
+      const groupEvents = (matches ?? [])
+        .filter((m: any) => m.group_id === g.id)
+        .flatMap((m: any) => eventsByMatch.get(m.id) ?? []);
+      const standings = computeStandings(groupTeamIds, groupMatches, pts, tiebreakers, {
+        fairPlay: rules.fairPlay,
+        events: groupEvents,
+        drawLotSalt: data.tournament_id,
+      });
       const teamMap = new Map((teams ?? []).map((te) => [te.id, te]));
       return {
         group: g,
@@ -512,8 +547,9 @@ export const getGroupStandings = createServerFn({ method: "POST" })
         })),
       };
     });
-    return { standings: result };
+    return { standings: result, rules };
   });
+
 
 // ---------- Knockout generation from group qualifiers
 
@@ -531,7 +567,21 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
 
-    // Compute standings & take top N from each group
+    const { data: t } = await supabase
+      .from("tournaments")
+      .select("settings, points_win, points_draw, points_loss, tiebreakers")
+      .eq("id", data.tournament_id)
+      .single();
+    const rules = mergeRules(t?.settings ?? {});
+    const pts = {
+      win: t?.points_win ?? rules.points.win,
+      draw: t?.points_draw ?? rules.points.draw,
+      loss: t?.points_loss ?? rules.points.loss,
+    };
+    const tiebreakers = rules.tiebreakers.length
+      ? rules.tiebreakers
+      : ((t?.tiebreakers as Tiebreaker[] | null) ?? DEFAULT_RULES.tiebreakers);
+
     const { data: groups } = await supabase
       .from("tournament_groups")
       .select("id, qualifiers_count, sort_order")
@@ -547,29 +597,51 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
       .eq("tournament_id", data.tournament_id);
     const { data: matches } = await supabase
       .from("tournament_matches")
-      .select("group_id, team_a_id, team_b_id, score_a, score_b, status")
+      .select("group_id, team_a_id, team_b_id, score_a, score_b, status, id")
       .eq("tournament_id", data.tournament_id)
       .eq("round", "group");
+    const { data: events } = await supabase
+      .from("tournament_match_events")
+      .select("match_id, team_id, kind")
+      .eq("tournament_id", data.tournament_id);
 
-    const qualifiers: string[] = [];
-    for (const g of groups) {
-      const ids = (teams ?? []).filter((t) => t.group_id === g.id).map((t) => t.id);
+    const groupStandings = groups.map((g) => {
+      const ids = (teams ?? []).filter((te) => te.group_id === g.id).map((te) => te.id);
       const gMatches = (matches ?? [])
         .filter((m) => m.group_id === g.id)
-        .map((m) => ({
+        .map((m: any) => ({
           teamAId: m.team_a_id,
           teamBId: m.team_b_id,
           scoreA: m.score_a,
           scoreB: m.score_b,
           status: m.status,
         }));
-      const standings = computeStandings(ids, gMatches);
-      qualifiers.push(...standings.slice(0, g.qualifiers_count).map((s) => s.teamId));
-    }
+      const gEvents = (matches ?? [])
+        .filter((m: any) => m.group_id === g.id)
+        .flatMap((m: any) =>
+          (events ?? [])
+            .filter((e: any) => e.match_id === m.id)
+            .map((e: any) => ({
+              matchId: e.match_id,
+              teamId: e.team_id,
+              kind: e.kind as MatchEventInput["kind"],
+            })),
+        );
+      const rows = computeStandings(ids, gMatches, pts, tiebreakers, {
+        fairPlay: rules.fairPlay,
+        events: gEvents,
+        drawLotSalt: data.tournament_id,
+      });
+      return { groupId: g.id, rows };
+    });
+
+    const qualifiedPicks = selectQualified(groupStandings, rules.qualification);
+    const qualifiers = qualifiedPicks.map((q) => q.teamId);
 
     if (qualifiers.length < 2) {
       throw new Response("Pas assez de qualifiés", { status: 400 });
     }
+
 
     const bracket = generateKnockoutBracket(qualifiers, { thirdPlace: data.third_place });
 
@@ -774,4 +846,169 @@ export const updateMatchSchedule = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Response(error.message, { status: 400 });
     return { match: row };
+  });
+
+// ---------- Tournament rules (jsonb settings)
+
+export const updateTournamentRules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        rules: z.record(z.string(), z.any()),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const merged = mergeRules(data.rules);
+    const patch: Record<string, unknown> = {
+      settings: merged,
+      points_win: merged.points.win,
+      points_draw: merged.points.draw,
+      points_loss: merged.points.loss,
+      tiebreakers: merged.tiebreakers,
+    };
+    const { error } = await supabase
+      .from("tournaments")
+      .update(patch)
+      .eq("id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { rules: merged };
+  });
+
+// ---------- Match validation & dispute
+
+export const validateMatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        validated: z.boolean(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { error } = await supabase
+      .from("tournament_matches")
+      .update({
+        validated_at: data.validated ? new Date().toISOString() : null,
+        validated_by: data.validated ? userId : null,
+      })
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+export const setMatchDispute = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        dispute: z.boolean(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { error } = await supabase
+      .from("tournament_matches")
+      .update({ dispute_flag: data.dispute })
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+// ---------- Match events (cards, goals)
+
+export const recordMatchEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        team_id: z.string().uuid().nullable().optional(),
+        kind: z.enum([
+          "goal",
+          "own_goal",
+          "assist",
+          "yellow_card",
+          "red_card",
+          "second_yellow",
+          "penalty",
+          "foul",
+        ]),
+        player_name: z.string().max(120).nullable().optional(),
+        minute: z.number().int().min(0).max(200).nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { data: row, error } = await supabase
+      .from("tournament_match_events")
+      .insert({
+        tournament_id: data.tournament_id,
+        match_id: data.match_id,
+        team_id: data.team_id ?? null,
+        kind: data.kind,
+        player_name: data.player_name ?? null,
+        minute: data.minute ?? null,
+        created_by: userId,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { event: row };
+  });
+
+export const deleteMatchEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        event_id: z.string().uuid(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { error } = await supabase
+      .from("tournament_match_events")
+      .delete()
+      .eq("id", data.event_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
+export const listMatchEvents = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { tournament_id: string }) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("tournament_match_events")
+      .select("*")
+      .eq("tournament_id", data.tournament_id)
+      .order("created_at");
+    if (error) throw error;
+    return { events: rows ?? [] };
   });

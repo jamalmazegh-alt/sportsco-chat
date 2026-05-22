@@ -1,80 +1,145 @@
 
-# Suite E2E Playwright — Clubero
+# Moteur de règles de tournoi — Plan d'implémentation
 
-## Objectif
+## Ce qui existe déjà ✅
+- Tables `tournaments`, `tournament_groups`, `tournament_matches`, équipes, brackets
+- Format `group / knockout / mixed` + génération auto poules + bracket
+- Calcul de classement (`computeStandings`) avec tie-breakers basiques : `points, goal_diff, goals_for, head_to_head, wins`
+- Auto-scheduling avec terrains, pause déjeuner, durée match
+- Page publique `/t/$slug`, mode "accès tournoi uniquement", multi-sport (foot, basket, hand, volley, rugby, hockey…)
+- i18n FR/EN en place (`react-i18next`)
 
-Automatiser les parcours fonctionnels critiques de bout en bout (UI réelle + base Lovable Cloud) en complément des tests unitaires (226) et RLS (111).
+## Ce qui manque (objet de ce plan)
+1. **Points configurables** (W/D/L + bonus)
+2. **Tie-breakers riches & ré-ordonnables** (drag & drop, ajout : head-to-head GD/GF, fair play, penalty shootout, tirage)
+3. **Règles de qualification avancées** (N par poule + meilleurs 3èmes + wildcards)
+4. **Fair play** : cartons → points de discipline → tie-breaker
+5. **Génération PDF du règlement** (FR/EN, logo, branding)
+6. **Round-robin pur & format ligue** (juste une variante de `group` sans bracket — petite étoffe)
+7. **Statut de validation des scores** (provisional vs validated, override admin)
 
-## Stack & organisation
+## Architecture
 
-- **Playwright** (`@playwright/test`) — navigateur Chromium par défaut, Firefox/WebKit en option.
-- Dossier `tests/e2e/` avec un fichier `.e2e.ts` par parcours fonctionnel.
-- `tests/e2e/_fixtures/` : helpers (création user via service role, login programmatique via Supabase session, seed/cleanup d'un club isolé par run).
-- `playwright.config.ts` à la racine : baseURL = preview Lovable (`https://id-preview--<id>.lovable.app`) ou local (`http://localhost:8080`) selon `E2E_BASE_URL`.
-- Isolation : chaque test crée son propre club via service role + supprime à la fin (comme les tests RLS).
+### 1. DB — une seule migration
 
-## Parcours couverts (1 fichier par bloc)
+**Étendre `tournaments.settings` (jsonb)** plutôt qu'ajouter 10 colonnes. Schéma typé côté TS :
 
-```text
-tests/e2e/
-  01-onboarding-club.e2e.ts       # signup admin, validation email (lien magic dans email_send_log), création club, wizard
-  02-teams-multi-sport.e2e.ts     # création équipes football, basket, rugby, handball, volley
-  03-users-roles.e2e.ts           # invite admin, coach ; coach rattaché à équipe
-  04-players-parents.e2e.ts       # ajout joueurs avec parents / sans parents, onboarding parent via lien
-  05-events-all-types.e2e.ts      # entraînement, match (home/away), tournoi, réunion — sur 2 sports
-  06-lineup.e2e.ts                # création compo football, drag-drop slots, publication
-  07-convocations-send.e2e.ts     # envoi convocation email + WhatsApp (vérif lien wa.me)
-  08-convocations-respond.e2e.ts  # réponse joueur, réponse parent, mise à jour par admin/coach
-  09-event-chat.e2e.ts            # envoi message, mention, pièce jointe
-  10-coach-feedback.e2e.ts        # feedback sur 3 joueurs, synthèse IA, édition synthèse
-  11-match-result-stats.e2e.ts    # score, buts, cartons, vérif page stats
-  12-convocation-lifecycle.e2e.ts # annuler conv joueur, renvoyer conv, reporter event
-  13-player-profile.e2e.ts        # MAJ profil joueur (poste, dossard, photo)
+```ts
+type TournamentRules = {
+  points: { win: number; draw: number; loss: number; bonusWin?: number };
+  tiebreakers: TiebreakerKey[];          // ordre configurable
+  qualification: {
+    perGroup: number;                     // ex. 2
+    bestThirds?: number;                  // ex. 2 meilleurs 3èmes
+    wildcards?: string[];                 // team_ids
+  };
+  fairPlay: {
+    enabled: boolean;
+    yellow: number;                       // -1 pt par défaut
+    red: number;                          // -3 pts
+    secondYellow?: number;
+  };
+  overtime: { enabled: boolean; minutes?: number };
+  penaltyShootout: { enabled: boolean };
+  language: "fr" | "en";
+  branding: { primaryColor?: string; organizerName?: string };
+};
 ```
 
-~13 fichiers, ~40-60 tests, durée cible < 8 min en parallèle.
+**Nouvelles tables / colonnes** :
+- `tournament_match_events` : `id, match_id, team_id, player_id?, kind ('yellow'|'red'|'goal'|'own_goal'|'assist'), minute, created_at` — pour fair-play et stats détaillées
+- `tournament_matches` : ajouter `validated_at`, `validated_by`, `dispute_flag boolean`, `penalty_score_a`, `penalty_score_b`, `overtime_score_a`, `overtime_score_b`
+- `tournament_documents` : `id, tournament_id, kind ('rules'), language, file_url, generated_at` — historique des PDF
+- Bucket Storage `tournament-documents` (public read)
 
-## Helpers clés
+RLS : reprendre les helpers `can_view_tournament` / `can_manage_tournament` déjà en place.
 
-- `createTestClub()` → renvoie `{ clubId, adminUser, cleanup }` via service role.
-- `loginAs(page, user)` → injecte session Supabase dans `localStorage` (évite UI login répétitif).
-- `getLastEmail(recipient, template)` → lit `email_send_log` pour récupérer tokens (validation, invite, convocation).
-- `seedTeamWithPlayers(clubId, sport, count)` → raccourci pour les tests qui ne testent pas la création.
+### 2. Moteur de classement (étendu)
 
-## CI
+`src/modules/tournaments/lib/standings.ts` — élargir `Tiebreaker` :
+```
+"points" | "head_to_head_points" | "head_to_head_gd" | "head_to_head_gf"
+| "goal_diff" | "goals_for" | "wins" | "fair_play" | "draw_lot"
+```
+- Ajouter `fairPlayPoints` par équipe (calculé depuis `tournament_match_events`)
+- `draw_lot` → ordre stable basé sur hash(teamId+tournamentId) (déterministe, transparent)
+- Mini-ligue head-to-head : quand ≥3 équipes ex-aequo sur "points", recalculer un sous-classement entre elles avant de continuer
 
-- Nouveau workflow `.github/workflows/e2e-tests.yml`
-  - **Cron** : `0 4 * * *` (4 AM UTC, après les RLS de 3 AM)
-  - **Manuel** : `workflow_dispatch` avec choix de `target` (preview / production)
-  - Timeout 20 min, upload du rapport HTML Playwright en artifact
-  - Issue GitHub auto si échec cron (label `e2e` + `bug`)
-- Scripts package.json :
-  - `test:e2e` → `playwright test`
-  - `test:e2e:ui` → `playwright test --ui` (debug local)
-  - `test:e2e:headed` → mode headed
+### 3. Qualification
 
-## Secrets GitHub requis (en plus des RLS)
+`src/modules/tournaments/lib/qualification.ts` (nouveau) :
+- `selectQualified(groups, standings, rules)` → liste ordonnée de team_ids qualifiés
+- Logique meilleurs 3èmes : extraire les Nèmes de chaque poule, les classer entre eux
+- Ajouter wildcards manuels
+- Brancher sur `generateBracket` existant
 
-- `E2E_BASE_URL` (par défaut preview URL)
-- Réutilise `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`
+### 4. UI Admin — onglet "Règles"
 
-## Points d'attention
+Nouveau composant `TournamentRulesEditor.tsx` dans l'écran tournoi :
+- Section Points : 3 inputs numériques
+- Section Tie-breakers : liste drag-and-drop (`@dnd-kit/sortable` déjà dispo ? sinon `react-sortable-hoc`) avec switch on/off
+- Section Qualification : N par poule, meilleurs 3èmes, sélecteur wildcards
+- Section Fair Play : toggle + valeurs cartons
+- Section Overtime / Penalty / Branding / Language
+- Bouton "Enregistrer" → `updateTournament({ patch: { settings: rules } })`
+- Bouton "Réinitialiser aux défauts"
 
-- **WhatsApp** : pas d'envoi réel — on vérifie juste que le lien `https://wa.me/...?text=...` est généré correctement (clic → `page.waitForEvent('popup')`).
-- **Emails** : pas de SMTP en test — on lit `email_send_log` pour extraire tokens (déjà la stratégie utilisée par les RLS).
-- **IA (synthèse coach)** : appel réel à Lovable AI Gateway (coût faible mais réel) OU mock via flag `E2E_MOCK_AI=1`. Recommandé : appel réel en nightly, mock en CI PR.
-- **Flakiness** : `webkit` désactivé pour V1 (drag-drop compo instable), retry x2 en CI, x0 en local.
+### 5. Validation des matchs
 
-## Livrable
+`MatchesList.tsx` :
+- Badge "Provisoire" / "Validé"
+- Bouton "Valider" (manager/admin) → `validateMatch(matchId)`
+- Bouton "Signaler litige" → `dispute_flag = true`
+- Standings recalculées en live mais option "n'inclure que matchs validés" (settings)
 
-1. `playwright.config.ts` + install (`bun add -D @playwright/test`)
-2. 13 fichiers de tests + fixtures
-3. Workflow CI nightly + manuel
-4. Doc courte `docs/dev/e2e.md` (comment lancer, debug, ajouter un test)
+### 6. PDF du règlement
 
-## Questions avant de coder
+`src/modules/tournaments/lib/rules-pdf.server.ts` + server route `src/routes/api/public/tournaments/$slug/rules.ts` :
+- Lib : **`pdf-lib`** (déjà compatible Workers, pure JS, pas de native bin)
+- Génère PDF avec logo (fetch depuis Storage), nom, organisateur, sport, format, dates, lieu
+- Sections : Points, Tie-breakers (numérotés dans l'ordre choisi), Qualification, Fair-play, Prolongations/Tirs au but, Calendrier (si dispo)
+- i18n via `src/locales/{fr,en}/tournament-rules.json` (nouvelle namespace)
+- Stocké dans bucket `tournament-documents`, ligne dans `tournament_documents`
+- Bouton "Télécharger règlement (FR)" / "(EN)" dans l'admin + page publique
 
-1. **Cible CI** : preview Lovable, ou prod ? (recommandé : preview)
-2. **IA en CI** : appel réel ou mock ? (recommandé : réel en nightly seulement)
-3. **WhatsApp** : on se contente de vérifier le lien généré, ou tu veux un vrai test bout en bout via une API tierce (genre Twilio sandbox) ?
-4. **Périmètre V1** : on attaque les 13 blocs d'un coup, ou on commence par les 5 plus critiques (onboarding, événements, convocations, compo, feedback) ?
+### 7. i18n
+
+Nouveau namespace `tournament-rules` (FR + EN) avec toutes les clés : labels colonnes classement, noms de tie-breakers, sections PDF, messages.
+
+## Découpage en livraison (incrémental)
+
+**PR 1 — Fondations** (migration + moteur)
+- Migration : settings étendus, colonnes validation match, table events, table documents, bucket
+- Étendre `standings.ts` (nouveaux tie-breakers, fair-play, mini-ligue h2h)
+- `qualification.ts` (sélection qualifiés + meilleurs 3èmes)
+- Tests unitaires (`src/tests/unit/standings.test.ts`, `qualification.test.ts`)
+
+**PR 2 — UI Règles**
+- `TournamentRulesEditor.tsx` (drag-and-drop tie-breakers, tous les toggles)
+- Branchement dans la page tournoi (nouvel onglet "Règles")
+- Server fns `updateTournamentRules`, `resetRulesToDefaults`
+
+**PR 3 — Validation matchs & fair-play**
+- UI validation + dispute dans `MatchesList`
+- Saisie cartons (réutiliser `event_goals` pattern si possible, sinon `tournament_match_events`)
+- Server fns `validateMatch`, `recordMatchEvent`
+
+**PR 4 — PDF règlement**
+- `rules-pdf.server.ts` avec `pdf-lib`
+- Server route publique `/api/public/tournaments/$slug/rules?lang=fr`
+- Namespace i18n `tournament-rules`
+- Boutons "Télécharger règlement FR/EN"
+
+## Détails techniques
+
+- **DnD** : `@dnd-kit/core` + `@dnd-kit/sortable` (à installer si absent)
+- **PDF** : `pdf-lib` (Workers-safe ; PAS `puppeteer`, PAS `pdfkit` native)
+- **Storage** : bucket `tournament-documents` public-read, écritures via `supabaseAdmin` côté server fn
+- **RLS** : `tournament_match_events` & `tournament_documents` → `can_view_tournament` (SELECT public/anon), `can_manage_tournament` (WRITE)
+- **Future-proofing** : `tournament_match_events` sert déjà de socle pour le live-scoring et l'app arbitre futurs ; le bucket documents peut accueillir feuilles de match, affiches, etc.
+
+## Hors scope (à confirmer)
+- App arbitre dédiée, push live, IA résumés, QR codes, bannières sponsors → mentionnés comme "future-proofing" → on prépare la DB mais **on n'implémente pas** ces écrans maintenant.
+- Référi-validation séparée du manager → l'admin override couvre le besoin V1.
+
+Confirme-moi : **on attaque dans cet ordre (PR1 → PR4) ?** Ou tu préfères que je livre tout d'un coup ?
