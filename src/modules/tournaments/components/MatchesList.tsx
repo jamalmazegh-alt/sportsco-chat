@@ -468,11 +468,15 @@ function MatchCard({
               </span>
             )}
             {done && !validated && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">
+              <span
+                className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300"
+                title="Score saisi, en attente de validation par l'organisateur"
+              >
                 <Check className="h-3 w-3" />
-                Provisoire
+                À valider
               </span>
             )}
+
             {validated && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
                 <ShieldCheck className="h-3 w-3" />
