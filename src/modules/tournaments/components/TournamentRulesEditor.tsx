@@ -368,6 +368,58 @@ export function TournamentRulesEditor({ tournamentId, settings }: Props) {
         </CardContent>
       </Card>
 
+      {/* PDF generation */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Règlement PDF</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Génère un PDF officiel basé sur les règles enregistrées. Pense à
+            sauvegarder tes modifications avant de générer.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => generate.mutate()}
+            disabled={generate.isPending}
+          >
+            {generate.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileDown className="h-4 w-4" />
+            )}
+            Générer le PDF
+          </Button>
+          {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
+            <ul className="space-y-1.5 pt-2">
+              {docsQuery.data.documents.slice(0, 5).map((d: any) => (
+                <li
+                  key={d.id}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
+                >
+                  <span className="truncate">
+                    <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
+                      {d.language}
+                    </span>
+                    {new Date(d.generated_at).toLocaleString("fr-FR")}
+                  </span>
+                  <a
+                    href={d.file_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-1 text-xs"
+                  >
+                    Ouvrir <ExternalLink className="h-3 w-3" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+
       <div className="flex gap-2 sticky bottom-0 bg-background/95 backdrop-blur py-3 border-t border-border">
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
           {save.isPending ? (
