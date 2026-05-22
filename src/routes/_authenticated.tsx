@@ -65,16 +65,6 @@ function AuthLayout() {
       t={t}
     />;
   }
-    return <NoMembershipScreen
-      clubName={clubName}
-      setClubName={setClubName}
-      busy={busy}
-      setBusy={setBusy}
-      userId={user?.id ?? ""}
-      onDone={refreshMemberships}
-      t={t}
-    />;
-  }
 
   return (
     <ConsentGate>
