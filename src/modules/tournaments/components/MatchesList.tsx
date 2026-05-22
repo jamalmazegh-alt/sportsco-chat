@@ -224,9 +224,15 @@ function MatchCard({
   const [editOpen, setEditOpen] = useState(false);
   const [a, setA] = useState(match.score_a ?? 0);
   const [b, setB] = useState(match.score_b ?? 0);
+  const [penA, setPenA] = useState(match.penalty_score_a ?? 0);
+  const [penB, setPenB] = useState(match.penalty_score_b ?? 0);
   const [sets, setSets] = useState<SetScore[]>(
     (match.sets ?? []).map((s) => ({ a: s.a, b: s.b })),
   );
+  const isKnockout = match.round !== "group";
+  const tied = a === b;
+  const hasPenalty = (match.penalty_score_a ?? null) !== null && (match.penalty_score_b ?? null) !== null;
+
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
   const valFn = useServerFn(validateMatch);
