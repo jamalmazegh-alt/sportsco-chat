@@ -55,8 +55,8 @@ import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/cl
 import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug.tv'
-import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug.register'
+import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug_.tv'
+import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug_.register'
 import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
 import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
@@ -324,14 +324,14 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const TournamentSlugTvRoute = TournamentSlugTvRouteImport.update({
-  id: '/tv',
-  path: '/tv',
-  getParentRoute: () => TournamentSlugRoute,
+  id: '/tournament/$slug_/tv',
+  path: '/tournament/$slug/tv',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TournamentSlugRegisterRoute = TournamentSlugRegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => TournamentSlugRoute,
+  id: '/tournament/$slug_/register',
+  path: '/tournament/$slug/register',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TSlugTvRoute = TSlugTvRouteImport.update({
   id: '/tv',
@@ -552,7 +552,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
-  '/tournament/$slug': typeof TournamentSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
@@ -629,7 +629,7 @@ export interface FileRoutesByTo {
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
-  '/tournament/$slug': typeof TournamentSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin': typeof SuperadminIndexRoute
@@ -712,7 +712,7 @@ export interface FileRoutesById {
   '/superadmin/users': typeof SuperadminUsersRouteWithChildren
   '/t/$slug': typeof TSlugRouteWithChildren
   '/tournament-invite/$token': typeof TournamentInviteTokenRoute
-  '/tournament/$slug': typeof TournamentSlugRouteWithChildren
+  '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
@@ -736,8 +736,8 @@ export interface FileRoutesById {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
-  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
-  '/tournament/$slug/tv': typeof TournamentSlugTvRoute
+  '/tournament/$slug_/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug_/tv': typeof TournamentSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
@@ -978,8 +978,8 @@ export interface FileRouteTypes {
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
     | '/t/$slug/tv'
-    | '/tournament/$slug/register'
-    | '/tournament/$slug/tv'
+    | '/tournament/$slug_/register'
+    | '/tournament/$slug_/tv'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
     | '/_authenticated/support/'
@@ -1021,7 +1021,7 @@ export interface RootRouteChildren {
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
-  TournamentSlugRoute: typeof TournamentSlugRouteWithChildren
+  TournamentSlugRoute: typeof TournamentSlugRoute
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
@@ -1029,6 +1029,8 @@ export interface RootRouteChildren {
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRoute
+  TournamentSlugTvRoute: typeof TournamentSlugTvRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
@@ -1363,19 +1365,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/tournament/$slug/tv': {
-      id: '/tournament/$slug/tv'
-      path: '/tv'
+    '/tournament/$slug_/tv': {
+      id: '/tournament/$slug_/tv'
+      path: '/tournament/$slug/tv'
       fullPath: '/tournament/$slug/tv'
       preLoaderRoute: typeof TournamentSlugTvRouteImport
-      parentRoute: typeof TournamentSlugRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/tournament/$slug/register': {
-      id: '/tournament/$slug/register'
-      path: '/register'
+    '/tournament/$slug_/register': {
+      id: '/tournament/$slug_/register'
+      path: '/tournament/$slug/register'
       fullPath: '/tournament/$slug/register'
       preLoaderRoute: typeof TournamentSlugRegisterRouteImport
-      parentRoute: typeof TournamentSlugRoute
+      parentRoute: typeof rootRouteImport
     }
     '/t/$slug/tv': {
       id: '/t/$slug/tv'
@@ -1823,20 +1825,6 @@ const TSlugRouteChildren: TSlugRouteChildren = {
 
 const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
 
-interface TournamentSlugRouteChildren {
-  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRoute
-  TournamentSlugTvRoute: typeof TournamentSlugTvRoute
-}
-
-const TournamentSlugRouteChildren: TournamentSlugRouteChildren = {
-  TournamentSlugRegisterRoute: TournamentSlugRegisterRoute,
-  TournamentSlugTvRoute: TournamentSlugTvRoute,
-}
-
-const TournamentSlugRouteWithChildren = TournamentSlugRoute._addFileChildren(
-  TournamentSlugRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1859,7 +1847,7 @@ const rootRouteChildren: RootRouteChildren = {
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentInviteTokenRoute: TournamentInviteTokenRoute,
-  TournamentSlugRoute: TournamentSlugRouteWithChildren,
+  TournamentSlugRoute: TournamentSlugRoute,
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
@@ -1867,6 +1855,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  TournamentSlugRegisterRoute: TournamentSlugRegisterRoute,
+  TournamentSlugTvRoute: TournamentSlugTvRoute,
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
@@ -1879,3 +1869,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
