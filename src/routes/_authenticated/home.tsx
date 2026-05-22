@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,6 +15,7 @@ import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
 import { HomeSkeleton } from "@/components/skeletons";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
