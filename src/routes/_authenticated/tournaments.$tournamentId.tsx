@@ -204,6 +204,8 @@ function TournamentDetailPage() {
             tournamentId={tournament.id}
             matches={matches as any}
             teams={teams as any}
+            canManage={canManage}
+            fields={((tournament as any).fields as string[] | null) ?? []}
           />
         )}
         {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
