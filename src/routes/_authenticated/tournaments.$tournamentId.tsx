@@ -83,6 +83,9 @@ function TournamentDetailPage() {
     { id: "matches", icon: Calendar, label: "Matchs" },
     { id: "standings", icon: ListOrdered, label: "Classement" },
     { id: "bracket", icon: GitBranch, label: "Bracket" },
+    ...(canManage
+      ? [{ id: "rules" as const, icon: Settings2, label: "Règles" }]
+      : []),
   ];
 
   return (
