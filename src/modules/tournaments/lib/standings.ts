@@ -29,6 +29,58 @@ export interface MatchInput {
   penaltyB?: number | null;
 }
 
+export interface ForfeitConfig {
+  winnerScore: number;
+  loserScore: number;
+  abandonedAsForfeit: boolean;
+}
+
+export const DEFAULT_FORFEIT: ForfeitConfig = {
+  winnerScore: 3,
+  loserScore: 0,
+  abandonedAsForfeit: true,
+};
+
+/**
+ * Normalise un match selon son statut spécial (forfait, équipe absente, abandon).
+ * Retourne null si le match doit être ignoré (annulé, non joué).
+ */
+function normalizeSpecialStatus(
+  m: MatchInput,
+  forfeit: ForfeitConfig,
+): MatchInput | null {
+  switch (m.status) {
+    case "completed":
+      return m.scoreA !== null && m.scoreB !== null ? m : null;
+    case "forfeit_a":
+    case "no_show_a":
+      // équipe A perd par forfait
+      return { ...m, scoreA: forfeit.loserScore, scoreB: forfeit.winnerScore, status: "completed" };
+    case "forfeit_b":
+    case "no_show_b":
+      return { ...m, scoreA: forfeit.winnerScore, scoreB: forfeit.loserScore, status: "completed" };
+    case "abandoned":
+      if (!forfeit.abandonedAsForfeit) {
+        // Garder le score figé au moment de l'abandon
+        return m.scoreA !== null && m.scoreB !== null ? { ...m, status: "completed" } : null;
+      }
+      // Sinon : l'équipe qui mène garde la victoire par forfait ; à défaut, équipe A perd
+      if (m.scoreA !== null && m.scoreB !== null) {
+        if (m.scoreA > m.scoreB) {
+          return { ...m, scoreA: forfeit.winnerScore, scoreB: forfeit.loserScore, status: "completed" };
+        }
+        if (m.scoreB > m.scoreA) {
+          return { ...m, scoreA: forfeit.loserScore, scoreB: forfeit.winnerScore, status: "completed" };
+        }
+      }
+      return null;
+    case "cancelled":
+    default:
+      return null;
+  }
+}
+
+
 export interface MatchEventInput {
   matchId: string;
   teamId: string | null;
