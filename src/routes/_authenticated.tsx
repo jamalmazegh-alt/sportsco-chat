@@ -58,15 +58,30 @@ function AuthLayout() {
   if (!session) return <Navigate to="/login" replace />;
 
   const { tournamentOnly } = useTournamentOnlyMode();
+  const { activeClubId } = useAuth();
+  const { isActive: clubSubActive, isLoading: subLoading } =
+    useClubSubscriptionActive(activeClubId);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
   const isTournamentOrganizer = signupRole === "tournament_organizer";
 
   // Guard: tournament-only accounts can only reach tournament + profile pages.
-  if (tournamentOnly && !isTournamentOnlyAllowed(pathname)) {
+  if (tournamentOnly && !isPathAllowed(pathname, TOURNAMENT_ONLY_ALLOWED)) {
     return <Navigate to="/tournaments" replace />;
   }
+
+  // Guard: clubs without an active subscription only see Admin + Profile.
+  if (
+    !tournamentOnly &&
+    activeClubId &&
+    !subLoading &&
+    !clubSubActive &&
+    !isPathAllowed(pathname, CLUB_LOCKED_ALLOWED)
+  ) {
+    return <Navigate to="/admin/billing" replace />;
+  }
+
 
   if (memberships.length === 0) {
     // Tournament organizers don't need a club — render the route with just
