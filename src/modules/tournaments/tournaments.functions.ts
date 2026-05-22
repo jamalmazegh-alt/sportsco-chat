@@ -123,6 +123,25 @@ export const listMyTournaments = createServerFn({ method: "POST" })
     return { tournaments: rows ?? [] };
   });
 
+/**
+ * List personal tournaments created by the current user without any club
+ * (tournament-only organizers).
+ */
+export const listMyPersonalTournaments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("tournaments")
+      .select("*")
+      .is("club_id", null)
+      .eq("created_by", userId)
+      .is("archived_at", null)
+      .order("starts_on", { ascending: false });
+    if (error) throw error;
+    return { tournaments: rows ?? [] };
+  });
+
 export const getTournament = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { tournament_id: string }) =>
