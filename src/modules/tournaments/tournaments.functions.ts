@@ -942,7 +942,50 @@ export const setMatchDispute = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+const MATCH_STATUS_ENUM = [
+  "scheduled",
+  "live",
+  "completed",
+  "cancelled",
+  "forfeit_a",
+  "forfeit_b",
+  "no_show_a",
+  "no_show_b",
+  "abandoned",
+] as const;
+
+export const setMatchStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        status: z.enum(MATCH_STATUS_ENUM),
+        notes: z.string().max(500).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const patch: Record<string, unknown> = { status: data.status };
+    if (data.notes !== undefined) patch.notes = data.notes;
+    if (data.status === "scheduled" || data.status === "live") {
+      patch.validated_at = null;
+      patch.validated_by = null;
+    }
+    const { error } = await supabase
+      .from("tournament_matches")
+      .update(patch)
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id);
+    if (error) throw new Response(error.message, { status: 400 });
+    return { ok: true };
+  });
+
 // ---------- Match events (cards, goals)
+
 
 export const recordMatchEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
