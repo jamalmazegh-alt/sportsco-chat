@@ -88,8 +88,8 @@ function PricingPage() {
 
       {/* Main Pricing */}
       <section className="border-b border-border/60">
-        <div className="mx-auto max-w-5xl px-5 py-16 lg:px-8 lg:py-20">
-          <div className="grid gap-8 lg:grid-cols-2">
+        <div className="mx-auto max-w-6xl px-5 py-16 lg:px-8 lg:py-20">
+          <div className="grid gap-8 lg:grid-cols-3">
             {/* CLUBERO Plan */}
             <div className="relative rounded-3xl border border-primary bg-card p-8 shadow-xl shadow-primary/5">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
