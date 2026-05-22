@@ -35,6 +35,7 @@ interface Props {
 export function GroupsAndFixtures({
   tournamentId,
   format,
+  status,
   numTeams,
   groupsCount,
   matchesCount,
@@ -45,8 +46,10 @@ export function GroupsAndFixtures({
   dailyEndTime,
   fields,
   settings,
+  teams,
 }: Props) {
   const qc = useQueryClient();
+  const [drawOpen, setDrawOpen] = useState(false);
   const [numGroups, setNumGroups] = useState(2);
   const [qualifiers, setQualifiers] = useState(2);
   const [thirdPlace, setThirdPlace] = useState(false);
