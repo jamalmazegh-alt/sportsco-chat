@@ -25,6 +25,7 @@ interface Props {
   dailyStartTime?: string | null;
   dailyEndTime?: string | null;
   fields?: string[] | null;
+  settings?: Record<string, any> | null;
 }
 
 export function GroupsAndFixtures({
@@ -39,6 +40,7 @@ export function GroupsAndFixtures({
   dailyStartTime,
   dailyEndTime,
   fields,
+  settings,
 }: Props) {
   const qc = useQueryClient();
   const [numGroups, setNumGroups] = useState(2);
@@ -53,6 +55,9 @@ export function GroupsAndFixtures({
   const [fieldsText, setFieldsText] = useState(
     (fields ?? ["Terrain 1"]).join(", "),
   );
+  const [lunchEnabled, setLunchEnabled] = useState<boolean>(!!settings?.lunch_start);
+  const [lunchStart, setLunchStart] = useState<string>(settings?.lunch_start ?? "12:00");
+  const [lunchEnd, setLunchEnd] = useState<string>(settings?.lunch_end ?? "13:30");
 
   useEffect(() => {
     setDuration(matchDurationMin ?? 20);
@@ -60,7 +65,10 @@ export function GroupsAndFixtures({
     setStartTime(dailyStartTime ?? "09:00");
     setEndTime(dailyEndTime ?? "18:00");
     setFieldsText((fields ?? ["Terrain 1"]).join(", "));
-  }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields]);
+    setLunchEnabled(!!settings?.lunch_start);
+    setLunchStart(settings?.lunch_start ?? "12:00");
+    setLunchEnd(settings?.lunch_end ?? "13:30");
+  }, [matchDurationMin, breakMin, dailyStartTime, dailyEndTime, fields, settings]);
 
   const genGroupsFn = useServerFn(autoCreateGroupsAndFixtures);
   const genKnockoutFn = useServerFn(generateKnockoutFromGroups);
@@ -101,6 +109,11 @@ export function GroupsAndFixtures({
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+      const nextSettings = {
+        ...(settings ?? {}),
+        lunch_start: lunchEnabled ? lunchStart : null,
+        lunch_end: lunchEnabled ? lunchEnd : null,
+      };
       return updateFn({
         data: {
           tournament_id: tournamentId,
@@ -110,6 +123,7 @@ export function GroupsAndFixtures({
             daily_start_time: startTime,
             daily_end_time: endTime,
             fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+            settings: nextSettings,
           },
         },
       });
@@ -139,6 +153,8 @@ export function GroupsAndFixtures({
           match_duration_min: duration,
           break_min: pause,
           fields: fieldsList.length ? fieldsList : ["Terrain 1"],
+          lunch_start_time: lunchEnabled ? lunchStart : undefined,
+          lunch_end_time: lunchEnabled ? lunchEnd : undefined,
         },
       });
     },
@@ -302,8 +318,39 @@ export function GroupsAndFixtures({
             placeholder="Terrain 1, Terrain 2"
           />
           <p className="text-[11px] text-muted-foreground">
-            Plusieurs terrains = matchs en parallèle.
+            Plusieurs terrains = matchs en parallèle. Tu peux aussi réassigner chaque match à un terrain dans l'onglet "Matchs".
           </p>
+        </div>
+        <div className="space-y-2 rounded-lg border border-border/60 p-3">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={lunchEnabled}
+              onChange={(e) => setLunchEnabled(e.target.checked)}
+              className="h-4 w-4 rounded border-input"
+            />
+            Pause déjeuner (aucun match)
+          </label>
+          {lunchEnabled && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Début pause</Label>
+                <Input
+                  type="time"
+                  value={lunchStart}
+                  onChange={(e) => setLunchStart(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Fin pause</Label>
+                <Input
+                  type="time"
+                  value={lunchEnd}
+                  onChange={(e) => setLunchEnd(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-2">
           <Button

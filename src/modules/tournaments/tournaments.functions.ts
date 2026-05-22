@@ -588,6 +588,8 @@ export const autoScheduleMatches = createServerFn({ method: "POST" })
         match_duration_min: z.number().int().min(1).max(240),
         break_min: z.number().int().min(0).max(120),
         fields: z.array(z.string().min(1).max(60)).min(1).max(20),
+        lunch_start_time: z.string().optional(), // HH:MM
+        lunch_end_time: z.string().optional(), // HH:MM
       })
       .parse(input),
   )
@@ -606,53 +608,55 @@ export const autoScheduleMatches = createServerFn({ method: "POST" })
       return { scheduled: 0 };
     }
 
-    const [h, m] = data.daily_start_time.split(":").map((x) => parseInt(x, 10));
+    const toMin = (hhmm: string) => {
+      const [hh, mm] = hhmm.split(":").map((x) => parseInt(x, 10));
+      return hh * 60 + mm;
+    };
+
     const slotMin = data.match_duration_min + data.break_min;
-    const dayStartMin = h * 60 + m;
-    const dayEndMin = data.daily_end_time
-      ? (() => {
-          const [eh, em] = data.daily_end_time!.split(":").map((x) => parseInt(x, 10));
-          return eh * 60 + em;
-        })()
-      : 24 * 60;
+    const dayStartMin = toMin(data.daily_start_time);
+    const dayEndMin = data.daily_end_time ? toMin(data.daily_end_time) : 24 * 60;
+    const lunchStart =
+      data.lunch_start_time && data.lunch_end_time ? toMin(data.lunch_start_time) : null;
+    const lunchEnd =
+      data.lunch_start_time && data.lunch_end_time ? toMin(data.lunch_end_time!) : null;
+
     const baseDate = new Date(`${data.starts_on}T00:00:00`);
-
-    let day = 0;
-    let slotIdx = 0;
     const numFields = data.fields.length;
-    const updates: Promise<any>[] = [];
 
-    for (const match of matches) {
-      const fieldIdx = slotIdx % numFields;
-      const slotInDay = Math.floor(slotIdx / numFields);
-      const minOfDay = dayStartMin + slotInDay * slotMin;
-
-      if (minOfDay + data.match_duration_min > dayEndMin) {
-        // Next day
-        day++;
-        slotIdx = 0;
-        const dayMinNew = dayStartMin;
-        const at = new Date(baseDate);
-        at.setDate(at.getDate() + day);
-        at.setMinutes(dayMinNew);
-        updates.push(
-          supabase
-            .from("tournament_matches")
-            .update({
-              scheduled_at: at.toISOString(),
-              field: data.fields[0],
-              duration_min: data.match_duration_min,
-            })
-            .eq("id", match.id)
-            .then(() => null) as any,
-        );
-        slotIdx = 1;
+    // Pre-compute valid start times per day (same every day)
+    const validStartMins: number[] = [];
+    let t = dayStartMin;
+    while (t + data.match_duration_min <= dayEndMin) {
+      const matchEnd = t + data.match_duration_min;
+      const overlapsLunch =
+        lunchStart !== null && lunchEnd !== null && t < lunchEnd && matchEnd > lunchStart;
+      if (overlapsLunch) {
+        t = lunchEnd!; // jump past lunch
         continue;
       }
+      validStartMins.push(t);
+      t += slotMin;
+    }
+
+    if (validStartMins.length === 0) {
+      throw new Response("Aucun créneau disponible avec ces réglages", { status: 400 });
+    }
+
+    const updates: Promise<any>[] = [];
+    let cursor = 0; // global match cursor
+    for (const match of matches) {
+      const slotsPerDay = validStartMins.length * numFields;
+      const dayIdx = Math.floor(cursor / slotsPerDay);
+      const idxInDay = cursor % slotsPerDay;
+      const timeIdx = Math.floor(idxInDay / numFields);
+      const fieldIdx = idxInDay % numFields;
+      const minOfDay = validStartMins[timeIdx];
 
       const at = new Date(baseDate);
-      at.setDate(at.getDate() + day);
-      at.setMinutes(minOfDay);
+      at.setDate(at.getDate() + dayIdx);
+      at.setHours(0, minOfDay, 0, 0);
+
       updates.push(
         supabase
           .from("tournament_matches")
@@ -664,9 +668,40 @@ export const autoScheduleMatches = createServerFn({ method: "POST" })
           .eq("id", match.id)
           .then(() => null) as any,
       );
-      slotIdx++;
+      cursor++;
     }
 
     await Promise.all(updates);
     return { scheduled: matches.length };
+  });
+
+// ---------- Manual match assignment (field + scheduled_at)
+
+export const updateMatchSchedule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        match_id: z.string().uuid(),
+        field: z.string().min(1).max(60).nullable().optional(),
+        scheduled_at: z.string().nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const patch: { field?: string | null; scheduled_at?: string | null } = {};
+    if (data.field !== undefined) patch.field = data.field;
+    if (data.scheduled_at !== undefined) patch.scheduled_at = data.scheduled_at;
+    const { data: row, error } = await supabase
+      .from("tournament_matches")
+      .update(patch)
+      .eq("id", data.match_id)
+      .eq("tournament_id", data.tournament_id)
+      .select("*")
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+    return { match: row };
   });

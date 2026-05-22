@@ -189,7 +189,9 @@ function TournamentDetailPage() {
             dailyStartTime={(tournament as any).daily_start_time}
             dailyEndTime={(tournament as any).daily_end_time}
             fields={(tournament as any).fields}
+            settings={(tournament as any).settings}
           />
+
         )}
 
         {tab === "fixtures" && !canManage && (
@@ -202,6 +204,8 @@ function TournamentDetailPage() {
             tournamentId={tournament.id}
             matches={matches as any}
             teams={teams as any}
+            canManage={canManage}
+            fields={((tournament as any).fields as string[] | null) ?? []}
           />
         )}
         {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
