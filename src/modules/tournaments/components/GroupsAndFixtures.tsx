@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Shuffle, Trophy, Clock, CalendarClock, HelpCircle, Plus, X, MapPin, UtensilsCrossed } from "lucide-react";
+import { Loader2, Shuffle, Trophy, Clock, CalendarClock, HelpCircle, Plus, X, MapPin, UtensilsCrossed, Dices } from "lucide-react";
 import { toast } from "sonner";
 import {
   autoCreateGroupsAndFixtures,
@@ -13,10 +13,12 @@ import {
   updateTournament,
   autoScheduleMatches,
 } from "../tournaments.functions";
+import { DrawDialog } from "./DrawDialog";
 
 interface Props {
   tournamentId: string;
   format: "group" | "knockout" | "mixed";
+  status: string;
   numTeams: number;
   groupsCount: number;
   matchesCount: number;
@@ -27,11 +29,13 @@ interface Props {
   dailyEndTime?: string | null;
   fields?: string[] | null;
   settings?: Record<string, any> | null;
+  teams: Array<{ id: string; name: string; short_name?: string | null; logo_url?: string | null }>;
 }
 
 export function GroupsAndFixtures({
   tournamentId,
   format,
+  status,
   numTeams,
   groupsCount,
   matchesCount,
@@ -42,8 +46,10 @@ export function GroupsAndFixtures({
   dailyEndTime,
   fields,
   settings,
+  teams,
 }: Props) {
   const qc = useQueryClient();
+  const [drawOpen, setDrawOpen] = useState(false);
   const [numGroups, setNumGroups] = useState(2);
   const [qualifiers, setQualifiers] = useState(2);
   const [thirdPlace, setThirdPlace] = useState(false);
@@ -198,8 +204,41 @@ export function GroupsAndFixtures({
   const supportsGroups = format !== "knockout";
   const supportsKnockout = format !== "group";
 
+  const hasExistingDraw = groupsCount > 0 || matchesCount > 0;
+
   return (
     <div className="space-y-4">
+      <section className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Dices className="h-4 w-4 text-primary" />
+          <h3 className="font-medium">Tirage au sort</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {numTeams < 2
+            ? "Ajoutez des équipes avant de lancer le tirage au sort."
+            : "Auto, progressif (animation) ou manuel — répartit les équipes dans les poules ou le bracket."}
+        </p>
+        <Button
+          onClick={() => setDrawOpen(true)}
+          disabled={numTeams < 2}
+          className="w-full"
+          variant={hasExistingDraw ? "outline" : "default"}
+        >
+          <Dices className="h-4 w-4" />
+          {hasExistingDraw ? "Relancer le tirage au sort" : "Lancer le tirage au sort"}
+        </Button>
+      </section>
+
+      <DrawDialog
+        open={drawOpen}
+        onOpenChange={setDrawOpen}
+        tournamentId={tournamentId}
+        format={format}
+        status={status}
+        teams={teams}
+        hasExistingDraw={hasExistingDraw}
+      />
+
       {supportsGroups && (
         <section className="rounded-xl border border-border bg-card p-4 space-y-3">
           <div className="flex items-center gap-2">

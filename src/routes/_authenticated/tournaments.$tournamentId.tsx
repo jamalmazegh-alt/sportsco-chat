@@ -203,7 +203,9 @@ function TournamentDetailPage() {
           <GroupsAndFixtures
             tournamentId={tournament.id}
             format={tournament.format}
+            status={tournament.status}
             numTeams={teams.length}
+            teams={teams as any}
             groupsCount={groups.length}
             matchesCount={matches.length}
             startsOn={tournament.starts_on}
