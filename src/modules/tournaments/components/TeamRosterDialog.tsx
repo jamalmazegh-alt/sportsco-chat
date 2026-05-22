@@ -236,12 +236,26 @@ function PlayerFormDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Nom</Label>
+            <Label className="flex items-center justify-between">
+              <span>Nom</span>
+              <button
+                type="button"
+                onClick={() =>
+                  setLastName((v) =>
+                    v.trim() ? `${v.trim().charAt(0).toUpperCase()}.` : v,
+                  )
+                }
+                className="text-[11px] text-primary hover:underline"
+              >
+                Anonymiser
+              </button>
+            </Label>
             <Input
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
               maxLength={80}
+              placeholder="Dupont ou D."
             />
           </div>
         </div>
