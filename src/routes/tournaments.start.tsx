@@ -126,7 +126,7 @@ function SignupForm() {
           full_name: fullName,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
-          signup_role: "club_admin",
+          signup_role: "tournament_organizer",
         },
       },
     });
