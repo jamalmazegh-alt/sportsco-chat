@@ -308,6 +308,93 @@
       "rejected": "Refusée",
       "cancelled": "Annulée"
     }
+  },
+  "teams": {
+    "count_one": "{{count}}{{limit}} équipe",
+    "count_other": "{{count}}{{limit}} équipes",
+    "import": "Importer",
+    "add": "Ajouter",
+    "empty": "Aucune équipe inscrite",
+    "addedToast": "Équipe ajoutée",
+    "updatedToast": "Équipe mise à jour",
+    "errorToast": "Erreur",
+    "importedToast_one": "{{count}} équipe importée",
+    "importedToast_other": "{{count}} équipes importées",
+    "noneDetected": "Aucune équipe détectée",
+    "pickTeam": "Choisis une équipe",
+    "dialog": {
+      "bulkTitle": "Importer plusieurs équipes",
+      "addTitle": "Ajouter une équipe",
+      "editTitle": "Modifier {{name}}",
+      "templateHint": "Pas encore de fichier ? Télécharge le modèle.",
+      "csvTemplate": "Modèle CSV",
+      "csvFileLabel": "Fichier CSV",
+      "csvHint": "Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire). Compatible Excel / Numbers / Google Sheets.",
+      "pasteLabel": "Ou colle ta liste",
+      "logoHint": "Les logos peuvent être ajoutés ensuite équipe par équipe.",
+      "external": "Équipe externe",
+      "internal": "Équipe Clubero",
+      "name": "Nom",
+      "logo": "Logo de l'équipe (optionnel)",
+      "logoEdit": "Logo",
+      "clubTeam": "Équipe du club",
+      "selectPlaceholder": "— Sélectionner —",
+      "shortName": "Nom court",
+      "shortPlaceholder": "FCU",
+      "seed": "Tête de série",
+      "seedTooltip": "La tête de série (seed) indique le rang de l'équipe au classement de départ. La n°1 est la plus forte ; elle est placée de manière à ne rencontrer la n°2 qu'en finale.",
+      "seedNone": "Non classée",
+      "seedOption": "N°{{n}}",
+      "seedBest": " (meilleure équipe)",
+      "seedHint": "Optionnel — utilisé pour le tirage et l'ordre dans le bracket.",
+      "save": "Enregistrer"
+    },
+    "row": {
+      "seed": "Seed {{n}}",
+      "noSeed": "—",
+      "clubero": " · Clubero",
+      "external": " · Externe",
+      "players": "Joueurs",
+      "edit": "Modifier"
+    }
+  },
+  "roster": {
+    "title": "Joueurs · {{team}}",
+    "import": "Importer",
+    "add": "Ajouter",
+    "empty": "Aucun joueur. Ajoute des joueurs ou importe une liste.",
+    "edit": "Modifier",
+    "remove": "Supprimer",
+    "errorToast": "Erreur",
+    "form": {
+      "addTitle": "Ajouter un joueur",
+      "editTitle": "Modifier le joueur",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "anonymize": "Anonymiser",
+      "lastNamePlaceholder": "Dupont ou D.",
+      "jersey": "N°",
+      "position": "Poste",
+      "positionPlaceholder": "GK, DEF, MID, ATT…",
+      "license": "N° de licence (optionnel)",
+      "captain": "Capitaine",
+      "save": "Enregistrer",
+      "requiredNames": "Nom et prénom requis",
+      "added": "Joueur ajouté",
+      "updated": "Joueur mis à jour"
+    },
+    "bulk": {
+      "title": "Importer une liste de joueurs",
+      "fileLabel": "Fichier CSV",
+      "hint": "Colonnes : <code>prénom, nom, n°, poste, capitaine, licence</code> (les 2 premières obligatoires). Capitaine : 1/oui/c.",
+      "pasteLabel": "Ou colle ta liste",
+      "replace": "Remplacer la liste existante",
+      "submit": "Importer",
+      "imported_one": "{{count}} joueur importé",
+      "imported_other": "{{count}} joueurs importés",
+      "noneDetected": "Aucun joueur détecté"
+    }
   }
 }
+
 
