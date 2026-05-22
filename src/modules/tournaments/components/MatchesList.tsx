@@ -379,11 +379,11 @@ function MatchCard({
       });
     },
     onSuccess: () => {
-      toast.success("Match mis à jour");
+      toast.success(t("matches.matchUpdated"));
       invalidateAll();
       setEditOpen(false);
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
   // Referee assignment
