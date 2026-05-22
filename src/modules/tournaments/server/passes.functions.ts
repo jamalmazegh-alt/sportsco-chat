@@ -155,7 +155,7 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       throw new Response("Ce pass n'appartient pas à votre compte", { status: 403 });
     }
 
-    const slug = await uniqueSlug(slugify(data.name));
+    const slug = await uniqueSlug(supabaseAdmin, slugify(data.name));
 
     const { data: tournament, error: tErr } = await supabaseAdmin
       .from("tournaments")
