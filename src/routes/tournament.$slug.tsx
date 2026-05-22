@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Trophy,
   Calendar,
@@ -13,9 +13,12 @@ import {
   GitBranch,
   CalendarDays,
   UserPlus,
+  Radio,
+  Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
 import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
