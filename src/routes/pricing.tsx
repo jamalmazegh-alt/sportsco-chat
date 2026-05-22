@@ -3,7 +3,7 @@ import { Check, Sparkles, Building2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
-import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
+
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
