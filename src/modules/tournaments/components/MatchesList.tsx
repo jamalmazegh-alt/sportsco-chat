@@ -341,6 +341,24 @@ function MatchCard({
                 Litige
               </span>
             )}
+            {match.status === "cancelled" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">Annulé</span>
+            )}
+            {match.status === "forfeit_a" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait A</span>
+            )}
+            {match.status === "forfeit_b" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">Forfait B</span>
+            )}
+            {match.status === "no_show_a" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">A absente</span>
+            )}
+            {match.status === "no_show_b" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">B absente</span>
+            )}
+            {match.status === "abandoned" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">Abandonné</span>
+            )}
           </div>
         </div>
         <button
