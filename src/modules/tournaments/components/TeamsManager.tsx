@@ -216,6 +216,15 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
             title="Importer plusieurs équipes"
           >
             <form onSubmit={onBulkSubmit} className="space-y-4 mt-4 pb-6">
+              <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3 flex items-center justify-between gap-3">
+                <div className="text-xs text-muted-foreground">
+                  Pas encore de fichier ? Télécharge le modèle.
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={downloadCsvTemplate}>
+                  <Download className="h-4 w-4" />
+                  Modèle CSV
+                </Button>
+              </div>
               <div className="space-y-1.5">
                 <Label>Fichier CSV</Label>
                 <Input
@@ -224,9 +233,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
                   onChange={onCsvFile}
                 />
                 <p className="text-[11px] text-muted-foreground">
-                  Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire).
+                  Une équipe par ligne. Colonnes : <code>nom, nom_court, seed</code> (seul le nom est obligatoire). Compatible Excel / Numbers / Google Sheets.
                 </p>
               </div>
+
               <div className="space-y-1.5">
                 <Label>Ou colle ta liste</Label>
                 <Textarea
