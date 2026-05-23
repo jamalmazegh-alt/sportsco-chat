@@ -1,117 +1,44 @@
 import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Loader2, Settings2, CreditCard, ChevronRight } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Loader2,
+  CreditCard,
+  Send,
+  MessagesSquare,
+  BellRing,
+  ChevronRight,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
   head: () => ({ meta: [{ title: "Admin settings — Clubero" }] }),
 });
 
-type ChannelKey = "in_app" | "email";
-const CHANNELS: ChannelKey[] = ["in_app", "email"];
-
-type ClubSettings = {
-  id: string;
-  name: string;
-  convocation_channels: string[];
-  wall_comments_enabled: boolean;
-  event_chat_enabled: boolean;
-  event_chat_players_enabled: boolean;
-  event_chat_parents_enabled: boolean;
-  auto_reminders_enabled: boolean;
-  auto_reminder_hours_before: number[];
-};
-
-const REMINDER_PRESETS = [
-  { value: [48, 3], label: "48h + 3h avant (standard)" },
-  { value: [72, 24, 3], label: "3j + 24h + 3h avant" },
-  { value: [24], label: "24h avant" },
-  { value: [3], label: "3h avant" },
-];
-
 function AdminSettingsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
-  const role = useActiveRole();
   const roles = useMyRoles();
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["club-settings", activeClubId],
+  const { data, isLoading } = useQuery({
+    queryKey: ["club-name", activeClubId],
     enabled: !!activeClubId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clubs")
-        .select("id, name, convocation_channels, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, auto_reminders_enabled, auto_reminder_hours_before")
+        .select("id, name")
         .eq("id", activeClubId!)
         .single();
       if (error) throw error;
-      return data as unknown as ClubSettings;
+      return data;
     },
   });
 
-  const [form, setForm] = useState<ClubSettings | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (data) {
-      setForm({
-        ...data,
-        convocation_channels: Array.isArray(data.convocation_channels)
-          ? data.convocation_channels
-          : ["email", "in_app"],
-        auto_reminder_hours_before: Array.isArray(data.auto_reminder_hours_before)
-          ? data.auto_reminder_hours_before
-          : [48, 3],
-      });
-    }
-  }, [data]);
-
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
-  const toggleChannel = (ch: ChannelKey) => {
-    if (!form) return;
-    const has = form.convocation_channels.includes(ch);
-    setForm({
-      ...form,
-      convocation_channels: has
-        ? form.convocation_channels.filter((c) => c !== ch)
-        : [...form.convocation_channels, ch],
-    });
-  };
-
-  async function save() {
-    if (!form) return;
-    setSaving(true);
-    const { error } = await supabase
-      .from("clubs")
-      .update({
-        convocation_channels: form.convocation_channels,
-        wall_comments_enabled: form.wall_comments_enabled,
-        event_chat_enabled: form.event_chat_enabled,
-        event_chat_players_enabled: form.event_chat_players_enabled,
-        event_chat_parents_enabled: form.event_chat_parents_enabled,
-        auto_reminders_enabled: form.auto_reminders_enabled,
-        auto_reminder_hours_before: form.auto_reminder_hours_before,
-      })
-      .eq("id", form.id);
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(t("admin.saved"));
-    refetch();
-  }
-
-  if (isLoading || !form) {
+  if (isLoading || !data) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -119,132 +46,68 @@ function AdminSettingsPage() {
     );
   }
 
+  const items: Array<{
+    to: string;
+    icon: typeof CreditCard;
+    title: string;
+    hint: string;
+    tone: string;
+  }> = [
+    {
+      to: "/admin/billing",
+      icon: CreditCard,
+      title: t("admin.hubSubscription"),
+      hint: t("admin.hubSubscriptionHint"),
+      tone: "bg-primary/10 text-primary",
+    },
+    {
+      to: "/admin/settings/convocations",
+      icon: Send,
+      title: t("admin.hubConvocations"),
+      hint: t("admin.hubConvocationsHint"),
+      tone: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    },
+    {
+      to: "/admin/settings/communications",
+      icon: MessagesSquare,
+      title: t("admin.hubCommunications"),
+      hint: t("admin.hubCommunicationsHint"),
+      tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      to: "/admin/settings/reminders",
+      icon: BellRing,
+      title: t("admin.hubReminders"),
+      hint: t("admin.hubRemindersHint"),
+      tone: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    },
+  ];
+
   return (
-    <div className="px-5 py-4 space-y-5">
-      <p className="text-sm text-muted-foreground">{t("admin.subtitle", { club: form.name })}</p>
+    <div className="px-5 py-4 space-y-4">
+      <p className="text-sm text-muted-foreground">
+        {t("admin.subtitle", { club: data.name })}
+      </p>
 
-      <Link
-        to="/admin/billing"
-        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:border-primary transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <CreditCard className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="font-semibold">Abonnement</p>
-            <p className="text-xs text-muted-foreground">Gérer le plan Clubero du club</p>
-          </div>
-        </div>
-        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-      </Link>
-
-      <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
-        <div>
-          <Label className="text-base">{t("admin.convocationChannels")}</Label>
-          <p className="text-xs text-muted-foreground mt-0.5">{t("admin.convocationChannelsHint")}</p>
-        </div>
-        <div className="space-y-2">
-          {CHANNELS.map((ch) => (
-            <div key={ch} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
-              <span className="text-sm capitalize">{t(`channels.${ch}`)}</span>
-              <Switch
-                checked={form.convocation_channels.includes(ch)}
-                onCheckedChange={() => toggleChannel(ch)}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <Label className="text-base">{t("admin.communications")}</Label>
-
-        <Row
-          label={t("admin.wallComments")}
-          hint={t("admin.wallCommentsHint")}
-          checked={form.wall_comments_enabled}
-          onChange={(v) => setForm({ ...form, wall_comments_enabled: v })}
-        />
-        <Row
-          label={t("admin.eventChat")}
-          hint={t("admin.eventChatHint")}
-          checked={form.event_chat_enabled}
-          onChange={(v) => setForm({ ...form, event_chat_enabled: v })}
-        />
-        {form.event_chat_enabled && (
-          <div className="ml-2 pl-3 border-l-2 border-border space-y-3">
-            <Row
-              label={t("admin.eventChatPlayers")}
-              checked={form.event_chat_players_enabled}
-              onChange={(v) => setForm({ ...form, event_chat_players_enabled: v })}
-            />
-            <Row
-              label={t("admin.eventChatParents")}
-              checked={form.event_chat_parents_enabled}
-              onChange={(v) => setForm({ ...form, event_chat_parents_enabled: v })}
-            />
-          </div>
-        )}
-      </section>
-
-      <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <div>
-          <Label className="text-base">Relances automatiques avant événement</Label>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Envoie un email aux joueurs et parents qui n'ont pas encore répondu à la convocation.
-          </p>
-        </div>
-        <Row
-          label="Activer les relances auto"
-          checked={form.auto_reminders_enabled}
-          onChange={(v) => setForm({ ...form, auto_reminders_enabled: v })}
-        />
-        {form.auto_reminders_enabled && (
-          <div className="space-y-2">
-            <Label className="text-sm">Quand envoyer ?</Label>
-            <div className="space-y-2">
-              {REMINDER_PRESETS.map((preset) => {
-                const selected =
-                  preset.value.length === form.auto_reminder_hours_before.length &&
-                  preset.value.every((v) => form.auto_reminder_hours_before.includes(v));
-                return (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => setForm({ ...form, auto_reminder_hours_before: preset.value })}
-                    className={`w-full text-left rounded-lg border px-3 py-2 text-sm transition-colors ${
-                      selected
-                        ? "border-primary bg-primary/5 font-medium"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {preset.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </section>
-
-      <Button className="w-full h-11" onClick={save} disabled={saving}>
-        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.save")}
-      </Button>
-    </div>
-  );
-}
-
-function Row({
-  label, hint, checked, onChange,
-}: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <div className="min-w-0">
-        <p className="text-sm font-medium">{label}</p>
-        {hint && <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>}
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
+        {items.map((it) => (
+          <li key={it.to}>
+            <Link
+              to={it.to}
+              className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/40 transition-colors"
+            >
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${it.tone}`}>
+                <it.icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{it.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">{it.hint}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
