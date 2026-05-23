@@ -113,59 +113,86 @@ async function detectPendingConvocations(clubId: string): Promise<DetectedInsigh
 
 // INSIGHT 2: 3+ consecutive absences in last 30 days
 async function detectConsecutiveAbsences(clubId: string): Promise<DetectedInsight[]> {
-  const teamIds = await loadClubTeamIds(clubId);
-  if (teamIds.length === 0) return [];
   const since = new Date(Date.now() - 30 * 86400 * 1000).toISOString();
 
+  // 1. All active players for this club
   const { data: players } = await supabaseAdmin
     .from("players")
     .select("id, first_name, last_name, club_id")
     .eq("club_id", clubId)
     .is("deleted_at", null);
 
+  if (!players || players.length === 0) return [];
+  const playerIds = (players as any[]).map((p) => p.id);
+
+  // 2. All convocations for these players in last 30 days — ONE query
+  const { data: convs } = await supabaseAdmin
+    .from("convocations")
+    .select("player_id, status, event:event_id(id, starts_at, team_id, status)")
+    .in("player_id", playerIds)
+    .gte("created_at", since)
+    .order("created_at", { ascending: false });
+
+  // 3. All team names — ONE query
+  const teamIds = [
+    ...new Set(
+      ((convs ?? []) as any[])
+        .map((c) => c.event?.team_id)
+        .filter(Boolean),
+    ),
+  ];
+  const { data: teams } = teamIds.length
+    ? await supabaseAdmin.from("teams").select("id, name").in("id", teamIds)
+    : { data: [] as any[] };
+  const teamMap = new Map(((teams ?? []) as any[]).map((t) => [t.id, t.name]));
+
+  // 4. Group convocations by player and check consecutive absences
+  const byPlayer = new Map<string, any[]>();
+  for (const c of ((convs ?? []) as any[])) {
+    if (!c.event || c.event.status === "cancelled") continue;
+    const arr = byPlayer.get(c.player_id) ?? [];
+    arr.push(c);
+    byPlayer.set(c.player_id, arr);
+  }
+
   const out: DetectedInsight[] = [];
-  for (const p of (players ?? []) as any[]) {
-    const { data: convs } = await supabaseAdmin
-      .from("convocations")
-      .select("status, event:event_id(id, starts_at, team_id, status)")
-      .eq("player_id", p.id)
-      .order("created_at", { ascending: false })
-      .limit(5);
-    const items = ((convs ?? []) as any[])
-      .filter((c) => c.event && c.event.status !== "cancelled" && c.event.starts_at >= since)
-      .sort(
-        (a: any, b: any) =>
-          new Date(b.event.starts_at).getTime() - new Date(a.event.starts_at).getTime(),
-      );
-    if (items.length < 3) continue;
-    const lastThree = items.slice(0, 3);
-    const allAbsent = lastThree.every((c: any) => c.status === "absent");
+  const playerMap = new Map(((players ?? []) as any[]).map((p) => [p.id, p]));
+
+  for (const [playerId, items] of byPlayer.entries()) {
+    const sorted = items.sort(
+      (a: any, b: any) =>
+        new Date(b.event.starts_at).getTime() - new Date(a.event.starts_at).getTime(),
+    );
+    if (sorted.length < 3) continue;
+    const lastThree = sorted.slice(0, 3);
+    const allAbsent = lastThree.every(
+      (c: any) => c.status === "absent" || c.status === "no_show",
+    );
     if (!allAbsent) continue;
+
+    const p = playerMap.get(playerId);
+    if (!p) continue;
     const teamId = lastThree[0].event.team_id;
-    const { data: team } = await supabaseAdmin
-      .from("teams")
-      .select("name")
-      .eq("id", teamId)
-      .maybeSingle();
     const fullName = `${p.first_name} ${p.last_name}`.trim();
+
     out.push({
       insight_type: "consecutive_absences",
       club_id: clubId,
       team_id: teamId,
       payload: {
-        player_id: p.id,
+        player_id: playerId,
         player_name: fullName,
         team_id: teamId,
-        team_name: team?.name ?? "",
+        team_name: teamMap.get(teamId) ?? "",
         absence_count: lastThree.length,
         last_event_date: lastThree[0].event.starts_at,
       },
       priority: "medium",
       action_type: "view_player",
-      action_payload: { player_id: p.id },
-      dedup_key: `consecutive_absences:${p.id}:${isoWeek()}`,
+      action_payload: { player_id: playerId },
+      dedup_key: `consecutive_absences:${playerId}:${isoWeek()}`,
       expires_at: new Date(Date.now() + 7 * 86400 * 1000).toISOString(),
-      userPrompt: `${fullName} has been absent ${lastThree.length} times in a row. Generate a short alert suggesting the coach check in.`,
+      userPrompt: `${fullName} has been absent or no-show ${lastThree.length} times in a row. Generate a short alert suggesting the coach check in.`,
     });
   }
   return out;
