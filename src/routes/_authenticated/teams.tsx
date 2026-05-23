@@ -13,6 +13,8 @@ import { SportSelect } from "@/components/sport-select";
 import { Plus, Users, ChevronRight, Loader2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
+import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
+
 
 export const Route = createFileRoute("/_authenticated/teams")({
   component: TeamsRoute,
