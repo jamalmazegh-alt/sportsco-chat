@@ -37,7 +37,6 @@ type ConvocationInfo = {
 };
 
 type StatusStyle = {
-  label: string;
   icon: typeof CheckCircle2;
   // Idle (white card) styles
   border: string;
@@ -57,7 +56,6 @@ type StatusStyle = {
 
 const STATUS_CONFIG: Record<Status, StatusStyle> = {
   present: {
-    label: "Présent",
     icon: CheckCircle2,
     border: "border-emerald-100",
     hoverBorder: "hover:border-emerald-300",
@@ -73,7 +71,6 @@ const STATUS_CONFIG: Record<Status, StatusStyle> = {
     activeRing: "ring-2 ring-emerald-500/30",
   },
   uncertain: {
-    label: "Incertain",
     icon: HelpCircle,
     border: "border-amber-100",
     hoverBorder: "hover:border-amber-300",
@@ -89,7 +86,6 @@ const STATUS_CONFIG: Record<Status, StatusStyle> = {
     activeRing: "ring-2 ring-amber-500/30",
   },
   absent: {
-    label: "Absent",
     icon: XCircle,
     border: "border-rose-100",
     hoverBorder: "hover:border-rose-300",
