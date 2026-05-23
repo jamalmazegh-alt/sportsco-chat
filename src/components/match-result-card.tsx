@@ -82,6 +82,8 @@ export function MatchResultCard({
   const [notes, setNotes] = useState("");
   const [sets, setSets] = useState<SetScore[]>([]);
   const [saving, setSaving] = useState(false);
+  const [celebrate, setCelebrate] = useState(0);
+
 
   // New event form
   const [showGoalForm, setShowGoalForm] = useState(false);
