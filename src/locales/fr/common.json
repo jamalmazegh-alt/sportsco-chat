@@ -501,8 +501,12 @@
       "all": "Tous",
       "training": "Entraînements",
       "match": "Matchs"
-    }
+    },
+    "showRecordDetail": "Voir le détail",
+    "hideRecordDetail": "Masquer le détail",
+    "summaryAria": "Résumé de saison"
   },
+
   "match": {
     "result": "Résultat du match",
     "enterScore": "Saisir le score",
