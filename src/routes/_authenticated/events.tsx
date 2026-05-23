@@ -13,10 +13,16 @@ import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, C
 import { EventFormSheet } from "@/components/event-form-sheet";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/events")({
   component: EventsRoute,
-  head: () => ({ meta: [{ title: "Events — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.events.title") },
+      { name: "description", content: i18n.t("meta.events.description") },
+    ],
+  }),
 });
 
 function EventsRoute() {
