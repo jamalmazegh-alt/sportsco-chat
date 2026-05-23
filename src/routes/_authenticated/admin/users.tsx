@@ -39,15 +39,32 @@ function AdminUsersPage() {
   });
 
 
+  const CLUB_ROLE_KEYS = [
+    "admin",
+    "coach",
+    "assistant_coach",
+    "staff",
+    "tournament_manager",
+  ] as const;
+  type ClubRoleKey = (typeof CLUB_ROLE_KEYS)[number];
+
   const [open, setOpen] = useState(false);
-  const [inviteRole, setInviteRole] = useState<"admin" | "coach">("coach");
+  const [inviteRoles, setInviteRoles] = useState<ClubRoleKey[]>(["coach"]);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
   function reset() {
-    setInviteRole("coach"); setFirst(""); setLast(""); setEmail("");
+    setInviteRoles(["coach"]); setFirst(""); setLast(""); setEmail("");
+  }
+
+  function toggleInviteRole(r: ClubRoleKey, checked: boolean) {
+    setInviteRoles((prev) => {
+      if (checked) return Array.from(new Set([...prev, r]));
+      const next = prev.filter((x) => x !== r);
+      return next.length === 0 ? prev : next;
+    });
   }
 
   async function onInvite(e: FormEvent) {
