@@ -1,6 +1,7 @@
 import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18nInstance from "@/lib/i18n";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,7 +16,12 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
-  head: () => ({ meta: [{ title: "Admin settings — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.admin.title") },
+      { name: "description", content: i18nInstance.t("meta.admin.description") },
+    ],
+  }),
 });
 
 function AdminSettingsPage() {
