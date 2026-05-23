@@ -35,3 +35,19 @@ export function useMyRoles(): string[] {
   const m = memberships.find((x) => x.club_id === activeClubId);
   return m?.roles ?? (m ? [m.role] : []);
 }
+
+/** Convenience: check whether the active membership has a given role. */
+export function useHasRole(role: string): boolean {
+  return useMyRoles().includes(role);
+}
+
+/** Convenience: is the user an admin of the active club? */
+export function useIsAdmin(): boolean {
+  return useMyRoles().includes("admin");
+}
+
+/** Convenience: is the user any kind of coach (head or assistant) or admin? */
+export function useIsCoach(): boolean {
+  const roles = useMyRoles();
+  return roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+}
