@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, ShieldCheck } from "lucide-react";
+import { BarChart3, ShieldCheck, ChevronDown, Trophy, Minus, X, TrendingUp, TrendingDown } from "lucide-react";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { Skeleton } from "@/components/ui/skeleton";
