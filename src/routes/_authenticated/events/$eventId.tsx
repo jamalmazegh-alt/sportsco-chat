@@ -2350,14 +2350,59 @@ function EventDetail() {
           {/* Stats + players list (visible once convocations are sent) */}
           {event.convocations_sent && (
             <>
-              {isCoach && (
-                <div className="grid grid-cols-4 gap-1.5 px-4 pt-3">
-                  <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present border-present/40" />
-                  <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain/15 text-uncertain-foreground border-uncertain/30" />
-                  <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent/10 text-absent border-absent/30" />
-                  <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending/40 text-pending-foreground border-border" />
-                </div>
-              )}
+              {isCoach && (() => {
+                const total = counts.present + counts.uncertain + counts.absent + counts.pending;
+                const responded = total - counts.pending;
+                const rate = total === 0 ? 0 : Math.round((responded / total) * 100);
+                const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
+                return (
+                  <div className="px-4 pt-4">
+                    <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-muted/40 p-4 shadow-sm">
+                      <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
+                      <div className="relative flex items-end justify-between gap-3 mb-3">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">
+                            {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
+                          </p>
+                          <div className="flex items-baseline gap-1.5 mt-1">
+                            <span className="text-4xl font-bold tabular-nums leading-none tracking-tight">{rate}</span>
+                            <span className="text-lg font-semibold text-muted-foreground">%</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold tabular-nums leading-tight">
+                            {responded}<span className="text-muted-foreground font-normal">/{total}</span>
+                          </p>
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                            {t("attendance.responded", { defaultValue: "réponses" })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Segmented progress bar */}
+                      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted/60 flex">
+                        {counts.present > 0 && (
+                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-present transition-all" />
+                        )}
+                        {counts.uncertain > 0 && (
+                          <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-uncertain transition-all" />
+                        )}
+                        {counts.absent > 0 && (
+                          <div style={{ width: `${pct(counts.absent)}%` }} className="bg-absent transition-all" />
+                        )}
+                      </div>
+
+                      {/* Chips */}
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        <StatChip dotCls="bg-present" label={t("attendance.present")} value={counts.present} />
+                        <StatChip dotCls="bg-uncertain" label={t("attendance.uncertain")} value={counts.uncertain} />
+                        <StatChip dotCls="bg-absent" label={t("attendance.absent")} value={counts.absent} />
+                        <StatChip dotCls="bg-pending border border-border" label={t("attendance.pending")} value={counts.pending} muted />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {isCoach && counts.pending > 0 && (
                 <div className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
