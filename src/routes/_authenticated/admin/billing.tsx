@@ -378,6 +378,18 @@ function BillingPage() {
                     href={inv.invoice_pdf}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const w = window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
+                      if (!w) {
+                        // Popup blocked — fall back to top-level navigation in a new tab
+                        const a = document.createElement("a");
+                        a.href = inv.invoice_pdf!;
+                        a.target = "_blank";
+                        a.rel = "noopener noreferrer";
+                        a.click();
+                      }
+                    }}
                     className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"
                   >
                     PDF <ExternalLink className="h-3 w-3" />
