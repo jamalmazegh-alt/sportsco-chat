@@ -111,8 +111,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
     }
   }
 
-  async function onRemove(memberId: string) {
-    if (!confirm(t("tournamentMembers.confirmRemove", { defaultValue: "Retirer ce membre ?" }))) return;
+  async function confirmRemove() {
+    const memberId = removeId;
+    if (!memberId) return;
+    setRemoveId(null);
     try {
       await removeFn({ data: { tournament_id: tournamentId, member_id: memberId } });
       toast.success(t("tournamentMembers.removed", { defaultValue: "Membre retiré" }));
