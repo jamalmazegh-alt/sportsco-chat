@@ -347,14 +347,15 @@ function PlayerProfile() {
 
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">
-        <div className="relative h-16 w-16 rounded-full bg-muted overflow-hidden shrink-0">
+        <div className="relative h-16 w-16 rounded-full overflow-hidden shrink-0 shadow-sm">
           {player.photo_url ? (
             <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-base font-semibold text-muted-foreground">
-              {(player.first_name?.[0] ?? "") + (player.last_name?.[0] ?? "")}
+            <div className={`h-full w-full flex items-center justify-center text-lg font-bold ${avatarGradient(player.id)}`}>
+              {initialsFrom(player.first_name, player.last_name)}
             </div>
           )}
+
           {(isCoach || isSelf || isParentOfThisPlayer) && (
             <span
               className={cn(
