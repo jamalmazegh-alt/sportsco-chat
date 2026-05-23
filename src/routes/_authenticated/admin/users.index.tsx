@@ -282,14 +282,25 @@ function AdminUsersPage() {
                   [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ") ??
                   u.email ??
                   "—";
+                const userRoles: string[] = u.roles ?? [];
+                const isParentOnly =
+                  userRoles.includes("parent") &&
+                  !userRoles.some((r) => STAFF_ROLES.has(r));
                 return (
                   <li key={u.user_id}>
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={() => setSelectedUserId(u.user_id)}
-                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setSelectedUserId(u.user_id);
+                        }
+                      }}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors cursor-pointer"
                     >
-                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden">
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden shrink-0">
                         {u.profile?.avatar_url ? (
                           <img src={u.profile.avatar_url} alt="" className="h-full w-full object-cover" />
                         ) : (
@@ -305,7 +316,7 @@ function AdminUsersPage() {
                           </p>
                         )}
                         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                          {(u.roles ?? []).map((r: string) => (
+                          {userRoles.map((r: string) => (
                             <span
                               key={r}
                               className={
@@ -324,7 +335,22 @@ function AdminUsersPage() {
                           ))}
                         </div>
                       </div>
-                    </button>
+                      {isParentOnly && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="shrink-0 gap-1.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedUserId(u.user_id);
+                          }}
+                        >
+                          <ShieldCheck className="h-3.5 w-3.5" />
+                          {t("admin.promoteToClubMember", { defaultValue: "Promouvoir en membre" })}
+                        </Button>
+                      )}
+                    </div>
                   </li>
                 );
               })}
