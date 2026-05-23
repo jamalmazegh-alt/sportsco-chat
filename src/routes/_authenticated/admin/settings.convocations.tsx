@@ -9,10 +9,11 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
+import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/convocations")({
   component: ConvocationsSettings,
-  head: () => ({ meta: [{ title: "Convocations — Clubero" }] }),
+  head: () => ({ meta: [{ title: `${i18nInstance.t("admin.hubConvocations")} — Clubero` }] }),
 });
 
 type ChannelKey = "in_app" | "email";

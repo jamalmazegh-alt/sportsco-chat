@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader, SettingsRow } from "@/components/admin/settings-shared";
+import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/reminders")({
   component: RemindersSettings,
-  head: () => ({ meta: [{ title: "Reminders — Clubero" }] }),
+  head: () => ({ meta: [{ title: `${i18nInstance.t("admin.remindersTitle")} — Clubero` }] }),
 });
 
 type Form = {
