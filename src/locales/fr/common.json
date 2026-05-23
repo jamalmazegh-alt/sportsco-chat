@@ -13,7 +13,8 @@
     "staff": "Staff",
     "tournament_manager": "Responsable tournois",
     "tournament_admin": "Admin du tournoi",
-    "referee": "Arbitre"
+    "referee": "Arbitre",
+    "incompatibleWith": "Incompatible avec {{role}}"
   },
   "nav": {
     "home": "Accueil",
