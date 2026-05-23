@@ -2350,14 +2350,59 @@ function EventDetail() {
           {/* Stats + players list (visible once convocations are sent) */}
           {event.convocations_sent && (
             <>
-              {isCoach && (
-                <div className="grid grid-cols-4 gap-1.5 px-4 pt-3">
-                  <Stat label={t("attendance.present")} value={counts.present} cls="bg-present/15 text-present border-present/40" />
-                  <Stat label={t("attendance.uncertain")} value={counts.uncertain} cls="bg-uncertain/15 text-uncertain-foreground border-uncertain/30" />
-                  <Stat label={t("attendance.absent")} value={counts.absent} cls="bg-absent/10 text-absent border-absent/30" />
-                  <Stat label={t("attendance.pending")} value={counts.pending} cls="bg-pending/40 text-pending-foreground border-border" />
-                </div>
-              )}
+              {isCoach && (() => {
+                const total = counts.present + counts.uncertain + counts.absent + counts.pending;
+                const responded = total - counts.pending;
+                const rate = total === 0 ? 0 : Math.round((responded / total) * 100);
+                const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
+                return (
+                  <div className="px-4 pt-4">
+                    <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-muted/40 p-4 shadow-sm">
+                      <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
+                      <div className="relative flex items-end justify-between gap-3 mb-3">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">
+                            {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
+                          </p>
+                          <div className="flex items-baseline gap-1.5 mt-1">
+                            <span className="text-4xl font-bold tabular-nums leading-none tracking-tight">{rate}</span>
+                            <span className="text-lg font-semibold text-muted-foreground">%</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold tabular-nums leading-tight">
+                            {responded}<span className="text-muted-foreground font-normal">/{total}</span>
+                          </p>
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                            {t("attendance.responded", { defaultValue: "réponses" })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Segmented progress bar */}
+                      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted/60 flex">
+                        {counts.present > 0 && (
+                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-present transition-all" />
+                        )}
+                        {counts.uncertain > 0 && (
+                          <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-uncertain transition-all" />
+                        )}
+                        {counts.absent > 0 && (
+                          <div style={{ width: `${pct(counts.absent)}%` }} className="bg-absent transition-all" />
+                        )}
+                      </div>
+
+                      {/* Chips */}
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        <StatChip dotCls="bg-present" label={t("attendance.present")} value={counts.present} />
+                        <StatChip dotCls="bg-uncertain" label={t("attendance.uncertain")} value={counts.uncertain} />
+                        <StatChip dotCls="bg-absent" label={t("attendance.absent")} value={counts.absent} />
+                        <StatChip dotCls="bg-pending border border-border" label={t("attendance.pending")} value={counts.pending} muted />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {isCoach && counts.pending > 0 && (
                 <div className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
@@ -2375,11 +2420,23 @@ function EventDetail() {
                   {t("attendance.noConvokedPlayers")}
                 </div>
               ) : (
-                <ul className="mt-3 divide-y divide-border border-t border-border">
-                  {sortedConvocations.map((c: any) => (
-                    <li key={c.id} className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
+                <ul className="mt-3 border-t border-border">
+                  {sortedConvocations.map((c: any) => {
+                    const accent =
+                      c.status === "present" ? "bg-present"
+                      : c.status === "absent" ? "bg-absent"
+                      : c.status === "uncertain" ? "bg-uncertain"
+                      : "bg-pending";
+                    const ringCls =
+                      c.status === "present" ? "ring-2 ring-present/40"
+                      : c.status === "absent" ? "ring-2 ring-absent/40"
+                      : c.status === "uncertain" ? "ring-2 ring-uncertain/40"
+                      : "ring-1 ring-border";
+                    return (
+                    <li key={c.id} className="relative flex flex-col gap-2 px-3 py-2.5 border-b border-border last:border-b-0 sm:flex-row sm:items-center sm:justify-between hover:bg-muted/30 transition-colors">
+                      <span className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full", accent)} />
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1 pl-1.5">
+                        <div className={cn("h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden", ringCls)}>
                           {c.players?.photo_url ? (
                             <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
                           ) : (
@@ -2447,7 +2504,8 @@ function EventDetail() {
                         )}
                       </div>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               )}
             </>
@@ -2621,5 +2679,22 @@ function Stat({ label, value, cls }: { label: string; value: number; cls: string
       <p className="text-base font-bold leading-none">{value}</p>
       <p className="text-[9px] uppercase tracking-wider mt-1 opacity-90">{label}</p>
     </div>
+  );
+}
+
+function StatChip({ dotCls, label, value, muted }: { dotCls: string; label: string; value: number; muted?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium tabular-nums transition-colors",
+        muted
+          ? "border-border bg-background text-muted-foreground"
+          : "border-border bg-background/60 text-foreground",
+      )}
+    >
+      <span className={cn("h-2 w-2 rounded-full", dotCls)} />
+      <span className="font-semibold">{value}</span>
+      <span className="text-muted-foreground">{label}</span>
+    </span>
   );
 }
