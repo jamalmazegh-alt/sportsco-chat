@@ -32,7 +32,22 @@ import {
   Flag,
   Radio,
   Zap,
+  MoreVertical,
+  Pencil,
+  Eye,
+  CalendarClock,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ScoreStepper } from "@/components/score-stepper";
 
 import { toast } from "sonner";
