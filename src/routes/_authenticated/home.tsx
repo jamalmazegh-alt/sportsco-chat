@@ -200,7 +200,7 @@ function HomePage() {
       </header>
 
       {/* Onboarding checklist (admins) */}
-      {isCoach && role === "admin" && activeClubId && (
+      {isAdmin && activeClubId && (
         <OnboardingChecklist
           clubId={activeClubId}
           hasLogo={!!club?.logo_url}
