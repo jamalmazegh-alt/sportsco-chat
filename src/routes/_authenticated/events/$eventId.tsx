@@ -2668,3 +2668,20 @@ function Stat({ label, value, cls }: { label: string; value: number; cls: string
     </div>
   );
 }
+
+function StatChip({ dotCls, label, value, muted }: { dotCls: string; label: string; value: number; muted?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium tabular-nums transition-colors",
+        muted
+          ? "border-border bg-background text-muted-foreground"
+          : "border-border bg-background/60 text-foreground",
+      )}
+    >
+      <span className={cn("h-2 w-2 rounded-full", dotCls)} />
+      <span className="font-semibold">{value}</span>
+      <span className="text-muted-foreground">{label}</span>
+    </span>
+  );
+}
