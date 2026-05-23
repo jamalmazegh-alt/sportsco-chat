@@ -335,7 +335,10 @@ function fallbackMessages(ins: DetectedInsight): { fr: string; en: string } {
   }
 }
 
-export async function detectAndGenerateInsightsForClub(clubId: string) {
+export async function detectAndGenerateInsightsForClub(
+  clubId: string,
+  options?: { types?: InsightType[] },
+) {
   // Resolve expired insights first
   await supabaseAdmin
     .from("coach_insights")
@@ -343,11 +346,14 @@ export async function detectAndGenerateInsightsForClub(clubId: string) {
     .lt("expires_at", new Date().toISOString())
     .is("resolved_at", null);
 
+  const wanted = options?.types ? new Set(options.types) : null;
+  const include = (t: InsightType) => !wanted || wanted.has(t);
+
   const detected: DetectedInsight[] = [
-    ...(await detectPendingConvocations(clubId)),
-    ...(await detectConsecutiveAbsences(clubId)),
-    ...(await detectMissingScore(clubId)),
-    ...(await detectMissingGuardian(clubId)),
+    ...(include("pending_convocations") ? await detectPendingConvocations(clubId) : []),
+    ...(include("consecutive_absences") ? await detectConsecutiveAbsences(clubId) : []),
+    ...(include("missing_score") ? await detectMissingScore(clubId) : []),
+    ...(include("missing_guardian") ? await detectMissingGuardian(clubId) : []),
   ];
 
   if (detected.length === 0) return { detected: 0, created: 0 };
