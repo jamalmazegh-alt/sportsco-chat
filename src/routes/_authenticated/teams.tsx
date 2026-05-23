@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tan
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,8 @@ function TeamsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const role = useActiveRole();
-  const isAdmin = role === "admin";
+  const roles = useMyRoles();
+  const isAdmin = roles.includes("admin");
   const qc = useQueryClient();
 
   const { data: teams, isLoading } = useQuery({

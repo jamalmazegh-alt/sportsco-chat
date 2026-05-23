@@ -219,7 +219,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     return <WallFeedSkeleton />;
   }
 
-  const canPost = role === "admin" || role === "coach";
+  const canPost = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
 
   return (
     <div className="space-y-4">
@@ -302,7 +302,7 @@ function WallGrouped({
 
   const renderItem = (p: Post) => {
     const d = new Date(p.created_at);
-    const canManage = p.author_user_id === currentUserId || role === "admin";
+    const canManage = p.author_user_id === currentUserId || roles.includes("admin");
     return (
       <li
         key={p.id}
@@ -356,7 +356,7 @@ function WallGrouped({
               <AttachmentList items={p.attachments as Attachment[]} />
             </div>
           )}
-          {(p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
+          {(p.author_user_id === currentUserId || roles.includes("admin") || role === "coach") &&
             memberCount > 0 && (() => {
               // Exclude the post author from the denominator: they don't need to "read" their own post
               const denom = Math.max(memberCount - 1, 0);
@@ -462,7 +462,7 @@ function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; curre
               {fmt(c.created_at, "d MMM HH:mm")}
             </p>
           </div>
-          {(c.author_user_id === currentUserId || role === "admin") && (
+          {(c.author_user_id === currentUserId || roles.includes("admin")) && (
             <button onClick={() => del(c.id)} className="text-muted-foreground hover:text-destructive">
               <Trash2 className="h-3.5 w-3.5" />
             </button>

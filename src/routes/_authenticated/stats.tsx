@@ -38,7 +38,7 @@ function StatsPage() {
       {!activeClubId ? (
         <p className="text-sm text-muted-foreground">{t("common.noClubSelected", { defaultValue: "Aucun club sélectionné" })}</p>
       ) : isStaff ? (
-        <StaffStats clubId={activeClubId} isAdmin={role === "admin"} userId={user?.id ?? ""} />
+        <StaffStats clubId={activeClubId} isAdmin={roles.includes("admin")} userId={user?.id ?? ""} />
       ) : (
         <PlayerOrParentStats clubId={activeClubId} userId={user?.id ?? ""} />
       )}

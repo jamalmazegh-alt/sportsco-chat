@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -24,7 +24,8 @@ function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { user, signOut, memberships, activeClubId, setActiveClubId, refreshMemberships } = useAuth();
   const role = useActiveRole();
-  const isAdmin = role === "admin";
+  const roles = useMyRoles();
+  const isAdmin = roles.includes("admin");
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();

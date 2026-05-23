@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
 import { Plus, Trophy, ChevronRight, Calendar } from "lucide-react";
@@ -30,9 +30,10 @@ function TournamentsRoute() {
 function TournamentsList() {
   const { activeClubId, memberships } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const { tournamentOnly } = useTournamentOnlyMode();
   const noClub = memberships.length === 0;
-  const canManage = role === "admin" || (role as string) === "dirigeant" || noClub;
+  const canManage = roles.includes("admin") || (role as string) === "dirigeant" || noClub;
   const [open, setOpen] = useState(false);
 
   const clubFn = useServerFn(listMyTournaments);
