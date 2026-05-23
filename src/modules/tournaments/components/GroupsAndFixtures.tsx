@@ -280,12 +280,21 @@ export function GroupsAndFixtures({
             </div>
           </div>
           <Button
-            onClick={() => genGroups.mutate()}
+            onClick={() => {
+              if (groupsCount > 0) {
+                setRegenGroupsOpen(true);
+              } else {
+                genGroups.mutate();
+              }
+            }}
             disabled={genGroups.isPending || numTeams < 2}
+            variant={groupsCount > 0 ? "destructive" : "default"}
             className="w-full"
           >
             {genGroups.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
+            ) : groupsCount > 0 ? (
+              t("groups.regenerateGroups")
             ) : (
               t("groups.generateGroups")
             )}
