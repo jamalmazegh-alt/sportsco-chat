@@ -42,7 +42,7 @@ export function ClubThemeProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     if (!activeClubId) {
       // logged-out: keep stored theme (don't reset)
       return;
