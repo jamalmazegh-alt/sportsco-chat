@@ -1,6 +1,7 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18nInstance from "@/lib/i18n";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Check, Loader2, Palette } from "lucide-react";
@@ -20,7 +21,12 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/settings/branding")({
   component: BrandingSettingsPage,
-  head: () => ({ meta: [{ title: "Identité visuelle — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.adminBranding.title") },
+      { name: "description", content: i18nInstance.t("meta.adminBranding.description") },
+    ],
+  }),
 });
 
 function BrandingSettingsPage() {
