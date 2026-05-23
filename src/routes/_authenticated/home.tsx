@@ -428,31 +428,44 @@ function HomePage() {
             </div>
           ) : (
             <ul className="space-y-2">
-              {upcoming.map((e) => (
-                <li key={e.id}>
-                  <Link
-                    to="/events/$eventId"
-                    params={{ eventId: e.id }}
-                    className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{e.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                        <Calendar className="h-3 w-3" />
-                        {formatWhen(new Date(e.starts_at))}
-                        {e.location && (
-                          <>
-                            <span>·</span>
-                            <MapPin className="h-3 w-3" />
-                            <span className="truncate">{e.location}</span>
-                          </>
+              {upcoming.map((e, idx) => {
+                const isFirst = idx === 0;
+                return (
+                  <li key={e.id}>
+                    <Link
+                      to="/events/$eventId"
+                      params={{ eventId: e.id }}
+                      className={cn(
+                        "flex items-center justify-between rounded-2xl border active:scale-[0.99] transition-transform",
+                        isFirst
+                          ? "border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-5 shadow-sm ring-1 ring-primary/10"
+                          : "border-border bg-card p-4",
+                      )}
+                    >
+                      <div className="min-w-0">
+                        {isFirst && (
+                          <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-bold mb-1">
+                            {t("dashboard.nextEvent")}
+                          </p>
                         )}
-                      </p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </Link>
-                </li>
-              ))}
+                        <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
+                          <Calendar className="h-3 w-3" />
+                          {formatWhen(new Date(e.starts_at))}
+                          {e.location && (
+                            <>
+                              <span>·</span>
+                              <MapPin className="h-3 w-3" />
+                              <span className="truncate">{e.location}</span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                      <ChevronRight className={cn("text-muted-foreground shrink-0", isFirst ? "h-5 w-5 text-primary" : "h-4 w-4")} />
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
