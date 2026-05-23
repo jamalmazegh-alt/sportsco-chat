@@ -83,9 +83,9 @@ function TeamDetail() {
       if (ids.length === 0) return new Set<string>();
       const { data } = await supabase
         .from("member_invites")
-        .select("player_id, parent_for_player_id, accepted_at")
+        .select("player_id, parent_for_player_id, used_at")
         .eq("club_id", activeClubId!)
-        .is("accepted_at", null);
+        .is("used_at", null);
       const set = new Set<string>();
       (data ?? []).forEach((r: any) => {
         const pid = r.player_id ?? r.parent_for_player_id;
