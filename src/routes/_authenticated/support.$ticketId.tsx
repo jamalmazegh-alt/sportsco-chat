@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getSupportTicket } from "@/lib/support.functions";
 import { TicketThread } from "@/components/support/ticket-thread";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { STATUS_BADGE_CLASS, type SupportStatus } from "@/lib/support-constants";
 
 export const Route = createFileRoute("/_authenticated/support/$ticketId")({
