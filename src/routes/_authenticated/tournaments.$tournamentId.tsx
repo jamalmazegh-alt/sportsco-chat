@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
   component: TournamentDetailPage,
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
 
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
