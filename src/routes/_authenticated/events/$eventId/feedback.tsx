@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getFeedbackTagsForSport } from "@/lib/feedback-tags";
-import { useActiveRole, useAuth } from "@/lib/auth-context";
+import { useActiveRole, useAuth, useMyRoles } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -38,7 +38,8 @@ function PostMatchFeedback() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isActiveCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isActiveCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const fetchData = useServerFn(listEventPlayersForFeedback);
   const createFn = useServerFn(createPlayerFeedback);

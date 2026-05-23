@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import {
   ChevronLeft,
   Loader2,
@@ -59,6 +59,7 @@ function AdminUserDetailPage() {
   const { t } = useTranslation();
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const qc = useQueryClient();
 
   const fetchDetail = useServerFn(getClubUserDetail);
@@ -74,12 +75,12 @@ function AdminUserDetailPage() {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-user-detail", userId, activeClubId],
-    enabled: !!activeClubId && role === "admin",
+    enabled: !!activeClubId && roles.includes("admin"),
     queryFn: () =>
       fetchDetail({ data: { club_id: activeClubId!, user_id: userId } }),
   });
 
-  if (role !== "admin") return <Navigate to="/profile" replace />;
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
   if (isLoading || !data) {
     return (
       <div className="flex justify-center pt-20">

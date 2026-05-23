@@ -2,7 +2,7 @@ import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3, Trophy } from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
@@ -34,7 +34,7 @@ function formatWhen(d: Date) {
 function HomePage() {
   const { t, i18n } = useTranslation();
   const { user, activeClubId, memberships } = useAuth();
-  const role = useActiveRole();
+  const roles = useMyRoles();
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
@@ -160,7 +160,8 @@ function HomePage() {
     },
   });
 
-  const isCoach = role === "admin" || role === "coach";
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isAdmin = roles.includes("admin");
 
   // Show skeleton on first paint while the primary queries hydrate.
   if (activeClubId && teamsLoading) {
@@ -198,7 +199,7 @@ function HomePage() {
       </header>
 
       {/* Onboarding checklist (admins) */}
-      {isCoach && role === "admin" && activeClubId && (
+      {isAdmin && activeClubId && (
         <OnboardingChecklist
           clubId={activeClubId}
           hasLogo={!!club?.logo_url}

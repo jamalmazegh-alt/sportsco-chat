@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,8 @@ function TeamDetail() {
   const { t } = useTranslation();
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   
 
@@ -508,7 +509,7 @@ function TeamDetail() {
 
       {isCoach && <CollapsibleTeamStats teamId={teamId} />}
 
-      <TeamCoaches teamId={teamId} clubId={(team as any)?.club_id} isAdmin={role === "admin"} />
+      <TeamCoaches teamId={teamId} clubId={(team as any)?.club_id} isAdmin={roles.includes("admin")} />
 
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">

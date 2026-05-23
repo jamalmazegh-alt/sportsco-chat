@@ -13,6 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
@@ -65,6 +75,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<TournamentRole>("staff");
   const [busy, setBusy] = useState(false);
+  const [removeId, setRemoveId] = useState<string | null>(null);
 
   const teamById = new Map(teams.map((tm) => [tm.id, tm.name]));
 
@@ -100,8 +111,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
     }
   }
 
-  async function onRemove(memberId: string) {
-    if (!confirm(t("tournamentMembers.confirmRemove", { defaultValue: "Retirer ce membre ?" }))) return;
+  async function confirmRemove() {
+    const memberId = removeId;
+    if (!memberId) return;
+    setRemoveId(null);
     try {
       await removeFn({ data: { tournament_id: tournamentId, member_id: memberId } });
       toast.success(t("tournamentMembers.removed", { defaultValue: "Membre retiré" }));
@@ -240,7 +253,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                       size="icon"
                       variant="ghost"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => onRemove(m.id)}
+                      onClick={() => setRemoveId(m.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -282,6 +295,25 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           })}
         </ul>
       )}
+
+      <AlertDialog open={!!removeId} onOpenChange={(o) => { if (!o) setRemoveId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("tournamentMembers.confirmRemoveTitle", { defaultValue: "Retirer ce membre ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("tournamentMembers.confirmRemoveDesc", { defaultValue: "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard." })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t("tournamentMembers.confirmRemoveAction", { defaultValue: "Retirer" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

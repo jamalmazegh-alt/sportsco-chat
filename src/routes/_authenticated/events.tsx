@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { format, isPast, isToday, isSameDay, startOfDay } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
@@ -37,7 +37,8 @@ function EventsPage() {
   const { t, i18n } = useTranslation();
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [showPast, setShowPast] = useState(false);

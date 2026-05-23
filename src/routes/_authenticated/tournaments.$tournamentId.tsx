@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { useActiveRole } from "@/lib/auth-context";
+import { useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -46,6 +46,7 @@ type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket"
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
+  const roles = useMyRoles();
 
   const getFn = useServerFn(getTournament);
   const updateFn = useServerFn(updateTournament);
@@ -80,7 +81,7 @@ function TournamentDetailPage() {
   const { tournament, groups, teams, matches } = q.data;
   const canManage =
     (q.data as any).canManage === true ||
-    role === "admin" ||
+    roles.includes("admin") || roles.includes("tournament_manager") ||
     (role as string) === "dirigeant";
   const publicUrl =
     typeof window !== "undefined"

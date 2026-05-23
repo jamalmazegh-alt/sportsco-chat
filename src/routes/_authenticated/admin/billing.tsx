@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import {
   getClubSubscription,
   createCheckoutSession,
@@ -85,6 +85,7 @@ function BillingPage() {
   const { t, i18n } = useTranslation();
   const { activeClubId } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const search = useSearch({ from: "/_authenticated/admin/billing" });
   const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
 
@@ -133,7 +134,7 @@ function BillingPage() {
     queryFn: () => fetchInvoices({ data: { clubId: activeClubId! } }),
   });
 
-  if (role !== "admin") return <Navigate to="/profile" replace />;
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
   if (isLoading || isFetching || !activeClubId || (!!activeClubId && data === undefined)) {
     return (

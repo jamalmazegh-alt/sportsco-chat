@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CoachFeedbackTab } from "@/components/coach-feedback-tab";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId/feedback")({
@@ -12,7 +12,8 @@ function PlayerFeedbackPage() {
   const { playerId } = Route.useParams();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isActiveCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isActiveCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
 
   // Mirror the event-page pattern: combine role with a server-side RPC check.
   // RLS still enforces access at the row level; this just hides edit affordances

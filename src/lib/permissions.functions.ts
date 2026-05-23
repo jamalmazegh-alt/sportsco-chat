@@ -442,7 +442,7 @@ export const assignRefereeToMatch = createServerFn({ method: "POST" })
 
     const { data: member, error: mErr } = await supabaseAdmin
       .from("tournament_members")
-      .select("id, role, assigned_match_ids, user_id, email")
+      .select("id, role, assigned_match_ids, user_id, email, first_name, last_name")
       .eq("id", data.member_id)
       .eq("tournament_id", data.tournament_id)
       .maybeSingle();
@@ -474,7 +474,7 @@ export const assignRefereeToMatch = createServerFn({ method: "POST" })
           referee_user_id: data.remove ? null : member.user_id,
           referee_name: data.remove
             ? null
-            : `${member.email}`,
+            : `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim() || member.email,
         })
         .eq("id", data.match_id)
         .eq("tournament_id", data.tournament_id);

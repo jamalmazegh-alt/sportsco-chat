@@ -27,7 +27,7 @@ import { EventChat } from "@/components/event-chat";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -164,7 +164,8 @@ function EventDetail() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isActiveCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isActiveCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const [sending, setSending] = useState(false);

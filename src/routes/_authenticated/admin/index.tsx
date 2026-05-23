@@ -2,7 +2,7 @@ import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -41,6 +41,7 @@ function AdminSettingsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["club-settings", activeClubId],
@@ -73,7 +74,7 @@ function AdminSettingsPage() {
     }
   }, [data]);
 
-  if (role !== "admin") return <Navigate to="/profile" replace />;
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
   const toggleChannel = (ch: ChannelKey) => {
     if (!form) return;

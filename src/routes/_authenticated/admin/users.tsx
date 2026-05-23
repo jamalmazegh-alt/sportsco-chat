@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useState, type FormEvent } from "react";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { Loader2, Users, Mail, ShieldCheck, Trophy, UserPlus } from "lucide-react";
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { toast } from "sonner";
 
@@ -26,12 +27,13 @@ function AdminUsersPage() {
   const { t } = useTranslation();
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const qc = useQueryClient();
   const fetchUsers = useServerFn(listClubUsers);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-club-users", activeClubId],
-    enabled: !!activeClubId && role === "admin",
+    enabled: !!activeClubId && roles.includes("admin"),
     queryFn: async () => {
       const res = await fetchUsers({ data: { club_id: activeClubId! } });
       return res.users;
@@ -141,7 +143,7 @@ function AdminUsersPage() {
     qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
   }
 
-  if (role !== "admin") return <Navigate to="/profile" replace />;
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
   return (
     <div className="px-5 pt-4 pb-10 space-y-4">
@@ -218,72 +220,97 @@ function AdminUsersPage() {
         <div className="flex justify-center py-10">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
-      ) : (data ?? []).length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          {t("admin.usersEmpty")}
-        </div>
-      ) : (
-        <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
-          {(data ?? []).map((u: any) => {
-            const name =
-              u.profile?.full_name ??
-              [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ") ??
-              u.email ??
-              "—";
-            const isAdmin = u.roles.includes("admin");
-            const isCoach = u.roles.includes("coach");
-            return (
-              <li key={u.user_id}>
-                <Link
-                  to="/admin/users/$userId"
-                  params={{ userId: u.user_id }}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
-                >
-                  <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden">
-                    {u.profile?.avatar_url ? (
-                      <img src={u.profile.avatar_url} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      (name?.[0] ?? "?").toUpperCase()
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium truncate">{name || "—"}</p>
-                    {u.email && (
-                      <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
-                        <Mail className="h-3 w-3" />
-                        {u.email}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      {u.roles.map((r: string) => {
-                        const isStaff = r === "admin" || r === "coach";
-                        return (
-                          <span
-                            key={r}
-                            className={
-                              "text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize inline-flex items-center gap-1 " +
-                              (r === "admin"
-                                ? "bg-primary/15 text-primary"
-                                : r === "coach"
-                                ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-                                : "bg-muted text-muted-foreground")
-                            }
-                          >
-                            {r === "admin" && <ShieldCheck className="h-3 w-3" />}
-                            {r === "coach" && <Trophy className="h-3 w-3" />}
-                            {t(`roles.${r}`, { defaultValue: r })}
-                          </span>
-                        );
-                      })}
-                      {!isAdmin && !isCoach && null}
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      ) : (() => {
+        const STAFF_ROLES = new Set(["admin", "coach", "assistant_coach", "staff", "tournament_manager"]);
+        const allUsers = (data ?? []) as any[];
+        const staff = allUsers.filter((u) => (u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)));
+        const playersParents = allUsers.filter(
+          (u) =>
+            !(u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)) &&
+            ((u.roles ?? []).includes("player") || (u.roles ?? []).includes("parent")),
+        );
+
+        const renderList = (users: any[], emptyKey: string) =>
+          users.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+              {t(emptyKey, { defaultValue: t("admin.usersEmpty") })}
+            </div>
+          ) : (
+            <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
+              {users.map((u: any) => {
+                const name =
+                  u.profile?.full_name ??
+                  [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(" ") ??
+                  u.email ??
+                  "—";
+                return (
+                  <li key={u.user_id}>
+                    <Link
+                      to="/admin/users/$userId"
+                      params={{ userId: u.user_id }}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
+                    >
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden">
+                        {u.profile?.avatar_url ? (
+                          <img src={u.profile.avatar_url} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          (name?.[0] ?? "?").toUpperCase()
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{name || "—"}</p>
+                        {u.email && (
+                          <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                            <Mail className="h-3 w-3" />
+                            {u.email}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          {(u.roles ?? []).map((r: string) => (
+                            <span
+                              key={r}
+                              className={
+                                "text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize inline-flex items-center gap-1 " +
+                                (r === "admin"
+                                  ? "bg-primary/15 text-primary"
+                                  : r === "coach" || r === "assistant_coach"
+                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                                  : "bg-muted text-muted-foreground")
+                              }
+                            >
+                              {r === "admin" && <ShieldCheck className="h-3 w-3" />}
+                              {(r === "coach" || r === "assistant_coach") && <Trophy className="h-3 w-3" />}
+                              {t(`roles.${r}`, { defaultValue: r })}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+
+        return (
+          <Tabs defaultValue="staff" className="w-full">
+            <TabsList className="grid grid-cols-2 w-full">
+              <TabsTrigger value="staff">
+                {t("admin.tabClubMembers", { defaultValue: "Membres du club" })} ({staff.length})
+              </TabsTrigger>
+              <TabsTrigger value="players">
+                {t("admin.tabPlayersParents", { defaultValue: "Joueurs & parents" })} ({playersParents.length})
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="staff" className="mt-3">
+              {renderList(staff, "admin.tabClubMembersEmpty")}
+            </TabsContent>
+            <TabsContent value="players" className="mt-3">
+              {renderList(playersParents, "admin.tabPlayersParentsEmpty")}
+            </TabsContent>
+          </Tabs>
+        );
+      })()}
     </div>
   );
 }
