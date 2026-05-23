@@ -23,9 +23,18 @@ import {
   setUserDisabled,
   removeUserFromClub,
   sendUserPasswordReset,
-  setUserClubStaffRoles,
 } from "@/lib/admin.functions";
+import { setClubMemberRoles } from "@/lib/permissions.functions";
 import { Checkbox } from "@/components/ui/checkbox";
+
+const CLUB_ROLE_KEYS = [
+  "admin",
+  "coach",
+  "assistant_coach",
+  "staff",
+  "tournament_manager",
+] as const;
+type ClubRoleKey = (typeof CLUB_ROLE_KEYS)[number];
 
 import { Button } from "@/components/ui/button";
 import {
