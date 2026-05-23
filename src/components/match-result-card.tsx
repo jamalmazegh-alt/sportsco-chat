@@ -207,8 +207,10 @@ export function MatchResultCard({
       return;
     }
     toast.success(t("match.resultSaved"));
-    // Celebrate a win only — subtle delight, not noise.
-    if (home_score !== away_score) setCelebrate((n) => n + 1);
+    // Celebrate wins only — subtle delight, not noise.
+    const ourScore = isHome === false ? away_score : home_score;
+    const theirScore = isHome === false ? home_score : away_score;
+    if (ourScore > theirScore) setCelebrate((n) => n + 1);
     setEditing(false);
     qc.invalidateQueries({ queryKey: ["match-result", eventId] });
 
