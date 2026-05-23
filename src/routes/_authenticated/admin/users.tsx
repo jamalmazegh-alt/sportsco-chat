@@ -56,6 +56,7 @@ function AdminUsersPage() {
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
 
   function reset() {
     setInviteRoles(["coach"]); setFirst(""); setLast(""); setEmail("");
