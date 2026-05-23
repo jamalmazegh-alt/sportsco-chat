@@ -28,6 +28,7 @@ export type AppRole = "admin" | "coach" | "parent" | "player";
 export interface ClubMembership {
   club_id: string;
   role: AppRole;
+  roles: string[];
   club: { id: string; name: string; logo_url: string | null };
 }
 
