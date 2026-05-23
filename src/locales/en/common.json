@@ -614,7 +614,17 @@
     "accountStatus": "Account status",
     "statusDisabled": "Disabled",
     "confirmDisable": "Disable this account?",
-    "confirmRemove": "Remove this user from the club?"
+    "confirmRemove": "Remove this user from the club?",
+    "tabClubMembers": "Club members",
+    "tabPlayersParents": "Players & parents",
+    "tabClubMembersEmpty": "No club members yet.",
+    "tabPlayersParentsEmpty": "No players or parents yet.",
+    "inviteUser": "Invite a user",
+    "inviteRole": "Roles",
+    "inviteEmailAlreadyUser": "This address already has a Clubero account. Ask them to sign in, then add them via their profile.",
+    "inviteEmailFailed": "Invitation created but the email could not be sent.",
+    "inviteSent": "Invitation sent",
+    "sendInvite": "Send invitation"
   },
   "attachments": {
     "add": "Add file",
@@ -908,6 +918,9 @@
     "pending": "Pending",
     "assignMatches": "Assign to matches",
     "copyLink": "Copy link",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "confirmRemoveTitle": "Remove this member?",
+    "confirmRemoveDesc": "This person will no longer have access to the tournament. You can re-invite them later.",
+    "confirmRemoveAction": "Remove"
   }
 }
