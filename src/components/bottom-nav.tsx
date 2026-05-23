@@ -27,7 +27,7 @@ export function BottomNav() {
       ]
     : clubLocked
       ? [
-          ...(role === "admin"
+          ...(isAdmin
             ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
             : []),
           { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
@@ -38,7 +38,7 @@ export function BottomNav() {
         { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
         { to: "/stats", icon: BarChart3, label: t("nav.stats"), badge: 0 },
         { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
-        ...(role === "admin"
+        ...(isAdmin
           ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
           : []),
         { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
