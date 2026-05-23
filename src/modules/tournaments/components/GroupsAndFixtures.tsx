@@ -331,7 +331,7 @@ export function GroupsAndFixtures({
             {t("groups.thirdPlaceMatch")}
           </label>
           <Button
-            onClick={() => genKnockout.mutate()}
+            onClick={() => setGenBracketOpen(true)}
             disabled={genKnockout.isPending}
             variant="outline"
             className="w-full"
