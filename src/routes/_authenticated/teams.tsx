@@ -202,33 +202,62 @@ function TeamsPage() {
           }
         />
       ) : (
-        <ul className="space-y-2">
-          {teams.map((tm) => (
-            <li key={tm.id}>
-              <Link
-                to="/teams/$teamId"
-                params={{ teamId: tm.id }}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
-              >
-                <div className="h-14 w-14 rounded-xl bg-muted shrink-0 overflow-hidden flex items-center justify-center">
-                  {tm.image_url ? (
-                    <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">{tm.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
-                    {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-2">
+            {teams.map((tm) => (
+              <li key={tm.id}>
+                <Link
+                  to="/teams/$teamId"
+                  params={{ teamId: tm.id }}
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
+                >
+                  <div className="h-14 w-14 rounded-xl bg-muted shrink-0 overflow-hidden flex items-center justify-center">
+                    {tm.image_url ? (
+                      <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <Users className="h-5 w-5 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{tm.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
+                      {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                </Link>
+              </li>
+            ))}
+
+            {isAdmin && teams.length < 3 && (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  className="group w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/30 px-4 py-5 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                >
+                  <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+                  {t("teams.create")}
+                </button>
+              </li>
+            )}
+          </ul>
+
+          <Link
+            to="/stats"
+            className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform hover:bg-accent/40"
+          >
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <BarChart3 className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{t("nav.viewStats", { defaultValue: "Voir les statistiques" })}</p>
+              <p className="text-xs text-muted-foreground">{t("nav.stats")}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          </Link>
+        </>
       )}
     </div>
   );
