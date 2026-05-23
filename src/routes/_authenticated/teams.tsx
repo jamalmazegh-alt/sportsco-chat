@@ -213,13 +213,16 @@ function TeamsPage() {
                   params={{ teamId: tm.id }}
                   className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
                 >
-                  <div className="h-14 w-14 rounded-xl bg-muted shrink-0 overflow-hidden flex items-center justify-center">
+                  <div className="h-14 w-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
                     {tm.image_url ? (
                       <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
                     ) : (
-                      <Users className="h-5 w-5 text-muted-foreground" />
+                      <div className={`h-full w-full flex items-center justify-center text-sm font-bold tracking-tight ${avatarGradient(tm.id)}`}>
+                        {initialsFrom(tm.name)}
+                      </div>
                     )}
                   </div>
+
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">{tm.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
