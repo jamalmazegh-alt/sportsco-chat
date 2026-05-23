@@ -147,10 +147,9 @@ function PrivacyPage() {
   return (
     <div className="px-4 pb-10 pt-2 space-y-6">
       <div className="flex items-center gap-2">
-        <Link to="/profile" className="-ml-2 inline-flex items-center text-sm text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-        </Link>
+        <BackLink to="/profile" />
       </div>
+
 
       <header className="space-y-1">
         <div className="flex items-center gap-2">
