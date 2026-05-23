@@ -15,8 +15,8 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({
     meta: [
-      { title: "Log in — Clubero" },
-      { name: "description", content: "Log in to manage your team and events." },
+      { title: i18n.t("meta.login.title") },
+      { name: "description", content: i18n.t("meta.login.description") },
     ],
   }),
 });
