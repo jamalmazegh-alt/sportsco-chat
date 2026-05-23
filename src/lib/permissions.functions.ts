@@ -108,6 +108,18 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertClubAdmin(supabase, data.club_id, userId);
 
+    // Enforce incompatible role pairs
+    const INCOMPATIBLE: [string, string][] = [
+      ["coach", "assistant_coach"],
+      ["admin", "assistant_coach"],
+      ["staff", "assistant_coach"],
+    ];
+    for (const [a, b] of INCOMPATIBLE) {
+      if (data.roles.includes(a as any) && data.roles.includes(b as any)) {
+        throw new Response(`Roles ${a} and ${b} are incompatible`, { status: 400 });
+      }
+    }
+
     // Prevent self-removing admin
     if (
       data.user_id === userId &&
