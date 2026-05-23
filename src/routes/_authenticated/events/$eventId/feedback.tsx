@@ -256,13 +256,8 @@ function PostMatchFeedback() {
 
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">
-      <Link
-        to="/events/$eventId"
-        params={{ eventId }}
-        className="inline-flex items-center text-sm text-muted-foreground gap-1"
-      >
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/events/$eventId" params={{ eventId }} />
+
 
       <div>
         <h1 className="text-xl font-semibold">
