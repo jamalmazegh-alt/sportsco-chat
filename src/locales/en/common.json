@@ -587,6 +587,7 @@
     "saved": "Settings saved.",
     "usersTitle": "Platform users",
     "usersSubtitle": "All users with access to this club, with their roles and status.",
+    "searchUsersPlaceholder": "Search by name or email…",
     "usersEmpty": "No users yet.",
     "openUsers": "Manage users",
     "statusActive": "Active",
