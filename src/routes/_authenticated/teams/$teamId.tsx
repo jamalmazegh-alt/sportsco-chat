@@ -341,6 +341,7 @@ function TeamDetail() {
     if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
     else if (totalFailed) toast.warning(t("players.inviteBulkResult", { sent: totalSent, failed: totalFailed, skipped: totalSkipped }));
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
+    qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
   async function onAdd(e: FormEvent) {
