@@ -32,6 +32,8 @@ import {
   SOLO_STAT_KINDS,
   type StatKind,
 } from "@/lib/sport-config";
+import { ConfettiBurst } from "@/components/confetti-burst";
+
 
 type Goal = {
   id: string;
