@@ -16,6 +16,7 @@ import {
   autoScheduleMatches,
 } from "../tournaments.functions";
 import { DrawDialog } from "./DrawDialog";
+import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 
 interface Props {
   tournamentId: string;
@@ -53,6 +54,8 @@ export function GroupsAndFixtures({
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [drawOpen, setDrawOpen] = useState(false);
+  const [regenGroupsOpen, setRegenGroupsOpen] = useState(false);
+  const [genBracketOpen, setGenBracketOpen] = useState(false);
 
   const [numGroups, setNumGroups] = useState(2);
   const [qualifiers, setQualifiers] = useState(2);
@@ -277,12 +280,21 @@ export function GroupsAndFixtures({
             </div>
           </div>
           <Button
-            onClick={() => genGroups.mutate()}
+            onClick={() => {
+              if (groupsCount > 0) {
+                setRegenGroupsOpen(true);
+              } else {
+                genGroups.mutate();
+              }
+            }}
             disabled={genGroups.isPending || numTeams < 2}
+            variant={groupsCount > 0 ? "destructive" : "default"}
             className="w-full"
           >
             {genGroups.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
+            ) : groupsCount > 0 ? (
+              t("groups.regenerateGroups")
             ) : (
               t("groups.generateGroups")
             )}
@@ -319,7 +331,7 @@ export function GroupsAndFixtures({
             {t("groups.thirdPlaceMatch")}
           </label>
           <Button
-            onClick={() => genKnockout.mutate()}
+            onClick={() => setGenBracketOpen(true)}
             disabled={genKnockout.isPending}
             variant="outline"
             className="w-full"
@@ -506,6 +518,63 @@ export function GroupsAndFixtures({
         )}
 
       </section>
+
+      <DestructiveConfirmSheet
+        open={regenGroupsOpen}
+        onOpenChange={setRegenGroupsOpen}
+        mode="type"
+        confirmWord="EFFACER"
+        title={t("groups.regenConfirmTitle")}
+        description={t("groups.regenConfirmDesc")}
+        consequences={
+          <ul className="list-disc pl-5 space-y-1 text-destructive">
+            <li>{t("groups.regenConsequenceGroups", { count: groupsCount })}</li>
+            <li>{t("groups.regenConsequenceMatches", { count: matchesCount })}</li>
+            <li>{t("groups.regenConsequenceScores")}</li>
+          </ul>
+        }
+        cancelLabel={t("draw.cancel")}
+        confirmLabel={t("groups.regenConfirmAction")}
+        loading={genGroups.isPending}
+        onConfirm={async () => {
+          await genGroups.mutateAsync();
+          setRegenGroupsOpen(false);
+        }}
+      />
+
+      <DestructiveConfirmSheet
+        open={genBracketOpen}
+        onOpenChange={setGenBracketOpen}
+        mode="simple"
+        title={
+          format === "knockout"
+            ? t("groups.generateBracket")
+            : t("groups.generateBracketFromQualifiers")
+        }
+        description={
+          format === "knockout"
+            ? t("groups.bracketConfirmDescKnockout", { count: numTeams })
+            : t("groups.bracketConfirmDescMixed", {
+                qualifiers: qualifiers,
+                groups: groupsCount,
+                total: qualifiers * groupsCount,
+              })
+        }
+        consequences={
+          <p className="text-foreground">
+            {thirdPlace
+              ? t("groups.bracketConfirmThirdPlaceYes")
+              : t("groups.bracketConfirmThirdPlaceNo")}
+          </p>
+        }
+        cancelLabel={t("draw.cancel")}
+        confirmLabel={t("groups.bracketConfirmAction")}
+        loading={genKnockout.isPending}
+        onConfirm={async () => {
+          await genKnockout.mutateAsync();
+          setGenBracketOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -481,7 +481,21 @@
     "scheduledToast_one": "{{count}} match programmé",
     "scheduledToast_other": "{{count}} matchs programmés",
     "scheduledWithSkippedToast": "{{count}} matchs programmés · {{skipped}} non placés (contrainte de repos)",
-    "defaultFieldName": "Terrain 1"
+    "defaultFieldName": "Terrain 1",
+    "regenerateGroups": "Régénérer les groupes",
+    "regenConfirmTitle": "Régénérer les groupes ?",
+    "regenConfirmDesc": "Tous les groupes et les matchs déjà créés seront supprimés. Les scores saisis seront perdus.",
+    "regenConsequenceGroups_one": "{{count}} groupe sera supprimé",
+    "regenConsequenceGroups_other": "{{count}} groupes seront supprimés",
+    "regenConsequenceMatches_one": "{{count}} match sera supprimé",
+    "regenConsequenceMatches_other": "{{count}} matchs seront supprimés",
+    "regenConsequenceScores": "Tous les scores et statistiques saisis seront effacés",
+    "regenConfirmAction": "Effacer et régénérer",
+    "bracketConfirmDescKnockout": "Un tableau à élimination directe sera créé à partir des {{count}} équipes inscrites.",
+    "bracketConfirmDescMixed": "Le tableau final sera créé à partir des {{total}} qualifiés ({{qualifiers}} par groupe × {{groups}} groupes).",
+    "bracketConfirmThirdPlaceYes": "Un match pour la 3e place sera inclus.",
+    "bracketConfirmThirdPlaceNo": "Aucun match pour la 3e place.",
+    "bracketConfirmAction": "Générer le tableau"
   },
   "draw": {
     "title": "Tirage au sort",

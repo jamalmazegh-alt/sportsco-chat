@@ -481,7 +481,21 @@
     "scheduledToast_one": "{{count}} match scheduled",
     "scheduledToast_other": "{{count}} matches scheduled",
     "scheduledWithSkippedToast": "{{count}} matches scheduled · {{skipped}} unplaced (rest constraint)",
-    "defaultFieldName": "Field 1"
+    "defaultFieldName": "Field 1",
+    "regenerateGroups": "Regenerate groups",
+    "regenConfirmTitle": "Regenerate groups?",
+    "regenConfirmDesc": "All existing groups and matches will be deleted. Recorded scores will be lost.",
+    "regenConsequenceGroups_one": "{{count}} group will be deleted",
+    "regenConsequenceGroups_other": "{{count}} groups will be deleted",
+    "regenConsequenceMatches_one": "{{count}} match will be deleted",
+    "regenConsequenceMatches_other": "{{count}} matches will be deleted",
+    "regenConsequenceScores": "All recorded scores and stats will be erased",
+    "regenConfirmAction": "Erase and regenerate",
+    "bracketConfirmDescKnockout": "A knockout bracket will be created from the {{count}} registered teams.",
+    "bracketConfirmDescMixed": "The final bracket will be created from {{total}} qualifiers ({{qualifiers}} per group × {{groups}} groups).",
+    "bracketConfirmThirdPlaceYes": "A 3rd-place match will be included.",
+    "bracketConfirmThirdPlaceNo": "No 3rd-place match.",
+    "bracketConfirmAction": "Generate bracket"
   },
   "draw": {
     "title": "Draw",
