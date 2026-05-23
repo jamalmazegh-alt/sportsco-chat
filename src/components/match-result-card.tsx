@@ -273,6 +273,8 @@ export function MatchResultCard({
 
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+      <ConfettiBurst trigger={celebrate} />
+
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
           <Trophy className="h-4 w-4" /> {t("match.result")}
