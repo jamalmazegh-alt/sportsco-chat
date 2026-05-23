@@ -85,8 +85,9 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   });
 
   const p = data?.profile;
-  const name = p?.full_name
-    ?? [p?.first_name, p?.last_name].filter(Boolean).join(" ")
+  const name =
+    (p?.full_name
+      ?? [p?.first_name, p?.last_name].filter(Boolean).join(" "))
     || data?.email
     || "—";
   const isSelf = user?.id === userId;
