@@ -47,24 +47,30 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   const navigate = useNavigate();
   const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
 
+  const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
   const { data: insights } = useQuery({
     queryKey: ["coach-insights", clubId, user?.id],
     enabled: !!clubId && !!user,
     queryFn: async () => {
       const nowIso = new Date().toISOString();
       const { data, error } = await supabase
-        .from("coach_insights" as any)
+        .from("coach_insights")
         .select(
           "id, club_id, insight_type, message_fr, message_en, priority, action_type, action_payload, dismissed_by, resolved_at, expires_at",
         )
         .eq("club_id", clubId)
         .is("resolved_at", null)
         .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
-        .order("priority", { ascending: true })
         .order("created_at", { ascending: false });
       if (error) throw error;
       const list = (data ?? []) as unknown as InsightRow[];
-      return list.filter((i) => !(i.dismissed_by ?? []).includes(user!.id));
+      return list
+        .filter((i) => !(i.dismissed_by ?? []).includes(user!.id))
+        .sort(
+          (a, b) =>
+            (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99),
+        );
     },
   });
 
@@ -73,7 +79,11 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   const handleAction = (ins: InsightRow) => {
     const ap = (ins.action_payload ?? {}) as { event_id?: string; player_id?: string };
     if (ins.action_type === "send_reminder" && ap.event_id) {
-      navigate({ to: "/events/$eventId", params: { eventId: ap.event_id } });
+      navigate({
+        to: "/events/$eventId",
+        params: { eventId: ap.event_id },
+        search: { action: "remind" },
+      });
     } else if (ins.action_type === "view_event" && ap.event_id) {
       navigate({ to: "/events/$eventId", params: { eventId: ap.event_id } });
     } else if (ins.action_type === "view_player" && ap.player_id) {
