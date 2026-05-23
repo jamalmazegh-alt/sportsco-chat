@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -56,7 +57,7 @@ const ROLE_ICON: Record<TournamentRole, any> = {
 };
 
 export function MembersManager({ tournamentId, matches, teams }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
 
   const listFn = useServerFn(listTournamentMembers);
@@ -101,6 +102,28 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           ? t("tournamentMembers.added", { defaultValue: "Membre ajouté" })
           : t("tournamentMembers.invited", { defaultValue: "Invitation créée" }),
       );
+
+      // Notify existing user that they've been added to the tournament
+      if (res.linked && res.tournament_slug) {
+        const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
+        const roleLabel = t(`roles.${role}`, { lng: locale, defaultValue: role });
+        const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
+        sendTransactionalEmail({
+          templateName: "tournament-member-added",
+          recipientEmail: email,
+          idempotencyKey: `tournament-member-added-${res.member_id}`,
+          templateData: {
+            displayName: firstName,
+            tournamentName: res.tournament_name ?? undefined,
+            roleLabel,
+            tournamentUrl,
+            locale,
+          },
+        }).catch((err) => {
+          console.error("tournament-member-added email failed", err);
+        });
+      }
+
       setOpen(false);
       resetForm();
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });

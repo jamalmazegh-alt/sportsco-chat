@@ -31,6 +31,7 @@ import { template as supportTicketCreatedTemplate } from './support-ticket-creat
 import { template as supportTicketReplyTemplate } from './support-ticket-reply'
 import { template as tournamentPassPurchasedTemplate } from './tournament-pass-purchased'
 import { template as tournamentInviteTemplate } from './tournament-invite'
+import { template as tournamentMemberAddedTemplate } from './tournament-member-added'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-confirmation': inquiryConfirmationTemplate,
@@ -47,4 +48,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'support-ticket-reply': supportTicketReplyTemplate,
   'tournament-pass-purchased': tournamentPassPurchasedTemplate,
   'tournament-invite': tournamentInviteTemplate,
+  'tournament-member-added': tournamentMemberAddedTemplate,
 }
