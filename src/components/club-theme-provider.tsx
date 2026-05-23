@@ -1,5 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+
+// useLayoutEffect on the client, useEffect during SSR (avoids React warning).
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -19,7 +22,8 @@ export function ClubThemeProvider({ children }: { children: React.ReactNode }) {
   const { activeClubId } = useAuth();
 
   // Apply stored theme ASAP (covers login page + first paint).
-  useEffect(() => {
+  // Apply stored theme synchronously before first paint (covers login + first paint, no flash).
+  useIsoLayoutEffect(() => {
     applyClubTheme(readStoredTheme());
   }, []);
 
@@ -38,7 +42,7 @@ export function ClubThemeProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     if (!activeClubId) {
       // logged-out: keep stored theme (don't reset)
       return;
