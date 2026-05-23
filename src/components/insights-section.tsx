@@ -1,13 +1,24 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Clock, UserX, Trophy, Shield, X } from "lucide-react";
+import { useState } from "react";
+import { Clock, UserX, Trophy, Shield, X, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { dismissInsight } from "@/lib/insights.functions";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type InsightRow = {
   id: string;
@@ -34,10 +45,31 @@ const TYPE_ICON = {
   missing_guardian: Shield,
 } as const;
 
-const PRIORITY_BORDER: Record<InsightRow["priority"], string> = {
-  high: "border-l-destructive",
-  medium: "border-l-pending",
-  low: "border-l-primary",
+const PRIORITY_TONE: Record<
+  InsightRow["priority"],
+  { ring: string; iconBg: string; iconFg: string; badge: string; accent: string }
+> = {
+  high: {
+    ring: "ring-destructive/20",
+    iconBg: "bg-destructive/10",
+    iconFg: "text-destructive",
+    badge: "bg-destructive/10 text-destructive",
+    accent: "before:bg-destructive",
+  },
+  medium: {
+    ring: "ring-pending/20",
+    iconBg: "bg-pending/10",
+    iconFg: "text-pending",
+    badge: "bg-pending/10 text-pending",
+    accent: "before:bg-pending",
+  },
+  low: {
+    ring: "ring-primary/15",
+    iconBg: "bg-primary/10",
+    iconFg: "text-primary",
+    badge: "bg-primary/10 text-primary",
+    accent: "before:bg-primary",
+  },
 };
 
 export function InsightsSection({ clubId }: { clubId: string }) {
@@ -46,6 +78,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
+  const [pendingDismiss, setPendingDismiss] = useState<string | null>(null);
 
   const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
@@ -91,8 +124,10 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     }
   };
 
-  const handleDismiss = async (id: string) => {
-    // Optimistic
+  const confirmDismiss = async () => {
+    const id = pendingDismiss;
+    if (!id) return;
+    setPendingDismiss(null);
     qc.setQueryData<InsightRow[] | undefined>(
       ["coach-insights", clubId, user?.id],
       (old) => old?.filter((i) => i.id !== id),
@@ -113,49 +148,66 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   };
 
   return (
-    <section className="space-y-2">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+    <section className="space-y-3">
+      <div className="flex items-center justify-between px-0.5">
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.14em]">
           {t("insights.title")}
         </h2>
+        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {insights.length}
+        </span>
       </div>
-      <div className="flex gap-3 overflow-x-auto sm:overflow-visible sm:flex-col sm:gap-2 -mx-5 px-5 sm:mx-0 sm:px-0 snap-x snap-mandatory">
+      <div className="flex gap-3 overflow-x-auto sm:overflow-visible sm:flex-col sm:gap-2.5 -mx-5 px-5 sm:mx-0 sm:px-0 snap-x snap-mandatory pb-1">
         {insights.map((ins) => {
           const Icon = TYPE_ICON[ins.insight_type] ?? Clock;
           const msg = locale === "en" ? ins.message_en : ins.message_fr;
           const label = actionLabel(ins.action_type);
+          const tone = PRIORITY_TONE[ins.priority];
           return (
             <div
               key={ins.id}
               className={cn(
-                "relative shrink-0 snap-start w-[85%] sm:w-auto rounded-2xl border bg-card p-4 border-l-4",
-                PRIORITY_BORDER[ins.priority],
+                "relative shrink-0 snap-start w-[85%] sm:w-auto overflow-hidden rounded-2xl bg-card p-4 pl-5 ring-1 shadow-sm transition-shadow hover:shadow-md",
+                "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1",
+                tone.ring,
+                tone.accent,
               )}
             >
               <button
                 aria-label={t("insights.dismiss")}
-                onClick={() => handleDismiss(ins.id)}
-                className="absolute top-2 right-2 p-1 rounded-md hover:bg-muted text-muted-foreground"
+                onClick={() => setPendingDismiss(ins.id)}
+                className="absolute top-2.5 right-2.5 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
               </button>
               <div className="flex items-start gap-3 pr-6">
-                <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <Icon className="h-5 w-5 text-foreground" />
+                <div
+                  className={cn(
+                    "h-10 w-10 rounded-xl flex items-center justify-center shrink-0",
+                    tone.iconBg,
+                  )}
+                >
+                  <Icon className={cn("h-5 w-5", tone.iconFg)} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <span
+                    className={cn(
+                      "inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
+                      tone.badge,
+                    )}
+                  >
                     {t(`insights.${ins.priority}`)}
-                  </p>
-                  <p className="text-sm mt-0.5 leading-snug">{msg}</p>
+                  </span>
+                  <p className="text-sm mt-2 leading-snug text-foreground">{msg}</p>
                   {label && (
                     <Button
                       size="sm"
-                      variant="secondary"
-                      className="mt-3 h-8"
+                      variant="ghost"
+                      className="mt-2 h-8 px-2 -ml-2 text-primary hover:text-primary hover:bg-primary/10"
                       onClick={() => handleAction(ins)}
                     >
                       {label}
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </Button>
                   )}
                 </div>
@@ -164,6 +216,26 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           );
         })}
       </div>
+
+      <AlertDialog
+        open={!!pendingDismiss}
+        onOpenChange={(o) => !o && setPendingDismiss(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("insights.dismissConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("insights.dismissConfirmDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDismiss}>
+              {t("insights.dismissConfirmAction")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

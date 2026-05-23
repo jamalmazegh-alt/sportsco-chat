@@ -953,7 +953,10 @@
     "dismiss": "Dismiss",
     "high": "Urgent",
     "medium": "Attention",
-    "low": "Info"
+    "low": "Info",
+    "dismissConfirmTitle": "Dismiss this insight?",
+    "dismissConfirmDescription": "It won't show up again for you. This action cannot be undone.",
+    "dismissConfirmAction": "Dismiss"
   }
 }
 
