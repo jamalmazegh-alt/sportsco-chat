@@ -282,21 +282,49 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                       })}
                     </p>
                   </div>
-                  <div className="space-y-0.5">
-                    {CLUB_ROLE_KEYS.map((r) => (
-                      <label
-                        key={r}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer"
-                      >
-                        <Checkbox
-                          checked={currentRoles.includes(r)}
-                          disabled={acting === "roles"}
-                          onCheckedChange={(v) => toggleRole(r, !!v)}
-                        />
-                        <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <TooltipProvider delayDuration={150}>
+                    <div className="space-y-0.5">
+                      {CLUB_ROLE_KEYS.map((r) => {
+                        const blockingRole = currentRoles.find((sel) =>
+                          (INCOMPATIBLE_ROLES[sel] ?? []).includes(r),
+                        );
+                        const incompatible = !!blockingRole && !currentRoles.includes(r);
+                        const isDisabled = acting === "roles" || incompatible;
+                        const row = (
+                          <label
+                            className={
+                              "flex items-center gap-3 p-2 rounded-lg " +
+                              (incompatible
+                                ? "opacity-50 cursor-not-allowed bg-muted/20"
+                                : "hover:bg-muted/40 cursor-pointer")
+                            }
+                          >
+                            <Checkbox
+                              checked={currentRoles.includes(r)}
+                              disabled={isDisabled}
+                              onCheckedChange={(v) => toggleRole(r, !!v)}
+                            />
+                            <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
+                          </label>
+                        );
+                        if (incompatible && blockingRole) {
+                          return (
+                            <Tooltip key={r}>
+                              <TooltipTrigger asChild>
+                                <div>{row}</div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("roles.incompatibleWith", {
+                                  role: t(`roles.${blockingRole}`, { defaultValue: blockingRole }),
+                                })}
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        }
+                        return <div key={r}>{row}</div>;
+                      })}
+                    </div>
+                  </TooltipProvider>
                 </section>
               )}
 
