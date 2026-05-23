@@ -74,6 +74,27 @@ function TeamDetail() {
     },
   });
 
+  // Track which players already have a pending (unaccepted) invite.
+  const { data: pendingInvitePlayerIds } = useQuery({
+    queryKey: ["team-pending-invites", teamId, activeClubId],
+    enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from("member_invites")
+        .select("player_id, parent_for_player_id, accepted_at")
+        .eq("club_id", activeClubId!)
+        .is("accepted_at", null);
+      const set = new Set<string>();
+      (data ?? []).forEach((r: any) => {
+        const pid = r.player_id ?? r.parent_for_player_id;
+        if (pid && ids.includes(pid)) set.add(pid);
+      });
+      return set;
+    },
+  });
+
   // Selection state for bulk invitations
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
