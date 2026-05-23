@@ -1111,6 +1111,14 @@
     "player": {
       "title": "Player — Clubero",
       "description": "Player profile, attendance and coach feedback."
+    },
+    "teams": {
+      "title": "Teams — Clubero",
+      "description": "Your teams and rosters."
+    },
+    "team": {
+      "title": "Team — Clubero",
+      "description": "Team details and players."
     }
   },
   "trial": {
