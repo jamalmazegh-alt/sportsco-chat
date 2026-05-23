@@ -90,6 +90,7 @@ import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './rout
 import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
+import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
 
 const SuperadminRoute = SuperadminRouteImport.update({
   id: '/superadmin',
@@ -522,6 +523,12 @@ const AuthenticatedAdminUsersUserIdRoute =
     path: '/users/$userId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsConvocationsRoute =
+  AuthenticatedAdminSettingsConvocationsRouteImport.update({
+    id: '/settings/convocations',
+    path: '/settings/convocations',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -590,6 +597,7 @@ export interface FileRoutesByFullPath {
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -668,6 +676,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -752,6 +761,7 @@ export interface FileRoutesById {
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/_authenticated/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -836,6 +846,7 @@ export interface FileRouteTypes {
     | '/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/admin/settings/convocations'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -914,6 +925,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
+    | '/admin/settings/convocations'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -997,6 +1009,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/_authenticated/admin/settings/convocations'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
@@ -1625,12 +1638,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings/convocations': {
+      id: '/_authenticated/admin/settings/convocations'
+      path: '/settings/convocations'
+      fullPath: '/admin/settings/convocations'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsConvocationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminSettingsConvocationsRoute: typeof AuthenticatedAdminSettingsConvocationsRoute
   AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -1638,6 +1659,8 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminSettingsConvocationsRoute:
+    AuthenticatedAdminSettingsConvocationsRoute,
   AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
