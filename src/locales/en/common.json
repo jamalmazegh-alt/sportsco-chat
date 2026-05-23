@@ -100,7 +100,13 @@
     "saved": "Saved",
     "errorTitle": "Something went wrong",
     "errorSubtitle": "Something went wrong. You can try again or go back home.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "close": "Close",
+    "error": "An error occurred",
+    "next": "Next",
+    "previous": "Previous",
+    "skip": "Skip",
+    "done": "Done"
   },
   "privacy": {
     "title": "Privacy & data",
@@ -144,7 +150,57 @@
     "clubName": "Club name",
     "createClub": "Create club",
     "joinHint": "Already a member? Ask your admin to invite you.",
-    "joinClub": "Join with code"
+    "joinClub": "Join with code",
+    "steps": {
+      "logo": {
+        "label": "Add your club logo",
+        "hint": "Personalize the app for your players and parents."
+      },
+      "team": {
+        "label": "Create your first team",
+        "hint": "U13, Seniors, Recreational… give it a name and category."
+      },
+      "players": {
+        "label": "Add your players",
+        "hint": "Build the roster of at least one team."
+      },
+      "invites": {
+        "label": "Invite parents and coaches",
+        "hint": "They respond to call-ups in one tap."
+      },
+      "event": {
+        "label": "Publish your first event",
+        "hint": "Training or match — test the full flow."
+      }
+    },
+    "cta": {
+      "upload": "Add",
+      "create": "Create",
+      "add": "Add",
+      "invite": "Invite",
+      "publish": "Publish"
+    },
+    "wizard": {
+      "welcomeTitle": "Welcome to Clubero 🎉",
+      "welcomeBody": "Your 30-day free trial is already active. Let's walk through the 4 steps to set up your club.",
+      "welcomeCta": "Get started",
+      "teamTitle": "Create your first team",
+      "teamBody": "U13, Seniors, Recreational… give it a name, a category and a season.",
+      "teamCtaCreate": "Create a team",
+      "teamCtaView": "View teams",
+      "playersTitle": "Add your players",
+      "playersBody": "Build the roster of at least one team. You'll be able to invite parents and coaches next.",
+      "playersCtaAdd": "Add players",
+      "playersCtaManage": "Manage players",
+      "eventTitle": "Publish your first event",
+      "eventBody": "Training, match or meeting: create it, call up your players and test the full flow.",
+      "eventCtaCreate": "Create an event",
+      "eventCtaView": "View events",
+      "doneTitle": "You're all set!",
+      "doneBody": "Find these steps anytime on your home page. Have a great season with Clubero!",
+      "doneCta": "Finish",
+      "alreadyDone": "Already done"
+    }
   },
   "invites": {
     "title": "Invite players & parents",
@@ -506,7 +562,6 @@
     "hideRecordDetail": "Hide details",
     "summaryAria": "Season summary"
   },
-
   "match": {
     "result": "Match result",
     "enterScore": "Enter score",
@@ -970,6 +1025,37 @@
     "dismissConfirmTitle": "Dismiss this insight?",
     "dismissConfirmDescription": "It won't show up again for you. This action cannot be undone.",
     "dismissConfirmAction": "Dismiss"
+  },
+  "meta": {
+    "login": {
+      "title": "Log in — Clubero",
+      "description": "Log in to manage your team and events."
+    },
+    "forgot": {
+      "title": "Forgot password — Clubero",
+      "description": "Reset your Clubero password."
+    },
+    "reset": {
+      "title": "Reset password — Clubero",
+      "description": "Choose a new password."
+    }
+  },
+  "respond": {
+    "eyebrow": "Call-up",
+    "invalidLink": "Invalid or expired link.",
+    "invalidTitle": "Invalid link",
+    "invalidBody": "This call-up cannot be found. Ask your coach for a new link.",
+    "backHome": "Back to home",
+    "forPlayer": "For",
+    "thePlayer": "the player",
+    "savedTitle": "Response saved:",
+    "editYourReply": "Edit your response",
+    "yourReply": "Your response",
+    "openApp": "Open in Clubero",
+    "footer": "You received this link because a call-up was sent to you. You can change your response at any time from this same link.",
+    "submitError": "Failed to save",
+    "present": "Present",
+    "absent": "Absent",
+    "uncertain": "Uncertain"
   }
 }
-
