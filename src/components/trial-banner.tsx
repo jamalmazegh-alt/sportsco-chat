@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle, Sparkles, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 const DISMISS_KEY = (clubId: string) => `clubero-trial-banner-dismissed:${clubId}`;
 
 export function TrialBanner() {
+  const { t } = useTranslation();
   const { memberships, activeClubId } = useAuth();
   const isAdmin = !!memberships.find(
     (m) => m.club_id === activeClubId && m.role === "admin",
@@ -80,12 +82,12 @@ export function TrialBanner() {
 
   const message =
     kind === "expired"
-      ? "Votre essai est terminé. Activez votre abonnement pour continuer à créer des événements."
+      ? t("trial.expired")
       : kind === "trial-ending"
-        ? `Essai gratuit : ${daysLeft} jour${daysLeft > 1 ? "s" : ""} restant${daysLeft > 1 ? "s" : ""}.`
+        ? t("trial.ending", { count: daysLeft })
         : kind === "canceling"
-          ? `Abonnement résilié — actif encore ${daysLeft} jour${daysLeft > 1 ? "s" : ""}.`
-          : `Essai gratuit actif — ${daysLeft} jours restants.`;
+          ? t("trial.canceling", { count: daysLeft })
+          : t("trial.active", { count: daysLeft });
 
   return (
     <div className={cn("px-3 py-2 text-xs flex items-center gap-2", tone)}>
@@ -95,13 +97,13 @@ export function TrialBanner() {
         to="/admin/billing"
         className="font-semibold underline underline-offset-2 shrink-0"
       >
-        {kind === "expired" || kind === "trial-ending" ? "Activer" : "Gérer"}
+        {kind === "expired" || kind === "trial-ending" ? t("trial.activate") : t("trial.manage")}
       </Link>
       {dismissable && (
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Fermer"
+          aria-label={t("trial.dismiss")}
           className="shrink-0 opacity-70 hover:opacity-100"
         >
           <X className="h-3.5 w-3.5" />
