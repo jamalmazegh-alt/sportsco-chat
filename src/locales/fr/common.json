@@ -922,5 +922,17 @@
     "confirmRemoveTitle": "Retirer ce membre ?",
     "confirmRemoveDesc": "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard.",
     "confirmRemoveAction": "Retirer"
+  },
+  "insights": {
+    "title": "Insights",
+    "empty": "Aucun insight pour le moment",
+    "sendReminder": "Envoyer un rappel",
+    "viewEvent": "Voir l'événement",
+    "viewPlayer": "Voir le joueur",
+    "dismiss": "Ignorer",
+    "high": "Urgent",
+    "medium": "Attention",
+    "low": "Info"
   }
 }
+
