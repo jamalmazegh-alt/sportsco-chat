@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 const STATUS_ACTIONS = [
-  { status: "present", Icon: CheckCircle2, activeCls: "bg-present text-present-foreground border-present", idleCls: "text-present hover:bg-present/15" },
+  { status: "present", Icon: CheckCircle2, activeCls: "bg-emerald-500 text-white border-emerald-500", idleCls: "text-emerald-600 hover:bg-emerald-50" },
   { status: "uncertain", Icon: HelpCircle, activeCls: "bg-uncertain text-uncertain-foreground border-uncertain", idleCls: "text-uncertain-foreground hover:bg-uncertain/20" },
   { status: "absent", Icon: XCircle, activeCls: "bg-absent text-white border-absent", idleCls: "text-absent hover:bg-absent/10" },
 ] as const;

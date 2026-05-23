@@ -53,7 +53,7 @@ const ATTENDANCE_ACTIONS: Array<{
   Icon: typeof CheckCircle2;
   className: string;
 }> = [
-  { status: "present", Icon: CheckCircle2, className: "text-present hover:bg-present/15 hover:text-present" },
+  { status: "present", Icon: CheckCircle2, className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700" },
   { status: "absent", Icon: XCircle, className: "text-absent hover:bg-absent/10 hover:text-absent" },
   { status: "uncertain", Icon: HelpCircle, className: "text-uncertain-foreground hover:bg-uncertain/20 hover:text-uncertain-foreground" },
   { status: "pending", Icon: CircleDot, className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground" },
@@ -2305,13 +2305,13 @@ function EventDetail() {
                           const active = c.status === s;
                           const inactiveTint =
                             s === "present"
-                              ? "border-present/25 bg-present/5 text-present hover:bg-present/10 hover:border-present/50"
+                              ? "border-emerald-200/60 bg-emerald-50/40 text-emerald-600 hover:bg-emerald-100/60 hover:border-emerald-400"
                               : s === "absent"
                                 ? "border-absent/25 bg-absent/5 text-absent hover:bg-absent/10 hover:border-absent/50"
                                 : "border-uncertain/30 bg-uncertain/5 text-uncertain-foreground hover:bg-uncertain/15 hover:border-uncertain/60";
                           const activeTint =
                             s === "present"
-                              ? "bg-present text-present-foreground border-present shadow-md shadow-present/20 ring-2 ring-present/30"
+                              ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20 ring-2 ring-emerald-500/30"
                               : s === "absent"
                                 ? "bg-absent text-white border-absent shadow-md shadow-absent/20 ring-2 ring-absent/30"
                                 : "bg-uncertain text-uncertain-foreground border-uncertain shadow-md shadow-uncertain/20 ring-2 ring-uncertain/30";
@@ -2379,7 +2379,7 @@ function EventDetail() {
                       {/* Segmented progress bar */}
                       <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted/60 flex">
                         {counts.present > 0 && (
-                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-present transition-all" />
+                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-emerald-500 transition-all" />
                         )}
                         {counts.uncertain > 0 && (
                           <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-uncertain transition-all" />
@@ -2391,7 +2391,7 @@ function EventDetail() {
 
                       {/* Chips */}
                       <div className="flex flex-wrap gap-1.5 mt-3">
-                        <StatChip dotCls="bg-present" label={t("attendance.present")} value={counts.present} />
+                        <StatChip dotCls="bg-emerald-500" label={t("attendance.present")} value={counts.present} />
                         <StatChip dotCls="bg-uncertain" label={t("attendance.uncertain")} value={counts.uncertain} />
                         <StatChip dotCls="bg-absent" label={t("attendance.absent")} value={counts.absent} />
                         <StatChip dotCls="bg-pending border border-border" label={t("attendance.pending")} value={counts.pending} muted />
@@ -2420,12 +2420,12 @@ function EventDetail() {
                 <ul className="mt-3 border-t border-border">
                   {sortedConvocations.map((c: any) => {
                     const accent =
-                      c.status === "present" ? "bg-present"
+                      c.status === "present" ? "bg-emerald-500"
                       : c.status === "absent" ? "bg-absent"
                       : c.status === "uncertain" ? "bg-uncertain"
                       : "bg-pending";
                     const ringCls =
-                      c.status === "present" ? "ring-2 ring-present/40"
+                      c.status === "present" ? "ring-2 ring-emerald-500/40"
                       : c.status === "absent" ? "ring-2 ring-absent/40"
                       : c.status === "uncertain" ? "ring-2 ring-uncertain/40"
                       : "ring-1 ring-border";
@@ -2467,7 +2467,7 @@ function EventDetail() {
                                   className={cn(
                                     "h-8 min-w-0 rounded-lg px-1.5 text-[11px] sm:h-7 sm:rounded-full sm:px-2",
                                     c.status === status
-                                      ? status === "present" ? "bg-present text-present-foreground hover:bg-present hover:text-present-foreground"
+                                      ? status === "present" ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
                                         : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
                                         : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
                                       : className,
