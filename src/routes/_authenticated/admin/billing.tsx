@@ -135,7 +135,7 @@ function BillingPage() {
 
   if (role !== "admin") return <Navigate to="/profile" replace />;
 
-  if (isLoading || !activeClubId) {
+  if (isLoading || isFetching || !activeClubId || (!!activeClubId && data === undefined)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
