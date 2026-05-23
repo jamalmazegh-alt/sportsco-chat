@@ -18,7 +18,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/admin/users")({
+export const Route = createFileRoute("/_authenticated/admin/users/")({
   component: AdminUsersPage,
   head: () => ({ meta: [{ title: "Users — Clubero" }] }),
 });
