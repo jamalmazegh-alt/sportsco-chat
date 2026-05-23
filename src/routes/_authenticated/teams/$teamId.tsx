@@ -406,9 +406,8 @@ function TeamDetail() {
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
-      <Link to="/teams" className="inline-flex items-center text-sm text-muted-foreground gap-1">
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/teams" />
+
 
       <div className="flex items-start gap-4">
         <TeamImage
