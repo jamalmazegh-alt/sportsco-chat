@@ -2504,7 +2504,8 @@ function EventDetail() {
                         )}
                       </div>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               )}
             </>
