@@ -65,7 +65,7 @@ function AdminUserDetailPage() {
   const callSetDisabled = useServerFn(setUserDisabled);
   const callRemove = useServerFn(removeUserFromClub);
   const callReset = useServerFn(sendUserPasswordReset);
-  const callSetStaffRoles = useServerFn(setUserClubStaffRoles);
+  const callSetRoles = useServerFn(setClubMemberRoles);
 
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
