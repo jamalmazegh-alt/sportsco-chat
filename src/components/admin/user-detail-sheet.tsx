@@ -189,6 +189,8 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        closeLabel={t("common.close", { defaultValue: "Fermer" })}
+        onCloseClick={() => onOpenChange(false)}
         className="w-full sm:max-w-md p-0 flex flex-col gap-0 overflow-hidden"
       >
         <SheetHeader className="sr-only">
