@@ -112,7 +112,8 @@
     "continue": "Continuer",
     "exportCsv": "Exporter CSV",
     "undo": "Annuler",
-    "remove": "Retirer"
+    "remove": "Retirer",
+    "clear": "Effacer"
   },
   "privacy": {
     "title": "Confidentialité & données",
@@ -761,7 +762,20 @@
     "inviteEmailAlreadyUser": "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
     "inviteEmailFailed": "Invitation créée mais l'email n'a pas pu être envoyé.",
     "inviteSent": "Invitation envoyée",
-    "sendInvite": "Envoyer l'invitation"
+    "sendInvite": "Envoyer l'invitation",
+    "hubBranding": "Identité visuelle",
+    "hubBrandingHint": "Couleur principale de l'app pour ton club",
+    "branding": {
+      "saved": "Couleur du club mise à jour",
+      "saveError": "Impossible de sauvegarder",
+      "title": "Identité visuelle",
+      "subtitle": "Choisis la couleur principale de l'app. Elle s'applique partout, y compris la page de connexion.",
+      "previewTitle": "Aperçu",
+      "previewPrimary": "Bouton principal",
+      "previewSecondary": "Secondaire"
+    },
+    "promoteToClubMember": "Promouvoir membre du club",
+    "rolesUpdated": "Rôles mis à jour"
   },
   "attachments": {
     "add": "Ajouter un fichier",
@@ -1119,6 +1133,18 @@
     "team": {
       "title": "Équipe — Clubero",
       "description": "Détail de l'équipe et joueurs."
+    },
+    "admin": {
+      "title": "Paramètres admin — Clubero",
+      "description": "Configuration du club, abonnement et préférences."
+    },
+    "adminBranding": {
+      "title": "Identité visuelle — Clubero",
+      "description": "Personnalise la couleur principale de l'application."
+    },
+    "adminUsers": {
+      "title": "Utilisateurs — Clubero",
+      "description": "Gère les membres et les rôles de ton club."
     }
   },
   "trial": {

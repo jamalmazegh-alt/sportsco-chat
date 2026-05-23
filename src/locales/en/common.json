@@ -112,7 +112,8 @@
     "continue": "Continue",
     "exportCsv": "Export CSV",
     "undo": "Undo",
-    "remove": "Remove"
+    "remove": "Remove",
+    "clear": "Clear"
   },
   "privacy": {
     "title": "Privacy & data",
@@ -761,7 +762,20 @@
     "inviteEmailAlreadyUser": "This address already has a Clubero account. Ask them to sign in, then add them via their profile.",
     "inviteEmailFailed": "Invitation created but the email could not be sent.",
     "inviteSent": "Invitation sent",
-    "sendInvite": "Send invitation"
+    "sendInvite": "Send invitation",
+    "hubBranding": "Branding",
+    "hubBrandingHint": "Primary app color for your club",
+    "branding": {
+      "saved": "Club color updated",
+      "saveError": "Could not save",
+      "title": "Branding",
+      "subtitle": "Choose the primary app color. It applies everywhere, including the sign-in page.",
+      "previewTitle": "Preview",
+      "previewPrimary": "Primary button",
+      "previewSecondary": "Secondary"
+    },
+    "promoteToClubMember": "Promote to club member",
+    "rolesUpdated": "Roles updated"
   },
   "attachments": {
     "add": "Add file",
@@ -1119,6 +1133,18 @@
     "team": {
       "title": "Team — Clubero",
       "description": "Team details and players."
+    },
+    "admin": {
+      "title": "Admin settings — Clubero",
+      "description": "Club configuration, subscription, and preferences."
+    },
+    "adminBranding": {
+      "title": "Branding — Clubero",
+      "description": "Customize the app's primary color."
+    },
+    "adminUsers": {
+      "title": "Users — Clubero",
+      "description": "Manage your club members and roles."
     }
   },
   "trial": {
