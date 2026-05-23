@@ -20,7 +20,12 @@ import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournament
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
-  head: () => ({ meta: [{ title: "Home — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.home.title") },
+      { name: "description", content: i18n.t("meta.home.description") },
+    ],
+  }),
 });
 
 function formatWhen(d: Date) {
@@ -246,7 +251,7 @@ function HomePage() {
             <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
               <Link to="/tournaments">
                 <Trophy className="h-4 w-4" />
-                {t("nav.tournaments", { defaultValue: "Tournois" })}
+                {t("nav.tournaments")}
               </Link>
             </Button>
           </div>
