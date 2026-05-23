@@ -2420,11 +2420,23 @@ function EventDetail() {
                   {t("attendance.noConvokedPlayers")}
                 </div>
               ) : (
-                <ul className="mt-3 divide-y divide-border border-t border-border">
-                  {sortedConvocations.map((c: any) => (
-                    <li key={c.id} className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div className="h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden">
+                <ul className="mt-3 border-t border-border">
+                  {sortedConvocations.map((c: any) => {
+                    const accent =
+                      c.status === "present" ? "bg-present"
+                      : c.status === "absent" ? "bg-absent"
+                      : c.status === "uncertain" ? "bg-uncertain"
+                      : "bg-pending";
+                    const ringCls =
+                      c.status === "present" ? "ring-2 ring-present/40"
+                      : c.status === "absent" ? "ring-2 ring-absent/40"
+                      : c.status === "uncertain" ? "ring-2 ring-uncertain/40"
+                      : "ring-1 ring-border";
+                    return (
+                    <li key={c.id} className="relative flex flex-col gap-2 px-3 py-2.5 border-b border-border last:border-b-0 sm:flex-row sm:items-center sm:justify-between hover:bg-muted/30 transition-colors">
+                      <span className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full", accent)} />
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1 pl-1.5">
+                        <div className={cn("h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden", ringCls)}>
                           {c.players?.photo_url ? (
                             <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
                           ) : (
