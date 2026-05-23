@@ -270,7 +270,12 @@ function ProfilePage() {
               <SelectContent>
                 {memberships.map((m) => (
                   <SelectItem key={m.club_id} value={m.club_id}>
-                    {m.club.name} · {m.role}
+                    <span className="flex items-center gap-2">
+                      <span className="truncate max-w-[180px]">{m.club.name}</span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide capitalize">
+                        {t(`roles.${m.role}`, { defaultValue: m.role })}
+                      </span>
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
