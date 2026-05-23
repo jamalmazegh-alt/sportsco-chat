@@ -104,7 +104,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   const clubMemberships = (data?.memberships ?? []).filter(
     (m: any) => m.club_id === activeClubId,
   );
-  const currentRoles: ClubRoleKey[] = (() => {
+  const allClubRoles: Set<string> = (() => {
     const set = new Set<string>();
     for (const m of clubMemberships) {
       if (Array.isArray(m.roles) && m.roles.length > 0) {
@@ -113,8 +113,12 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
         set.add(m.role);
       }
     }
-    return CLUB_ROLE_KEYS.filter((r) => set.has(r));
+    return set;
   })();
+  const currentRoles: ClubRoleKey[] = CLUB_ROLE_KEYS.filter((r) => allClubRoles.has(r));
+  const nonStaffRoles: string[] = ["parent", "player"].filter((r) => allClubRoles.has(r));
+  const hasStaffRole = currentRoles.length > 0;
+  const isParentOrPlayerOnly = !hasStaffRole && nonStaffRoles.length > 0;
   const isMember = clubMemberships.length > 0;
 
   async function toggleDisabled(disabled: boolean) {
