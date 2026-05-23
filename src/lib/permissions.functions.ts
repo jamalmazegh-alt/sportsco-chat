@@ -395,6 +395,12 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Response(error.message, { status: 500 });
 
+    const { data: tournament } = await supabaseAdmin
+      .from("tournaments")
+      .select("name, slug")
+      .eq("id", data.tournament_id)
+      .maybeSingle();
+
     await logPermissionChange({
       actorId: userId,
       targetId: existingUserId,
@@ -412,6 +418,8 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
       member_id: inserted!.id,
       invite_token: inserted!.invite_token,
       linked: !!existingUserId,
+      tournament_name: tournament?.name ?? null,
+      tournament_slug: tournament?.slug ?? null,
     };
   });
 
