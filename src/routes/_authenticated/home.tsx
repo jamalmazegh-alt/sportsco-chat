@@ -360,23 +360,31 @@ function HomePage() {
             </div>
           ) : (
             <ul className="space-y-2">
-              {myConvocs.map((e: any) => {
+              {myConvocs.map((e: any, idx: number) => {
                 const actionRequired = e.convocation?.status === "pending";
+                const isFirst = idx === 0 && !actionRequired;
                 return (
                   <li key={e.id}>
                     <Link
                       to="/events/$eventId"
                       params={{ eventId: e.id }}
                       className={cn(
-                        "flex items-center justify-between rounded-2xl border p-4 active:scale-[0.99] transition-transform",
+                        "flex items-center justify-between rounded-2xl border active:scale-[0.99] transition-transform",
                         actionRequired
-                          ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30"
-                          : "border-border bg-card",
+                          ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30 p-4"
+                          : isFirst
+                            ? "border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-5 shadow-sm ring-1 ring-primary/10"
+                            : "border-border bg-card p-4",
                       )}
                     >
                       <div className="min-w-0">
+                        {isFirst && (
+                          <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-bold mb-1">
+                            {t("dashboard.nextEvent")}
+                          </p>
+                        )}
                         <div className="flex items-center gap-2">
-                          <p className="font-medium truncate">{e.title}</p>
+                          <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
                           {actionRequired && (
                             <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
                               {t("dashboard.actionRequired", { defaultValue: "Action required" })}
@@ -398,7 +406,7 @@ function HomePage() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {e.convocation && <AttendancePill status={e.convocation.status} />}
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        <ChevronRight className={cn("text-muted-foreground", isFirst ? "h-5 w-5 text-primary" : "h-4 w-4")} />
                       </div>
                     </Link>
                   </li>
