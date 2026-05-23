@@ -168,9 +168,10 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
 
   async function toggleRole(role: ClubRoleKey, checked: boolean) {
     if (!activeClubId || !userId) return;
-    const next = checked
+    const nextStaff = checked
       ? Array.from(new Set([...currentRoles, role]))
       : currentRoles.filter((r) => r !== role);
+    const next = [...nextStaff, ...nonStaffRoles];
     if (next.length === 0) {
       toast.error(t("permissions.atLeastOneRole", { defaultValue: "Au moins un rôle est requis" }));
       return;
@@ -178,11 +179,12 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
     setActing("roles");
     try {
       await callSetRoles({
-        data: { club_id: activeClubId, user_id: userId, roles: next },
+        data: { club_id: activeClubId, user_id: userId, roles: next as any },
       });
       toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
       refetch();
+      if (nextStaff.length > 0) setPromoting(false);
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {
