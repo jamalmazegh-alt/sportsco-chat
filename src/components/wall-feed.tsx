@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Eye, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
@@ -32,6 +32,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const [posts, setPosts] = useState<Post[]>([]);
   const [body, setBody] = useState("");
   const [atts, setAtts] = useState<Attachment[]>([]);

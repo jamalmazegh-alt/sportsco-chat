@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart3, ShieldCheck } from "lucide-react";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
@@ -24,8 +24,9 @@ function StatsPage() {
   const { t } = useTranslation();
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
 
-  const isStaff = role === "admin" || role === "coach";
+  const isStaff = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach") || roles.includes("staff");
 
   return (
     <div className="container max-w-5xl py-4 pb-24 space-y-5">

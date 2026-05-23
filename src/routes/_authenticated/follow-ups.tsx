@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
@@ -31,7 +31,8 @@ function FollowUpsPage() {
   const { t } = useTranslation();
   const { user, activeClubId } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const [bulkSending, setBulkSending] = useState(false);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
