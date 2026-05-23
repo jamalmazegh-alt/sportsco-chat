@@ -339,9 +339,8 @@ function PlayerProfile() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-      <Link to="/teams" className="inline-flex items-center text-sm text-muted-foreground gap-1">
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/teams" />
+
 
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">
