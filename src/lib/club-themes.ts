@@ -12,7 +12,8 @@ export type ClubThemeKey =
   | "crimson"
   | "slate"
   | "sky"
-  | "teal";
+  | "teal"
+  | "noir";
 
 export interface ClubTheme {
   key: ClubThemeKey;
@@ -116,6 +117,15 @@ export const CLUB_THEMES: Record<ClubThemeKey, ClubTheme> = {
     primaryDark: "oklch(0.68 0.12 190)",
     primaryForeground: "oklch(0.99 0.005 60)",
     ring: "oklch(0.55 0.11 190)",
+  },
+  noir: {
+    key: "noir",
+    label: "Noir",
+    swatch: "#111111",
+    primary: "oklch(0.20 0.01 240)",
+    primaryDark: "oklch(0.92 0.005 240)",
+    primaryForeground: "oklch(0.99 0 0)",
+    ring: "oklch(0.20 0.01 240)",
   },
 };
 
