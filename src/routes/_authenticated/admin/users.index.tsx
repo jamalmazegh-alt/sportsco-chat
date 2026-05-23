@@ -19,10 +19,16 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { UserDetailSheet } from "@/components/admin/user-detail-sheet";
 import { toast } from "sonner";
+import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/users/")({
   component: AdminUsersPage,
-  head: () => ({ meta: [{ title: "Users — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.adminUsers.title") },
+      { name: "description", content: i18nInstance.t("meta.adminUsers.description") },
+    ],
+  }),
 });
 
 function AdminUsersPage() {
