@@ -141,17 +141,33 @@ function AdminUserDetailPage() {
   }
 
   const clubMemberships = (data.memberships ?? []).filter(
-    (m: any) => m.club_id === activeClubId
+    (m: any) => m.club_id === activeClubId,
   );
-  const isUserAdmin = clubMemberships.some((m: any) => m.role === "admin");
-  const isUserCoach = clubMemberships.some((m: any) => m.role === "coach");
+  const currentRoles: ClubRoleKey[] = (() => {
+    const set = new Set<string>();
+    for (const m of clubMemberships) {
+      if (Array.isArray(m.roles) && m.roles.length > 0) {
+        for (const r of m.roles) set.add(r);
+      } else if (m.role) {
+        set.add(m.role);
+      }
+    }
+    return CLUB_ROLE_KEYS.filter((r) => set.has(r));
+  })();
 
-  async function toggleStaffRole(next: { is_admin: boolean; is_coach: boolean }) {
+  async function toggleRole(role: ClubRoleKey, checked: boolean) {
     if (!activeClubId) return;
+    const next = checked
+      ? Array.from(new Set([...currentRoles, role]))
+      : currentRoles.filter((r) => r !== role);
+    if (next.length === 0) {
+      toast.error(t("permissions.atLeastOneRole", { defaultValue: "Au moins un rôle est requis" }));
+      return;
+    }
     setActing("roles");
     try {
-      await callSetStaffRoles({
-        data: { club_id: activeClubId, user_id: userId, ...next },
+      await callSetRoles({
+        data: { club_id: activeClubId, user_id: userId, roles: next },
       });
       toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
@@ -163,6 +179,7 @@ function AdminUserDetailPage() {
     }
   }
 
+  const isMember = clubMemberships.length > 0;
 
   return (
     <div className="px-5 pt-4 pb-10 space-y-5">
@@ -220,55 +237,61 @@ function AdminUserDetailPage() {
           <p className="text-sm text-muted-foreground">—</p>
         ) : (
           <ul className="space-y-1.5">
-            {data.memberships.map((m: any) => (
-              <li
-                key={`${m.club_id}-${m.role}`}
-                className="flex items-center justify-between gap-2 text-sm"
-              >
-                <span className="truncate">{m.clubs?.name ?? m.club_id}</span>
-                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary capitalize">
-                  {t(`roles.${m.role}`, { defaultValue: m.role })}
-                </span>
-              </li>
-            ))}
+            {data.memberships.map((m: any) => {
+              const rolesArr: string[] =
+                Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : [m.role];
+              return (
+                <li
+                  key={`${m.club_id}`}
+                  className="flex items-center justify-between gap-2 text-sm"
+                >
+                  <span className="truncate">{m.clubs?.name ?? m.club_id}</span>
+                  <span className="flex flex-wrap gap-1 justify-end">
+                    {rolesArr.map((r) => (
+                      <span
+                        key={r}
+                        className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary"
+                      >
+                        {t(`roles.${r}`, { defaultValue: r })}
+                      </span>
+                    ))}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
 
-      {!isSelf && (isUserAdmin || isUserCoach) && (
+      {!isSelf && isMember && (
         <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("admin.staffRoles", { defaultValue: "Rôles staff" })}
+            {t("permissions.clubRoles", { defaultValue: "Rôles dans le club" })}
           </h2>
           <p className="text-[11px] text-muted-foreground">
-            {t("admin.staffRolesHint", {
-              defaultValue: "Un utilisateur peut cumuler les rôles administrateur et coach.",
+            {t("permissions.clubRolesHint", {
+              defaultValue: "Un utilisateur peut cumuler plusieurs rôles.",
             })}
           </p>
-          <div className="space-y-2">
-            <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer">
-              <Checkbox
-                checked={isUserAdmin}
-                disabled={acting === "roles"}
-                onCheckedChange={(v) =>
-                  toggleStaffRole({ is_admin: !!v, is_coach: isUserCoach })
-                }
-              />
-              <span className="text-sm">{t("roles.admin", { defaultValue: "Administrateur" })}</span>
-            </label>
-            <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer">
-              <Checkbox
-                checked={isUserCoach}
-                disabled={acting === "roles"}
-                onCheckedChange={(v) =>
-                  toggleStaffRole({ is_admin: isUserAdmin, is_coach: !!v })
-                }
-              />
-              <span className="text-sm">{t("roles.coach", { defaultValue: "Coach" })}</span>
-            </label>
+          <div className="space-y-1">
+            {CLUB_ROLE_KEYS.map((r) => (
+              <label
+                key={r}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer"
+              >
+                <Checkbox
+                  checked={currentRoles.includes(r)}
+                  disabled={acting === "roles"}
+                  onCheckedChange={(v) => toggleRole(r, !!v)}
+                />
+                <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
+              </label>
+            ))}
           </div>
         </section>
       )}
+
+
 
 
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
