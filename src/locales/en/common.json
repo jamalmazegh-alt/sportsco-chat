@@ -111,7 +111,8 @@
     "done": "Done",
     "continue": "Continue",
     "exportCsv": "Export CSV",
-    "undo": "Undo"
+    "undo": "Undo",
+    "remove": "Remove"
   },
   "privacy": {
     "title": "Privacy & data",
@@ -275,7 +276,20 @@
       "ice_hockey": "Ice hockey",
       "field_hockey": "Field hockey"
     },
-    "sportsCollective": "Other collective sports"
+    "sportsCollective": "Other collective sports",
+    "coach": "Coach",
+    "attachCoach": "Attach",
+    "attachCoachTitle": "Attach a coach",
+    "coachAttached": "Coach attached",
+    "coachDetach": "Remove",
+    "coachDetachConfirm": "Remove this coach from the team?",
+    "coachDetached": "Coach removed",
+    "noAvailableCoach": "No coach available. Invite a coach first from Admin → Users.",
+    "noCoachYet": "No coach attached yet. Click Attach to add one.",
+    "emptyHintAdmin": "Create your first team to start scheduling trainings and matches.",
+    "emptyHintMember": "You are not a member of any team yet. Ask an admin to add you.",
+    "imageTooLarge": "Image too large (max 5 MB).",
+    "imageInvalidType": "Unsupported file format."
   },
   "club": {
     "logo": "Club logo",
@@ -349,7 +363,10 @@
     "photoTooLarge": "Photo too large (max 5 MB).",
     "photoInvalidType": "Unsupported file format.",
     "photoConsentRequired": "Minor player: parental media consent is required before any upload. Current status: ",
-    "childAccessNeedsEmail": "Add an email to the child first to enable access."
+    "childAccessNeedsEmail": "Add an email to the child first to enable access.",
+    "account": "Account",
+    "removeConfirm": "Remove {{name}} from the team?",
+    "removed": "Player removed from the team"
   },
   "events": {
     "whatsappShare": {
@@ -590,7 +607,8 @@
     },
     "showRecordDetail": "Show details",
     "hideRecordDetail": "Hide details",
-    "summaryAria": "Season summary"
+    "summaryAria": "Season summary",
+    "showAttendance": "Show attendance statistics"
   },
   "match": {
     "result": "Match result",

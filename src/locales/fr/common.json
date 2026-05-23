@@ -111,7 +111,8 @@
     "done": "Terminé",
     "continue": "Continuer",
     "exportCsv": "Exporter CSV",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "remove": "Retirer"
   },
   "privacy": {
     "title": "Confidentialité & données",
@@ -275,7 +276,20 @@
       "ice_hockey": "Hockey sur glace",
       "field_hockey": "Hockey sur gazon"
     },
-    "sportsCollective": "Autres sports collectifs"
+    "sportsCollective": "Autres sports collectifs",
+    "coach": "Coach",
+    "attachCoach": "Attacher",
+    "attachCoachTitle": "Attacher un coach",
+    "coachAttached": "Coach attaché",
+    "coachDetach": "Retirer",
+    "coachDetachConfirm": "Retirer ce coach de l'équipe ?",
+    "coachDetached": "Coach retiré",
+    "noAvailableCoach": "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs.",
+    "noCoachYet": "Aucun coach attaché. Cliquez sur Attacher pour en ajouter.",
+    "emptyHintAdmin": "Crée ta première équipe pour commencer à programmer entraînements et matchs.",
+    "emptyHintMember": "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter.",
+    "imageTooLarge": "Image trop lourde (max 5 Mo).",
+    "imageInvalidType": "Format de fichier non supporté."
   },
   "club": {
     "logo": "Logo du club",
@@ -349,7 +363,10 @@
     "photoTooLarge": "Photo trop lourde (max 5 Mo).",
     "photoInvalidType": "Format de fichier non supporté.",
     "photoConsentRequired": "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : ",
-    "childAccessNeedsEmail": "Ajoutez d'abord un email à l'enfant pour activer l'accès."
+    "childAccessNeedsEmail": "Ajoutez d'abord un email à l'enfant pour activer l'accès.",
+    "account": "Compte",
+    "removeConfirm": "Retirer {{name}} de l'équipe ?",
+    "removed": "Joueur retiré de l'équipe"
   },
   "events": {
     "whatsappShare": {
@@ -590,7 +607,8 @@
     },
     "showRecordDetail": "Voir le détail",
     "hideRecordDetail": "Masquer le détail",
-    "summaryAria": "Résumé de saison"
+    "summaryAria": "Résumé de saison",
+    "showAttendance": "Voir les statistiques de présence"
   },
   "match": {
     "result": "Résultat du match",
