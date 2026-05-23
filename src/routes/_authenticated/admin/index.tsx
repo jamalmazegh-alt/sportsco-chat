@@ -82,6 +82,15 @@ function AdminSettingsPage() {
       hint: t("admin.hubRemindersHint"),
       tone: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     },
+    {
+      to: "/admin/settings/branding",
+      icon: Palette,
+      title: t("admin.hubBranding", { defaultValue: "Identité visuelle" }),
+      hint: t("admin.hubBrandingHint", {
+        defaultValue: "Couleur principale de l'app pour ton club",
+      }),
+      tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+    },
   ];
 
   return (
