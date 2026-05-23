@@ -587,6 +587,7 @@
     "saved": "Paramètres enregistrés.",
     "usersTitle": "Utilisateurs de la plateforme",
     "usersSubtitle": "Tous les utilisateurs ayant accès à ce club, avec leur rôle et leur statut.",
+    "searchUsersPlaceholder": "Rechercher par nom ou email…",
     "usersEmpty": "Aucun utilisateur.",
     "openUsers": "Gérer les utilisateurs",
     "statusActive": "Actif",
