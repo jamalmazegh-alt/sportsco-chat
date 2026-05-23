@@ -110,7 +110,8 @@
     "skip": "Passer",
     "done": "Terminé",
     "continue": "Continuer",
-    "exportCsv": "Exporter CSV"
+    "exportCsv": "Exporter CSV",
+    "undo": "Annuler"
   },
   "privacy": {
     "title": "Confidentialité & données",
@@ -341,7 +342,14 @@
     "childAccessHint": "Par défaut, les enfants ne reçoivent ni compte ni notifications. Activez cette option si vous (le parent) souhaitez donner à votre enfant un accès à la plateforme.",
     "minorParentNotice": "Ce joueur est mineur — un parent est obligatoire et recevra l'invitation. L'enfant ne reçoit pas de compte par défaut.",
     "autoInviteSent": "Invitation envoyée automatiquement.",
-    "autoInviteParentSent": "Invitation envoyée au parent."
+    "autoInviteParentSent": "Invitation envoyée au parent.",
+    "tabProfile": "Profil",
+    "tabFeedback": "Retours coach",
+    "photoBlockedMinor": "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
+    "photoTooLarge": "Photo trop lourde (max 5 Mo).",
+    "photoInvalidType": "Format de fichier non supporté.",
+    "photoConsentRequired": "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : ",
+    "childAccessNeedsEmail": "Ajoutez d'abord un email à l'enfant pour activer l'accès."
   },
   "events": {
     "whatsappShare": {
@@ -559,7 +567,9 @@
     "confirmSend": "Confirmer l'envoi",
     "recipients": "Destinataires",
     "reviewBeforeSend": "Vérifier avant envoi",
-    "reviewBeforeSendHint": "Vérifie les destinataires et les détails — l'envoi est définitif."
+    "reviewBeforeSendHint": "Vérifie les destinataires et les détails — l'envoi est définitif.",
+    "cooldownHint": "Encore {{m}} min avant de pouvoir relancer",
+    "remindIn": "Relancer dans {{m}} min"
   },
   "stats": {
     "title": "Statistiques",
