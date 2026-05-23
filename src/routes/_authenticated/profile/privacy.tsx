@@ -31,7 +31,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
+import { Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { LegalDialog } from "@/components/legal-dialog";
