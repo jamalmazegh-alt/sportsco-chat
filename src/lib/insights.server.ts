@@ -246,6 +246,7 @@ async function detectMissingScore(clubId: string): Promise<DetectedInsight[]> {
 
 // INSIGHT 4: minor players without a guardian
 async function detectMissingGuardian(clubId: string): Promise<DetectedInsight[]> {
+  // 1. All minor players — ONE query
   const { data: players } = await supabaseAdmin
     .from("players")
     .select("id, first_name, last_name, birth_date")
@@ -253,31 +254,51 @@ async function detectMissingGuardian(clubId: string): Promise<DetectedInsight[]>
     .is("deleted_at", null)
     .not("birth_date", "is", null);
 
-  const out: DetectedInsight[] = [];
-  for (const p of (players ?? []) as any[]) {
+  if (!players || players.length === 0) return [];
+  const minors = (players as any[]).filter((p) => {
     const age = ageFromBirth(p.birth_date);
-    if (age === null || age >= 18) continue;
-    const { count } = await supabaseAdmin
-      .from("player_parents")
-      .select("id", { count: "exact", head: true })
-      .eq("player_id", p.id);
-    if ((count ?? 0) > 0) continue;
-    const { data: tm } = await supabaseAdmin
-      .from("team_members")
-      .select("team_id, teams:team_id(name)")
-      .eq("player_id", p.id)
-      .limit(1)
-      .maybeSingle();
+    return age !== null && age < 18;
+  });
+  if (minors.length === 0) return [];
+  const minorIds = minors.map((p: any) => p.id);
+
+  // 2. All guardians for minors — ONE query
+  const { data: guardians } = await supabaseAdmin
+    .from("player_parents")
+    .select("player_id")
+    .in("player_id", minorIds);
+  const withGuardian = new Set(((guardians ?? []) as any[]).map((g) => g.player_id));
+
+  // 3. All team memberships — ONE query
+  const { data: memberships } = await supabaseAdmin
+    .from("team_members")
+    .select("player_id, team_id, teams:team_id(name)")
+    .in("player_id", minorIds);
+  const teamByPlayer = new Map<string, { team_id: string; team_name: string }>();
+  for (const m of ((memberships ?? []) as any[])) {
+    if (!teamByPlayer.has(m.player_id)) {
+      teamByPlayer.set(m.player_id, {
+        team_id: m.team_id,
+        team_name: m.teams?.name ?? "",
+      });
+    }
+  }
+
+  // 4. Filter and build insights in memory
+  const out: DetectedInsight[] = [];
+  for (const p of minors) {
+    if (withGuardian.has(p.id)) continue;
+    const team = teamByPlayer.get(p.id);
     const fullName = `${p.first_name} ${p.last_name}`.trim();
     out.push({
       insight_type: "missing_guardian",
       club_id: clubId,
-      team_id: tm?.team_id ?? null,
+      team_id: team?.team_id ?? null,
       payload: {
         player_id: p.id,
         player_name: fullName,
-        team_id: tm?.team_id ?? null,
-        team_name: (tm as any)?.teams?.name ?? "",
+        team_id: team?.team_id ?? null,
+        team_name: team?.team_name ?? "",
         birth_date: p.birth_date,
       },
       priority: "medium",
