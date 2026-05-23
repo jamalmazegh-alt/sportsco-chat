@@ -675,6 +675,25 @@
     "tied": "Tied — enter penalty kicks to decide the winner",
     "tab": "PK {{team}}",
     "winner": "Winner: {{team}}",
-    "penShort": "pk"
+    "penShort": "pk",
+    "lifecycle": {
+      "scheduled": "Scheduled",
+      "live": "Live",
+      "submitted": "To validate",
+      "validated": "Validated",
+      "disputed": "Disputed"
+    },
+    "cta": {
+      "scheduled": "Enter score",
+      "live": "Update score",
+      "submitted": "Validate score",
+      "validated": "View details",
+      "disputed": "Resolve dispute"
+    },
+    "disputedHelper": "Score under review — flagged by a team",
+    "moreActions": "More actions",
+    "addEventAction": "Add an event",
+    "changeStatusAction": "Change status",
+    "vs": "VS"
   }
 }
