@@ -16,6 +16,7 @@ import {
   autoScheduleMatches,
 } from "../tournaments.functions";
 import { DrawDialog } from "./DrawDialog";
+import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 
 interface Props {
   tournamentId: string;
