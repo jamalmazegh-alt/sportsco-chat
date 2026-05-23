@@ -12,7 +12,8 @@ export type ClubThemeKey =
   | "crimson"
   | "slate"
   | "sky"
-  | "teal";
+  | "teal"
+  | "noir";
 
 export interface ClubTheme {
   key: ClubThemeKey;
