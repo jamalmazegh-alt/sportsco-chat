@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
-import { Plus, Users, ChevronRight, Loader2 } from "lucide-react";
+import { Plus, Users, ChevronRight, Loader2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
 
