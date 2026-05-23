@@ -275,7 +275,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
+        .select("id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
         .eq("id", event!.team_id);
       return data ?? [];
     },
@@ -874,6 +874,22 @@ function EventDetail() {
     setPickerOpen(false);
     refetch();
     refetchEvent();
+
+    // Fire-and-forget: refresh pending_convocations insights for this club.
+    // Limited to one insight type to keep AI costs minimal.
+    const clubIdForInsights = (teamRow as any)?.club_id as string | undefined;
+    if (clubIdForInsights) {
+      import("@/lib/insights.functions")
+        .then(({ triggerInsightsDetection }) =>
+          triggerInsightsDetection({
+            data: { clubId: clubIdForInsights, types: ["pending_convocations"] },
+          }),
+        )
+        .catch(() => {
+          // best-effort; never block the convocation flow
+        });
+    }
+
     toast.success(
       useWhatsApp
         ? t("events.whatsappShare.convocationsCreated", { defaultValue: "Call-ups created — share now via WhatsApp below" })

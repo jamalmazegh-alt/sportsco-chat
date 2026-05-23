@@ -5,10 +5,22 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { detectAndGenerateInsightsForClub } from "@/lib/insights.server";
 
 // Trigger detection for the active club (admins/coaches)
+const INSIGHT_TYPES = [
+  "pending_convocations",
+  "consecutive_absences",
+  "missing_score",
+  "missing_guardian",
+] as const;
+
 export const triggerInsightsDetection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { clubId: string }) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
+  .inputValidator((input: { clubId: string; types?: string[] }) =>
+    z
+      .object({
+        clubId: z.string().uuid(),
+        types: z.array(z.enum(INSIGHT_TYPES)).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -27,7 +39,9 @@ export const triggerInsightsDetection = createServerFn({ method: "POST" })
     ) {
       throw new Response("Forbidden", { status: 403 });
     }
-    const result = await detectAndGenerateInsightsForClub(data.clubId);
+    const result = await detectAndGenerateInsightsForClub(data.clubId, {
+      types: data.types as any,
+    });
     return { ok: true, ...result };
   });
 
