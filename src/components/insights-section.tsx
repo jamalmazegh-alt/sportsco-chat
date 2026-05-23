@@ -135,7 +135,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     try {
       await dismissInsight({ data: { insightId: id } });
     } catch {
-      toast.error("Error");
+      toast.error(t("errors.generic"));
       qc.invalidateQueries({ queryKey: ["coach-insights", clubId, user?.id] });
     }
   };

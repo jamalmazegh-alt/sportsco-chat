@@ -166,7 +166,7 @@ function NoMembershipScreen({
       .single();
     if (error || !club) {
       setBusy(false);
-      toast.error(error?.message ?? "Could not create club");
+      toast.error(error?.message ?? t("errors.clubCreateFailed"));
       return;
     }
     const { error: mErr } = await supabase

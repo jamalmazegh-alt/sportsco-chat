@@ -22,13 +22,13 @@ export function BottomNav() {
 
   const items = tournamentOnly
     ? [
-        { to: "/tournaments", icon: Trophy, label: "Tournois", badge: 0 },
+        { to: "/tournaments", icon: Trophy, label: t("nav.tournaments"), badge: 0 },
         { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
       ]
     : clubLocked
       ? [
           ...(isAdmin
-            ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
+            ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin"), badge: 0 }]
             : []),
           { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
         ]
@@ -44,7 +44,7 @@ export function BottomNav() {
   return (
     <nav
       className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-background/80 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_0_0_rgba(0,0,0,0.02)]"
-      aria-label="Primary"
+      aria-label={t("nav.primary")}
     >
       <ul className="mx-auto flex max-w-xl items-stretch justify-around px-1">
         {items.map((it) => {
