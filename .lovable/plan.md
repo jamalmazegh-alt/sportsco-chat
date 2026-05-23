@@ -1,123 +1,71 @@
-## Plan — Sprints A & B (priorités 1, 4, 5 + diaporama)
+# Multi-Role Permission System
 
-Périmètre verrouillé suite à tes réponses :
-- **Sports couverts** : Football, Futsal, Basketball, Rugby, Handball, Volleyball, Hockey sur glace, Hockey sur gazon (= `TOP_SPORTS ∪ COLLECTIVE_SPORTS` actuels).
-- **Paiement public** : reporté. Sprint C (inscription publique + Stripe) est mis de côté pour plus tard.
-- **URL publique** : `clubero.app/tournament/$slug` (on migre l'actuel `/t/$slug` → `/tournament/$slug`, avec redirection de l'ancien).
-- **Diaporama (#3)** : intégré au Sprint B.
+Large, cross-cutting change spanning DB schema, RLS on many tables, server functions, hooks, and two UI surfaces. I'll deliver it in 5 sequential migrations + code, in this exact order.
 
----
+## Part 1 — Database (migration 1)
 
-### Sprint A — Formats flexibles & score par sets (#1, #5)
+**`club_members.roles text[]`**
+- Add `roles text[] not null default '{}'`
+- Backfill `UPDATE club_members SET roles = ARRAY[role::text]`
+- CHECK: `array_length(roles,1) >= 1 AND roles <@ ARRAY['admin','coach','assistant_coach','staff','tournament_manager']`
+- Keep `role` column (deprecated, kept in sync via trigger `role = roles[1]` for back-compat with old RLS reads not yet migrated)
+- Add new enum values to `app_role`: `assistant_coach`, `staff`, `tournament_manager` (since `role` column is `app_role`)
 
-**Objectif** : un moteur de format modulaire par sport + saisie de score adaptée (sets pour volley/hockey, score simple pour les autres).
+**`tournament_members`** — per spec. `user_id references auth.users(id)` (not profiles, per project convention).
 
-**Base de données**
-- Enrichir `tournaments.settings` (JSONB déjà existant) avec un bloc `scoring` :
-  - `mode`: `"simple"` | `"sets"`
-  - `sets`: `{ bestOf: 3 | 5, pointsToWin: 21|25, tieBreakPoints?: 15, winBy: 2 }`
-  - `periods` (pour hockey/rugby) : `{ count, durationMin }`
-- Enrichir `matches` :
-  - colonne `sets` (JSONB) : `[{ a: 25, b: 23 }, { a: 22, b: 25 }, ...]`
-  - `score_a` / `score_b` restent (= sets gagnés en mode sets, ou score brut en mode simple)
+**`permission_changes_log`** — per spec, append-only.
 
-**Moteur de formats** (`src/modules/tournaments/lib/formats.ts`)
-- Profils par sport déterminant le mode par défaut :
-  - Sets : `volleyball`
-  - Mi-temps / périodes : `football`, `futsal`, `basketball`, `rugby`, `handball`, `ice_hockey`, `field_hockey`
-  - Score simple universel disponible en fallback.
-- Helpers : `defaultScoringForSport(sport)`, `computeWinnerFromSets(sets, rules)`.
+## Part 2 — RLS
 
-**UI**
-- `MatchesList` / saisie de score : nouvelle variante "score par sets" (volley uniquement pour V1), avec ajout/retrait de sets, validation auto du vainqueur.
-- `TournamentRulesEditor` : section "Scoring" pilotée par le sport sélectionné.
+**Helper functions (SECURITY DEFINER, search_path=public):**
+- `has_club_role_v2(_user_id, _club_id, _role text) → boolean` — checks `_role = ANY(roles)`
+- `is_tournament_member(_user_id, _tournament_id, _role text)` 
+- `is_tournament_admin(_user_id, _tournament_id)` — true if tournament_members.role='tournament_admin' OR (club owner of that tournament with `tournament_manager` or `admin` in club_members.roles)
+- `is_tournament_referee_for_match(_user_id, _match_id)`
 
-**Restriction** : on garde `SportSelect` actuel, on ne touche pas aux sports listés.
+**Migration strategy:** existing `has_club_role(uid, club, 'admin')` already checks `role` column. I'll update `has_club_role` body to check `_role::text = ANY(roles)` — this transparently migrates every existing policy without touching them. The deprecated `role` column stays in sync via trigger.
 
----
+**New policies:**
+- `tournament_members`: admin RW, staff R, referee self-R, club admin R via tournament's club, public R by token (RPC instead — keep RLS denied, expose `get_tournament_member_by_token` RPC)
+- `matches`/`tournament_matches`: add UPDATE policy for referees on assigned matches (score columns only — enforced by checking `assigned_match_ids` membership)
+- `permission_changes_log`: club admin R for scope='club', tournament admin R for scope='tournament', superadmin R all, no UPDATE/DELETE
 
-### Sprint B — Site public + diaporama (#4 + #3)
+## Part 3 — Server Functions
 
-**Objectif** : chaque tournoi publié a une URL partageable, SEO friendly, plus un mode TV plein écran auto-rotatif.
+New file `src/lib/permissions.functions.ts` with the 7 functions. Email invites reuse `sendTransactionalEmail` with existing `player-invite` template (rename context label to "member"). Tournament invite uses `tournament-invite` template.
 
-**Routing**
-- Nouvelle route : `src/routes/tournament.$slug.tsx` (remplace `t.$slug.tsx`).
-- Nouvelle route : `src/routes/tournament.$slug.tv.tsx` (remplace `t.$slug.tv.tsx`).
-- Ancienne route `t.$slug` : redirection 301 vers `/tournament/$slug` (compat liens existants).
-- Mise à jour des liens internes (`ShareDialog`, `tournaments.$tournamentId.tsx`, sitemap).
+Hooks (`src/lib/auth-context.tsx`):
+- Keep `useActiveRole()` — derive from `roles[]` instead of `role`
+- Add `useMyRoles(): string[]` returning the active club's `roles` array
 
-**Page publique `/tournament/$slug`**
-- SSR via `getPublicTournament` (déjà existant), enrichi : `og:image` dynamique (cover ou fallback dérivé), `og:title`, `og:description` spécifiques au tournoi.
-- Onglets existants conservés : Aperçu / Équipes / Matchs / Classement / Bracket.
-- Affichage score : adapté au mode (sets visibles sous forme `25-22, 23-25, 15-12`).
-- Bouton "TV / Diaporama" en évidence.
-- Sitemap `sitemap.xml` : ajout des tournois publiés.
+## Part 4 — Club Admin UI
 
-**Diaporama `/tournament/$slug/tv`**
-- Plein écran, fond sombre, auto-rotation des écrans toutes N secondes (configurable via `?refresh=15`) :
-  - Slide 1 : derniers résultats
-  - Slide 2 : prochains matchs
-  - Slide 3 : classement (par poule, paginé si > 1 poule)
-  - Slide 4 : bracket (phase finale si présente)
-- Refetch live toutes les 30 s (`refetchInterval` déjà en place).
-- Logo Clubero discret + nom tournoi + horloge.
-- Bouton plein écran natif (`requestFullscreen`).
+Refactor `src/routes/_authenticated/admin/users.tsx`:
+- Tabs: "Club members" (admin/coach/assistant_coach/staff/tournament_manager) vs "Players & Parents" (player/parent — keep current rendering)
+- Edit dialog: multi-select checkboxes, validation client-side + server-side
+- Invite dialog: same multi-select
+- Search + filter chips
+- Last-change line from `permission_changes_log`
 
----
+## Part 5 — Tournament Members UI
 
-### Détails techniques
+Add to existing tournament admin area. Need to locate the tournament admin shell — likely `src/routes/_authenticated/tournaments/...`. I'll add a `MembersManager.tsx` under `src/modules/tournaments/components/` and wire it into the existing tournament tabs.
 
-**Sports couverts (verrouillé)**
+## i18n
+Add ~40 new keys in FR and EN `common.json` under `permissions.*` and `tournamentMembers.*`. Run parity check.
 
-```ts
-// src/lib/sports.ts — inchangé
-TOP_SPORTS = ["football", "basketball"]
-COLLECTIVE_SPORTS = ["handball", "volleyball", "rugby", "futsal",
-                    "ice_hockey", "field_hockey"]
-```
+## Constraints respected
+- Tournament roles fully separate (own table, own RLS).
+- `tournament_manager` club role → `is_tournament_admin()` returns true for that club's tournaments only (helper checks `tournaments.club_id`).
+- All mutations log to `permission_changes_log`.
+- All new SQL functions: `SECURITY DEFINER SET search_path = public`.
+- Existing `has_club_role` body rewritten to read `roles[]`; existing policies untouched.
 
-**Scoring par défaut**
+## Delivery order
+1. Migration 1: schema (club_members.roles, tournament_members, permission_changes_log, app_role enum extension, sync trigger, rewrite has_club_role)
+2. Migration 2: new RLS helpers + tournament_members/log policies + referee match update policy + public token RPC
+3. Code: server fns + hooks
+4. Code: club admin UI refactor
+5. Code: tournament members UI + i18n + parity check
 
-```text
-football, futsal, basketball, rugby, handball,
-ice_hockey, field_hockey   → mode "simple" (score brut)
-volleyball                  → mode "sets" (3 sets gagnants à 25, tie-break 15)
-```
-
-L'orga peut surcharger via `TournamentRulesEditor`.
-
-**Migrations DB**
-1. `ALTER TABLE matches ADD COLUMN sets jsonb;`
-2. Pas de nouveau type — `settings.scoring` vit dans le JSONB existant.
-
-**Redirection ancienne URL**
-- `src/routes/t.$slug.tsx` devient un simple `<Navigate to="/tournament/$slug" replace />`.
-- Idem `t.$slug.tv.tsx` et `t.$slug.register.tsx` (cette dernière sera désactivée tant que Sprint C n'est pas livré).
-
-**Tests**
-- Unit : `formats.test.ts` (defaults par sport, calcul vainqueur sets).
-- E2E : étendre `15-clubero-pack-purchase` ou nouveau `16-public-tournament.e2e.ts` (publication → URL publique accessible non-auth → TV s'ouvre).
-
----
-
-### Livrables par sprint
-
-**Sprint A**
-- Migration `matches.sets`
-- `src/modules/tournaments/lib/formats.ts`
-- Mise à jour `MatchesList` (saisie sets pour volley)
-- Section "Scoring" dans `TournamentRulesEditor`
-- Tests unit
-
-**Sprint B**
-- Routes `tournament.$slug.tsx` + `tournament.$slug.tv.tsx`
-- Redirections depuis `t.$slug*`
-- Diaporama TV plein écran auto-rotatif
-- `og:image` dynamique + sitemap mis à jour
-- Mise à jour des liens internes (ShareDialog, etc.)
-
----
-
-### Hors périmètre (à confirmer plus tard)
-- Inscription publique + paiement Stripe (#6)
-- Sponsors, stats joueur cross-tournois, co-organisateurs, PWA push
+This is ~5–7 hours of work compressed; I'll execute it tightly without intermediate confirmations between migrations.
