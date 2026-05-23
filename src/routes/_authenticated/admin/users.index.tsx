@@ -284,10 +284,10 @@ function AdminUsersPage() {
                   "—";
                 return (
                   <li key={u.user_id}>
-                    <Link
-                      to="/admin/users/$userId"
-                      params={{ userId: u.user_id }}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => setSelectedUserId(u.user_id)}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
                     >
                       <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden">
                         {u.profile?.avatar_url ? (
@@ -324,7 +324,7 @@ function AdminUsersPage() {
                           ))}
                         </div>
                       </div>
-                    </Link>
+                    </button>
                   </li>
                 );
               })}
