@@ -350,6 +350,12 @@ function AdminUsersPage() {
           </Tabs>
         );
       })()}
+
+      <UserDetailSheet
+        userId={selectedUserId}
+        open={!!selectedUserId}
+        onOpenChange={(o) => { if (!o) setSelectedUserId(null); }}
+      />
     </div>
   );
 }
