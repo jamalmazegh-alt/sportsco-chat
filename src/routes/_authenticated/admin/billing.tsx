@@ -375,26 +375,31 @@ function BillingPage() {
                   </p>
                 </div>
                 {inv.invoice_pdf && (
-                  <a
-                    href={inv.invoice_pdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
+                  <button
+                    type="button"
+                    onClick={async (e) => {
                       e.preventDefault();
-                      const w = window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
-                      if (!w) {
-                        // Popup blocked — fall back to top-level navigation in a new tab
+                      try {
+                        const res = await fetch(inv.invoice_pdf!, { mode: "cors" });
+                        if (!res.ok) throw new Error("download_failed");
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
                         const a = document.createElement("a");
-                        a.href = inv.invoice_pdf!;
-                        a.target = "_blank";
-                        a.rel = "noopener noreferrer";
+                        a.href = url;
+                        a.download = `${inv.number ?? inv.id}.pdf`;
+                        document.body.appendChild(a);
                         a.click();
+                        document.body.removeChild(a);
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                      } catch {
+                        // Fallback: noopener prevents the iframe parent from being replaced
+                        window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
                       }
                     }}
                     className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"
                   >
                     PDF <ExternalLink className="h-3 w-3" />
-                  </a>
+                  </button>
                 )}
               </li>
             ))}
