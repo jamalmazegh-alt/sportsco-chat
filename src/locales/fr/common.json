@@ -953,7 +953,10 @@
     "dismiss": "Ignorer",
     "high": "Urgent",
     "medium": "Attention",
-    "low": "Info"
+    "low": "Info",
+    "dismissConfirmTitle": "Ignorer cet insight ?",
+    "dismissConfirmDescription": "Il ne réapparaîtra plus pour vous. Cette action ne peut pas être annulée.",
+    "dismissConfirmAction": "Ignorer"
   }
 }
 
