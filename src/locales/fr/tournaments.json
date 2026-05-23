@@ -675,6 +675,25 @@
     "tied": "Égalité — saisir les tirs au but pour désigner le vainqueur",
     "tab": "Tab {{team}}",
     "winner": "Vainqueur : {{team}}",
-    "penShort": "tab"
+    "penShort": "tab",
+    "lifecycle": {
+      "scheduled": "Planifié",
+      "live": "En cours",
+      "submitted": "À valider",
+      "validated": "Validé",
+      "disputed": "Contesté"
+    },
+    "cta": {
+      "scheduled": "Saisir le score",
+      "live": "Modifier le score",
+      "submitted": "Valider le score",
+      "validated": "Voir les détails",
+      "disputed": "Résoudre le litige"
+    },
+    "disputedHelper": "Score sous revue — signalé par une équipe",
+    "moreActions": "Autres actions",
+    "addEventAction": "Ajouter un événement",
+    "changeStatusAction": "Changer le statut",
+    "vs": "VS"
   }
 }
