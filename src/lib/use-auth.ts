@@ -28,6 +28,7 @@ export type AppRole = "admin" | "coach" | "parent" | "player";
 export interface ClubMembership {
   club_id: string;
   role: AppRole;
+  roles: string[];
   club: { id: string; name: string; logo_url: string | null };
 }
 
@@ -94,7 +95,7 @@ export function useAuthState(): AuthState {
       });
     const { data, error } = await supabase
       .from("club_members")
-      .select("club_id, role, clubs:club_id(id, name, logo_url)")
+      .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
       .eq("user_id", userData.user.id);
     if (error) {
       console.error(error);
@@ -103,6 +104,7 @@ export function useAuthState(): AuthState {
     const list: ClubMembership[] = (data ?? []).map((row: any) => ({
       club_id: row.club_id,
       role: row.role,
+      roles: row.roles ?? [row.role],
       club: row.clubs,
     }));
     setMemberships(list);

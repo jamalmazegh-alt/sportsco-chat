@@ -18,16 +18,20 @@ export function useActiveRole(): "admin" | "coach" | "parent" | "player" | null 
   const { memberships, activeClubId } = useAuth();
   const m = memberships.find((x) => x.club_id === activeClubId);
   if (!m) return null;
-  // priority: admin > coach > parent > player (highest privilege wins for UI default)
-  const all = memberships
-    .filter((x) => x.club_id === activeClubId)
-    .map((x) => x.role);
+  const all = new Set<string>(m.roles ?? [m.role]);
   const order: Array<"admin" | "coach" | "parent" | "player"> = [
     "admin",
     "coach",
     "parent",
     "player",
   ];
-  for (const r of order) if (all.includes(r)) return r;
+  for (const r of order) if (all.has(r)) return r;
   return m.role;
+}
+
+/** Full roles array for the active club (multi-role aware). */
+export function useMyRoles(): string[] {
+  const { memberships, activeClubId } = useAuth();
+  const m = memberships.find((x) => x.club_id === activeClubId);
+  return m?.roles ?? (m ? [m.role] : []);
 }
