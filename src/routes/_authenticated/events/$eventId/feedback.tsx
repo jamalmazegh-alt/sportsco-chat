@@ -257,7 +257,7 @@ function PostMatchFeedback() {
 
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">
-      <BackLink to="/events/$eventId" params={{ eventId }} />
+      <BackLink to="/events/$eventId" params={{ eventId } as never} />
 
 
       <div>
