@@ -402,12 +402,27 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
   const r = data ?? { played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
   const diff = r.gf - r.ga;
   const winRate = r.played > 0 ? Math.round((r.w / r.played) * 100) : 0;
+  const [expanded, setExpanded] = useState(false);
 
-  const cards = [
-    { label: t("stats.matchesWithResult", { defaultValue: "Matchs joués" }), value: r.played },
-    { label: t("stats.wins", { defaultValue: "Victoires" }), value: r.w, tone: "text-emerald-600" },
-    { label: t("stats.draws", { defaultValue: "Nuls" }), value: r.d, tone: "text-muted-foreground" },
-    { label: t("stats.losses", { defaultValue: "Défaites" }), value: r.l, tone: "text-destructive" },
+  const chips = [
+    { icon: null, label: `${r.played} ${t("stats.matchesWithResult", { defaultValue: "Matchs" }).toLowerCase()}`, cls: "bg-muted text-foreground" },
+    { icon: <Trophy className="h-3 w-3" />, label: `${r.w}V`, cls: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" },
+    { icon: <Minus className="h-3 w-3" />, label: `${r.d}N`, cls: "bg-muted text-muted-foreground" },
+    { icon: <X className="h-3 w-3" />, label: `${r.l}D`, cls: "bg-destructive/10 text-destructive" },
+    {
+      icon: diff > 0 ? <TrendingUp className="h-3 w-3" /> : diff < 0 ? <TrendingDown className="h-3 w-3" /> : null,
+      label: `${diff > 0 ? "+" : ""}${diff}`,
+      cls: diff > 0 ? "bg-primary/10 text-primary" : diff < 0 ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground",
+    },
+  ];
+
+  // Mini W/D/L bar
+  const total = Math.max(r.played, 1);
+  const wPct = (r.w / total) * 100;
+  const dPct = (r.d / total) * 100;
+  const lPct = (r.l / total) * 100;
+
+  const detailCards = [
     { label: unitLabels.for, value: r.gf },
     { label: unitLabels.against, value: r.ga },
     { label: t("stats.diff", { defaultValue: "Différence" }), value: `${diff > 0 ? "+" : ""}${diff}` },
@@ -415,21 +430,77 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
   ];
 
   return (
-    <div className="space-y-3">
-      <div className="text-xs text-muted-foreground">
-        {t("stats.currentSeason", { defaultValue: "Saison en cours" })} · {season.label}
+    <section
+      className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4"
+      aria-label={t("stats.summaryAria", { defaultValue: "Season summary" })}
+    >
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <BarChart3 className="h-4 w-4" /> {season.label}
+        </h2>
+        <span className="text-[10px] text-muted-foreground">
+          {t("stats.currentSeason", { defaultValue: "Saison en cours" })}
+        </span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {cards.map((c) => (
-          <div key={c.label} className="rounded-xl border bg-card p-4">
-            <div className="text-xs text-muted-foreground">{c.label}</div>
-            <div className={cn("mt-1 text-2xl font-bold", c.tone)}>{c.value}</div>
-          </div>
+
+      {/* Compact summary chips */}
+      <div className="flex flex-wrap gap-1.5">
+        {chips.map((c, i) => (
+          <span
+            key={i}
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums",
+              c.cls
+            )}
+          >
+            {c.icon}
+            {c.label}
+          </span>
         ))}
       </div>
-    </div>
+
+      {/* Mini W/D/L sparkline */}
+      {r.played > 0 && (
+        <div className="space-y-1">
+          <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div className="bg-emerald-500 transition-all" style={{ width: `${wPct}%` }} />
+            <div className="bg-muted-foreground/40 transition-all" style={{ width: `${dPct}%` }} />
+            <div className="bg-destructive transition-all" style={{ width: `${lPct}%` }} />
+          </div>
+          <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums">
+            <span>{winRate}% {t("stats.wins", { defaultValue: "Victoires" }).toLowerCase()}</span>
+            <span>{unitLabels.for}: {r.gf} · {unitLabels.against}: {r.ga}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Collapsible detail */}
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+        aria-expanded={expanded}
+      >
+        {expanded
+          ? t("stats.hideRecordDetail", { defaultValue: "Hide details" })
+          : t("stats.showRecordDetail", { defaultValue: "Show details" })}
+        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+      </button>
+
+      {expanded && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-border animate-in fade-in slide-in-from-top-1 duration-200">
+          {detailCards.map((c) => (
+            <div key={c.label} className="rounded-xl border bg-card p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{c.label}</div>
+              <div className="mt-1 text-xl font-bold tabular-nums">{c.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
+
 
 type PlayerRow = {
   player_id: string;
