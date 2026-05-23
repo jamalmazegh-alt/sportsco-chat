@@ -614,7 +614,17 @@
     "accountStatus": "Statut du compte",
     "statusDisabled": "Désactivé",
     "confirmDisable": "Désactiver ce compte ?",
-    "confirmRemove": "Retirer cet utilisateur du club ?"
+    "confirmRemove": "Retirer cet utilisateur du club ?",
+    "tabClubMembers": "Membres du club",
+    "tabPlayersParents": "Joueurs & parents",
+    "tabClubMembersEmpty": "Aucun membre du club.",
+    "tabPlayersParentsEmpty": "Aucun joueur ou parent.",
+    "inviteUser": "Inviter un utilisateur",
+    "inviteRole": "Rôles",
+    "inviteEmailAlreadyUser": "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
+    "inviteEmailFailed": "Invitation créée mais l'email n'a pas pu être envoyé.",
+    "inviteSent": "Invitation envoyée",
+    "sendInvite": "Envoyer l'invitation"
   },
   "attachments": {
     "add": "Ajouter un fichier",
@@ -908,6 +918,9 @@
     "pending": "En attente",
     "assignMatches": "Affecter à des matchs",
     "copyLink": "Copier le lien",
-    "linkCopied": "Lien copié"
+    "linkCopied": "Lien copié",
+    "confirmRemoveTitle": "Retirer ce membre ?",
+    "confirmRemoveDesc": "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard.",
+    "confirmRemoveAction": "Retirer"
   }
 }
