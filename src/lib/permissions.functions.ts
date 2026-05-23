@@ -474,7 +474,7 @@ export const assignRefereeToMatch = createServerFn({ method: "POST" })
           referee_user_id: data.remove ? null : member.user_id,
           referee_name: data.remove
             ? null
-            : `${member.email}`,
+            : `${member.first_name ?? ""} ${member.last_name ?? ""}`.trim() || member.email,
         })
         .eq("id", data.match_id)
         .eq("tournament_id", data.tournament_id);
