@@ -92,13 +92,8 @@ function PasswordPage() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-6 max-w-lg mx-auto">
-      <Link
-        to="/profile"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ChevronLeft className="h-4 w-4" />
-        {t("common.back", { defaultValue: "Retour" })}
-      </Link>
+      <BackLink to="/profile" />
+
 
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
