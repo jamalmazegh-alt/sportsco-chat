@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User } from "lucide-react";
 import { BackLink } from "@/components/back-link";
+import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
+
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
