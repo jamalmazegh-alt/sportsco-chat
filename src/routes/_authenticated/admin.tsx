@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { Navigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useActiveRole } from "@/lib/auth-context";
+import { useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { ShieldCheck, Settings2, Users, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,10 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const { t } = useTranslation();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  if (role !== "admin") return <Navigate to="/profile" replace />;
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
   const tabs = [
     { to: "/admin", icon: Settings2, label: t("admin.openSettings"), exact: true },

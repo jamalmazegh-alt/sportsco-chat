@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { useState, type FormEvent } from "react";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { Loader2, Users, Mail, ShieldCheck, Trophy, UserPlus } from "lucide-react";
@@ -26,12 +26,13 @@ function AdminUsersPage() {
   const { t } = useTranslation();
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const qc = useQueryClient();
   const fetchUsers = useServerFn(listClubUsers);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-club-users", activeClubId],
-    enabled: !!activeClubId && role === "admin",
+    enabled: !!activeClubId && roles.includes("admin"),
     queryFn: async () => {
       const res = await fetchUsers({ data: { club_id: activeClubId! } });
       return res.users;
@@ -141,7 +142,7 @@ function AdminUsersPage() {
     qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
   }
 
-  if (role !== "admin") return <Navigate to="/profile" replace />;
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
   return (
     <div className="px-5 pt-4 pb-10 space-y-4">
