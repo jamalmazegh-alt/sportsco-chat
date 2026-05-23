@@ -1063,6 +1063,22 @@
     "home": {
       "title": "Accueil — Clubero",
       "description": "Tableau de bord de votre club."
+    },
+    "events": {
+      "title": "Événements — Clubero",
+      "description": "Tous vos entraînements et matchs."
+    },
+    "eventDetail": {
+      "title": "Événement — Clubero",
+      "description": "Détails de l'événement et convocations."
+    },
+    "lineup": {
+      "title": "Composition — Clubero",
+      "description": "Composition d'équipe."
+    },
+    "feedback": {
+      "title": "Retours coach — Clubero",
+      "description": "Feedback des coachs."
     }
   },
   "trial": {

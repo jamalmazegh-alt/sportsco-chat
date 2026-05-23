@@ -1063,6 +1063,22 @@
     "home": {
       "title": "Home — Clubero",
       "description": "Your club dashboard."
+    },
+    "events": {
+      "title": "Events — Clubero",
+      "description": "All your trainings and matches."
+    },
+    "eventDetail": {
+      "title": "Event — Clubero",
+      "description": "Event details and call-ups."
+    },
+    "lineup": {
+      "title": "Lineup — Clubero",
+      "description": "Team lineup."
+    },
+    "feedback": {
+      "title": "Coach feedback — Clubero",
+      "description": "Coach feedback notes."
     }
   },
   "trial": {
