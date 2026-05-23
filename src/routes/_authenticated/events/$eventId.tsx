@@ -2379,7 +2379,7 @@ function EventDetail() {
                       {/* Segmented progress bar */}
                       <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted/60 flex">
                         {counts.present > 0 && (
-                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-present transition-all" />
+                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-emerald-500 transition-all" />
                         )}
                         {counts.uncertain > 0 && (
                           <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-uncertain transition-all" />
@@ -2391,7 +2391,7 @@ function EventDetail() {
 
                       {/* Chips */}
                       <div className="flex flex-wrap gap-1.5 mt-3">
-                        <StatChip dotCls="bg-present" label={t("attendance.present")} value={counts.present} />
+                        <StatChip dotCls="bg-emerald-500" label={t("attendance.present")} value={counts.present} />
                         <StatChip dotCls="bg-uncertain" label={t("attendance.uncertain")} value={counts.uncertain} />
                         <StatChip dotCls="bg-absent" label={t("attendance.absent")} value={counts.absent} />
                         <StatChip dotCls="bg-pending border border-border" label={t("attendance.pending")} value={counts.pending} muted />
