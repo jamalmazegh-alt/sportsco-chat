@@ -415,6 +415,8 @@
     "linkBadge": "{{count}} to remind"
   },
   "attendance": {
+    "responseRate": "Response rate",
+    "responded": "responses",
     "title": "Attendance",
     "present": "Present",
     "absent": "Absent",
