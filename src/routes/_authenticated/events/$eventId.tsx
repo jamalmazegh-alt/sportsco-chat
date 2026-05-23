@@ -1679,28 +1679,28 @@ function EventDetail() {
       {/* Convocation CTAs moved into the unified Convocation card below */}
 
 
-      {/* Coach: reschedule event */}
+      {/* Coach: secondary lifecycle actions */}
       {isCoach && event.status !== "cancelled" && (
-        <Button
-          variant="outline"
-          onClick={openReschedule}
-          className="w-full h-10"
-        >
-          <CalendarClock className="h-4 w-4" />
-          {t("events.reschedule")}
-        </Button>
-      )}
-
-      {/* Coach: cancel event */}
-      {isCoach && event.status !== "cancelled" && (
-        <Button
-          variant="outline"
-          onClick={() => setCancelEventOpen(true)}
-          className="w-full h-10 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-        >
-          <Ban className="h-4 w-4" />
-          {t("events.cancelEvent")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={openReschedule}
+            className="flex-1 h-9 text-muted-foreground hover:text-foreground border border-border/60 hover:bg-muted/60"
+          >
+            <CalendarClock className="h-4 w-4" />
+            {t("events.reschedule")}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCancelEventOpen(true)}
+            className="flex-1 h-9 text-destructive/80 hover:text-destructive border border-destructive/20 hover:bg-destructive/10"
+          >
+            <Ban className="h-4 w-4" />
+            {t("events.cancelEvent")}
+          </Button>
+        </div>
       )}
 
       <Dialog
