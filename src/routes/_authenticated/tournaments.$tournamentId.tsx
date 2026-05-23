@@ -81,7 +81,7 @@ function TournamentDetailPage() {
   const { tournament, groups, teams, matches } = q.data;
   const canManage =
     (q.data as any).canManage === true ||
-    role === "admin" ||
+    roles.includes("admin") || roles.includes("tournament_manager") ||
     (role as string) === "dirigeant";
   const publicUrl =
     typeof window !== "undefined"
