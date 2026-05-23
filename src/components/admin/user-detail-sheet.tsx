@@ -27,6 +27,7 @@ import {
 } from "@/lib/admin.functions";
 import { setClubMemberRoles } from "@/lib/permissions.functions";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
