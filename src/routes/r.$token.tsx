@@ -106,6 +106,7 @@ const STATUS_CONFIG: Record<Status, StatusStyle> = {
 const STATUS_ORDER: Status[] = ["present", "absent", "uncertain"];
 
 function RespondPage() {
+  const { t } = useTranslation();
   const { token } = Route.useParams();
   const search = useSearch({ from: "/r/$token" });
   const [info, setInfo] = useState<ConvocationInfo | null>(null);
@@ -118,7 +119,7 @@ function RespondPage() {
     setLoading(true);
     const { data, error: rpcError } = await supabase.rpc("get_convocation_by_token", { _token: token });
     if (rpcError || !data || data.length === 0) {
-      setError("Lien invalide ou expiré.");
+      setError(t("respond.invalidLink"));
       setLoading(false);
       return;
     }
@@ -135,7 +136,7 @@ function RespondPage() {
     });
     setSubmitting(null);
     if (rpcError) {
-      setError(rpcError.message || "Échec de l'enregistrement");
+      setError(rpcError.message || t("respond.submitError"));
       return;
     }
     await load();
@@ -167,12 +168,12 @@ function RespondPage() {
       <div className="min-h-screen flex items-center justify-center bg-background px-5">
         <div className="rounded-2xl border border-border bg-card p-8 max-w-md text-center space-y-3">
           <XCircle className="h-10 w-10 text-destructive mx-auto" />
-          <h1 className="text-lg font-semibold">Lien invalide</h1>
+          <h1 className="text-lg font-semibold">{t("respond.invalidTitle")}</h1>
           <p className="text-sm text-muted-foreground">
-            {error ?? "Cette convocation est introuvable. Demandez un nouveau lien à votre coach."}
+            {error ?? t("respond.invalidBody")}
           </p>
           <Button asChild variant="outline" className="mt-2">
-            <Link to="/">Retour à l'accueil</Link>
+            <Link to="/">{t("respond.backHome")}</Link>
           </Button>
         </div>
       </div>
@@ -182,12 +183,13 @@ function RespondPage() {
   const playerName = `${info.player_first_name ?? ""} ${info.player_last_name ?? ""}`.trim();
   const isResponded = info.status !== "pending";
   const currentConfig = isResponded ? STATUS_CONFIG[info.status as Status] : null;
+  const statusLabel = (s: Status) => t(`respond.${s}`);
 
   return (
     <div className="min-h-screen bg-background px-5 py-8">
       <div className="max-w-md mx-auto space-y-5">
         <header className="text-center space-y-1">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Convocation</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("respond.eyebrow")}</p>
           <h1 className="text-2xl font-bold">{info.event_title}</h1>
           {info.club_name && (
             <p className="text-sm text-muted-foreground">
@@ -209,7 +211,7 @@ function RespondPage() {
             </div>
           )}
           <p className="text-sm text-muted-foreground pt-1">
-            Pour <strong className="text-foreground">{playerName || "le joueur"}</strong>
+            {t("respond.forPlayer")} <strong className="text-foreground">{playerName || t("respond.thePlayer")}</strong>
           </p>
         </section>
 
@@ -232,7 +234,7 @@ function RespondPage() {
               <currentConfig.icon className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold">Réponse enregistrée : {currentConfig.label}</p>
+              <p className="font-semibold">{t("respond.savedTitle")} {statusLabel(info.status as Status)}</p>
               {info.responded_at && (
                 <p className="text-xs opacity-80">
                   {fmt(info.responded_at, "d MMM 'à' HH'h'mm")}
@@ -244,7 +246,7 @@ function RespondPage() {
 
         <section className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {isResponded ? "Modifier votre réponse" : "Votre réponse"}
+            {isResponded ? t("respond.editYourReply") : t("respond.yourReply")}
           </p>
           <div className="flex gap-3">
             {STATUS_ORDER.map((s) => {
@@ -281,7 +283,7 @@ function RespondPage() {
                     )}
                   </div>
                   <span className={cn("text-sm font-semibold tracking-tight", cfg.labelText)}>
-                    {cfg.label}
+                    {statusLabel(s)}
                   </span>
                 </button>
               );
@@ -293,14 +295,13 @@ function RespondPage() {
           <Button asChild variant="ghost" size="sm">
             <Link to="/events/$eventId" params={{ eventId: info.event_id }}>
               <ExternalLink className="h-3.5 w-3.5" />
-              Ouvrir dans Clubero
+              {t("respond.openApp")}
             </Link>
           </Button>
         </div>
 
         <p className="text-[11px] text-center text-muted-foreground pt-4">
-          Vous recevez ce lien parce qu'une convocation vous a été envoyée. Vous pouvez modifier
-          votre réponse à tout moment depuis ce même lien.
+          {t("respond.footer")}
         </p>
       </div>
     </div>
