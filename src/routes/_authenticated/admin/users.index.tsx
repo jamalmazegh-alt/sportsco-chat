@@ -15,6 +15,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { UserDetailSheet } from "@/components/admin/user-detail-sheet";
 import { toast } from "sonner";
