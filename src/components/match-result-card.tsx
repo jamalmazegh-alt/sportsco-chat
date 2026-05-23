@@ -32,6 +32,8 @@ import {
   SOLO_STAT_KINDS,
   type StatKind,
 } from "@/lib/sport-config";
+import { ConfettiBurst } from "@/components/confetti-burst";
+
 
 type Goal = {
   id: string;
@@ -80,6 +82,8 @@ export function MatchResultCard({
   const [notes, setNotes] = useState("");
   const [sets, setSets] = useState<SetScore[]>([]);
   const [saving, setSaving] = useState(false);
+  const [celebrate, setCelebrate] = useState(0);
+
 
   // New event form
   const [showGoalForm, setShowGoalForm] = useState(false);
@@ -203,8 +207,11 @@ export function MatchResultCard({
       return;
     }
     toast.success(t("match.resultSaved"));
+    // Celebrate a win only — subtle delight, not noise.
+    if (home_score !== away_score) setCelebrate((n) => n + 1);
     setEditing(false);
     qc.invalidateQueries({ queryKey: ["match-result", eventId] });
+
   }
 
   async function addGoal() {
@@ -266,6 +273,8 @@ export function MatchResultCard({
 
   return (
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+      <ConfettiBurst trigger={celebrate} />
+
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
           <Trophy className="h-4 w-4" /> {t("match.result")}
