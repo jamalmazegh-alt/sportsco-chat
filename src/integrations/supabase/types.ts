@@ -163,6 +163,7 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          theme_color: string
           wall_comments_enabled: boolean
         }
         Insert: {
@@ -179,6 +180,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          theme_color?: string
           wall_comments_enabled?: boolean
         }
         Update: {
@@ -195,6 +197,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          theme_color?: string
           wall_comments_enabled?: boolean
         }
         Relationships: []

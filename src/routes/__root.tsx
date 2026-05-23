@@ -12,6 +12,8 @@ import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { bootstrapTheme } from "@/lib/use-theme";
 import { CookieConsentBanner } from "@/components/cookie-consent";
+import { ClubThemeProvider } from "@/components/club-theme-provider";
+import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
 
 import appCss from "../styles.css?url";
 
@@ -95,6 +97,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
     bootstrapTheme();
+    // Apply the last-known club brand colour ASAP (covers login page).
+    applyClubTheme(readStoredTheme());
     // Catch Supabase auth error redirects (e.g. expired confirmation link)
     // and route to a friendly resend screen instead of dumping users on a
     // protected route with an unreadable URL hash.
@@ -110,9 +114,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
-        <Toaster position="top-center" />
-        <CookieConsentBanner />
+        <ClubThemeProvider>
+          <Outlet />
+          <Toaster position="top-center" />
+          <CookieConsentBanner />
+        </ClubThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

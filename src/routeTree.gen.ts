@@ -93,6 +93,7 @@ import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminSettingsRemindersRouteImport } from './routes/_authenticated/admin/settings.reminders'
 import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
 import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './routes/_authenticated/admin/settings.communications'
+import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
 
 const SuperadminRoute = SuperadminRouteImport.update({
   id: '/superadmin',
@@ -543,6 +544,12 @@ const AuthenticatedAdminSettingsCommunicationsRoute =
     path: '/settings/communications',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsBrandingRoute =
+  AuthenticatedAdminSettingsBrandingRouteImport.update({
+    id: '/settings/branding',
+    path: '/settings/branding',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -611,6 +618,7 @@ export interface FileRoutesByFullPath {
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
@@ -692,6 +700,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
@@ -779,6 +788,7 @@ export interface FileRoutesById {
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/_authenticated/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/_authenticated/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
   '/_authenticated/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/_authenticated/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
@@ -866,6 +876,7 @@ export interface FileRouteTypes {
     | '/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/admin/settings/branding'
     | '/admin/settings/communications'
     | '/admin/settings/convocations'
     | '/admin/settings/reminders'
@@ -947,6 +958,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
+    | '/admin/settings/branding'
     | '/admin/settings/communications'
     | '/admin/settings/convocations'
     | '/admin/settings/reminders'
@@ -1033,6 +1045,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/_authenticated/admin/settings/branding'
     | '/_authenticated/admin/settings/communications'
     | '/_authenticated/admin/settings/convocations'
     | '/_authenticated/admin/settings/reminders'
@@ -1685,12 +1698,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsCommunicationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings/branding': {
+      id: '/_authenticated/admin/settings/branding'
+      path: '/settings/branding'
+      fullPath: '/admin/settings/branding'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsBrandingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminSettingsBrandingRoute: typeof AuthenticatedAdminSettingsBrandingRoute
   AuthenticatedAdminSettingsCommunicationsRoute: typeof AuthenticatedAdminSettingsCommunicationsRoute
   AuthenticatedAdminSettingsConvocationsRoute: typeof AuthenticatedAdminSettingsConvocationsRoute
   AuthenticatedAdminSettingsRemindersRoute: typeof AuthenticatedAdminSettingsRemindersRoute
@@ -1701,6 +1722,8 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminSettingsBrandingRoute:
+    AuthenticatedAdminSettingsBrandingRoute,
   AuthenticatedAdminSettingsCommunicationsRoute:
     AuthenticatedAdminSettingsCommunicationsRoute,
   AuthenticatedAdminSettingsConvocationsRoute:
