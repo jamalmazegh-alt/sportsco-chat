@@ -8,7 +8,12 @@
     "coach": "Coach",
     "player": "Joueur",
     "parent": "Parent",
-    "dirigeant": "Dirigeant"
+    "dirigeant": "Dirigeant",
+    "assistant_coach": "Coach adjoint",
+    "staff": "Staff",
+    "tournament_manager": "Responsable tournois",
+    "tournament_admin": "Admin du tournoi",
+    "referee": "Arbitre"
   },
   "nav": {
     "home": "Accueil",
@@ -883,5 +888,26 @@
       "title": "Créer la convocation depuis cette compo"
     },
     "noPlayersForConvoc": "Ajoutez d'abord des joueurs à la compo."
+  },
+  "permissions": {
+    "clubRoles": "Rôles dans le club",
+    "clubRolesHint": "Un utilisateur peut cumuler plusieurs rôles.",
+    "atLeastOneRole": "Au moins un rôle est requis"
+  },
+  "tournamentMembers": {
+    "title": "Membres du tournoi",
+    "invite": "Inviter",
+    "inviteTitle": "Inviter un membre",
+    "role": "Rôle",
+    "sendInvite": "Envoyer l'invitation",
+    "invited": "Invitation créée",
+    "added": "Membre ajouté",
+    "removed": "Membre retiré",
+    "confirmRemove": "Retirer ce membre ?",
+    "empty": "Aucun membre pour le moment.",
+    "pending": "En attente",
+    "assignMatches": "Affecter à des matchs",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié"
   }
 }
