@@ -23,7 +23,10 @@
     "inbox": "Mur",
     "stats": "Stats",
     "profile": "Profil",
-    "admin": "Admin"
+    "admin": "Admin",
+    "manageClub": "Gérer le club",
+    "manageClubSubtitle": "Paramètres, membres, abonnement",
+    "viewStats": "Voir les statistiques"
   },
   "auth": {
     "login": "Se connecter",
