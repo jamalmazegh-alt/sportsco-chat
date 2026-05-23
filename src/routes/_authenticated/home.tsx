@@ -35,6 +35,7 @@ function HomePage() {
   const { t, i18n } = useTranslation();
   const { user, activeClubId, memberships } = useAuth();
   const role = useActiveRole();
+  const roles = useMyRoles();
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
