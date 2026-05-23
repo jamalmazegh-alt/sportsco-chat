@@ -104,6 +104,7 @@ function TournamentDetailPage() {
       ? [
           { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
           { id: "team_staff" as const, icon: UserPlus, label: "Équipe" },
+          { id: "members" as const, icon: UserCog, label: "Membres" },
           { id: "rules" as const, icon: Settings2, label: "Règles" },
         ]
       : []),
