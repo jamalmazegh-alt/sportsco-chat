@@ -586,6 +586,8 @@
     "eventChatParents": "Les parents peuvent accéder aux chats d'événement",
     "save": "Enregistrer",
     "saved": "Paramètres enregistrés.",
+    "promoteToMember": "Promouvoir en membre du club",
+    "parentOrPlayerOnly": "Cet utilisateur est uniquement parent ou joueur. Pour lui donner des droits supplémentaires, utilisez le bouton ci-dessous.",
     "hubSubscription": "Abonnement",
     "hubSubscriptionHint": "Plan, factures et moyen de paiement.",
     "hubConvocations": "Convocations",

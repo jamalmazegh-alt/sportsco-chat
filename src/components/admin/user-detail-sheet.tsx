@@ -84,6 +84,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [acting, setActing] = useState<string | null>(null);
+  const [promoting, setPromoting] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-user-detail", userId, activeClubId],
@@ -103,7 +104,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   const clubMemberships = (data?.memberships ?? []).filter(
     (m: any) => m.club_id === activeClubId,
   );
-  const currentRoles: ClubRoleKey[] = (() => {
+  const allClubRoles: Set<string> = (() => {
     const set = new Set<string>();
     for (const m of clubMemberships) {
       if (Array.isArray(m.roles) && m.roles.length > 0) {
@@ -112,8 +113,12 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
         set.add(m.role);
       }
     }
-    return CLUB_ROLE_KEYS.filter((r) => set.has(r));
+    return set;
   })();
+  const currentRoles: ClubRoleKey[] = CLUB_ROLE_KEYS.filter((r) => allClubRoles.has(r));
+  const nonStaffRoles: string[] = ["parent", "player"].filter((r) => allClubRoles.has(r));
+  const hasStaffRole = currentRoles.length > 0;
+  const isParentOrPlayerOnly = !hasStaffRole && nonStaffRoles.length > 0;
   const isMember = clubMemberships.length > 0;
 
   async function toggleDisabled(disabled: boolean) {
@@ -163,9 +168,10 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
 
   async function toggleRole(role: ClubRoleKey, checked: boolean) {
     if (!activeClubId || !userId) return;
-    const next = checked
+    const nextStaff = checked
       ? Array.from(new Set([...currentRoles, role]))
       : currentRoles.filter((r) => r !== role);
+    const next = [...nextStaff, ...nonStaffRoles];
     if (next.length === 0) {
       toast.error(t("permissions.atLeastOneRole", { defaultValue: "Au moins un rôle est requis" }));
       return;
@@ -173,11 +179,12 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
     setActing("roles");
     try {
       await callSetRoles({
-        data: { club_id: activeClubId, user_id: userId, roles: next },
+        data: { club_id: activeClubId, user_id: userId, roles: next as any },
       });
       toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
       refetch();
+      if (nextStaff.length > 0) setPromoting(false);
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {
@@ -284,51 +291,82 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                       })}
                     </p>
                   </div>
-                  <TooltipProvider delayDuration={150}>
-                    <div className="space-y-0.5">
-                      {CLUB_ROLE_KEYS.map((r) => {
-                        const blockingRole = currentRoles.find((sel) =>
-                          (INCOMPATIBLE_ROLES[sel] ?? []).includes(r),
-                        );
-                        const incompatible = !!blockingRole && !currentRoles.includes(r);
-                        const isDisabled = acting === "roles" || incompatible;
-                        const row = (
-                          <label
-                            className={
-                              "flex items-center gap-3 p-2 rounded-lg " +
-                              (incompatible
-                                ? "opacity-50 cursor-not-allowed bg-muted/20"
-                                : "hover:bg-muted/40 cursor-pointer")
-                            }
-                          >
-                            <Checkbox
-                              checked={currentRoles.includes(r)}
-                              disabled={isDisabled}
-                              onCheckedChange={(v) => toggleRole(r, !!v)}
-                            />
-                            <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
-                          </label>
-                        );
-                        if (incompatible && blockingRole) {
-                          return (
-                            <Tooltip key={r}>
-                              <TooltipTrigger asChild>
-                                <div>{row}</div>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t("roles.incompatibleWith", {
-                                  role: t(`roles.${blockingRole}`, { defaultValue: blockingRole }),
-                                })}
-                              </TooltipContent>
-                            </Tooltip>
-                          );
-                        }
-                        return <div key={r}>{row}</div>;
-                      })}
+
+                  {nonStaffRoles.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {nonStaffRoles.map((r) => (
+                        <span
+                          key={r}
+                          className="text-[11px] font-medium px-2 py-1 rounded-full bg-muted text-muted-foreground inline-flex items-center gap-1"
+                        >
+                          {t(`roles.${r}`, { defaultValue: r })}
+                        </span>
+                      ))}
                     </div>
-                  </TooltipProvider>
+                  )}
+
+                  {isParentOrPlayerOnly && !promoting ? (
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        {t("admin.parentOrPlayerOnly")}
+                      </p>
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setPromoting(true)}
+                      >
+                        <ShieldCheck className="h-4 w-4" />
+                        {t("admin.promoteToMember")}
+                      </Button>
+                    </div>
+                  ) : (
+                    <TooltipProvider delayDuration={150}>
+                      <div className="space-y-0.5">
+                        {CLUB_ROLE_KEYS.map((r) => {
+                          const blockingRole = currentRoles.find((sel) =>
+                            (INCOMPATIBLE_ROLES[sel] ?? []).includes(r),
+                          );
+                          const incompatible = !!blockingRole && !currentRoles.includes(r);
+                          const isDisabled = acting === "roles" || incompatible;
+                          const row = (
+                            <label
+                              className={
+                                "flex items-center gap-3 p-2 rounded-lg " +
+                                (incompatible
+                                  ? "opacity-50 cursor-not-allowed bg-muted/20"
+                                  : "hover:bg-muted/40 cursor-pointer")
+                              }
+                            >
+                              <Checkbox
+                                checked={currentRoles.includes(r)}
+                                disabled={isDisabled}
+                                onCheckedChange={(v) => toggleRole(r, !!v)}
+                              />
+                              <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
+                            </label>
+                          );
+                          if (incompatible && blockingRole) {
+                            return (
+                              <Tooltip key={r}>
+                                <TooltipTrigger asChild>
+                                  <div>{row}</div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {t("roles.incompatibleWith", {
+                                    role: t(`roles.${blockingRole}`, { defaultValue: blockingRole }),
+                                  })}
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          }
+                          return <div key={r}>{row}</div>;
+                        })}
+                      </div>
+                    </TooltipProvider>
+                  )}
                 </section>
               )}
+
 
               {/* Linked players */}
               {(data.linkedPlayers.length > 0 || data.parentLinks.length > 0) && (
