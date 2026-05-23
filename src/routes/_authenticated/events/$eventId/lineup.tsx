@@ -359,13 +359,8 @@ function LineupPage() {
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="px-4 md:px-6 pt-4 pb-24 space-y-4">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <Link
-            to="/events/$eventId"
-            params={{ eventId }}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="h-4 w-4" /> {t("common.back", "Retour")}
-          </Link>
+          <BackLink to="/events/$eventId" params={{ eventId } as never} />
+
           <div className="flex items-center gap-2">
             {published && (
               <span className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
