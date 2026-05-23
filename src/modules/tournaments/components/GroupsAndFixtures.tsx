@@ -54,6 +54,8 @@ export function GroupsAndFixtures({
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [drawOpen, setDrawOpen] = useState(false);
+  const [regenGroupsOpen, setRegenGroupsOpen] = useState(false);
+  const [genBracketOpen, setGenBracketOpen] = useState(false);
 
   const [numGroups, setNumGroups] = useState(2);
   const [qualifiers, setQualifiers] = useState(2);
