@@ -24,10 +24,16 @@ import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId")({
   component: TeamDetail,
-  head: () => ({ meta: [{ title: "Team — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.team.title") },
+      { name: "description", content: i18n.t("meta.team.description") },
+    ],
+  }),
 });
 
 type RespondBy = "player" | "parent" | "both";

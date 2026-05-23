@@ -16,9 +16,16 @@ import { EmptyState } from "@/components/empty-state";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 
 
+import i18n from "@/lib/i18n";
+
 export const Route = createFileRoute("/_authenticated/teams")({
   component: TeamsRoute,
-  head: () => ({ meta: [{ title: "Teams — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.teams.title") },
+      { name: "description", content: i18n.t("meta.teams.description") },
+    ],
+  }),
 });
 
 function TeamsRoute() {
