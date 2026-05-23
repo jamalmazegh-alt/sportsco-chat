@@ -84,6 +84,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const [acting, setActing] = useState<string | null>(null);
+  const [promoting, setPromoting] = useState(false);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-user-detail", userId, activeClubId],
