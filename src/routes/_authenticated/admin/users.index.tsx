@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
+import { UserDetailSheet } from "@/components/admin/user-detail-sheet";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin/users/")({
@@ -57,6 +58,8 @@ function AdminUsersPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
 
   function reset() {
     setInviteRoles(["coach"]); setFirst(""); setLast(""); setEmail("");
@@ -281,10 +284,10 @@ function AdminUsersPage() {
                   "—";
                 return (
                   <li key={u.user_id}>
-                    <Link
-                      to="/admin/users/$userId"
-                      params={{ userId: u.user_id }}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => setSelectedUserId(u.user_id)}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-muted/40 transition-colors"
                     >
                       <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground overflow-hidden">
                         {u.profile?.avatar_url ? (
@@ -321,7 +324,7 @@ function AdminUsersPage() {
                           ))}
                         </div>
                       </div>
-                    </Link>
+                    </button>
                   </li>
                 );
               })}
@@ -347,6 +350,12 @@ function AdminUsersPage() {
           </Tabs>
         );
       })()}
+
+      <UserDetailSheet
+        userId={selectedUserId}
+        open={!!selectedUserId}
+        onOpenChange={(o) => { if (!o) setSelectedUserId(null); }}
+      />
     </div>
   );
 }
