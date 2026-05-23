@@ -9,8 +9,9 @@ import i18n from "@/lib/i18n";
 const emailLocale = (): "fr" | "en" => ((i18n.language ?? "en").toLowerCase().startsWith("fr") ? "fr" : "en");
 import { fmt } from "@/lib/date-locale";
 import {
-  ChevronLeft, MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus,
+  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus,
 } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -1438,12 +1439,8 @@ function EventDetail() {
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
-      <Link
-        to="/events"
-        className="inline-flex items-center text-sm text-muted-foreground gap-1 hover:text-foreground transition-colors -ml-1 px-1 py-1 rounded-md"
-      >
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/events" />
+
 
       <div
         className={cn(

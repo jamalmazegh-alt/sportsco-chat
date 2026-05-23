@@ -31,7 +31,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
+import { Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { LegalDialog } from "@/components/legal-dialog";
@@ -147,10 +148,9 @@ function PrivacyPage() {
   return (
     <div className="px-4 pb-10 pt-2 space-y-6">
       <div className="flex items-center gap-2">
-        <Link to="/profile" className="-ml-2 inline-flex items-center text-sm text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-        </Link>
+        <BackLink to="/profile" />
       </div>
+
 
       <header className="space-y-1">
         <div className="flex items-center gap-2">

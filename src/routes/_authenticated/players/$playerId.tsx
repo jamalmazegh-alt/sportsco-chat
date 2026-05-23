@@ -16,7 +16,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User } from "lucide-react";
+import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
@@ -339,9 +340,8 @@ function PlayerProfile() {
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-      <Link to="/teams" className="inline-flex items-center text-sm text-muted-foreground gap-1">
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/teams" />
+
 
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">

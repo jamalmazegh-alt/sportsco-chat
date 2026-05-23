@@ -3,7 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, Loader2, CheckCircle2, Star } from "lucide-react";
+import { Loader2, CheckCircle2, Star } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -256,13 +257,8 @@ function PostMatchFeedback() {
 
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">
-      <Link
-        to="/events/$eventId"
-        params={{ eventId }}
-        className="inline-flex items-center text-sm text-muted-foreground gap-1"
-      >
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/events/$eventId" params={{ eventId } as never} />
+
 
       <div>
         <h1 className="text-xl font-semibold">

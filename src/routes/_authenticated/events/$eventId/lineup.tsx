@@ -10,7 +10,8 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { ChevronLeft, Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus, X as XIcon, Move } from "lucide-react";
+import { Save, Send, Eye, EyeOff, Loader2, Star, Hand, UserPlus, X as XIcon, Move } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -342,9 +343,8 @@ function LineupPage() {
   if (ctx.event.type !== "match" || !_isFootball) {
     return (
       <div className="p-6 space-y-4">
-        <Link to="/events/$eventId" params={{ eventId }} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" /> {t("common.back", "Retour")}
-        </Link>
+        <BackLink to="/events/$eventId" params={{ eventId } as never} />
+
         <p className="text-sm text-muted-foreground">
           {t("lineup.unavailable", "La composition est disponible uniquement pour les matchs de football.")}
         </p>
@@ -359,13 +359,8 @@ function LineupPage() {
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="px-4 md:px-6 pt-4 pb-24 space-y-4">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <Link
-            to="/events/$eventId"
-            params={{ eventId }}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className="h-4 w-4" /> {t("common.back", "Retour")}
-          </Link>
+          <BackLink to="/events/$eventId" params={{ eventId } as never} />
+
           <div className="flex items-center gap-2">
             {published && (
               <span className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">

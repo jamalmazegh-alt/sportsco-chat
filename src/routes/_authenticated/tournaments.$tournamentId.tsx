@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Trophy,
   Loader2,
   Users,
@@ -17,6 +16,7 @@ import {
   GitBranch,
   MapPin,
 } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -114,13 +114,8 @@ function TournamentDetailPage() {
   return (
     <div className="pb-6">
       <header className="px-5 pt-6 pb-4 space-y-3">
-        <Link
-          to="/tournaments"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Tournois
-        </Link>
+        <BackLink to="/tournaments" label="Tournois" />
+
         <div className="flex items-start gap-3">
           <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <Trophy className="h-6 w-6 text-primary" />

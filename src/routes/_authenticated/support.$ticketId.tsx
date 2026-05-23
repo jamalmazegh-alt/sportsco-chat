@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getSupportTicket } from "@/lib/support.functions";
 import { TicketThread } from "@/components/support/ticket-thread";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { STATUS_BADGE_CLASS, type SupportStatus } from "@/lib/support-constants";
 
 export const Route = createFileRoute("/_authenticated/support/$ticketId")({
@@ -34,9 +35,8 @@ function TicketDetailPage() {
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen">
       <header className="px-5 pt-6 pb-3 border-b">
-        <Link to="/support" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-3 w-3" /> {t("page.back")}
-        </Link>
+        <BackLink to="/support" label={t("page.back")} />
+
         <h1 className="text-lg font-semibold mt-2">{ticket.subject}</h1>
         <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground">
           <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${cls}`}>
