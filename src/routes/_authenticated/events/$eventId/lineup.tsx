@@ -44,10 +44,16 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/lineup")({
   component: LineupPage,
-  head: () => ({ meta: [{ title: "Composition — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.lineup.title") },
+      { name: "description", content: i18n.t("meta.lineup.description") },
+    ],
+  }),
 });
 
 type LineupSlot = FormationSlot & { player_id: string | null };
