@@ -117,8 +117,8 @@ function BillingPage() {
     }
   }, [search.billing, search.card, t]);
 
-  const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["club-subscription", activeClubId],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["club-subscription-full", activeClubId],
     enabled: !!activeClubId,
     queryFn: () => fetchSub({ data: { clubId: activeClubId! } }),
     refetchOnWindowFocus: true,
@@ -136,7 +136,7 @@ function BillingPage() {
 
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
-  if (isLoading || isFetching || !activeClubId || (!!activeClubId && data === undefined)) {
+  if (isLoading || !activeClubId || (!!activeClubId && data === undefined)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
