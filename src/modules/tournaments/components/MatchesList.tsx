@@ -16,7 +16,6 @@ import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
   Loader2,
@@ -25,14 +24,26 @@ import {
   Clock,
   ShieldCheck,
   AlertTriangle,
-  ChevronDown,
   Plus,
-  Minus,
   Trash2,
   Flag,
-  Radio,
   Zap,
+  MoreVertical,
+  Pencil,
+  Eye,
+  CalendarClock,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ScoreStepper } from "@/components/score-stepper";
 
 import { toast } from "sonner";
@@ -455,89 +466,183 @@ function MatchCard({
     ? `${pad(initialDate.getDate())}/${pad(initialDate.getMonth() + 1)} ${pad(initialDate.getHours())}:${pad(initialDate.getMinutes())}`
     : null;
 
+  // ── Unified lifecycle state (exactly one) ──────────────────────────────
+  type Lifecycle = "scheduled" | "live" | "submitted" | "validated" | "disputed" | "other";
+  const lifecycle: Lifecycle = disputed
+    ? "disputed"
+    : match.status === "live"
+      ? "live"
+      : match.status === "completed"
+        ? validated
+          ? "validated"
+          : "submitted"
+        : match.status === "scheduled"
+          ? "scheduled"
+          : "other";
+
+  const LIFECYCLE_STYLES: Record<Lifecycle, {
+    border: string;
+    headerBg: string;
+    badge: string;
+    cta: string;
+    dot: string;
+  }> = {
+    scheduled: {
+      border: "border-l-slate-400 dark:border-l-slate-500",
+      headerBg: "bg-muted/40",
+      badge: "bg-muted text-muted-foreground border border-border",
+      cta: "bg-foreground text-background hover:bg-foreground/90",
+      dot: "bg-slate-400",
+    },
+    live: {
+      border: "border-l-orange-500",
+      headerBg: "bg-orange-500/5",
+      badge: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border border-orange-500/30",
+      cta: "bg-orange-600 hover:bg-orange-700 text-white shadow-md shadow-orange-500/20",
+      dot: "bg-orange-500",
+    },
+    submitted: {
+      border: "border-l-blue-500",
+      headerBg: "bg-blue-500/5",
+      badge: "bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30",
+      cta: "bg-blue-600 hover:bg-blue-700 text-white",
+      dot: "bg-blue-500",
+    },
+    validated: {
+      border: "border-l-emerald-500",
+      headerBg: "bg-emerald-500/5",
+      badge: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30",
+      cta: "bg-card border border-border text-muted-foreground hover:bg-muted/60",
+      dot: "bg-emerald-500",
+    },
+    disputed: {
+      border: "border-l-red-600",
+      headerBg: "bg-red-500/10",
+      badge: "bg-red-600 text-white border border-red-700",
+      cta: "bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-500/20",
+      dot: "bg-red-500",
+    },
+    other: {
+      border: "border-l-amber-500",
+      headerBg: "bg-amber-500/5",
+      badge: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30",
+      cta: "bg-foreground text-background hover:bg-foreground/90",
+      dot: "bg-amber-500",
+    },
+  };
+  const lifecycleStyle = LIFECYCLE_STYLES[lifecycle];
+
+  const lifecycleLabel =
+    lifecycle === "other"
+      ? t(`matches.statusLabels.${match.status}`, { defaultValue: match.status })
+      : t(`matches.lifecycle.${lifecycle}`);
+
+  const LifecycleIcon = (() => {
+    switch (lifecycle) {
+      case "scheduled":
+        return <Clock className="h-3 w-3" />;
+      case "live":
+        return (
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-600" />
+          </span>
+        );
+      case "submitted":
+        return <Eye className="h-3 w-3" />;
+      case "validated":
+        return <ShieldCheck className="h-3 w-3" />;
+      case "disputed":
+        return <AlertTriangle className="h-3 w-3" />;
+      default:
+        return <Flag className="h-3 w-3" />;
+    }
+  })();
+
+  // State-dependent primary CTA
+  const [eventFormOpen, setEventFormOpen] = useState(false);
+  const hasScore = match.score_a != null && match.score_b != null;
+
+  const primaryCta = (() => {
+    if (!canManage) return null;
+    if (!teamA || !teamB) return null;
+    switch (lifecycle) {
+      case "scheduled":
+        return {
+          label: t("matches.cta.scheduled"),
+          onClick: () => setOpen(true),
+          icon: <Pencil className="h-3.5 w-3.5" />,
+        };
+      case "live":
+        return {
+          label: t("matches.cta.live"),
+          onClick: () => setOpen(true),
+          icon: <Pencil className="h-3.5 w-3.5" />,
+        };
+      case "submitted":
+        return {
+          label: t("matches.cta.submitted"),
+          onClick: () => validateM.mutate(true),
+          icon: <Check className="h-3.5 w-3.5" />,
+        };
+      case "validated":
+        return {
+          label: t("matches.cta.validated"),
+          onClick: () => setOpen(true),
+          icon: <Eye className="h-3.5 w-3.5" />,
+        };
+      case "disputed":
+        return {
+          label: t("matches.cta.disputed"),
+          onClick: () => setOpen(true),
+          icon: <AlertTriangle className="h-3.5 w-3.5" />,
+        };
+      default:
+        return null;
+    }
+  })();
+
   return (
     <li>
-      <div className="w-full rounded-xl border border-border bg-card p-3 text-left">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <span className="text-xs text-muted-foreground">#{match.match_number ?? "—"}</span>
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap justify-end">
+      <div
+        className={`w-full rounded-xl border border-border bg-card overflow-hidden border-l-4 ${lifecycleStyle.border} ${lifecycle === "live" ? "shadow-md" : "shadow-sm"} transition-shadow`}
+      >
+        {/* HEADER: meta + single status badge */}
+        <div
+          className={`px-3 py-2 flex items-center justify-between gap-2 border-b border-border ${lifecycleStyle.headerBg}`}
+        >
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider min-w-0">
+            <span className="shrink-0">#{match.match_number ?? "—"}</span>
             {whenLabel && (
-              <span className="inline-flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {whenLabel}
-              </span>
+              <>
+                <span className="opacity-40">·</span>
+                <span className="inline-flex items-center gap-1 shrink-0">
+                  <Clock className="h-3 w-3" />
+                  {whenLabel}
+                </span>
+              </>
             )}
             {match.field && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {match.field}
-              </span>
-            )}
-            {(match.referee_user_id || match.referee_name) && (
-              <span className="inline-flex items-center gap-1">
-                <Flag className="h-3 w-3" />
-                {match.referee_name ||
-                  refereeOptions.find((r) => r.user_id === match.referee_user_id)?.label ||
-                  t("matches.referee")}
-              </span>
-            )}
-            {done && !validated && (
-              <span
-                className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300"
-                title={t("matches.pendingValidationTitle")}
-              >
-                <Check className="h-3 w-3" />
-                {t("matches.pendingValidation")}
-              </span>
-            )}
-
-            {validated && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
-                <ShieldCheck className="h-3 w-3" />
-                {t("matches.validated")}
-              </span>
-            )}
-            {disputed && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-destructive">
-                <AlertTriangle className="h-3 w-3" />
-                {t("matches.dispute")}
-              </span>
-            )}
-            {match.status === "cancelled" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5">{t("matches.statusLabels.cancelled")}</span>
-            )}
-            {match.status === "forfeit_a" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.forfeit_a")}</span>
-            )}
-            {match.status === "forfeit_b" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.forfeit_b")}</span>
-            )}
-            {match.status === "no_show_a" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.no_show_a")}</span>
-            )}
-            {match.status === "no_show_b" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-950/40 px-2 py-0.5 text-orange-700 dark:text-orange-300">{t("matches.statusLabels.no_show_b")}</span>
-            )}
-            {match.status === "abandoned" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-amber-700 dark:text-amber-300">{t("matches.statusLabels.abandoned")}</span>
+              <>
+                <span className="opacity-40">·</span>
+                <span className="inline-flex items-center gap-1 truncate">
+                  <MapPin className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{match.field}</span>
+                </span>
+              </>
             )}
           </div>
+          <span
+            className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-tight ${lifecycleStyle.badge}`}
+          >
+            {LifecycleIcon}
+            {lifecycleLabel}
+          </span>
         </div>
-        {canManage && match.status === "live" && !setsMode && teamA && teamB ? (
-          <div className="mt-2 rounded-lg border border-red-500/40 bg-red-500/5 p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-red-600 dark:text-red-400">
-                <Radio className="h-3 w-3 animate-pulse" />
-                {t("matches.liveScore")}
-              </span>
-              <button
-                type="button"
-                onClick={() => setOpen(true)}
-                className="text-[11px] text-muted-foreground underline"
-              >
-                {t("matches.fullEntry")}
-              </button>
-            </div>
+
+        {/* SCORE ROW */}
+        <div className="p-3">
+          {canManage && lifecycle === "live" && !setsMode && teamA && teamB ? (
             <div className="flex items-center justify-around gap-2">
               <ScoreStepper
                 label={teamA.short_name ?? teamA.name}
@@ -559,72 +664,204 @@ function MatchCard({
                 size="md"
               />
             </div>
-            <Button
-              size="sm"
-              className="w-full mt-3 h-9"
-              onClick={() => {
-                setA(match.score_a ?? 0);
-                setB(match.score_b ?? 0);
-                save.mutate();
-              }}
-              disabled={save.isPending}
-            >
-              <Check className="h-4 w-4" />
-              {t("matches.finishMatch")}
-            </Button>
-          </div>
-        ) : (
-          <>
+          ) : (
             <button
               type="button"
-              onClick={() => setOpen(true)}
+              onClick={() => canManage && teamA && teamB && setOpen(true)}
               disabled={!teamA || !teamB || !canManage}
-              className="mt-1.5 w-full grid grid-cols-[1fr_auto_1fr] items-center gap-2 active:scale-[0.99] transition disabled:opacity-70"
+              className="w-full grid grid-cols-[1fr_auto_1fr] items-center gap-3 active:scale-[0.99] transition disabled:opacity-80 disabled:active:scale-100"
             >
-              <span className="truncate text-sm font-medium text-right">
-                {teamA?.name ?? t("matches.tbd")}
+              <span className="truncate text-sm font-bold text-right">
+                {teamA?.short_name ?? teamA?.name ?? t("matches.tbd")}
               </span>
-              <span className="font-semibold tabular-nums text-lg">
-                {match.score_a ?? "–"} : {match.score_b ?? "–"}
-                {hasPenalty && (
-                  <span className="ml-1 text-xs text-muted-foreground">
-                    ({t("matches.penShort")} {match.penalty_score_a}-{match.penalty_score_b})
+              {hasScore ? (
+                <span className="inline-flex items-center gap-2 tabular-nums">
+                  <span
+                    className={`text-2xl font-black ${lifecycle === "disputed" ? "text-red-600 dark:text-red-400" : lifecycle === "validated" ? "text-emerald-700 dark:text-emerald-300" : "text-foreground"}`}
+                  >
+                    {match.score_a}
                   </span>
-                )}
-              </span>
-              <span className="truncate text-sm font-medium">
-                {teamB?.name ?? t("matches.tbd")}
+                  <span className="text-muted-foreground/50 font-bold">:</span>
+                  <span
+                    className={`text-2xl font-black ${lifecycle === "disputed" ? "text-red-600 dark:text-red-400" : lifecycle === "validated" ? "text-emerald-700 dark:text-emerald-300" : "text-foreground"}`}
+                  >
+                    {match.score_b}
+                  </span>
+                  {hasPenalty && (
+                    <span className="ml-1 text-[10px] text-muted-foreground tabular-nums">
+                      ({t("matches.penShort")} {match.penalty_score_a}-{match.penalty_score_b})
+                    </span>
+                  )}
+                </span>
+              ) : (
+                <span className="text-lg font-black text-muted-foreground/40 tracking-tight">
+                  {t("matches.vs")}
+                </span>
+              )}
+              <span className="truncate text-sm font-bold">
+                {teamB?.short_name ?? teamB?.name ?? t("matches.tbd")}
               </span>
             </button>
+          )}
 
-            {setsMode && match.sets && match.sets.length > 0 && (
-              <p className="mt-1 text-center text-[11px] text-muted-foreground tabular-nums">
-                {formatSets(match.sets)}
+          {setsMode && match.sets && match.sets.length > 0 && (
+            <p className="mt-1.5 text-center text-[11px] text-muted-foreground tabular-nums">
+              {formatSets(match.sets)}
+            </p>
+          )}
+
+          {(match.referee_user_id || match.referee_name) && (
+            <p className="mt-1.5 text-center text-[10px] text-muted-foreground inline-flex items-center justify-center gap-1 w-full">
+              <Flag className="h-3 w-3" />
+              {match.referee_name ||
+                refereeOptions.find((r) => r.user_id === match.referee_user_id)?.label ||
+                t("matches.referee")}
+            </p>
+          )}
+
+          {/* Disputed helper */}
+          {lifecycle === "disputed" && (
+            <div className="mt-2 rounded-md border border-red-500/30 bg-red-500/5 px-2 py-1.5 flex items-start gap-2">
+              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-red-500 shrink-0 animate-pulse" />
+              <p className="text-[11px] text-red-700 dark:text-red-300 leading-snug font-medium">
+                {t("matches.disputedHelper")}
               </p>
+            </div>
+          )}
+        </div>
+
+        {/* PRIMARY CTA + KEBAB */}
+        {canManage && (
+          <div className="px-3 pb-3 flex gap-2">
+            {primaryCta ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={primaryCta.onClick}
+                disabled={validateM.isPending || statusM.isPending || liveUpdate.isPending}
+                className={`flex-1 h-10 text-xs font-bold gap-1.5 ${lifecycleStyle.cta}`}
+              >
+                {validateM.isPending || statusM.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  primaryCta.icon
+                )}
+                {primaryCta.label}
+              </Button>
+            ) : (
+              <div className="flex-1" />
             )}
-            {canManage &&
-              match.status === "scheduled" &&
-              teamA &&
-              teamB && (
+
+            {/* Live → quick "Terminer" inline */}
+            {lifecycle === "live" && teamA && teamB && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-10 text-xs"
+                onClick={() => {
+                  setA(match.score_a ?? 0);
+                  setB(match.score_b ?? 0);
+                  save.mutate();
+                }}
+                disabled={save.isPending}
+                title={t("matches.finishMatch")}
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            )}
+
+            {/* Scheduled → quick "Start live" inline */}
+            {lifecycle === "scheduled" && teamA && teamB && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-10 text-xs border-orange-500/40 text-orange-600 dark:text-orange-400 hover:bg-orange-500/10"
+                onClick={() => statusM.mutate("live")}
+                disabled={statusM.isPending}
+                title={t("matches.startLive")}
+              >
+                <Zap className="h-4 w-4" />
+              </Button>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
-                  size="sm"
+                  size="icon"
                   variant="outline"
-                  className="mt-2 w-full h-8 text-xs border-red-500/40 text-red-600 dark:text-red-400 hover:bg-red-500/10"
-                  onClick={() => statusM.mutate("live")}
-                  disabled={statusM.isPending}
+                  className="h-10 w-10 shrink-0"
+                  aria-label={t("matches.moreActions")}
                 >
-                  <Zap className="h-3.5 w-3.5" />
-                  {t("matches.startLive")}
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
-              )}
-          </>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>{t("matches.moreActions")}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                {done && (
+                  <DropdownMenuItem
+                    onClick={() => validateM.mutate(!validated)}
+                    disabled={validateM.isPending}
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    {validated ? t("matches.unvalidate") : t("matches.validate")}
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuItem
+                  onClick={() => disputeM.mutate(!disputed)}
+                  disabled={disputeM.isPending}
+                  className={disputed ? "text-destructive" : ""}
+                >
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  {disputed ? t("matches.liftDispute") : t("matches.raiseDispute")}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                  <CalendarClock className="h-3.5 w-3.5" />
+                  {t("matches.fieldAndTime")}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem onClick={() => setEventFormOpen((o) => !o)}>
+                  <Plus className="h-3.5 w-3.5" />
+                  {t("matches.addEventAction")}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Flag className="h-3.5 w-3.5" />
+                    {t("matches.changeStatusAction")}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {(["scheduled", "live", "completed", "forfeit_a", "forfeit_b", "no_show_a", "no_show_b", "abandoned", "cancelled"] as const).map((s) => (
+                      <DropdownMenuItem
+                        key={s}
+                        onClick={() => statusM.mutate(s)}
+                        disabled={statusM.isPending || match.status === s}
+                        className={match.status === s ? "font-semibold" : ""}
+                      >
+                        {match.status === s && <Check className="h-3.5 w-3.5" />}
+                        {t(`matches.statusOptions.${s}`)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )}
 
-
-        {/* Events summary (always visible if any) */}
+        {/* Events chips */}
         {events.length > 0 && (
-          <ul className="mt-2 flex flex-wrap gap-1.5">
+          <ul className="px-3 pb-3 flex flex-wrap gap-1.5">
             {events.map((ev) => {
               const meta = eventMeta(ev.kind, t);
               const isA = ev.team_id === match.team_a_id;
@@ -655,130 +892,66 @@ function MatchCard({
           </ul>
         )}
 
+        {/* Event add form (toggled from kebab) */}
         {canManage && (
-          <div className="mt-2 flex flex-wrap justify-end gap-1">
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 text-xs">
-                  <ChevronDown className="h-3 w-3" />
-                  {t("matches.events.toggle")}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="w-full mt-2 rounded-lg border border-border bg-muted/30 p-2 space-y-2">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <Select value={evKind} onValueChange={setEvKind}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {EVENT_KIND_VALUES.map((k) => (
-                        <SelectItem key={k.value} value={k.value}>
-                          {k.emoji} {t(`matches.events.${k.value}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={evTeam} onValueChange={setEvTeam}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder={t("matches.events.team")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teamA && (
-                        <SelectItem value={teamA.id}>{teamA.name}</SelectItem>
-                      )}
-                      {teamB && (
-                        <SelectItem value={teamB.id}>{teamB.name}</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    className="h-8 text-xs"
-                    placeholder={t("matches.events.player")}
-                    value={evPlayer}
-                    onChange={(e) => setEvPlayer(e.target.value)}
-                  />
-                  <Input
-                    className="h-8 text-xs"
-                    type="number"
-                    min={0}
-                    max={200}
-                    placeholder={t("matches.events.minute")}
-                    value={evMinute}
-                    onChange={(e) => setEvMinute(e.target.value)}
-                  />
-                </div>
-                <Button
-                  size="sm"
-                  className="h-8 text-xs w-full"
-                  onClick={() => addEvent.mutate()}
-                  disabled={addEvent.isPending || !evTeam}
-                >
-                  {addEvent.isPending ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <Plus className="h-3 w-3" />
-                  )}
-                  {t("matches.events.add")}
-                </Button>
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
-              onClick={() => setEditOpen(true)}
-            >
-              {t("matches.fieldAndTime")}
-            </Button>
-            {done && (
+          <Collapsible open={eventFormOpen} onOpenChange={setEventFormOpen}>
+            <CollapsibleContent className="mx-3 mb-3 rounded-lg border border-border bg-muted/30 p-2 space-y-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <Select value={evKind} onValueChange={setEvKind}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EVENT_KIND_VALUES.map((k) => (
+                      <SelectItem key={k.value} value={k.value}>
+                        {k.emoji} {t(`matches.events.${k.value}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={evTeam} onValueChange={setEvTeam}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder={t("matches.events.team")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teamA && <SelectItem value={teamA.id}>{teamA.name}</SelectItem>}
+                    {teamB && <SelectItem value={teamB.id}>{teamB.name}</SelectItem>}
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder={t("matches.events.player")}
+                  value={evPlayer}
+                  onChange={(e) => setEvPlayer(e.target.value)}
+                />
+                <Input
+                  className="h-8 text-xs"
+                  type="number"
+                  min={0}
+                  max={200}
+                  placeholder={t("matches.events.minute")}
+                  value={evMinute}
+                  onChange={(e) => setEvMinute(e.target.value)}
+                />
+              </div>
               <Button
-                variant={validated ? "ghost" : "default"}
                 size="sm"
-                className={
-                  validated
-                    ? "h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                    : "h-7 text-xs"
-                }
-                onClick={() => validateM.mutate(!validated)}
-                disabled={validateM.isPending}
-                title={validated ? t("matches.unvalidateTitle") : t("matches.validateTitle")}
+                className="h-8 text-xs w-full"
+                onClick={() => addEvent.mutate()}
+                disabled={addEvent.isPending || !evTeam}
               >
-                <ShieldCheck className="h-3 w-3" />
-                {validated ? t("matches.unvalidate") : t("matches.validate")}
+                {addEvent.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Plus className="h-3 w-3" />
+                )}
+                {t("matches.events.add")}
               </Button>
-            )}
-
-            <Button
-              variant={disputed ? "destructive" : "ghost"}
-              size="sm"
-              className="h-7 text-xs"
-              onClick={() => disputeM.mutate(!disputed)}
-              disabled={disputeM.isPending}
-            >
-              <AlertTriangle className="h-3 w-3" />
-              {disputed ? t("matches.liftDispute") : t("matches.raiseDispute")}
-            </Button>
-            <select
-              className="h-7 rounded-md border border-input bg-background px-2 text-xs"
-              value={match.status}
-              disabled={statusM.isPending}
-              onChange={(e) => statusM.mutate(e.target.value)}
-              aria-label={t("matches.statusAria")}
-            >
-              <option value="scheduled">{t("matches.statusOptions.scheduled")}</option>
-              <option value="live">{t("matches.statusOptions.live")}</option>
-              <option value="completed">{t("matches.statusOptions.completed")}</option>
-              <option value="forfeit_a">{t("matches.statusOptions.forfeit_a")}</option>
-              <option value="forfeit_b">{t("matches.statusOptions.forfeit_b")}</option>
-              <option value="no_show_a">{t("matches.statusOptions.no_show_a")}</option>
-              <option value="no_show_b">{t("matches.statusOptions.no_show_b")}</option>
-              <option value="abandoned">{t("matches.statusOptions.abandoned")}</option>
-              <option value="cancelled">{t("matches.statusOptions.cancelled")}</option>
-            </select>
-          </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
       </div>
+
 
 
       <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("matches.title")}>
