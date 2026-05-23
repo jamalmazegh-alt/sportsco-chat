@@ -96,8 +96,7 @@ function AdminUsersPage() {
       created_by: user.id,
       first_name: first.trim() || null,
       last_name: last.trim() || null,
-      extra_roles: inviteRoles,
-    } as any);
+    });
     if (invErr) {
       setBusy(false);
       toast.error(invErr.message);
