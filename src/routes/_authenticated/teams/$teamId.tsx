@@ -17,7 +17,8 @@ import {
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
+import { ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
