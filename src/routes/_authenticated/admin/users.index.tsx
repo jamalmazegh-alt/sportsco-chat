@@ -15,6 +15,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { UserDetailSheet } from "@/components/admin/user-detail-sheet";
 import { toast } from "sonner";
@@ -50,6 +51,13 @@ function AdminUsersPage() {
     "tournament_manager",
   ] as const;
   type ClubRoleKey = (typeof CLUB_ROLE_KEYS)[number];
+
+  const INCOMPATIBLE_ROLES: Record<string, string[]> = {
+    coach: ["assistant_coach"],
+    assistant_coach: ["coach", "admin", "staff"],
+    admin: ["assistant_coach"],
+    staff: ["assistant_coach"],
+  };
 
   const [open, setOpen] = useState(false);
   const [inviteRoles, setInviteRoles] = useState<ClubRoleKey[]>(["coach"]);
@@ -173,22 +181,51 @@ function AdminUsersPage() {
               <p className="text-[11px] text-muted-foreground">
                 {t("permissions.clubRolesHint", { defaultValue: "Un utilisateur peut cumuler plusieurs rôles." })}
               </p>
-              <div className="space-y-1">
-                {CLUB_ROLE_KEYS.map((r) => (
-                  <label
-                    key={r}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer border border-border/40"
-                  >
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-primary"
-                      checked={inviteRoles.includes(r)}
-                      onChange={(e) => toggleInviteRole(r, e.target.checked)}
-                    />
-                    <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
-                  </label>
-                ))}
-              </div>
+              <TooltipProvider delayDuration={150}>
+                <div className="space-y-1">
+                  {CLUB_ROLE_KEYS.map((r) => {
+                    const blockingRole = inviteRoles.find((sel) =>
+                      (INCOMPATIBLE_ROLES[sel] ?? []).includes(r),
+                    );
+                    const disabled = !!blockingRole && !inviteRoles.includes(r);
+                    const row = (
+                      <label
+                        key={r}
+                        className={
+                          "flex items-center gap-3 p-2 rounded-lg border border-border/40 " +
+                          (disabled
+                            ? "opacity-50 cursor-not-allowed bg-muted/20"
+                            : "hover:bg-muted/40 cursor-pointer")
+                        }
+                      >
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 accent-primary"
+                          checked={inviteRoles.includes(r)}
+                          disabled={disabled}
+                          onChange={(e) => toggleInviteRole(r, e.target.checked)}
+                        />
+                        <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
+                      </label>
+                    );
+                    if (disabled && blockingRole) {
+                      return (
+                        <Tooltip key={r}>
+                          <TooltipTrigger asChild>
+                            <div>{row}</div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {t("roles.incompatibleWith", {
+                              role: t(`roles.${blockingRole}`, { defaultValue: blockingRole }),
+                            })}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }
+                    return row;
+                  })}
+                </div>
+              </TooltipProvider>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

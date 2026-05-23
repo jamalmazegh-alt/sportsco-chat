@@ -13,7 +13,8 @@
     "staff": "Staff",
     "tournament_manager": "Tournament manager",
     "tournament_admin": "Tournament admin",
-    "referee": "Referee"
+    "referee": "Referee",
+    "incompatibleWith": "Incompatible with {{role}}"
   },
   "nav": {
     "home": "Home",
