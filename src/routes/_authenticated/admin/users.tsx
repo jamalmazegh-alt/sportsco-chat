@@ -109,9 +109,9 @@ function AdminUsersPage() {
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
 
-    const roleLabel = inviteRole === "admin"
-      ? t("roles.admin", { defaultValue: "Administrateur" })
-      : t("roles.coach", { defaultValue: "Coach" });
+    const roleLabel = inviteRoles
+      .map((r) => t(`roles.${r}`, { defaultValue: r }))
+      .join(", ");
 
     try {
       await sendTransactionalEmail({
