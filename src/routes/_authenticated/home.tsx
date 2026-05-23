@@ -216,7 +216,7 @@ function HomePage() {
 
       {/* Quick actions */}
       {isCoach && (
-        <div className="flex gap-2">
+        <div className="space-y-2">
           {user && (
             <EventFormSheet
               open={createOpen}
@@ -228,21 +228,28 @@ function HomePage() {
                 qc.invalidateQueries({ queryKey: ["events"] });
                 qc.invalidateQueries({ queryKey: ["upcoming"] });
               }}
-              trigger={<Button className="flex-1 h-11"><Plus className="h-4 w-4" />{t("dashboard.createEvent")}</Button>}
+              trigger={
+                <Button className="w-full h-12 text-[15px] font-semibold shadow-sm">
+                  <Plus className="h-4 w-4" />
+                  {t("dashboard.createEvent")}
+                </Button>
+              }
             />
           )}
-          <Button asChild variant="outline" className="flex-1 h-11">
-            <Link to="/teams">
-              <Users className="h-4 w-4" />
-              {t("dashboard.viewTeams")}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="flex-1 h-11">
-            <Link to="/tournaments">
-              <Trophy className="h-4 w-4" />
-              Tournois
-            </Link>
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
+              <Link to="/teams">
+                <Users className="h-4 w-4" />
+                {t("dashboard.viewTeams")}
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
+              <Link to="/tournaments">
+                <Trophy className="h-4 w-4" />
+                {t("nav.tournaments", { defaultValue: "Tournois" })}
+              </Link>
+            </Button>
+          </div>
         </div>
       )}
 
