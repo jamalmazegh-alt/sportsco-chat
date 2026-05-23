@@ -955,6 +955,27 @@ function EventDetail() {
     else toast.info(t("attendance.alreadyRemindedRecently"));
   }
 
+  // Auto-trigger reminder flow from coach insights deep-link (?action=remind)
+  const autoRemindTriggered = useRef(false);
+  useEffect(() => {
+    if (
+      search.action === "remind" &&
+      !autoRemindTriggered.current &&
+      convocations &&
+      isActiveCoach
+    ) {
+      autoRemindTriggered.current = true;
+      remindAllPending();
+      navigate({
+        to: "/events/$eventId",
+        params: { eventId },
+        search: (prev: any) => ({ ...prev, action: undefined }),
+        replace: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.action, convocations, isActiveCoach]);
+
   async function toggleLock() {
     if (!event) return;
     await supabase
