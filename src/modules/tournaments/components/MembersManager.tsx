@@ -57,7 +57,7 @@ const ROLE_ICON: Record<TournamentRole, any> = {
 };
 
 export function MembersManager({ tournamentId, matches, teams }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
 
   const listFn = useServerFn(listTournamentMembers);
