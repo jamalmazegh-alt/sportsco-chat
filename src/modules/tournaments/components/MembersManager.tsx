@@ -75,6 +75,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<TournamentRole>("staff");
   const [busy, setBusy] = useState(false);
+  const [removeId, setRemoveId] = useState<string | null>(null);
 
   const teamById = new Map(teams.map((tm) => [tm.id, tm.name]));
 
