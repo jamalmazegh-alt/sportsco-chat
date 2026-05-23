@@ -117,8 +117,8 @@ function BillingPage() {
     }
   }, [search.billing, search.card, t]);
 
-  const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ["club-subscription", activeClubId],
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["club-subscription-full", activeClubId],
     enabled: !!activeClubId,
     queryFn: () => fetchSub({ data: { clubId: activeClubId! } }),
     refetchOnWindowFocus: true,
