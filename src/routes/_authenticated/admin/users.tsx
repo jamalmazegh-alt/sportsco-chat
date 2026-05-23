@@ -83,15 +83,21 @@ function AdminUsersPage() {
     } catch { /* non-blocking */ }
 
     const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+    const primaryRole: string = inviteRoles.includes("admin")
+      ? "admin"
+      : inviteRoles.includes("coach")
+        ? "coach"
+        : "dirigeant";
     const { error: invErr } = await supabase.from("member_invites").insert({
       club_id: activeClubId,
-      role: inviteRole,
+      role: primaryRole as any,
       email,
       token,
       created_by: user.id,
       first_name: first.trim() || null,
       last_name: last.trim() || null,
-    });
+      extra_roles: inviteRoles,
+    } as any);
     if (invErr) {
       setBusy(false);
       toast.error(invErr.message);
