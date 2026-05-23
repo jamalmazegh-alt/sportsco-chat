@@ -23,7 +23,10 @@
     "inbox": "Wall",
     "stats": "Stats",
     "profile": "Profile",
-    "admin": "Admin"
+    "admin": "Admin",
+    "manageClub": "Manage club",
+    "manageClubSubtitle": "Settings, members, subscription",
+    "viewStats": "View statistics"
   },
   "auth": {
     "login": "Log in",
