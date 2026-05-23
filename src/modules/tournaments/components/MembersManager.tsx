@@ -42,7 +42,7 @@ interface Props {
 const ROLE_ICON: Record<TournamentRole, any> = {
   tournament_admin: ShieldCheck,
   staff: Briefcase,
-  referee: Whistle,
+  referee: Gavel,
 };
 
 export function MembersManager({ tournamentId, matches, teams }: Props) {
