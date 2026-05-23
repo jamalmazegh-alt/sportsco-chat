@@ -253,7 +253,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                       size="icon"
                       variant="ghost"
                       className="text-destructive hover:text-destructive"
-                      onClick={() => onRemove(m.id)}
+                      onClick={() => setRemoveId(m.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
