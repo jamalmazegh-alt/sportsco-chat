@@ -58,6 +58,8 @@ function AdminUsersPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
 
   function reset() {
     setInviteRoles(["coach"]); setFirst(""); setLast(""); setEmail("");
