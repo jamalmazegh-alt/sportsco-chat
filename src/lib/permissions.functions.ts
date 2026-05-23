@@ -231,6 +231,11 @@ export const inviteClubMember = createServerFn({ method: "POST" })
           club_id: data.club_id,
           user_id: existingUserId,
           roles: data.roles,
+          role: (data.roles.includes("admin")
+            ? "admin"
+            : data.roles.includes("coach")
+              ? "coach"
+              : "dirigeant") as any,
         });
         if (error) throw new Response(error.message, { status: 500 });
 
