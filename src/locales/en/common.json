@@ -24,6 +24,8 @@
     "stats": "Stats",
     "profile": "Profile",
     "admin": "Admin",
+    "tournaments": "Tournaments",
+    "primary": "Primary navigation",
     "manageClub": "Manage club",
     "manageClubSubtitle": "Settings, members, subscription",
     "viewStats": "View statistics"
