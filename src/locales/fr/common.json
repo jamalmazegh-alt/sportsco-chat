@@ -222,6 +222,7 @@
     "viewTeams": "Voir les équipes",
     "respondNow": "Répondre",
     "myConvocations": "Vos convocations",
+    "actionRequired": "Action requise",
     "childConvocations": "Convocations de {{name}}",
     "childrenConvocations": "Convocations des enfants",
     "noConvocations": "Tout est à jour.",
@@ -1040,7 +1041,27 @@
     "reset": {
       "title": "Nouveau mot de passe — Clubero",
       "description": "Choisissez un nouveau mot de passe."
+    },
+    "home": {
+      "title": "Accueil — Clubero",
+      "description": "Tableau de bord de votre club."
     }
+  },
+  "trial": {
+    "expired": "Votre essai est terminé. Activez votre abonnement pour continuer à créer des événements.",
+    "ending_one": "Essai gratuit : {{count}} jour restant.",
+    "ending_other": "Essai gratuit : {{count}} jours restants.",
+    "canceling_one": "Abonnement résilié — actif encore {{count}} jour.",
+    "canceling_other": "Abonnement résilié — actif encore {{count}} jours.",
+    "active_one": "Essai gratuit actif — {{count}} jour restant.",
+    "active_other": "Essai gratuit actif — {{count}} jours restants.",
+    "activate": "Activer",
+    "manage": "Gérer",
+    "dismiss": "Fermer"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue.",
+    "clubCreateFailed": "Impossible de créer le club."
   },
   "respond": {
     "eyebrow": "Convocation",

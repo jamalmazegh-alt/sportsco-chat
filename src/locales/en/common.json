@@ -222,6 +222,7 @@
     "viewTeams": "View teams",
     "respondNow": "Respond now",
     "myConvocations": "Your invitations",
+    "actionRequired": "Action required",
     "childConvocations": "{{name}}'s invitations",
     "childrenConvocations": "Your children's invitations",
     "noConvocations": "You're all caught up.",
@@ -1040,7 +1041,27 @@
     "reset": {
       "title": "Reset password — Clubero",
       "description": "Choose a new password."
+    },
+    "home": {
+      "title": "Home — Clubero",
+      "description": "Your club dashboard."
     }
+  },
+  "trial": {
+    "expired": "Your trial has ended. Activate your subscription to keep creating events.",
+    "ending_one": "Free trial: {{count}} day left.",
+    "ending_other": "Free trial: {{count}} days left.",
+    "canceling_one": "Subscription canceled — active for {{count}} more day.",
+    "canceling_other": "Subscription canceled — active for {{count}} more days.",
+    "active_one": "Free trial active — {{count}} day left.",
+    "active_other": "Free trial active — {{count}} days left.",
+    "activate": "Activate",
+    "manage": "Manage",
+    "dismiss": "Dismiss"
+  },
+  "errors": {
+    "generic": "Something went wrong.",
+    "clubCreateFailed": "Could not create club."
   },
   "respond": {
     "eyebrow": "Call-up",
