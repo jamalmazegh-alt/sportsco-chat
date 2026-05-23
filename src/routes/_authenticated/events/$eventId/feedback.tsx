@@ -19,10 +19,16 @@ import { getFeedbackTagsForSport } from "@/lib/feedback-tags";
 import { useActiveRole, useAuth, useMyRoles } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/events/$eventId/feedback")({
   component: PostMatchFeedback,
-  head: () => ({ meta: [{ title: "Retours coach — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.feedback.title") },
+      { name: "description", content: i18n.t("meta.feedback.description") },
+    ],
+  }),
 });
 
 type RowValue = {

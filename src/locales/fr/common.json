@@ -108,7 +108,9 @@
     "next": "Suivant",
     "previous": "Précédent",
     "skip": "Passer",
-    "done": "Terminé"
+    "done": "Terminé",
+    "continue": "Continuer",
+    "exportCsv": "Exporter CSV"
   },
   "privacy": {
     "title": "Confidentialité & données",
@@ -471,7 +473,18 @@
       "meeting_point": "Point de RDV",
       "competition_name": "Compétition",
       "type": "Type"
-    }
+    },
+    "pastBadge": "Passé",
+    "calendarHint": "Touche un jour avec une pastille pour voir les événements.",
+    "noEventsThisDay": "Aucun événement ce jour.",
+    "duplicateExists": "Un événement existe déjà pour cette équipe à cette date/heure.",
+    "someDuplicatesSkipped": "{{count}} doublon(s) ignoré(s).",
+    "openConvocationAfterCreate": "Choisir les convoqués juste après",
+    "openConvocationAfterCreateHint": "L'écran de convocation s'ouvrira pour que tu sélectionnes les joueurs.",
+    "viewCalendar": "Calendrier",
+    "viewList": "Liste",
+    "emptyHintCoach": "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+    "emptyHintPlayer": "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un."
   },
   "followUps": {
     "title": "À relancer",
@@ -542,7 +555,11 @@
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
-    "notSentYet": "Pas encore envoyée"
+    "notSentYet": "Pas encore envoyée",
+    "confirmSend": "Confirmer l'envoi",
+    "recipients": "Destinataires",
+    "reviewBeforeSend": "Vérifier avant envoi",
+    "reviewBeforeSendHint": "Vérifie les destinataires et les détails — l'envoi est définitif."
   },
   "stats": {
     "title": "Statistiques",
@@ -739,7 +756,8 @@
     "empty": "Aucun message pour l'instant.",
     "placeholder": "Écrivez un message…",
     "disabled": "Le chat est désactivé pour cet événement.",
-    "you": "Vous"
+    "you": "Vous",
+    "loadMore": "Charger plus"
   },
   "assistant": {
     "title": "Assistant Clubero",
@@ -1045,6 +1063,22 @@
     "home": {
       "title": "Accueil — Clubero",
       "description": "Tableau de bord de votre club."
+    },
+    "events": {
+      "title": "Événements — Clubero",
+      "description": "Tous vos entraînements et matchs."
+    },
+    "eventDetail": {
+      "title": "Événement — Clubero",
+      "description": "Détails de l'événement et convocations."
+    },
+    "lineup": {
+      "title": "Composition — Clubero",
+      "description": "Composition d'équipe."
+    },
+    "feedback": {
+      "title": "Retours coach — Clubero",
+      "description": "Feedback des coachs."
     }
   },
   "trial": {
