@@ -922,5 +922,17 @@
     "confirmRemoveTitle": "Remove this member?",
     "confirmRemoveDesc": "This person will no longer have access to the tournament. You can re-invite them later.",
     "confirmRemoveAction": "Remove"
+  },
+  "insights": {
+    "title": "Insights",
+    "empty": "No insights yet",
+    "sendReminder": "Send reminder",
+    "viewEvent": "View event",
+    "viewPlayer": "View player",
+    "dismiss": "Dismiss",
+    "high": "Urgent",
+    "medium": "Attention",
+    "low": "Info"
   }
 }
+
