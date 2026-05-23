@@ -141,10 +141,12 @@ async function detectConsecutiveAbsences(clubId: string): Promise<DetectedInsigh
         .filter(Boolean),
     ),
   ];
-  const { data: teams } = teamIds.length
-    ? await supabaseAdmin.from("teams").select("id, name").in("id", teamIds)
-    : { data: [] as any[] };
-  const teamMap = new Map(((teams ?? []) as any[]).map((t) => [t.id, t.name]));
+  let teams: { id: string; name: string }[] = [];
+  if (teamIds.length) {
+    const { data } = await supabaseAdmin.from("teams").select("id, name").in("id", teamIds);
+    teams = (data ?? []) as any[];
+  }
+  const teamMap = new Map(teams.map((t) => [t.id, t.name]));
 
   // 4. Group convocations by player and check consecutive absences
   const byPlayer = new Map<string, any[]>();
