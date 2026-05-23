@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Calendar, Users, Megaphone, User, ShieldCheck, BarChart3, Trophy } from "lucide-react";
+import { Home, Calendar, Users, Megaphone, User, ShieldCheck, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
