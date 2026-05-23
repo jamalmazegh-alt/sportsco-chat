@@ -1438,12 +1438,8 @@ function EventDetail() {
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
-      <Link
-        to="/events"
-        className="inline-flex items-center text-sm text-muted-foreground gap-1 hover:text-foreground transition-colors -ml-1 px-1 py-1 rounded-md"
-      >
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/events" />
+
 
       <div
         className={cn(
