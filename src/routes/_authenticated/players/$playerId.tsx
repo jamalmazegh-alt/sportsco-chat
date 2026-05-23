@@ -23,10 +23,16 @@ import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId")({
   component: PlayerProfile,
-  head: () => ({ meta: [{ title: "Player — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.player.title") },
+      { name: "description", content: i18n.t("meta.player.description") },
+    ],
+  }),
 });
 
 function isMinorFromBirthDate(birth: string | null | undefined): boolean {
