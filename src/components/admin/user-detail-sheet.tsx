@@ -56,6 +56,13 @@ const CLUB_ROLE_KEYS = [
 ] as const;
 type ClubRoleKey = (typeof CLUB_ROLE_KEYS)[number];
 
+const INCOMPATIBLE_ROLES: Record<string, string[]> = {
+  coach: ["assistant_coach"],
+  assistant_coach: ["coach", "admin", "staff"],
+  admin: ["assistant_coach"],
+  staff: ["assistant_coach"],
+};
+
 interface Props {
   userId: string | null;
   open: boolean;
