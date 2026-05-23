@@ -9,6 +9,7 @@ import {
   Send,
   MessagesSquare,
   BellRing,
+  Palette,
   ChevronRight,
 } from "lucide-react";
 
