@@ -518,6 +518,63 @@ export function GroupsAndFixtures({
         )}
 
       </section>
+
+      <DestructiveConfirmSheet
+        open={regenGroupsOpen}
+        onOpenChange={setRegenGroupsOpen}
+        mode="type"
+        confirmWord="EFFACER"
+        title={t("groups.regenConfirmTitle")}
+        description={t("groups.regenConfirmDesc")}
+        consequences={
+          <ul className="list-disc pl-5 space-y-1 text-destructive">
+            <li>{t("groups.regenConsequenceGroups", { count: groupsCount })}</li>
+            <li>{t("groups.regenConsequenceMatches", { count: matchesCount })}</li>
+            <li>{t("groups.regenConsequenceScores")}</li>
+          </ul>
+        }
+        cancelLabel={t("draw.cancel")}
+        confirmLabel={t("groups.regenConfirmAction")}
+        loading={genGroups.isPending}
+        onConfirm={async () => {
+          await genGroups.mutateAsync();
+          setRegenGroupsOpen(false);
+        }}
+      />
+
+      <DestructiveConfirmSheet
+        open={genBracketOpen}
+        onOpenChange={setGenBracketOpen}
+        mode="simple"
+        title={
+          format === "knockout"
+            ? t("groups.generateBracket")
+            : t("groups.generateBracketFromQualifiers")
+        }
+        description={
+          format === "knockout"
+            ? t("groups.bracketConfirmDescKnockout", { count: numTeams })
+            : t("groups.bracketConfirmDescMixed", {
+                qualifiers: qualifiers,
+                groups: groupsCount,
+                total: qualifiers * groupsCount,
+              })
+        }
+        consequences={
+          <p className="text-foreground">
+            {thirdPlace
+              ? t("groups.bracketConfirmThirdPlaceYes")
+              : t("groups.bracketConfirmThirdPlaceNo")}
+          </p>
+        }
+        cancelLabel={t("draw.cancel")}
+        confirmLabel={t("groups.bracketConfirmAction")}
+        loading={genKnockout.isPending}
+        onConfirm={async () => {
+          await genKnockout.mutateAsync();
+          setGenBracketOpen(false);
+        }}
+      />
     </div>
   );
 }
