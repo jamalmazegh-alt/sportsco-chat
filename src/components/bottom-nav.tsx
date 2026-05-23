@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Calendar, Users, Megaphone, User, ShieldCheck, BarChart3, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { useWallUnread } from "@/lib/use-wall-unread";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
@@ -11,7 +11,7 @@ export function BottomNav() {
   const { t } = useTranslation();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { activeClubId } = useAuth();
-  const role = useActiveRole();
+  const isAdmin = useMyRoles().includes("admin");
   const { count: wallUnread } = useWallUnread(activeClubId);
   const { tournamentOnly } = useTournamentOnlyMode();
   const { isActive: subActive } = useClubSubscriptionActive(activeClubId);
