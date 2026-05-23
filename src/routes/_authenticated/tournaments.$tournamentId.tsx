@@ -258,6 +258,13 @@ function TournamentDetailPage() {
         {tab === "team_staff" && canManage && (
           <CollaboratorsManager tournamentId={tournament.id} />
         )}
+        {tab === "members" && canManage && (
+          <MembersManager
+            tournamentId={tournament.id}
+            matches={matches as any}
+            teams={teams as any}
+          />
+        )}
         {tab === "rules" && canManage && (
           <TournamentRulesEditor
             tournamentId={tournament.id}
