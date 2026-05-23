@@ -161,7 +161,8 @@ function HomePage() {
     },
   });
 
-  const isCoach = role === "admin" || role === "coach";
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isAdmin = roles.includes("admin");
 
   // Show skeleton on first paint while the primary queries hydrate.
   if (activeClubId && teamsLoading) {
