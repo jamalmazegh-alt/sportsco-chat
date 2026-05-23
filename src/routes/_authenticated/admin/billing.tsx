@@ -116,10 +116,12 @@ function BillingPage() {
     }
   }, [search.billing, search.card, t]);
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["club-subscription", activeClubId],
     enabled: !!activeClubId,
     queryFn: () => fetchSub({ data: { clubId: activeClubId! } }),
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
   });
 
   const sub = data?.subscription;
@@ -133,7 +135,7 @@ function BillingPage() {
 
   if (role !== "admin") return <Navigate to="/profile" replace />;
 
-  if (isLoading || !activeClubId) {
+  if (isLoading || isFetching || !activeClubId || (!!activeClubId && data === undefined)) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -376,6 +378,18 @@ function BillingPage() {
                     href={inv.invoice_pdf}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const w = window.open(inv.invoice_pdf!, "_blank", "noopener,noreferrer");
+                      if (!w) {
+                        // Popup blocked — fall back to top-level navigation in a new tab
+                        const a = document.createElement("a");
+                        a.href = inv.invoice_pdf!;
+                        a.target = "_blank";
+                        a.rel = "noopener noreferrer";
+                        a.click();
+                      }
+                    }}
                     className="text-sm text-primary hover:underline inline-flex items-center gap-1 shrink-0"
                   >
                     PDF <ExternalLink className="h-3 w-3" />
