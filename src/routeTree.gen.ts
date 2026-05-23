@@ -85,6 +85,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
+import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
 import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
@@ -490,6 +491,12 @@ const ApiPublicHooksDataRetentionRoute =
     path: '/api/public/hooks/data-retention',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCoachInsightsRoute =
+  ApiPublicHooksCoachInsightsRouteImport.update({
+    id: '/api/public/hooks/coach-insights',
+    path: '/api/public/hooks/coach-insights',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedPlayersPlayerIdFeedbackRoute =
   AuthenticatedPlayersPlayerIdFeedbackRouteImport.update({
     id: '/feedback',
@@ -587,6 +594,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
@@ -664,6 +672,7 @@ export interface FileRoutesByTo {
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
@@ -747,6 +756,7 @@ export interface FileRoutesById {
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
@@ -830,6 +840,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
     | '/players/$playerId/feedback'
+    | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
@@ -907,6 +918,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
     | '/players/$playerId/feedback'
+    | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
@@ -989,6 +1001,7 @@ export interface FileRouteTypes {
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
     | '/_authenticated/players/$playerId/feedback'
+    | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
@@ -1031,6 +1044,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRoute
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
+  ApiPublicHooksCoachInsightsRoute: typeof ApiPublicHooksCoachInsightsRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
@@ -1575,6 +1589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDataRetentionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/coach-insights': {
+      id: '/api/public/hooks/coach-insights'
+      path: '/api/public/hooks/coach-insights'
+      fullPath: '/api/public/hooks/coach-insights'
+      preLoaderRoute: typeof ApiPublicHooksCoachInsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/players/$playerId/feedback': {
       id: '/_authenticated/players/$playerId/feedback'
       path: '/feedback'
@@ -1857,6 +1878,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   TournamentSlugRegisterRoute: TournamentSlugRegisterRoute,
   TournamentSlugTvRoute: TournamentSlugTvRoute,
+  ApiPublicHooksCoachInsightsRoute: ApiPublicHooksCoachInsightsRoute,
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,

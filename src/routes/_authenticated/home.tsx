@@ -15,6 +15,7 @@ import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
 import { HomeSkeleton } from "@/components/skeletons";
+import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -197,6 +198,9 @@ function HomePage() {
           </h1>
         </div>
       </header>
+
+      {/* Insights (admins/coaches) */}
+      {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
 
       {/* Onboarding checklist (admins) */}
       {isAdmin && activeClubId && (
