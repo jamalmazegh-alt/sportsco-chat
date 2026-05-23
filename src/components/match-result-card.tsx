@@ -580,6 +580,24 @@ export function MatchResultCard({
   );
 }
 
+function FootballBall({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6.5l3 2v4l-3 2-3-2v-4z" />
+      <path d="M9 8.5l-3-2M15 8.5l3-2M9 14.5l-3 2M15 14.5l3 2" />
+    </svg>
+  );
+}
+
 function KindIcon({ kind }: { kind: StatKind }) {
   if (kind === "yellow_card")
     return <Square className="h-3.5 w-3.5 fill-yellow-400 text-yellow-500 shrink-0" />;
@@ -589,6 +607,8 @@ function KindIcon({ kind }: { kind: StatKind }) {
     return <Square className="h-3.5 w-3.5 fill-white text-muted-foreground shrink-0" />;
   if (kind === "foul" || kind === "penalty" || kind === "own_goal")
     return <AlertTriangle className="h-3.5 w-3.5 text-orange-500 shrink-0" />;
+  if (kind === "goal")
+    return <FootballBall className="h-3.5 w-3.5 text-primary shrink-0" />;
   return <Trophy className="h-3.5 w-3.5 text-primary shrink-0" />;
 }
 
