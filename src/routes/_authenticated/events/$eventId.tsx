@@ -53,7 +53,7 @@ const ATTENDANCE_ACTIONS: Array<{
   Icon: typeof CheckCircle2;
   className: string;
 }> = [
-  { status: "present", Icon: CheckCircle2, className: "text-present hover:bg-present/15 hover:text-present" },
+  { status: "present", Icon: CheckCircle2, className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700" },
   { status: "absent", Icon: XCircle, className: "text-absent hover:bg-absent/10 hover:text-absent" },
   { status: "uncertain", Icon: HelpCircle, className: "text-uncertain-foreground hover:bg-uncertain/20 hover:text-uncertain-foreground" },
   { status: "pending", Icon: CircleDot, className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground" },
