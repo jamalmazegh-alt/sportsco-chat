@@ -749,6 +749,8 @@ function TeamDetail() {
         <ul className="space-y-2">
           {players.map((p: any) => {
             const canInvite = !p.user_id && (p.email || p.phone);
+            const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
+            const linked = !!p.user_id;
             const checked = selectedIds.has(p.id);
             const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
             const inner = (
@@ -765,7 +767,11 @@ function TeamDetail() {
                     <span
                       className={cn(
                         "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
-                        p.user_id ? "bg-present" : "bg-muted-foreground/40",
+                        linked
+                          ? "bg-emerald-500"
+                          : hasPendingInvite
+                            ? "bg-amber-400"
+                            : "bg-muted-foreground/40",
                       )}
                     />
                   )}
@@ -777,8 +783,29 @@ function TeamDetail() {
                       <span className="text-muted-foreground font-normal"> · #{p.jersey_number}</span>
                     ) : null}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {p.preferred_position ?? (isCoach ? (p.user_id ? t("players.accountActive") : t("players.accountInactive")) : "")}
+                  <p className="text-xs mt-0.5 truncate">
+                    {linked ? (
+                      <span className="text-muted-foreground">
+                        {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
+                      </span>
+                    ) : isCoach ? (
+                      hasPendingInvite ? (
+                        <span className="inline-flex items-center gap-1 text-amber-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
+                        </span>
+                      ) : canInvite ? (
+                        <span className="text-muted-foreground">
+                          {t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {p.preferred_position ?? t("players.accountInactive")}
+                        </span>
+                      )
+                    ) : (
+                      <span className="text-muted-foreground">{p.preferred_position ?? ""}</span>
+                    )}
                   </p>
                 </div>
               </>
@@ -803,14 +830,17 @@ function TeamDetail() {
                       </Link>
                       {isCoach && canInvite && (
                         <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 shrink-0"
-                          title={t("players.invite")}
+                          size="sm"
+                          variant={hasPendingInvite ? "outline" : "default"}
+                          className="h-8 px-3 shrink-0 text-xs"
+                          title={hasPendingInvite ? t("players.resendAction") : t("players.inviteSentAction")}
                           disabled={inviting}
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); inviteOne(p.id); }}
                         >
-                          <Send className="h-4 w-4 text-primary" />
+                          <Send className="h-3.5 w-3.5" />
+                          {hasPendingInvite
+                            ? t("players.resendAction", { defaultValue: "Renvoyer" })
+                            : t("players.inviteSentAction", { defaultValue: "Inviter" })}
                         </Button>
                       )}
                       <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
