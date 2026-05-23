@@ -22,7 +22,8 @@ export function ClubThemeProvider({ children }: { children: React.ReactNode }) {
   const { activeClubId } = useAuth();
 
   // Apply stored theme ASAP (covers login page + first paint).
-  useEffect(() => {
+  // Apply stored theme synchronously before first paint (covers login + first paint, no flash).
+  useIsoLayoutEffect(() => {
     applyClubTheme(readStoredTheme());
   }, []);
 
