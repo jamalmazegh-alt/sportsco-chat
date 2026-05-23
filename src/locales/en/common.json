@@ -501,8 +501,12 @@
       "all": "All",
       "training": "Trainings",
       "match": "Matches"
-    }
+    },
+    "showRecordDetail": "Show details",
+    "hideRecordDetail": "Hide details",
+    "summaryAria": "Season summary"
   },
+
   "match": {
     "result": "Match result",
     "enterScore": "Enter score",
