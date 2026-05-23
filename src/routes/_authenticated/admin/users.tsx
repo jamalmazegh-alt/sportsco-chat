@@ -217,13 +217,48 @@ function AdminUsersPage() {
       </header>
       <p className="text-xs text-muted-foreground">{t("admin.usersSubtitle")}</p>
 
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t("admin.searchUsersPlaceholder", { defaultValue: "Rechercher par nom ou email…" })}
+          className="pl-9 pr-9 h-10"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-muted text-muted-foreground"
+            aria-label={t("common.clear", { defaultValue: "Effacer" })}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+
       {isLoading ? (
         <div className="flex justify-center py-10">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
       ) : (() => {
         const STAFF_ROLES = new Set(["admin", "coach", "assistant_coach", "staff", "tournament_manager"]);
-        const allUsers = (data ?? []) as any[];
+        const q = search.trim().toLowerCase();
+        const allUsersRaw = (data ?? []) as any[];
+        const allUsers = q
+          ? allUsersRaw.filter((u) => {
+              const fn = u.profile?.first_name ?? "";
+              const ln = u.profile?.last_name ?? "";
+              const full = u.profile?.full_name ?? `${fn} ${ln}`;
+              const em = u.email ?? "";
+              return (
+                full.toLowerCase().includes(q) ||
+                fn.toLowerCase().includes(q) ||
+                ln.toLowerCase().includes(q) ||
+                em.toLowerCase().includes(q)
+              );
+            })
+          : allUsersRaw;
         const staff = allUsers.filter((u) => (u.roles ?? []).some((r: string) => STAFF_ROLES.has(r)));
         const playersParents = allUsers.filter(
           (u) =>
