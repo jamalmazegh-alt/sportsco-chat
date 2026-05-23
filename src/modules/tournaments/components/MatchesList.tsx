@@ -16,7 +16,6 @@ import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
   Loader2,
