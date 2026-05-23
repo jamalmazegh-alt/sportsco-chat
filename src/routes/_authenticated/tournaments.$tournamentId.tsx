@@ -34,13 +34,14 @@ import { TournamentRulesEditor } from "@/modules/tournaments/components/Tourname
 import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
 import { RegistrationsManager } from "@/modules/tournaments/components/RegistrationsManager";
 import { CollaboratorsManager } from "@/modules/tournaments/components/CollaboratorsManager";
-import { ClipboardList, UserPlus } from "lucide-react";
+import { MembersManager } from "@/modules/tournaments/components/MembersManager";
+import { ClipboardList, UserPlus, UserCog } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
 
 function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
@@ -103,6 +104,7 @@ function TournamentDetailPage() {
       ? [
           { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
           { id: "team_staff" as const, icon: UserPlus, label: "Équipe" },
+          { id: "members" as const, icon: UserCog, label: "Membres" },
           { id: "rules" as const, icon: Settings2, label: "Règles" },
         ]
       : []),
@@ -255,6 +257,13 @@ function TournamentDetailPage() {
         )}
         {tab === "team_staff" && canManage && (
           <CollaboratorsManager tournamentId={tournament.id} />
+        )}
+        {tab === "members" && canManage && (
+          <MembersManager
+            tournamentId={tournament.id}
+            matches={matches as any}
+            teams={teams as any}
+          />
         )}
         {tab === "rules" && canManage && (
           <TournamentRulesEditor

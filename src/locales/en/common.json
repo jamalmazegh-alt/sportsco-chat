@@ -8,7 +8,12 @@
     "coach": "Coach",
     "player": "Player",
     "parent": "Parent",
-    "dirigeant": "Director"
+    "dirigeant": "Director",
+    "assistant_coach": "Assistant coach",
+    "staff": "Staff",
+    "tournament_manager": "Tournament manager",
+    "tournament_admin": "Tournament admin",
+    "referee": "Referee"
   },
   "nav": {
     "home": "Home",
@@ -883,5 +888,26 @@
       "title": "Create the call-up from this lineup"
     },
     "noPlayersForConvoc": "Add players to the lineup first."
+  },
+  "permissions": {
+    "clubRoles": "Club roles",
+    "clubRolesHint": "A user can hold multiple roles.",
+    "atLeastOneRole": "At least one role is required"
+  },
+  "tournamentMembers": {
+    "title": "Tournament members",
+    "invite": "Invite",
+    "inviteTitle": "Invite a member",
+    "role": "Role",
+    "sendInvite": "Send invitation",
+    "invited": "Invitation created",
+    "added": "Member added",
+    "removed": "Member removed",
+    "confirmRemove": "Remove this member?",
+    "empty": "No members yet.",
+    "pending": "Pending",
+    "assignMatches": "Assign to matches",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied"
   }
 }

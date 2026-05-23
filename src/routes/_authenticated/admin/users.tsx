@@ -39,15 +39,32 @@ function AdminUsersPage() {
   });
 
 
+  const CLUB_ROLE_KEYS = [
+    "admin",
+    "coach",
+    "assistant_coach",
+    "staff",
+    "tournament_manager",
+  ] as const;
+  type ClubRoleKey = (typeof CLUB_ROLE_KEYS)[number];
+
   const [open, setOpen] = useState(false);
-  const [inviteRole, setInviteRole] = useState<"admin" | "coach">("coach");
+  const [inviteRoles, setInviteRoles] = useState<ClubRoleKey[]>(["coach"]);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
   function reset() {
-    setInviteRole("coach"); setFirst(""); setLast(""); setEmail("");
+    setInviteRoles(["coach"]); setFirst(""); setLast(""); setEmail("");
+  }
+
+  function toggleInviteRole(r: ClubRoleKey, checked: boolean) {
+    setInviteRoles((prev) => {
+      if (checked) return Array.from(new Set([...prev, r]));
+      const next = prev.filter((x) => x !== r);
+      return next.length === 0 ? prev : next;
+    });
   }
 
   async function onInvite(e: FormEvent) {
@@ -66,9 +83,14 @@ function AdminUsersPage() {
     } catch { /* non-blocking */ }
 
     const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
+    const primaryRole: string = inviteRoles.includes("admin")
+      ? "admin"
+      : inviteRoles.includes("coach")
+        ? "coach"
+        : "dirigeant";
     const { error: invErr } = await supabase.from("member_invites").insert({
       club_id: activeClubId,
-      role: inviteRole,
+      role: primaryRole as any,
       email,
       token,
       created_by: user.id,
@@ -87,9 +109,9 @@ function AdminUsersPage() {
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
 
-    const roleLabel = inviteRole === "admin"
-      ? t("roles.admin", { defaultValue: "Administrateur" })
-      : t("roles.coach", { defaultValue: "Coach" });
+    const roleLabel = inviteRoles
+      .map((r) => t(`roles.${r}`, { defaultValue: r }))
+      .join(", ");
 
     try {
       await sendTransactionalEmail({
@@ -141,18 +163,26 @@ function AdminUsersPage() {
         >
           <form onSubmit={onInvite} className="space-y-4 mt-4 pb-6">
             <div className="space-y-1.5">
-              <Label>{t("admin.inviteRole", { defaultValue: "Rôle" })}</Label>
-              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as any)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">
-                    {t("roles.admin")} — {t("admin.roleAdminHint", { defaultValue: "accès complet au club" })}
-                  </SelectItem>
-                  <SelectItem value="coach">
-                    {t("roles.coach")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>{t("admin.inviteRole", { defaultValue: "Rôles" })}</Label>
+              <p className="text-[11px] text-muted-foreground">
+                {t("permissions.clubRolesHint", { defaultValue: "Un utilisateur peut cumuler plusieurs rôles." })}
+              </p>
+              <div className="space-y-1">
+                {CLUB_ROLE_KEYS.map((r) => (
+                  <label
+                    key={r}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 cursor-pointer border border-border/40"
+                  >
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 accent-primary"
+                      checked={inviteRoles.includes(r)}
+                      onChange={(e) => toggleInviteRole(r, e.target.checked)}
+                    />
+                    <span className="text-sm">{t(`roles.${r}`, { defaultValue: r })}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

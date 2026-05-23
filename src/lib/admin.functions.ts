@@ -30,7 +30,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
     // Fetch all members of the club
     const { data: members, error } = await supabaseAdmin
       .from("club_members")
-      .select("user_id, role, created_at")
+      .select("user_id, role, roles, created_at")
       .eq("club_id", data.club_id);
     if (error) throw error;
 
@@ -43,8 +43,6 @@ export const listClubUsers = createServerFn({ method: "POST" })
       .in("id", ids);
     const profById = new Map((profiles ?? []).map((p: any) => [p.id, p]));
 
-    // Fetch emails directly from auth.users (scoped to club members only — O(N_club),
-    // not O(N_platform)). Uses service role to bypass RLS on auth schema.
     const emailById = new Map<string, string | null>();
     const { data: authRows } = await (supabaseAdmin as any)
       .schema("auth")
@@ -58,6 +56,10 @@ export const listClubUsers = createServerFn({ method: "POST" })
       { user_id: string; roles: string[]; profile: any; email: string | null }
     >();
     for (const m of members ?? []) {
+      const rolesArr: string[] =
+        Array.isArray((m as any).roles) && (m as any).roles.length > 0
+          ? (m as any).roles
+          : [m.role];
       const g =
         grouped.get(m.user_id) ?? {
           user_id: m.user_id,
@@ -65,7 +67,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
           profile: profById.get(m.user_id) ?? null,
           email: emailById.get(m.user_id) ?? null,
         };
-      if (!g.roles.includes(m.role)) g.roles.push(m.role);
+      for (const r of rolesArr) if (!g.roles.includes(r)) g.roles.push(r);
       grouped.set(m.user_id, g);
     }
 
@@ -121,7 +123,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
           .maybeSingle(),
         supabaseAdmin
           .from("club_members")
-          .select("club_id, role, created_at, clubs:club_id(name)")
+          .select("club_id, role, roles, created_at, clubs:club_id(name)")
           .eq("user_id", data.user_id),
         supabaseAdmin
           .from("players")
