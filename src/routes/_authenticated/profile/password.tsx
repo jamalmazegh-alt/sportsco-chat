@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ChevronLeft, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 
 export const Route = createFileRoute("/_authenticated/profile/password")({
   component: PasswordPage,
