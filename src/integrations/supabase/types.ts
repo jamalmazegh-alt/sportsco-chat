@@ -119,6 +119,7 @@ export type Database = {
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          roles: string[]
           user_id: string
         }
         Insert: {
@@ -126,6 +127,7 @@ export type Database = {
           created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
+          roles?: string[]
           user_id: string
         }
         Update: {
@@ -133,6 +135,7 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          roles?: string[]
           user_id?: string
         }
         Relationships: [
@@ -749,6 +752,48 @@ export type Database = {
           title?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      permission_changes_log: {
+        Row: {
+          action: string | null
+          actor_id: string | null
+          changed_at: string
+          id: string
+          new_roles: string[] | null
+          note: string | null
+          old_roles: string[] | null
+          scope: string
+          scope_id: string
+          target_email: string | null
+          target_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          actor_id?: string | null
+          changed_at?: string
+          id?: string
+          new_roles?: string[] | null
+          note?: string | null
+          old_roles?: string[] | null
+          scope: string
+          scope_id: string
+          target_email?: string | null
+          target_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          actor_id?: string | null
+          changed_at?: string
+          id?: string
+          new_roles?: string[] | null
+          note?: string | null
+          old_roles?: string[] | null
+          scope?: string
+          scope_id?: string
+          target_email?: string | null
+          target_id?: string | null
         }
         Relationships: []
       }
@@ -1765,6 +1810,65 @@ export type Database = {
           },
         ]
       }
+      tournament_members: {
+        Row: {
+          assigned_match_ids: string[]
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          invite_token: string
+          invited_at: string
+          invited_by: string | null
+          joined_at: string | null
+          last_name: string
+          role: string
+          tournament_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_match_ids?: string[]
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          invite_token?: string
+          invited_at?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          last_name: string
+          role: string
+          tournament_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_match_ids?: string[]
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          invite_token?: string
+          invited_at?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          last_name?: string
+          role?: string
+          tournament_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_members_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_passes: {
         Row: {
           amount_total: number | null
@@ -2309,6 +2413,10 @@ export type Database = {
     }
     Functions: {
       accept_tournament_invite: { Args: { _token: string }; Returns: Json }
+      accept_tournament_member_invite: {
+        Args: { _token: string; _user_id: string }
+        Returns: string
+      }
       can_access_event_chat: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean
@@ -2318,6 +2426,10 @@ export type Database = {
         Returns: boolean
       }
       can_manage_tournament: {
+        Args: { _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_manage_tournament_members: {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
@@ -2416,12 +2528,30 @@ export type Database = {
         Args: { _token: string }
         Returns: Json
       }
+      get_tournament_member_by_token: {
+        Args: { _token: string }
+        Returns: {
+          email: string
+          first_name: string
+          id: string
+          joined_at: string
+          last_name: string
+          role: string
+          tournament_id: string
+          tournament_name: string
+          tournament_slug: string
+        }[]
+      }
       has_club_role: {
         Args: {
           _club_id: string
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_club_role_text: {
+        Args: { _club_id: string; _role: string; _user_id: string }
         Returns: boolean
       }
       has_super_admin: { Args: { _user_id: string }; Returns: boolean }
@@ -2449,12 +2579,20 @@ export type Database = {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
+      is_tournament_member: {
+        Args: { _role?: string; _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_tournament_owner: {
         Args: { _tournament_id: string; _user_id: string }
         Returns: boolean
       }
       is_tournament_referee: {
         Args: { _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_tournament_referee_for_match: {
+        Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
       log_superadmin_action: {
