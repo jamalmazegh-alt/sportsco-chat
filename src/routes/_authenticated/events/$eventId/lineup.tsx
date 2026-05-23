@@ -342,9 +342,8 @@ function LineupPage() {
   if (ctx.event.type !== "match" || !_isFootball) {
     return (
       <div className="p-6 space-y-4">
-        <Link to="/events/$eventId" params={{ eventId }} className="inline-flex items-center gap-1 text-sm text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" /> {t("common.back", "Retour")}
-        </Link>
+        <BackLink to="/events/$eventId" params={{ eventId } as never} />
+
         <p className="text-sm text-muted-foreground">
           {t("lineup.unavailable", "La composition est disponible uniquement pour les matchs de football.")}
         </p>
