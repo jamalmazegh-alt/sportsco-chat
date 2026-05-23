@@ -123,7 +123,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
           .maybeSingle(),
         supabaseAdmin
           .from("club_members")
-          .select("club_id, role, created_at, clubs:club_id(name)")
+          .select("club_id, role, roles, created_at, clubs:club_id(name)")
           .eq("user_id", data.user_id),
         supabaseAdmin
           .from("players")
