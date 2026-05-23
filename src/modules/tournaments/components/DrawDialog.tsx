@@ -646,29 +646,22 @@ export function DrawDialog({
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("draw.overwriteTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {tournamentStarted ? t("draw.overwriteDescStarted") : t("draw.overwriteDesc")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("draw.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                const action = pendingAction;
-                setConfirmOpen(false);
-                setPendingAction(null);
-                if (action) action();
-              }}
-            >
-              {t("draw.confirmRelaunch")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DestructiveConfirmSheet
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        mode="delay"
+        delaySeconds={3}
+        title={t("draw.overwriteTitle")}
+        description={tournamentStarted ? t("draw.overwriteDescStarted") : t("draw.overwriteDesc")}
+        cancelLabel={t("draw.cancel")}
+        confirmLabel={t("draw.confirmRelaunch")}
+        onConfirm={() => {
+          const action = pendingAction;
+          setConfirmOpen(false);
+          setPendingAction(null);
+          if (action) action();
+        }}
+      />
 
     </>
   );
