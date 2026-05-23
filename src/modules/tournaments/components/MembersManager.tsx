@@ -295,6 +295,25 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           })}
         </ul>
       )}
+
+      <AlertDialog open={!!removeId} onOpenChange={(o) => { if (!o) setRemoveId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("tournamentMembers.confirmRemoveTitle", { defaultValue: "Retirer ce membre ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("tournamentMembers.confirmRemoveDesc", { defaultValue: "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard." })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {t("tournamentMembers.confirmRemoveAction", { defaultValue: "Retirer" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
