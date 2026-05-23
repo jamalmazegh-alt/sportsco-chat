@@ -110,7 +110,8 @@
     "skip": "Skip",
     "done": "Done",
     "continue": "Continue",
-    "exportCsv": "Export CSV"
+    "exportCsv": "Export CSV",
+    "undo": "Undo"
   },
   "privacy": {
     "title": "Privacy & data",
@@ -341,7 +342,14 @@
     "childAccessHint": "By default, children do not receive any account or notifications. Toggle this on if you (the parent) want your child to have their own platform access.",
     "minorParentNotice": "This player is a minor — a parent is required and will receive the invitation. The child does not receive an account by default.",
     "autoInviteSent": "Invitation sent automatically.",
-    "autoInviteParentSent": "Invitation sent to the parent."
+    "autoInviteParentSent": "Invitation sent to the parent.",
+    "tabProfile": "Profile",
+    "tabFeedback": "Coach feedback",
+    "photoBlockedMinor": "Parental media consent is required before uploading a photo of a minor.",
+    "photoTooLarge": "Photo too large (max 5 MB).",
+    "photoInvalidType": "Unsupported file format.",
+    "photoConsentRequired": "Minor player: parental media consent is required before any upload. Current status: ",
+    "childAccessNeedsEmail": "Add an email to the child first to enable access."
   },
   "events": {
     "whatsappShare": {
@@ -559,7 +567,9 @@
     "confirmSend": "Confirm send",
     "recipients": "Recipients",
     "reviewBeforeSend": "Review before sending",
-    "reviewBeforeSendHint": "Check the recipients and details — sending is final."
+    "reviewBeforeSendHint": "Check the recipients and details — sending is final.",
+    "cooldownHint": "{{m}} min before you can remind again",
+    "remindIn": "Remind in {{m}} min"
   },
   "stats": {
     "title": "Stats",
@@ -1079,6 +1089,10 @@
     "feedback": {
       "title": "Coach feedback — Clubero",
       "description": "Coach feedback notes."
+    },
+    "player": {
+      "title": "Player — Clubero",
+      "description": "Player profile, attendance and coach feedback."
     }
   },
   "trial": {
