@@ -6,12 +6,15 @@ import { Switch } from "@/components/ui/switch";
 export function SettingsSubHeader({ title, description }: { title: string; description?: string }) {
   const { t } = useTranslation();
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <Link
         to="/admin"
-        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        aria-label={t("admin.back", { defaultValue: "Retour aux paramètres" })}
+        className="group inline-flex items-center gap-2 rounded-full border border-border bg-card pl-1.5 pr-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-sm hover:text-foreground hover:bg-muted/60 hover:border-foreground/20 active:scale-[0.97] transition-all"
       >
-        <ChevronLeft className="h-3.5 w-3.5" />
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </span>
         {t("admin.back", { defaultValue: "Retour aux paramètres" })}
       </Link>
       <div>
