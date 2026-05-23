@@ -1089,6 +1089,10 @@
     "feedback": {
       "title": "Retours coach — Clubero",
       "description": "Feedback des coachs."
+    },
+    "player": {
+      "title": "Joueur — Clubero",
+      "description": "Profil joueur, présences et retours coach."
     }
   },
   "trial": {

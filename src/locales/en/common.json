@@ -1089,6 +1089,10 @@
     "feedback": {
       "title": "Coach feedback — Clubero",
       "description": "Coach feedback notes."
+    },
+    "player": {
+      "title": "Player — Clubero",
+      "description": "Player profile, attendance and coach feedback."
     }
   },
   "trial": {
