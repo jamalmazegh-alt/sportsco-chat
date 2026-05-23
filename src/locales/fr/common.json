@@ -100,7 +100,13 @@
     "saved": "Enregistré",
     "errorTitle": "Une erreur est survenue",
     "errorSubtitle": "Quelque chose s'est mal passé. Vous pouvez réessayer ou revenir à l'accueil.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "error": "Une erreur est survenue",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "skip": "Passer",
+    "done": "Terminé"
   },
   "privacy": {
     "title": "Confidentialité & données",
@@ -144,7 +150,57 @@
     "clubName": "Nom du club",
     "createClub": "Créer le club",
     "joinHint": "Déjà membre ? Demandez à votre admin de vous inviter.",
-    "joinClub": "Rejoindre avec un code"
+    "joinClub": "Rejoindre avec un code",
+    "steps": {
+      "logo": {
+        "label": "Ajouter le logo du club",
+        "hint": "Personnalise l'app pour vos joueurs et parents."
+      },
+      "team": {
+        "label": "Créer votre première équipe",
+        "hint": "U13, Seniors, Loisirs… donnez-lui un nom et une catégorie."
+      },
+      "players": {
+        "label": "Ajouter vos joueurs",
+        "hint": "Saisissez l'effectif d'au moins une équipe."
+      },
+      "invites": {
+        "label": "Inviter parents et coachs",
+        "hint": "Ils répondent aux convocations en un tap."
+      },
+      "event": {
+        "label": "Publier votre premier événement",
+        "hint": "Entraînement ou match — testez le flux complet."
+      }
+    },
+    "cta": {
+      "upload": "Ajouter",
+      "create": "Créer",
+      "add": "Ajouter",
+      "invite": "Inviter",
+      "publish": "Publier"
+    },
+    "wizard": {
+      "welcomeTitle": "Bienvenue sur Clubero 🎉",
+      "welcomeBody": "Votre essai gratuit de 30 jours est déjà actif. Suivons ensemble les 4 étapes pour préparer votre club.",
+      "welcomeCta": "Commencer",
+      "teamTitle": "Créer votre première équipe",
+      "teamBody": "U13, Seniors, Loisirs… donnez-lui un nom, une catégorie et une saison.",
+      "teamCtaCreate": "Créer une équipe",
+      "teamCtaView": "Voir les équipes",
+      "playersTitle": "Ajouter vos joueurs",
+      "playersBody": "Saisissez l'effectif d'au moins une équipe. Vous pourrez inviter parents et coachs ensuite.",
+      "playersCtaAdd": "Ajouter des joueurs",
+      "playersCtaManage": "Gérer les joueurs",
+      "eventTitle": "Publier votre premier événement",
+      "eventBody": "Entraînement, match ou réunion : créez-le, convoquez vos joueurs et testez tout le flux.",
+      "eventCtaCreate": "Créer un événement",
+      "eventCtaView": "Voir les événements",
+      "doneTitle": "Vous êtes prêt !",
+      "doneBody": "Retrouvez ces étapes à tout moment sur votre page d'accueil. Bonne saison avec Clubero !",
+      "doneCta": "Terminer",
+      "alreadyDone": "Déjà fait"
+    }
   },
   "invites": {
     "title": "Inviter joueurs & parents",
@@ -506,7 +562,6 @@
     "hideRecordDetail": "Masquer le détail",
     "summaryAria": "Résumé de saison"
   },
-
   "match": {
     "result": "Résultat du match",
     "enterScore": "Saisir le score",
@@ -970,6 +1025,37 @@
     "dismissConfirmTitle": "Ignorer cet insight ?",
     "dismissConfirmDescription": "Il ne réapparaîtra plus pour vous. Cette action ne peut pas être annulée.",
     "dismissConfirmAction": "Ignorer"
+  },
+  "meta": {
+    "login": {
+      "title": "Connexion — Clubero",
+      "description": "Connectez-vous pour gérer votre équipe et vos événements."
+    },
+    "forgot": {
+      "title": "Mot de passe oublié — Clubero",
+      "description": "Réinitialisez votre mot de passe Clubero."
+    },
+    "reset": {
+      "title": "Nouveau mot de passe — Clubero",
+      "description": "Choisissez un nouveau mot de passe."
+    }
+  },
+  "respond": {
+    "eyebrow": "Convocation",
+    "invalidLink": "Lien invalide ou expiré.",
+    "invalidTitle": "Lien invalide",
+    "invalidBody": "Cette convocation est introuvable. Demandez un nouveau lien à votre coach.",
+    "backHome": "Retour à l'accueil",
+    "forPlayer": "Pour",
+    "thePlayer": "le joueur",
+    "savedTitle": "Réponse enregistrée :",
+    "editYourReply": "Modifier votre réponse",
+    "yourReply": "Votre réponse",
+    "openApp": "Ouvrir dans Clubero",
+    "footer": "Vous recevez ce lien parce qu'une convocation vous a été envoyée. Vous pouvez modifier votre réponse à tout moment depuis ce même lien.",
+    "submitError": "Échec de l'enregistrement",
+    "present": "Présent",
+    "absent": "Absent",
+    "uncertain": "Incertain"
   }
 }
-

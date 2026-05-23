@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   CheckCircle2,
@@ -35,6 +36,7 @@ type Step = {
 };
 
 export function OnboardingWizard() {
+  const { t } = useTranslation();
   const { user, memberships, activeClubId } = useAuth();
   const isAdmin = !!memberships.find(
     (m) => m.club_id === activeClubId && m.role === "admin",
@@ -97,46 +99,46 @@ export function OnboardingWizard() {
       {
         id: "welcome",
         icon: Sparkles,
-        title: "Bienvenue sur Clubero 🎉",
-        body: "Votre essai gratuit de 30 jours est déjà actif. Suivons ensemble les 4 étapes pour préparer votre club.",
-        cta: "Commencer",
+        title: t("onboarding.wizard.welcomeTitle"),
+        body: t("onboarding.wizard.welcomeBody"),
+        cta: t("onboarding.wizard.welcomeCta"),
       },
       {
         id: "team",
         icon: Users,
-        title: "Créer votre première équipe",
-        body: "U13, Seniors, Loisirs… donnez-lui un nom, une catégorie et une saison.",
-        cta: c.teams > 0 ? "Voir les équipes" : "Créer une équipe",
+        title: t("onboarding.wizard.teamTitle"),
+        body: t("onboarding.wizard.teamBody"),
+        cta: c.teams > 0 ? t("onboarding.wizard.teamCtaView") : t("onboarding.wizard.teamCtaCreate"),
         to: "/teams",
         done: c.teams > 0,
       },
       {
         id: "players",
         icon: UserPlus,
-        title: "Ajouter vos joueurs",
-        body: "Saisissez l'effectif d'au moins une équipe. Vous pourrez inviter parents et coachs ensuite.",
-        cta: c.players > 0 ? "Gérer les joueurs" : "Ajouter des joueurs",
+        title: t("onboarding.wizard.playersTitle"),
+        body: t("onboarding.wizard.playersBody"),
+        cta: c.players > 0 ? t("onboarding.wizard.playersCtaManage") : t("onboarding.wizard.playersCtaAdd"),
         to: "/teams",
         done: c.players > 0,
       },
       {
         id: "event",
         icon: CalendarPlus,
-        title: "Publier votre premier événement",
-        body: "Entraînement, match ou réunion : créez-le, convoquez vos joueurs et testez tout le flux.",
-        cta: c.events > 0 ? "Voir les événements" : "Créer un événement",
+        title: t("onboarding.wizard.eventTitle"),
+        body: t("onboarding.wizard.eventBody"),
+        cta: c.events > 0 ? t("onboarding.wizard.eventCtaView") : t("onboarding.wizard.eventCtaCreate"),
         to: "/events",
         done: c.events > 0,
       },
       {
         id: "done",
         icon: PartyPopper,
-        title: "Vous êtes prêt !",
-        body: "Retrouvez ces étapes à tout moment sur votre page d'accueil. Bonne saison avec Clubero !",
-        cta: "Terminer",
+        title: t("onboarding.wizard.doneTitle"),
+        body: t("onboarding.wizard.doneBody"),
+        cta: t("onboarding.wizard.doneCta"),
       },
     ];
-  }, [counts]);
+  }, [counts, t]);
 
   function close() {
     if (user?.id && activeClubId) {
@@ -182,7 +184,7 @@ export function OnboardingWizard() {
 
         {current.done && !isFirst && !isLast && (
           <p className="flex items-center justify-center gap-1.5 text-xs text-primary">
-            <CheckCircle2 className="h-3.5 w-3.5" /> Déjà fait
+            <CheckCircle2 className="h-3.5 w-3.5" /> {t("onboarding.wizard.alreadyDone")}
           </p>
         )}
 
@@ -209,7 +211,7 @@ export function OnboardingWizard() {
               disabled={isFirst}
               className="text-muted-foreground hover:text-foreground disabled:opacity-30"
             >
-              Précédent
+              {t("common.previous")}
             </button>
             {!isLast && current.to && (
               <button
@@ -217,7 +219,7 @@ export function OnboardingWizard() {
                 onClick={() => setStep(step + 1)}
                 className="text-muted-foreground hover:text-foreground"
               >
-                Passer
+                {t("common.skip")}
               </button>
             )}
             <button
@@ -225,7 +227,7 @@ export function OnboardingWizard() {
               onClick={close}
               className="text-muted-foreground hover:text-foreground"
             >
-              Fermer
+              {t("common.close")}
             </button>
           </div>
         </div>
