@@ -108,7 +108,9 @@
     "next": "Next",
     "previous": "Previous",
     "skip": "Skip",
-    "done": "Done"
+    "done": "Done",
+    "continue": "Continue",
+    "exportCsv": "Export CSV"
   },
   "privacy": {
     "title": "Privacy & data",
@@ -471,7 +473,18 @@
       "meeting_point": "Meeting point",
       "competition_name": "Competition",
       "type": "Type"
-    }
+    },
+    "pastBadge": "Past",
+    "calendarHint": "Tap a day with a dot to see events.",
+    "noEventsThisDay": "No events that day.",
+    "duplicateExists": "An event already exists for this team at that date/time.",
+    "someDuplicatesSkipped": "{{count}} duplicate(s) skipped.",
+    "openConvocationAfterCreate": "Pick call-ups right after",
+    "openConvocationAfterCreateHint": "The call-up screen will open so you can select players.",
+    "viewCalendar": "Calendar",
+    "viewList": "List",
+    "emptyHintCoach": "Create your first training or match — players will be called up automatically.",
+    "emptyHintPlayer": "No events scheduled right now. You'll be notified as soon as a coach plans one."
   },
   "followUps": {
     "title": "Follow-ups",
@@ -542,7 +555,11 @@
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
-    "notSentYet": "Not sent yet"
+    "notSentYet": "Not sent yet",
+    "confirmSend": "Confirm send",
+    "recipients": "Recipients",
+    "reviewBeforeSend": "Review before sending",
+    "reviewBeforeSendHint": "Check the recipients and details — sending is final."
   },
   "stats": {
     "title": "Stats",
@@ -739,7 +756,8 @@
     "empty": "No messages yet.",
     "placeholder": "Type a message…",
     "disabled": "Chat is disabled for this event.",
-    "you": "You"
+    "you": "You",
+    "loadMore": "Load more"
   },
   "assistant": {
     "title": "Clubero Assistant",
