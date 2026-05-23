@@ -199,6 +199,75 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_insights: {
+        Row: {
+          action_payload: Json | null
+          action_type: string | null
+          club_id: string
+          created_at: string
+          dedup_key: string | null
+          dismissed_by: string[]
+          expires_at: string | null
+          id: string
+          insight_type: string
+          message_en: string
+          message_fr: string
+          payload: Json
+          priority: string
+          resolved_at: string | null
+          team_id: string | null
+        }
+        Insert: {
+          action_payload?: Json | null
+          action_type?: string | null
+          club_id: string
+          created_at?: string
+          dedup_key?: string | null
+          dismissed_by?: string[]
+          expires_at?: string | null
+          id?: string
+          insight_type: string
+          message_en: string
+          message_fr: string
+          payload?: Json
+          priority?: string
+          resolved_at?: string | null
+          team_id?: string | null
+        }
+        Update: {
+          action_payload?: Json | null
+          action_type?: string | null
+          club_id?: string
+          created_at?: string
+          dedup_key?: string | null
+          dismissed_by?: string[]
+          expires_at?: string | null
+          id?: string
+          insight_type?: string
+          message_en?: string
+          message_fr?: string
+          payload?: Json
+          priority?: string
+          resolved_at?: string | null
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_insights_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_insights_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consent_versions: {
         Row: {
           content_md: string
