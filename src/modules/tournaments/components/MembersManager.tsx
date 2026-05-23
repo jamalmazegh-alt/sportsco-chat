@@ -16,7 +16,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Loader2, UserPlus, Mail, Trash2, ShieldCheck, Whistle, Briefcase, Copy,
+  Loader2, UserPlus, Mail, Trash2, ShieldCheck, Gavel, Briefcase, Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 
