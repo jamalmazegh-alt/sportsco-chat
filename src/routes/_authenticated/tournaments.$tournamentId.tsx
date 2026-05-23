@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   Trophy,
   Loader2,
   Users,
@@ -17,6 +16,7 @@ import {
   GitBranch,
   MapPin,
 } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
