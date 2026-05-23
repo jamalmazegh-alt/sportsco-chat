@@ -48,4 +48,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'support-ticket-reply': supportTicketReplyTemplate,
   'tournament-pass-purchased': tournamentPassPurchasedTemplate,
   'tournament-invite': tournamentInviteTemplate,
+  'tournament-member-added': tournamentMemberAddedTemplate,
 }
