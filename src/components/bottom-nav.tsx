@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Calendar, Users, Megaphone, User, ShieldCheck, BarChart3, Trophy } from "lucide-react";
+import { Home, Calendar, Users, Megaphone, User, ShieldCheck, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
@@ -36,11 +36,7 @@ export function BottomNav() {
         { to: "/home", icon: Home, label: t("nav.home"), badge: 0 },
         { to: "/events", icon: Calendar, label: t("nav.events"), badge: 0 },
         { to: "/teams", icon: Users, label: t("nav.teams"), badge: 0 },
-        { to: "/stats", icon: BarChart3, label: t("nav.stats"), badge: 0 },
         { to: "/inbox", icon: Megaphone, label: t("nav.inbox"), badge: wallUnread },
-        ...(isAdmin
-          ? [{ to: "/admin", icon: ShieldCheck, label: t("nav.admin", { defaultValue: "Admin" }), badge: 0 }]
-          : []),
         { to: "/profile", icon: User, label: t("nav.profile"), badge: 0 },
       ];
 

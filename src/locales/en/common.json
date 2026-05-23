@@ -23,7 +23,10 @@
     "inbox": "Wall",
     "stats": "Stats",
     "profile": "Profile",
-    "admin": "Admin"
+    "admin": "Admin",
+    "manageClub": "Manage club",
+    "manageClubSubtitle": "Settings, members, subscription",
+    "viewStats": "View statistics"
   },
   "auth": {
     "login": "Log in",
@@ -252,6 +255,10 @@
     "respondBoth": "Both",
     "accountActive": "Account active",
     "accountInactive": "No account yet",
+    "inviteNotSent": "Invitation not sent",
+    "inviteSentLabel": "Invitation sent",
+    "inviteSentAction": "Invite",
+    "resendAction": "Resend",
     "noPlayers": "No players yet.",
     "profile": "Player profile",
     "details": "Details",

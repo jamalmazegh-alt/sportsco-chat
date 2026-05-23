@@ -131,6 +131,26 @@ function ProfilePage() {
         </div>
       </div>
 
+      {isAdmin && (
+        <Link
+          to="/admin"
+          className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 active:scale-[0.99] transition-all hover:border-primary/40 hover:shadow-sm"
+        >
+          <div className="h-11 w-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-foreground">
+              {t("nav.manageClub", { defaultValue: "Gérer le club" })}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {t("nav.manageClubSubtitle", { defaultValue: "Paramètres, membres, abonnement" })}
+            </p>
+          </div>
+          <ChevronRight className="h-4 w-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      )}
+
       {user?.email && (
         <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -270,7 +290,12 @@ function ProfilePage() {
               <SelectContent>
                 {memberships.map((m) => (
                   <SelectItem key={m.club_id} value={m.club_id}>
-                    {m.club.name} · {m.role}
+                    <span className="flex items-center gap-2">
+                      <span className="truncate max-w-[180px]">{m.club.name}</span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide capitalize">
+                        {t(`roles.${m.role}`, { defaultValue: m.role })}
+                      </span>
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
