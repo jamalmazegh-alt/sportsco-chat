@@ -311,6 +311,7 @@ function TeamDetail() {
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed) toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
     else toast.success(t("players.inviteSent"));
+    qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
   async function removeFromTeam(playerId: string, fullName: string) {
