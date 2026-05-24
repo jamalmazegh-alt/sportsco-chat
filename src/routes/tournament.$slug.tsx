@@ -865,12 +865,21 @@ function PublishedRegistrationView({
   const rules = mergeRules(tournament.settings);
   const accent = rules.branding.primaryColor;
 
+  const parseLocalish = (s: string | null | undefined): number | null => {
+    if (!s) return null;
+    // datetime-local inputs ("2026-05-25T00:11") have no TZ. The API treats
+    // them as UTC, so do the same here to keep FE/BE consistent.
+    const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
+    const iso = hasTz ? s : `${s}Z`;
+    const t = new Date(iso).getTime();
+    return Number.isFinite(t) ? t : null;
+  };
   const now = Date.now();
-  const opens = rules.registration.opensAt ? new Date(rules.registration.opensAt).getTime() : null;
-  const closes = rules.registration.closesAt ? new Date(rules.registration.closesAt).getTime() : null;
+  const opens = parseLocalish(rules.registration.opensAt);
+  const closes = parseLocalish(rules.registration.closesAt);
   const maxTeams = (tournament as any).num_teams ?? null;
   const teamsCount = (teams as any[]).length;
-  const fee = Number((tournament as any).registration_fee ?? 0) || 0;
+  const feeCents = Number((tournament as any).registration_fee ?? 0) || 0;
   const currency = ((tournament as any).registration_currency ?? "eur").toUpperCase();
 
   const reachedCap = maxTeams != null && teamsCount >= maxTeams;
@@ -878,6 +887,7 @@ function PublishedRegistrationView({
   const notYetOpen = opens !== null && now < opens;
   const canRegister =
     rules.registration.enabled && !reachedCap && !closedByDate && !notYetOpen;
+
 
   const daysToClose =
     closes !== null && closes > now
@@ -931,7 +941,7 @@ function PublishedRegistrationView({
                 <span className="inline-flex items-center gap-1.5">
                   <Trophy className="h-3.5 w-3.5" />
                   {tournament.sport}
-                  {tournament.format ? ` · ${tournament.format}` : ""}
+                  {tournament.format ? ` · ${t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}` : ""}
                 </span>
               </div>
             </div>
@@ -970,9 +980,10 @@ function PublishedRegistrationView({
             <>
               <div>
                 <p className="text-base font-semibold">
-                  {fee > 0
-                    ? `${t("tournament.registrationFee")}: ${fee.toFixed(2)} ${currency}`
+                  {feeCents > 0
+                    ? `${t("tournament.registrationFee")}: ${(feeCents / 100).toFixed(2)} ${currency}`
                     : t("tournament.freeRegistration")}
+
                 </p>
                 {maxTeams != null ? (
                   <p className="text-sm text-muted-foreground mt-0.5">
@@ -1011,7 +1022,7 @@ function PublishedRegistrationView({
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <dt className="text-xs text-muted-foreground">{t("public.tabs.standings", { defaultValue: "Format" })}</dt>
-              <dd className="font-medium">{tournament.format}</dd>
+              <dd className="font-medium">{t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}</dd>
             </div>
             {maxTeams != null && (
               <div>
