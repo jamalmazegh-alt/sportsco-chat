@@ -364,12 +364,9 @@ function TournamentDetailPage() {
           />
         )}
         {section === "manage" && canManage && sub === "staff" && (
-          <StaffAndOfficialsPanel
-            tournamentId={tournament.id}
-            matches={matches as any}
-            teams={teams as any}
-          />
+          <StaffAndOfficialsPanel tournamentId={tournament.id} />
         )}
+
 
         {/* Play section */}
         {section === "play" && sub === "matches" && (
