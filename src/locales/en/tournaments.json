@@ -900,6 +900,32 @@
     "publicLink": "Public registration link",
     "linkCopied": "Link copied"
   },
+  "payments": {
+    "title": "Payments & registration fees",
+    "save": "Save",
+    "saved": "Settings saved",
+    "saveError": "Could not save",
+    "personalTournamentWarning": "This tournament is not attached to a club. Online payments require a club with an active Stripe account.",
+    "feeHint": "Amount paid by each team at registration. Set to 0 for a free tournament.",
+    "descriptionPlaceholder": "Ex: Includes meal and official t-shirt.",
+    "payNow": "Pay {{amount}}",
+    "alreadyPaid": "Payment already received — thank you!",
+    "refundedMessage": "This registration has been refunded.",
+    "linkExpired": "Payment link expired",
+    "linkExpiredMessage": "Ask the organizer for a new link.",
+    "feeBreakdown": "On {{gross}} {{currency}} collected, Clubero keeps {{fee}} {{currency}} ({{pct}}%). You receive {{net}} {{currency}}.",
+    "fields": {
+      "fee": "Registration fee",
+      "currency": "Currency",
+      "description": "Description (optional)",
+      "mode": "Payment mode"
+    },
+    "modes": {
+      "offline": "Offline only (cash / bank transfer)",
+      "online": "Online only (card)",
+      "both": "Both (team's choice)"
+    }
+  },
   "status": {
     "draft": "Draft",
     "published": "Published",
