@@ -24,7 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
+import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
 import { mergeRules } from "@/modules/tournaments/lib/rules";

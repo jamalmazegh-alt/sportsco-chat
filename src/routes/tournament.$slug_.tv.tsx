@@ -25,7 +25,7 @@ import {
   Radio,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
+import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
 import { computeStandings } from "@/modules/tournaments/lib/standings";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";

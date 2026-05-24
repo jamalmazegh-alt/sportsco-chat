@@ -3,19 +3,9 @@
 // amounts coming from the client. All admin actions require can_manage_tournament.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getStripe } from "@/lib/stripe.server";
-import { createLogger } from "@/lib/logger.server";
-import {
-  buildCheckoutForRegistration,
-  logPaymentEvent,
-} from "./tournament-payments.server";
-
-export { buildCheckoutForRegistration };
-
-const log = createLogger("tournament-payments");
+import { logPaymentEvent } from "./tournament-payment-events.server";
 
 const PAYMENT_MODES = ["online", "offline", "both"] as const;
 const CURRENCIES = ["eur", "usd", "gbp", "chf", "cad"] as const;
@@ -192,6 +182,7 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
       throw new Response("Missing Stripe reference", { status: 400 });
     }
 
+    const { getStripe } = await import("@/lib/stripe.server");
     const stripe = getStripe();
     const refund = await stripe.refunds.create({
       payment_intent: reg.stripe_payment_intent_id ?? undefined,
@@ -248,6 +239,9 @@ export const startRegistrationCheckout = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
+    const { buildCheckoutForRegistration } = await import(
+      "./tournament-payments.server"
+    );
     const result = await buildCheckoutForRegistration({
       registrationId: data.registration_id,
       origin: data.origin,

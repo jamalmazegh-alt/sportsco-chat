@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import {
   acceptTournamentInvite,
   getTournamentInviteByToken,
-} from "@/modules/tournaments/tournaments.functions";
+} from "@/modules/tournaments/tournaments-public.functions";
 import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/tournament-invite/$token")({
