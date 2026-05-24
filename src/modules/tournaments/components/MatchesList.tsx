@@ -1055,6 +1055,7 @@ function MatchCard({
                 value={a}
                 onChange={setA}
                 size="lg"
+                disabled={validated}
               />
               <span className="text-2xl font-semibold text-muted-foreground">:</span>
               <ScoreStepper
@@ -1062,6 +1063,7 @@ function MatchCard({
                 value={b}
                 onChange={setB}
                 size="lg"
+                disabled={validated}
               />
             </div>
           )}
@@ -1076,6 +1078,7 @@ function MatchCard({
                   value={penA}
                   onChange={setPenA}
                   size="md"
+                  disabled={validated}
                 />
                 <span className="text-xl text-muted-foreground">:</span>
                 <ScoreStepper
@@ -1083,6 +1086,7 @@ function MatchCard({
                   value={penB}
                   onChange={setPenB}
                   size="md"
+                  disabled={validated}
                 />
               </div>
               {penA !== penB && (
@@ -1093,17 +1097,34 @@ function MatchCard({
             </div>
           )}
 
-          <Button
-            onClick={() => save.mutate()}
-            disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
-            className="w-full h-12"
-          >
-            {save.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("matches.saveAndValidate")
-            )}
-          </Button>
+          {validated ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => validateM.mutate(false)}
+              disabled={validateM.isPending}
+              className="w-full h-12"
+            >
+              {validateM.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ShieldCheck className="h-4 w-4" />
+              )}
+              {t("matches.unvalidateToEdit", { defaultValue: "Dévalider pour modifier" })}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => save.mutate()}
+              disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
+              className="w-full h-12"
+            >
+              {save.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("matches.saveAndValidate")
+              )}
+            </Button>
+          )}
         </div>
       </ResponsiveFormDialog>
 
