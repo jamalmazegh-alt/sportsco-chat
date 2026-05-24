@@ -426,7 +426,7 @@ export async function handleTournamentCheckoutCompleted(
   const { data: reg } = await supabaseAdmin
     .from("tournament_registrations")
     .update({
-      payment_status: "paid",
+      payment_status: "paid_online",
       payment_intent_id: paymentIntentId,
       stripe_payment_intent_id: paymentIntentId,
       stripe_charge_id: chargeId,
