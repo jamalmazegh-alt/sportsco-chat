@@ -178,7 +178,12 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                     {r.contact_name}
                   </p>
                 </div>
-                <StatusBadge status={r.status} />
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <StatusBadge status={r.status} />
+                  {r.payment_status && r.payment_status !== "free" && (
+                    <PaymentBadge status={r.payment_status} />
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
