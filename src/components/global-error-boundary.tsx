@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Sentry } from "@/lib/sentry";
 
 interface Props {
   error?: Error;
