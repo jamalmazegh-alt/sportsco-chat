@@ -1172,6 +1172,18 @@
     "tournaments": {
       "title": "Tournois — Clubero",
       "description": "Gérez vos tournois et compétitions."
+    },
+    "profile": {
+      "title": "Profil — Clubero",
+      "description": "Vos préférences et informations de compte."
+    },
+    "password": {
+      "title": "Mot de passe — Clubero",
+      "description": "Modifier votre mot de passe."
+    },
+    "privacy": {
+      "title": "Confidentialité — Clubero",
+      "description": "Gérez vos consentements et vos données."
     }
   },
   "trial": {
