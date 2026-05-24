@@ -5,12 +5,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import {
-  buildCheckoutForRegistration,
-} from "./tournament-payments.server";
 import { logPaymentEvent } from "./tournament-payment-events.server";
-
-export { buildCheckoutForRegistration };
 
 const PAYMENT_MODES = ["online", "offline", "both"] as const;
 const CURRENCIES = ["eur", "usd", "gbp", "chf", "cad"] as const;
@@ -244,6 +239,9 @@ export const startRegistrationCheckout = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
+    const { buildCheckoutForRegistration } = await import(
+      "./tournament-payments.server"
+    );
     const result = await buildCheckoutForRegistration({
       registrationId: data.registration_id,
       origin: data.origin,
