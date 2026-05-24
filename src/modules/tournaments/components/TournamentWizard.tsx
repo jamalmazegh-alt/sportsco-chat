@@ -171,7 +171,14 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                   type="date"
                   required
                   value={startsOn}
-                  onChange={(e) => setStartsOn(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setStartsOn(v);
+                    // Auto-sync end date if empty or still matching previous start
+                    if (v && (!endsOn || endsOn === startsOn || endsOn < v)) {
+                      setEndsOn(v);
+                    }
+                  }}
                 />
               </div>
               <div className="space-y-1.5">
