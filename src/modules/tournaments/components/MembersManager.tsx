@@ -291,8 +291,8 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                     <div className="mt-2 grid gap-1 max-h-64 overflow-y-auto pr-1">
                       {matches.map((mt) => {
                         const isOn = assigned.includes(mt.id);
-                        const home = mt.home_team_id ? teamById.get(mt.home_team_id) : "?";
-                        const away = mt.away_team_id ? teamById.get(mt.away_team_id) : "?";
+                        const home = mt.team_a_id ? teamById.get(mt.team_a_id) : "?";
+                        const away = mt.team_b_id ? teamById.get(mt.team_b_id) : "?";
                         return (
                           <label
                             key={mt.id}
@@ -305,7 +305,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                               onChange={() => toggleAssign(m.id, mt.id, isOn)}
                             />
                             <span className="truncate">
-                              #{mt.match_no ?? "—"} · {home} vs {away}
+                              #{mt.match_number ?? "—"} · {home ?? "?"} vs {away ?? "?"}
                             </span>
                           </label>
                         );
