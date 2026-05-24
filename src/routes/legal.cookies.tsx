@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { ChevronLeft } from "lucide-react";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
@@ -7,12 +8,8 @@ export const Route = createFileRoute("/legal/cookies")({
   component: CookiesPage,
   head: () => ({
     meta: [
-      { title: "Politique cookies — Clubero" },
-      {
-        name: "description",
-        content:
-          "Liste exhaustive des cookies utilisés par Clubero, leur finalité et leur durée de conservation.",
-      },
+      { title: i18n.t("meta.legalCookies.title") },
+      { name: "description", content: i18n.t("meta.legalCookies.description") },
     ],
   }),
 });
