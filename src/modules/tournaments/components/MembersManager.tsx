@@ -102,14 +102,15 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       toast.success(
         res.linked
           ? t("tournamentMembers.added", { defaultValue: "Membre ajouté" })
-          : t("tournamentMembers.invited", { defaultValue: "Invitation créée" }),
+          : res.offline
+            ? t("tournamentMembers.offlineAdded", { defaultValue: "Ajouté (sans compte)" })
+            : t("tournamentMembers.invited", { defaultValue: "Invitation créée" }),
       );
 
       const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
       const roleLabel = t(`roles.${role}`, { lng: locale, defaultValue: role });
 
-      if (res.linked && res.tournament_slug) {
-        // Existing user: notify they were added
+      if (res.linked && res.tournament_slug && email) {
         const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
         sendTransactionalEmail({
           templateName: "tournament-member-added",
@@ -125,8 +126,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
         }).catch((err) => {
           console.error("tournament-member-added email failed", err);
         });
-      } else if (!res.linked && res.invite_token) {
-        // New user: send invitation email with accept link
+      } else if (!res.linked && !res.offline && res.invite_token && email) {
         const inviteUrl = `${window.location.origin}/tournament-invite/${res.invite_token}`;
         sendTransactionalEmail({
           templateName: "tournament-invite",
@@ -142,6 +142,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           console.error("tournament-member invite email failed", err);
         });
       }
+
 
 
       setOpen(false);
