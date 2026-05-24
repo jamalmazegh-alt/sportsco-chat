@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
+import { z } from "zod";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,6 +54,13 @@ import { ClipboardList, UserCog, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: z
+      .enum(["configurer", "gerer", "jouer"])
+      .optional()
+      .parse(search.tab),
+    sub: typeof search.sub === "string" ? (search.sub as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: i18n.t("meta.tournaments.title", { ns: "common" }) },
@@ -60,6 +68,17 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
     ],
   }),
 });
+
+const SECTION_TO_URL: Record<"configure" | "manage" | "play", "configurer" | "gerer" | "jouer"> = {
+  configure: "configurer",
+  manage: "gerer",
+  play: "jouer",
+};
+const URL_TO_SECTION: Record<"configurer" | "gerer" | "jouer", "configure" | "manage" | "play"> = {
+  configurer: "configure",
+  gerer: "manage",
+  jouer: "play",
+};
 
 type Section = "configure" | "manage" | "play";
 type Sub =
@@ -101,8 +120,21 @@ function TournamentDetailPage() {
     onError: (e: any) => toast.error(e?.message ?? t("common.error", { defaultValue: "Erreur" })),
   });
 
-  const [section, setSection] = useState<Section>("play");
-  const [sub, setSub] = useState<Sub>("matches");
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const urlSection: Section | null = search.tab
+    ? URL_TO_SECTION[search.tab as "configurer" | "gerer" | "jouer"]
+    : null;
+  const [section, setSectionState] = useState<Section>(urlSection ?? "play");
+  const [sub, setSubState] = useState<Sub>((search.sub as Sub) ?? "matches");
+  const setSection = (next: Section) => {
+    setSectionState(next);
+    navigate({ search: (prev: any) => ({ ...prev, tab: SECTION_TO_URL[next] }), replace: true });
+  };
+  const setSub = (next: Sub) => {
+    setSubState(next);
+    navigate({ search: (prev: any) => ({ ...prev, sub: next }), replace: true });
+  };
 
   if (q.isLoading) {
     return (
@@ -164,6 +196,18 @@ function TournamentDetailPage() {
   ];
 
   const activeSubs = sectionDefs.find((s) => s.id === section)?.subs ?? [];
+  // On first mount with no ?tab= in URL, default by tournament status.
+  const didInitDefault = useRef(false);
+  useEffect(() => {
+    if (didInitDefault.current) return;
+    didInitDefault.current = true;
+    if (search.tab) return; // URL wins
+    const status = (tournament as any).status as string;
+    const defaultSection: Section =
+      status === "in_progress" || status === "completed" ? "play" : canManage ? "configure" : "play";
+    if (defaultSection !== section) setSection(defaultSection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Auto-correct sub when switching section
   useEffect(() => {
     if (!activeSubs.find((s) => s.id === sub)) {

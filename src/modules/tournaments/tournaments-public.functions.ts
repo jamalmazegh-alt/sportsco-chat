@@ -12,7 +12,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
     const { data: t } = await supabaseAdmin
       .from("tournaments")
       .select(
-        "id, name, slug, sport, category, starts_on, ends_on, location, format, status, cover_image_url, num_teams, settings",
+        "id, name, slug, sport, category, starts_on, ends_on, location, format, status, cover_image_url, num_teams, settings, published_programme_at, registration_fee, registration_currency",
       )
       .eq("slug", data.slug)
       .in("status", ["published", "in_progress", "completed"])
