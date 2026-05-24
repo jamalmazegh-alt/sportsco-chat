@@ -101,8 +101,10 @@ interface MatchEvent {
   minute: number | null;
 }
 interface RefereeOption {
-  user_id: string;
+  member_id: string;
+  user_id: string | null;
   label: string;
+  offline: boolean;
 }
 
 interface Props {
