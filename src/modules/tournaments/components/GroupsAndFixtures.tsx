@@ -538,8 +538,10 @@ export function GroupsAndFixtures({
             />
           </div>
         </Block>
+        )}
 
         {/* Block 5 — Créneau horaire */}
+        {showSlot && (
         <Block
           icon={<CalendarClock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
           iconBg="bg-emerald-100 dark:bg-emerald-950/40"
