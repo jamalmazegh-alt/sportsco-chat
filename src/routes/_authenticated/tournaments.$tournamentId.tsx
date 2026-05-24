@@ -102,20 +102,20 @@ function TournamentDetailPage() {
   );
 
   const tabs: { id: Tab; icon: any; label: string }[] = [
-    { id: "teams", icon: Users, label: "Équipes" },
-    { id: "fixtures", icon: Shuffle, label: "Format" },
+    { id: "teams", icon: Users, label: t("tabs.teams") },
+    { id: "fixtures", icon: Shuffle, label: t("tabs.format") },
     ...(canManage
-      ? [{ id: "fields" as const, icon: MapPin, label: "Terrains" }]
+      ? [{ id: "fields" as const, icon: MapPin, label: t("tabs.fields") }]
       : []),
-    { id: "matches", icon: Calendar, label: "Matchs" },
-    { id: "standings", icon: ListOrdered, label: "Classement" },
-    { id: "bracket", icon: GitBranch, label: "Bracket" },
+    { id: "matches", icon: Calendar, label: t("tabs.matches") },
+    { id: "standings", icon: ListOrdered, label: t("tabs.standings") },
+    { id: "bracket", icon: GitBranch, label: t("tabs.bracket") },
     ...(canManage
       ? [
-          { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
-          { id: "team_staff" as const, icon: UserPlus, label: "Équipe" },
-          { id: "members" as const, icon: UserCog, label: "Membres" },
-          { id: "rules" as const, icon: Settings2, label: "Règles" },
+          { id: "registrations" as const, icon: ClipboardList, label: t("tabs.registrations") },
+          { id: "team_staff" as const, icon: UserPlus, label: t("tabs.teamStaff") },
+          { id: "members" as const, icon: UserCog, label: t("tabs.members") },
+          { id: "rules" as const, icon: Settings2, label: t("tabs.rules") },
         ]
       : []),
   ];
@@ -123,7 +123,7 @@ function TournamentDetailPage() {
   return (
     <div className="pb-6">
       <header className="px-5 pt-6 pb-4 space-y-3">
-        <BackLink to="/tournaments" label="Tournois" />
+        <BackLink to="/tournaments" label={t("detail.back")} />
 
         <div className="flex items-start gap-3">
           <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
