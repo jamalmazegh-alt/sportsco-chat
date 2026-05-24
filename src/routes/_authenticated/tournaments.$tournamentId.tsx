@@ -54,7 +54,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
   }),
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "payments" | "rules" | "team_staff" | "members";
 
 function TournamentDetailPage() {
   const { t } = useTranslation("tournaments");
