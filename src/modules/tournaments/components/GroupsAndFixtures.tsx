@@ -671,10 +671,12 @@ export function GroupsAndFixtures({
       </div>
 
       {/* Sticky CTA bar — sits above bottom-nav */}
+      {showStickyBar && (
       <div
         className="fixed left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border px-4 py-3 flex gap-2"
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 56px)" }}
       >
+        {showSaveCta && (
         <Button
           variant="outline"
           onClick={() => saveSettings.mutate()}
@@ -690,6 +692,8 @@ export function GroupsAndFixtures({
             </>
           )}
         </Button>
+        )}
+        {showScheduleCta && (
         <Button
           onClick={() => schedule.mutate()}
           disabled={schedule.isPending || matchesCount === 0 || !startsOn}
@@ -704,7 +708,9 @@ export function GroupsAndFixtures({
             </>
           )}
         </Button>
+        )}
       </div>
+      )}
 
       <DestructiveConfirmSheet
         open={regenGroupsOpen}
