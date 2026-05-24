@@ -18,6 +18,9 @@ interface Props {
 export function GlobalErrorBoundary({ error, reset }: Props) {
   const isDev = import.meta.env.DEV;
   const { t } = useTranslation("common");
+  useEffect(() => {
+    if (error) Sentry.captureException(error);
+  }, [error]);
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-6 py-12">
       <div className="max-w-md w-full text-center space-y-4">
