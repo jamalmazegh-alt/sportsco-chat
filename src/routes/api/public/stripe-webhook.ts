@@ -4,6 +4,10 @@ import { getStripe } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { notifySubscriptionAdmin } from "@/lib/subscription-notify.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import {
+  handleTournamentCheckoutCompleted,
+  handleTournamentChargeRefunded,
+} from "@/modules/tournaments/tournament-payments.functions";
 
 type SubStatus =
   | "trialing"
