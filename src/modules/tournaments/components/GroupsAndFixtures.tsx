@@ -369,11 +369,22 @@ export function GroupsAndFixtures({
   const supportsKnockout = format !== "group";
   const hasExistingDraw = groupsCount > 0 || matchesCount > 0;
 
+  const showDraw = view === "all" || view === "draw";
+  const showGroupsConfig = (view === "all" || view === "schedule") && supportsGroups;
+  const showFinals = (view === "all" || view === "draw") && supportsKnockout;
+  const showDuration = view === "all" || view === "format";
+  const showSlot = view === "all" || view === "format";
+  const showFields = view === "all";
+  const showSaveCta = view === "all" || view === "format" || view === "schedule";
+  const showScheduleCta = view === "all" || view === "schedule";
+  const showStickyBar = showSaveCta || showScheduleCta;
+
   return (
     <>
       {/* pb-40 = leave room for sticky CTA + bottom nav */}
-      <div className="space-y-3 pb-40">
+      <div className={cn("space-y-3", showStickyBar ? "pb-40" : "pb-6")}>
         {/* Block 1 — Tirage au sort */}
+        {showDraw && (
         <Block
           tone="primary"
           icon={<Dices className="h-5 w-5 text-primary" />}
