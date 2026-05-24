@@ -458,7 +458,197 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
     return { ok: true, channel: "copy", link };
   });
 
-
 // Webhook helpers moved to tournament-payments.server.ts to keep
 // the stripe-webhook route bundle free of the createServerFn graph.
+
+// ---------- Admin: publish tournament programme (irreversible)
+// Pre-flight checks → flip status to 'in_progress', stamp published_programme_at,
+// notify every confirmed team by email with their first match (if any).
+
+export const publishTournamentProgramme = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+
+    // ---- Pre-flight checks
+    if (tournament.status !== "published") {
+      throw new Response("tournament_not_published", { status: 400 });
+    }
+    if (!tournament.starts_on) {
+      throw new Response("missing_start_date", { status: 400 });
+    }
+
+    const PAID_STATUSES = ["paid_online", "paid_offline", "free"];
+    const { data: confirmedRegs } = await supabaseAdmin
+      .from("tournament_registrations")
+      .select("id, team_name, contact_email, tournament_team_id, payment_status")
+      .eq("tournament_id", data.tournament_id)
+      .in("payment_status", PAID_STATUSES);
+    const confirmed = confirmedRegs ?? [];
+    if (confirmed.length < 2) {
+      throw new Response("not_enough_confirmed_teams", { status: 400 });
+    }
+
+    const confirmedTeamIds = confirmed
+      .map((r) => r.tournament_team_id)
+      .filter((v): v is string => !!v);
+    if (confirmedTeamIds.length === 0) {
+      throw new Response("teams_not_linked", { status: 400 });
+    }
+    const { data: ttRows } = await supabaseAdmin
+      .from("tournament_teams")
+      .select("id, name, short_name, group_id")
+      .in("id", confirmedTeamIds);
+    const teamsById = new Map((ttRows ?? []).map((t) => [t.id, t]));
+    const unassigned = (ttRows ?? []).filter((t) => !t.group_id);
+    if (unassigned.length > 0) {
+      throw new Response("teams_without_group", { status: 400 });
+    }
+
+    const { count: matchesCount } = await supabaseAdmin
+      .from("tournament_matches")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (!matchesCount || matchesCount < 1) {
+      throw new Response("no_matches", { status: 400 });
+    }
+
+    // ---- Flip status + stamp
+    const publishedAt = new Date().toISOString();
+    const { error: updErr } = await supabaseAdmin
+      .from("tournaments")
+      .update({
+        status: "in_progress",
+        published_programme_at: publishedAt,
+      })
+      .eq("id", data.tournament_id);
+    if (updErr) throw new Response(updErr.message, { status: 400 });
+
+    // ---- Build first-match index per team
+    const { data: allMatches } = await supabaseAdmin
+      .from("tournament_matches")
+      .select("id, team_a_id, team_b_id, scheduled_at, field")
+      .eq("tournament_id", data.tournament_id)
+      .order("scheduled_at", { ascending: true, nullsFirst: false });
+
+    const firstMatchByTeam = new Map<
+      string,
+      { scheduled_at: string | null; field: string | null; opponentTeamId: string | null }
+    >();
+    for (const m of allMatches ?? []) {
+      if (m.team_a_id && !firstMatchByTeam.has(m.team_a_id)) {
+        firstMatchByTeam.set(m.team_a_id, {
+          scheduled_at: m.scheduled_at,
+          field: m.field,
+          opponentTeamId: m.team_b_id ?? null,
+        });
+      }
+      if (m.team_b_id && !firstMatchByTeam.has(m.team_b_id)) {
+        firstMatchByTeam.set(m.team_b_id, {
+          scheduled_at: m.scheduled_at,
+          field: m.field,
+          opponentTeamId: m.team_a_id ?? null,
+        });
+      }
+    }
+
+    // ---- Notify each confirmed team
+    const fmtDate = (iso: string | null) => {
+      if (!iso) return null;
+      try {
+        return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(iso));
+      } catch {
+        return iso;
+      }
+    };
+    const fmtTime = (iso: string | null) => {
+      if (!iso) return null;
+      try {
+        return new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(
+          new Date(iso),
+        );
+      } catch {
+        return null;
+      }
+    };
+    const startDateLabel = (() => {
+      try {
+        return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(
+          new Date(tournament.starts_on),
+        );
+      } catch {
+        return tournament.starts_on as string;
+      }
+    })();
+
+    // Resolve origin for the public URL. Falls back to clubero.app.
+    const origin =
+      process.env.PUBLIC_APP_ORIGIN ||
+      process.env.VITE_PUBLIC_APP_ORIGIN ||
+      "https://www.clubero.app";
+    const programmeUrl = `${origin.replace(/\/$/, "")}/tournament/${encodeURIComponent(
+      tournament.slug,
+    )}`;
+
+    const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+
+    let notified = 0;
+    for (const reg of confirmed) {
+      if (!reg.contact_email) continue;
+      const ttId = reg.tournament_team_id;
+      const fm = ttId ? firstMatchByTeam.get(ttId) : null;
+      const opponentName = fm?.opponentTeamId
+        ? teamsById.get(fm.opponentTeamId)?.name ?? null
+        : null;
+
+      try {
+        await enqueueTransactionalEmailServer({
+          templateName: "tournament-programme-published",
+          recipientEmail: reg.contact_email,
+          templateData: {
+            teamName: reg.team_name,
+            tournamentName: tournament.name,
+            startDate: startDateLabel,
+            firstMatchDate: fmtDate(fm?.scheduled_at ?? null),
+            firstMatchTime: fmtTime(fm?.scheduled_at ?? null),
+            firstMatchField: fm?.field ?? null,
+            firstMatchOpponent: opponentName,
+            programmeUrl,
+            locale: "fr",
+          },
+          idempotencyKey: `tournament-programme-${data.tournament_id}-${reg.id}`,
+        });
+        notified += 1;
+      } catch {
+        // best-effort — keep going
+      }
+    }
+
+    await logPaymentEvent(
+      data.tournament_id,
+      null,
+      "programme_published",
+      null,
+      {
+        teams_notified: notified,
+        confirmed_teams: confirmed.length,
+        matches: matchesCount,
+        published_at: publishedAt,
+      },
+      null,
+      userId,
+    );
+
+    return {
+      ok: true,
+      published_programme_at: publishedAt,
+      teams_notified: notified,
+      confirmed_teams: confirmed.length,
+    };
+  });
+
 
