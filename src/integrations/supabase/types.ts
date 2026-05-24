@@ -163,6 +163,11 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          stripe_account_created_at: string | null
+          stripe_account_id: string | null
+          stripe_account_status: string | null
+          stripe_charges_enabled: boolean
+          stripe_payouts_enabled: boolean
           theme_color: string
           wall_comments_enabled: boolean
         }
@@ -180,6 +185,11 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          stripe_account_created_at?: string | null
+          stripe_account_id?: string | null
+          stripe_account_status?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_payouts_enabled?: boolean
           theme_color?: string
           wall_comments_enabled?: boolean
         }
@@ -197,6 +207,11 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          stripe_account_created_at?: string | null
+          stripe_account_id?: string | null
+          stripe_account_status?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_payouts_enabled?: boolean
           theme_color?: string
           wall_comments_enabled?: boolean
         }
@@ -2000,8 +2015,60 @@ export type Database = {
           },
         ]
       }
+      tournament_payment_events: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          registration_id: string | null
+          stripe_event_id: string | null
+          tournament_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          registration_id?: string | null
+          stripe_event_id?: string | null
+          tournament_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          registration_id?: string | null
+          stripe_event_id?: string | null
+          tournament_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_payment_events_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_payment_events_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_registrations: {
         Row: {
+          amount_paid: number | null
           amount_paid_cents: number | null
           contact_email: string
           contact_name: string
@@ -2012,11 +2079,19 @@ export type Database = {
           decided_by: string | null
           decision_note: string | null
           id: string
+          marked_paid_at: string | null
+          marked_paid_by: string | null
           notes: string | null
+          paid_at: string | null
+          payment_intent_id: string | null
           payment_status: string
+          platform_fee: number | null
           players: Json
+          refund_reason: string | null
+          refunded_at: string | null
           short_name: string | null
           status: Database["public"]["Enums"]["tournament_registration_status"]
+          stripe_charge_id: string | null
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
           team_name: string
@@ -2025,6 +2100,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          amount_paid?: number | null
           amount_paid_cents?: number | null
           contact_email: string
           contact_name: string
@@ -2035,11 +2111,19 @@ export type Database = {
           decided_by?: string | null
           decision_note?: string | null
           id?: string
+          marked_paid_at?: string | null
+          marked_paid_by?: string | null
           notes?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
           payment_status?: string
+          platform_fee?: number | null
           players?: Json
+          refund_reason?: string | null
+          refunded_at?: string | null
           short_name?: string | null
           status?: Database["public"]["Enums"]["tournament_registration_status"]
+          stripe_charge_id?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           team_name: string
@@ -2048,6 +2132,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          amount_paid?: number | null
           amount_paid_cents?: number | null
           contact_email?: string
           contact_name?: string
@@ -2058,11 +2143,19 @@ export type Database = {
           decided_by?: string | null
           decision_note?: string | null
           id?: string
+          marked_paid_at?: string | null
+          marked_paid_by?: string | null
           notes?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
           payment_status?: string
+          platform_fee?: number | null
           players?: Json
+          refund_reason?: string | null
+          refunded_at?: string | null
           short_name?: string | null
           status?: Database["public"]["Enums"]["tournament_registration_status"]
+          stripe_charge_id?: string | null
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
           team_name?: string
@@ -2071,6 +2164,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tournament_registrations_marked_paid_by_fkey"
+            columns: ["marked_paid_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tournament_registrations_tournament_id_fkey"
             columns: ["tournament_id"]
@@ -2232,11 +2332,16 @@ export type Database = {
           id: string
           location: string | null
           match_duration_min: number
+          max_teams: number | null
           name: string
           num_teams: number
+          payment_mode: string
           points_draw: number
           points_loss: number
           points_win: number
+          registration_currency: string
+          registration_fee: number
+          registration_fee_description: string | null
           settings: Json
           slug: string
           sport: string | null
@@ -2262,11 +2367,16 @@ export type Database = {
           id?: string
           location?: string | null
           match_duration_min?: number
+          max_teams?: number | null
           name: string
           num_teams?: number
+          payment_mode?: string
           points_draw?: number
           points_loss?: number
           points_win?: number
+          registration_currency?: string
+          registration_fee?: number
+          registration_fee_description?: string | null
           settings?: Json
           slug: string
           sport?: string | null
@@ -2292,11 +2402,16 @@ export type Database = {
           id?: string
           location?: string | null
           match_duration_min?: number
+          max_teams?: number | null
           name?: string
           num_teams?: number
+          payment_mode?: string
           points_draw?: number
           points_loss?: number
           points_win?: number
+          registration_currency?: string
+          registration_fee?: number
+          registration_fee_description?: string | null
           settings?: Json
           slug?: string
           sport?: string | null
