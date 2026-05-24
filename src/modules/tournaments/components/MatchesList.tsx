@@ -956,6 +956,19 @@ function MatchCard({
 
       <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("matches.title")}>
         <div className="space-y-4 mt-4 pb-6">
+          {validated && (
+            <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 px-3 py-2.5 flex items-start gap-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                  {t("matches.lockedTitle", { defaultValue: "Match validé" })}
+                </p>
+                <p className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 leading-snug mt-0.5">
+                  {t("matches.lockedHelper", { defaultValue: "Pour modifier le score, dévalidez d'abord le match." })}
+                </p>
+              </div>
+            </div>
+          )}
           {setsMode ? (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
@@ -984,6 +997,7 @@ function MatchCard({
                       variant="ghost"
                       className="h-7 w-7"
                       onClick={() => setSets(sets.filter((_, j) => j !== i))}
+                      disabled={validated}
                     >
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
@@ -998,6 +1012,7 @@ function MatchCard({
                         setSets(next);
                       }}
                       size="sm"
+                      disabled={validated}
                     />
                     <span className="text-xl text-muted-foreground">:</span>
                     <ScoreStepper
@@ -1009,6 +1024,7 @@ function MatchCard({
                         setSets(next);
                       }}
                       size="sm"
+                      disabled={validated}
                     />
                   </div>
                 </div>
@@ -1018,7 +1034,7 @@ function MatchCard({
                 variant="outline"
                 className="w-full"
                 onClick={() => setSets([...sets, { a: 0, b: 0 }])}
-                disabled={sets.length >= 7}
+                disabled={validated || sets.length >= 7}
               >
                 <Plus className="h-4 w-4" />
                 {t("matches.addSet")}
@@ -1039,6 +1055,7 @@ function MatchCard({
                 value={a}
                 onChange={setA}
                 size="lg"
+                disabled={validated}
               />
               <span className="text-2xl font-semibold text-muted-foreground">:</span>
               <ScoreStepper
@@ -1046,6 +1063,7 @@ function MatchCard({
                 value={b}
                 onChange={setB}
                 size="lg"
+                disabled={validated}
               />
             </div>
           )}
@@ -1060,6 +1078,7 @@ function MatchCard({
                   value={penA}
                   onChange={setPenA}
                   size="md"
+                  disabled={validated}
                 />
                 <span className="text-xl text-muted-foreground">:</span>
                 <ScoreStepper
@@ -1067,6 +1086,7 @@ function MatchCard({
                   value={penB}
                   onChange={setPenB}
                   size="md"
+                  disabled={validated}
                 />
               </div>
               {penA !== penB && (
@@ -1077,17 +1097,34 @@ function MatchCard({
             </div>
           )}
 
-          <Button
-            onClick={() => save.mutate()}
-            disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
-            className="w-full h-12"
-          >
-            {save.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("matches.saveAndValidate")
-            )}
-          </Button>
+          {validated ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => validateM.mutate(false)}
+              disabled={validateM.isPending}
+              className="w-full h-12"
+            >
+              {validateM.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ShieldCheck className="h-4 w-4" />
+              )}
+              {t("matches.unvalidateToEdit", { defaultValue: "Dévalider pour modifier" })}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => save.mutate()}
+              disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
+              className="w-full h-12"
+            >
+              {save.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("matches.saveAndValidate")
+              )}
+            </Button>
+          )}
         </div>
       </ResponsiveFormDialog>
 
