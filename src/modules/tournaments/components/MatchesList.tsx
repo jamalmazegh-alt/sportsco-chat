@@ -1287,11 +1287,13 @@ function MatchCard({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none__">{t("matches.refereeNone")}</SelectItem>
-                  {refereeOptions.map((r) => (
-                    <SelectItem key={r.user_id} value={`user:${r.user_id}`}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
+                  {refereeOptions
+                    .filter((r) => !!r.user_id)
+                    .map((r) => (
+                      <SelectItem key={r.user_id as string} value={`user:${r.user_id}`}>
+                        {r.label}
+                      </SelectItem>
+                    ))}
                   <SelectItem value="free">{t("matches.refereeFree")}</SelectItem>
                 </SelectContent>
               </Select>
