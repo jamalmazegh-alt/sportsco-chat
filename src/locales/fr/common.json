@@ -1224,6 +1224,43 @@
     "adminReminders": {
       "title": "Rappels — Clubero",
       "description": "Configuration des rappels d'événements."
+    },
+    "register": {
+      "title": "Créer un compte — Clubero",
+      "description": "Créez votre compte Clubero en quelques secondes."
+    },
+    "contact": {
+      "title": "Contact — Clubero",
+      "description": "Contactez l'équipe Clubero : questions produit, démonstration, partenariats ou support pour votre club sportif. Nous vous répondons sous 24 h.",
+      "ogDescription": "Contactez l'équipe Clubero : démo, support et partenariats pour votre club sportif."
+    },
+    "pricing": {
+      "title": "Tarifs — Clubero",
+      "description": "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€ par tournoi pour le module Tournois seul.",
+      "ogDescription": "30 jours gratuits. 49€/mois ensuite. Module Tournois inclus."
+    },
+    "features": {
+      "title": "Fonctionnalités — Clubero",
+      "description": "Convocations, présences, communication, statistiques. Découvrez tout ce que Clubero offre aux clubs, coachs, parents et joueurs.",
+      "ogDescription": "Tout ce dont votre club a besoin. Rien de superflu."
+    },
+    "faq": {
+      "title": "FAQ — Clubero",
+      "description": "Réponses aux questions fréquentes sur Clubero — tarifs, mise en place, RGPD, contrôle parental et plus.",
+      "ogDescription": "Réponses aux questions fréquentes sur Clubero."
+    },
+    "legalGeneric": {
+      "fallbackTitle": "Légal",
+      "fallbackDescription": "Document légal"
+    },
+    "legalCookies": {
+      "title": "Politique cookies — Clubero",
+      "description": "Liste exhaustive des cookies utilisés par Clubero, leur finalité et leur durée de conservation."
+    },
+    "publicHome": {
+      "title": "Clubero — La coordination d'équipe pour clubs sportifs",
+      "description": "Convocations, présences, rappels et communication de club dans une seule app mobile. WhatsApp reste disponible en option.",
+      "ogDescription": "Convocations, présences, rappels — tout dans un seul outil. En un clic."
     }
   },
   "trial": {

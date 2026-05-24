@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import {
   Accordion,
   AccordionContent,
@@ -16,14 +17,10 @@ export const Route = createFileRoute("/faq")({
   component: FAQPage,
   head: () => ({
     meta: [
-      { title: "FAQ — Clubero" },
-      {
-        name: "description",
-        content:
-          "Réponses aux questions fréquentes sur Clubero — tarifs, mise en place, RGPD, contrôle parental et plus.",
-      },
-      { property: "og:title", content: "FAQ — Clubero" },
-      { property: "og:description", content: "Réponses aux questions fréquentes sur Clubero." },
+      { title: i18n.t("meta.faq.title") },
+      { name: "description", content: i18n.t("meta.faq.description") },
+      { property: "og:title", content: i18n.t("meta.faq.title") },
+      { property: "og:description", content: i18n.t("meta.faq.ogDescription") },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/faq" }],
     scripts: [

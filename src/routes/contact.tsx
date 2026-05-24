@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,10 +21,10 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
   head: () => ({
     meta: [
-      { title: "Contact — Clubero" },
-      { name: "description", content: "Contactez l'équipe Clubero : questions produit, démonstration, partenariats ou support pour votre club sportif. Nous vous répondons sous 24 h." },
-      { property: "og:title", content: "Contact — Clubero" },
-      { property: "og:description", content: "Contactez l'équipe Clubero : démo, support et partenariats pour votre club sportif." },
+      { title: i18n.t("meta.contact.title") },
+      { name: "description", content: i18n.t("meta.contact.description") },
+      { property: "og:title", content: i18n.t("meta.contact.title") },
+      { property: "og:description", content: i18n.t("meta.contact.ogDescription") },
       { property: "og:url", content: "https://clubero.app/contact" },
     ],
     links: [{ rel: "canonical", href: "https://clubero.app/contact" }],

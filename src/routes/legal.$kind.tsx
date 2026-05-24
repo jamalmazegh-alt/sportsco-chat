@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { getLegalDoc } from "@/lib/legal.functions";
@@ -16,8 +17,8 @@ export const Route = createFileRoute("/legal/$kind")({
   component: LegalPage,
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.doc?.title ?? "Légal"} — Clubero` },
-      { name: "description", content: loaderData?.doc?.title ?? "Document légal" },
+      { title: `${loaderData?.doc?.title ?? i18n.t("meta.legalGeneric.fallbackTitle")} — Clubero` },
+      { name: "description", content: loaderData?.doc?.title ?? i18n.t("meta.legalGeneric.fallbackDescription") },
     ],
   }),
 });

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, Sparkles, Building2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
@@ -9,17 +10,10 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
   head: () => ({
     meta: [
-      { title: "Tarifs — Clubero" },
-      {
-        name: "description",
-        content:
-          "Essai gratuit de 30 jours. Puis 49€/mois tout inclus, ou 40€ par tournoi pour le module Tournois seul.",
-      },
-      { property: "og:title", content: "Tarifs — Clubero" },
-      {
-        property: "og:description",
-        content: "30 jours gratuits. 49€/mois ensuite. Module Tournois inclus.",
-      },
+      { title: i18n.t("meta.pricing.title") },
+      { name: "description", content: i18n.t("meta.pricing.description") },
+      { property: "og:title", content: i18n.t("meta.pricing.title") },
+      { property: "og:description", content: i18n.t("meta.pricing.ogDescription") },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/pricing" }],
   }),
