@@ -97,6 +97,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useEffect(() => {
+    initSentry();
     bootstrapTheme();
     // Apply the last-known club brand colour ASAP (covers login page).
     applyClubTheme(readStoredTheme());
