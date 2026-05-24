@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3, Trophy } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3 } from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
 import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { HomeSkeleton } from "@/components/skeletons";
 import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { HomeQuickCards } from "@/components/home-quick-cards";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -241,20 +242,9 @@ function HomePage() {
               }
             />
           )}
-          <div className="grid grid-cols-2 gap-2">
-            <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
-              <Link to="/teams">
-                <Users className="h-4 w-4" />
-                {t("dashboard.viewTeams")}
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
-              <Link to="/tournaments">
-                <Trophy className="h-4 w-4" />
-                {t("nav.tournaments")}
-              </Link>
-            </Button>
-          </div>
+          {activeClubId && (
+            <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />
+          )}
         </div>
       )}
 
