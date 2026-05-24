@@ -275,6 +275,7 @@ function TabsNav({
   setTab: (t: Tab) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const activeBtnRef = useRef<HTMLButtonElement>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
   const [hintPulse, setHintPulse] = useState(true);
@@ -303,6 +304,11 @@ function TabsNav({
     };
   }, [tabs.length]);
 
+  // Center the active tab only when it changes (not on every render)
+  useEffect(() => {
+    activeBtnRef.current?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+  }, [tab]);
+
   const scrollBy = (dir: 1 | -1) => {
     const el = scrollRef.current;
     if (!el) return;
@@ -315,7 +321,7 @@ function TabsNav({
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex gap-1 overflow-x-auto scroll-smooth snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-1 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {tabs.map((it) => {
             const Icon = it.icon;
@@ -323,12 +329,10 @@ function TabsNav({
             return (
               <button
                 key={it.id}
-                ref={(el) => {
-                  if (active && el) el.scrollIntoView({ block: "nearest", inline: "center" });
-                }}
+                ref={active ? activeBtnRef : undefined}
                 onClick={() => setTab(it.id)}
                 className={cn(
-                  "shrink-0 snap-start flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                  "shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
                   active
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted/40",
