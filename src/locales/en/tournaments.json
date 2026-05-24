@@ -347,6 +347,22 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "cancelled": "Cancelled"
+    },
+    "payments": {
+      "markPaid": "Mark as paid",
+      "refund": "Refund",
+      "refundPrompt": "Refund reason (optional)",
+      "refundConfirm": "Confirm full refund via Stripe?",
+      "markedPaid": "Payment recorded",
+      "refunded": "Refund initiated",
+      "status": {
+        "pending": "Payment pending",
+        "paid_online": "Paid online",
+        "paid_offline": "Paid (offline)",
+        "refunded": "Refunded",
+        "refund_pending": "Refund pending",
+        "free": "Free"
+      }
     }
   },
   "teams": {
