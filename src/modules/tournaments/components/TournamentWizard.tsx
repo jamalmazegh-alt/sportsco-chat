@@ -90,6 +90,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     setLocation("");
     setFormat("mixed");
     setNumTeams(8);
+    setNumTeamsRaw("8");
     setLogo([]);
   }
 
