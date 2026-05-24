@@ -133,10 +133,12 @@
     "slides": {
       "recent": "Derniers résultats",
       "upcoming": "Prochains matchs",
+      "nowPlaying": "Actuellement en jeu",
       "noRecent": "Aucun résultat pour le moment",
       "noUpcoming": "Aucun match programmé",
       "standings": "Classement · {{group}}",
-      "bracket": "Phase finale"
+      "bracket": "Phase finale",
+      "scanForLive": "Scannez pour suivre en direct"
     },
     "controls": {
       "previous": "Précédent",
