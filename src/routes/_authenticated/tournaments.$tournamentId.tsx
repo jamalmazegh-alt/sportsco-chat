@@ -230,7 +230,7 @@ function TournamentDetailPage() {
 
         {tab === "fixtures" && !canManage && (
           <p className="text-sm text-muted-foreground">
-            Seuls les admins et dirigeants peuvent configurer le format.
+            {t("detail.formatAdminOnly")}
           </p>
         )}
         {tab === "fields" && canManage && (
