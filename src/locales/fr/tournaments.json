@@ -221,7 +221,9 @@
     "emailPlaceholder": "vous@exemple.com",
     "continuePay": "Continuer vers le paiement",
     "paymentImpossible": "Impossible de démarrer le paiement.",
-    "paymentError": "Erreur lors de la création du paiement."
+    "paymentError": "Erreur lors de la création du paiement.",
+    "quantityLabel": "Nombre de pass",
+    "unitPriceHint": "{{price}} € par pass · Total : {{total}} €"
   },
   "upgrade": {
     "heading": "Débloquez toutes les fonctionnalités",

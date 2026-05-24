@@ -221,7 +221,9 @@
     "emailPlaceholder": "you@example.com",
     "continuePay": "Continue to payment",
     "paymentImpossible": "Unable to start payment.",
-    "paymentError": "Error while creating payment."
+    "paymentError": "Error while creating payment.",
+    "quantityLabel": "Number of passes",
+    "unitPriceHint": "€{{price}} per pass · Total: €{{total}}"
   },
   "upgrade": {
     "heading": "Unlock all features",
