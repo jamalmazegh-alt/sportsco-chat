@@ -467,6 +467,26 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
+  // Quick referee assignment from dropdown menu (no dialog).
+  const quickAssignRef = useMutation({
+    mutationFn: (opt: RefereeOption | null) => {
+      const payload =
+        opt === null
+          ? { referee_user_id: null, referee_name: null }
+          : opt.offline || !opt.user_id
+            ? { referee_user_id: null, referee_name: opt.label }
+            : { referee_user_id: opt.user_id, referee_name: opt.label };
+      return refFn({
+        data: { tournament_id: tournamentId, match_id: match.id, ...payload },
+      });
+    },
+    onSuccess: () => {
+      toast.success(t("matches.refereeUpdated"));
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
+  });
+
   // Add event form
   const [evTeam, setEvTeam] = useState<string>(match.team_a_id ?? "");
   const [evKind, setEvKind] = useState<string>("yellow_card");
