@@ -315,7 +315,28 @@ function PublicTournamentPage() {
         </div>
       </header>
 
+      {/* Confirmation banner shown right after programme publication */}
+      {tournament.status === "in_progress" && (() => {
+        const ppa = (tournament as any).published_programme_at;
+        if (!ppa) return null;
+        const ageMs = Date.now() - new Date(ppa).getTime();
+        if (ageMs < 0 || ageMs > 3_600_000) return null;
+        return (
+          <div className="max-w-3xl mx-auto px-5 mt-4">
+            <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm">
+              <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                ✅ {t("tournament.registrationConfirmed")}
+              </p>
+              <p className="text-emerald-700/80 dark:text-emerald-300/80 mt-0.5">
+                {t("tournament.programmeComingSoon")}
+              </p>
+            </div>
+          </div>
+        );
+      })()}
+
       <div className="max-w-3xl mx-auto px-5 mt-5">
+
         <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
           <div className="flex gap-1 overflow-x-auto">
             {tabs.map((tabItem) => {
