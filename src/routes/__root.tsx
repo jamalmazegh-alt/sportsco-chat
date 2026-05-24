@@ -11,6 +11,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { bootstrapTheme } from "@/lib/use-theme";
+import { initSentry } from "@/lib/sentry";
 import { CookieConsentBanner } from "@/components/cookie-consent";
 import { ClubThemeProvider } from "@/components/club-theme-provider";
 import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
