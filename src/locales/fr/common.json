@@ -1204,6 +1204,26 @@
     "supportTicket": {
       "title": "Demande — Clubero",
       "description": "Détail de la demande de support."
+    },
+    "stats": {
+      "title": "Statistiques — Clubero",
+      "description": "Statistiques de présence et performances de votre club."
+    },
+    "adminBilling": {
+      "title": "Abonnement — Clubero",
+      "description": "Gérer l'abonnement et la facturation du club."
+    },
+    "adminCommunications": {
+      "title": "Communications — Clubero",
+      "description": "Paramètres des emails et notifications."
+    },
+    "adminConvocations": {
+      "title": "Convocations — Clubero",
+      "description": "Paramètres des convocations automatiques."
+    },
+    "adminReminders": {
+      "title": "Rappels — Clubero",
+      "description": "Configuration des rappels d'événements."
     }
   },
   "trial": {

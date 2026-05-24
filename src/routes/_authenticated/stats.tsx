@@ -14,10 +14,16 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
+import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/stats")({
   component: StatsPage,
-  head: () => ({ meta: [{ title: "Stats — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.stats.title") },
+      { name: "description", content: i18nInstance.t("meta.stats.description") },
+    ],
+  }),
 });
 
 function StatsPage() {
