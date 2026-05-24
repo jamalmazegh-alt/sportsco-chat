@@ -76,6 +76,9 @@ export function PublishWorkflow({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [checklistOpen, setChecklistOpen] = useState(true);
 
+  const registrationEnabled =
+    (tournament as any)?.settings?.registration?.enabled === true;
+
   const checks: Check[] = useMemo(
     () => [
       {
