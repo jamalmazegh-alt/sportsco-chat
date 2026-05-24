@@ -290,7 +290,16 @@
     "emptyHintAdmin": "Create your first team to start scheduling trainings and matches.",
     "emptyHintMember": "You are not a member of any team yet. Ask an admin to add you.",
     "imageTooLarge": "Image too large (max 5 MB).",
-    "imageInvalidType": "Unsupported file format."
+    "imageInvalidType": "Unsupported file format.",
+    "whatsappGroupLink": "WhatsApp — team group link",
+    "communicationMode": "Communication mode",
+    "commMode": {
+      "app": "Clubero only (attendance tracked in the app)",
+      "hybrid": "Hybrid (WhatsApp + attendance tracking in Clubero)",
+      "whatsapp": "WhatsApp only (no attendance tracking)"
+    },
+    "whatsappGroupHint": "Paste the team's WhatsApp group invite link. Used to quickly share call-ups.",
+    "commModeHint": "In WhatsApp-only mode, you share events without requesting responses in the app."
   },
   "club": {
     "logo": "Club logo",

@@ -328,7 +328,7 @@ function TeamDetail() {
       .eq("team_id", teamId)
       .eq("player_id", playerId);
     if (error) { toast.error(error.message); return; }
-    toast.success(t("players.removed", { defaultValue: "Joueur retiré de l'équipe" }));
+    toast.success(t("players.removed"));
     qc.invalidateQueries({ queryKey: ["team-players", teamId] });
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
   }
@@ -503,7 +503,7 @@ function TeamDetail() {
                 <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
               </div>
               <div className="space-y-1.5 pt-2 border-t border-border/60">
-                <Label>WhatsApp — lien du groupe d'équipe</Label>
+                <Label>{t("teams.whatsappGroupLink")}</Label>
                 <Input
                   type="url"
                   placeholder="https://chat.whatsapp.com/..."
@@ -511,21 +511,21 @@ function TeamDetail() {
                   onChange={(e) => setEditWhatsappUrl(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Coller le lien d'invitation du groupe WhatsApp de l'équipe. Utilisé pour partager rapidement les convocations.
+                  {t("teams.whatsappGroupHint")}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label>Mode de communication</Label>
+                <Label>{t("teams.communicationMode")}</Label>
                 <Select value={editCommMode} onValueChange={(v) => setEditCommMode(v as any)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="app">Clubero uniquement (suivi des présences dans l'app)</SelectItem>
-                    <SelectItem value="hybrid">Hybride (WhatsApp + suivi des présences dans Clubero)</SelectItem>
-                    <SelectItem value="whatsapp">WhatsApp uniquement (pas de suivi de présence)</SelectItem>
+                    <SelectItem value="app">{t("teams.commMode.app")}</SelectItem>
+                    <SelectItem value="hybrid">{t("teams.commMode.hybrid")}</SelectItem>
+                    <SelectItem value="whatsapp">{t("teams.commMode.whatsapp")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  En mode WhatsApp uniquement, vous partagez les événements sans demander de réponses dans l'app.
+                  {t("teams.commModeHint")}
                 </p>
               </div>
               <Button type="submit" className="w-full h-11" disabled={editBusy}>
@@ -1036,7 +1036,7 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
   }
 
   async function detach(uid: string) {
-    if (!confirm(t("teams.coachDetachConfirm", { defaultValue: "Retirer ce coach de l'équipe ?" }))) return;
+    if (!confirm(t("teams.coachDetachConfirm"))) return;
     setBusyUid(uid);
     const { error } = await supabase
       .from("team_members")

@@ -290,7 +290,16 @@
     "emptyHintAdmin": "Crée ta première équipe pour commencer à programmer entraînements et matchs.",
     "emptyHintMember": "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter.",
     "imageTooLarge": "Image trop lourde (max 5 Mo).",
-    "imageInvalidType": "Format de fichier non supporté."
+    "imageInvalidType": "Format de fichier non supporté.",
+    "whatsappGroupLink": "WhatsApp — lien du groupe d'équipe",
+    "communicationMode": "Mode de communication",
+    "commMode": {
+      "app": "Clubero uniquement (suivi des présences dans l'app)",
+      "hybrid": "Hybride (WhatsApp + suivi des présences dans Clubero)",
+      "whatsapp": "WhatsApp uniquement (pas de suivi de présence)"
+    },
+    "whatsappGroupHint": "Coller le lien d'invitation du groupe WhatsApp de l'équipe. Utilisé pour partager rapidement les convocations.",
+    "commModeHint": "En mode WhatsApp uniquement, vous partagez les événements sans demander de réponses dans l'app."
   },
   "club": {
     "logo": "Logo du club",

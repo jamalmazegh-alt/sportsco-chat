@@ -276,7 +276,7 @@ function PlayerProfile() {
     if (value) {
       const target = (email || player.email || "").trim();
       if (!target) {
-        toast.error(t("players.childAccessNeedsEmail", { defaultValue: "Ajoutez d'abord un email à l'enfant pour activer l'accès." }));
+        toast.error(t("players.childAccessNeedsEmail"));
         return;
       }
       if (player.user_id) {
@@ -461,9 +461,7 @@ function PlayerProfile() {
           </label>
           {minor && player.media_consent_status !== "granted" && (
             <p className="text-xs text-amber-600 dark:text-amber-400">
-              {t("players.photoConsentRequired", {
-                defaultValue: "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : ",
-              })}
+              {t("players.photoConsentRequired")}
               <b>{player.media_consent_status}</b>
             </p>
           )}
