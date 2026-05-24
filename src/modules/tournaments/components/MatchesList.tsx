@@ -118,12 +118,9 @@ interface Props {
 
 export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
   const { t } = useTranslation("tournaments");
+  const { user } = useAuth();
+  const currentUserId = user?.id ?? null;
   const teamMap = new Map(teams.map((t) => [t.id, t]));
-  const grouped = matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
-    (acc[key] ??= []).push(m);
-    return acc;
-  }, {});
 
   const listFn = useServerFn(listMatchEvents);
   const eventsQ = useQuery({
@@ -136,25 +133,64 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
     eventsByMatch.get(ev.match_id)!.push(ev);
   }
 
-  // Accepted referees (with a user account) — used to populate the per-match selector.
-  const collabFn = useServerFn(listTournamentCollaborators);
-  const collabQ = useQuery({
-    queryKey: ["tournament-collaborators", tournamentId],
-    queryFn: () => collabFn({ data: { tournament_id: tournamentId } }),
+  // Referees (tournament_members with role=referee) — populates per-match assignment menu.
+  const refFn = useServerFn(listTournamentReferees);
+  const refereesQ = useQuery({
+    queryKey: ["tournament-referees", tournamentId],
+    queryFn: () => refFn({ data: { tournament_id: tournamentId } }),
     enabled: !!canManage,
   });
-  const refereeOptions: RefereeOption[] = ((collabQ.data?.collaborators ?? []) as any[])
-    .filter(
-      (c) =>
-        c.role === "referee" && !!c.accepted_at && !c.revoked_at && !!c.user_id,
-    )
-    .map((c) => ({
-      user_id: c.user_id as string,
-      label: (c.display_name as string | null) || (c.email as string),
-    }));
+  const refereeOptions: RefereeOption[] = ((refereesQ.data?.referees ?? []) as any[]).map(
+    (r) => ({
+      member_id: r.id as string,
+      user_id: (r.user_id as string | null) ?? null,
+      label: r.label as string,
+      offline: !!r.offline,
+    }),
+  );
+
+  // "My matches" filter — visible when current user is referee on at least one match.
+  const assignedToMe = useMemo(
+    () =>
+      currentUserId
+        ? matches.filter((m) => m.referee_user_id === currentUserId).length
+        : 0,
+    [matches, currentUserId],
+  );
+  const [onlyMine, setOnlyMine] = useState(false);
+  const showFilter = assignedToMe > 0;
+  const visibleMatches =
+    showFilter && onlyMine
+      ? matches.filter((m) => m.referee_user_id === currentUserId)
+      : matches;
+
+  const grouped = visibleMatches.reduce<Record<string, Match[]>>((acc, m) => {
+    const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
+    (acc[key] ??= []).push(m);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-5">
+      {showFilter && (
+        <div className="flex items-center gap-2 px-1">
+          <Button
+            type="button"
+            size="sm"
+            variant={onlyMine ? "default" : "outline"}
+            onClick={() => setOnlyMine((v) => !v)}
+            className="h-8 text-xs gap-1.5"
+          >
+            <Gavel className="h-3.5 w-3.5" />
+            {onlyMine
+              ? t("matches.allMatches", { defaultValue: "Tous les matchs" })
+              : t("matches.myMatches", { defaultValue: "Mes matchs" })}
+            <span className="ml-1 rounded-full bg-background/30 px-1.5 text-[10px] font-semibold tabular-nums">
+              {assignedToMe}
+            </span>
+          </Button>
+        </div>
+      )}
       {Object.entries(grouped).map(([round, ms]) => (
         <section key={round} className="space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground px-1">
@@ -178,7 +214,7 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
           </ul>
         </section>
       ))}
-      {matches.length === 0 && (
+      {visibleMatches.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
           {t("matches.empty")}
         </div>
