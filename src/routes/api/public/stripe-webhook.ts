@@ -304,6 +304,13 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
               }
               break;
             }
+            case "charge.refunded": {
+              await handleTournamentChargeRefunded(
+                event.data.object as Stripe.Charge,
+                event.id,
+              );
+              break;
+            }
             default:
               break;
           }
