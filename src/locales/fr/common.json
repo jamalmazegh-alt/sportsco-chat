@@ -1145,6 +1145,10 @@
     "adminUsers": {
       "title": "Utilisateurs — Clubero",
       "description": "Gère les membres et les rôles de ton club."
+    },
+    "tournaments": {
+      "title": "Tournois — Clubero",
+      "description": "Gérez vos tournois et compétitions."
     }
   },
   "trial": {
