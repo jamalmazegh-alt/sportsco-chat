@@ -770,26 +770,37 @@ function PublicMatches({
         const setsLine = scoring.mode === "sets" ? formatSets(m.sets) : "";
         const isLive = m.status === "live";
         const evts = eventsByMatch.get(m.id) ?? [];
+        const winnerA = m.winner_team_id && m.winner_team_id === m.team_a_id;
+        const winnerB = m.winner_team_id && m.winner_team_id === m.team_b_id;
         return (
           <li
             key={m.id}
             className={cn(
-              "rounded-xl border border-border bg-card p-3",
-              isLive && "border-red-500/40 bg-red-500/5",
+              "rounded-xl border bg-card p-3 transition-colors",
+              isLive
+                ? "border-red-500/40 bg-red-500/5"
+                : m.status === "completed"
+                ? "border-border"
+                : "border-border hover:border-primary/30",
             )}
           >
             <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
-              <span className="truncate text-right text-sm font-medium">
+              <span className={cn("truncate text-right text-sm inline-flex items-center justify-end gap-1.5", winnerA ? "font-bold text-foreground" : "font-medium text-muted-foreground")}>
+                {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
                 {teamMap.get(m.team_a_id)?.name ?? t("common.tbd")}
               </span>
               <span className="tabular-nums font-bold flex items-center gap-1.5">
-                {m.score_a ?? "–"} : {m.score_b ?? "–"}
+                <span className={cn(!winnerA && "text-muted-foreground")}>{m.score_a ?? "–"}</span>
+                <span className="text-muted-foreground">:</span>
+                <span className={cn(!winnerB && "text-muted-foreground")}>{m.score_b ?? "–"}</span>
                 {isLive && <LiveBadge />}
               </span>
-              <span className="truncate text-sm font-medium">
+              <span className={cn("truncate text-sm inline-flex items-center gap-1.5", winnerB ? "font-bold text-foreground" : "font-medium text-muted-foreground")}>
                 {teamMap.get(m.team_b_id)?.name ?? t("common.tbd")}
+                {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
               </span>
             </div>
+            <MatchBadges match={m} />
             {(m.scheduled_at || m.field) && (
               <div className="text-[11px] text-muted-foreground text-center mt-1">
                 {m.scheduled_at &&
