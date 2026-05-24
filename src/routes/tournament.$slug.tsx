@@ -1032,14 +1032,14 @@ function PublishedRegistrationView({
           </dl>
         </section>
 
-        {/* Rules */}
-        {rules.text && (
+        {/* Public message from organizer (if set) */}
+        {rules.registration.publicMessage && (
           <section className="rounded-2xl border border-border bg-card p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
               {t("tournament.rules")}
             </h2>
-            <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm">
-              {rules.text}
+            <div className="whitespace-pre-wrap text-sm">
+              {rules.registration.publicMessage}
             </div>
           </section>
         )}
