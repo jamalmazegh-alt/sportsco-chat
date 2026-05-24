@@ -22,6 +22,9 @@
     "tbd": "TBD",
     "live": "Live",
     "ft": "FT",
+    "aet": "AP",
+    "pen": "TAB",
+    "mvp": "MVP",
     "field": "Terrain"
   },
   "public": {
