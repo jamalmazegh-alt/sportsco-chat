@@ -46,6 +46,7 @@ import { RegistrationsManager } from "@/modules/tournaments/components/Registrat
 import { RegistrationSettingsPanel } from "@/modules/tournaments/components/RegistrationSettingsPanel";
 import { StaffAndOfficialsPanel } from "@/modules/tournaments/components/StaffAndOfficialsPanel";
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
+import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
 import { ClipboardList, UserCog, CreditCard } from "lucide-react";
 
