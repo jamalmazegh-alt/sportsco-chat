@@ -462,6 +462,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
         <TeamRosterDialog
           tournamentTeamId={rosterTeam.id}
           teamName={rosterTeam.name}
+          sport={sport ?? null}
           onClose={() => setRosterTeam(null)}
         />
       )}
