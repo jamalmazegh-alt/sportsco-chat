@@ -147,12 +147,18 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                   session.metadata?.email ??
                   null;
                 if (buyerEmail) {
+                  const qty = Math.max(
+                    1,
+                    parseInt(session.metadata?.quantity ?? "1", 10) || 1,
+                  );
+                  const totalCents = session.amount_total ?? 4000 * qty;
+                  const perPass = Math.round(totalCents / qty);
                   await supabaseAdmin
                     .from("tournament_passes")
                     .update({
                       status: "paid",
                       stripe_payment_intent_id: paymentIntentId,
-                      amount_total: session.amount_total ?? 4000,
+                      amount_total: perPass,
                       currency: session.currency ?? "eur",
                       paid_at: new Date().toISOString(),
                     })
@@ -163,10 +169,11 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                       idempotencyKey: `tournament-pass-${session.id}`,
                       templateData: {
                         buyerEmail,
-                        amount: session.amount_total ?? 4000,
+                        amount: totalCents,
                         currency: session.currency ?? "eur",
                         sessionId: session.id,
                         paymentIntentId,
+                        quantity: qty,
                       },
                     });
                   } catch (e) {
