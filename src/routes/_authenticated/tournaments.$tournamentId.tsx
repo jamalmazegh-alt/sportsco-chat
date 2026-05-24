@@ -37,6 +37,7 @@ import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
 import { RegistrationsManager } from "@/modules/tournaments/components/RegistrationsManager";
 import { CollaboratorsManager } from "@/modules/tournaments/components/CollaboratorsManager";
 import { MembersManager } from "@/modules/tournaments/components/MembersManager";
+import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
 import { ClipboardList, UserPlus, UserCog } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
