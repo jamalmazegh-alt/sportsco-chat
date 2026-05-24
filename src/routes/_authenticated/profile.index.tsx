@@ -290,7 +290,7 @@ function ProfilePage() {
 
         {memberships.length > 1 && (
           <div className="space-y-1.5">
-            <Label>Club</Label>
+            <Label>{t("profile.club")}</Label>
             <Select value={activeClubId ?? undefined} onValueChange={setActiveClubId}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
