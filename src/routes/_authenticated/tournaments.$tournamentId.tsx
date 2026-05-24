@@ -206,6 +206,8 @@ function TournamentDetailPage() {
         { id: "registrations", icon: ClipboardList, label: t("tabs.registrations") },
         { id: "teams", icon: Users, label: t("tabs.teams") },
         { id: "staff", icon: UserCog, label: t("sections.staffAndOfficials", { defaultValue: "Staff & arbitres" }) },
+        { id: "draw", icon: Dices, label: t("sections.draw", { defaultValue: "Tirage au sort" }) },
+        { id: "schedule", icon: CalendarClock, label: t("sections.groupsSchedule", { defaultValue: "Groupes & calendrier" }) },
       ]
     : [{ id: "teams", icon: Users, label: t("tabs.teams") }];
   const configureSubs: { id: Sub; icon: any; label: string }[] = canManage
