@@ -16,6 +16,7 @@ export async function logPaymentEvent(
   amount: number | null,
   metadata: Record<string, unknown>,
   stripeEventId: string | null = null,
+  actorId: string | null = null,
 ): Promise<void> {
   try {
     await supabaseAdmin.from("tournament_payment_events").insert({
@@ -24,6 +25,7 @@ export async function logPaymentEvent(
       event_type: eventType,
       amount,
       stripe_event_id: stripeEventId,
+      actor_id: actorId,
       metadata: metadata as unknown as never,
     });
   } catch (e) {
