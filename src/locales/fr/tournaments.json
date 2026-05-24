@@ -239,7 +239,7 @@
     "creationError": "Erreur lors de la création du club."
   },
   "bracket": {
-    "empty": "Aucun bracket généré pour le moment.",
+    "empty": "Aucun tableau final généré pour le moment.",
     "thirdPlace": "Match pour la 3e place",
     "matchNumber": "Match #{{n}}",
     "tbd": "À déterminer",
