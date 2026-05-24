@@ -961,5 +961,17 @@
     "numTeams": "Nombre d'équipes",
     "consumeHint": "Votre pass sera consommé à la création. Il vous donne accès complet à la gestion du tournoi (équipes, poules, scores, partage public).",
     "submit": "Créer le tournoi"
+  },
+  "tournament": {
+    "publishProgramme": "Publier le programme",
+    "publishProgrammeSubtitle": "Notifie toutes les équipes confirmées avec leur premier match (date, heure, terrain, adversaire) et démarre le tournoi.",
+    "publishProgrammeIrreversible": "Action irréversible — les inscriptions seront verrouillées.",
+    "checkTeamsConfirmed": "Au moins 2 équipes confirmées (paiement validé)",
+    "checkTeamsAssigned": "Toutes les équipes confirmées sont assignées à une poule",
+    "checkMatchesGenerated": "Les matchs ont été générés",
+    "checkStartDate": "Une date de début est définie",
+    "programmePublished": "Programme publié — équipes notifiées",
+    "publishConfirmTitle": "Publier le programme du tournoi ?",
+    "publishConfirmBody": "Un email sera envoyé à chaque équipe confirmée avec son premier match. Le tournoi passera en cours et les nouvelles inscriptions seront fermées. Cette action est irréversible."
   }
 }

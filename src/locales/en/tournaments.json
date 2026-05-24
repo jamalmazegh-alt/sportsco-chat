@@ -961,5 +961,17 @@
     "numTeams": "Number of teams",
     "consumeHint": "Your pass will be consumed at creation. It gives you full access to tournament management (teams, groups, scores, public sharing).",
     "submit": "Create tournament"
+  },
+  "tournament": {
+    "publishProgramme": "Publish programme",
+    "publishProgrammeSubtitle": "Notify all confirmed teams with their first match (date, time, field, opponent) and start the tournament.",
+    "publishProgrammeIrreversible": "Irreversible action — registrations will be locked.",
+    "checkTeamsConfirmed": "At least 2 confirmed teams (payment validated)",
+    "checkTeamsAssigned": "All confirmed teams assigned to a group",
+    "checkMatchesGenerated": "Matches have been generated",
+    "checkStartDate": "A start date is set",
+    "programmePublished": "Programme published — teams notified",
+    "publishConfirmTitle": "Publish the tournament programme?",
+    "publishConfirmBody": "An email will be sent to each confirmed team with their first match. The tournament will move to in-progress and new registrations will close. This action is irreversible."
   }
 }

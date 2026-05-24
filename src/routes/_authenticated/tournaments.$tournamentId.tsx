@@ -46,6 +46,7 @@ import { RegistrationsManager } from "@/modules/tournaments/components/Registrat
 import { RegistrationSettingsPanel } from "@/modules/tournaments/components/RegistrationSettingsPanel";
 import { StaffAndOfficialsPanel } from "@/modules/tournaments/components/StaffAndOfficialsPanel";
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
+import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
 import { ClipboardList, UserCog, CreditCard } from "lucide-react";
 
@@ -369,6 +370,15 @@ function TournamentDetailPage() {
 
 
         {/* Play section */}
+        {section === "play" && canManage && (
+          <PublishProgrammeCard
+            tournamentId={tournament.id}
+            status={tournament.status}
+            teams={(teams as any[]).map((tt) => ({ id: tt.id, group_id: tt.group_id ?? null }))}
+            matchesCount={(matches as any[])?.length ?? 0}
+            hasStartDate={Boolean(tournament.starts_on)}
+          />
+        )}
         {section === "play" && sub === "matches" && (
           <MatchesList
             tournamentId={tournament.id}
