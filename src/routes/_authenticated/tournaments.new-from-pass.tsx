@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Loader2, Trophy, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SportSelect } from "@/components/sport-select";
 import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
+import i18nInstance from "@/lib/i18n";
 import {
   listMyAvailablePasses,
   createTournamentFromPass,
@@ -21,13 +23,14 @@ export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass"
     session_id: typeof s.session_id === "string" ? s.session_id : undefined,
   }),
   head: () => ({
-    meta: [{ title: "Créer mon tournoi — Clubero" }],
+    meta: [{ title: i18nInstance.t("newFromPass.metaTitle", { ns: "tournaments" }) }],
   }),
 });
 
 type Format = "group" | "knockout" | "mixed";
 
 function NewFromPassPage() {
+  const { t } = useTranslation("tournaments");
   const navigate = useNavigate();
   const search = Route.useSearch();
   const justPaid = search.pass === "success";
@@ -71,7 +74,7 @@ function NewFromPassPage() {
         },
       }),
     onSuccess: (res) => {
-      toast.success("Tournoi créé");
+      toast.success(t("newFromPass.createdToast"));
       navigate({
         to: "/tournaments/$tournamentId",
         params: { tournamentId: res.tournament.id },
@@ -87,7 +90,7 @@ function NewFromPassPage() {
     e.preventDefault();
     if (!pass) return;
     if (!name.trim() || !startsOn) {
-      toast.error("Nom et date de début requis");
+      toast.error(t("newFromPass.missingFields"));
       return;
     }
     create.mutate(pass.id);
@@ -108,11 +111,10 @@ function NewFromPassPage() {
           <Loader2 className="h-7 w-7 animate-spin text-primary" />
         </div>
         <h1 className="mt-5 font-display text-2xl font-bold">
-          Paiement en cours de validation
+          {t("newFromPass.validatingTitle")}
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Merci pour votre achat. Nous activons votre pass tournoi… cela ne
-          prend que quelques secondes.
+          {t("newFromPass.validatingBody")}
         </p>
       </div>
     );
@@ -124,18 +126,17 @@ function NewFromPassPage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <AlertCircle className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-bold">Aucun pass disponible</h1>
+        <h1 className="mt-5 font-display text-2xl font-bold">{t("newFromPass.noPassTitle")}</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Achetez un pass tournoi à 40 € pour créer votre tournoi. Aucun
-          abonnement requis — un paiement unique par tournoi.
+          {t("newFromPass.noPassBody")}
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
           <TournamentPassButton
             variant="default"
-            label="Acheter un pass 40 €"
+            label={t("newFromPass.buyPass")}
           />
           <Button asChild variant="ghost" size="sm">
-            <Link to="/tournaments">Retour aux tournois</Link>
+            <Link to="/tournaments">{t("newFromPass.backToTournaments")}</Link>
           </Button>
         </div>
       </div>
@@ -149,44 +150,44 @@ function NewFromPassPage() {
           <Trophy className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="font-display text-2xl font-bold">Créer mon tournoi</h1>
+          <h1 className="font-display text-2xl font-bold">{t("newFromPass.heading")}</h1>
           <p className="text-sm text-muted-foreground">
-            Pass tournoi validé pour {pass.email}
+            {t("newFromPass.passValidatedFor", { email: pass.email })}
           </p>
         </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="name">Nom du tournoi *</Label>
+          <Label htmlFor="name">{t("newFromPass.name")}</Label>
           <Input
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Coupe du Printemps"
+            placeholder={t("newFromPass.namePlaceholder")}
             required
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Sport *</Label>
+            <Label>{t("newFromPass.sport")}</Label>
             <SportSelect value={sport} onValueChange={setSport} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="category">Catégorie</Label>
+            <Label htmlFor="category">{t("newFromPass.category")}</Label>
             <Input
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="U15, Seniors…"
+              placeholder={t("newFromPass.categoryPlaceholder")}
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="starts">Date de début *</Label>
+            <Label htmlFor="starts">{t("newFromPass.startDate")}</Label>
             <Input
               id="starts"
               type="date"
@@ -196,7 +197,7 @@ function NewFromPassPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="ends">Date de fin</Label>
+            <Label htmlFor="ends">{t("newFromPass.endDate")}</Label>
             <Input
               id="ends"
               type="date"
@@ -207,31 +208,31 @@ function NewFromPassPage() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="location">Lieu</Label>
+          <Label htmlFor="location">{t("newFromPass.location")}</Label>
           <Input
             id="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Adresse ou complexe sportif"
+            placeholder={t("newFromPass.locationPlaceholder")}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="format">Format</Label>
+            <Label htmlFor="format">{t("newFromPass.format")}</Label>
             <select
               id="format"
               value={format}
               onChange={(e) => setFormat(e.target.value as Format)}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
             >
-              <option value="group">Poules</option>
-              <option value="knockout">Élimination directe</option>
-              <option value="mixed">Poules + phase finale</option>
+              <option value="group">{t("newFromPass.formatGroup")}</option>
+              <option value="knockout">{t("newFromPass.formatKnockout")}</option>
+              <option value="mixed">{t("newFromPass.formatMixed")}</option>
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="num">Nombre d'équipes</Label>
+            <Label htmlFor="num">{t("newFromPass.numTeams")}</Label>
             <Input
               id="num"
               type="number"
@@ -244,13 +245,12 @@ function NewFromPassPage() {
         </div>
 
         <div className="rounded-lg bg-muted/40 p-4 text-xs text-muted-foreground">
-          Votre pass sera consommé à la création. Il vous donne accès complet à
-          la gestion du tournoi (équipes, poules, scores, partage public).
+          {t("newFromPass.consumeHint")}
         </div>
 
         <Button type="submit" disabled={create.isPending} className="w-full h-11">
           {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-          Créer le tournoi
+          {t("newFromPass.submit")}
         </Button>
       </form>
     </div>
