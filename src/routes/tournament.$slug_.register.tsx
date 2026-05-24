@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { getPublicTournament } from "@/modules/tournaments/tournaments.functions";
+import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
 
 export const Route = createFileRoute("/tournament/$slug_/register")({
   component: RegisterPage,
