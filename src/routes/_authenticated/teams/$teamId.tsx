@@ -1036,7 +1036,7 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
   }
 
   async function detach(uid: string) {
-    if (!confirm(t("teams.coachDetachConfirm", { defaultValue: "Retirer ce coach de l'équipe ?" }))) return;
+    if (!confirm(t("teams.coachDetachConfirm"))) return;
     setBusyUid(uid);
     const { error } = await supabase
       .from("team_members")
