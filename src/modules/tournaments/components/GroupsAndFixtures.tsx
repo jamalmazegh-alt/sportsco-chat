@@ -204,6 +204,7 @@ export function GroupsAndFixtures({
   fields,
   settings,
   teams,
+  view = "all",
 }: Props) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
