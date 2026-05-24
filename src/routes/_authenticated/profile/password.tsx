@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,12 @@ import { BackLink } from "@/components/back-link";
 
 export const Route = createFileRoute("/_authenticated/profile/password")({
   component: PasswordPage,
-  head: () => ({ meta: [{ title: "Mot de passe — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.password.title", { ns: "common" }) },
+      { name: "description", content: i18n.t("meta.password.description", { ns: "common" }) },
+    ],
+  }),
 });
 
 function PasswordPage() {

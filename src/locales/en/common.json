@@ -686,7 +686,30 @@
     "legalTerms": "Terms of service",
     "legalPrivacy": "Privacy policy",
     "legalNotice": "Legal notice",
-    "legalDataProcessing": "Data processing"
+    "legalDataProcessing": "Data processing",
+    "email": "Email address",
+    "phoneSaved": "Phone saved",
+    "club": "Club",
+    "theme": "Appearance",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "Auto",
+    "password": {
+      "menu": "Password",
+      "menuSubtitle": "Change your password",
+      "title": "Password",
+      "subtitle": "Change your account password.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "hint": "At least 8 characters.",
+      "save": "Update password",
+      "tooShort": "Password must be at least 8 characters.",
+      "mismatch": "The two passwords don't match.",
+      "sameAsCurrent": "New password must be different from the current one.",
+      "wrongCurrent": "Current password is incorrect.",
+      "updated": "Password updated."
+    }
   },
   "admin": {
     "title": "Club settings",
@@ -1149,6 +1172,18 @@
     "tournaments": {
       "title": "Tournaments — Clubero",
       "description": "Manage your tournaments and competitions."
+    },
+    "profile": {
+      "title": "Profile — Clubero",
+      "description": "Your account preferences and information."
+    },
+    "password": {
+      "title": "Password — Clubero",
+      "description": "Change your password."
+    },
+    "privacy": {
+      "title": "Privacy — Clubero",
+      "description": "Manage your consents and data."
     }
   },
   "trial": {
