@@ -1,11 +1,13 @@
 // Server-only helpers for tournament payments. Kept out of the .functions.ts
-// file so server routes (e.g. /api/public/tournament-payment-link) can import
+// file so server routes (e.g. /api/public/stripe-webhook) can import
 // the raw helpers without dragging the full createServerFn graph into their
 // bundle (which caused production build OOM).
+import type Stripe from "stripe";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe } from "@/lib/stripe.server";
 import { computeFeeForClub } from "@/lib/platform-fee";
 import { createLogger } from "@/lib/logger.server";
+
 
 const log = createLogger("tournament-payments.server");
 
