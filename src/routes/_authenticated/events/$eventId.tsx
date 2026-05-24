@@ -127,6 +127,12 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
     preselect: typeof s.preselect === "string" && s.preselect.length > 0 ? s.preselect : undefined,
     action: typeof s.action === "string" && s.action.length > 0 ? s.action : undefined,
   }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.eventDetail.title") },
+      { name: "description", content: i18n.t("meta.eventDetail.description") },
+    ],
+  }),
   component: EventDetailRoute,
 });
 
