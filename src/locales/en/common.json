@@ -1272,6 +1272,11 @@
       "description": "Answers to frequent questions about Clubero — pricing, setup, GDPR, parental controls and more.",
       "ogDescription": "Answers to frequent questions about Clubero."
     },
+    "demo": {
+      "title": "Request a demo — Clubero",
+      "description": "Book a 15-minute Clubero demo. We'll set up your first team with you.",
+      "ogDescription": "Book a 15-minute Clubero demo."
+    },
     "legalGeneric": {
       "fallbackTitle": "Legal",
       "fallbackDescription": "Legal document"
