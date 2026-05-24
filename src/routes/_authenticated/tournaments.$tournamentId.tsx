@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +41,12 @@ import { ClipboardList, UserPlus, UserCog } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.tournaments.title", { ns: "common" }) },
+      { name: "description", content: i18n.t("meta.tournaments.description", { ns: "common" }) },
+    ],
+  }),
 });
 
 type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
