@@ -139,6 +139,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }:
         <PlayerFormDialog
           tournamentTeamId={tournamentTeamId}
           player={editing}
+          sport={sport ?? null}
           upsertFn={upsertFn}
           onClose={() => {
             setAdding(false);
