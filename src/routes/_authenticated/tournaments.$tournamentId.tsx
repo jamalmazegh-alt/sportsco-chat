@@ -444,6 +444,44 @@ function TournamentDetailPage() {
         {section === "manage" && canManage && sub === "staff" && (
           <StaffAndOfficialsPanel tournamentId={tournament.id} />
         )}
+        {section === "manage" && canManage && sub === "draw" && (
+          <GroupsAndFixtures
+            view="draw"
+            tournamentId={tournament.id}
+            format={tournament.format}
+            status={tournament.status}
+            numTeams={teams.length}
+            teams={teams as any}
+            groupsCount={groups.length}
+            matchesCount={matches.length}
+            startsOn={tournament.starts_on}
+            matchDurationMin={(tournament as any).match_duration_min}
+            breakMin={(tournament as any).break_min}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            fields={(tournament as any).fields}
+            settings={(tournament as any).settings}
+          />
+        )}
+        {section === "manage" && canManage && sub === "schedule" && (
+          <GroupsAndFixtures
+            view="schedule"
+            tournamentId={tournament.id}
+            format={tournament.format}
+            status={tournament.status}
+            numTeams={teams.length}
+            teams={teams as any}
+            groupsCount={groups.length}
+            matchesCount={matches.length}
+            startsOn={tournament.starts_on}
+            matchDurationMin={(tournament as any).match_duration_min}
+            breakMin={(tournament as any).break_min}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            fields={(tournament as any).fields}
+            settings={(tournament as any).settings}
+          />
+        )}
 
 
         {/* Play section */}
