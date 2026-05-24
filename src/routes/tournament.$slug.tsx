@@ -592,23 +592,22 @@ function HeroStat({
   return (
     <div
       className={cn(
-        "rounded-xl border bg-card/60 backdrop-blur-sm px-3 py-2.5 flex flex-col justify-center",
+        "rounded-xl border bg-card/60 backdrop-blur-sm px-3 py-2.5 flex flex-col justify-center min-h-[64px]",
         accent ? "border-red-500/40" : "border-border",
       )}
     >
-      {!hideValue && (
-        <p className={cn("text-xl sm:text-2xl font-extrabold tabular-nums leading-none", accent && "text-red-600 dark:text-red-400")}>
-          {value}
-        </p>
-      )}
-      <p className={cn("text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-muted-foreground", hideValue && "text-sm normal-case tracking-normal text-foreground font-bold tabular-nums")}>
-        {hideValue ? value : label}
+      <p
+        className={cn(
+          "font-extrabold tabular-nums leading-none",
+          hideValue ? "text-base sm:text-lg text-foreground" : "text-xl sm:text-2xl",
+          accent && "text-red-600 dark:text-red-400",
+        )}
+      >
+        {value}
       </p>
-      {hideValue && (
-        <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mt-0.5">
-          {label}
-        </p>
-      )}
+      <p className="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mt-1">
+        {label}
+      </p>
     </div>
   );
 }
