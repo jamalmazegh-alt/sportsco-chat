@@ -914,6 +914,51 @@ function MatchCard({
                     ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Gavel className="h-3.5 w-3.5" />
+                    {t("matches.assignRefereeAction", { defaultValue: "Assigner un arbitre" })}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
+                    <DropdownMenuItem
+                      onClick={() => quickAssignRef.mutate(null)}
+                      disabled={quickAssignRef.isPending}
+                    >
+                      {!match.referee_user_id && !match.referee_name && (
+                        <Check className="h-3.5 w-3.5" />
+                      )}
+                      {t("matches.refereeNone")}
+                    </DropdownMenuItem>
+                    {refereeOptions.length > 0 && <DropdownMenuSeparator />}
+                    {refereeOptions.map((r) => {
+                      const isCurrent = r.user_id
+                        ? match.referee_user_id === r.user_id
+                        : match.referee_name === r.label && !match.referee_user_id;
+                      return (
+                        <DropdownMenuItem
+                          key={r.member_id}
+                          onClick={() => quickAssignRef.mutate(r)}
+                          disabled={quickAssignRef.isPending}
+                          className={isCurrent ? "font-semibold" : ""}
+                        >
+                          {isCurrent && <Check className="h-3.5 w-3.5" />}
+                          <span className="truncate">{r.label}</span>
+                          {r.offline && (
+                            <span className="ml-auto text-[10px] text-muted-foreground">
+                              {t("matches.refereeOffline", { defaultValue: "(sans compte)" })}
+                            </span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                    {refereeOptions.length === 0 && (
+                      <div className="px-2 py-1.5 text-[11px] text-muted-foreground">
+                        {t("matches.refereeNoAccepted")}
+                      </div>
+                    )}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
