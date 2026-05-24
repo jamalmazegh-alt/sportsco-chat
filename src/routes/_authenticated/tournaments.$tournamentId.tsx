@@ -136,11 +136,13 @@ function TournamentDetailPage() {
               {tournament.sport} · {tournament.starts_on}
               {tournament.location ? ` · ${tournament.location}` : ""}
             </p>
-            <p className="text-xs mt-1">
-              <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
-                {t(`status.${tournament.status}`, { defaultValue: tournament.status })}
-              </span>
-            </p>
+            {!canManage && (
+              <p className="text-xs mt-1">
+                <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
+                  {t(`status.${tournament.status}`, { defaultValue: tournament.status })}
+                </span>
+              </p>
+            )}
           </div>
         </div>
 
