@@ -86,7 +86,7 @@ export async function buildCheckoutForRegistration(params: {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    automatic_payment_methods: { enabled: true },
+    payment_method_types: ["card", "sepa_debit", "link"],
     customer_email: reg.contact_email ?? undefined,
     line_items: [
       {
