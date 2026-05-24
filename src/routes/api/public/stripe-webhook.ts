@@ -7,7 +7,8 @@ import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import {
   handleTournamentCheckoutCompleted,
   handleTournamentChargeRefunded,
-} from "@/modules/tournaments/tournament-payments.functions";
+} from "@/modules/tournaments/tournament-payments.server";
+
 
 type SubStatus =
   | "trialing"
