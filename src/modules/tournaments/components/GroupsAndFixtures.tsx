@@ -385,39 +385,42 @@ export function GroupsAndFixtures({
       <div className={cn("space-y-3", showStickyBar ? "pb-40" : "pb-6")}>
         {/* Block 1 — Tirage au sort */}
         {showDraw && (
-        <Block
-          tone="primary"
-          icon={<Dices className="h-5 w-5 text-primary" />}
-          iconBg="bg-primary/10"
-          title={t("groups.drawTitle")}
-          subtitle={t("groups.drawSubtitle")}
-        >
-          <p className="text-xs text-muted-foreground">
-            {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
-          </p>
-          <Button
-            onClick={() => setDrawOpen(true)}
-            disabled={numTeams < 2}
-            className="w-full h-11"
-            variant={hasExistingDraw ? "outline" : "default"}
-          >
-            <Dices className="h-4 w-4" />
-            {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
-          </Button>
-        </Block>
+          <>
+            <Block
+              tone="primary"
+              icon={<Dices className="h-5 w-5 text-primary" />}
+              iconBg="bg-primary/10"
+              title={t("groups.drawTitle")}
+              subtitle={t("groups.drawSubtitle")}
+            >
+              <p className="text-xs text-muted-foreground">
+                {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
+              </p>
+              <Button
+                onClick={() => setDrawOpen(true)}
+                disabled={numTeams < 2}
+                className="w-full h-11"
+                variant={hasExistingDraw ? "outline" : "default"}
+              >
+                <Dices className="h-4 w-4" />
+                {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
+              </Button>
+            </Block>
 
-        <DrawDialog
-          open={drawOpen}
-          onOpenChange={setDrawOpen}
-          tournamentId={tournamentId}
-          format={format}
-          status={status}
-          teams={teams}
-          hasExistingDraw={hasExistingDraw}
-        />
+            <DrawDialog
+              open={drawOpen}
+              onOpenChange={setDrawOpen}
+              tournamentId={tournamentId}
+              format={format}
+              status={status}
+              teams={teams}
+              hasExistingDraw={hasExistingDraw}
+            />
+          </>
+        )}
 
         {/* Block 2 — Groupes & matchs */}
-        {supportsGroups && (
+        {showGroupsConfig && (
           <Block
             icon={<Shuffle className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
             iconBg="bg-blue-100 dark:bg-blue-950/40"
