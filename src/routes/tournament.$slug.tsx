@@ -941,7 +941,7 @@ function PublishedRegistrationView({
                 <span className="inline-flex items-center gap-1.5">
                   <Trophy className="h-3.5 w-3.5" />
                   {tournament.sport}
-                  {tournament.format ? ` · ${tournament.format}` : ""}
+                  {tournament.format ? ` · ${t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}` : ""}
                 </span>
               </div>
             </div>
@@ -1022,7 +1022,7 @@ function PublishedRegistrationView({
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <dt className="text-xs text-muted-foreground">{t("public.tabs.standings", { defaultValue: "Format" })}</dt>
-              <dd className="font-medium">{tournament.format}</dd>
+              <dd className="font-medium">{t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}</dd>
             </div>
             {maxTeams != null && (
               <div>

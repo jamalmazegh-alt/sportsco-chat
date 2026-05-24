@@ -70,14 +70,22 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             { status: 400 },
           );
         }
+        const parseLocalish = (s: string | null | undefined): number | null => {
+          if (!s) return null;
+          const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
+          const t = new Date(hasTz ? s : `${s}Z`).getTime();
+          return Number.isFinite(t) ? t : null;
+        };
         const now = Date.now();
-        if (reg.opensAt && new Date(reg.opensAt).getTime() > now) {
+        const opensAt = parseLocalish(reg.opensAt);
+        const closesAt = parseLocalish(reg.closesAt);
+        if (opensAt !== null && opensAt > now) {
           return Response.json(
             { error: "Registration not yet open" },
             { status: 400 },
           );
         }
-        if (reg.closesAt && new Date(reg.closesAt).getTime() < now) {
+        if (closesAt !== null && closesAt < now) {
           return Response.json(
             { error: "Registration closed" },
             { status: 400 },

@@ -93,8 +93,10 @@ export function PublishWorkflow({
       {
         key: "teams",
         label: t("publishFlow.checks.teams", { count: teamsCount }),
-        ok: teamsCount >= 2,
-        required: true,
+        // When public registration is enabled, teams will register AFTER
+        // publication — don't block the publish step on team count.
+        ok: registrationEnabled ? true : teamsCount >= 2,
+        required: !registrationEnabled,
       },
       {
         key: "format",
