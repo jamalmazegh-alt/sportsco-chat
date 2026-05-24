@@ -35,9 +35,9 @@ type TournamentRole = "tournament_admin" | "staff" | "referee";
 
 interface Match {
   id: string;
-  match_no?: number | null;
-  home_team_id?: string | null;
-  away_team_id?: string | null;
+  match_number?: number | null;
+  team_a_id?: string | null;
+  team_b_id?: string | null;
 }
 interface Team {
   id: string;
