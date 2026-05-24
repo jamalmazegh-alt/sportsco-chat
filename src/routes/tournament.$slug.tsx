@@ -424,7 +424,7 @@ function Overview({
     <div className="grid gap-5 md:grid-cols-2">
       {live.length > 0 && (
         <div className="md:col-span-2">
-          <Card title={t("public.sections.live")} empty="">
+          <Card title={t("public.sections.nowPlaying")} empty="" accent>
             {live.map((m: any) => (
               <MatchRow
                 key={m.id}
