@@ -115,6 +115,11 @@
     "remove": "Remove",
     "clear": "Clear"
   },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "subtitle": "The page you're looking for doesn't exist or has moved."
+  },
   "privacy": {
     "title": "Privacy & data",
     "subtitle": "Manage your consents and exercise your GDPR rights.",

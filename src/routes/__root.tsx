@@ -12,6 +12,7 @@ import i18n from "@/lib/i18n";
 import { useTranslation } from "react-i18next";
 import { bootstrapTheme } from "@/lib/use-theme";
 import { initSentry } from "@/lib/sentry";
+import { NotFoundPage } from "@/components/not-found-page";
 import { CookieConsentBanner } from "@/components/cookie-consent";
 import { ClubThemeProvider } from "@/components/club-theme-provider";
 import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
@@ -76,6 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   }),
   shellComponent: RootShell,
   component: RootComponent,
+  notFoundComponent: NotFoundPage,
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
