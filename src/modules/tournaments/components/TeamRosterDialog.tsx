@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
+import { PositionCombobox } from "@/components/position-combobox";
 import {
   listTeamPlayers,
   upsertTeamPlayer,
@@ -20,6 +21,7 @@ import {
 interface Props {
   tournamentTeamId: string;
   teamName: string;
+  sport?: string | null;
   onClose: () => void;
 }
 
@@ -34,7 +36,7 @@ type Player = {
   license_number: string | null;
 };
 
-export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props) {
+export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }: Props) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const listFn = useServerFn(listTeamPlayers);
@@ -137,6 +139,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
         <PlayerFormDialog
           tournamentTeamId={tournamentTeamId}
           player={editing}
+          sport={sport ?? null}
           upsertFn={upsertFn}
           onClose={() => {
             setAdding(false);
@@ -168,12 +171,14 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props)
 function PlayerFormDialog({
   tournamentTeamId,
   player,
+  sport,
   upsertFn,
   onClose,
   onSaved,
 }: {
   tournamentTeamId: string;
   player: Player | null;
+  sport?: string | null;
   upsertFn: (args: { data: any }) => Promise<any>;
   onClose: () => void;
   onSaved: () => void;
@@ -275,10 +280,10 @@ function PlayerFormDialog({
           </div>
           <div className="space-y-1.5">
             <Label>{t("roster.form.position")}</Label>
-            <Input
+            <PositionCombobox
               value={position}
-              onChange={(e) => setPosition(e.target.value)}
-              maxLength={40}
+              onChange={setPosition}
+              sport={sport ?? null}
               placeholder={t("roster.form.positionPlaceholder")}
             />
           </div>

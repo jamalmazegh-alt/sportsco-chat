@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
+import { PositionCombobox } from "@/components/position-combobox";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
 import { BackLink } from "@/components/back-link";
@@ -650,7 +651,12 @@ function TeamDetail() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>{t("players.preferredPosition")}</Label>
-                    <Input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="GK / DF / MF / FW" />
+                    <PositionCombobox
+                      value={position}
+                      onChange={setPosition}
+                      sport={team?.sport ?? null}
+                      placeholder="GK / DF / MF / FW"
+                    />
                   </div>
                 </div>
 

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User } from "lucide-react";
 import { BackLink } from "@/components/back-link";
+import { PositionCombobox } from "@/components/position-combobox";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 
 import { toast } from "sonner";
@@ -133,6 +134,23 @@ function PlayerProfile() {
         .select("id, full_name, phone, email, parent_user_id, can_respond")
         .eq("player_id", playerId);
       return data ?? [];
+    },
+  });
+
+  // Used for sport-aware position suggestions. Falls back to free text when
+  // the player isn't on any team yet.
+  const { data: playerSport } = useQuery({
+    queryKey: ["player-primary-sport", playerId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("team_members")
+        .select("teams:team_id(sport)")
+        .eq("player_id", playerId)
+        .limit(5);
+      const sports = (data ?? [])
+        .map((r: any) => r?.teams?.sport)
+        .filter(Boolean) as string[];
+      return sports[0] ?? null;
     },
   });
 
@@ -485,7 +503,12 @@ function PlayerProfile() {
           </div>
           <div className="space-y-1.5">
             <Label>{t("players.preferredPosition")}</Label>
-            <Input value={position} onChange={(e) => setPosition(e.target.value)} disabled={!isCoach} />
+            <PositionCombobox
+              value={position}
+              onChange={setPosition}
+              sport={playerSport ?? null}
+              disabled={!isCoach}
+            />
           </div>
         </div>
         <div className="space-y-1.5">

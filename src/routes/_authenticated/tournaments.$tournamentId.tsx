@@ -206,6 +206,7 @@ function TournamentDetailPage() {
             clubId={tournament.club_id}
             teams={teams as any}
             maxTeams={(tournament as any).num_teams ?? null}
+            sport={(tournament as any).sport ?? null}
           />
         )}
         {tab === "fixtures" && canManage && (
