@@ -52,6 +52,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
 type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
 
 function TournamentDetailPage() {
+  const { t } = useTranslation("tournaments");
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -69,10 +70,10 @@ function TournamentDetailPage() {
     mutationFn: (status: "published" | "in_progress" | "completed" | "draft") =>
       updateFn({ data: { tournament_id: tournamentId, patch: { status } } }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("detail.statusUpdated"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error", { defaultValue: "Erreur" })),
   });
 
   const [tab, setTab] = useState<Tab>("teams");
@@ -101,20 +102,20 @@ function TournamentDetailPage() {
   );
 
   const tabs: { id: Tab; icon: any; label: string }[] = [
-    { id: "teams", icon: Users, label: "Équipes" },
-    { id: "fixtures", icon: Shuffle, label: "Format" },
+    { id: "teams", icon: Users, label: t("tabs.teams") },
+    { id: "fixtures", icon: Shuffle, label: t("tabs.format") },
     ...(canManage
-      ? [{ id: "fields" as const, icon: MapPin, label: "Terrains" }]
+      ? [{ id: "fields" as const, icon: MapPin, label: t("tabs.fields") }]
       : []),
-    { id: "matches", icon: Calendar, label: "Matchs" },
-    { id: "standings", icon: ListOrdered, label: "Classement" },
-    { id: "bracket", icon: GitBranch, label: "Bracket" },
+    { id: "matches", icon: Calendar, label: t("tabs.matches") },
+    { id: "standings", icon: ListOrdered, label: t("tabs.standings") },
+    { id: "bracket", icon: GitBranch, label: t("tabs.bracket") },
     ...(canManage
       ? [
-          { id: "registrations" as const, icon: ClipboardList, label: "Inscriptions" },
-          { id: "team_staff" as const, icon: UserPlus, label: "Équipe" },
-          { id: "members" as const, icon: UserCog, label: "Membres" },
-          { id: "rules" as const, icon: Settings2, label: "Règles" },
+          { id: "registrations" as const, icon: ClipboardList, label: t("tabs.registrations") },
+          { id: "team_staff" as const, icon: UserPlus, label: t("tabs.teamStaff") },
+          { id: "members" as const, icon: UserCog, label: t("tabs.members") },
+          { id: "rules" as const, icon: Settings2, label: t("tabs.rules") },
         ]
       : []),
   ];
@@ -122,7 +123,7 @@ function TournamentDetailPage() {
   return (
     <div className="pb-6">
       <header className="px-5 pt-6 pb-4 space-y-3">
-        <BackLink to="/tournaments" label="Tournois" />
+        <BackLink to="/tournaments" label={t("detail.back")} />
 
         <div className="flex items-start gap-3">
           <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -136,7 +137,7 @@ function TournamentDetailPage() {
             </p>
             <p className="text-xs mt-1">
               <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
-                {tournament.status}
+                {t(`status.${tournament.status}`, { defaultValue: tournament.status })}
               </span>
             </p>
           </div>
@@ -146,12 +147,12 @@ function TournamentDetailPage() {
           <div className="flex flex-wrap gap-2">
             {tournament.status === "draft" && (
               <Button size="sm" onClick={() => publish.mutate("published")}>
-                Publier
+                {t("detail.publish")}
               </Button>
             )}
             {tournament.status === "published" && (
               <Button size="sm" onClick={() => publish.mutate("in_progress")}>
-                Démarrer
+                {t("detail.start")}
               </Button>
             )}
             {tournament.status === "in_progress" && (
@@ -160,14 +161,14 @@ function TournamentDetailPage() {
                 variant="outline"
                 onClick={() => publish.mutate("completed")}
               >
-                Clôturer
+                {t("detail.close")}
               </Button>
             )}
             <ShareDialog url={publicUrl} title={tournament.name} />
             <Button size="sm" variant="ghost" asChild>
               <a href={`/tournament/${tournament.slug}`} target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4" />
-                Voir la page publique
+                {t("detail.viewPublic")}
               </a>
             </Button>
           </div>
@@ -229,7 +230,7 @@ function TournamentDetailPage() {
 
         {tab === "fixtures" && !canManage && (
           <p className="text-sm text-muted-foreground">
-            Seuls les admins et dirigeants peuvent configurer le format.
+            {t("detail.formatAdminOnly")}
           </p>
         )}
         {tab === "fields" && canManage && (
