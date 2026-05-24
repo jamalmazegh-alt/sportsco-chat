@@ -152,8 +152,14 @@ function PublicTournamentPage() {
     ((tournament as any).settings as any)?.scoring,
   );
   const now = Date.now();
-  const opens = rules.registration.opensAt ? new Date(rules.registration.opensAt).getTime() : null;
-  const closes = rules.registration.closesAt ? new Date(rules.registration.closesAt).getTime() : null;
+  const parseLocalish = (s: string | null | undefined): number | null => {
+    if (!s) return null;
+    const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
+    const ts = new Date(hasTz ? s : `${s}Z`).getTime();
+    return Number.isFinite(ts) ? ts : null;
+  };
+  const opens = parseLocalish(rules.registration.opensAt);
+  const closes = parseLocalish(rules.registration.closesAt);
   const registrationOpen =
     rules.registration.enabled &&
     (opens === null || now >= opens) &&
