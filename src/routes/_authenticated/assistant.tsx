@@ -27,10 +27,16 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { useAuth } from "@/lib/auth-context";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/assistant")({
   component: AssistantPage,
-  head: () => ({ meta: [{ title: "Assistant — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.assistant.title") },
+      { name: "description", content: i18n.t("meta.assistant.description") },
+    ],
+  }),
 });
 
 const STORAGE_KEY = "clubero-assistant-messages-v1";

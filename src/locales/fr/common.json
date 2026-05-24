@@ -1184,6 +1184,26 @@
     "privacy": {
       "title": "Confidentialité — Clubero",
       "description": "Gérez vos consentements et vos données."
+    },
+    "inbox": {
+      "title": "Mur — Clubero",
+      "description": "Fil d'actualité et messages de votre club."
+    },
+    "followUps": {
+      "title": "À relancer — Clubero",
+      "description": "Joueurs et parents à relancer pour les convocations."
+    },
+    "assistant": {
+      "title": "Assistant — Clubero",
+      "description": "Assistant IA pour gérer votre club."
+    },
+    "support": {
+      "title": "Support — Clubero",
+      "description": "Vos demandes d'assistance."
+    },
+    "supportTicket": {
+      "title": "Demande — Clubero",
+      "description": "Détail de la demande de support."
     }
   },
   "trial": {

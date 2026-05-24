@@ -6,10 +6,16 @@ import { TicketThread } from "@/components/support/ticket-thread";
 import { Loader2 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { STATUS_BADGE_CLASS, type SupportStatus } from "@/lib/support-constants";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/support/$ticketId")({
   component: TicketDetailPage,
-  head: () => ({ meta: [{ title: "Demande — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.supportTicket.title") },
+      { name: "description", content: i18n.t("meta.supportTicket.description") },
+    ],
+  }),
 });
 
 function TicketDetailPage() {
