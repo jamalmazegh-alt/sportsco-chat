@@ -1,13 +1,27 @@
-import { useState, useEffect, type KeyboardEvent } from "react";
+import { useState, useEffect, type KeyboardEvent, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Shuffle, Trophy, Clock, CalendarClock, HelpCircle, Plus, X, MapPin, UtensilsCrossed, Dices } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  Loader2,
+  Shuffle,
+  Trophy,
+  Clock,
+  CalendarClock,
+  HelpCircle,
+  Plus,
+  Minus,
+  X,
+  MapPin,
+  UtensilsCrossed,
+  Dices,
+  Save,
+} from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 import {
   autoCreateGroupsAndFixtures,
@@ -34,6 +48,144 @@ interface Props {
   settings?: Record<string, any> | null;
   teams: Array<{ id: string; name: string; short_name?: string | null; logo_url?: string | null }>;
 }
+
+/* ---------- Reusable block primitives ---------- */
+
+function Block({
+  icon,
+  iconBg,
+  title,
+  subtitle,
+  children,
+  tone,
+}: {
+  icon: ReactNode;
+  iconBg: string;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  tone?: "primary" | "default";
+}) {
+  return (
+    <section
+      className={cn(
+        "rounded-2xl border bg-card overflow-hidden",
+        tone === "primary" ? "border-primary/30" : "border-border",
+      )}
+    >
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-border/60 bg-muted/30">
+        <div
+          className={cn(
+            "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
+            iconBg,
+          )}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold leading-tight truncate">{title}</h3>
+          {subtitle && (
+            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+          )}
+        </div>
+      </header>
+      <div className="p-4 space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function Stepper({
+  label,
+  value,
+  onChange,
+  step = 5,
+  min = 0,
+  max = 240,
+  unit,
+  className,
+}: {
+  label: string;
+  value: number;
+  onChange: (n: number) => void;
+  step?: number;
+  min?: number;
+  max?: number;
+  unit?: string;
+  className?: string;
+}) {
+  const clamp = (n: number) => Math.min(max, Math.max(min, n));
+  return (
+    <div className={cn("space-y-1.5", className)}>
+      <label className="text-[11px] font-medium text-muted-foreground block">{label}</label>
+      <div className="flex items-stretch rounded-xl border-[1.5px] border-border bg-muted/40 overflow-hidden focus-within:border-primary transition-colors">
+        <button
+          type="button"
+          onClick={() => onChange(clamp(value - step))}
+          className="w-10 flex items-center justify-center text-foreground hover:bg-muted active:bg-border transition-colors shrink-0"
+          aria-label="−"
+        >
+          <Minus className="h-4 w-4" />
+        </button>
+        <input
+          type="number"
+          inputMode="numeric"
+          value={value}
+          onChange={(e) => onChange(clamp(parseInt(e.target.value || String(min), 10)))}
+          className="flex-1 min-w-0 bg-transparent text-center text-base font-bold tabular-nums outline-none border-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <button
+          type="button"
+          onClick={() => onChange(clamp(value + step))}
+          className="w-10 flex items-center justify-center text-foreground hover:bg-muted active:bg-border transition-colors shrink-0"
+          aria-label="+"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+      </div>
+      {unit && (
+        <p className="text-[10px] text-muted-foreground text-center">{unit}</p>
+      )}
+    </div>
+  );
+}
+
+function TimeField({
+  label,
+  value,
+  onChange,
+  tone,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  tone?: "default" | "amber";
+}) {
+  return (
+    <div className="flex-1 min-w-0 space-y-1.5">
+      <label
+        className={cn(
+          "text-[11px] font-medium block",
+          tone === "amber" ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground",
+        )}
+      >
+        {label}
+      </label>
+      <Input
+        type="time"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(
+          "h-11 text-center text-base font-bold tabular-nums border-[1.5px] rounded-xl",
+          tone === "amber"
+            ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800"
+            : "bg-muted/40",
+        )}
+      />
+    </div>
+  );
+}
+
+/* ---------- Main component ---------- */
 
 export function GroupsAndFixtures({
   tournamentId,
@@ -99,6 +251,7 @@ export function GroupsAndFixtures({
     }
     setFieldsList([...fieldsList, v]);
     setNewField("");
+    toast.success(t("groups.fieldAddedToast", { name: v }));
   }
 
   function removeField(name: string) {
@@ -144,7 +297,6 @@ export function GroupsAndFixtures({
     onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
 
-
   const saveSettings = useMutation({
     mutationFn: () => {
       const fl = fieldsList.length ? fieldsList : [t("groups.defaultFieldName")];
@@ -182,7 +334,6 @@ export function GroupsAndFixtures({
     mutationFn: async () => {
       if (!startsOn) throw new Error(t("groups.missingStartDate"));
       const fl = fieldsList.length ? fieldsList : [t("groups.defaultFieldName")];
-      // Save settings first so they persist
       await saveSettings.mutateAsync();
       return scheduleFn({
         data: {
@@ -211,230 +362,266 @@ export function GroupsAndFixtures({
     onError: (e: any) => toast.error(e?.message ?? t("common.error")),
   });
 
-
   const supportsGroups = format !== "knockout";
   const supportsKnockout = format !== "group";
-
   const hasExistingDraw = groupsCount > 0 || matchesCount > 0;
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Dices className="h-4 w-4 text-primary" />
-          <h3 className="font-medium">{t("groups.drawTitle")}</h3>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
-        </p>
-        <Button
-          onClick={() => setDrawOpen(true)}
-          disabled={numTeams < 2}
-          className="w-full"
-          variant={hasExistingDraw ? "outline" : "default"}
+    <>
+      {/* pb-40 = leave room for sticky CTA + bottom nav */}
+      <div className="space-y-3 pb-40">
+        {/* Block 1 — Tirage au sort */}
+        <Block
+          tone="primary"
+          icon={<Dices className="h-5 w-5 text-primary" />}
+          iconBg="bg-primary/10"
+          title={t("groups.drawTitle")}
+          subtitle={t("groups.drawSubtitle")}
         >
-          <Dices className="h-4 w-4" />
-          {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
-        </Button>
-      </section>
-
-      <DrawDialog
-        open={drawOpen}
-        onOpenChange={setDrawOpen}
-        tournamentId={tournamentId}
-        format={format}
-        status={status}
-        teams={teams}
-        hasExistingDraw={hasExistingDraw}
-      />
-
-      {supportsGroups && (
-        <section className="rounded-xl border border-border bg-card p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <Shuffle className="h-4 w-4 text-primary" />
-            <h3 className="font-medium">{t("groups.groupsTitle")}</h3>
-          </div>
           <p className="text-xs text-muted-foreground">
-            {t("groups.groupsCount", { count: groupsCount })} · {t("groups.matchesCount", { count: matchesCount })}
+            {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>{t("groups.numGroups")}</Label>
-              <Input
-                type="number"
+          <Button
+            onClick={() => setDrawOpen(true)}
+            disabled={numTeams < 2}
+            className="w-full h-11"
+            variant={hasExistingDraw ? "outline" : "default"}
+          >
+            <Dices className="h-4 w-4" />
+            {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
+          </Button>
+        </Block>
+
+        <DrawDialog
+          open={drawOpen}
+          onOpenChange={setDrawOpen}
+          tournamentId={tournamentId}
+          format={format}
+          status={status}
+          teams={teams}
+          hasExistingDraw={hasExistingDraw}
+        />
+
+        {/* Block 2 — Groupes & matchs */}
+        {supportsGroups && (
+          <Block
+            icon={<Shuffle className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
+            iconBg="bg-blue-100 dark:bg-blue-950/40"
+            title={t("groups.groupsTitle")}
+            subtitle={`${t("groups.groupsCount", { count: groupsCount })} · ${t("groups.matchesCount", { count: matchesCount })}`}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              <Stepper
+                label={t("groups.numGroups")}
+                value={numGroups}
+                onChange={setNumGroups}
+                step={1}
                 min={1}
                 max={16}
-                value={numGroups}
-                onChange={(e) => setNumGroups(parseInt(e.target.value || "1", 10))}
               />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("groups.qualifiersPerGroup")}</Label>
-              <Input
-                type="number"
+              <Stepper
+                label={t("groups.qualifiersPerGroup")}
+                value={qualifiers}
+                onChange={setQualifiers}
+                step={1}
                 min={1}
                 max={8}
-                value={qualifiers}
-                onChange={(e) => setQualifiers(parseInt(e.target.value || "1", 10))}
+              />
+            </div>
+            <Button
+              onClick={() => {
+                if (groupsCount > 0) {
+                  setRegenGroupsOpen(true);
+                } else {
+                  genGroups.mutate();
+                }
+              }}
+              disabled={genGroups.isPending || numTeams < 2}
+              variant={groupsCount > 0 ? "destructive" : "default"}
+              className="w-full h-11"
+            >
+              {genGroups.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : groupsCount > 0 ? (
+                t("groups.regenerateGroups")
+              ) : (
+                t("groups.generateGroups")
+              )}
+            </Button>
+            {groupsCount > 0 && (
+              <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                {t("groups.regenerateWarn")}
+              </p>
+            )}
+          </Block>
+        )}
+
+        {/* Block 3 — Finales */}
+        {supportsKnockout && (
+          <Block
+            icon={<Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
+            iconBg="bg-amber-100 dark:bg-amber-950/40"
+            title={t("groups.finalsTitle")}
+            subtitle={t("groups.finalsSubtitle")}
+          >
+            <div className="flex items-start gap-2 text-xs text-muted-foreground">
+              <HelpCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+              <span>{t("groups.finalsTooltip")}</span>
+            </div>
+            <label className="flex items-center justify-between gap-2 py-1">
+              <span className="text-sm font-medium">{t("groups.thirdPlaceMatch")}</span>
+              <Switch checked={thirdPlace} onCheckedChange={setThirdPlace} />
+            </label>
+            <Button
+              onClick={() => setGenBracketOpen(true)}
+              disabled={genKnockout.isPending}
+              variant="outline"
+              className="w-full h-11"
+            >
+              {genKnockout.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : format === "knockout" ? (
+                t("groups.generateBracket")
+              ) : (
+                t("groups.generateBracketFromQualifiers")
+              )}
+            </Button>
+            {format === "mixed" && (
+              <p className="text-[11px] text-muted-foreground">{t("groups.mixedHint")}</p>
+            )}
+          </Block>
+        )}
+
+        {/* Block 4 — Durée des matchs */}
+        <Block
+          icon={<Clock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />}
+          iconBg="bg-indigo-100 dark:bg-indigo-950/40"
+          title={t("groups.durationTitle")}
+          subtitle={t("groups.durationSubtitle")}
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <Stepper
+              label={t("groups.matchDuration")}
+              value={duration}
+              onChange={setDuration}
+              step={5}
+              min={5}
+              max={120}
+              unit={t("groups.minutesUnit")}
+            />
+            <Stepper
+              label={t("groups.matchBreak")}
+              value={pause}
+              onChange={setPause}
+              step={5}
+              min={0}
+              max={60}
+              unit={t("groups.minutesUnit")}
+            />
+          </div>
+        </Block>
+
+        {/* Block 5 — Créneau horaire */}
+        <Block
+          icon={<CalendarClock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
+          iconBg="bg-emerald-100 dark:bg-emerald-950/40"
+          title={t("groups.slotTitle")}
+          subtitle={t("groups.slotSubtitle")}
+        >
+          <div className="flex items-end gap-2">
+            <TimeField
+              label={t("groups.dayStart")}
+              value={startTime}
+              onChange={setStartTime}
+            />
+            <span className="pb-3 text-muted-foreground text-lg font-light shrink-0">→</span>
+            <TimeField
+              label={t("groups.dayEnd")}
+              value={endTime}
+              onChange={setEndTime}
+            />
+          </div>
+
+          {/* Min rest — inline compact row */}
+          <div className="flex items-center justify-between gap-3 pt-3 border-t border-border/60">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold leading-tight">{t("groups.minRestShort")}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {t("groups.minRestSubtitle")}
+              </p>
+            </div>
+            <div className="w-[130px] shrink-0">
+              <Stepper
+                label=""
+                value={minRest}
+                onChange={setMinRest}
+                step={5}
+                min={0}
+                max={120}
               />
             </div>
           </div>
-          <Button
-            onClick={() => {
-              if (groupsCount > 0) {
-                setRegenGroupsOpen(true);
-              } else {
-                genGroups.mutate();
-              }
-            }}
-            disabled={genGroups.isPending || numTeams < 2}
-            variant={groupsCount > 0 ? "destructive" : "default"}
-            className="w-full"
-          >
-            {genGroups.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : groupsCount > 0 ? (
-              t("groups.regenerateGroups")
-            ) : (
-              t("groups.generateGroups")
-            )}
-          </Button>
-          {groupsCount > 0 && (
-            <p className="text-xs text-amber-600 dark:text-amber-400">
-              {t("groups.regenerateWarn")}
-            </p>
-          )}
-        </section>
-      )}
 
-      {supportsKnockout && (
-        <section className="rounded-xl border border-border bg-card p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-primary" />
-            <h3 className="font-medium flex items-center gap-1.5">
-              {t("groups.finalsTitle")}
-              <span
-                className="text-muted-foreground"
-                title={t("groups.finalsTooltip")}
-              >
-                <HelpCircle className="h-3.5 w-3.5" />
-              </span>
-            </h3>
+          {/* Lunch break toggle */}
+          <div className="flex items-center justify-between gap-3 pt-3 border-t border-border/60">
+            <div className="min-w-0 flex items-center gap-2">
+              <UtensilsCrossed className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-semibold leading-tight">{t("groups.lunchBreak")}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {t("groups.lunchBreakSubtitle")}
+                </p>
+              </div>
+            </div>
+            <Switch checked={lunchEnabled} onCheckedChange={setLunchEnabled} />
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={thirdPlace}
-              onChange={(e) => setThirdPlace(e.target.checked)}
-              className="h-4 w-4 rounded border-input"
-            />
-            {t("groups.thirdPlaceMatch")}
-          </label>
-          <Button
-            onClick={() => setGenBracketOpen(true)}
-            disabled={genKnockout.isPending}
-            variant="outline"
-            className="w-full"
-          >
-            {genKnockout.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : format === "knockout" ? (
-              t("groups.generateBracket")
-            ) : (
-              t("groups.generateBracketFromQualifiers")
-            )}
-          </Button>
-          {format === "mixed" && (
-            <p className="text-xs text-muted-foreground">
-              {t("groups.mixedHint")}
-            </p>
-          )}
-        </section>
-      )}
 
-      {/* Match scheduling */}
-      <section className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-primary" />
-          <h3 className="font-medium">{t("groups.scheduleTitle")}</h3>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>{t("groups.matchDuration")}</Label>
-            <Input
-              type="number"
-              min={1}
-              max={240}
-              value={duration}
-              onChange={(e) => setDuration(parseInt(e.target.value || "0", 10))}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t("groups.matchBreak")}</Label>
-            <Input
-              type="number"
-              min={0}
-              max={120}
-              value={pause}
-              onChange={(e) => setPause(parseInt(e.target.value || "0", 10))}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t("groups.dayStart")}</Label>
-            <Input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t("groups.dayEnd")}</Label>
-            <Input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="space-y-1.5">
-          <Label>{t("groups.minRest")}</Label>
-          <Input
-            type="number"
-            min={0}
-            max={720}
-            value={minRest}
-            onChange={(e) => setMinRest(parseInt(e.target.value || "0", 10))}
-          />
-          <p className="text-[11px] text-muted-foreground">
-            {t("groups.minRestHint")}
-          </p>
-        </div>
-        <div className="space-y-2">
-          <Label className="flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-            {t("groups.fieldsLabel")}
-          </Label>
+          {lunchEnabled && (
+            <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 p-3 flex items-end gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+              <TimeField
+                label={t("groups.lunchStart")}
+                value={lunchStart}
+                onChange={setLunchStart}
+                tone="amber"
+              />
+              <span className="pb-3 text-amber-600 text-lg font-light shrink-0">→</span>
+              <TimeField
+                label={t("groups.lunchEnd")}
+                value={lunchEnd}
+                onChange={setLunchEnd}
+                tone="amber"
+              />
+            </div>
+          )}
+        </Block>
+
+        {/* Block 6 — Terrains */}
+        <Block
+          icon={<MapPin className="h-5 w-5 text-rose-600 dark:text-rose-400" />}
+          iconBg="bg-rose-100 dark:bg-rose-950/40"
+          title={t("groups.fieldsTitle")}
+          subtitle={t("groups.fieldsSubtitle")}
+        >
           {fieldsList.length === 0 ? (
             <p className="text-xs text-muted-foreground italic">{t("groups.noFields")}</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {fieldsList.map((f) => (
-                <Badge
+                <span
                   key={f}
-                  variant="secondary"
-                  className="gap-1.5 pl-2.5 pr-1 py-1 text-sm font-normal"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary text-primary-foreground px-2.5 py-1 text-xs font-semibold"
                 >
-                  <MapPin className="h-3 w-3 opacity-70" />
+                  <MapPin className="h-3 w-3 opacity-80" />
                   {f}
                   <button
                     type="button"
                     onClick={() => removeField(f)}
-                    className="ml-0.5 rounded-sm p-0.5 hover:bg-background/60 transition-colors"
+                    className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded bg-primary-foreground/20 hover:bg-primary-foreground/30 transition-colors"
                     aria-label={t("groups.removeField", { name: f })}
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-2.5 w-2.5" />
                   </button>
-                </Badge>
+                </span>
               ))}
             </div>
           )}
@@ -444,80 +631,57 @@ export function GroupsAndFixtures({
               onChange={(e) => setNewField(e.target.value)}
               onKeyDown={onFieldKeyDown}
               placeholder={t("groups.newFieldPlaceholder")}
+              className="h-10"
             />
-            <Button type="button" variant="outline" size="icon" onClick={addField}>
+            <Button type="button" variant="outline" size="icon" className="h-10 w-10 shrink-0" onClick={addField}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            {t("groups.fieldsHint")}
-          </p>
-        </div>
-        <div className="space-y-2 rounded-lg border border-border/60 p-3">
-          <label className="flex items-center gap-2 text-sm font-medium">
-            <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
-            <input
-              type="checkbox"
-              checked={lunchEnabled}
-              onChange={(e) => setLunchEnabled(e.target.checked)}
-              className="h-4 w-4 rounded border-input"
-            />
-            {t("groups.lunchBreak")}
-          </label>
-          <div className={`grid grid-cols-2 gap-3 ${lunchEnabled ? "" : "opacity-50 pointer-events-none"}`}>
-            <div className="space-y-1.5">
-              <Label>{t("groups.lunchStart")}</Label>
-              <Input
-                type="time"
-                value={lunchStart}
-                onChange={(e) => setLunchStart(e.target.value)}
-                disabled={!lunchEnabled}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("groups.lunchEnd")}</Label>
-              <Input
-                type="time"
-                value={lunchEnd}
-                onChange={(e) => setLunchEnd(e.target.value)}
-                disabled={!lunchEnabled}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            variant="outline"
-            onClick={() => saveSettings.mutate()}
-            disabled={saveSettings.isPending}
-          >
-            {saveSettings.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("groups.save")
-            )}
-          </Button>
-          <Button
-            onClick={() => schedule.mutate()}
-            disabled={schedule.isPending || matchesCount === 0 || !startsOn}
-          >
-            {schedule.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <CalendarClock className="h-4 w-4" />
-                {t("groups.scheduleAuto")}
-              </>
-            )}
-          </Button>
-        </div>
+          <p className="text-[11px] text-muted-foreground">{t("groups.fieldsHint")}</p>
+        </Block>
+
         {matchesCount === 0 && (
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[11px] text-muted-foreground text-center px-4">
             {t("groups.scheduleHint")}
           </p>
         )}
+      </div>
 
-      </section>
+      {/* Sticky CTA bar — sits above bottom-nav */}
+      <div
+        className="fixed left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border px-4 py-3 flex gap-2"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 56px)" }}
+      >
+        <Button
+          variant="outline"
+          onClick={() => saveSettings.mutate()}
+          disabled={saveSettings.isPending}
+          className="h-11 px-4 shrink-0"
+        >
+          {saveSettings.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("groups.save")}</span>
+            </>
+          )}
+        </Button>
+        <Button
+          onClick={() => schedule.mutate()}
+          disabled={schedule.isPending || matchesCount === 0 || !startsOn}
+          className="h-11 flex-1"
+        >
+          {schedule.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <CalendarClock className="h-4 w-4" />
+              {t("groups.scheduleAuto")}
+            </>
+          )}
+        </Button>
+      </div>
 
       <DestructiveConfirmSheet
         open={regenGroupsOpen}
@@ -575,6 +739,6 @@ export function GroupsAndFixtures({
           setGenBracketOpen(false);
         }}
       />
-    </div>
+    </>
   );
 }

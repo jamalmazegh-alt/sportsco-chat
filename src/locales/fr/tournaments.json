@@ -495,7 +495,22 @@
     "bracketConfirmDescMixed": "Le tableau final sera créé à partir des {{total}} qualifiés ({{qualifiers}} par groupe × {{groups}} groupes).",
     "bracketConfirmThirdPlaceYes": "Un match pour la 3e place sera inclus.",
     "bracketConfirmThirdPlaceNo": "Aucun match pour la 3e place.",
-    "bracketConfirmAction": "Générer le tableau"
+    "bracketConfirmAction": "Générer le tableau",
+    "drawSubtitle": "Répartir les équipes en groupes ou en bracket",
+    "groupsSubtitle": "Créer les groupes et générer les matchs",
+    "finalsSubtitle": "Bracket des phases finales",
+    "durationTitle": "Durée des matchs",
+    "durationSubtitle": "Durée et temps de pause entre chaque match",
+    "slotTitle": "Créneau horaire",
+    "slotSubtitle": "Heure de début, fin et pause déjeuner",
+    "fieldsTitle": "Terrains",
+    "fieldsSubtitle": "Plusieurs terrains = matchs en parallèle",
+    "minutesUnit": "minutes",
+    "minRestShort": "Repos min. entre 2 matchs",
+    "minRestSubtitle": "Par équipe · 0 = désactivé",
+    "lunchBreakSubtitle": "Aucun match pendant ce créneau",
+    "addFieldShort": "+ Ajouter un terrain",
+    "fieldAddedToast": "Terrain {{name}} ajouté"
   },
   "draw": {
     "title": "Tirage au sort",

@@ -495,7 +495,22 @@
     "bracketConfirmDescMixed": "The final bracket will be created from {{total}} qualifiers ({{qualifiers}} per group × {{groups}} groups).",
     "bracketConfirmThirdPlaceYes": "A 3rd-place match will be included.",
     "bracketConfirmThirdPlaceNo": "No 3rd-place match.",
-    "bracketConfirmAction": "Generate bracket"
+    "bracketConfirmAction": "Generate bracket",
+    "drawSubtitle": "Distribute teams across groups or bracket",
+    "groupsSubtitle": "Create groups and generate matches",
+    "finalsSubtitle": "Knockout bracket",
+    "durationTitle": "Match duration",
+    "durationSubtitle": "Match length and break between matches",
+    "slotTitle": "Time slot",
+    "slotSubtitle": "Start, end and lunch break",
+    "fieldsTitle": "Fields",
+    "fieldsSubtitle": "More fields = parallel matches",
+    "minutesUnit": "minutes",
+    "minRestShort": "Min. rest between matches",
+    "minRestSubtitle": "Per team · 0 = disabled",
+    "lunchBreakSubtitle": "No match during this slot",
+    "addFieldShort": "+ Add a field",
+    "fieldAddedToast": "Field {{name}} added"
   },
   "draw": {
     "title": "Draw",
