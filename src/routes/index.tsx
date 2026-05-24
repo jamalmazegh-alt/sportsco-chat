@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useAuth } from "@/lib/auth-context";
 import { isAppHost } from "@/lib/host";
 import {
@@ -14,17 +15,10 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Clubero — La coordination d'équipe pour clubs sportifs" },
-      {
-        name: "description",
-        content:
-          "Convocations, présences, rappels et communication de club dans une seule app mobile. WhatsApp reste disponible en option.",
-      },
-      { property: "og:title", content: "Clubero — La coordination d'équipe pour clubs sportifs" },
-      {
-        property: "og:description",
-        content: "Convocations, présences, rappels — tout dans un seul outil. En un clic.",
-      },
+      { title: i18n.t("meta.publicHome.title") },
+      { name: "description", content: i18n.t("meta.publicHome.description") },
+      { property: "og:title", content: i18n.t("meta.publicHome.title") },
+      { property: "og:description", content: i18n.t("meta.publicHome.ogDescription") },
       { property: "og:url", content: "https://clubero.app/" },
     ],
     links: [{ rel: "canonical", href: "https://clubero.app/" }],
