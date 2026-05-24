@@ -1172,6 +1172,18 @@
     "tournaments": {
       "title": "Tournaments — Clubero",
       "description": "Manage your tournaments and competitions."
+    },
+    "profile": {
+      "title": "Profile — Clubero",
+      "description": "Your account preferences and information."
+    },
+    "password": {
+      "title": "Password — Clubero",
+      "description": "Change your password."
+    },
+    "privacy": {
+      "title": "Privacy — Clubero",
+      "description": "Manage your consents and data."
     }
   },
   "trial": {
