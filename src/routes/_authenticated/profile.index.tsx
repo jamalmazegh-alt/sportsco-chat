@@ -340,6 +340,41 @@ function ProfilePage() {
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="first-name">{t("profile.firstName", { defaultValue: "Prénom" })}</Label>
+            <Input
+              id="first-name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              autoComplete="given-name"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="last-name">{t("profile.lastName", { defaultValue: "Nom" })}</Label>
+            <Input
+              id="last-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              autoComplete="family-name"
+            />
+          </div>
+        </div>
+        <Button
+          type="button"
+          className="w-full h-11"
+          disabled={
+            nameBusy ||
+            (firstName.trim() === (profile?.first_name ?? "") &&
+              lastName.trim() === (profile?.last_name ?? ""))
+          }
+          onClick={onSaveName}
+        >
+          {nameBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Save" })}
+        </Button>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <Label>{t("profile.phone")}</Label>
         <PhoneInput value={phone} onChange={setPhone} />
         <Button
