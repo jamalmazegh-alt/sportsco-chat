@@ -79,6 +79,9 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const [role, setRole] = useState<TournamentRole>("staff");
   const [busy, setBusy] = useState(false);
   const [removeId, setRemoveId] = useState<string | null>(null);
+  const [convertMember, setConvertMember] = useState<any | null>(null);
+  const [convertEmail, setConvertEmail] = useState("");
+  const [convertBusy, setConvertBusy] = useState(false);
 
   const teamById = new Map(teams.map((tm) => [tm.id, tm.name]));
 
