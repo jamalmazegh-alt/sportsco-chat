@@ -228,18 +228,6 @@ function TournamentDetailPage() {
   ];
 
   const activeSubs = sectionDefs.find((s) => s.id === section)?.subs ?? [];
-  // On first mount with no ?tab= in URL, default by tournament status.
-  const didInitDefault = useRef(false);
-  useEffect(() => {
-    if (didInitDefault.current) return;
-    didInitDefault.current = true;
-    if (search.tab) return; // URL wins
-    const status = (tournament as any).status as string;
-    const defaultSection: Section =
-      status === "in_progress" || status === "completed" ? "play" : canManage ? "configure" : "play";
-    if (defaultSection !== section) setSection(defaultSection);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   // Auto-correct sub when switching section
   useEffect(() => {
     if (!activeSubs.find((s) => s.id === sub)) {
