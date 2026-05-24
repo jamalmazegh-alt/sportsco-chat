@@ -11,6 +11,7 @@ import {
   MessagesSquare,
   BellRing,
   Palette,
+  Wallet,
   ChevronRight,
 } from "lucide-react";
 
@@ -66,6 +67,15 @@ function AdminSettingsPage() {
       title: t("admin.hubSubscription"),
       hint: t("admin.hubSubscriptionHint"),
       tone: "bg-primary/10 text-primary",
+    },
+    {
+      to: "/admin/settings/payments",
+      icon: Wallet,
+      title: t("admin.hubPayments", { defaultValue: "Paiements" }),
+      hint: t("admin.hubPaymentsHint", {
+        defaultValue: "Encaissez les inscriptions tournoi via Stripe",
+      }),
+      tone: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
     },
     {
       to: "/admin/settings/convocations",
