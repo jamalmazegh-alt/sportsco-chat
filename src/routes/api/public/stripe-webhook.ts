@@ -251,6 +251,47 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
               }
               break;
             }
+            case "account.updated": {
+              const account = event.data.object as Stripe.Account;
+              const chargesEnabled = !!account.charges_enabled;
+              const payoutsEnabled = !!account.payouts_enabled;
+              const disabledReason = account.requirements?.disabled_reason ?? null;
+              const status: "pending" | "active" | "restricted" | "disabled" =
+                disabledReason
+                  ? (disabledReason.startsWith("rejected") ? "disabled" : "restricted")
+                  : chargesEnabled && payoutsEnabled
+                    ? "active"
+                    : "pending";
+              const { data: club } = await supabaseAdmin
+                .from("clubs")
+                .select("id")
+                .eq("stripe_account_id", account.id)
+                .maybeSingle();
+              if (club) {
+                await supabaseAdmin
+                  .from("clubs")
+                  .update({
+                    stripe_account_status: status,
+                    stripe_charges_enabled: chargesEnabled,
+                    stripe_payouts_enabled: payoutsEnabled,
+                  })
+                  .eq("id", club.id);
+                await supabaseAdmin.from("tournament_payment_events").insert({
+                  tournament_id: null,
+                  event_type: "account_updated",
+                  stripe_event_id: event.id,
+                  metadata: {
+                    club_id: club.id,
+                    stripe_account_id: account.id,
+                    status,
+                    charges_enabled: chargesEnabled,
+                    payouts_enabled: payoutsEnabled,
+                    disabled_reason: disabledReason,
+                  } as unknown as never,
+                });
+              }
+              break;
+            }
             default:
               break;
           }
