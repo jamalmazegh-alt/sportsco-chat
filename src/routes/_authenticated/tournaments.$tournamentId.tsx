@@ -145,33 +145,30 @@ function TournamentDetailPage() {
         </div>
 
         {canManage && (
-          <div className="flex flex-wrap gap-2">
-            {tournament.status === "draft" && (
-              <Button size="sm" onClick={() => publish.mutate("published")}>
-                {t("detail.publish")}
+          <div className="space-y-3">
+            <PublishWorkflow
+              tournament={tournament as any}
+              teamsCount={(teams as any[])?.length ?? 0}
+              fieldsCount={
+                Array.isArray(((tournament as any).settings as any)?.fields)
+                  ? ((tournament as any).settings as any).fields.length
+                  : 0
+              }
+              publicUrl={publicUrl}
+              busy={publish.isPending}
+              onPublish={() => publish.mutate("published")}
+              onStart={() => publish.mutate("in_progress")}
+              onClose={() => publish.mutate("completed")}
+            />
+            <div className="flex flex-wrap gap-2">
+              <ShareDialog url={publicUrl} title={tournament.name} />
+              <Button size="sm" variant="ghost" asChild>
+                <a href={`/tournament/${tournament.slug}`} target="_blank" rel="noreferrer">
+                  <Eye className="h-4 w-4" />
+                  {t("detail.viewPublic")}
+                </a>
               </Button>
-            )}
-            {tournament.status === "published" && (
-              <Button size="sm" onClick={() => publish.mutate("in_progress")}>
-                {t("detail.start")}
-              </Button>
-            )}
-            {tournament.status === "in_progress" && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => publish.mutate("completed")}
-              >
-                {t("detail.close")}
-              </Button>
-            )}
-            <ShareDialog url={publicUrl} title={tournament.name} />
-            <Button size="sm" variant="ghost" asChild>
-              <a href={`/tournament/${tournament.slug}`} target="_blank" rel="noreferrer">
-                <Eye className="h-4 w-4" />
-                {t("detail.viewPublic")}
-              </a>
-            </Button>
+            </div>
           </div>
         )}
       </header>
