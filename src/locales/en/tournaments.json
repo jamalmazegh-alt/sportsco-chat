@@ -709,5 +709,46 @@
     "addEventAction": "Add an event",
     "changeStatusAction": "Change status",
     "vs": "VS"
+  },
+  "list": {
+    "metaTitle": "Tournaments — Clubero",
+    "title": "Tournaments",
+    "organizerModeTitle": "Tournament organizer mode",
+    "organizerModeBody": "Buy a pass for €40 per tournament (pay per event). No subscription required.",
+    "passAvailable_one": "pass available ready to use.",
+    "passAvailable_other": "passes available ready to use.",
+    "noPassAvailable": "no pass available. Buy one to create a tournament.",
+    "emptyTitle": "No tournaments",
+    "emptyDescManage": "Create your first tournament to organize a competition.",
+    "emptyDescView": "No tournaments are currently running in this club.",
+    "create": "Create a tournament"
+  },
+  "detail": {
+    "back": "Tournaments",
+    "publish": "Publish",
+    "start": "Start",
+    "close": "Close",
+    "viewPublic": "View public page",
+    "formatAdminOnly": "Only admins and managers can configure the format.",
+    "statusUpdated": "Status updated"
+  },
+  "tabs": {
+    "teams": "Teams",
+    "format": "Format",
+    "fields": "Fields",
+    "matches": "Matches",
+    "standings": "Standings",
+    "bracket": "Bracket",
+    "registrations": "Registrations",
+    "teamStaff": "Team",
+    "members": "Members",
+    "rules": "Rules"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
   }
 }

@@ -709,5 +709,46 @@
     "addEventAction": "Ajouter un événement",
     "changeStatusAction": "Changer le statut",
     "vs": "VS"
+  },
+  "list": {
+    "metaTitle": "Tournois — Clubero",
+    "title": "Tournois",
+    "organizerModeTitle": "Mode organisateur de tournoi",
+    "organizerModeBody": "Achetez un pass à 40 € par tournoi (paiement à l'événement). Aucun abonnement requis.",
+    "passAvailable_one": "pass disponible prêt à l'emploi.",
+    "passAvailable_other": "pass disponibles prêts à l'emploi.",
+    "noPassAvailable": "aucun pass disponible. Achetez-en un pour créer un tournoi.",
+    "emptyTitle": "Aucun tournoi",
+    "emptyDescManage": "Crée ton premier tournoi pour organiser une compétition.",
+    "emptyDescView": "Aucun tournoi n'est en cours dans ce club.",
+    "create": "Créer un tournoi"
+  },
+  "detail": {
+    "back": "Tournois",
+    "publish": "Publier",
+    "start": "Démarrer",
+    "close": "Clôturer",
+    "viewPublic": "Voir la page publique",
+    "formatAdminOnly": "Seuls les admins et dirigeants peuvent configurer le format.",
+    "statusUpdated": "Statut mis à jour"
+  },
+  "tabs": {
+    "teams": "Équipes",
+    "format": "Format",
+    "fields": "Terrains",
+    "matches": "Matchs",
+    "standings": "Classement",
+    "bracket": "Bracket",
+    "registrations": "Inscriptions",
+    "teamStaff": "Équipe",
+    "members": "Membres",
+    "rules": "Règles"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "published": "Publié",
+    "in_progress": "En cours",
+    "completed": "Terminé",
+    "cancelled": "Annulé"
   }
 }
