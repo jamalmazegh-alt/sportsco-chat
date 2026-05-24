@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
+import { PositionCombobox } from "@/components/position-combobox";
 import {
   listTeamPlayers,
   upsertTeamPlayer,
