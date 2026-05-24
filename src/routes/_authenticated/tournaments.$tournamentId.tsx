@@ -90,6 +90,8 @@ type Sub =
   | "registrations"
   | "teams"
   | "staff"
+  | "draw"
+  | "schedule"
   | "matches"
   | "standings"
   | "bracket"
