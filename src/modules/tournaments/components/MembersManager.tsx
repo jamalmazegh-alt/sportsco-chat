@@ -337,12 +337,19 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                       <Icon className="h-4 w-4 text-muted-foreground" />
                       {fullName}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">{m.email}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    {m.email ? (
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{m.email}</p>
+                    ) : null}
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
                         {t(`roles.${m.role}`, { defaultValue: m.role })}
                       </span>
-                      {!m.joined_at && (
+                      {!m.email && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+                          {t("tournamentMembers.offline", { defaultValue: "Sans compte" })}
+                        </span>
+                      )}
+                      {m.email && !m.joined_at && (
                         <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
                           {t("tournamentMembers.pending", { defaultValue: "En attente" })}
                         </span>
@@ -350,7 +357,19 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    {!m.joined_at && m.invite_token && (
+                    {!m.email && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8"
+                        onClick={() => { setConvertMember(m); setConvertEmail(""); }}
+                        title={t("tournamentMembers.inviteOffline", { defaultValue: "Inviter par email" })}
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                        {t("tournamentMembers.invite", { defaultValue: "Inviter" })}
+                      </Button>
+                    )}
+                    {m.email && !m.joined_at && m.invite_token && (
                       <Button
                         size="icon"
                         variant="ghost"
