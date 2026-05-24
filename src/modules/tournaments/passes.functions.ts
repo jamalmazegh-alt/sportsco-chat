@@ -17,6 +17,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     z
       .object({
         email: z.string().email().max(255),
+        quantity: z.number().int().min(1).max(20).optional(),
         return_to: z
           .string()
           .max(200)
@@ -30,6 +31,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const stripe = getStripe();
     const origin = getOrigin();
+    const quantity = data.quantity ?? 1;
 
     // Only allow safe in-app return paths
     const safeReturnTo =
@@ -43,7 +45,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: data.email,
-      line_items: [{ price: STRIPE_PRICE_TOURNAMENT, quantity: 1 }],
+      line_items: [{ price: STRIPE_PRICE_TOURNAMENT, quantity }],
       billing_address_collection: "required",
       tax_id_collection: { enabled: true },
       automatic_tax: { enabled: true },
@@ -53,25 +55,30 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
       metadata: {
         purpose: "tournament_pass",
         email: data.email,
+        quantity: String(quantity),
       },
       payment_intent_data: {
         metadata: {
           purpose: "tournament_pass",
           email: data.email,
+          quantity: String(quantity),
         },
       },
     });
 
-    await supabaseAdmin.from("tournament_passes").insert({
+    // Pre-create one row per pass so we have N independent, usable passes.
+    const rows = Array.from({ length: quantity }, () => ({
       email: data.email,
       stripe_session_id: session.id,
       amount_total: 4000,
       currency: "eur",
-      status: "pending",
-    });
+      status: "pending" as const,
+    }));
+    await supabaseAdmin.from("tournament_passes").insert(rows);
 
     return { url: session.url };
   });
+
 
 /**
  * List available (paid, unused) passes for the current user — matched by user_id or email.
