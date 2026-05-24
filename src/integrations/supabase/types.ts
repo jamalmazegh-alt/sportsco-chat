@@ -2509,6 +2509,10 @@ export type Database = {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      can_validate_match: {
+        Args: { _match_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_view_player_feedback: {
         Args: { _feedback_id: string; _user_id: string }
         Returns: boolean
