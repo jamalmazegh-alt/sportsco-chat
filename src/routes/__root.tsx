@@ -35,6 +35,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Clubero is a fast, mobile-first app for sports clubs to coordinate events, convocations and attendance in seconds.",
       },
       { name: "theme-color", content: "#7cc142" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Clubero" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { property: "og:site_name", content: "Clubero" },
       { property: "og:title", content: "Clubero — Team coordination, made simple" },
       {
