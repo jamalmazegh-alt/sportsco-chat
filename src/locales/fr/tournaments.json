@@ -511,7 +511,7 @@
   "groups": {
     "drawTitle": "Tirage au sort",
     "drawHintEmpty": "Ajoutez des équipes avant de lancer le tirage au sort.",
-    "drawHint": "Auto, progressif (animation) ou manuel — répartit les équipes dans les poules ou le bracket.",
+    "drawHint": "Auto, progressif (animation) ou manuel — répartit les équipes dans les poules ou le tableau final.",
     "drawLaunch": "Lancer le tirage au sort",
     "drawRelaunch": "Relancer le tirage au sort",
     "groupsTitle": "Poules & calendrier",
