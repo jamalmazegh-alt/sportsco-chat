@@ -444,6 +444,38 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ResponsiveFormDialog
+        open={!!convertMember}
+        onOpenChange={(o) => { if (!o) { setConvertMember(null); setConvertEmail(""); } }}
+        title={t("tournamentMembers.inviteTitle", { defaultValue: "Inviter un membre" })}
+      >
+        <form onSubmit={onConvert} className="space-y-4 mt-4 pb-6">
+          <p className="text-sm text-muted-foreground">
+            {convertMember
+              ? t("tournamentMembers.convertDesc", {
+                  defaultValue: "Envoyer une invitation par email à {{name}} pour qu'il/elle puisse se connecter et valider ses matchs.",
+                  name: [convertMember.first_name, convertMember.last_name].filter(Boolean).join(" "),
+                })
+              : null}
+          </p>
+          <div className="space-y-1.5">
+            <Label>{t("players.email")}<span className="text-destructive ml-1">*</span></Label>
+            <Input
+              type="email"
+              required
+              autoFocus
+              value={convertEmail}
+              onChange={(e) => setConvertEmail(e.target.value)}
+            />
+          </div>
+          <Button type="submit" className="w-full h-11" disabled={convertBusy}>
+            {convertBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+              <><Mail className="h-4 w-4" />{t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}</>
+            )}
+          </Button>
+        </form>
+      </ResponsiveFormDialog>
     </div>
   );
 }
