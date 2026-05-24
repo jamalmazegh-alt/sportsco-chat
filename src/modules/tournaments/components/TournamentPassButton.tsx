@@ -21,6 +21,8 @@ interface TournamentPassButtonProps {
   className?: string;
   variant?: "default" | "outline";
   label?: string;
+  /** Render the price + quantity + CTA inline (no dialog). */
+  inline?: boolean;
 }
 
 const UNIT_PRICE_EUR = 40;
@@ -76,6 +78,7 @@ export function TournamentPassButton({
   className,
   variant = "outline",
   label,
+  inline = false,
 }: TournamentPassButtonProps) {
   const { t } = useTranslation("tournaments");
   const { user } = useAuth();
@@ -111,6 +114,76 @@ export function TournamentPassButton({
 
   const total = (UNIT_PRICE_EUR * quantity).toFixed(2);
 
+  const formBody = (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        startCheckout(user?.email ?? email, quantity);
+      }}
+      className="space-y-4"
+    >
+      {!user?.email && (
+        <div className="space-y-2">
+          <Label htmlFor="pass-email">{t("pass.emailLabel")}</Label>
+          <Input
+            id="pass-email"
+            type="email"
+            required
+            autoFocus={!inline}
+            placeholder={t("pass.emailPlaceholder")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label>
+          {t("pass.quantityLabel", { defaultValue: "Nombre de pass" })}
+        </Label>
+        <QuantityStepper value={quantity} onChange={setQuantity} disabled={busy} />
+        <p className="text-xs text-muted-foreground">
+          {t("pass.unitPriceHint", {
+            defaultValue: "{{price}} € par pass · Total : {{total}} €",
+            price: UNIT_PRICE_EUR.toFixed(2),
+            total,
+          })}
+        </p>
+      </div>
+      <div className={inline ? "" : ""}>
+        <Button
+          type="submit"
+          disabled={busy || (!user?.email && !email.includes("@"))}
+          className="w-full"
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trophy className="h-4 w-4" />}
+          {t("pass.continuePay")} · {total} €
+        </Button>
+      </div>
+    </form>
+  );
+
+  if (inline) {
+    return (
+      <div className={className}>
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 shrink-0">
+              <Trophy className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold leading-tight">{t("pass.dialogTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t("pass.dialogDesc")}
+              </p>
+            </div>
+          </div>
+          {formBody}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button variant={variant} className={className} onClick={() => setOpen(true)}>
@@ -122,52 +195,8 @@ export function TournamentPassButton({
           <DialogTitle>{t("pass.dialogTitle")}</DialogTitle>
           <DialogDescription>{t("pass.dialogDesc")}</DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            startCheckout(user?.email ?? email, quantity);
-          }}
-          className="space-y-4"
-        >
-          {!user?.email && (
-            <div className="space-y-2">
-              <Label htmlFor="pass-email">{t("pass.emailLabel")}</Label>
-              <Input
-                id="pass-email"
-                type="email"
-                required
-                autoFocus
-                placeholder={t("pass.emailPlaceholder")}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={busy}
-              />
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label>
-              {t("pass.quantityLabel", { defaultValue: "Nombre de pass" })}
-            </Label>
-            <QuantityStepper value={quantity} onChange={setQuantity} disabled={busy} />
-            <p className="text-xs text-muted-foreground">
-              {t("pass.unitPriceHint", {
-                defaultValue: "{{price}} € par pass · Total : {{total}} €",
-                price: UNIT_PRICE_EUR.toFixed(2),
-                total,
-              })}
-            </p>
-          </div>
-          <DialogFooter>
-            <Button
-              type="submit"
-              disabled={busy || (!user?.email && !email.includes("@"))}
-              className="w-full"
-            >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {t("pass.continuePay")}
-            </Button>
-          </DialogFooter>
-        </form>
+        {formBody}
+        <DialogFooter />
       </DialogContent>
     </Dialog>
   );
