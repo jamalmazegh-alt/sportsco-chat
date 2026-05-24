@@ -8,22 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { toast } from "sonner";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/demo")({
   component: DemoPage,
   head: () => ({
     meta: [
-      { title: "Demander une démo — Clubero" },
-      {
-        name: "description",
-        content:
-          "Réservez une démo de 15 minutes de Clubero. Nous configurons votre première équipe avec vous.",
-      },
-      { property: "og:title", content: "Demander une démo — Clubero" },
-      {
-        property: "og:description",
-        content: "Réservez une démo de 15 minutes de Clubero.",
-      },
+      { title: i18n.t("meta.demo.title") },
+      { name: "description", content: i18n.t("meta.demo.description") },
+      { property: "og:title", content: i18n.t("meta.demo.title") },
+      { property: "og:description", content: i18n.t("meta.demo.ogDescription") },
     ],
     links: [{ rel: "canonical", href: "https://www.clubero.app/demo" }],
   }),
