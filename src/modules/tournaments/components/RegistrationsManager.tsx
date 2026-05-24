@@ -146,6 +146,37 @@ export function RegistrationsManager({
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
 
+  const sendLinkFn = useServerFn(sendPaymentLinkToTeam);
+  const sendLink = useMutation({
+    mutationFn: (vars: { id: string; channel: "email" | "whatsapp" | "copy" }) =>
+      sendLinkFn({
+        data: {
+          tournament_id: tournamentId,
+          registration_id: vars.id,
+          channel: vars.channel,
+          origin: window.location.origin,
+        },
+      }),
+    onSuccess: (res: any, vars) => {
+      if (vars.channel === "copy" && res?.link) {
+        navigator.clipboard?.writeText(res.link).catch(() => {});
+        toast.success(t("registrations.payments.linkCopied"));
+      } else if (vars.channel === "whatsapp" && res?.whatsappUrl) {
+        window.open(res.whatsappUrl, "_blank", "noopener");
+      } else if (vars.channel === "email") {
+        toast.success(t("registrations.payments.linkSentEmail", { defaultValue: "Lien envoyé par email" }));
+      }
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
+  const canShowSendLink =
+    !!tournament &&
+    (tournament.registration_fee ?? 0) > 0 &&
+    (tournament.payment_mode === "online" || tournament.payment_mode === "both") &&
+    !!tournament.club_stripe_charges_enabled;
+
   const regs = (q.data?.registrations ?? []) as Reg[];
 
   const counts = useMemo(() => {
