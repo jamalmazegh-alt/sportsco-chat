@@ -198,8 +198,8 @@ function TeamsPage() {
           title={t("teams.noTeams")}
           description={
             isAdmin
-              ? t("teams.emptyHintAdmin", { defaultValue: "Crée ta première équipe pour commencer à programmer entraînements et matchs." })
-              : t("teams.emptyHintMember", { defaultValue: "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter." })
+              ? t("teams.emptyHintAdmin")
+              : t("teams.emptyHintMember")
           }
           action={
             isAdmin ? (
