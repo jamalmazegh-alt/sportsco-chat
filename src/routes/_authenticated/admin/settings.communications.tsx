@@ -12,7 +12,12 @@ import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/communications")({
   component: CommunicationsSettings,
-  head: () => ({ meta: [{ title: `${i18nInstance.t("admin.hubCommunications")} — Clubero` }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.adminCommunications.title") },
+      { name: "description", content: i18nInstance.t("meta.adminCommunications.description") },
+    ],
+  }),
 });
 
 type Form = {
