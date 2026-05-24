@@ -35,6 +35,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [location, setLocation] = useState("");
   const [format, setFormat] = useState<Format>("mixed");
   const [numTeams, setNumTeams] = useState(8);
+  const [numTeamsRaw, setNumTeamsRaw] = useState("8");
   const [logo, setLogo] = useState<Attachment[]>([]);
 
   const navigate = useNavigate();
