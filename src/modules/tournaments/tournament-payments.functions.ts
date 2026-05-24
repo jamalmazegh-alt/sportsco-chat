@@ -211,7 +211,9 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
       reg.id,
       "refund_initiated",
       reg.amount_paid ?? 0,
-      { refund_id: refund.id, reason: data.reason ?? null, by: userId },
+      { refund_id: refund.id, reason: data.reason ?? null },
+      null,
+      userId,
     );
 
     // status is updated when charge.refunded webhook lands; but reflect locally too
