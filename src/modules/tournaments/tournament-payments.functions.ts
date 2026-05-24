@@ -263,7 +263,11 @@ export async function buildCheckoutForRegistration(params: {
     .eq("id", registrationId)
     .maybeSingle();
   if (!reg) return null;
-  if (reg.payment_status === "paid" || reg.payment_status === "refunded") {
+  if (
+    reg.payment_status === "paid_online" ||
+    reg.payment_status === "paid_offline" ||
+    reg.payment_status === "refunded"
+  ) {
     return null;
   }
 
