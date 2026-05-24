@@ -39,7 +39,12 @@ import { LegalDialog } from "@/components/legal-dialog";
 
 export const Route = createFileRoute("/_authenticated/profile/privacy")({
   component: PrivacyPage,
-  head: () => ({ meta: [{ title: "Privacy & data — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.privacy.title", { ns: "common" }) },
+      { name: "description", content: i18n.t("meta.privacy.description", { ns: "common" }) },
+    ],
+  }),
 });
 
 function PrivacyPage() {
