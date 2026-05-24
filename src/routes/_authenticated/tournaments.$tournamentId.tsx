@@ -144,6 +144,30 @@ function TournamentDetailPage() {
     });
   };
 
+  // On first mount with no ?tab= in URL, default by tournament status.
+  // Must be declared BEFORE any early return to keep hook order stable.
+  const didInitDefault = useRef(false);
+  const tournamentStatus = (q.data as any)?.tournament?.status as string | undefined;
+  const canManageEarly =
+    (q.data as any)?.canManage === true ||
+    roles.includes("admin") ||
+    roles.includes("tournament_manager") ||
+    (role as string) === "dirigeant";
+  useEffect(() => {
+    if (didInitDefault.current) return;
+    if (!tournamentStatus) return;
+    didInitDefault.current = true;
+    if (search.tab) return;
+    const defaultSection: Section =
+      tournamentStatus === "in_progress" || tournamentStatus === "completed"
+        ? "play"
+        : canManageEarly
+          ? "configure"
+          : "play";
+    if (defaultSection !== section) setSection(defaultSection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tournamentStatus]);
+
   if (q.isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
