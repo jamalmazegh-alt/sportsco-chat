@@ -853,3 +853,226 @@ function PublicMatches({
   );
 }
 
+function PublishedRegistrationView({
+  slug,
+  data,
+}: {
+  slug: string;
+  data: any;
+}) {
+  const { t } = useTranslation("tournaments");
+  const { tournament, teams } = data;
+  const rules = mergeRules(tournament.settings);
+  const accent = rules.branding.primaryColor;
+
+  const now = Date.now();
+  const opens = rules.registration.opensAt ? new Date(rules.registration.opensAt).getTime() : null;
+  const closes = rules.registration.closesAt ? new Date(rules.registration.closesAt).getTime() : null;
+  const maxTeams = (tournament as any).num_teams ?? null;
+  const teamsCount = (teams as any[]).length;
+  const fee = Number((tournament as any).registration_fee ?? 0) || 0;
+  const currency = ((tournament as any).registration_currency ?? "eur").toUpperCase();
+
+  const reachedCap = maxTeams != null && teamsCount >= maxTeams;
+  const closedByDate = closes !== null && now > closes;
+  const notYetOpen = opens !== null && now < opens;
+  const canRegister =
+    rules.registration.enabled && !reachedCap && !closedByDate && !notYetOpen;
+
+  const daysToClose =
+    closes !== null && closes > now
+      ? Math.ceil((closes - now) / 86_400_000)
+      : null;
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Hero */}
+      <header className="relative overflow-hidden border-b border-border bg-gradient-to-b from-muted/50 via-background to-background">
+        {tournament.cover_image_url && (
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.07] bg-cover bg-center"
+            style={{ backgroundImage: `url(${tournament.cover_image_url})` }}
+          />
+        )}
+        <div
+          aria-hidden
+          className="absolute -top-32 -right-32 h-80 w-80 rounded-full blur-3xl opacity-25"
+          style={{ background: accent ?? "hsl(var(--primary))" }}
+        />
+        <div className="relative max-w-3xl mx-auto px-5 pt-10 pb-7">
+          <div className="flex items-start gap-5">
+            <div
+              className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl flex items-center justify-center shrink-0 ring-1 ring-border shadow-sm"
+              style={
+                accent
+                  ? { background: `linear-gradient(135deg, ${accent}22, ${accent}05)`, color: accent }
+                  : { background: "linear-gradient(135deg, hsl(var(--primary)/0.18), hsl(var(--primary)/0.04))", color: "hsl(var(--primary))" }
+              }
+            >
+              <Trophy className="h-8 w-8 sm:h-10 sm:w-10" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-[1.05]">
+                {tournament.name}
+              </h1>
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {tournament.starts_on}
+                  {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
+                </span>
+                {tournament.location && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {tournament.location}
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1.5">
+                  <Trophy className="h-3.5 w-3.5" />
+                  {tournament.sport}
+                  {tournament.format ? ` · ${tournament.format}` : ""}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-3xl mx-auto px-5 py-6 space-y-5">
+        {/* Registration banner */}
+        <section
+          className={cn(
+            "rounded-2xl border p-5 space-y-3",
+            canRegister
+              ? "border-primary/40 bg-primary/5"
+              : "border-border bg-muted/30",
+          )}
+        >
+          {reachedCap ? (
+            <div className="space-y-1">
+              <p className="text-base font-semibold">
+                <span className="inline-flex items-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-xs font-bold uppercase tracking-wider">
+                  {t("tournament.tournamentFull")}
+                </span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {t("tournament.teamsRegistered", { count: teamsCount, total: maxTeams })}
+              </p>
+            </div>
+          ) : closedByDate ? (
+            <div className="space-y-1">
+              <p className="text-base font-semibold text-muted-foreground">
+                {t("tournament.registrationClosed")}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div>
+                <p className="text-base font-semibold">
+                  {fee > 0
+                    ? `${t("tournament.registrationFee")}: ${fee.toFixed(2)} ${currency}`
+                    : t("tournament.freeRegistration")}
+                </p>
+                {maxTeams != null ? (
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {t("tournament.teamsRegistered", { count: teamsCount, total: maxTeams })}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {t("tournament.teamsRegisteredNoMax", { count: teamsCount })}
+                  </p>
+                )}
+              </div>
+              {canRegister && (
+                <Button asChild size="lg" className="w-full sm:w-auto">
+                  <Link to="/tournament/$slug/register" params={{ slug }}>
+                    <UserPlus className="h-4 w-4" />
+                    {t("tournament.registerCta")}
+                  </Link>
+                </Button>
+              )}
+              {daysToClose != null && (
+                <p className="text-xs text-muted-foreground">
+                  {daysToClose === 0
+                    ? t("tournament.closesToday")
+                    : t("tournament.closesIn", { days: daysToClose })}
+                </p>
+              )}
+            </>
+          )}
+        </section>
+
+        {/* Tournament info */}
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            {t("tournament.tournamentInfo")}
+          </h2>
+          <dl className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <dt className="text-xs text-muted-foreground">{t("public.tabs.standings", { defaultValue: "Format" })}</dt>
+              <dd className="font-medium">{tournament.format}</dd>
+            </div>
+            {maxTeams != null && (
+              <div>
+                <dt className="text-xs text-muted-foreground">{t("create.numTeams", { defaultValue: "Équipes max" })}</dt>
+                <dd className="font-medium">{maxTeams}</dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-xs text-muted-foreground">{t("common.match", { defaultValue: "Sport" })}</dt>
+              <dd className="font-medium">{tournament.sport}</dd>
+            </div>
+            {tournament.location && (
+              <div>
+                <dt className="text-xs text-muted-foreground">Lieu</dt>
+                <dd className="font-medium">{tournament.location}</dd>
+              </div>
+            )}
+          </dl>
+        </section>
+
+        {/* Rules */}
+        {rules.text && (
+          <section className="rounded-2xl border border-border bg-card p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+              {t("tournament.rules")}
+            </h2>
+            <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap text-sm">
+              {rules.text}
+            </div>
+          </section>
+        )}
+
+        {/* Registered teams — names only */}
+        <section className="rounded-2xl border border-border bg-card p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            {t("tournament.registeredTeams")}
+          </h2>
+          {teamsCount === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("tournament.beFirst")}</p>
+          ) : (
+            <ul className="flex flex-wrap gap-2">
+              {(teams as any[]).map((teamItem) => (
+                <li
+                  key={teamItem.id}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm"
+                >
+                  <Users className="h-3 w-3 text-muted-foreground" />
+                  {teamItem.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <SponsorsStrip
+          sponsors={rules.branding.sponsors}
+          title={rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault")}
+        />
+      </div>
+    </div>
+  );
+}
+
+
