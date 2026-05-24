@@ -10,10 +10,16 @@ import { Bell, BellRing, Calendar, ChevronRight, Loader2 } from "lucide-react";
 import { fmt } from "@/lib/date-locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/follow-ups")({
   component: FollowUpsPage,
-  head: () => ({ meta: [{ title: "À relancer — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.followUps.title") },
+      { name: "description", content: i18n.t("meta.followUps.description") },
+    ],
+  }),
 });
 
 type Row = {
