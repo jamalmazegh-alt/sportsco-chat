@@ -118,6 +118,7 @@ function TournamentDetailPage() {
     ...(canManage
       ? [
           { id: "registrations" as const, icon: ClipboardList, label: t("tabs.registrations") },
+          { id: "payments" as const, icon: CreditCard, label: t("tabs.payments") },
           { id: "team_staff" as const, icon: UserPlus, label: t("tabs.teamStaff") },
           { id: "members" as const, icon: UserCog, label: t("tabs.members") },
           { id: "rules" as const, icon: Settings2, label: t("tabs.rules") },
