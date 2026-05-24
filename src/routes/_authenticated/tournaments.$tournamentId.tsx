@@ -370,6 +370,15 @@ function TournamentDetailPage() {
 
 
         {/* Play section */}
+        {section === "play" && canManage && (
+          <PublishProgrammeCard
+            tournamentId={tournament.id}
+            status={tournament.status}
+            teams={(teams as any[]).map((tt) => ({ id: tt.id, group_id: tt.group_id ?? null }))}
+            matchesCount={(matches as any[])?.length ?? 0}
+            hasStartDate={Boolean(tournament.starts_on)}
+          />
+        )}
         {section === "play" && sub === "matches" && (
           <MatchesList
             tournamentId={tournament.id}
