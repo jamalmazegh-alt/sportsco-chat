@@ -65,6 +65,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const inviteFn = useServerFn(inviteTournamentMember);
   const removeFn = useServerFn(removeTournamentMember);
   const assignFn = useServerFn(assignRefereeToMatch);
+  const convertFn = useServerFn(convertOfflineMember);
 
   const { data, isLoading } = useQuery({
     queryKey: ["tournament-members", tournamentId],
