@@ -32,18 +32,29 @@ interface PublishProgrammeCardProps {
 export function PublishProgrammeCard({
   tournamentId,
   status,
-  confirmedTeamsCount,
-  unassignedConfirmedTeamsCount,
+  teams,
   matchesCount,
   hasStartDate,
 }: PublishProgrammeCardProps) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const publishFn = useServerFn(publishTournamentProgramme);
+  const listFn = useServerFn(listTournamentRegistrationsWithPayments);
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const regsQuery = useQuery({
+    queryKey: ["tournament-payments", tournamentId],
+    queryFn: () => listFn({ data: { tournament_id: tournamentId } }),
+    enabled: status === "published",
+  });
 
   // Only show when tournament is in the "published" stage
   if (status !== "published") return null;
+
+  const PAID = new Set(["paid_online", "paid_offline", "free"]);
+  const confirmedTeamsCount =
+    regsQuery.data?.payments.filter((p: any) => PAID.has(p.payment_status)).length ?? 0;
+  const unassignedConfirmedTeamsCount = teams.filter((tt) => !tt.group_id).length;
 
   const checks = [
     {
@@ -63,7 +74,8 @@ export function PublishProgrammeCard({
       label: t("tournament.checkStartDate"),
     },
   ];
-  const allOk = checks.every((c) => c.ok);
+  const allOk = checks.every((c) => c.ok) && !regsQuery.isLoading;
+
 
   const m = useMutation({
     mutationFn: () => publishFn({ data: { tournament_id: tournamentId } }),
