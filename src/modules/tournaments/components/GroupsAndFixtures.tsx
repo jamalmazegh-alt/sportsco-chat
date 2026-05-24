@@ -47,6 +47,8 @@ interface Props {
   fields?: string[] | null;
   settings?: Record<string, any> | null;
   teams: Array<{ id: string; name: string; short_name?: string | null; logo_url?: string | null }>;
+  /** Restrict which blocks render. Defaults to "all" (legacy behaviour). */
+  view?: "all" | "format" | "draw" | "schedule";
 }
 
 /* ---------- Reusable block primitives ---------- */
