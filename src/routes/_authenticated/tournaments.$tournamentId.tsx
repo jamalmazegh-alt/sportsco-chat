@@ -373,6 +373,7 @@ function TournamentDetailPage() {
         )}
         {section === "configure" && canManage && sub === "format" && (
           <GroupsAndFixtures
+            view="format"
             tournamentId={tournament.id}
             format={tournament.format}
             status={tournament.status}
