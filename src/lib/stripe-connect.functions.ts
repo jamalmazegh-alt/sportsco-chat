@@ -13,7 +13,7 @@ function getOrigin(): string {
 }
 
 async function assertClubAdmin(
-  supabase: Awaited<ReturnType<typeof requireSupabaseAuth.server>>["context"]["supabase"],
+  supabase: SupabaseClient,
   userId: string,
   clubId: string,
 ): Promise<void> {
@@ -38,7 +38,8 @@ async function logEvent(
     await supabaseAdmin.from("tournament_payment_events").insert({
       tournament_id: tournamentId,
       event_type: eventType,
-      metadata,
+      // metadata is a jsonb column; cast through unknown to satisfy generated Json type.
+      metadata: metadata as unknown as never,
     });
   } catch (e) {
     log.error("Failed to insert payment event", { eventType, error: String(e) });
