@@ -474,7 +474,7 @@ export function GroupsAndFixtures({
         )}
 
         {/* Block 3 — Finales */}
-        {supportsKnockout && (
+        {showFinals && (
           <Block
             icon={<Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
             iconBg="bg-amber-100 dark:bg-amber-950/40"
@@ -510,6 +510,7 @@ export function GroupsAndFixtures({
         )}
 
         {/* Block 4 — Durée des matchs */}
+        {showDuration && (
         <Block
           icon={<Clock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />}
           iconBg="bg-indigo-100 dark:bg-indigo-950/40"
