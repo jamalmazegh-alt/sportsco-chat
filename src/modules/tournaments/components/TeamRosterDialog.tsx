@@ -36,7 +36,7 @@ type Player = {
   license_number: string | null;
 };
 
-export function TeamRosterDialog({ tournamentTeamId, teamName, onClose }: Props) {
+export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }: Props) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const listFn = useServerFn(listTeamPlayers);
