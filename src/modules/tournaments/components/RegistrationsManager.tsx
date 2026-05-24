@@ -77,6 +77,9 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
       }),
   });
 
+  const markPaidFn = useServerFn(markRegistrationPaidOffline);
+  const refundFn = useServerFn(refundRegistrationPayment);
+
   const decide = useMutation({
     mutationFn: (vars: { id: string; action: "approve" | "reject"; note?: string }) =>
       decideFn({
@@ -92,6 +95,25 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
       );
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
+  const markPaid = useMutation({
+    mutationFn: (id: string) => markPaidFn({ data: { registration_id: id } }),
+    onSuccess: () => {
+      toast.success(t("registrations.payments.markedPaid"));
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
+  const refund = useMutation({
+    mutationFn: (vars: { id: string; reason?: string }) =>
+      refundFn({ data: { registration_id: vars.id, reason: vars.reason ?? null } }),
+    onSuccess: () => {
+      toast.success(t("registrations.payments.refunded"));
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
     },
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
