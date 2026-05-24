@@ -196,7 +196,7 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
     if (!reg) throw new Response("Not found", { status: 404 });
     await assertCanManage(supabase, userId, reg.tournament_id);
 
-    if (reg.payment_status !== "paid") {
+    if (reg.payment_status !== "paid_online") {
       throw new Response(
         "Only Stripe-paid registrations can be refunded",
         { status: 400 },
