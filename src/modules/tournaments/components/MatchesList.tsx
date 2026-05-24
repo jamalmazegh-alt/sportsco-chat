@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ import {
   Pencil,
   Eye,
   CalendarClock,
+  Gavel,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,7 +58,7 @@ import {
   recordMatchEvent,
   deleteMatchEvent,
   listMatchEvents,
-  listTournamentCollaborators,
+  listTournamentReferees,
   assignMatchReferee,
 } from "../tournaments.functions";
 
@@ -99,8 +101,10 @@ interface MatchEvent {
   minute: number | null;
 }
 interface RefereeOption {
-  user_id: string;
+  member_id: string;
+  user_id: string | null;
   label: string;
+  offline: boolean;
 }
 
 interface Props {
@@ -114,12 +118,9 @@ interface Props {
 
 export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
   const { t } = useTranslation("tournaments");
+  const { user } = useAuth();
+  const currentUserId = user?.id ?? null;
   const teamMap = new Map(teams.map((t) => [t.id, t]));
-  const grouped = matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
-    (acc[key] ??= []).push(m);
-    return acc;
-  }, {});
 
   const listFn = useServerFn(listMatchEvents);
   const eventsQ = useQuery({
@@ -132,25 +133,64 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
     eventsByMatch.get(ev.match_id)!.push(ev);
   }
 
-  // Accepted referees (with a user account) — used to populate the per-match selector.
-  const collabFn = useServerFn(listTournamentCollaborators);
-  const collabQ = useQuery({
-    queryKey: ["tournament-collaborators", tournamentId],
-    queryFn: () => collabFn({ data: { tournament_id: tournamentId } }),
+  // Referees (tournament_members with role=referee) — populates per-match assignment menu.
+  const refFn = useServerFn(listTournamentReferees);
+  const refereesQ = useQuery({
+    queryKey: ["tournament-referees", tournamentId],
+    queryFn: () => refFn({ data: { tournament_id: tournamentId } }),
     enabled: !!canManage,
   });
-  const refereeOptions: RefereeOption[] = ((collabQ.data?.collaborators ?? []) as any[])
-    .filter(
-      (c) =>
-        c.role === "referee" && !!c.accepted_at && !c.revoked_at && !!c.user_id,
-    )
-    .map((c) => ({
-      user_id: c.user_id as string,
-      label: (c.display_name as string | null) || (c.email as string),
-    }));
+  const refereeOptions: RefereeOption[] = ((refereesQ.data?.referees ?? []) as any[]).map(
+    (r) => ({
+      member_id: r.id as string,
+      user_id: (r.user_id as string | null) ?? null,
+      label: r.label as string,
+      offline: !!r.offline,
+    }),
+  );
+
+  // "My matches" filter — visible when current user is referee on at least one match.
+  const assignedToMe = useMemo(
+    () =>
+      currentUserId
+        ? matches.filter((m) => m.referee_user_id === currentUserId).length
+        : 0,
+    [matches, currentUserId],
+  );
+  const [onlyMine, setOnlyMine] = useState(false);
+  const showFilter = assignedToMe > 0;
+  const visibleMatches =
+    showFilter && onlyMine
+      ? matches.filter((m) => m.referee_user_id === currentUserId)
+      : matches;
+
+  const grouped = visibleMatches.reduce<Record<string, Match[]>>((acc, m) => {
+    const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
+    (acc[key] ??= []).push(m);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-5">
+      {showFilter && (
+        <div className="flex items-center gap-2 px-1">
+          <Button
+            type="button"
+            size="sm"
+            variant={onlyMine ? "default" : "outline"}
+            onClick={() => setOnlyMine((v) => !v)}
+            className="h-8 text-xs gap-1.5"
+          >
+            <Gavel className="h-3.5 w-3.5" />
+            {onlyMine
+              ? t("matches.allMatches", { defaultValue: "Tous les matchs" })
+              : t("matches.myMatches", { defaultValue: "Mes matchs" })}
+            <span className="ml-1 rounded-full bg-background/30 px-1.5 text-[10px] font-semibold tabular-nums">
+              {assignedToMe}
+            </span>
+          </Button>
+        </div>
+      )}
       {Object.entries(grouped).map(([round, ms]) => (
         <section key={round} className="space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground px-1">
@@ -174,7 +214,7 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
           </ul>
         </section>
       ))}
-      {matches.length === 0 && (
+      {visibleMatches.length === 0 && (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
           {t("matches.empty")}
         </div>
@@ -416,6 +456,26 @@ function MatchCard({
       } else {
         payload = { referee_user_id: refMode.replace(/^user:/, ""), referee_name: null };
       }
+      return refFn({
+        data: { tournament_id: tournamentId, match_id: match.id, ...payload },
+      });
+    },
+    onSuccess: () => {
+      toast.success(t("matches.refereeUpdated"));
+      invalidateAll();
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
+  });
+
+  // Quick referee assignment from dropdown menu (no dialog).
+  const quickAssignRef = useMutation({
+    mutationFn: (opt: RefereeOption | null) => {
+      const payload =
+        opt === null
+          ? { referee_user_id: null, referee_name: null }
+          : opt.offline || !opt.user_id
+            ? { referee_user_id: null, referee_name: opt.label }
+            : { referee_user_id: opt.user_id, referee_name: opt.label };
       return refFn({
         data: { tournament_id: tournamentId, match_id: match.id, ...payload },
       });
@@ -854,6 +914,51 @@ function MatchCard({
                     ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Gavel className="h-3.5 w-3.5" />
+                    {t("matches.assignRefereeAction", { defaultValue: "Assigner un arbitre" })}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
+                    <DropdownMenuItem
+                      onClick={() => quickAssignRef.mutate(null)}
+                      disabled={quickAssignRef.isPending}
+                    >
+                      {!match.referee_user_id && !match.referee_name && (
+                        <Check className="h-3.5 w-3.5" />
+                      )}
+                      {t("matches.refereeNone")}
+                    </DropdownMenuItem>
+                    {refereeOptions.length > 0 && <DropdownMenuSeparator />}
+                    {refereeOptions.map((r) => {
+                      const isCurrent = r.user_id
+                        ? match.referee_user_id === r.user_id
+                        : match.referee_name === r.label && !match.referee_user_id;
+                      return (
+                        <DropdownMenuItem
+                          key={r.member_id}
+                          onClick={() => quickAssignRef.mutate(r)}
+                          disabled={quickAssignRef.isPending}
+                          className={isCurrent ? "font-semibold" : ""}
+                        >
+                          {isCurrent && <Check className="h-3.5 w-3.5" />}
+                          <span className="truncate">{r.label}</span>
+                          {r.offline && (
+                            <span className="ml-auto text-[10px] text-muted-foreground">
+                              {t("matches.refereeOffline", { defaultValue: "(sans compte)" })}
+                            </span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                    {refereeOptions.length === 0 && (
+                      <div className="px-2 py-1.5 text-[11px] text-muted-foreground">
+                        {t("matches.refereeNoAccepted")}
+                      </div>
+                    )}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -1182,11 +1287,13 @@ function MatchCard({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__none__">{t("matches.refereeNone")}</SelectItem>
-                  {refereeOptions.map((r) => (
-                    <SelectItem key={r.user_id} value={`user:${r.user_id}`}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
+                  {refereeOptions
+                    .filter((r) => !!r.user_id)
+                    .map((r) => (
+                      <SelectItem key={r.user_id as string} value={`user:${r.user_id}`}>
+                        {r.label}
+                      </SelectItem>
+                    ))}
                   <SelectItem value="free">{t("matches.refereeFree")}</SelectItem>
                 </SelectContent>
               </Select>

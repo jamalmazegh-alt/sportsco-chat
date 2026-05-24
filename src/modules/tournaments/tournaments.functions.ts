@@ -1967,6 +1967,34 @@ export const getTournamentInviteByToken = createServerFn({ method: "GET" })
 
 // ----- Referee assignment per match -----
 
+export const listTournamentReferees = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    const { data: rows, error } = await (supabase as any)
+      .from("tournament_members")
+      .select("id, user_id, email, first_name, last_name, joined_at")
+      .eq("tournament_id", data.tournament_id)
+      .eq("role", "referee")
+      .order("invited_at", { ascending: false });
+    if (error) throw new Response(error.message, { status: 400 });
+    const referees = (rows ?? []).map((r: any) => {
+      const name = [r.first_name, r.last_name].filter(Boolean).join(" ").trim();
+      return {
+        id: r.id as string,
+        user_id: (r.user_id as string | null) ?? null,
+        label: name || (r.email as string) || "—",
+        offline: !r.user_id,
+        accepted: !!r.joined_at,
+      };
+    });
+    return { referees };
+  });
+
 export const assignMatchReferee = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -1974,7 +2002,7 @@ export const assignMatchReferee = createServerFn({ method: "POST" })
       .object({
         tournament_id: z.string().uuid(),
         match_id: z.string().uuid(),
-        // Either pick an existing accepted referee account, or just write a free-text name.
+        // Either pick an existing referee member, or just write a free-text name.
         referee_user_id: z.string().uuid().nullable().optional(),
         referee_name: z.string().trim().max(120).nullable().optional(),
       })
@@ -1984,17 +2012,27 @@ export const assignMatchReferee = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
 
-    // If a user is provided, ensure they are an accepted referee for this tournament.
     if (data.referee_user_id) {
+      // New system: tournament_members
       const { data: ref } = await (supabase as any)
-        .from("tournament_collaborators")
-        .select("id, accepted_at, revoked_at")
+        .from("tournament_members")
+        .select("id")
         .eq("tournament_id", data.tournament_id)
         .eq("role", "referee")
         .eq("user_id", data.referee_user_id)
         .maybeSingle();
-      if (!ref || !ref.accepted_at || ref.revoked_at) {
-        throw new Response("Referee not part of this tournament", { status: 400 });
+      if (!ref) {
+        // Legacy fallback: tournament_collaborators
+        const { data: legacy } = await (supabase as any)
+          .from("tournament_collaborators")
+          .select("id, accepted_at, revoked_at")
+          .eq("tournament_id", data.tournament_id)
+          .eq("role", "referee")
+          .eq("user_id", data.referee_user_id)
+          .maybeSingle();
+        if (!legacy || !legacy.accepted_at || legacy.revoked_at) {
+          throw new Response("Referee not part of this tournament", { status: 400 });
+        }
       }
     }
 
