@@ -2364,6 +2364,7 @@ export type Database = {
           points_draw: number
           points_loss: number
           points_win: number
+          published_programme_at: string | null
           registration_currency: string
           registration_fee: number
           registration_fee_description: string | null
@@ -2399,6 +2400,7 @@ export type Database = {
           points_draw?: number
           points_loss?: number
           points_win?: number
+          published_programme_at?: string | null
           registration_currency?: string
           registration_fee?: number
           registration_fee_description?: string | null
@@ -2434,6 +2436,7 @@ export type Database = {
           points_draw?: number
           points_loss?: number
           points_win?: number
+          published_programme_at?: string | null
           registration_currency?: string
           registration_fee?: number
           registration_fee_description?: string | null
