@@ -997,6 +997,7 @@ function MatchCard({
                       variant="ghost"
                       className="h-7 w-7"
                       onClick={() => setSets(sets.filter((_, j) => j !== i))}
+                      disabled={validated}
                     >
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
@@ -1011,6 +1012,7 @@ function MatchCard({
                         setSets(next);
                       }}
                       size="sm"
+                      disabled={validated}
                     />
                     <span className="text-xl text-muted-foreground">:</span>
                     <ScoreStepper
