@@ -369,7 +369,7 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
   .inputValidator(
     (input: {
       tournament_id: string;
-      email: string;
+      email?: string | null;
       first_name: string;
       last_name: string;
       role: TournamentRole;
@@ -377,7 +377,9 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
       z
         .object({
           tournament_id: z.string().uuid(),
-          email: z.string().email().max(255),
+          email: z
+            .union([z.string().email().max(255), z.literal(""), z.null()])
+            .optional(),
           first_name: z.string().min(1).max(120),
           last_name: z.string().min(1).max(120),
           role: z.enum(TOURNAMENT_ROLES),
@@ -388,8 +390,9 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertTournamentAdmin(supabase, data.tournament_id, userId);
 
-    const email = data.email.trim().toLowerCase();
-    const existingUserId = await findAuthUserByEmail(email);
+    const rawEmail = (data.email ?? "").trim().toLowerCase();
+    const email = rawEmail.length > 0 ? rawEmail : null;
+    const existingUserId = email ? await findAuthUserByEmail(email) : null;
 
     const { data: inserted, error } = await supabaseAdmin
       .from("tournament_members")
@@ -421,7 +424,11 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
       scopeId: data.tournament_id,
       oldRoles: null,
       newRoles: [data.role],
-      action: existingUserId ? "add_existing_user" : "invite_new_user",
+      action: existingUserId
+        ? "add_existing_user"
+        : email
+          ? "invite_new_user"
+          : "add_offline_member",
       note: existingUserId ? null : `token=${inserted?.invite_token}`,
     });
 
@@ -429,6 +436,61 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
       ok: true,
       member_id: inserted!.id,
       invite_token: inserted!.invite_token,
+      linked: !!existingUserId,
+      offline: !email,
+      tournament_name: tournament?.name ?? null,
+      tournament_slug: tournament?.slug ?? null,
+    };
+  });
+
+// ============================================================
+// 4b) convertOfflineMember — add email & invite link for an offline member
+// ============================================================
+export const convertOfflineMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: { tournament_id: string; member_id: string; email: string }) =>
+      z
+        .object({
+          tournament_id: z.string().uuid(),
+          member_id: z.string().uuid(),
+          email: z.string().email().max(255),
+        })
+        .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertTournamentAdmin(supabase, data.tournament_id, userId);
+
+    const email = data.email.trim().toLowerCase();
+    const existingUserId = await findAuthUserByEmail(email);
+
+    const { data: updated, error } = await supabaseAdmin
+      .from("tournament_members")
+      .update({
+        email,
+        user_id: existingUserId,
+        joined_at: existingUserId ? new Date().toISOString() : null,
+      })
+      .eq("id", data.member_id)
+      .eq("tournament_id", data.tournament_id)
+      .select("id, invite_token, first_name, last_name, role")
+      .single();
+    if (error) throw new Response(error.message, { status: 400 });
+
+    const { data: tournament } = await supabaseAdmin
+      .from("tournaments")
+      .select("name, slug")
+      .eq("id", data.tournament_id)
+      .maybeSingle();
+
+    return {
+      ok: true,
+      member_id: updated.id,
+      invite_token: updated.invite_token,
+      first_name: updated.first_name,
+      last_name: updated.last_name,
+      role: updated.role,
       linked: !!existingUserId,
       tournament_name: tournament?.name ?? null,
       tournament_slug: tournament?.slug ?? null,

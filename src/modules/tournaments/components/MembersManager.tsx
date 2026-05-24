@@ -8,6 +8,7 @@ import {
   inviteTournamentMember,
   removeTournamentMember,
   assignRefereeToMatch,
+  convertOfflineMember,
 } from "@/lib/permissions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +65,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const inviteFn = useServerFn(inviteTournamentMember);
   const removeFn = useServerFn(removeTournamentMember);
   const assignFn = useServerFn(assignRefereeToMatch);
+  const convertFn = useServerFn(convertOfflineMember);
 
   const { data, isLoading } = useQuery({
     queryKey: ["tournament-members", tournamentId],
@@ -77,6 +79,9 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const [role, setRole] = useState<TournamentRole>("staff");
   const [busy, setBusy] = useState(false);
   const [removeId, setRemoveId] = useState<string | null>(null);
+  const [convertMember, setConvertMember] = useState<any | null>(null);
+  const [convertEmail, setConvertEmail] = useState("");
+  const [convertBusy, setConvertBusy] = useState(false);
 
   const teamById = new Map(teams.map((tm) => [tm.id, tm.name]));
 
@@ -100,14 +105,15 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       toast.success(
         res.linked
           ? t("tournamentMembers.added", { defaultValue: "Membre ajouté" })
-          : t("tournamentMembers.invited", { defaultValue: "Invitation créée" }),
+          : res.offline
+            ? t("tournamentMembers.offlineAdded", { defaultValue: "Ajouté (sans compte)" })
+            : t("tournamentMembers.invited", { defaultValue: "Invitation créée" }),
       );
 
       const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
       const roleLabel = t(`roles.${role}`, { lng: locale, defaultValue: role });
 
-      if (res.linked && res.tournament_slug) {
-        // Existing user: notify they were added
+      if (res.linked && res.tournament_slug && email) {
         const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
         sendTransactionalEmail({
           templateName: "tournament-member-added",
@@ -123,8 +129,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
         }).catch((err) => {
           console.error("tournament-member-added email failed", err);
         });
-      } else if (!res.linked && res.invite_token) {
-        // New user: send invitation email with accept link
+      } else if (!res.linked && !res.offline && res.invite_token && email) {
         const inviteUrl = `${window.location.origin}/tournament-invite/${res.invite_token}`;
         sendTransactionalEmail({
           templateName: "tournament-invite",
@@ -140,6 +145,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           console.error("tournament-member invite email failed", err);
         });
       }
+
 
 
       setOpen(false);
@@ -185,6 +191,60 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
     const url = `${window.location.origin}/tournament-invite/${token}`;
     navigator.clipboard.writeText(url);
     toast.success(t("tournamentMembers.linkCopied", { defaultValue: "Lien copié" }));
+  }
+
+  async function onConvert(e: FormEvent) {
+    e.preventDefault();
+    if (!convertMember) return;
+    setConvertBusy(true);
+    try {
+      const res = await convertFn({
+        data: {
+          tournament_id: tournamentId,
+          member_id: convertMember.id,
+          email: convertEmail,
+        },
+      });
+      const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
+      const roleLabel = t(`roles.${res.role}`, { lng: locale, defaultValue: res.role });
+      const cleanEmail = convertEmail.trim().toLowerCase();
+      if (res.linked && res.tournament_slug) {
+        const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
+        sendTransactionalEmail({
+          templateName: "tournament-member-added",
+          recipientEmail: cleanEmail,
+          idempotencyKey: `tournament-member-added-${res.member_id}`,
+          templateData: {
+            displayName: res.first_name,
+            tournamentName: res.tournament_name ?? undefined,
+            roleLabel,
+            tournamentUrl,
+            locale,
+          },
+        }).catch((err) => console.error("convert/added email failed", err));
+      } else if (res.invite_token) {
+        const inviteUrl = `${window.location.origin}/tournament-invite/${res.invite_token}`;
+        sendTransactionalEmail({
+          templateName: "tournament-invite",
+          recipientEmail: cleanEmail,
+          idempotencyKey: `tournament-member-invite-${res.member_id}`,
+          templateData: {
+            displayName: res.first_name,
+            tournamentName: res.tournament_name ?? undefined,
+            roleLabel,
+            inviteUrl,
+          },
+        }).catch((err) => console.error("convert/invite email failed", err));
+      }
+      toast.success(t("tournamentMembers.invited", { defaultValue: "Invitation créée" }));
+      setConvertMember(null);
+      setConvertEmail("");
+      qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Error");
+    } finally {
+      setConvertBusy(false);
+    }
   }
 
   return (
@@ -233,8 +293,18 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>{t("players.email")}<span className="text-destructive ml-1">*</span></Label>
-              <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Label>
+                {t("players.email")}{" "}
+                <span className="text-muted-foreground text-xs font-normal">
+                  ({t("common.optional", { defaultValue: "optionnel" })})
+                </span>
+              </Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                {t("tournamentMembers.emailHint", {
+                  defaultValue: "Laissez vide pour ajouter sans compte. Vous pourrez l'inviter plus tard.",
+                })}
+              </p>
             </div>
             <Button type="submit" className="w-full h-11" disabled={busy}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
@@ -267,12 +337,19 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                       <Icon className="h-4 w-4 text-muted-foreground" />
                       {fullName}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">{m.email}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    {m.email ? (
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{m.email}</p>
+                    ) : null}
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
                         {t(`roles.${m.role}`, { defaultValue: m.role })}
                       </span>
-                      {!m.joined_at && (
+                      {!m.email && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+                          {t("tournamentMembers.offline", { defaultValue: "Sans compte" })}
+                        </span>
+                      )}
+                      {m.email && !m.joined_at && (
                         <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
                           {t("tournamentMembers.pending", { defaultValue: "En attente" })}
                         </span>
@@ -280,7 +357,19 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    {!m.joined_at && m.invite_token && (
+                    {!m.email && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8"
+                        onClick={() => { setConvertMember(m); setConvertEmail(""); }}
+                        title={t("tournamentMembers.inviteOffline", { defaultValue: "Inviter par email" })}
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                        {t("tournamentMembers.invite", { defaultValue: "Inviter" })}
+                      </Button>
+                    )}
+                    {m.email && !m.joined_at && m.invite_token && (
                       <Button
                         size="icon"
                         variant="ghost"
@@ -355,6 +444,38 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ResponsiveFormDialog
+        open={!!convertMember}
+        onOpenChange={(o) => { if (!o) { setConvertMember(null); setConvertEmail(""); } }}
+        title={t("tournamentMembers.inviteTitle", { defaultValue: "Inviter un membre" })}
+      >
+        <form onSubmit={onConvert} className="space-y-4 mt-4 pb-6">
+          <p className="text-sm text-muted-foreground">
+            {convertMember
+              ? t("tournamentMembers.convertDesc", {
+                  defaultValue: "Envoyer une invitation par email à {{name}} pour qu'il/elle puisse se connecter et valider ses matchs.",
+                  name: [convertMember.first_name, convertMember.last_name].filter(Boolean).join(" "),
+                })
+              : null}
+          </p>
+          <div className="space-y-1.5">
+            <Label>{t("players.email")}<span className="text-destructive ml-1">*</span></Label>
+            <Input
+              type="email"
+              required
+              autoFocus
+              value={convertEmail}
+              onChange={(e) => setConvertEmail(e.target.value)}
+            />
+          </div>
+          <Button type="submit" className="w-full h-11" disabled={convertBusy}>
+            {convertBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
+              <><Mail className="h-4 w-4" />{t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}</>
+            )}
+          </Button>
+        </form>
+      </ResponsiveFormDialog>
     </div>
   );
 }
