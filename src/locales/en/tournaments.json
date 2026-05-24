@@ -130,7 +130,8 @@
       "metaTitle": "Registration confirmed — {{slug}} · Clubero",
       "title": "Payment received, registration confirmed!",
       "body": "A confirmation email has just been sent to you. See you on the pitch!"
-    }
+    },
+    "payMetaTitle": "Payment — {{slug}} · Clubero"
   },
   "tv": {
     "metaTitle": "Slideshow — {{slug}} · Clubero",

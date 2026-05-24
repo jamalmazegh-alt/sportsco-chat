@@ -16,6 +16,7 @@ export async function logPaymentEvent(
   amount: number | null,
   metadata: Record<string, unknown>,
   stripeEventId: string | null = null,
+  actorId: string | null = null,
 ): Promise<void> {
   try {
     await supabaseAdmin.from("tournament_payment_events").insert({
@@ -24,6 +25,7 @@ export async function logPaymentEvent(
       event_type: eventType,
       amount,
       stripe_event_id: stripeEventId,
+      actor_id: actorId,
       metadata: metadata as unknown as never,
     });
   } catch (e) {
@@ -86,7 +88,7 @@ export async function buildCheckoutForRegistration(params: {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    payment_method_types: ["card"],
+    payment_method_types: ["card", "sepa_debit", "link"],
     customer_email: reg.contact_email ?? undefined,
     line_items: [
       {

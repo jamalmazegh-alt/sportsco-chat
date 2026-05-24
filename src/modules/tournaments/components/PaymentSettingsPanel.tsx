@@ -39,7 +39,7 @@ export function PaymentSettingsPanel({ tournamentId, clubId, initial }: Props) {
   );
   const [currency, setCurrency] = useState(initial.registration_currency || "eur");
   const [description, setDescription] = useState(initial.registration_fee_description ?? "");
-  const [mode, setMode] = useState(initial.payment_mode || "offline");
+  const [mode, setMode] = useState(initial.payment_mode || "both");
 
   const save = useMutation({
     mutationFn: () =>
