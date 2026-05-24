@@ -558,7 +558,7 @@ export function EventFormSheet({
         const toInsert = rows.filter((r) => !existingSet.has(r.starts_at));
         if (toInsert.length === 0) {
           setBusy(false);
-          toast.error(t("events.duplicateExists", { defaultValue: "Un événement existe déjà pour cette équipe à cette date/heure." }));
+          toast.error(t("events.duplicateExists"));
           return;
         }
         const { data, error } = await supabase
@@ -571,7 +571,7 @@ export function EventFormSheet({
           return;
         }
         if (existingSet.size > 0) {
-          toast.info(t("events.someDuplicatesSkipped", { defaultValue: "{{count}} doublon(s) ignoré(s).", count: existingSet.size }));
+          toast.info(t("events.someDuplicatesSkipped", { count: existingSet.size }));
         }
         toast.success(t("events.repeatCreated", { count: data.length }));
         onOpenChange(false);
@@ -589,7 +589,7 @@ export function EventFormSheet({
         .limit(1);
       if (dupes && dupes.length > 0) {
         setBusy(false);
-        toast.error(t("events.duplicateExists", { defaultValue: "Un événement existe déjà pour cette équipe à cette date/heure." }));
+        toast.error(t("events.duplicateExists"));
         return;
       }
       const { data, error } = await supabase
@@ -848,10 +848,10 @@ export function EventFormSheet({
               />
               <div className="space-y-0.5">
                 <div className="text-sm font-medium">
-                  {t("events.openConvocationAfterCreate", { defaultValue: "Choisir les convoqués juste après" })}
+                  {t("events.openConvocationAfterCreate")}
                 </div>
                 <div className="text-[11px] text-muted-foreground">
-                  {t("events.openConvocationAfterCreateHint", { defaultValue: "L'écran de convocation s'ouvrira pour que tu sélectionnes les joueurs." })}
+                  {t("events.openConvocationAfterCreateHint")}
                 </div>
               </div>
             </label>
