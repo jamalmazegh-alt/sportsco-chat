@@ -245,6 +245,18 @@ function TournamentDetailPage() {
         {tab === "registrations" && canManage && (
           <RegistrationsManager tournamentId={tournament.id} />
         )}
+        {tab === "payments" && canManage && (
+          <PaymentSettingsPanel
+            tournamentId={tournament.id}
+            clubId={(tournament as any).club_id ?? null}
+            initial={{
+              registration_fee: (tournament as any).registration_fee ?? 0,
+              registration_currency: (tournament as any).registration_currency ?? "eur",
+              registration_fee_description: (tournament as any).registration_fee_description ?? null,
+              payment_mode: (tournament as any).payment_mode ?? "offline",
+            }}
+          />
+        )}
         {tab === "team_staff" && canManage && (
           <CollaboratorsManager tournamentId={tournament.id} />
         )}
