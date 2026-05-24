@@ -171,12 +171,14 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }:
 function PlayerFormDialog({
   tournamentTeamId,
   player,
+  sport,
   upsertFn,
   onClose,
   onSaved,
 }: {
   tournamentTeamId: string;
   player: Player | null;
+  sport?: string | null;
   upsertFn: (args: { data: any }) => Promise<any>;
   onClose: () => void;
   onSaved: () => void;
