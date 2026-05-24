@@ -175,8 +175,17 @@ export const getTournament = createServerFn({ method: "POST" })
     ]);
     if (tRes.error) throw tRes.error;
     if (!tRes.data) throw new Response("Not found", { status: 404 });
+    let club_stripe_charges_enabled = false;
+    if (tRes.data.club_id) {
+      const { data: club } = await supabase
+        .from("clubs")
+        .select("stripe_charges_enabled")
+        .eq("id", tRes.data.club_id)
+        .maybeSingle();
+      club_stripe_charges_enabled = Boolean(club?.stripe_charges_enabled);
+    }
     return {
-      tournament: tRes.data,
+      tournament: { ...tRes.data, club_stripe_charges_enabled },
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],
