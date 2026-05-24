@@ -483,16 +483,34 @@ function Card({
   title,
   empty,
   children,
+  accent,
 }: {
   title: string;
   empty?: string;
   children?: React.ReactNode;
+  accent?: boolean;
 }) {
   const hasContent = Array.isArray(children) ? children.length > 0 : !!children;
   return (
-    <section className="rounded-xl border border-border bg-card overflow-hidden">
-      <header className="px-3 py-2 border-b border-border bg-muted/40">
-        <h3 className="font-medium text-sm">{title}</h3>
+    <section
+      className={cn(
+        "rounded-xl border bg-card overflow-hidden",
+        accent ? "border-red-500/40 shadow-[0_0_0_3px_hsl(0_84%_60%/0.08)]" : "border-border",
+      )}
+    >
+      <header
+        className={cn(
+          "px-3 py-2 border-b flex items-center gap-2",
+          accent ? "border-red-500/30 bg-red-500/5" : "border-border bg-muted/40",
+        )}
+      >
+        {accent && (
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60 animate-ping" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600" />
+          </span>
+        )}
+        <h3 className={cn("font-medium text-sm", accent && "text-red-700 dark:text-red-400 uppercase tracking-wider text-xs font-bold")}>{title}</h3>
       </header>
       {hasContent ? (
         <ul className="divide-y divide-border">{children}</ul>
