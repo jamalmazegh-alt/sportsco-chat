@@ -614,8 +614,10 @@ export function GroupsAndFixtures({
             </div>
           )}
         </Block>
+        )}
 
         {/* Block 6 — Terrains */}
+        {showFields && (
         <Block
           icon={<MapPin className="h-5 w-5 text-rose-600 dark:text-rose-400" />}
           iconBg="bg-rose-100 dark:bg-rose-950/40"
@@ -659,8 +661,9 @@ export function GroupsAndFixtures({
           </div>
           <p className="text-[11px] text-muted-foreground">{t("groups.fieldsHint")}</p>
         </Block>
+        )}
 
-        {matchesCount === 0 && (
+        {showScheduleCta && matchesCount === 0 && (
           <p className="text-[11px] text-muted-foreground text-center px-4">
             {t("groups.scheduleHint")}
           </p>
