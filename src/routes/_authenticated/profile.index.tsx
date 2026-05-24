@@ -45,7 +45,7 @@ function ProfilePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, preferred_language, phone")
+        .select("full_name, first_name, last_name, preferred_language, phone")
         .eq("id", user!.id)
         .single();
       return data;
@@ -54,10 +54,18 @@ function ProfilePage() {
 
   const [phone, setPhone] = useState("");
   const [phoneBusy, setPhoneBusy] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nameBusy, setNameBusy] = useState(false);
 
   useEffect(() => {
     if (profile?.phone) setPhone(profile.phone);
   }, [profile?.phone]);
+
+  useEffect(() => {
+    setFirstName(profile?.first_name ?? "");
+    setLastName(profile?.last_name ?? "");
+  }, [profile?.first_name, profile?.last_name]);
 
   async function onSavePhone() {
     if (!user) return;
@@ -67,6 +75,26 @@ function ProfilePage() {
     if (error) { toast.error(error.message); return; }
     refetch();
     toast.success(t("profile.phoneSaved", { defaultValue: "Phone saved" }));
+  }
+
+  async function onSaveName() {
+    if (!user) return;
+    setNameBusy(true);
+    const fn = firstName.trim();
+    const ln = lastName.trim();
+    const composed = [fn, ln].filter(Boolean).join(" ");
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        first_name: fn || null,
+        last_name: ln || null,
+        full_name: composed || null,
+      })
+      .eq("id", user.id);
+    setNameBusy(false);
+    if (error) { toast.error(error.message); return; }
+    refetch();
+    toast.success(t("profile.nameSaved", { defaultValue: "Name saved" }));
   }
 
 
