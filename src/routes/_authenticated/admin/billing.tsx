@@ -50,9 +50,8 @@ export const Route = createFileRoute("/_authenticated/admin/billing")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      {
-        title: `${i18nInstance.t("billing.title", { defaultValue: "Abonnement" })} — Clubero`,
-      },
+      { title: i18nInstance.t("meta.adminBilling.title") },
+      { name: "description", content: i18nInstance.t("meta.adminBilling.description") },
     ],
   }),
 });
