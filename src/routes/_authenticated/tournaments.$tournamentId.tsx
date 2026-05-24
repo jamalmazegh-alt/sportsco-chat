@@ -241,6 +241,15 @@ function TournamentDetailPage() {
     setSub("regSettings");
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+  if (!hasData || !tournament) return null;
+
   return (
     <div className="pb-6">
       <header className="px-5 pt-6 pb-4 space-y-3">
