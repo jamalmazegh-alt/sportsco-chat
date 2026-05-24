@@ -1224,6 +1224,43 @@
     "adminReminders": {
       "title": "Reminders — Clubero",
       "description": "Event reminder configuration."
+    },
+    "register": {
+      "title": "Create account — Clubero",
+      "description": "Create your Clubero account in seconds."
+    },
+    "contact": {
+      "title": "Contact — Clubero",
+      "description": "Contact the Clubero team: product questions, demo, partnerships or support for your sports club. We reply within 24 h.",
+      "ogDescription": "Contact the Clubero team: demo, support and partnerships for your sports club."
+    },
+    "pricing": {
+      "title": "Pricing — Clubero",
+      "description": "30-day free trial. Then €49/month all-inclusive, or €40 per tournament for the Tournaments module only.",
+      "ogDescription": "30 days free. €49/month after. Tournaments module included."
+    },
+    "features": {
+      "title": "Features — Clubero",
+      "description": "Call-ups, attendance, communication, statistics. Discover everything Clubero offers clubs, coaches, parents and players.",
+      "ogDescription": "Everything your club needs. Nothing extra."
+    },
+    "faq": {
+      "title": "FAQ — Clubero",
+      "description": "Answers to frequent questions about Clubero — pricing, setup, GDPR, parental controls and more.",
+      "ogDescription": "Answers to frequent questions about Clubero."
+    },
+    "legalGeneric": {
+      "fallbackTitle": "Legal",
+      "fallbackDescription": "Legal document"
+    },
+    "legalCookies": {
+      "title": "Cookie policy — Clubero",
+      "description": "Exhaustive list of cookies used by Clubero, their purpose and retention period."
+    },
+    "publicHome": {
+      "title": "Clubero — Team coordination for sports clubs",
+      "description": "Call-ups, attendance, reminders and club communication in a single mobile app. WhatsApp remains available as an option.",
+      "ogDescription": "Call-ups, attendance, reminders — all in one tool. In one click."
     }
   },
   "trial": {
