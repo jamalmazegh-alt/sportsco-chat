@@ -290,7 +290,14 @@
     "emptyHintAdmin": "Create your first team to start scheduling trainings and matches.",
     "emptyHintMember": "You are not a member of any team yet. Ask an admin to add you.",
     "imageTooLarge": "Image too large (max 5 MB).",
-    "imageInvalidType": "Unsupported file format."
+    "imageInvalidType": "Unsupported file format.",
+    "whatsappGroupLink": "WhatsApp — team group link",
+    "communicationMode": "Communication mode",
+    "commMode": {
+      "app": "Clubero only (attendance tracked in the app)",
+      "hybrid": "Hybrid (WhatsApp + attendance tracking in Clubero)",
+      "whatsapp": "WhatsApp only (no attendance tracking)"
+    }
   },
   "club": {
     "logo": "Club logo",
@@ -367,7 +374,8 @@
     "childAccessNeedsEmail": "Add an email to the child first to enable access.",
     "account": "Account",
     "removeConfirm": "Remove {{name}} from the team?",
-    "removed": "Player removed from the team"
+    "removed": "Player removed from the team",
+    "minorMediaConsentRequired": "Minor player: parental media consent is required before any upload. Current status: "
   },
   "events": {
     "whatsappShare": {

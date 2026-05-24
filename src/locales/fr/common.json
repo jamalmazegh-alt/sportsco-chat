@@ -290,7 +290,14 @@
     "emptyHintAdmin": "Crée ta première équipe pour commencer à programmer entraînements et matchs.",
     "emptyHintMember": "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter.",
     "imageTooLarge": "Image trop lourde (max 5 Mo).",
-    "imageInvalidType": "Format de fichier non supporté."
+    "imageInvalidType": "Format de fichier non supporté.",
+    "whatsappGroupLink": "WhatsApp — lien du groupe d'équipe",
+    "communicationMode": "Mode de communication",
+    "commMode": {
+      "app": "Clubero uniquement (suivi des présences dans l'app)",
+      "hybrid": "Hybride (WhatsApp + suivi des présences dans Clubero)",
+      "whatsapp": "WhatsApp uniquement (pas de suivi de présence)"
+    }
   },
   "club": {
     "logo": "Logo du club",
@@ -367,7 +374,8 @@
     "childAccessNeedsEmail": "Ajoutez d'abord un email à l'enfant pour activer l'accès.",
     "account": "Compte",
     "removeConfirm": "Retirer {{name}} de l'équipe ?",
-    "removed": "Joueur retiré de l'équipe"
+    "removed": "Joueur retiré de l'équipe",
+    "minorMediaConsentRequired": "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : "
   },
   "events": {
     "whatsappShare": {
