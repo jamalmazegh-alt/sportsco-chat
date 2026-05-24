@@ -811,6 +811,40 @@
     "sendInvite": "Envoyer l'invitation",
     "hubBranding": "Identité visuelle",
     "hubBrandingHint": "Couleur principale de l'app pour ton club",
+    "hubPayments": "Paiements",
+    "hubPaymentsHint": "Encaissez les inscriptions tournoi via Stripe",
+    "payments": {
+      "title": "Paiements tournois",
+      "subtitle": "Activez Stripe pour encaisser les inscriptions tournoi directement sur le compte du club.",
+      "notActivatedTitle": "Paiements non activés",
+      "notActivatedHint": "Créez un compte Stripe Express pour commencer à encaisser les frais d'inscription.",
+      "activate": "Activer les paiements",
+      "pending": "En attente de validation Stripe",
+      "pendingHint": "Complétez les informations demandées par Stripe pour activer les paiements.",
+      "active": "Paiements actifs",
+      "activeHint": "Cartes {{charges}} · Virements {{payouts}}",
+      "restricted": "Compte restreint",
+      "restrictedHint": "Stripe demande des informations complémentaires. Reprenez l'onboarding pour débloquer le compte.",
+      "completeProfile": "Compléter votre profil Stripe",
+      "refreshStatus": "Rafraîchir le statut",
+      "platformFee": "Commission Clubero : {{rate}}%",
+      "feeReduced": "Tarif réduit grâce à votre abonnement Clubero actif.",
+      "feeStandard": "Activez un abonnement Clubero pour réduire la commission à 3%.",
+      "markPaid": "Marquer comme payé",
+      "markPaidOffline": "Paiement hors ligne",
+      "refund": "Rembourser",
+      "refundReason": "Motif du remboursement",
+      "refundConfirm": "Rembourser {{amount}}",
+      "noRefundOffline": "Les paiements hors ligne ne peuvent pas être remboursés via l'application.",
+      "paidOnline": "Payé en ligne",
+      "paidOffline": "Payé hors ligne",
+      "refunded": "Remboursé",
+      "refundPending": "Remboursement en cours",
+      "pendingStatus": "En attente",
+      "free": "Gratuit",
+      "totalCollected": "Total encaissé",
+      "totalPending": "En attente"
+    },
     "branding": {
       "saved": "Couleur du club mise à jour",
       "saveError": "Impossible de sauvegarder",
@@ -1235,6 +1269,10 @@
     "adminBilling": {
       "title": "Abonnement — Clubero",
       "description": "Gérer l'abonnement et la facturation du club."
+    },
+    "adminPayments": {
+      "title": "Paiements — Clubero",
+      "description": "Activez l'encaissement des inscriptions tournoi pour votre club."
     },
     "adminCommunications": {
       "title": "Communications — Clubero",

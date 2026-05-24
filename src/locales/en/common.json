@@ -811,6 +811,40 @@
     "sendInvite": "Send invitation",
     "hubBranding": "Branding",
     "hubBrandingHint": "Primary app color for your club",
+    "hubPayments": "Payments",
+    "hubPaymentsHint": "Collect tournament registrations via Stripe",
+    "payments": {
+      "title": "Tournament payments",
+      "subtitle": "Enable Stripe to collect tournament registration fees directly into the club's account.",
+      "notActivatedTitle": "Payments not activated",
+      "notActivatedHint": "Create a Stripe Express account to start collecting registration fees.",
+      "activate": "Activate payments",
+      "pending": "Pending Stripe validation",
+      "pendingHint": "Complete the information Stripe requires to activate payments.",
+      "active": "Payments active",
+      "activeHint": "Cards {{charges}} · Payouts {{payouts}}",
+      "restricted": "Account restricted",
+      "restrictedHint": "Stripe needs more information. Resume onboarding to unblock the account.",
+      "completeProfile": "Complete your Stripe profile",
+      "refreshStatus": "Refresh status",
+      "platformFee": "Clubero fee: {{rate}}%",
+      "feeReduced": "Reduced with your active Clubero subscription.",
+      "feeStandard": "Activate a Clubero subscription to lower the fee to 3%.",
+      "markPaid": "Mark as paid",
+      "markPaidOffline": "Offline payment",
+      "refund": "Refund",
+      "refundReason": "Refund reason",
+      "refundConfirm": "Refund {{amount}}",
+      "noRefundOffline": "Offline payments cannot be refunded through the app.",
+      "paidOnline": "Paid online",
+      "paidOffline": "Paid offline",
+      "refunded": "Refunded",
+      "refundPending": "Refund pending",
+      "pendingStatus": "Pending",
+      "free": "Free",
+      "totalCollected": "Total collected",
+      "totalPending": "Pending"
+    },
     "branding": {
       "saved": "Club color updated",
       "saveError": "Could not save",
@@ -1235,6 +1269,10 @@
     "adminBilling": {
       "title": "Subscription — Clubero",
       "description": "Manage your club's subscription and billing."
+    },
+    "adminPayments": {
+      "title": "Payments — Clubero",
+      "description": "Enable tournament registration payments for your club."
     },
     "adminCommunications": {
       "title": "Communications — Clubero",
