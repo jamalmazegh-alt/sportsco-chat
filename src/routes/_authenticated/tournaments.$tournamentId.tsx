@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
@@ -19,7 +19,11 @@ import {
   MapPin,
   ChevronRight,
   ChevronLeft,
-
+  Tv,
+  AlertTriangle,
+  Cog,
+  UsersRound,
+  PlayCircle,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
@@ -29,6 +33,7 @@ import {
   updateTournament,
 } from "@/modules/tournaments/tournaments.functions";
 import { resolveScoring } from "@/modules/tournaments/lib/formats";
+import { mergeRules } from "@/modules/tournaments/lib/rules";
 import { TeamsManager } from "@/modules/tournaments/components/TeamsManager";
 import { GroupsAndFixtures } from "@/modules/tournaments/components/GroupsAndFixtures";
 import { MatchesList } from "@/modules/tournaments/components/MatchesList";
@@ -38,11 +43,12 @@ import { ShareDialog } from "@/modules/tournaments/components/ShareDialog";
 import { TournamentRulesEditor } from "@/modules/tournaments/components/TournamentRulesEditor";
 import { FieldsManager } from "@/modules/tournaments/components/FieldsManager";
 import { RegistrationsManager } from "@/modules/tournaments/components/RegistrationsManager";
-import { CollaboratorsManager } from "@/modules/tournaments/components/CollaboratorsManager";
-import { MembersManager } from "@/modules/tournaments/components/MembersManager";
+import { RegistrationSettingsPanel } from "@/modules/tournaments/components/RegistrationSettingsPanel";
+import { StaffAndOfficialsPanel } from "@/modules/tournaments/components/StaffAndOfficialsPanel";
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
-import { ClipboardList, UserPlus, UserCog, CreditCard } from "lucide-react";
+import { ClipboardList, UserCog, CreditCard } from "lucide-react";
+
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
@@ -54,7 +60,20 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
   }),
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "payments" | "rules" | "team_staff" | "members";
+type Section = "configure" | "manage" | "play";
+type Sub =
+  | "format"
+  | "rules"
+  | "fields"
+  | "payments"
+  | "regSettings"
+  | "registrations"
+  | "teams"
+  | "staff"
+  | "matches"
+  | "standings"
+  | "bracket"
+  | "tv";
 
 function TournamentDetailPage() {
   const { t } = useTranslation("tournaments");
@@ -81,7 +100,8 @@ function TournamentDetailPage() {
     onError: (e: any) => toast.error(e?.message ?? t("common.error", { defaultValue: "Erreur" })),
   });
 
-  const [tab, setTab] = useState<Tab>("teams");
+  const [section, setSection] = useState<Section>("play");
+  const [sub, setSub] = useState<Sub>("matches");
 
   if (q.isLoading) {
     return (
@@ -105,26 +125,57 @@ function TournamentDetailPage() {
     (tournament as any).sport,
     ((tournament as any).settings as any)?.scoring,
   );
+  const mergedRules = mergeRules((tournament as any).settings);
+  const registrationEnabled = mergedRules.registration.enabled;
 
-  const tabs: { id: Tab; icon: any; label: string }[] = [
-    { id: "teams", icon: Users, label: t("tabs.teams") },
-    { id: "fixtures", icon: Shuffle, label: t("tabs.format") },
-    ...(canManage
-      ? [{ id: "fields" as const, icon: MapPin, label: t("tabs.fields") }]
-      : []),
+  // Section definitions
+  const playSubs: { id: Sub; icon: any; label: string }[] = [
     { id: "matches", icon: Calendar, label: t("tabs.matches") },
     { id: "standings", icon: ListOrdered, label: t("tabs.standings") },
     { id: "bracket", icon: GitBranch, label: t("tabs.bracket") },
+    { id: "tv", icon: Tv, label: t("sections.tvLive", { defaultValue: "Live / TV" }) },
+  ];
+  const manageSubs: { id: Sub; icon: any; label: string }[] = canManage
+    ? [
+        { id: "registrations", icon: ClipboardList, label: t("tabs.registrations") },
+        { id: "teams", icon: Users, label: t("tabs.teams") },
+        { id: "staff", icon: UserCog, label: t("sections.staffAndOfficials", { defaultValue: "Staff & arbitres" }) },
+      ]
+    : [{ id: "teams", icon: Users, label: t("tabs.teams") }];
+  const configureSubs: { id: Sub; icon: any; label: string }[] = canManage
+    ? [
+        { id: "regSettings", icon: ClipboardList, label: t("sections.registrationSettings", { defaultValue: "Inscriptions" }) },
+        { id: "format", icon: Shuffle, label: t("tabs.format") },
+        { id: "rules", icon: Settings2, label: t("tabs.rules") },
+        { id: "fields", icon: MapPin, label: t("tabs.fields") },
+        { id: "payments", icon: CreditCard, label: t("tabs.payments") },
+      ]
+    : [];
+
+  const sectionDefs: { id: Section; icon: any; label: string; subs: typeof playSubs }[] = [
     ...(canManage
       ? [
-          { id: "registrations" as const, icon: ClipboardList, label: t("tabs.registrations") },
-          { id: "payments" as const, icon: CreditCard, label: t("tabs.payments") },
-          { id: "team_staff" as const, icon: UserPlus, label: t("tabs.teamStaff") },
-          { id: "members" as const, icon: UserCog, label: t("tabs.members") },
-          { id: "rules" as const, icon: Settings2, label: t("tabs.rules") },
+          { id: "configure" as Section, icon: Cog, label: t("sections.configure", { defaultValue: "Configurer" }), subs: configureSubs },
+          { id: "manage" as Section, icon: UsersRound, label: t("sections.manage", { defaultValue: "Gérer" }), subs: manageSubs },
         ]
-      : []),
+      : [{ id: "manage" as Section, icon: UsersRound, label: t("sections.manage", { defaultValue: "Gérer" }), subs: manageSubs }]),
+    { id: "play", icon: PlayCircle, label: t("sections.play", { defaultValue: "Jouer" }), subs: playSubs },
   ];
+
+  const activeSubs = sectionDefs.find((s) => s.id === section)?.subs ?? [];
+  // Auto-correct sub when switching section
+  useEffect(() => {
+    if (!activeSubs.find((s) => s.id === sub)) {
+      const first = activeSubs[0];
+      if (first) setSub(first.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section]);
+
+  const goToRegSettings = () => {
+    setSection("configure");
+    setSub("regSettings");
+  };
 
   return (
     <div className="pb-6">
@@ -180,20 +231,70 @@ function TournamentDetailPage() {
         )}
       </header>
 
-      <TabsNav tabs={tabs} tab={tab} setTab={setTab} />
+      {/* Top-level section tabs */}
+      <div className="px-5 pb-3">
+        <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-muted/40 p-1.5">
+          {sectionDefs.map((s) => {
+            const Icon = s.icon;
+            const active = section === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => setSection(s.id)}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg text-xs font-semibold transition-all",
+                  active
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
+      {/* Sub-tabs scroller */}
+      <SubTabsNav tabs={activeSubs} tab={sub} setTab={setSub} />
 
-      <div className="px-5 pt-4">
-        {tab === "teams" && (
-          <TeamsManager
+      <div className="px-5 pt-4 space-y-4">
+        {/* Registration-disabled banner when admin lands on Registrations */}
+        {canManage &&
+          section === "manage" &&
+          sub === "registrations" &&
+          !registrationEnabled && (
+            <div className="flex items-start gap-3 rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-950/20 p-3">
+              <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                  {t("registrations.disabledBanner.title", {
+                    defaultValue: "Les inscriptions en ligne sont désactivées",
+                  })}
+                </p>
+                <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5">
+                  {t("registrations.disabledBanner.body", {
+                    defaultValue:
+                      "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures.",
+                  })}
+                </p>
+              </div>
+              <Button size="sm" onClick={goToRegSettings}>
+                {t("registrations.disabledBanner.cta", { defaultValue: "Activer" })}
+              </Button>
+            </div>
+          )}
+
+        {/* Configure section */}
+        {section === "configure" && canManage && sub === "regSettings" && (
+          <RegistrationSettingsPanel
             tournamentId={tournament.id}
-            clubId={tournament.club_id}
-            teams={teams as any}
-            maxTeams={(tournament as any).num_teams ?? null}
-            sport={(tournament as any).sport ?? null}
+            tournamentSlug={tournament.slug}
+            settings={(tournament as any).settings}
           />
         )}
-        {tab === "fixtures" && canManage && (
+        {section === "configure" && canManage && sub === "format" && (
           <GroupsAndFixtures
             tournamentId={tournament.id}
             format={tournament.format}
@@ -210,15 +311,15 @@ function TournamentDetailPage() {
             fields={(tournament as any).fields}
             settings={(tournament as any).settings}
           />
-
         )}
-
-        {tab === "fixtures" && !canManage && (
-          <p className="text-sm text-muted-foreground">
-            {t("detail.formatAdminOnly")}
-          </p>
+        {section === "configure" && canManage && sub === "rules" && (
+          <TournamentRulesEditor
+            tournamentId={tournament.id}
+            settings={(tournament as any).settings}
+            sport={(tournament as any).sport}
+          />
         )}
-        {tab === "fields" && canManage && (
+        {section === "configure" && canManage && sub === "fields" && (
           <FieldsManager
             tournamentId={tournament.id}
             fields={(tournament as any).fields}
@@ -228,32 +329,7 @@ function TournamentDetailPage() {
             teams={teams as any}
           />
         )}
-        {tab === "matches" && (
-          <MatchesList
-            tournamentId={tournament.id}
-            matches={matches as any}
-            teams={teams as any}
-            canManage={canManage}
-            fields={((tournament as any).fields as string[] | null) ?? []}
-            scoring={scoring}
-          />
-        )}
-        {tab === "standings" && <StandingsView tournamentId={tournament.id} />}
-        {tab === "bracket" && (
-          <BracketView matches={matches as any} teams={teams as any} />
-        )}
-        {tab === "registrations" && canManage && (
-          <RegistrationsManager
-            tournamentId={tournament.id}
-            tournament={{
-              registration_fee: (tournament as any).registration_fee ?? 0,
-              payment_mode: (tournament as any).payment_mode ?? "offline",
-              club_stripe_charges_enabled:
-                (tournament as any).club_stripe_charges_enabled ?? false,
-            }}
-          />
-        )}
-        {tab === "payments" && canManage && (
+        {section === "configure" && canManage && sub === "payments" && (
           <PaymentSettingsPanel
             tournamentId={tournament.id}
             clubId={(tournament as any).club_id ?? null}
@@ -265,36 +341,88 @@ function TournamentDetailPage() {
             }}
           />
         )}
-        {tab === "team_staff" && canManage && (
-          <CollaboratorsManager tournamentId={tournament.id} />
+
+        {/* Manage section */}
+        {section === "manage" && sub === "teams" && (
+          <TeamsManager
+            tournamentId={tournament.id}
+            clubId={tournament.club_id}
+            teams={teams as any}
+            maxTeams={(tournament as any).num_teams ?? null}
+            sport={(tournament as any).sport ?? null}
+          />
         )}
-        {tab === "members" && canManage && (
-          <MembersManager
+        {section === "manage" && canManage && sub === "registrations" && (
+          <RegistrationsManager
+            tournamentId={tournament.id}
+            tournament={{
+              registration_fee: (tournament as any).registration_fee ?? 0,
+              payment_mode: (tournament as any).payment_mode ?? "offline",
+              club_stripe_charges_enabled:
+                (tournament as any).club_stripe_charges_enabled ?? false,
+            }}
+          />
+        )}
+        {section === "manage" && canManage && sub === "staff" && (
+          <StaffAndOfficialsPanel
             tournamentId={tournament.id}
             matches={matches as any}
             teams={teams as any}
           />
         )}
-        {tab === "rules" && canManage && (
-          <TournamentRulesEditor
+
+        {/* Play section */}
+        {section === "play" && sub === "matches" && (
+          <MatchesList
             tournamentId={tournament.id}
-            settings={(tournament as any).settings}
-            sport={(tournament as any).sport}
+            matches={matches as any}
+            teams={teams as any}
+            canManage={canManage}
+            fields={((tournament as any).fields as string[] | null) ?? []}
+            scoring={scoring}
           />
+        )}
+        {section === "play" && sub === "standings" && (
+          <StandingsView tournamentId={tournament.id} />
+        )}
+        {section === "play" && sub === "bracket" && (
+          <BracketView matches={matches as any} teams={teams as any} />
+        )}
+        {section === "play" && sub === "tv" && (
+          <div className="rounded-lg border bg-card p-6 text-center space-y-3">
+            <Tv className="h-8 w-8 text-primary mx-auto" />
+            <div>
+              <p className="font-medium">
+                {t("sections.tvLiveTitle", { defaultValue: "Diaporama TV / Live" })}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t("sections.tvLiveHint", {
+                  defaultValue: "Ouvre l'écran plein-écran pour afficher matchs et classements en direct.",
+                })}
+              </p>
+            </div>
+            <Button asChild>
+              <a href={`/tournament/${tournament.slug}/tv`} target="_blank" rel="noreferrer">
+                <Tv className="h-4 w-4" />
+                {t("sections.openTv", { defaultValue: "Ouvrir l'écran live" })}
+              </a>
+            </Button>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function TabsNav({
+
+function SubTabsNav({
   tabs,
   tab,
   setTab,
 }: {
-  tabs: { id: Tab; icon: any; label: string }[];
-  tab: Tab;
-  setTab: (t: Tab) => void;
+  tabs: { id: Sub; icon: any; label: string }[];
+  tab: Sub;
+  setTab: (t: Sub) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeBtnRef = useRef<HTMLButtonElement>(null);

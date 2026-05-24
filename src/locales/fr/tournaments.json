@@ -323,6 +323,11 @@
     }
   },
   "registrations": {
+    "disabledBanner": {
+      "title": "Les inscriptions en ligne sont désactivées",
+      "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures.",
+      "cta": "Activer"
+    },
     "count_one": "{{count}} inscription",
     "count_other": "{{count}} inscriptions",
     "filter": {
@@ -868,9 +873,32 @@
     "standings": "Classement",
     "bracket": "Bracket",
     "registrations": "Inscriptions",
+    "payments": "Paiements",
     "teamStaff": "Équipe",
     "members": "Staff & arbitres",
     "rules": "Règles"
+  },
+  "sections": {
+    "configure": "Configurer",
+    "manage": "Gérer",
+    "play": "Jouer",
+    "registrationSettings": "Inscriptions",
+    "staffAndOfficials": "Staff & arbitres",
+    "tvLive": "Live / TV",
+    "tvLiveTitle": "Diaporama TV / Live",
+    "tvLiveHint": "Ouvre l'écran plein-écran pour afficher matchs et classements en direct.",
+    "openTv": "Ouvrir l'écran live"
+  },
+  "staff": {
+    "organizers": "Équipe d'organisation",
+    "officials": "Arbitres & bénévoles"
+  },
+  "registrationSettings": {
+    "title": "Inscriptions en ligne",
+    "enableLabel": "Ouvrir les inscriptions au public",
+    "enableHint": "Active un bouton « S'inscrire » sur la page publique du tournoi.",
+    "publicLink": "Lien public d'inscription",
+    "linkCopied": "Lien copié"
   },
   "status": {
     "draft": "Brouillon",

@@ -323,6 +323,11 @@
     }
   },
   "registrations": {
+    "disabledBanner": {
+      "title": "Online registrations are disabled",
+      "body": "No \"Register\" button appears on the public page. Enable them to receive applications.",
+      "cta": "Enable"
+    },
     "count_one": "{{count}} registration",
     "count_other": "{{count}} registrations",
     "filter": {
@@ -868,9 +873,32 @@
     "standings": "Standings",
     "bracket": "Bracket",
     "registrations": "Registrations",
+    "payments": "Payments",
     "teamStaff": "Team",
     "members": "Staff & referees",
     "rules": "Rules"
+  },
+  "sections": {
+    "configure": "Set up",
+    "manage": "Manage",
+    "play": "Play",
+    "registrationSettings": "Registrations",
+    "staffAndOfficials": "Staff & referees",
+    "tvLive": "Live / TV",
+    "tvLiveTitle": "TV slideshow / Live",
+    "tvLiveHint": "Open the fullscreen view to display matches and standings live.",
+    "openTv": "Open live screen"
+  },
+  "staff": {
+    "organizers": "Organizing team",
+    "officials": "Referees & volunteers"
+  },
+  "registrationSettings": {
+    "title": "Online registrations",
+    "enableLabel": "Open registrations to the public",
+    "enableHint": "Adds a \"Register\" button on the public tournament page.",
+    "publicLink": "Public registration link",
+    "linkCopied": "Link copied"
   },
   "status": {
     "draft": "Draft",
