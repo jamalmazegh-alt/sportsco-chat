@@ -151,6 +151,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       setOpen(false);
       resetForm();
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
+      qc.invalidateQueries({ queryKey: ["tournament-referees", tournamentId] });
     } catch (err: any) {
       toast.error(err?.message ?? "Error");
     } finally {
@@ -166,6 +167,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       await removeFn({ data: { tournament_id: tournamentId, member_id: memberId } });
       toast.success(t("tournamentMembers.removed", { defaultValue: "Membre retiré" }));
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
+      qc.invalidateQueries({ queryKey: ["tournament-referees", tournamentId] });
     } catch (err: any) {
       toast.error(err?.message ?? "Error");
     }
@@ -182,6 +184,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
         },
       });
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
+      qc.invalidateQueries({ queryKey: ["tournament-referees", tournamentId] });
     } catch (err: any) {
       toast.error(err?.message ?? "Error");
     }
@@ -240,6 +243,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       setConvertMember(null);
       setConvertEmail("");
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
+      qc.invalidateQueries({ queryKey: ["tournament-referees", tournamentId] });
     } catch (err: any) {
       toast.error(err?.message ?? "Error");
     } finally {
