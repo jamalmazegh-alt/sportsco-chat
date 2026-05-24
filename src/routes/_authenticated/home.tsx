@@ -241,20 +241,9 @@ function HomePage() {
               }
             />
           )}
-          <div className="grid grid-cols-2 gap-2">
-            <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
-              <Link to="/teams">
-                <Users className="h-4 w-4" />
-                {t("dashboard.viewTeams")}
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm" className="h-9 text-muted-foreground hover:text-foreground">
-              <Link to="/tournaments">
-                <Trophy className="h-4 w-4" />
-                {t("nav.tournaments")}
-              </Link>
-            </Button>
-          </div>
+          {activeClubId && (
+            <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />
+          )}
         </div>
       )}
 
