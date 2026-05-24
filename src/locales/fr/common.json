@@ -115,6 +115,11 @@
     "remove": "Retirer",
     "clear": "Effacer"
   },
+  "notFound": {
+    "code": "404",
+    "title": "Page introuvable",
+    "subtitle": "La page que vous cherchez n'existe pas ou a été déplacée."
+  },
   "privacy": {
     "title": "Confidentialité & données",
     "subtitle": "Gérez vos consentements et exercez vos droits RGPD.",
