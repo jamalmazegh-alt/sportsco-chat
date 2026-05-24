@@ -150,7 +150,9 @@ export const markRegistrationPaidOffline = createServerFn({ method: "POST" })
       reg.id,
       "marked_paid_offline",
       t?.registration_fee ?? 0,
-      { by: userId, note: data.note ?? null, team_name: reg.team_name },
+      { note: data.note ?? null, team_name: reg.team_name },
+      null,
+      userId,
     );
 
     return { ok: true };
