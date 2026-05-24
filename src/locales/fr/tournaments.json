@@ -124,7 +124,13 @@
       "notes": "Notes (optionnel)"
     },
     "addPlayer": "Ajouter",
-    "submit": "Envoyer l'inscription"
+    "submit": "Envoyer l'inscription",
+    "redirectingToPayment": "Redirection vers le paiement…",
+    "success": {
+      "metaTitle": "Inscription confirmée — {{slug}} · Clubero",
+      "title": "Paiement reçu, inscription confirmée !",
+      "body": "Un email de confirmation vient de t'être envoyé. À bientôt sur le terrain !"
+    }
   },
   "tv": {
     "metaTitle": "Diaporama — {{slug}} · Clubero",
