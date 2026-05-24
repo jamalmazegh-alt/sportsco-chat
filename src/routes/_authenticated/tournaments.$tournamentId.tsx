@@ -54,6 +54,13 @@ import { ClipboardList, UserCog, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: z
+      .enum(["configurer", "gerer", "jouer"])
+      .optional()
+      .parse(search.tab),
+    sub: typeof search.sub === "string" ? (search.sub as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: i18n.t("meta.tournaments.title", { ns: "common" }) },
@@ -61,6 +68,17 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
     ],
   }),
 });
+
+const SECTION_TO_URL: Record<"configure" | "manage" | "play", "configurer" | "gerer" | "jouer"> = {
+  configure: "configurer",
+  manage: "gerer",
+  play: "jouer",
+};
+const URL_TO_SECTION: Record<"configurer" | "gerer" | "jouer", "configure" | "manage" | "play"> = {
+  configurer: "configure",
+  gerer: "manage",
+  jouer: "play",
+};
 
 type Section = "configure" | "manage" | "play";
 type Sub =
