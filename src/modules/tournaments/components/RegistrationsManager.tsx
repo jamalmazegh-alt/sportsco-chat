@@ -12,6 +12,8 @@ import {
   Users,
   Clock,
   Filter,
+  Banknote,
+  Undo2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +27,19 @@ import {
   listTournamentRegistrations,
   decideRegistration,
 } from "../tournaments.functions";
+import {
+  markRegistrationPaidOffline,
+  refundRegistrationPayment,
+} from "../tournament-payments.functions";
 
 type Status = "pending" | "approved" | "rejected" | "cancelled";
+type PaymentStatus =
+  | "pending"
+  | "paid_online"
+  | "paid_offline"
+  | "refunded"
+  | "refund_pending"
+  | "free";
 
 interface Reg {
   id: string;
@@ -41,6 +54,9 @@ interface Reg {
   created_at: string;
   decided_at: string | null;
   decision_note: string | null;
+  payment_status?: PaymentStatus | null;
+  amount_paid?: number | null;
+  currency?: string | null;
 }
 
 export function RegistrationsManager({ tournamentId }: { tournamentId: string }) {
