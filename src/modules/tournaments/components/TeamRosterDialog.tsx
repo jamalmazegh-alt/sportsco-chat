@@ -21,6 +21,7 @@ import {
 interface Props {
   tournamentTeamId: string;
   teamName: string;
+  sport?: string | null;
   onClose: () => void;
 }
 
