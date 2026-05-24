@@ -137,7 +137,7 @@ function TournamentDetailPage() {
             </p>
             <p className="text-xs mt-1">
               <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium">
-                {tournament.status}
+                {t(`status.${tournament.status}`, { defaultValue: tournament.status })}
               </span>
             </p>
           </div>
@@ -147,12 +147,12 @@ function TournamentDetailPage() {
           <div className="flex flex-wrap gap-2">
             {tournament.status === "draft" && (
               <Button size="sm" onClick={() => publish.mutate("published")}>
-                Publier
+                {t("detail.publish")}
               </Button>
             )}
             {tournament.status === "published" && (
               <Button size="sm" onClick={() => publish.mutate("in_progress")}>
-                Démarrer
+                {t("detail.start")}
               </Button>
             )}
             {tournament.status === "in_progress" && (
@@ -161,14 +161,14 @@ function TournamentDetailPage() {
                 variant="outline"
                 onClick={() => publish.mutate("completed")}
               >
-                Clôturer
+                {t("detail.close")}
               </Button>
             )}
             <ShareDialog url={publicUrl} title={tournament.name} />
             <Button size="sm" variant="ghost" asChild>
               <a href={`/tournament/${tournament.slug}`} target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4" />
-                Voir la page publique
+                {t("detail.viewPublic")}
               </a>
             </Button>
           </div>
