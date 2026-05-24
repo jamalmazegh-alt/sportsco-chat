@@ -17,6 +17,9 @@ import {
   Eye,
   GitBranch,
   MapPin,
+  ChevronRight,
+  ChevronLeft,
+
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
