@@ -162,78 +162,151 @@ function PublicTournamentPage() {
 
   const accent = rules.branding.primaryColor;
 
+  const totalMatches = (matches as any[]).length;
+  const playedMatches = (matches as any[]).filter((m: any) => m.status === "completed").length;
+  const liveCount = (matches as any[]).filter((m: any) => m.status === "live").length;
+  const todayMs = new Date().setHours(0, 0, 0, 0);
+  const startMs = tournament.starts_on ? new Date(tournament.starts_on as any).setHours(0, 0, 0, 0) : null;
+  const endMs = tournament.ends_on ? new Date(tournament.ends_on as any).setHours(0, 0, 0, 0) : null;
+  const daysToStart =
+    startMs !== null ? Math.round((startMs - todayMs) / 86_400_000) : null;
+  const statusBadgeKey =
+    tournament.status === "completed"
+      ? "completedBadge"
+      : tournament.status === "in_progress"
+      ? "publishedBadge"
+      : "publishedBadge";
+  const heroSubline =
+    tournament.status === "completed" && endMs
+      ? t("public.hero.endedOn", { date: new Date(endMs).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" }) })
+      : liveCount > 0
+      ? t("public.hero.inProgress")
+      : daysToStart != null && daysToStart > 0
+      ? t("public.hero.startsIn", { count: daysToStart })
+      : daysToStart === 0
+      ? t("public.hero.today")
+      : null;
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative">
-        {tournament.cover_image_url ? (
-          <div className="h-40 w-full overflow-hidden">
-            <img
-              src={tournament.cover_image_url}
-              alt={tournament.name}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        ) : (
+      {/* Editorial hero — clean light surface, navy ink, blue accent */}
+      <header className="relative overflow-hidden border-b border-border bg-gradient-to-b from-muted/50 via-background to-background">
+        {tournament.cover_image_url && (
           <div
-            className="h-32 w-full"
-            style={
-              accent
-                ? { background: `linear-gradient(135deg, ${accent}33, ${accent}11, transparent)` }
-                : undefined
-            }
-          >
-            {!accent && (
-              <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background" />
+            aria-hidden
+            className="absolute inset-0 opacity-[0.07] bg-cover bg-center"
+            style={{ backgroundImage: `url(${tournament.cover_image_url})` }}
+          />
+        )}
+        <div
+          aria-hidden
+          className="absolute -top-32 -right-32 h-80 w-80 rounded-full blur-3xl opacity-25"
+          style={{ background: accent ?? "hsl(var(--primary))" }}
+        />
+        <div className="relative max-w-3xl mx-auto px-5 pt-10 pb-7">
+          <div className="flex items-center gap-2 mb-5">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
+              style={
+                accent
+                  ? { background: `${accent}1A`, color: accent }
+                  : undefined
+              }
+            >
+              <Sparkles className="h-3 w-3" />
+              {t("public.hero.eyebrow")}
+            </span>
+            {tournament.status === "in_progress" && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]">
+                <Activity className="h-3 w-3" />
+                {t(`public.hero.${statusBadgeKey}`)}
+              </span>
+            )}
+            {tournament.status === "completed" && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted text-muted-foreground px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]">
+                <Trophy className="h-3 w-3" />
+                {t(`public.hero.completedBadge`)}
+              </span>
             )}
           </div>
-        )}
-        <div className="max-w-3xl mx-auto px-5 -mt-10 relative">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Trophy className="h-7 w-7 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-2xl font-bold truncate">{tournament.name}</h1>
-                <div className="text-sm text-muted-foreground mt-1 space-y-1">
-                  <p className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {tournament.starts_on}
-                    {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
-                  </p>
-                  {tournament.location && (
-                    <p className="flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {tournament.location}
-                    </p>
-                  )}
-                  <p className="text-xs">
-                    {tournament.sport}
-                    {tournament.category ? ` · ${tournament.category}` : ""} ·{" "}
-                    <span className="font-medium">{tournament.status}</span>
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 shrink-0">
-                {registrationOpen && (
-                  <Button asChild size="sm">
-                    <Link to="/tournament/$slug/register" params={{ slug }}>
-                      <UserPlus className="h-4 w-4" />
-                      {t("public.register")}
-                    </Link>
-                  </Button>
+          <div className="flex items-start gap-5">
+            <div
+              className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl flex items-center justify-center shrink-0 ring-1 ring-border shadow-sm"
+              style={
+                accent
+                  ? { background: `linear-gradient(135deg, ${accent}22, ${accent}05)`, color: accent }
+                  : { background: "linear-gradient(135deg, hsl(var(--primary)/0.18), hsl(var(--primary)/0.04))", color: "hsl(var(--primary))" }
+              }
+            >
+              <Trophy className="h-8 w-8 sm:h-10 sm:w-10" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-[1.05]">
+                {tournament.name}
+              </h1>
+              {heroSubline && (
+                <p className="text-sm text-muted-foreground mt-1.5 font-medium">
+                  {heroSubline}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {tournament.starts_on}
+                  {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
+                </span>
+                {tournament.location && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {tournament.location}
+                  </span>
                 )}
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/tournament/$slug/tv" params={{ slug }}>
-                    <Tv className="h-4 w-4" />
-                    {t("public.tvSlideshow")}
-                  </Link>
-                </Button>
+                <span className="inline-flex items-center gap-1.5">
+                  <Trophy className="h-3.5 w-3.5" />
+                  {tournament.sport}
+                  {tournament.category ? ` · ${tournament.category}` : ""}
+                </span>
               </div>
             </div>
           </div>
+
+          {/* Stats strip */}
+          <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
+            <HeroStat
+              value={String((teams as any[]).length)}
+              label={t("public.hero.teamsCount", { count: (teams as any[]).length })}
+            />
+            <HeroStat
+              value={`${playedMatches}/${totalMatches || 0}`}
+              label={t("public.hero.matchesPlayed", { played: playedMatches, total: totalMatches })}
+              hideValue
+            />
+            <HeroStat
+              value={String(liveCount)}
+              label={t("public.hero.liveCount", { count: liveCount })}
+              accent={liveCount > 0}
+            />
+          </div>
+
+          {/* CTAs */}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {registrationOpen && (
+              <Button asChild size="sm" className="h-10 px-4">
+                <Link to="/tournament/$slug/register" params={{ slug }}>
+                  <UserPlus className="h-4 w-4" />
+                  {t("public.register")}
+                </Link>
+              </Button>
+            )}
+            <Button asChild size="sm" variant="outline" className="h-10 px-4">
+              <Link to="/tournament/$slug/tv" params={{ slug }}>
+                <Tv className="h-4 w-4" />
+                {t("public.tvSlideshow")}
+              </Link>
+            </Button>
+          </div>
         </div>
-      </div>
+      </header>
 
       <div className="max-w-3xl mx-auto px-5 mt-5">
         <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
