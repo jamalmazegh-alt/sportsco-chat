@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { WallFeed } from "@/components/wall-feed";
 import { useWallUnread } from "@/lib/use-wall-unread";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/inbox")({
   component: InboxPage,
