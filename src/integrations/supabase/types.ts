@@ -2084,6 +2084,11 @@ export type Database = {
           notes: string | null
           paid_at: string | null
           payment_intent_id: string | null
+          payment_link: string | null
+          payment_link_created_at: string | null
+          payment_link_expires_at: string | null
+          payment_link_sent_at: string | null
+          payment_link_sent_via: string | null
           payment_status: string
           platform_fee: number | null
           players: Json
@@ -2116,6 +2121,11 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           payment_intent_id?: string | null
+          payment_link?: string | null
+          payment_link_created_at?: string | null
+          payment_link_expires_at?: string | null
+          payment_link_sent_at?: string | null
+          payment_link_sent_via?: string | null
           payment_status?: string
           platform_fee?: number | null
           players?: Json
@@ -2148,6 +2158,11 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           payment_intent_id?: string | null
+          payment_link?: string | null
+          payment_link_created_at?: string | null
+          payment_link_expires_at?: string | null
+          payment_link_sent_at?: string | null
+          payment_link_sent_via?: string | null
           payment_status?: string
           platform_fee?: number | null
           players?: Json
