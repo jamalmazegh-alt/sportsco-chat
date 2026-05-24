@@ -13,7 +13,12 @@ import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/convocations")({
   component: ConvocationsSettings,
-  head: () => ({ meta: [{ title: `${i18nInstance.t("admin.hubConvocations")} — Clubero` }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.adminConvocations.title") },
+      { name: "description", content: i18nInstance.t("meta.adminConvocations.description") },
+    ],
+  }),
 });
 
 type ChannelKey = "in_app" | "email";
