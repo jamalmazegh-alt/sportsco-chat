@@ -7,8 +7,13 @@ import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe } from "@/lib/stripe.server";
-import { computeFeeForClub } from "@/lib/platform-fee";
 import { createLogger } from "@/lib/logger.server";
+import {
+  buildCheckoutForRegistration,
+  logPaymentEvent,
+} from "./tournament-payments.server";
+
+export { buildCheckoutForRegistration };
 
 const log = createLogger("tournament-payments");
 
@@ -34,27 +39,6 @@ async function assertCanManage(
   return { tournament: t };
 }
 
-async function logPaymentEvent(
-  tournamentId: string | null,
-  registrationId: string | null,
-  eventType: string,
-  amount: number | null,
-  metadata: Record<string, unknown>,
-  stripeEventId: string | null = null,
-): Promise<void> {
-  try {
-    await supabaseAdmin.from("tournament_payment_events").insert({
-      tournament_id: tournamentId,
-      registration_id: registrationId,
-      event_type: eventType,
-      amount,
-      stripe_event_id: stripeEventId,
-      metadata: metadata as unknown as never,
-    });
-  } catch (e) {
-    log.error("Failed to insert payment event", { eventType, error: String(e) });
-  }
-}
 
 // ---------- Admin: configure fee + payment mode
 
