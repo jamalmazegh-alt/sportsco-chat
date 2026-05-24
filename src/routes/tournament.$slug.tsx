@@ -649,7 +649,7 @@ function MatchBadges({ match }: { match: any }) {
         </span>
       )}
       {hasPen && (
-        <span className="rounded-md bg-blue-500/15 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide tabular-nums">
+        <span className="rounded-md bg-primary/15 text-primary px-1.5 py-0.5 text-[10px] font-semibold tracking-wide tabular-nums">
           {t("common.pen")} {match.penalty_score_a}-{match.penalty_score_b}
         </span>
       )}
