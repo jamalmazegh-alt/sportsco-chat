@@ -126,7 +126,7 @@ export function PublishWorkflow({
         required: false,
       },
     ],
-    [tournament, teamsCount, fieldsCount, t],
+    [tournament, teamsCount, fieldsCount, registrationEnabled, t],
   );
 
   const blockingMissing = checks.some((c) => c.required && !c.ok);
