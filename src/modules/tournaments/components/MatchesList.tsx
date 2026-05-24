@@ -502,11 +502,11 @@ function MatchCard({
       dot: "bg-orange-500",
     },
     submitted: {
-      border: "border-l-blue-500",
-      headerBg: "bg-blue-500/5",
-      badge: "bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30",
-      cta: "bg-blue-600 hover:bg-blue-700 text-white",
-      dot: "bg-blue-500",
+      border: "border-l-primary/70",
+      headerBg: "bg-primary/5",
+      badge: "bg-primary/15 text-primary border border-primary/30",
+      cta: "bg-primary hover:bg-primary/90 text-primary-foreground",
+      dot: "bg-primary",
     },
     validated: {
       border: "border-l-emerald-500",
