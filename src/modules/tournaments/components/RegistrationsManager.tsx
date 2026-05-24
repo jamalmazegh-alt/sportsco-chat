@@ -325,15 +325,58 @@ export function RegistrationsManager({
                 r.payment_status === "paid_online") && (
                 <div className="flex flex-wrap gap-2 pt-1 border-t border-border/50">
                   {r.payment_status === "pending" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => markPaid.mutate(r.id)}
-                      disabled={markPaid.isPending}
-                    >
-                      <Banknote className="h-4 w-4" />
-                      {t("registrations.payments.markPaid")}
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => markPaid.mutate(r.id)}
+                        disabled={markPaid.isPending}
+                      >
+                        <Banknote className="h-4 w-4" />
+                        {t("registrations.payments.markPaid")}
+                      </Button>
+                      {canShowSendLink && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" disabled={sendLink.isPending}>
+                              <Send className="h-4 w-4" />
+                              {t("registrations.payments.sendLink")}
+                              <ChevronDown className="h-3 w-3 ml-1" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "email" })}>
+                              <Mail className="h-4 w-4 mr-2" />
+                              {t("registrations.payments.sendByEmail")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "whatsapp" })}>
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              {t("registrations.payments.sendByWhatsApp")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "copy" })}>
+                              <Copy className="h-4 w-4 mr-2" />
+                              {t("registrations.payments.copyLink")}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                      {r.payment_link_sent_at && (
+                        <span className="inline-flex items-center text-[10px] text-muted-foreground self-center">
+                          {(() => {
+                            const expired =
+                              !r.payment_link_expires_at ||
+                              new Date(r.payment_link_expires_at).getTime() < Date.now();
+                            return expired
+                              ? t("registrations.payments.linkExpired")
+                              : t("registrations.payments.linkSentOn", {
+                                  date: new Date(r.payment_link_sent_at).toLocaleDateString(
+                                    i18n.language === "fr" ? "fr-FR" : "en-US",
+                                  ),
+                                });
+                          })()}
+                        </span>
+                      )}
+                    </>
                   )}
                   {r.payment_status === "paid_online" && (
                     <Button
