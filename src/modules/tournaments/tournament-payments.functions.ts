@@ -7,8 +7,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   buildCheckoutForRegistration,
-  logPaymentEvent,
 } from "./tournament-payments.server";
+import { logPaymentEvent } from "./tournament-payment-events.server";
 
 export { buildCheckoutForRegistration };
 
