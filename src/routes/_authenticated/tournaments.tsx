@@ -2,6 +2,8 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
@@ -18,7 +20,12 @@ import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournament
 
 export const Route = createFileRoute("/_authenticated/tournaments")({
   component: TournamentsRoute,
-  head: () => ({ meta: [{ title: "Tournois — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.tournaments.title", { ns: "common" }) },
+      { name: "description", content: i18n.t("meta.tournaments.description", { ns: "common" }) },
+    ],
+  }),
 });
 
 function TournamentsRoute() {
