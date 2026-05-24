@@ -900,6 +900,32 @@
     "publicLink": "Lien public d'inscription",
     "linkCopied": "Lien copié"
   },
+  "payments": {
+    "title": "Paiements & frais d'inscription",
+    "save": "Enregistrer",
+    "saved": "Paramètres enregistrés",
+    "saveError": "Impossible d'enregistrer",
+    "personalTournamentWarning": "Ce tournoi n'est pas rattaché à un club. Les paiements en ligne nécessitent un club avec un compte Stripe activé.",
+    "feeHint": "Montant payé par chaque équipe à l'inscription. Mets 0 pour un tournoi gratuit.",
+    "descriptionPlaceholder": "Ex : Inclut le repas et le t-shirt officiel.",
+    "payNow": "Payer {{amount}}",
+    "alreadyPaid": "Paiement déjà reçu — merci !",
+    "refundedMessage": "Cette inscription a été remboursée.",
+    "linkExpired": "Lien de paiement expiré",
+    "linkExpiredMessage": "Demande un nouveau lien à l'organisateur.",
+    "feeBreakdown": "Sur {{gross}} {{currency}} encaissés, Clubero retient {{fee}} {{currency}} ({{pct}} %). Tu reçois {{net}} {{currency}}.",
+    "fields": {
+      "fee": "Frais d'inscription",
+      "currency": "Devise",
+      "description": "Description (optionnel)",
+      "mode": "Mode de paiement"
+    },
+    "modes": {
+      "offline": "Hors ligne uniquement (espèces / virement)",
+      "online": "En ligne uniquement (carte)",
+      "both": "Les deux (au choix de l'équipe)"
+    }
+  },
   "status": {
     "draft": "Brouillon",
     "published": "Publié",
