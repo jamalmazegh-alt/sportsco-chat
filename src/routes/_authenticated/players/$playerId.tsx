@@ -276,7 +276,7 @@ function PlayerProfile() {
     if (value) {
       const target = (email || player.email || "").trim();
       if (!target) {
-        toast.error(t("players.childAccessNeedsEmail", { defaultValue: "Ajoutez d'abord un email à l'enfant pour activer l'accès." }));
+        toast.error(t("players.childAccessNeedsEmail"));
         return;
       }
       if (player.user_id) {
