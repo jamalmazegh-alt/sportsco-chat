@@ -133,7 +133,11 @@ export const markRegistrationPaidOffline = createServerFn({ method: "POST" })
     if (!reg) throw new Response("Not found", { status: 404 });
     await assertCanManage(supabase, userId, reg.tournament_id);
 
-    if (reg.payment_status === "paid" || reg.payment_status === "refunded") {
+    if (
+      reg.payment_status === "paid_online" ||
+      reg.payment_status === "paid_offline" ||
+      reg.payment_status === "refunded"
+    ) {
       throw new Response("Already settled", { status: 400 });
     }
 
