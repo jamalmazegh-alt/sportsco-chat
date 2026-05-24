@@ -35,6 +35,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [location, setLocation] = useState("");
   const [format, setFormat] = useState<Format>("mixed");
   const [numTeams, setNumTeams] = useState(8);
+  const [numTeamsRaw, setNumTeamsRaw] = useState("8");
   const [logo, setLogo] = useState<Attachment[]>([]);
 
   const navigate = useNavigate();
@@ -89,6 +90,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     setLocation("");
     setFormat("mixed");
     setNumTeams(8);
+    setNumTeamsRaw("8");
     setLogo([]);
   }
 
@@ -231,8 +233,26 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 type="number"
                 min={2}
                 max={64}
-                value={numTeams}
-                onChange={(e) => setNumTeams(parseInt(e.target.value || "0", 10))}
+                value={numTeamsRaw}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setNumTeamsRaw(val);
+                  const n = parseInt(val, 10);
+                  if (!isNaN(n)) setNumTeams(n);
+                }}
+                onBlur={() => {
+                  const n = parseInt(numTeamsRaw, 10);
+                  if (isNaN(n) || n < 2) {
+                    setNumTeams(2);
+                    setNumTeamsRaw("2");
+                  } else if (n > 64) {
+                    setNumTeams(64);
+                    setNumTeamsRaw("64");
+                  } else {
+                    setNumTeams(n);
+                    setNumTeamsRaw(String(n));
+                  }
+                }}
               />
             </div>
           </div>
