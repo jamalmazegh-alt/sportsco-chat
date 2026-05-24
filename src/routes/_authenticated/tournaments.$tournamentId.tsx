@@ -144,16 +144,39 @@ function TournamentDetailPage() {
     });
   };
 
-  if (q.isLoading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-  if (!q.data) return null;
+  // On first mount with no ?tab= in URL, default by tournament status.
+  // Must be declared BEFORE any early return to keep hook order stable.
+  const didInitDefault = useRef(false);
+  const tournamentStatus = (q.data as any)?.tournament?.status as string | undefined;
+  const canManageEarly =
+    (q.data as any)?.canManage === true ||
+    roles.includes("admin") ||
+    roles.includes("tournament_manager") ||
+    (role as string) === "dirigeant";
+  useEffect(() => {
+    if (didInitDefault.current) return;
+    if (!tournamentStatus) return;
+    didInitDefault.current = true;
+    if (search.tab) return;
+    const defaultSection: Section =
+      tournamentStatus === "in_progress" || tournamentStatus === "completed"
+        ? "play"
+        : canManageEarly
+          ? "configure"
+          : "play";
+    if (defaultSection !== section) setSection(defaultSection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tournamentStatus]);
 
-  const { tournament, groups, teams, matches } = q.data;
+  const isLoading = q.isLoading;
+  const hasData = !!q.data;
+
+  const { tournament, groups, teams, matches } = (q.data ?? {
+    tournament: null as any,
+    groups: [] as any[],
+    teams: [] as any[],
+    matches: [] as any[],
+  });
   const canManage =
     (q.data as any).canManage === true ||
     roles.includes("admin") || roles.includes("tournament_manager") ||
@@ -204,18 +227,6 @@ function TournamentDetailPage() {
   ];
 
   const activeSubs = sectionDefs.find((s) => s.id === section)?.subs ?? [];
-  // On first mount with no ?tab= in URL, default by tournament status.
-  const didInitDefault = useRef(false);
-  useEffect(() => {
-    if (didInitDefault.current) return;
-    didInitDefault.current = true;
-    if (search.tab) return; // URL wins
-    const status = (tournament as any).status as string;
-    const defaultSection: Section =
-      status === "in_progress" || status === "completed" ? "play" : canManage ? "configure" : "play";
-    if (defaultSection !== section) setSection(defaultSection);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   // Auto-correct sub when switching section
   useEffect(() => {
     if (!activeSubs.find((s) => s.id === sub)) {
@@ -229,6 +240,15 @@ function TournamentDetailPage() {
     setSection("configure");
     setSub("regSettings");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+  if (!hasData || !tournament) return null;
 
   return (
     <div className="pb-6">
