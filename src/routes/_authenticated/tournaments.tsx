@@ -35,6 +35,7 @@ function TournamentsRoute() {
 }
 
 function TournamentsList() {
+  const { t } = useTranslation("tournaments");
   const { activeClubId, memberships } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -75,14 +76,13 @@ function TournamentsList() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold flex items-center gap-2">
           <Trophy className="h-6 w-6 text-primary" />
-          Tournois
+          {t("list.title")}
         </h1>
         {canManage && noClub && (
           <div className="flex items-center gap-2">
             <TournamentPassButton
               variant="outline"
               className="h-9"
-              label="Acheter un pass"
             />
           </div>
         )}
@@ -99,10 +99,9 @@ function TournamentsList() {
 
       {noClub && (
         <div className="rounded-2xl border border-border bg-card p-4 text-sm">
-          <p className="font-medium">Mode organisateur de tournoi</p>
+          <p className="font-medium">{t("list.organizerModeTitle")}</p>
           <p className="mt-1 text-muted-foreground">
-            Achetez un pass à 40 € par tournoi (paiement à l'événement). Aucun
-            abonnement requis.
+            {t("list.organizerModeBody")}
           </p>
           <p className="mt-3 flex items-center gap-2 text-sm">
             <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
@@ -110,10 +109,10 @@ function TournamentsList() {
             </span>
             <span className={availablePasses.length > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
               {availablePasses.length > 1
-                ? "pass disponibles prêts à l'emploi."
+                ? t("list.passAvailable_other")
                 : availablePasses.length === 1
-                  ? "pass disponible prêt à l'emploi."
-                  : "aucun pass disponible. Achetez-en un pour créer un tournoi."}
+                  ? t("list.passAvailable_one")
+                  : t("list.noPassAvailable")}
             </span>
           </p>
         </div>
@@ -130,11 +129,11 @@ function TournamentsList() {
       ) : tournaments.length === 0 ? (
         <EmptyState
           icon={<Trophy className="h-6 w-6" />}
-          title="Aucun tournoi"
+          title={t("list.emptyTitle")}
           description={
             canManage
-              ? "Crée ton premier tournoi pour organiser une compétition."
-              : "Aucun tournoi n'est en cours dans ce club."
+              ? t("list.emptyDescManage")
+              : t("list.emptyDescView")
           }
           action={
             canManage ? (
@@ -143,14 +142,14 @@ function TournamentsList() {
                   <Button size="sm" asChild>
                     <Link to="/tournaments/new-from-pass">
                       <Plus className="h-4 w-4" />
-                      Créer un tournoi
+                      {t("list.create")}
                     </Link>
                   </Button>
                 ) : null
               ) : (
                 <Button size="sm" onClick={() => setOpen(true)}>
                   <Plus className="h-4 w-4" />
-                  Créer un tournoi
+                  {t("list.create")}
                 </Button>
               )
             ) : null
@@ -201,7 +200,7 @@ function TournamentsList() {
               <Button size="sm" variant="outline" className="w-full" asChild>
                 <Link to="/tournaments/new-from-pass">
                   <Plus className="h-4 w-4" />
-                  Créer un tournoi
+                  {t("list.create")}
                 </Link>
               </Button>
             ) : null
@@ -209,7 +208,7 @@ function TournamentsList() {
             activeClubId && (
               <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen(true)}>
                 <Plus className="h-4 w-4" />
-                Créer un tournoi
+                {t("list.create")}
               </Button>
             )
           )}
@@ -221,12 +220,7 @@ function TournamentsList() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const labels: Record<string, string> = {
-    draft: "Brouillon",
-    published: "Publié",
-    in_progress: "En cours",
-    completed: "Terminé",
-    cancelled: "Annulé",
-  };
-  return <span>{labels[status] ?? status}</span>;
+  const { t } = useTranslation("tournaments");
+  const label = t(`status.${status}`, { defaultValue: status });
+  return <span>{label}</span>;
 }
