@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.functions";
+import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.server";
 
 // Public endpoint: lookup-by-id payment info + checkout creation for a
 // payment link shared by the tournament organiser. The registration_id is
