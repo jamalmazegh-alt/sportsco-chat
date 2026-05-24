@@ -68,6 +68,17 @@ interface Reg {
   payment_status?: PaymentStatus | null;
   amount_paid?: number | null;
   currency?: string | null;
+  payment_link?: string | null;
+  payment_link_created_at?: string | null;
+  payment_link_expires_at?: string | null;
+  payment_link_sent_via?: "email" | "whatsapp" | "copy" | null;
+  payment_link_sent_at?: string | null;
+}
+
+interface TournamentMeta {
+  registration_fee?: number;
+  payment_mode?: "online" | "offline" | "both";
+  club_stripe_charges_enabled?: boolean;
 }
 
 export function RegistrationsManager({ tournamentId }: { tournamentId: string }) {
