@@ -243,7 +243,15 @@ function TournamentDetailPage() {
           <BracketView matches={matches as any} teams={teams as any} />
         )}
         {tab === "registrations" && canManage && (
-          <RegistrationsManager tournamentId={tournament.id} />
+          <RegistrationsManager
+            tournamentId={tournament.id}
+            tournament={{
+              registration_fee: (tournament as any).registration_fee ?? 0,
+              payment_mode: (tournament as any).payment_mode ?? "offline",
+              club_stripe_charges_enabled:
+                (tournament as any).club_stripe_charges_enabled ?? false,
+            }}
+          />
         )}
         {tab === "payments" && canManage && (
           <PaymentSettingsPanel
