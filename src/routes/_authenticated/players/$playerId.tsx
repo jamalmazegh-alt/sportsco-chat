@@ -143,7 +143,7 @@ function PlayerProfile() {
     queryKey: ["player-primary-sport", playerId],
     queryFn: async () => {
       const { data } = await supabase
-        .from("team_players")
+        .from("team_members")
         .select("teams:team_id(sport)")
         .eq("player_id", playerId)
         .limit(5);
