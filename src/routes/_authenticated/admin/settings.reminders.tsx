@@ -13,7 +13,12 @@ import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/reminders")({
   component: RemindersSettings,
-  head: () => ({ meta: [{ title: `${i18nInstance.t("admin.remindersTitle")} — Clubero` }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.adminReminders.title") },
+      { name: "description", content: i18nInstance.t("meta.adminReminders.description") },
+    ],
+  }),
 });
 
 type Form = {
