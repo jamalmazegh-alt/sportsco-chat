@@ -49,7 +49,7 @@ import { StaffAndOfficialsPanel } from "@/modules/tournaments/components/StaffAn
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
 import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
-import { ClipboardList, UserCog, CreditCard } from "lucide-react";
+import { ClipboardList, UserCog, CreditCard, Dices, CalendarClock } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
