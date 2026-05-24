@@ -168,14 +168,8 @@ function TournamentDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tournamentStatus]);
 
-  if (q.isLoading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-  if (!q.data) return null;
+  const isLoading = q.isLoading;
+  const hasData = !!q.data;
 
   const { tournament, groups, teams, matches } = q.data;
   const canManage =
