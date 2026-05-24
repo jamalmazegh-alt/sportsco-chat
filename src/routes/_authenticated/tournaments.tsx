@@ -78,14 +78,6 @@ function TournamentsList() {
           <Trophy className="h-6 w-6 text-primary" />
           {t("list.title")}
         </h1>
-        {canManage && noClub && (
-          <div className="flex items-center gap-2">
-            <TournamentPassButton
-              variant="outline"
-              className="h-9"
-            />
-          </div>
-        )}
       </div>
 
       {canManage && !noClub && activeClubId && (
