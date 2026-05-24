@@ -239,6 +239,12 @@
     "myTeam": "Mon équipe",
     "childTeam": "L'équipe de {{name}}",
     "teamHint": "Voir l'équipe et les coéquipiers",
+    "tournamentsCard": {
+      "createCta": "Créer un tournoi",
+      "live": "En cours",
+      "upcoming": "À venir",
+      "done": "Terminé"
+    },
     "kpis": {
       "title": "Vue d'ensemble",
       "attendance30d": "Présence 30j",
