@@ -133,10 +133,12 @@
     "slides": {
       "recent": "Latest results",
       "upcoming": "Upcoming matches",
+      "nowPlaying": "Currently playing",
       "noRecent": "No results yet",
       "noUpcoming": "No matches scheduled",
       "standings": "Standings · {{group}}",
-      "bracket": "Knockout stage"
+      "bracket": "Knockout stage",
+      "scanForLive": "Scan to follow live"
     },
     "controls": {
       "previous": "Previous",
