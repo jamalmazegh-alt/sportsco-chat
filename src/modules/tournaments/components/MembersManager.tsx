@@ -193,6 +193,60 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
     toast.success(t("tournamentMembers.linkCopied", { defaultValue: "Lien copié" }));
   }
 
+  async function onConvert(e: FormEvent) {
+    e.preventDefault();
+    if (!convertMember) return;
+    setConvertBusy(true);
+    try {
+      const res = await convertFn({
+        data: {
+          tournament_id: tournamentId,
+          member_id: convertMember.id,
+          email: convertEmail,
+        },
+      });
+      const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
+      const roleLabel = t(`roles.${res.role}`, { lng: locale, defaultValue: res.role });
+      const cleanEmail = convertEmail.trim().toLowerCase();
+      if (res.linked && res.tournament_slug) {
+        const tournamentUrl = `${window.location.origin}/tournament/${res.tournament_slug}`;
+        sendTransactionalEmail({
+          templateName: "tournament-member-added",
+          recipientEmail: cleanEmail,
+          idempotencyKey: `tournament-member-added-${res.member_id}`,
+          templateData: {
+            displayName: res.first_name,
+            tournamentName: res.tournament_name ?? undefined,
+            roleLabel,
+            tournamentUrl,
+            locale,
+          },
+        }).catch((err) => console.error("convert/added email failed", err));
+      } else if (res.invite_token) {
+        const inviteUrl = `${window.location.origin}/tournament-invite/${res.invite_token}`;
+        sendTransactionalEmail({
+          templateName: "tournament-invite",
+          recipientEmail: cleanEmail,
+          idempotencyKey: `tournament-member-invite-${res.member_id}`,
+          templateData: {
+            displayName: res.first_name,
+            tournamentName: res.tournament_name ?? undefined,
+            roleLabel,
+            inviteUrl,
+          },
+        }).catch((err) => console.error("convert/invite email failed", err));
+      }
+      toast.success(t("tournamentMembers.invited", { defaultValue: "Invitation créée" }));
+      setConvertMember(null);
+      setConvertEmail("");
+      qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Error");
+    } finally {
+      setConvertBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
