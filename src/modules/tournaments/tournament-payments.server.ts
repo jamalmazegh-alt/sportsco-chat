@@ -149,3 +149,99 @@ export async function buildCheckoutForRegistration(params: {
 
   return { url: session.url, sessionId: session.id };
 }
+
+// ---------- Webhook helpers (called from /api/public/stripe-webhook)
+
+export async function handleTournamentCheckoutCompleted(
+  session: Stripe.Checkout.Session,
+  eventId: string,
+): Promise<void> {
+  const registrationId = session.metadata?.registration_id;
+  if (!registrationId) return;
+
+  const paymentIntentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : session.payment_intent?.id ?? null;
+
+  const stripe = getStripe();
+  let chargeId: string | null = null;
+  let amountPaid = session.amount_total ?? 0;
+
+  if (paymentIntentId) {
+    try {
+      const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
+        expand: ["latest_charge"],
+      });
+      const charge = pi.latest_charge as Stripe.Charge | null;
+      chargeId = charge?.id ?? null;
+      amountPaid = pi.amount_received ?? amountPaid;
+    } catch (e) {
+      log.warn("Failed to retrieve payment intent", { paymentIntentId, error: String(e) });
+    }
+  }
+
+  const now = new Date().toISOString();
+  const { data: reg } = await supabaseAdmin
+    .from("tournament_registrations")
+    .update({
+      payment_status: "paid_online",
+      payment_intent_id: paymentIntentId,
+      stripe_payment_intent_id: paymentIntentId,
+      stripe_charge_id: chargeId,
+      amount_paid: amountPaid,
+      amount_paid_cents: amountPaid,
+      currency: session.currency ?? "eur",
+      paid_at: now,
+    })
+    .eq("id", registrationId)
+    .select("tournament_id")
+    .maybeSingle();
+
+  await logPaymentEvent(
+    reg?.tournament_id ?? null,
+    registrationId,
+    "payment_succeeded",
+    amountPaid,
+    {
+      session_id: session.id,
+      payment_intent: paymentIntentId,
+      charge: chargeId,
+    },
+    eventId,
+  );
+}
+
+export async function handleTournamentChargeRefunded(
+  charge: Stripe.Charge,
+  eventId: string,
+): Promise<void> {
+  const piId = typeof charge.payment_intent === "string"
+    ? charge.payment_intent
+    : charge.payment_intent?.id ?? null;
+  if (!piId) return;
+
+  const { data: reg } = await supabaseAdmin
+    .from("tournament_registrations")
+    .select("id, tournament_id")
+    .eq("stripe_payment_intent_id", piId)
+    .maybeSingle();
+  if (!reg) return;
+
+  await supabaseAdmin
+    .from("tournament_registrations")
+    .update({
+      payment_status: "refunded",
+      refunded_at: new Date().toISOString(),
+    })
+    .eq("id", reg.id);
+
+  await logPaymentEvent(
+    reg.tournament_id,
+    reg.id,
+    "refund_succeeded",
+    charge.amount_refunded ?? 0,
+    { charge_id: charge.id, payment_intent: piId },
+    eventId,
+  );
+}
