@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -16,13 +16,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import { publishTournamentProgramme } from "@/modules/tournaments/tournament-payments.functions";
+import {
+  listTournamentRegistrationsWithPayments,
+  publishTournamentProgramme,
+} from "@/modules/tournaments/tournament-payments.functions";
 
 interface PublishProgrammeCardProps {
   tournamentId: string;
   status: string;
-  confirmedTeamsCount: number;
-  unassignedConfirmedTeamsCount: number;
+  teams: { id: string; group_id: string | null }[];
   matchesCount: number;
   hasStartDate: boolean;
 }
