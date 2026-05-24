@@ -1,11 +1,23 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 import { useEffect, useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle2, XCircle, Loader2, RefreshCw } from 'lucide-react'
 
+// Lightweight gate: not a security boundary (resolvers are public DNS),
+// just stops drive-by URLs from indexing internal tooling.
+const DNS_CHECK_KEY = 'clubero-ops'
+
 export const Route = createFileRoute('/dns-check')({
+  validateSearch: (search: Record<string, unknown>) => ({
+    key: typeof search.key === 'string' ? search.key : undefined,
+  }),
+  beforeLoad: ({ search }) => {
+    if (search.key !== DNS_CHECK_KEY) {
+      throw notFound()
+    }
+  },
   component: DnsCheckPage,
   head: () => ({
     meta: [
