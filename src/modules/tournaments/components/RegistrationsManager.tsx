@@ -81,7 +81,13 @@ interface TournamentMeta {
   club_stripe_charges_enabled?: boolean;
 }
 
-export function RegistrationsManager({ tournamentId }: { tournamentId: string }) {
+export function RegistrationsManager({
+  tournamentId,
+  tournament,
+}: {
+  tournamentId: string;
+  tournament?: TournamentMeta;
+}) {
   const { t, i18n } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [filter, setFilter] = useState<Status | "all">("pending");
