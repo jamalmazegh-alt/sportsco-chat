@@ -35,7 +35,7 @@ function StatsPage() {
   const isStaff = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach") || roles.includes("staff");
 
   return (
-    <div className="container max-w-5xl py-4 pb-24 space-y-5">
+    <div className="container max-w-5xl px-4 py-4 pb-24 space-y-5">
       <header className="flex items-center gap-2">
         <BarChart3 className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-bold tracking-tight">{t("nav.stats")}</h1>
