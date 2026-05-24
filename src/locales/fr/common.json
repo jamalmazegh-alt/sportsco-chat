@@ -1272,6 +1272,11 @@
       "description": "Réponses aux questions fréquentes sur Clubero — tarifs, mise en place, RGPD, contrôle parental et plus.",
       "ogDescription": "Réponses aux questions fréquentes sur Clubero."
     },
+    "demo": {
+      "title": "Demander une démo — Clubero",
+      "description": "Réservez une démo de 15 minutes de Clubero. Nous configurons votre première équipe avec vous.",
+      "ogDescription": "Réservez une démo de 15 minutes de Clubero."
+    },
     "legalGeneric": {
       "fallbackTitle": "Légal",
       "fallbackDescription": "Document légal"
