@@ -1886,7 +1886,7 @@ export type Database = {
         Row: {
           assigned_match_ids: string[]
           created_at: string
-          email: string
+          email: string | null
           first_name: string
           id: string
           invite_token: string
@@ -1902,7 +1902,7 @@ export type Database = {
         Insert: {
           assigned_match_ids?: string[]
           created_at?: string
-          email: string
+          email?: string | null
           first_name: string
           id?: string
           invite_token?: string
@@ -1918,7 +1918,7 @@ export type Database = {
         Update: {
           assigned_match_ids?: string[]
           created_at?: string
-          email?: string
+          email?: string | null
           first_name?: string
           id?: string
           invite_token?: string
