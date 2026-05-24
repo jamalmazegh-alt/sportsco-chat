@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useActiveRole, useMyRoles } from "@/lib/auth-context";
@@ -17,6 +17,9 @@ import {
   Eye,
   GitBranch,
   MapPin,
+  ChevronRight,
+  ChevronLeft,
+
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
@@ -175,35 +178,8 @@ function TournamentDetailPage() {
         )}
       </header>
 
-      <nav className="px-5 pb-3 sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border">
-        <div className="relative">
-          <div className="flex gap-1 overflow-x-auto scroll-smooth snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {tabs.map((t) => {
-              const Icon = t.icon;
-              const active = tab === t.id;
-              return (
-                <button
-                  key={t.id}
-                  ref={(el) => {
-                    if (active && el) el.scrollIntoView({ block: "nearest", inline: "center" });
-                  }}
-                  onClick={() => setTab(t.id)}
-                  className={cn(
-                    "shrink-0 snap-start flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
-                    active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted/40",
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-          <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent" />
-        </div>
-      </nav>
+      <TabsNav tabs={tabs} tab={tab} setTab={setTab} />
+
 
       <div className="px-5 pt-4">
         {tab === "teams" && (
@@ -288,4 +264,126 @@ function TournamentDetailPage() {
     </div>
   );
 }
+
+function TabsNav({
+  tabs,
+  tab,
+  setTab,
+}: {
+  tabs: { id: Tab; icon: any; label: string }[];
+  tab: Tab;
+  setTab: (t: Tab) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+  const [hintPulse, setHintPulse] = useState(true);
+
+  const updateScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    window.addEventListener("resize", updateScrollState);
+    const stopHint = setTimeout(() => setHintPulse(false), 3500);
+    return () => {
+      el.removeEventListener("scroll", updateScrollState);
+      ro.disconnect();
+      window.removeEventListener("resize", updateScrollState);
+      clearTimeout(stopHint);
+    };
+  }, [tabs.length]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(160, el.clientWidth * 0.6), behavior: "smooth" });
+    setHintPulse(false);
+  };
+
+  return (
+    <nav className="px-5 pb-3 sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border">
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          className="flex gap-1 overflow-x-auto scroll-smooth snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {tabs.map((it) => {
+            const Icon = it.icon;
+            const active = tab === it.id;
+            return (
+              <button
+                key={it.id}
+                ref={(el) => {
+                  if (active && el) el.scrollIntoView({ block: "nearest", inline: "center" });
+                }}
+                onClick={() => setTab(it.id)}
+                className={cn(
+                  "shrink-0 snap-start flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted/40",
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {it.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Left edge */}
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background to-transparent transition-opacity duration-200",
+            canLeft ? "opacity-100" : "opacity-0",
+          )}
+        />
+        <button
+          type="button"
+          aria-label="Scroll left"
+          onClick={() => scrollBy(-1)}
+          className={cn(
+            "absolute left-0 top-1/2 -translate-y-1/2 -mt-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-background/90 border border-border shadow-sm text-foreground transition-opacity duration-200",
+            canLeft ? "opacity-100" : "opacity-0 pointer-events-none",
+          )}
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+
+        {/* Right edge */}
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent transition-opacity duration-200",
+            canRight ? "opacity-100" : "opacity-0",
+          )}
+        />
+        <button
+          type="button"
+          aria-label="Scroll right"
+          onClick={() => scrollBy(1)}
+          className={cn(
+            "absolute right-0 top-1/2 -translate-y-1/2 -mt-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-background/95 border border-border shadow-sm text-foreground transition-opacity duration-200",
+            canRight ? "opacity-100" : "opacity-0 pointer-events-none",
+            canRight && hintPulse ? "animate-pulse" : "",
+          )}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </nav>
+  );
+}
+
 
