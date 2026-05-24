@@ -34,9 +34,10 @@ interface Props {
   clubId: string | null;
   teams: TeamRow[];
   maxTeams?: number | null;
+  sport?: string | null;
 }
 
-export function TeamsManager({ tournamentId, clubId, teams, maxTeams }: Props) {
+export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: Props) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
