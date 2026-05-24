@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,12 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
-  head: () => ({ meta: [{ title: "Profile — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.profile.title", { ns: "common" }) },
+      { name: "description", content: i18n.t("meta.profile.description", { ns: "common" }) },
+    ],
+  }),
 });
 
 function ProfilePage() {
