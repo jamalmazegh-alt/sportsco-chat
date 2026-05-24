@@ -19,7 +19,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
   const fn = useServerFn(listMyTournaments);
   const { data, isLoading } = useQuery({
     queryKey: ["home-tournaments", clubId],
-    queryFn: () => fn({ data: { club_id: clubId } }),
+    queryFn: () => fn({ data: { club_id: clubId, limit: 10, exclude_completed: true } }),
     staleTime: 30_000,
   });
 
