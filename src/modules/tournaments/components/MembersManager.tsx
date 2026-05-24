@@ -236,8 +236,18 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>{t("players.email")}<span className="text-destructive ml-1">*</span></Label>
-              <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Label>
+                {t("players.email")}{" "}
+                <span className="text-muted-foreground text-xs font-normal">
+                  ({t("common.optional", { defaultValue: "optionnel" })})
+                </span>
+              </Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                {t("tournamentMembers.emailHint", {
+                  defaultValue: "Laissez vide pour ajouter sans compte. Vous pourrez l'inviter plus tard.",
+                })}
+              </p>
             </div>
             <Button type="submit" className="w-full h-11" disabled={busy}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
