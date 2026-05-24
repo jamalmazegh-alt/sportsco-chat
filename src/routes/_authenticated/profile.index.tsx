@@ -6,6 +6,7 @@ import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -44,7 +45,7 @@ function ProfilePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, preferred_language, phone")
+        .select("full_name, first_name, last_name, preferred_language, phone")
         .eq("id", user!.id)
         .single();
       return data;
@@ -53,10 +54,18 @@ function ProfilePage() {
 
   const [phone, setPhone] = useState("");
   const [phoneBusy, setPhoneBusy] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nameBusy, setNameBusy] = useState(false);
 
   useEffect(() => {
     if (profile?.phone) setPhone(profile.phone);
   }, [profile?.phone]);
+
+  useEffect(() => {
+    setFirstName(profile?.first_name ?? "");
+    setLastName(profile?.last_name ?? "");
+  }, [profile?.first_name, profile?.last_name]);
 
   async function onSavePhone() {
     if (!user) return;
@@ -66,6 +75,26 @@ function ProfilePage() {
     if (error) { toast.error(error.message); return; }
     refetch();
     toast.success(t("profile.phoneSaved", { defaultValue: "Phone saved" }));
+  }
+
+  async function onSaveName() {
+    if (!user) return;
+    setNameBusy(true);
+    const fn = firstName.trim();
+    const ln = lastName.trim();
+    const composed = [fn, ln].filter(Boolean).join(" ");
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        first_name: fn || null,
+        last_name: ln || null,
+        full_name: composed || null,
+      })
+      .eq("id", user.id);
+    setNameBusy(false);
+    if (error) { toast.error(error.message); return; }
+    refetch();
+    toast.success(t("profile.nameSaved", { defaultValue: "Name saved" }));
   }
 
 
@@ -308,6 +337,41 @@ function ProfilePage() {
             </Select>
           </div>
         )}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="first-name">{t("profile.firstName", { defaultValue: "Prénom" })}</Label>
+            <Input
+              id="first-name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              autoComplete="given-name"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="last-name">{t("profile.lastName", { defaultValue: "Nom" })}</Label>
+            <Input
+              id="last-name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              autoComplete="family-name"
+            />
+          </div>
+        </div>
+        <Button
+          type="button"
+          className="w-full h-11"
+          disabled={
+            nameBusy ||
+            (firstName.trim() === (profile?.first_name ?? "") &&
+              lastName.trim() === (profile?.last_name ?? ""))
+          }
+          onClick={onSaveName}
+        >
+          {nameBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Save" })}
+        </Button>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
