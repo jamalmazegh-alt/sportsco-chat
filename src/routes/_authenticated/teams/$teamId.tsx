@@ -328,7 +328,7 @@ function TeamDetail() {
       .eq("team_id", teamId)
       .eq("player_id", playerId);
     if (error) { toast.error(error.message); return; }
-    toast.success(t("players.removed", { defaultValue: "Joueur retiré de l'équipe" }));
+    toast.success(t("players.removed"));
     qc.invalidateQueries({ queryKey: ["team-players", teamId] });
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
   }
