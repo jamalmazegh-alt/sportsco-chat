@@ -77,6 +77,7 @@ import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
+import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -451,6 +452,12 @@ const AuthenticatedAdminUsersIndexRoute =
     path: '/users/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const TournamentSlugRegisterSuccessRoute =
+  TournamentSlugRegisterSuccessRouteImport.update({
+    id: '/success',
+    path: '/success',
+    getParentRoute: () => TournamentSlugRegisterRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -618,7 +625,7 @@ export interface FileRoutesByFullPath {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
-  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRouteWithChildren
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
@@ -643,6 +650,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -701,7 +709,7 @@ export interface FileRoutesByTo {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
-  '/tournament/$slug/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRouteWithChildren
   '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
@@ -726,6 +734,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -790,7 +799,7 @@ export interface FileRoutesById {
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
   '/t/$slug/tv': typeof TSlugTvRoute
-  '/tournament/$slug_/register': typeof TournamentSlugRegisterRoute
+  '/tournament/$slug_/register': typeof TournamentSlugRegisterRouteWithChildren
   '/tournament/$slug_/tv': typeof TournamentSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
@@ -815,6 +824,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -904,6 +914,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/tournament/$slug/register/success'
     | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -987,6 +998,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/tournament/$slug/register/success'
     | '/admin/users'
   id:
     | '__root__'
@@ -1075,6 +1087,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/tournament/$slug_/register/success'
     | '/_authenticated/admin/users/'
   fileRoutesById: FileRoutesById
 }
@@ -1108,7 +1121,7 @@ export interface RootRouteChildren {
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
-  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRoute
+  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
   ApiPublicHooksCoachInsightsRoute: typeof ApiPublicHooksCoachInsightsRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
@@ -1599,6 +1612,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/tournament/$slug_/register/success': {
+      id: '/tournament/$slug_/register/success'
+      path: '/success'
+      fullPath: '/tournament/$slug/register/success'
+      preLoaderRoute: typeof TournamentSlugRegisterSuccessRouteImport
+      parentRoute: typeof TournamentSlugRegisterRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1950,6 +1970,20 @@ const TSlugRouteChildren: TSlugRouteChildren = {
 
 const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
 
+interface TournamentSlugRegisterRouteChildren {
+  TournamentSlugRegisterSuccessRoute: typeof TournamentSlugRegisterSuccessRoute
+}
+
+const TournamentSlugRegisterRouteChildren: TournamentSlugRegisterRouteChildren =
+  {
+    TournamentSlugRegisterSuccessRoute: TournamentSlugRegisterSuccessRoute,
+  }
+
+const TournamentSlugRegisterRouteWithChildren =
+  TournamentSlugRegisterRoute._addFileChildren(
+    TournamentSlugRegisterRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -1980,7 +2014,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
-  TournamentSlugRegisterRoute: TournamentSlugRegisterRoute,
+  TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,
   TournamentSlugTvRoute: TournamentSlugTvRoute,
   ApiPublicHooksCoachInsightsRoute: ApiPublicHooksCoachInsightsRoute,
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,

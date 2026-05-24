@@ -133,7 +133,11 @@ export const markRegistrationPaidOffline = createServerFn({ method: "POST" })
     if (!reg) throw new Response("Not found", { status: 404 });
     await assertCanManage(supabase, userId, reg.tournament_id);
 
-    if (reg.payment_status === "paid" || reg.payment_status === "refunded") {
+    if (
+      reg.payment_status === "paid_online" ||
+      reg.payment_status === "paid_offline" ||
+      reg.payment_status === "refunded"
+    ) {
       throw new Response("Already settled", { status: 400 });
     }
 
@@ -192,7 +196,7 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
     if (!reg) throw new Response("Not found", { status: 404 });
     await assertCanManage(supabase, userId, reg.tournament_id);
 
-    if (reg.payment_status !== "paid") {
+    if (reg.payment_status !== "paid_online") {
       throw new Response(
         "Only Stripe-paid registrations can be refunded",
         { status: 400 },
@@ -259,7 +263,11 @@ export async function buildCheckoutForRegistration(params: {
     .eq("id", registrationId)
     .maybeSingle();
   if (!reg) return null;
-  if (reg.payment_status === "paid" || reg.payment_status === "refunded") {
+  if (
+    reg.payment_status === "paid_online" ||
+    reg.payment_status === "paid_offline" ||
+    reg.payment_status === "refunded"
+  ) {
     return null;
   }
 
@@ -418,7 +426,7 @@ export async function handleTournamentCheckoutCompleted(
   const { data: reg } = await supabaseAdmin
     .from("tournament_registrations")
     .update({
-      payment_status: "paid",
+      payment_status: "paid_online",
       payment_intent_id: paymentIntentId,
       stripe_payment_intent_id: paymentIntentId,
       stripe_charge_id: chargeId,

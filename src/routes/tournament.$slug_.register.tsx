@@ -135,6 +135,12 @@ function RegisterPage() {
         toast.error(data?.error ?? t("common.error"));
         return;
       }
+      // If online payment required, redirect to Stripe Checkout
+      if (data.checkout_url) {
+        toast.success(t("register.redirectingToPayment"));
+        window.location.href = data.checkout_url;
+        return;
+      }
       toast.success(
         data.requires_approval ? t("register.pending") : t("register.confirmed"),
       );

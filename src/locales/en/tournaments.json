@@ -124,7 +124,13 @@
       "notes": "Notes (optional)"
     },
     "addPlayer": "Add",
-    "submit": "Submit registration"
+    "submit": "Submit registration",
+    "redirectingToPayment": "Redirecting to payment…",
+    "success": {
+      "metaTitle": "Registration confirmed — {{slug}} · Clubero",
+      "title": "Payment received, registration confirmed!",
+      "body": "A confirmation email has just been sent to you. See you on the pitch!"
+    }
   },
   "tv": {
     "metaTitle": "Slideshow — {{slug}} · Clubero",
@@ -341,6 +347,22 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "cancelled": "Cancelled"
+    },
+    "payments": {
+      "markPaid": "Mark as paid",
+      "refund": "Refund",
+      "refundPrompt": "Refund reason (optional)",
+      "refundConfirm": "Confirm full refund via Stripe?",
+      "markedPaid": "Payment recorded",
+      "refunded": "Refund initiated",
+      "status": {
+        "pending": "Payment pending",
+        "paid_online": "Paid online",
+        "paid_offline": "Paid (offline)",
+        "refunded": "Refunded",
+        "refund_pending": "Refund pending",
+        "free": "Free"
+      }
     }
   },
   "teams": {

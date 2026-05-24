@@ -12,6 +12,8 @@ import {
   Users,
   Clock,
   Filter,
+  Banknote,
+  Undo2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +27,19 @@ import {
   listTournamentRegistrations,
   decideRegistration,
 } from "../tournaments.functions";
+import {
+  markRegistrationPaidOffline,
+  refundRegistrationPayment,
+} from "../tournament-payments.functions";
 
 type Status = "pending" | "approved" | "rejected" | "cancelled";
+type PaymentStatus =
+  | "pending"
+  | "paid_online"
+  | "paid_offline"
+  | "refunded"
+  | "refund_pending"
+  | "free";
 
 interface Reg {
   id: string;
@@ -41,6 +54,9 @@ interface Reg {
   created_at: string;
   decided_at: string | null;
   decision_note: string | null;
+  payment_status?: PaymentStatus | null;
+  amount_paid?: number | null;
+  currency?: string | null;
 }
 
 export function RegistrationsManager({ tournamentId }: { tournamentId: string }) {
@@ -61,6 +77,9 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
       }),
   });
 
+  const markPaidFn = useServerFn(markRegistrationPaidOffline);
+  const refundFn = useServerFn(refundRegistrationPayment);
+
   const decide = useMutation({
     mutationFn: (vars: { id: string; action: "approve" | "reject"; note?: string }) =>
       decideFn({
@@ -76,6 +95,25 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
       );
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
+  const markPaid = useMutation({
+    mutationFn: (id: string) => markPaidFn({ data: { registration_id: id } }),
+    onSuccess: () => {
+      toast.success(t("registrations.payments.markedPaid"));
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
+  const refund = useMutation({
+    mutationFn: (vars: { id: string; reason?: string }) =>
+      refundFn({ data: { registration_id: vars.id, reason: vars.reason ?? null } }),
+    onSuccess: () => {
+      toast.success(t("registrations.payments.refunded"));
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
     },
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
@@ -140,7 +178,12 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                     {r.contact_name}
                   </p>
                 </div>
-                <StatusBadge status={r.status} />
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <StatusBadge status={r.status} />
+                  {r.payment_status && r.payment_status !== "free" && (
+                    <PaymentBadge status={r.payment_status} />
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
@@ -218,6 +261,48 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                 </div>
               )}
 
+              {/* Payment actions */}
+              {(r.payment_status === "pending" ||
+                r.payment_status === "paid_online") && (
+                <div className="flex flex-wrap gap-2 pt-1 border-t border-border/50">
+                  {r.payment_status === "pending" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => markPaid.mutate(r.id)}
+                      disabled={markPaid.isPending}
+                    >
+                      <Banknote className="h-4 w-4" />
+                      {t("registrations.payments.markPaid")}
+                    </Button>
+                  )}
+                  {r.payment_status === "paid_online" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const reason = window.prompt(
+                          t("registrations.payments.refundPrompt"),
+                          "",
+                        );
+                        if (reason === null) return;
+                        if (
+                          !window.confirm(
+                            t("registrations.payments.refundConfirm"),
+                          )
+                        )
+                          return;
+                        refund.mutate({ id: r.id, reason: reason || undefined });
+                      }}
+                      disabled={refund.isPending}
+                    >
+                      <Undo2 className="h-4 w-4" />
+                      {t("registrations.payments.refund")}
+                    </Button>
+                  )}
+                </div>
+              )}
+
               {r.decision_note && (
                 <p className="text-[11px] text-muted-foreground">
                   {t("registrations.note", { note: r.decision_note })}
@@ -252,6 +337,25 @@ function StatusBadge({ status }: { status: Status }) {
       className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${cls[status]}`}
     >
       {t(`registrations.status.${status}`)}
+    </span>
+  );
+}
+
+function PaymentBadge({ status }: { status: PaymentStatus }) {
+  const { t } = useTranslation("tournaments");
+  const cls: Record<PaymentStatus, string> = {
+    pending: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    paid_online: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+    paid_offline: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
+    refunded: "bg-muted text-muted-foreground",
+    refund_pending: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    free: "bg-muted text-muted-foreground",
+  };
+  return (
+    <span
+      className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${cls[status]}`}
+    >
+      {t(`registrations.payments.status.${status}`)}
     </span>
   );
 }

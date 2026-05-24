@@ -124,7 +124,13 @@
       "notes": "Notes (optionnel)"
     },
     "addPlayer": "Ajouter",
-    "submit": "Envoyer l'inscription"
+    "submit": "Envoyer l'inscription",
+    "redirectingToPayment": "Redirection vers le paiement…",
+    "success": {
+      "metaTitle": "Inscription confirmée — {{slug}} · Clubero",
+      "title": "Paiement reçu, inscription confirmée !",
+      "body": "Un email de confirmation vient de t'être envoyé. À bientôt sur le terrain !"
+    }
   },
   "tv": {
     "metaTitle": "Diaporama — {{slug}} · Clubero",
@@ -341,6 +347,22 @@
       "approved": "Validée",
       "rejected": "Refusée",
       "cancelled": "Annulée"
+    },
+    "payments": {
+      "markPaid": "Marquer payé",
+      "refund": "Rembourser",
+      "refundPrompt": "Motif du remboursement (optionnel)",
+      "refundConfirm": "Confirmer le remboursement intégral via Stripe ?",
+      "markedPaid": "Paiement enregistré",
+      "refunded": "Remboursement initié",
+      "status": {
+        "pending": "Paiement en attente",
+        "paid_online": "Payé en ligne",
+        "paid_offline": "Payé (hors ligne)",
+        "refunded": "Remboursé",
+        "refund_pending": "Remboursement en cours",
+        "free": "Gratuit"
+      }
     }
   },
   "teams": {
