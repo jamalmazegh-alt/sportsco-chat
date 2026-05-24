@@ -123,7 +123,9 @@ export const createStripeConnectAccount = createServerFn({ method: "POST" })
         transfers: { requested: true },
         sepa_debit_payments: { requested: true },
       },
-      business_type: "non_profit",
+      // business_type is intentionally not set — Stripe will ask the user
+      // during the Express onboarding flow so it matches the club's real
+      // legal structure (non-profit, individual, company, ...).
       business_profile: {
         name: club.name,
       },
