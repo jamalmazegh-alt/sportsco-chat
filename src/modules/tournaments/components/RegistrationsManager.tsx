@@ -340,3 +340,22 @@ function StatusBadge({ status }: { status: Status }) {
     </span>
   );
 }
+
+function PaymentBadge({ status }: { status: PaymentStatus }) {
+  const { t } = useTranslation("tournaments");
+  const cls: Record<PaymentStatus, string> = {
+    pending: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    paid_online: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+    paid_offline: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
+    refunded: "bg-muted text-muted-foreground",
+    refund_pending: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    free: "bg-muted text-muted-foreground",
+  };
+  return (
+    <span
+      className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${cls[status]}`}
+    >
+      {t(`registrations.payments.status.${status}`)}
+    </span>
+  );
+}
