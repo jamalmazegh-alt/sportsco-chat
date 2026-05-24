@@ -578,6 +578,74 @@ function LiveBadge() {
   );
 }
 
+function HeroStat({
+  value,
+  label,
+  hideValue,
+  accent,
+}: {
+  value: string;
+  label: string;
+  hideValue?: boolean;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-xl border bg-card/60 backdrop-blur-sm px-3 py-2.5 flex flex-col justify-center",
+        accent ? "border-red-500/40" : "border-border",
+      )}
+    >
+      {!hideValue && (
+        <p className={cn("text-xl sm:text-2xl font-extrabold tabular-nums leading-none", accent && "text-red-600 dark:text-red-400")}>
+          {value}
+        </p>
+      )}
+      <p className={cn("text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-muted-foreground", hideValue && "text-sm normal-case tracking-normal text-foreground font-bold tabular-nums")}>
+        {hideValue ? value : label}
+      </p>
+      {hideValue && (
+        <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mt-0.5">
+          {label}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function matchExtras(m: any) {
+  const hasPen = m.penalty_score_a != null && m.penalty_score_b != null;
+  const hasOt = m.overtime_score_a != null && m.overtime_score_b != null;
+  const mvp = m?.details?.mvp_player_name as string | undefined;
+  return { hasPen, hasOt, mvp };
+}
+
+function MatchBadges({ match }: { match: any }) {
+  const { t } = useTranslation("tournaments");
+  const { hasPen, hasOt, mvp } = matchExtras(match);
+  if (!hasPen && !hasOt && !mvp) return null;
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-1 mt-1">
+      {hasOt && (
+        <span className="rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide">
+          {t("common.aet")}
+        </span>
+      )}
+      {hasPen && (
+        <span className="rounded-md bg-blue-500/15 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide tabular-nums">
+          {t("common.pen")} {match.penalty_score_a}-{match.penalty_score_b}
+        </span>
+      )}
+      {mvp && (
+        <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 text-primary px-1.5 py-0.5 text-[10px] font-semibold tracking-wide">
+          <Crown className="h-2.5 w-2.5" />
+          {t("common.mvp")} · {mvp}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function MatchRow({
   match,
   teamMap,
@@ -594,16 +662,27 @@ function MatchRow({
   const b = match.team_b_id ? teamMap.get(match.team_b_id) : null;
   const setsLine = scoring.mode === "sets" ? formatSets(match.sets) : "";
   const isLive = match.status === "live";
+  const winnerA = match.winner_team_id && match.winner_team_id === match.team_a_id;
+  const winnerB = match.winner_team_id && match.winner_team_id === match.team_b_id;
   return (
-    <li className={cn("px-3 py-2 text-sm", isLive && "bg-red-500/5")}>
+    <li className={cn("px-3 py-2 text-sm transition-colors", isLive && "bg-red-500/5 animate-pulse-ring")}>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <span className="truncate text-right">{a?.name ?? t("common.tbd")}</span>
+        <span className={cn("truncate text-right inline-flex items-center justify-end gap-1.5", winnerA && "font-semibold text-foreground")}>
+          {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
+          {a?.name ?? t("common.tbd")}
+        </span>
         <span className="tabular-nums font-semibold flex items-center gap-1.5">
-          {match.score_a ?? "–"} : {match.score_b ?? "–"}
+          <span className={cn(winnerA && "text-foreground", !winnerA && "text-muted-foreground")}>{match.score_a ?? "–"}</span>
+          <span className="text-muted-foreground">:</span>
+          <span className={cn(winnerB && "text-foreground", !winnerB && "text-muted-foreground")}>{match.score_b ?? "–"}</span>
           {isLive && <LiveBadge />}
         </span>
-        <span className="truncate">{b?.name ?? t("common.tbd")}</span>
+        <span className={cn("truncate inline-flex items-center gap-1.5", winnerB && "font-semibold text-foreground")}>
+          {b?.name ?? t("common.tbd")}
+          {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
+        </span>
       </div>
+      <MatchBadges match={match} />
       {setsLine && (
         <div className="text-[11px] text-muted-foreground text-center mt-0.5 tabular-nums">
           {setsLine}
