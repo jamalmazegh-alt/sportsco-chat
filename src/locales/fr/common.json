@@ -376,8 +376,7 @@
     "childAccessNeedsEmail": "Ajoutez d'abord un email à l'enfant pour activer l'accès.",
     "account": "Compte",
     "removeConfirm": "Retirer {{name}} de l'équipe ?",
-    "removed": "Joueur retiré de l'équipe",
-    "minorMediaConsentRequired": "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : "
+    "removed": "Joueur retiré de l'équipe"
   },
   "events": {
     "whatsappShare": {

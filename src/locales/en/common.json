@@ -376,8 +376,7 @@
     "childAccessNeedsEmail": "Add an email to the child first to enable access.",
     "account": "Account",
     "removeConfirm": "Remove {{name}} from the team?",
-    "removed": "Player removed from the team",
-    "minorMediaConsentRequired": "Minor player: parental media consent is required before any upload. Current status: "
+    "removed": "Player removed from the team"
   },
   "events": {
     "whatsappShare": {
