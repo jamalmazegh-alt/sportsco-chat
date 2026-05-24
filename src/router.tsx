@@ -15,6 +15,7 @@ export const getRouter = () => {
     defaultErrorComponent: ({ error, reset }) => (
       <GlobalErrorBoundary error={error} reset={reset} />
     ),
+    defaultNotFoundComponent: () => <NotFoundPage />,
   });
 
   return router;
