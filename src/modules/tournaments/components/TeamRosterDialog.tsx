@@ -280,10 +280,10 @@ function PlayerFormDialog({
           </div>
           <div className="space-y-1.5">
             <Label>{t("roster.form.position")}</Label>
-            <Input
+            <PositionCombobox
               value={position}
-              onChange={(e) => setPosition(e.target.value)}
-              maxLength={40}
+              onChange={setPosition}
+              sport={sport ?? null}
               placeholder={t("roster.form.positionPlaceholder")}
             />
           </div>
