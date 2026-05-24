@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.functions";
+import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.server";
 
 const PlayerSchema = z.object({
   first_name: z.string().trim().min(1).max(80),
