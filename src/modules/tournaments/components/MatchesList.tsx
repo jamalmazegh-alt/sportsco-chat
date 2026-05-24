@@ -1024,6 +1024,7 @@ function MatchCard({
                         setSets(next);
                       }}
                       size="sm"
+                      disabled={validated}
                     />
                   </div>
                 </div>
@@ -1033,7 +1034,7 @@ function MatchCard({
                 variant="outline"
                 className="w-full"
                 onClick={() => setSets([...sets, { a: 0, b: 0 }])}
-                disabled={sets.length >= 7}
+                disabled={validated || sets.length >= 7}
               >
                 <Plus className="h-4 w-4" />
                 {t("matches.addSet")}
