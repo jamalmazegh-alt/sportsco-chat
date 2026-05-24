@@ -21,6 +21,8 @@ interface TournamentPassButtonProps {
   className?: string;
   variant?: "default" | "outline";
   label?: string;
+  /** Render the price + quantity + CTA inline (no dialog). */
+  inline?: boolean;
 }
 
 const UNIT_PRICE_EUR = 40;
