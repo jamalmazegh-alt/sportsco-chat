@@ -261,6 +261,48 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                 </div>
               )}
 
+              {/* Payment actions */}
+              {(r.payment_status === "pending" ||
+                r.payment_status === "paid_online") && (
+                <div className="flex flex-wrap gap-2 pt-1 border-t border-border/50">
+                  {r.payment_status === "pending" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => markPaid.mutate(r.id)}
+                      disabled={markPaid.isPending}
+                    >
+                      <Banknote className="h-4 w-4" />
+                      {t("registrations.payments.markPaid")}
+                    </Button>
+                  )}
+                  {r.payment_status === "paid_online" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const reason = window.prompt(
+                          t("registrations.payments.refundPrompt"),
+                          "",
+                        );
+                        if (reason === null) return;
+                        if (
+                          !window.confirm(
+                            t("registrations.payments.refundConfirm"),
+                          )
+                        )
+                          return;
+                        refund.mutate({ id: r.id, reason: reason || undefined });
+                      }}
+                      disabled={refund.isPending}
+                    >
+                      <Undo2 className="h-4 w-4" />
+                      {t("registrations.payments.refund")}
+                    </Button>
+                  )}
+                </div>
+              )}
+
               {r.decision_note && (
                 <p className="text-[11px] text-muted-foreground">
                   {t("registrations.note", { note: r.decision_note })}
