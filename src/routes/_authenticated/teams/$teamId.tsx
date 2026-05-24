@@ -651,7 +651,12 @@ function TeamDetail() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>{t("players.preferredPosition")}</Label>
-                    <Input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="GK / DF / MF / FW" />
+                    <PositionCombobox
+                      value={position}
+                      onChange={setPosition}
+                      sport={team?.sport ?? null}
+                      placeholder="GK / DF / MF / FW"
+                    />
                   </div>
                 </div>
 
