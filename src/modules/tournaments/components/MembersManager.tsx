@@ -8,6 +8,7 @@ import {
   inviteTournamentMember,
   removeTournamentMember,
   assignRefereeToMatch,
+  convertOfflineMember,
 } from "@/lib/permissions.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
