@@ -47,7 +47,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         const { data: tournament, error: tErr } = await supabase
           .from("tournaments")
-          .select("id, status, settings, num_teams")
+          .select("id, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode")
           .eq("slug", parsed.tournament_slug)
           .maybeSingle();
         if (tErr) {
