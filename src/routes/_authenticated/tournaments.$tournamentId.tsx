@@ -120,8 +120,20 @@ function TournamentDetailPage() {
     onError: (e: any) => toast.error(e?.message ?? t("common.error", { defaultValue: "Erreur" })),
   });
 
-  const [section, setSection] = useState<Section>("play");
-  const [sub, setSub] = useState<Sub>("matches");
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  // Default section is derived from status once data arrives; URL wins if present.
+  const urlSection = search.tab ? URL_TO_SECTION[search.tab] : null;
+  const [section, setSectionState] = useState<Section>(urlSection ?? "play");
+  const [sub, setSubState] = useState<Sub>((search.sub as Sub) ?? "matches");
+  const setSection = (next: Section) => {
+    setSectionState(next);
+    navigate({ search: (prev) => ({ ...prev, tab: SECTION_TO_URL[next] }), replace: true });
+  };
+  const setSub = (next: Sub) => {
+    setSubState(next);
+    navigate({ search: (prev) => ({ ...prev, sub: next }), replace: true });
+  };
 
   if (q.isLoading) {
     return (
