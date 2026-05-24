@@ -503,7 +503,12 @@ function PlayerProfile() {
           </div>
           <div className="space-y-1.5">
             <Label>{t("players.preferredPosition")}</Label>
-            <Input value={position} onChange={(e) => setPosition(e.target.value)} disabled={!isCoach} />
+            <PositionCombobox
+              value={position}
+              onChange={setPosition}
+              sport={playerSport ?? null}
+              disabled={!isCoach}
+            />
           </div>
         </div>
         <div className="space-y-1.5">
