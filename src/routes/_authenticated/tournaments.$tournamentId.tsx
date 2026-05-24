@@ -415,14 +415,14 @@ function TournamentDetailPage() {
 }
 
 
-function TabsNav({
+function SubTabsNav({
   tabs,
   tab,
   setTab,
 }: {
-  tabs: { id: Tab; icon: any; label: string }[];
-  tab: Tab;
-  setTab: (t: Tab) => void;
+  tabs: { id: Sub; icon: any; label: string }[];
+  tab: Sub;
+  setTab: (t: Sub) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeBtnRef = useRef<HTMLButtonElement>(null);
