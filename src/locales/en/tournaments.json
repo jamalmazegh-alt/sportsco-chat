@@ -362,7 +362,17 @@
         "refunded": "Refunded",
         "refund_pending": "Refund pending",
         "free": "Free"
-      }
+      },
+      "sendLink": "Send payment link",
+      "sendByEmail": "Send by email",
+      "sendByWhatsApp": "Send by WhatsApp",
+      "copyLink": "Copy link",
+      "linkCopied": "Payment link copied",
+      "linkSentEmail": "Email sent to the team",
+      "linkSentOn": "Link sent on {{date}}",
+      "linkExpired": "Link expired",
+      "requestPayment": "Request payment",
+      "whatsappTemplate": "Hello {{teamName}} 👋\nHere is the payment link for your registration to {{tournamentName}} ({{amount}}) :\n{{paymentLink}}\nThis link is valid for 7 days."
     }
   },
   "teams": {
@@ -849,7 +859,6 @@
     "copyLink": "Copy link",
     "linkCopied": "Link copied"
   },
-
   "tabs": {
     "teams": "Teams",
     "format": "Format",
