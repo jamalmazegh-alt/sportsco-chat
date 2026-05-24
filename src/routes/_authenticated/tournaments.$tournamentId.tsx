@@ -129,11 +129,19 @@ function TournamentDetailPage() {
   const [sub, setSubState] = useState<Sub>((search.sub as Sub) ?? "matches");
   const setSection = (next: Section) => {
     setSectionState(next);
-    navigate({ search: (prev: any) => ({ ...prev, tab: SECTION_TO_URL[next] }), replace: true });
+    navigate({
+      search: (prev: any) => ({ ...prev, tab: SECTION_TO_URL[next] }),
+      replace: true,
+      resetScroll: false,
+    });
   };
   const setSub = (next: Sub) => {
     setSubState(next);
-    navigate({ search: (prev: any) => ({ ...prev, sub: next }), replace: true });
+    navigate({
+      search: (prev: any) => ({ ...prev, sub: next }),
+      replace: true,
+      resetScroll: false,
+    });
   };
 
   if (q.isLoading) {
