@@ -956,6 +956,19 @@ function MatchCard({
 
       <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("matches.title")}>
         <div className="space-y-4 mt-4 pb-6">
+          {validated && (
+            <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 px-3 py-2.5 flex items-start gap-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                  {t("matches.lockedTitle", { defaultValue: "Match validé" })}
+                </p>
+                <p className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 leading-snug mt-0.5">
+                  {t("matches.lockedHelper", { defaultValue: "Pour modifier le score, dévalidez d'abord le match." })}
+                </p>
+              </div>
+            </div>
+          )}
           {setsMode ? (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
