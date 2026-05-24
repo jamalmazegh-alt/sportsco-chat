@@ -137,6 +137,23 @@ function PlayerProfile() {
     },
   });
 
+  // Used for sport-aware position suggestions. Falls back to free text when
+  // the player isn't on any team yet.
+  const { data: playerSport } = useQuery({
+    queryKey: ["player-primary-sport", playerId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("team_players")
+        .select("teams:team_id(sport)")
+        .eq("player_id", playerId)
+        .limit(5);
+      const sports = (data ?? [])
+        .map((r: any) => r?.teams?.sport)
+        .filter(Boolean) as string[];
+      return sports[0] ?? null;
+    },
+  });
+
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
