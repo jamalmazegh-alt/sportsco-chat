@@ -14,6 +14,10 @@ import {
   Filter,
   Banknote,
   Undo2,
+  Send,
+  Copy,
+  MessageCircle,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,12 +28,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   listTournamentRegistrations,
   decideRegistration,
 } from "../tournaments.functions";
 import {
   markRegistrationPaidOffline,
   refundRegistrationPayment,
+  sendPaymentLinkToTeam,
 } from "../tournament-payments.functions";
 
 type Status = "pending" | "approved" | "rejected" | "cancelled";
