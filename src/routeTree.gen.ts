@@ -79,6 +79,7 @@ import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
+import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -465,6 +466,11 @@ const TournamentSlugRegisterSuccessRoute =
     path: '/success',
     getParentRoute: () => TournamentSlugRegisterRoute,
   } as any)
+const TSlugPayRegistrationIdRoute = TSlugPayRegistrationIdRouteImport.update({
+  id: '/pay/$registrationId',
+  path: '/pay/$registrationId',
+  getParentRoute: () => TSlugRoute,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -658,6 +664,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -743,6 +750,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -834,6 +842,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -925,6 +934,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -1010,6 +1020,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/admin/users'
   id:
@@ -1100,6 +1111,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/_authenticated/admin/users/'
   fileRoutesById: FileRoutesById
@@ -1640,6 +1652,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TournamentSlugRegisterSuccessRouteImport
       parentRoute: typeof TournamentSlugRegisterRoute
     }
+    '/t/$slug/pay/$registrationId': {
+      id: '/t/$slug/pay/$registrationId'
+      path: '/pay/$registrationId'
+      fullPath: '/t/$slug/pay/$registrationId'
+      preLoaderRoute: typeof TSlugPayRegistrationIdRouteImport
+      parentRoute: typeof TSlugRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1982,11 +2001,13 @@ const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
 interface TSlugRouteChildren {
   TSlugRegisterRoute: typeof TSlugRegisterRoute
   TSlugTvRoute: typeof TSlugTvRoute
+  TSlugPayRegistrationIdRoute: typeof TSlugPayRegistrationIdRoute
 }
 
 const TSlugRouteChildren: TSlugRouteChildren = {
   TSlugRegisterRoute: TSlugRegisterRoute,
   TSlugTvRoute: TSlugTvRoute,
+  TSlugPayRegistrationIdRoute: TSlugPayRegistrationIdRoute,
 }
 
 const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
