@@ -22,6 +22,9 @@
     "tbd": "TBD",
     "live": "Live",
     "ft": "FT",
+    "aet": "AET",
+    "pen": "PEN",
+    "mvp": "MVP",
     "field": "Field"
   },
   "public": {
@@ -45,6 +48,7 @@
     },
     "sections": {
       "live": "Live",
+      "nowPlaying": "Currently playing",
       "upcoming": "Upcoming matches",
       "recent": "Latest results",
       "format": "Format",
@@ -54,6 +58,34 @@
       "noMatches": "No matches scheduled.",
       "formatSummary_one": "{{groupCount}} group · {{teamCount}} teams · {{matchCount}} matches",
       "formatSummary_other": "{{groupCount}} groups · {{teamCount}} teams · {{matchCount}} matches"
+    },
+    "hero": {
+      "eyebrow": "Tournament",
+      "startsIn_one": "Starts in {{count}} day",
+      "startsIn_other": "Starts in {{count}} days",
+      "today": "Starts today",
+      "endedOn": "Ended on {{date}}",
+      "inProgress": "Tournament in progress",
+      "draftBadge": "Draft",
+      "publishedBadge": "Published",
+      "completedBadge": "Completed",
+      "teamsCount_one": "{{count}} team",
+      "teamsCount_other": "{{count}} teams",
+      "matchesPlayed": "{{played}}/{{total}} matches played",
+      "liveCount_one": "{{count}} match live",
+      "liveCount_other": "{{count}} matches live"
+    },
+    "round": {
+      "group": "Group",
+      "ro16": "Round of 16",
+      "qf": "Quarter-final",
+      "sf": "Semi-final",
+      "final": "Final",
+      "third": "Third place match"
+    },
+    "standings": {
+      "qualifiedTag": "Qualified",
+      "qualificationZone": "Qualification zone"
     },
     "events": {
       "goal": "Goal",
@@ -101,10 +133,12 @@
     "slides": {
       "recent": "Latest results",
       "upcoming": "Upcoming matches",
+      "nowPlaying": "Currently playing",
       "noRecent": "No results yet",
       "noUpcoming": "No matches scheduled",
       "standings": "Standings · {{group}}",
-      "bracket": "Knockout stage"
+      "bracket": "Knockout stage",
+      "scanForLive": "Scan to follow live"
     },
     "controls": {
       "previous": "Previous",

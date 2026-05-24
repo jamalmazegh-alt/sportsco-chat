@@ -87,19 +87,33 @@ export function PublicStandings({ groups, teams, matches }: Props) {
               <tbody>
                 {rows.map((r, i) => {
                   const qualified = i < g.qualifiers_count;
+                  const isFirstNonQualified = i === g.qualifiers_count;
                   const tm = teamMap.get(r.teamId);
                   return (
                     <tr
                       key={r.teamId}
-                      className={`border-t border-border ${
-                        qualified ? "bg-primary/5" : ""
-                      }`}
+                      className={`border-t ${
+                        isFirstNonQualified ? "border-t-2 border-t-primary/30" : "border-border"
+                      } ${qualified ? "bg-primary/5" : ""}`}
                     >
-                      <td className="px-3 py-2 text-muted-foreground tabular-nums">
+                      <td className="px-3 py-2 text-muted-foreground tabular-nums relative">
+                        {qualified && (
+                          <span
+                            aria-hidden
+                            className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full bg-primary"
+                          />
+                        )}
                         {i + 1}
                       </td>
                       <td className="px-1 py-2 font-medium truncate max-w-[140px]">
-                        {tm?.name ?? "—"}
+                        <span className="inline-flex items-center gap-1.5">
+                          {tm?.name ?? "—"}
+                          {qualified && (
+                            <span className="hidden sm:inline-block rounded-md bg-primary/15 text-primary px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider">
+                              {t("public.standings.qualifiedTag", { defaultValue: "Qualifié" })}
+                            </span>
+                          )}
+                        </span>
                       </td>
                       <td className="px-1 py-2 text-center tabular-nums">
                         {r.played}
@@ -111,7 +125,7 @@ export function PublicStandings({ groups, teams, matches }: Props) {
                       <td className="px-1 py-2 text-center tabular-nums">
                         {r.lost}
                       </td>
-                      <td className="px-1 py-2 text-center tabular-nums">
+                      <td className={`px-1 py-2 text-center tabular-nums ${r.goalDiff > 0 ? "text-emerald-600 dark:text-emerald-400" : r.goalDiff < 0 ? "text-red-600 dark:text-red-400" : ""}`}>
                         {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
                       </td>
                       <td className="px-2 py-2 text-center font-bold tabular-nums">

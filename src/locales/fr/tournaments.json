@@ -22,6 +22,9 @@
     "tbd": "TBD",
     "live": "Live",
     "ft": "FT",
+    "aet": "AP",
+    "pen": "TAB",
+    "mvp": "MVP",
     "field": "Terrain"
   },
   "public": {
@@ -45,6 +48,7 @@
     },
     "sections": {
       "live": "En direct",
+      "nowPlaying": "Actuellement en jeu",
       "upcoming": "Prochains matchs",
       "recent": "Derniers résultats",
       "format": "Format",
@@ -54,6 +58,34 @@
       "noMatches": "Aucun match programmé.",
       "formatSummary_one": "{{groupCount}} poule · {{teamCount}} équipes · {{matchCount}} matchs",
       "formatSummary_other": "{{groupCount}} poules · {{teamCount}} équipes · {{matchCount}} matchs"
+    },
+    "hero": {
+      "eyebrow": "Tournoi",
+      "startsIn_one": "Commence dans {{count}} jour",
+      "startsIn_other": "Commence dans {{count}} jours",
+      "today": "C'est aujourd'hui",
+      "endedOn": "Terminé le {{date}}",
+      "inProgress": "Tournoi en cours",
+      "draftBadge": "Brouillon",
+      "publishedBadge": "Publié",
+      "completedBadge": "Terminé",
+      "teamsCount_one": "{{count}} équipe",
+      "teamsCount_other": "{{count}} équipes",
+      "matchesPlayed": "{{played}}/{{total}} matchs joués",
+      "liveCount_one": "{{count}} match en direct",
+      "liveCount_other": "{{count}} matchs en direct"
+    },
+    "round": {
+      "group": "Poule",
+      "ro16": "8e de finale",
+      "qf": "Quart de finale",
+      "sf": "Demi-finale",
+      "final": "Finale",
+      "third": "Match pour la 3e place"
+    },
+    "standings": {
+      "qualifiedTag": "Qualifié",
+      "qualificationZone": "Zone de qualification"
     },
     "events": {
       "goal": "But",
@@ -101,10 +133,12 @@
     "slides": {
       "recent": "Derniers résultats",
       "upcoming": "Prochains matchs",
+      "nowPlaying": "Actuellement en jeu",
       "noRecent": "Aucun résultat pour le moment",
       "noUpcoming": "Aucun match programmé",
       "standings": "Classement · {{group}}",
-      "bracket": "Phase finale"
+      "bracket": "Phase finale",
+      "scanForLive": "Scannez pour suivre en direct"
     },
     "controls": {
       "previous": "Précédent",
