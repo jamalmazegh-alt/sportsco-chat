@@ -297,7 +297,9 @@
       "app": "Clubero only (attendance tracked in the app)",
       "hybrid": "Hybrid (WhatsApp + attendance tracking in Clubero)",
       "whatsapp": "WhatsApp only (no attendance tracking)"
-    }
+    },
+    "whatsappGroupHint": "Paste the team's WhatsApp group invite link. Used to quickly share call-ups.",
+    "commModeHint": "In WhatsApp-only mode, you share events without requesting responses in the app."
   },
   "club": {
     "logo": "Club logo",

@@ -297,7 +297,9 @@
       "app": "Clubero uniquement (suivi des présences dans l'app)",
       "hybrid": "Hybride (WhatsApp + suivi des présences dans Clubero)",
       "whatsapp": "WhatsApp uniquement (pas de suivi de présence)"
-    }
+    },
+    "whatsappGroupHint": "Coller le lien d'invitation du groupe WhatsApp de l'équipe. Utilisé pour partager rapidement les convocations.",
+    "commModeHint": "En mode WhatsApp uniquement, vous partagez les événements sans demander de réponses dans l'app."
   },
   "club": {
     "logo": "Logo du club",
