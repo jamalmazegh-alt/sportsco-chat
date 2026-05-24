@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.functions";
 
 const PlayerSchema = z.object({
   first_name: z.string().trim().min(1).max(80),
@@ -46,7 +47,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         const { data: tournament, error: tErr } = await supabase
           .from("tournaments")
-          .select("id, status, settings, num_teams")
+          .select("id, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode")
           .eq("slug", parsed.tournament_slug)
           .maybeSingle();
         if (tErr) {
@@ -171,10 +172,30 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           }
         }
 
+        // If tournament requires online payment, build a Stripe Checkout url.
+        const fee = (tournament as any).registration_fee ?? 0;
+        const mode = (tournament as any).payment_mode ?? "offline";
+        let checkout_url: string | null = null;
+        if (fee > 0 && (mode === "online" || mode === "both")) {
+          try {
+            const origin = new URL(request.url).origin;
+            const co = await buildCheckoutForRegistration({
+              registrationId: row.id,
+              origin,
+            });
+            checkout_url = co?.url ?? null;
+          } catch (e) {
+            console.error("Failed to build checkout for registration", e);
+          }
+        }
+
         return Response.json({
           success: true,
+          registration_id: row.id,
           status: row.status,
           requires_approval: !!reg.requiresApproval,
+          requires_payment: fee > 0 && mode !== "offline",
+          checkout_url,
         });
       },
     },

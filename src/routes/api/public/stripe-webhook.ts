@@ -4,6 +4,10 @@ import { getStripe } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { notifySubscriptionAdmin } from "@/lib/subscription-notify.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import {
+  handleTournamentCheckoutCompleted,
+  handleTournamentChargeRefunded,
+} from "@/modules/tournaments/tournament-payments.functions";
 
 type SubStatus =
   | "trialing"
@@ -120,6 +124,14 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
           switch (event.type) {
             case "checkout.session.completed": {
               const session = event.data.object as Stripe.Checkout.Session;
+              // Tournament registration: one-time destination charge
+              if (
+                session.mode === "payment" &&
+                session.metadata?.purpose === "tournament_registration"
+              ) {
+                await handleTournamentCheckoutCompleted(session, event.id);
+                break;
+              }
               // Tournament Pass: one-time payment, no subscription
               if (
                 session.mode === "payment" &&
@@ -290,6 +302,13 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                   } as unknown as never,
                 });
               }
+              break;
+            }
+            case "charge.refunded": {
+              await handleTournamentChargeRefunded(
+                event.data.object as Stripe.Charge,
+                event.id,
+              );
               break;
             }
             default:

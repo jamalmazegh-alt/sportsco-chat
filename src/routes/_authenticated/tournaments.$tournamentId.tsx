@@ -41,7 +41,8 @@ import { RegistrationsManager } from "@/modules/tournaments/components/Registrat
 import { CollaboratorsManager } from "@/modules/tournaments/components/CollaboratorsManager";
 import { MembersManager } from "@/modules/tournaments/components/MembersManager";
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
-import { ClipboardList, UserPlus, UserCog } from "lucide-react";
+import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
+import { ClipboardList, UserPlus, UserCog, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
@@ -53,7 +54,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
   }),
 });
 
-type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
+type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "payments" | "rules" | "team_staff" | "members";
 
 function TournamentDetailPage() {
   const { t } = useTranslation("tournaments");
@@ -117,6 +118,7 @@ function TournamentDetailPage() {
     ...(canManage
       ? [
           { id: "registrations" as const, icon: ClipboardList, label: t("tabs.registrations") },
+          { id: "payments" as const, icon: CreditCard, label: t("tabs.payments") },
           { id: "team_staff" as const, icon: UserPlus, label: t("tabs.teamStaff") },
           { id: "members" as const, icon: UserCog, label: t("tabs.members") },
           { id: "rules" as const, icon: Settings2, label: t("tabs.rules") },
@@ -242,6 +244,18 @@ function TournamentDetailPage() {
         )}
         {tab === "registrations" && canManage && (
           <RegistrationsManager tournamentId={tournament.id} />
+        )}
+        {tab === "payments" && canManage && (
+          <PaymentSettingsPanel
+            tournamentId={tournament.id}
+            clubId={(tournament as any).club_id ?? null}
+            initial={{
+              registration_fee: (tournament as any).registration_fee ?? 0,
+              registration_currency: (tournament as any).registration_currency ?? "eur",
+              registration_fee_description: (tournament as any).registration_fee_description ?? null,
+              payment_mode: (tournament as any).payment_mode ?? "offline",
+            }}
+          />
         )}
         {tab === "team_staff" && canManage && (
           <CollaboratorsManager tournamentId={tournament.id} />
