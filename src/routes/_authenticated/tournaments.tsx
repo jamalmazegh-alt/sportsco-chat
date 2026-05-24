@@ -98,23 +98,26 @@ function TournamentsList() {
 
 
       {noClub && (
-        <div className="rounded-2xl border border-border bg-card p-4 text-sm">
-          <p className="font-medium">{t("list.organizerModeTitle")}</p>
-          <p className="mt-1 text-muted-foreground">
-            {t("list.organizerModeBody")}
-          </p>
-          <p className="mt-3 flex items-center gap-2 text-sm">
-            <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
-              {availablePasses.length}
-            </span>
-            <span className={availablePasses.length > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
-              {availablePasses.length > 1
-                ? t("list.passAvailable_other")
-                : availablePasses.length === 1
-                  ? t("list.passAvailable_one")
-                  : t("list.noPassAvailable")}
-            </span>
-          </p>
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-border bg-card p-4 text-sm">
+            <p className="font-medium">{t("list.organizerModeTitle")}</p>
+            <p className="mt-1 text-muted-foreground">
+              {t("list.organizerModeBody")}
+            </p>
+            <p className="mt-3 flex items-center gap-2 text-sm">
+              <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
+                {availablePasses.length}
+              </span>
+              <span className={availablePasses.length > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
+                {availablePasses.length > 1
+                  ? t("list.passAvailable_other")
+                  : availablePasses.length === 1
+                    ? t("list.passAvailable_one")
+                    : t("list.noPassAvailable")}
+              </span>
+            </p>
+          </div>
+          <TournamentPassButton inline />
         </div>
       )}
 
