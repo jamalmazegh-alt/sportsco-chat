@@ -7,10 +7,16 @@ import { Button } from "@/components/ui/button";
 import { SupportFormDialog } from "@/components/support-form-dialog";
 import { LifeBuoy, Plus, ChevronRight, Loader2 } from "lucide-react";
 import { STATUS_BADGE_CLASS, type SupportStatus } from "@/lib/support-constants";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/support/")({
   component: SupportListPage,
-  head: () => ({ meta: [{ title: "Support — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.support.title") },
+      { name: "description", content: i18n.t("meta.support.description") },
+    ],
+  }),
 });
 
 function SupportListPage() {
