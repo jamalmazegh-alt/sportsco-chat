@@ -122,17 +122,18 @@ function TournamentDetailPage() {
 
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  // Default section is derived from status once data arrives; URL wins if present.
-  const urlSection = search.tab ? URL_TO_SECTION[search.tab] : null;
+  const urlSection: Section | null = search.tab
+    ? URL_TO_SECTION[search.tab as "configurer" | "gerer" | "jouer"]
+    : null;
   const [section, setSectionState] = useState<Section>(urlSection ?? "play");
   const [sub, setSubState] = useState<Sub>((search.sub as Sub) ?? "matches");
   const setSection = (next: Section) => {
     setSectionState(next);
-    navigate({ search: (prev) => ({ ...prev, tab: SECTION_TO_URL[next] }), replace: true });
+    navigate({ search: (prev: any) => ({ ...prev, tab: SECTION_TO_URL[next] }), replace: true });
   };
   const setSub = (next: Sub) => {
     setSubState(next);
-    navigate({ search: (prev) => ({ ...prev, sub: next }), replace: true });
+    navigate({ search: (prev: any) => ({ ...prev, sub: next }), replace: true });
   };
 
   if (q.isLoading) {
