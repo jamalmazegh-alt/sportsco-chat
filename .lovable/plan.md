@@ -1,47 +1,67 @@
-## Objectif
+## Problèmes identifiés
 
-Finir la localisation du corps de `players/$playerId.tsx`, `teams.tsx` et `teams/$teamId.tsx`. Tous trois ont déjà leur `head()` + `useTranslation()` — il reste 5 strings FR hardcodés et 6 `defaultValue:` inline à migrer proprement dans `common.json`.
+1. **10 onglets en scroll horizontal** — surcharge visuelle, on ne sait plus où trouver quoi.
+2. **Doublons** Équipes / Inscriptions / Staff / Membres — frontières floues.
+3. **Bouton "S'inscrire" invisible** sur la page publique : l'admin doit aller dans l'onglet **Règles** (caché en fin de scroll) pour cocher `registration.enabled = true`. Personne ne le trouve.
 
-## Changements
+## Nouvelle structure : 3 sections principales
 
-### 1. `src/locales/fr/common.json` + `src/locales/en/common.json`
+Remplace la barre de 10 onglets par **3 méga-onglets** (Configurer / Gérer / Jouer). À l'intérieur de chaque section, sous-onglets clairs sans doublons.
 
-Ajouter les clés sémantiques (FR + EN), en parité :
+```
+┌─ Configurer ─┬─ Gérer ─┬─ Jouer ─┐
+│ (avant)      │ (qui)   │ (jour J)│
+└──────────────┴─────────┴─────────┘
+```
 
-- `teams.emptyHintAdmin` — "Crée ta première équipe pour commencer à programmer entraînements et matchs."
-- `teams.emptyHintMember` — "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter."
-- `teams.whatsappGroupLink` — "WhatsApp — lien du groupe d'équipe"
-- `teams.communicationMode` — "Mode de communication"
-- `teams.commMode.app` — "Clubero uniquement (suivi des présences dans l'app)"
-- `teams.commMode.hybrid` — "Hybride (WhatsApp + suivi des présences dans Clubero)"
-- `teams.commMode.whatsapp` — "WhatsApp uniquement (pas de suivi de présence)"
-- `teams.coachDetachConfirm` — "Retirer ce coach de l'équipe ?"
-- `players.removed` — "Joueur retiré de l'équipe"
-- `players.childAccessNeedsEmail` — "Ajoutez d'abord un email à l'enfant pour activer l'accès."
-- `players.minorMediaConsentRequired` — "Joueur mineur : le consentement parental à l'image est requis avant tout upload. Statut actuel : "
+### Configurer — *one-time setup avant ouverture*
+- **Format** (groupes, bracket, poules) — actuel `fixtures`
+- **Règles** (durée, points, tiebreakers) — actuel `rules`
+- **Terrains** — actuel `fields`
+- **Paiements** (frais, mode online/offline) — actuel `payments`
+- **Inscriptions — paramètres** *(nouveau)* : extrait du panneau `rules` → toggle `enabled`, dates ouverture/fermeture, max équipes, requiresApproval, collectPlayers, publicMessage. C'est ici (pas dans "Règles") qu'on active l'inscription publique.
 
-### 2. `src/routes/_authenticated/teams/$teamId.tsx`
+### Gérer — *les personnes*
+- **Inscriptions** (candidates, validation, paiements) — actuel `registrations`. Si inscription désactivée → CTA direct "Activer les inscriptions" qui ouvre le sous-onglet Configurer › Inscriptions.
+- **Équipes** (roster confirmé, logos, groupes) — actuel `teams`
+- **Staff & arbitres** *(fusion)* — fusionne `team_staff` (CollaboratorsManager) + `members` (MembersManager) dans un seul écran à 2 sous-tabs internes : "Équipe d'organisation" (admins tournoi) + "Arbitres / bénévoles"
 
-- L.506 → `<Label>{t("teams.whatsappGroupLink")}</Label>`
-- L.518 → `<Label>{t("teams.communicationMode")}</Label>`
-- L.522-524 → `{t("teams.commMode.app|hybrid|whatsapp")}`
-- L.331 / L.1039 → retirer `defaultValue:`, garder juste `t("players.removed")` / `t("teams.coachDetachConfirm")`
+### Jouer — *jour J*
+- **Matchs** — actuel `matches`
+- **Classement** — actuel `standings`
+- **Bracket** — actuel `bracket`
+- **Vue Live / TV** *(nouveau lien)* : raccourci vers `/tournament/$slug/tv`
 
-### 3. `src/routes/_authenticated/teams.tsx`
+## Correctif "bouton inscription invisible"
 
-- L.201-202 → retirer les `defaultValue:` inline (les valeurs sont désormais dans le JSON)
+Sur la page admin tournoi :
+- Si `payment_mode` configuré OU admin sur l'onglet Inscriptions sans `registration.enabled` → bannière jaune **"Les inscriptions sont désactivées. Activer maintenant →"** qui pousse vers Configurer › Inscriptions.
+- Sur la page publique : si admin connecté visite la page et registration off → bannière discrète "Inscriptions désactivées — visible uniquement par toi".
 
-### 4. `src/routes/_authenticated/players/$playerId.tsx`
+Aucun changement au flux RegistrationsManager / API publique : juste rendre l'activation découvrable.
 
-- L.279 → retirer `defaultValue:` inline (`players.childAccessNeedsEmail`)
-- L.465 → retirer `defaultValue:` inline (`players.minorMediaConsentRequired`)
+## Implémentation technique
 
-### 5. Validation
+### Fichiers à créer
+- `src/modules/tournaments/components/RegistrationSettingsPanel.tsx` — extrait propre du bloc registration de `TournamentRulesEditor.tsx` (lignes ~425-560).
+- `src/modules/tournaments/components/StaffAndOfficialsPanel.tsx` — wrapper avec 2 sous-tabs internes regroupant `CollaboratorsManager` + `MembersManager`.
 
-- `node scripts/check-i18n-parity.mjs` doit passer
-- Pas d'autre changement (UI / business logic intacts)
+### Fichiers à modifier
+- `src/routes/_authenticated/tournaments.$tournamentId.tsx` :
+  - Remplacer le `tabs` plat (10 entrées) par une structure groupée `{section: "configure"|"manage"|"play", sub: …}`.
+  - Nouveau composant `SectionTabs` (3 boutons larges) + `SubTabs` (pills sous-jacents) au lieu du scroll-horizontal actuel.
+  - Garder le composant `TabsNav` existant pour les sous-onglets (déjà bien fait).
+  - Routing par `?section=…&sub=…` en query params pour deep-link.
+  - Bannière "Inscriptions désactivées" si l'admin est sur sub=registrations et `rules.registration.enabled === false`.
+- `src/modules/tournaments/components/TournamentRulesEditor.tsx` : retirer le bloc registration (déplacé), garder règles sportives uniquement.
+- `src/locales/{fr,en}/tournaments.json` : nouvelles clés `sections.configure/manage/play` + `tabs.registrationSettings` + `registrations.disabledBanner`.
 
-## Hors périmètre
+### Non touché
+- API publique `/api/public/tournament-registration` : OK.
+- Page publique `/tournament/$slug` : le CTA Register est déjà conditionné correctement sur `registration.enabled` — pas de bug, juste pas activé par défaut.
+- Flux paiement, RegistrationsManager, TeamsManager : aucun changement de logique.
 
-- Placeholders exemples (`"U13"`, `"FFF-2025-12345"`, `"GK / DF / MF / FW"`) — restent codés, ce sont des formats illustratifs
-- Composants externes (`event-form-sheet`, etc.) — autre lot
+## Ce qui reste hors scope
+- Pas de refonte visuelle des panneaux internes.
+- Pas de changement DB / RLS.
+- "Tirage au sort / seeding" mentionné dans la section Gérer existe déjà dans `GroupsAndFixtures` (DrawDialog) — reste sous Configurer › Format pour ne rien casser.
