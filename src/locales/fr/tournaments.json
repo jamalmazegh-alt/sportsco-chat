@@ -323,6 +323,11 @@
     }
   },
   "registrations": {
+    "disabledBanner": {
+      "title": "Les inscriptions en ligne sont désactivées",
+      "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures.",
+      "cta": "Activer"
+    },
     "count_one": "{{count}} inscription",
     "count_other": "{{count}} inscriptions",
     "filter": {
