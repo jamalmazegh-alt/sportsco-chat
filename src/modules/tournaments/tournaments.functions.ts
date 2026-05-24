@@ -99,17 +99,28 @@ export const createTournament = createServerFn({ method: "POST" })
 
 export const listMyTournaments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { club_id: string }) =>
-    z.object({ club_id: z.string().uuid() }).parse(input),
+  .inputValidator((input: { club_id: string; limit?: number; exclude_completed?: boolean }) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        limit: z.number().int().min(1).max(100).optional(),
+        exclude_completed: z.boolean().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: rows, error } = await supabase
+    let q = supabase
       .from("tournaments")
       .select("*")
       .eq("club_id", data.club_id)
-      .is("archived_at", null)
-      .order("starts_on", { ascending: false });
+      .is("archived_at", null);
+    if (data.exclude_completed) {
+      q = q.not("status", "in", "(completed,cancelled)");
+    }
+    q = q.order("starts_on", { ascending: false });
+    if (data.limit) q = q.limit(data.limit);
+    const { data: rows, error } = await q;
     if (error) throw error;
     return { tournaments: rows ?? [] };
   });
