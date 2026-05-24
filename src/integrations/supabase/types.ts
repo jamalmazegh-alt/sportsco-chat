@@ -2017,6 +2017,7 @@ export type Database = {
       }
       tournament_payment_events: {
         Row: {
+          actor_id: string | null
           amount: number | null
           created_at: string
           currency: string | null
@@ -2028,6 +2029,7 @@ export type Database = {
           tournament_id: string | null
         }
         Insert: {
+          actor_id?: string | null
           amount?: number | null
           created_at?: string
           currency?: string | null
@@ -2039,6 +2041,7 @@ export type Database = {
           tournament_id?: string | null
         }
         Update: {
+          actor_id?: string | null
           amount?: number | null
           created_at?: string
           currency?: string | null
@@ -2050,6 +2053,13 @@ export type Database = {
           tournament_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tournament_payment_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tournament_payment_events_registration_id_fkey"
             columns: ["registration_id"]
