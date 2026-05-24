@@ -121,7 +121,14 @@ function PublicTournamentPage() {
     );
   }
 
-  const { tournament, groups, teams, matches } = q.data;
+  const data = q.data;
+
+  // Progressive disclosure: "published" stage = registration-focused page only.
+  if (data.tournament.status === "published") {
+    return <PublishedRegistrationView slug={slug} data={data} />;
+  }
+
+  const { tournament, groups, teams, matches } = data;
   const events = ((q.data as any).events ?? []) as any[];
   const eventsByMatch = useMemo(() => {
     const map = new Map<string, any[]>();
