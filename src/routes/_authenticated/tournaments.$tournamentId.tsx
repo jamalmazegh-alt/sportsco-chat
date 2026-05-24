@@ -49,7 +49,7 @@ import { StaffAndOfficialsPanel } from "@/modules/tournaments/components/StaffAn
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
 import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
-import { ClipboardList, UserCog, CreditCard } from "lucide-react";
+import { ClipboardList, UserCog, CreditCard, Dices, CalendarClock } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
@@ -90,6 +90,8 @@ type Sub =
   | "registrations"
   | "teams"
   | "staff"
+  | "draw"
+  | "schedule"
   | "matches"
   | "standings"
   | "bracket"
@@ -204,6 +206,8 @@ function TournamentDetailPage() {
         { id: "registrations", icon: ClipboardList, label: t("tabs.registrations") },
         { id: "teams", icon: Users, label: t("tabs.teams") },
         { id: "staff", icon: UserCog, label: t("sections.staffAndOfficials", { defaultValue: "Staff & arbitres" }) },
+        { id: "draw", icon: Dices, label: t("sections.draw", { defaultValue: "Tirage au sort" }) },
+        { id: "schedule", icon: CalendarClock, label: t("sections.groupsSchedule", { defaultValue: "Groupes & calendrier" }) },
       ]
     : [{ id: "teams", icon: Users, label: t("tabs.teams") }];
   const configureSubs: { id: Sub; icon: any; label: string }[] = canManage
@@ -369,6 +373,7 @@ function TournamentDetailPage() {
         )}
         {section === "configure" && canManage && sub === "format" && (
           <GroupsAndFixtures
+            view="format"
             tournamentId={tournament.id}
             format={tournament.format}
             status={tournament.status}
@@ -438,6 +443,44 @@ function TournamentDetailPage() {
         )}
         {section === "manage" && canManage && sub === "staff" && (
           <StaffAndOfficialsPanel tournamentId={tournament.id} />
+        )}
+        {section === "manage" && canManage && sub === "draw" && (
+          <GroupsAndFixtures
+            view="draw"
+            tournamentId={tournament.id}
+            format={tournament.format}
+            status={tournament.status}
+            numTeams={teams.length}
+            teams={teams as any}
+            groupsCount={groups.length}
+            matchesCount={matches.length}
+            startsOn={tournament.starts_on}
+            matchDurationMin={(tournament as any).match_duration_min}
+            breakMin={(tournament as any).break_min}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            fields={(tournament as any).fields}
+            settings={(tournament as any).settings}
+          />
+        )}
+        {section === "manage" && canManage && sub === "schedule" && (
+          <GroupsAndFixtures
+            view="schedule"
+            tournamentId={tournament.id}
+            format={tournament.format}
+            status={tournament.status}
+            numTeams={teams.length}
+            teams={teams as any}
+            groupsCount={groups.length}
+            matchesCount={matches.length}
+            startsOn={tournament.starts_on}
+            matchDurationMin={(tournament as any).match_duration_min}
+            breakMin={(tournament as any).break_min}
+            dailyStartTime={(tournament as any).daily_start_time}
+            dailyEndTime={(tournament as any).daily_end_time}
+            fields={(tournament as any).fields}
+            settings={(tournament as any).settings}
+          />
         )}
 
 

@@ -47,6 +47,8 @@ interface Props {
   fields?: string[] | null;
   settings?: Record<string, any> | null;
   teams: Array<{ id: string; name: string; short_name?: string | null; logo_url?: string | null }>;
+  /** Restrict which blocks render. Defaults to "all" (legacy behaviour). */
+  view?: "all" | "format" | "draw" | "schedule";
 }
 
 /* ---------- Reusable block primitives ---------- */
@@ -202,6 +204,7 @@ export function GroupsAndFixtures({
   fields,
   settings,
   teams,
+  view = "all",
 }: Props) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
@@ -366,44 +369,58 @@ export function GroupsAndFixtures({
   const supportsKnockout = format !== "group";
   const hasExistingDraw = groupsCount > 0 || matchesCount > 0;
 
+  const showDraw = view === "all" || view === "draw";
+  const showGroupsConfig = (view === "all" || view === "schedule") && supportsGroups;
+  const showFinals = (view === "all" || view === "draw") && supportsKnockout;
+  const showDuration = view === "all" || view === "format";
+  const showSlot = view === "all" || view === "format";
+  const showFields = view === "all";
+  const showSaveCta = view === "all" || view === "format" || view === "schedule";
+  const showScheduleCta = view === "all" || view === "schedule";
+  const showStickyBar = showSaveCta || showScheduleCta;
+
   return (
     <>
       {/* pb-40 = leave room for sticky CTA + bottom nav */}
-      <div className="space-y-3 pb-40">
+      <div className={cn("space-y-3", showStickyBar ? "pb-40" : "pb-6")}>
         {/* Block 1 — Tirage au sort */}
-        <Block
-          tone="primary"
-          icon={<Dices className="h-5 w-5 text-primary" />}
-          iconBg="bg-primary/10"
-          title={t("groups.drawTitle")}
-          subtitle={t("groups.drawSubtitle")}
-        >
-          <p className="text-xs text-muted-foreground">
-            {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
-          </p>
-          <Button
-            onClick={() => setDrawOpen(true)}
-            disabled={numTeams < 2}
-            className="w-full h-11"
-            variant={hasExistingDraw ? "outline" : "default"}
-          >
-            <Dices className="h-4 w-4" />
-            {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
-          </Button>
-        </Block>
+        {showDraw && (
+          <>
+            <Block
+              tone="primary"
+              icon={<Dices className="h-5 w-5 text-primary" />}
+              iconBg="bg-primary/10"
+              title={t("groups.drawTitle")}
+              subtitle={t("groups.drawSubtitle")}
+            >
+              <p className="text-xs text-muted-foreground">
+                {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
+              </p>
+              <Button
+                onClick={() => setDrawOpen(true)}
+                disabled={numTeams < 2}
+                className="w-full h-11"
+                variant={hasExistingDraw ? "outline" : "default"}
+              >
+                <Dices className="h-4 w-4" />
+                {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
+              </Button>
+            </Block>
 
-        <DrawDialog
-          open={drawOpen}
-          onOpenChange={setDrawOpen}
-          tournamentId={tournamentId}
-          format={format}
-          status={status}
-          teams={teams}
-          hasExistingDraw={hasExistingDraw}
-        />
+            <DrawDialog
+              open={drawOpen}
+              onOpenChange={setDrawOpen}
+              tournamentId={tournamentId}
+              format={format}
+              status={status}
+              teams={teams}
+              hasExistingDraw={hasExistingDraw}
+            />
+          </>
+        )}
 
         {/* Block 2 — Groupes & matchs */}
-        {supportsGroups && (
+        {showGroupsConfig && (
           <Block
             icon={<Shuffle className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
             iconBg="bg-blue-100 dark:bg-blue-950/40"
@@ -457,7 +474,7 @@ export function GroupsAndFixtures({
         )}
 
         {/* Block 3 — Finales */}
-        {supportsKnockout && (
+        {showFinals && (
           <Block
             icon={<Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
             iconBg="bg-amber-100 dark:bg-amber-950/40"
@@ -493,6 +510,7 @@ export function GroupsAndFixtures({
         )}
 
         {/* Block 4 — Durée des matchs */}
+        {showDuration && (
         <Block
           icon={<Clock className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />}
           iconBg="bg-indigo-100 dark:bg-indigo-950/40"
@@ -520,8 +538,10 @@ export function GroupsAndFixtures({
             />
           </div>
         </Block>
+        )}
 
         {/* Block 5 — Créneau horaire */}
+        {showSlot && (
         <Block
           icon={<CalendarClock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />}
           iconBg="bg-emerald-100 dark:bg-emerald-950/40"
@@ -594,8 +614,10 @@ export function GroupsAndFixtures({
             </div>
           )}
         </Block>
+        )}
 
         {/* Block 6 — Terrains */}
+        {showFields && (
         <Block
           icon={<MapPin className="h-5 w-5 text-rose-600 dark:text-rose-400" />}
           iconBg="bg-rose-100 dark:bg-rose-950/40"
@@ -639,8 +661,9 @@ export function GroupsAndFixtures({
           </div>
           <p className="text-[11px] text-muted-foreground">{t("groups.fieldsHint")}</p>
         </Block>
+        )}
 
-        {matchesCount === 0 && (
+        {showScheduleCta && matchesCount === 0 && (
           <p className="text-[11px] text-muted-foreground text-center px-4">
             {t("groups.scheduleHint")}
           </p>
@@ -648,10 +671,12 @@ export function GroupsAndFixtures({
       </div>
 
       {/* Sticky CTA bar — sits above bottom-nav */}
+      {showStickyBar && (
       <div
         className="fixed left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border px-4 py-3 flex gap-2"
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 56px)" }}
       >
+        {showSaveCta && (
         <Button
           variant="outline"
           onClick={() => saveSettings.mutate()}
@@ -667,6 +692,8 @@ export function GroupsAndFixtures({
             </>
           )}
         </Button>
+        )}
+        {showScheduleCta && (
         <Button
           onClick={() => schedule.mutate()}
           disabled={schedule.isPending || matchesCount === 0 || !startsOn}
@@ -681,7 +708,9 @@ export function GroupsAndFixtures({
             </>
           )}
         </Button>
+        )}
       </div>
+      )}
 
       <DestructiveConfirmSheet
         open={regenGroupsOpen}
