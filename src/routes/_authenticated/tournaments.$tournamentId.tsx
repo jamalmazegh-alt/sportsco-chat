@@ -52,6 +52,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
 type Tab = "teams" | "fixtures" | "fields" | "matches" | "standings" | "bracket" | "registrations" | "rules" | "team_staff" | "members";
 
 function TournamentDetailPage() {
+  const { t } = useTranslation("tournaments");
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -69,10 +70,10 @@ function TournamentDetailPage() {
     mutationFn: (status: "published" | "in_progress" | "completed" | "draft") =>
       updateFn({ data: { tournament_id: tournamentId, patch: { status } } }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("detail.statusUpdated"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Erreur"),
+    onError: (e: any) => toast.error(e?.message ?? t("common.error", { defaultValue: "Erreur" })),
   });
 
   const [tab, setTab] = useState<Tab>("teams");
