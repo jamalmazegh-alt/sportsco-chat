@@ -14,6 +14,10 @@ import {
   Filter,
   Banknote,
   Undo2,
+  Send,
+  Copy,
+  MessageCircle,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,12 +28,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   listTournamentRegistrations,
   decideRegistration,
 } from "../tournaments.functions";
 import {
   markRegistrationPaidOffline,
   refundRegistrationPayment,
+  sendPaymentLinkToTeam,
 } from "../tournament-payments.functions";
 
 type Status = "pending" | "approved" | "rejected" | "cancelled";
@@ -57,9 +68,26 @@ interface Reg {
   payment_status?: PaymentStatus | null;
   amount_paid?: number | null;
   currency?: string | null;
+  payment_link?: string | null;
+  payment_link_created_at?: string | null;
+  payment_link_expires_at?: string | null;
+  payment_link_sent_via?: "email" | "whatsapp" | "copy" | null;
+  payment_link_sent_at?: string | null;
 }
 
-export function RegistrationsManager({ tournamentId }: { tournamentId: string }) {
+interface TournamentMeta {
+  registration_fee?: number;
+  payment_mode?: "online" | "offline" | "both";
+  club_stripe_charges_enabled?: boolean;
+}
+
+export function RegistrationsManager({
+  tournamentId,
+  tournament,
+}: {
+  tournamentId: string;
+  tournament?: TournamentMeta;
+}) {
   const { t, i18n } = useTranslation("tournaments");
   const qc = useQueryClient();
   const [filter, setFilter] = useState<Status | "all">("pending");
@@ -117,6 +145,37 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
     },
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
+
+  const sendLinkFn = useServerFn(sendPaymentLinkToTeam);
+  const sendLink = useMutation({
+    mutationFn: (vars: { id: string; channel: "email" | "whatsapp" | "copy" }) =>
+      sendLinkFn({
+        data: {
+          tournament_id: tournamentId,
+          registration_id: vars.id,
+          channel: vars.channel,
+          origin: window.location.origin,
+        },
+      }),
+    onSuccess: (res: any, vars) => {
+      if (vars.channel === "copy" && res?.link) {
+        navigator.clipboard?.writeText(res.link).catch(() => {});
+        toast.success(t("registrations.payments.linkCopied"));
+      } else if (vars.channel === "whatsapp" && res?.whatsappUrl) {
+        window.open(res.whatsappUrl, "_blank", "noopener");
+      } else if (vars.channel === "email") {
+        toast.success(t("registrations.payments.linkSentEmail", { defaultValue: "Lien envoyé par email" }));
+      }
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
+  const canShowSendLink =
+    !!tournament &&
+    (tournament.registration_fee ?? 0) > 0 &&
+    (tournament.payment_mode === "online" || tournament.payment_mode === "both") &&
+    !!tournament.club_stripe_charges_enabled;
 
   const regs = (q.data?.registrations ?? []) as Reg[];
 
@@ -266,15 +325,58 @@ export function RegistrationsManager({ tournamentId }: { tournamentId: string })
                 r.payment_status === "paid_online") && (
                 <div className="flex flex-wrap gap-2 pt-1 border-t border-border/50">
                   {r.payment_status === "pending" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => markPaid.mutate(r.id)}
-                      disabled={markPaid.isPending}
-                    >
-                      <Banknote className="h-4 w-4" />
-                      {t("registrations.payments.markPaid")}
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => markPaid.mutate(r.id)}
+                        disabled={markPaid.isPending}
+                      >
+                        <Banknote className="h-4 w-4" />
+                        {t("registrations.payments.markPaid")}
+                      </Button>
+                      {canShowSendLink && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" disabled={sendLink.isPending}>
+                              <Send className="h-4 w-4" />
+                              {t("registrations.payments.sendLink")}
+                              <ChevronDown className="h-3 w-3 ml-1" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "email" })}>
+                              <Mail className="h-4 w-4 mr-2" />
+                              {t("registrations.payments.sendByEmail")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "whatsapp" })}>
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              {t("registrations.payments.sendByWhatsApp")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "copy" })}>
+                              <Copy className="h-4 w-4 mr-2" />
+                              {t("registrations.payments.copyLink")}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                      {r.payment_link_sent_at && (
+                        <span className="inline-flex items-center text-[10px] text-muted-foreground self-center">
+                          {(() => {
+                            const expired =
+                              !r.payment_link_expires_at ||
+                              new Date(r.payment_link_expires_at).getTime() < Date.now();
+                            return expired
+                              ? t("registrations.payments.linkExpired")
+                              : t("registrations.payments.linkSentOn", {
+                                  date: new Date(r.payment_link_sent_at).toLocaleDateString(
+                                    i18n.language === "fr" ? "fr-FR" : "en-US",
+                                  ),
+                                });
+                          })()}
+                        </span>
+                      )}
+                    </>
                   )}
                   {r.payment_status === "paid_online" && (
                     <Button

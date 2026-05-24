@@ -64,6 +64,7 @@ import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/s
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicTournamentRegistrationRouteImport } from './routes/api/public/tournament-registration'
+import { Route as ApiPublicTournamentPaymentLinkRouteImport } from './routes/api/public/tournament-payment-link'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
@@ -78,6 +79,7 @@ import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
 import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
+import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -377,6 +379,12 @@ const ApiPublicTournamentRegistrationRoute =
     path: '/api/public/tournament-registration',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTournamentPaymentLinkRoute =
+  ApiPublicTournamentPaymentLinkRouteImport.update({
+    id: '/api/public/tournament-payment-link',
+    path: '/api/public/tournament-payment-link',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe-webhook',
   path: '/api/public/stripe-webhook',
@@ -458,6 +466,11 @@ const TournamentSlugRegisterSuccessRoute =
     path: '/success',
     getParentRoute: () => TournamentSlugRegisterRoute,
   } as any)
+const TSlugPayRegistrationIdRoute = TSlugPayRegistrationIdRouteImport.update({
+  id: '/pay/$registrationId',
+  path: '/pay/$registrationId',
+  getParentRoute: () => TSlugRoute,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -618,6 +631,7 @@ export interface FileRoutesByFullPath {
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
@@ -650,6 +664,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -702,6 +717,7 @@ export interface FileRoutesByTo {
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
@@ -734,6 +750,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -792,6 +809,7 @@ export interface FileRoutesById {
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
@@ -824,6 +842,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -882,6 +901,7 @@ export interface FileRouteTypes {
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
+    | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
@@ -914,6 +934,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -966,6 +987,7 @@ export interface FileRouteTypes {
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
+    | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
@@ -998,6 +1020,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/admin/users'
   id:
@@ -1055,6 +1078,7 @@ export interface FileRouteTypes {
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
+    | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
@@ -1087,6 +1111,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/_authenticated/admin/users/'
   fileRoutesById: FileRoutesById
@@ -1119,6 +1144,7 @@ export interface RootRouteChildren {
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicTournamentPaymentLinkRoute: typeof ApiPublicTournamentPaymentLinkRoute
   ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
@@ -1521,6 +1547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTournamentRegistrationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/tournament-payment-link': {
+      id: '/api/public/tournament-payment-link'
+      path: '/api/public/tournament-payment-link'
+      fullPath: '/api/public/tournament-payment-link'
+      preLoaderRoute: typeof ApiPublicTournamentPaymentLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe-webhook': {
       id: '/api/public/stripe-webhook'
       path: '/api/public/stripe-webhook'
@@ -1618,6 +1651,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tournament/$slug/register/success'
       preLoaderRoute: typeof TournamentSlugRegisterSuccessRouteImport
       parentRoute: typeof TournamentSlugRegisterRoute
+    }
+    '/t/$slug/pay/$registrationId': {
+      id: '/t/$slug/pay/$registrationId'
+      path: '/pay/$registrationId'
+      fullPath: '/t/$slug/pay/$registrationId'
+      preLoaderRoute: typeof TSlugPayRegistrationIdRouteImport
+      parentRoute: typeof TSlugRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -1961,11 +2001,13 @@ const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
 interface TSlugRouteChildren {
   TSlugRegisterRoute: typeof TSlugRegisterRoute
   TSlugTvRoute: typeof TSlugTvRoute
+  TSlugPayRegistrationIdRoute: typeof TSlugPayRegistrationIdRoute
 }
 
 const TSlugRouteChildren: TSlugRouteChildren = {
   TSlugRegisterRoute: TSlugRegisterRoute,
   TSlugTvRoute: TSlugTvRoute,
+  TSlugPayRegistrationIdRoute: TSlugPayRegistrationIdRoute,
 }
 
 const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
@@ -2012,6 +2054,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicTournamentPaymentLinkRoute: ApiPublicTournamentPaymentLinkRoute,
   ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,

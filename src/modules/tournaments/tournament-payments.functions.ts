@@ -391,6 +391,213 @@ export const startRegistrationCheckout = createServerFn({ method: "POST" })
     return result;
   });
 
+// ---------- Admin: create / refresh shareable payment link (7 days)
+
+const LINK_TTL_DAYS = 7;
+
+function buildPublicPaymentUrl(origin: string, slug: string, registrationId: string) {
+  return `${origin.replace(/\/$/, "")}/t/${encodeURIComponent(slug)}/pay/${registrationId}`;
+}
+
+function formatMoney(amountCents: number, currency: string) {
+  try {
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: (currency || "eur").toUpperCase(),
+    }).format(amountCents / 100);
+  } catch {
+    return `${(amountCents / 100).toFixed(2)} ${currency.toUpperCase()}`;
+  }
+}
+
+export const createRegistrationPaymentLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        registration_id: z.string().uuid(),
+        origin: z.string().url(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { data: reg } = await supabaseAdmin
+      .from("tournament_registrations")
+      .select("id, tournament_id, payment_status")
+      .eq("id", data.registration_id)
+      .eq("tournament_id", data.tournament_id)
+      .maybeSingle();
+    if (!reg) throw new Response("Not found", { status: 404 });
+    if (reg.payment_status !== "pending") {
+      throw new Response("Registration is not awaiting payment", { status: 400 });
+    }
+
+    const { data: t } = await supabaseAdmin
+      .from("tournaments")
+      .select("id, slug, club_id, registration_fee, payment_mode")
+      .eq("id", data.tournament_id)
+      .single();
+    if (!t || !t.registration_fee || t.registration_fee <= 0) {
+      throw new Response("Tournament has no fee", { status: 400 });
+    }
+    if (t.payment_mode === "offline") {
+      throw new Response("Tournament does not accept online payment", { status: 400 });
+    }
+    if (!t.club_id) {
+      throw new Response("Online payment requires a club", { status: 400 });
+    }
+    const { data: club } = await supabaseAdmin
+      .from("clubs")
+      .select("stripe_account_id, stripe_charges_enabled")
+      .eq("id", t.club_id)
+      .single();
+    if (!club?.stripe_account_id || !club.stripe_charges_enabled) {
+      throw new Response("Club Stripe account not ready", { status: 400 });
+    }
+
+    const url = buildPublicPaymentUrl(data.origin, t.slug, reg.id);
+    const now = new Date();
+    const expires = new Date(now.getTime() + LINK_TTL_DAYS * 24 * 3600 * 1000);
+
+    const { error } = await supabaseAdmin
+      .from("tournament_registrations")
+      .update({
+        payment_link: url,
+        payment_link_created_at: now.toISOString(),
+        payment_link_expires_at: expires.toISOString(),
+      })
+      .eq("id", reg.id);
+    if (error) throw new Response(error.message, { status: 400 });
+
+    return { url, expires_at: expires.toISOString() };
+  });
+
+// ---------- Admin: send the payment link (email or WhatsApp pre-fill)
+
+export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        registration_id: z.string().uuid(),
+        channel: z.enum(["email", "whatsapp", "copy"]),
+        origin: z.string().url(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { data: reg } = await supabaseAdmin
+      .from("tournament_registrations")
+      .select(
+        "id, tournament_id, team_name, contact_email, contact_phone, payment_status, payment_link, payment_link_expires_at",
+      )
+      .eq("id", data.registration_id)
+      .eq("tournament_id", data.tournament_id)
+      .maybeSingle();
+    if (!reg) throw new Response("Not found", { status: 404 });
+    if (reg.payment_status !== "pending") {
+      throw new Response("Registration is not awaiting payment", { status: 400 });
+    }
+
+    const { data: t } = await supabaseAdmin
+      .from("tournaments")
+      .select("id, name, slug, registration_fee, registration_currency, payment_mode, club_id")
+      .eq("id", data.tournament_id)
+      .single();
+    if (!t || !t.registration_fee || t.registration_fee <= 0) {
+      throw new Response("Tournament has no fee", { status: 400 });
+    }
+
+    // Reuse or regenerate the link
+    let link = reg.payment_link as string | null;
+    const expired =
+      !reg.payment_link_expires_at ||
+      new Date(reg.payment_link_expires_at).getTime() < Date.now();
+    if (!link || expired) {
+      const now = new Date();
+      const expires = new Date(now.getTime() + LINK_TTL_DAYS * 24 * 3600 * 1000);
+      link = buildPublicPaymentUrl(data.origin, t.slug, reg.id);
+      const { error } = await supabaseAdmin
+        .from("tournament_registrations")
+        .update({
+          payment_link: link,
+          payment_link_created_at: now.toISOString(),
+          payment_link_expires_at: expires.toISOString(),
+        })
+        .eq("id", reg.id);
+      if (error) throw new Response(error.message, { status: 400 });
+    }
+
+    const amountLabel = formatMoney(t.registration_fee, t.registration_currency ?? "eur");
+    const sentAt = new Date().toISOString();
+
+    if (data.channel === "email") {
+      if (!reg.contact_email) {
+        throw new Response("Team has no contact email", { status: 400 });
+      }
+      const { enqueueTransactionalEmailServer } = await import(
+        "@/lib/email/send.server"
+      );
+      await enqueueTransactionalEmailServer({
+        templateName: "tournament-payment-request",
+        recipientEmail: reg.contact_email,
+        templateData: {
+          teamName: reg.team_name,
+          tournamentName: t.name,
+          amountLabel,
+          paymentUrl: link!,
+          expiresInDays: LINK_TTL_DAYS,
+        },
+        idempotencyKey: `tournament-payment-${reg.id}-${Date.now()}`,
+      });
+      await supabaseAdmin
+        .from("tournament_registrations")
+        .update({ payment_link_sent_via: "email", payment_link_sent_at: sentAt })
+        .eq("id", reg.id);
+      await logPaymentEvent(
+        t.id,
+        reg.id,
+        "checkout_created",
+        t.registration_fee,
+        { payment_link_sent: "email", to: reg.contact_email },
+      );
+      return { ok: true, channel: "email", link };
+    }
+
+    if (data.channel === "whatsapp") {
+      const phone = (reg.contact_phone || "").replace(/[^\d]/g, "");
+      const message =
+        `Bonjour ${reg.team_name} 👋\n` +
+        `Voici le lien de paiement pour votre inscription à ${t.name} (${amountLabel}) :\n` +
+        `${link}\n` +
+        `Ce lien est valable ${LINK_TTL_DAYS} jours.`;
+      const waUrl = phone
+        ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
+        : `https://wa.me/?text=${encodeURIComponent(message)}`;
+      await supabaseAdmin
+        .from("tournament_registrations")
+        .update({ payment_link_sent_via: "whatsapp", payment_link_sent_at: sentAt })
+        .eq("id", reg.id);
+      return { ok: true, channel: "whatsapp", link, whatsappUrl: waUrl, message };
+    }
+
+    // copy
+    await supabaseAdmin
+      .from("tournament_registrations")
+      .update({ payment_link_sent_via: "copy", payment_link_sent_at: sentAt })
+      .eq("id", reg.id);
+    return { ok: true, channel: "copy", link };
+  });
+
+
 // ---------- Webhook helpers (called from stripe-webhook.ts)
 
 export async function handleTournamentCheckoutCompleted(
