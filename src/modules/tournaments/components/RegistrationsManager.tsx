@@ -93,6 +93,7 @@ interface Reg {
 }
 
 interface TournamentMeta {
+  club_id?: string | null;
   registration_fee?: number;
   payment_mode?: "online" | "offline" | "both";
   club_stripe_charges_enabled?: boolean;
