@@ -210,8 +210,28 @@ export function ClubOnboardingPage({ locale }: { locale: "fr" | "en" }) {
         </div>
       </section>
 
+      {/* CTA */}
+      <section>
+        <div className="mx-auto max-w-4xl px-5 py-20 text-center lg:px-8">
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("onboarding.ctaTitle")}
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">{t("onboarding.ctaBody")}</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg" className="h-12 px-6">
+              <Link to="/demo">
+                {t("onboarding.ctaPrimary")} <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="h-12 px-6">
+              <Link to="/contact">{t("onboarding.ctaSecondary")}</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
-      <section className="border-b border-border/60 bg-muted/20">
+      <section className="border-t border-border/60 bg-muted/20">
         <div className="mx-auto max-w-3xl px-5 py-20 lg:px-8">
           <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {t("onboarding.faqTitle")}
@@ -231,26 +251,6 @@ export function ClubOnboardingPage({ locale }: { locale: "fr" | "en" }) {
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
               </details>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section>
-        <div className="mx-auto max-w-4xl px-5 py-20 text-center lg:px-8">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            {t("onboarding.ctaTitle")}
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">{t("onboarding.ctaBody")}</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="h-12 px-6">
-              <Link to="/demo">
-                {t("onboarding.ctaPrimary")} <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-12 px-6">
-              <Link to="/contact">{t("onboarding.ctaSecondary")}</Link>
-            </Button>
           </div>
         </div>
       </section>
