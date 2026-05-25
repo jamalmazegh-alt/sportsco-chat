@@ -595,6 +595,34 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      <section className="border-t border-border/60 bg-muted/20">
+        <div className="mx-auto max-w-3xl px-5 py-20 lg:px-8">
+          <h2 className="text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("tournamentsPage.faqTitle")}
+          </h2>
+          <div className="mt-10 space-y-3">
+            {(() => {
+              const faq = t("tournamentsPage.faq", { returnObjects: true }) as { q: string; a: string }[];
+              return faq.map((item) => (
+                <details
+                  key={item.q}
+                  className="group rounded-2xl border border-border bg-card p-5 open:shadow-sm"
+                >
+                  <summary className="flex cursor-pointer items-center justify-between gap-4 font-display text-base font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
+                    <span>{item.q}</span>
+                    <span className="text-muted-foreground transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+                </details>
+              ));
+            })()}
+          </div>
+        </div>
+      </section>
     </MarketingLayout>
   );
 }

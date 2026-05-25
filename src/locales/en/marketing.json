@@ -578,6 +578,15 @@
     "finalTitle": "Ready to modernize your tournaments?",
     "finalBody": "Launch a tournament in minutes, or see Clubero in action with our team.",
     "finalPrimary": "Create a tournament",
-    "finalSecondary": "Book a demo"
+    "finalSecondary": "Book a demo",
+    "faqTitle": "Frequently asked questions about tournaments",
+    "faq": [
+      { "q": "Can external teams participate?", "a": "Yes. Teams that don't use Clubero daily can register via the public page and be managed just like internal teams." },
+      { "q": "Does it work with limited internet on the field?", "a": "The referee mobile interface is lightweight and works on 3G/4G. Score updates sync as soon as the connection is back." },
+      { "q": "Can I change the schedule during the tournament?", "a": "Absolutely. You can reschedule, swap fields, or adjust times in seconds. The public page and TV mode update instantly." },
+      { "q": "Is there a limit on the number of teams?", "a": "No hard limit. Clubero handles tournaments from 4 to 100+ teams with automatic scheduling." },
+      { "q": "Can spectators follow without an account?", "a": "Yes. The public page is accessible to anyone via a link or QR code — no signup required." },
+      { "q": "How does the TV mode work?", "a": "Open the dedicated TV link on any screen (smart TV, projector, laptop). It displays live standings, upcoming matches and current scores in full screen — zero installation." }
+    ]
   }
 }

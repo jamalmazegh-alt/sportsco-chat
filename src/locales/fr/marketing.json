@@ -578,6 +578,15 @@
     "finalTitle": "Prêt à moderniser vos tournois ?",
     "finalBody": "Lancez un tournoi en quelques minutes ou voyez Clubero en action avec notre équipe.",
     "finalPrimary": "Créer un tournoi",
-    "finalSecondary": "Demander une démo"
+    "finalSecondary": "Demander une démo",
+    "faqTitle": "Questions fréquentes sur les tournois",
+    "faq": [
+      { "q": "Des équipes extérieures peuvent-elles participer ?", "a": "Oui. Les équipes qui n'utilisent pas Clubero au quotidien peuvent s'inscrire via la page publique et être gérées comme les équipes internes." },
+      { "q": "Ça fonctionne avec une connexion limitée sur le terrain ?", "a": "L'interface mobile arbitre est légère et fonctionne en 3G/4G. Les scores se synchronisent dès que la connexion revient." },
+      { "q": "Peut-on modifier le calendrier en cours de tournoi ?", "a": "Absolument. Vous pouvez reprogrammer, changer de terrain ou ajuster les horaires en quelques secondes. La page publique et le mode TV se mettent à jour instantanément." },
+      { "q": "Y a-t-il une limite au nombre d'équipes ?", "a": "Aucune limite stricte. Clubero gère des tournois de 4 à 100+ équipes avec programmation automatique." },
+      { "q": "Les spectateurs peuvent-ils suivre sans compte ?", "a": "Oui. La page publique est accessible à tous via un lien ou un QR code — aucune inscription requise." },
+      { "q": "Comment fonctionne le mode TV ?", "a": "Ouvrez le lien TV dédié sur n'importe quel écran (smart TV, projecteur, ordinateur). Il affiche les classements live, les prochains matchs et les scores en cours en plein écran — zéro installation." }
+    ]
   }
 }
