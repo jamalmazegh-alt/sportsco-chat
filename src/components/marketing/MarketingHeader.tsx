@@ -13,6 +13,17 @@ const NAV = [
   { to: "/contact", key: "contact" },
 ] as const;
 
+const LOCALIZED_NAV = {
+  fr: [
+    { to: "/fr/tournois", key: "tournaments" },
+    { to: "/fr/onboarding-club", key: "onboarding" },
+  ],
+  en: [
+    { to: "/en/tournaments", key: "tournaments" },
+    { to: "/en/club-onboarding", key: "onboarding" },
+  ],
+} as const;
+
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
   const { t, i18n } = useTranslation("marketing");
