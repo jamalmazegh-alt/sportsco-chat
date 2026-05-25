@@ -124,7 +124,7 @@ const I18N = {
     a5Yellow: "Carton jaune",
     a5Second: "Second jaune (expulsion)",
     a5Red: "Carton rouge direct",
-    a5Pts: (n: number) => `−${n} point${n > 1 ? "s" : ""}`,
+    a5Pts: (n: number) => `-${n} point${n > 1 ? "s" : ""}`,
     a5Outro:
       "Toute expulsion entraîne une suspension automatique pour la rencontre suivante. L'organisateur peut aggraver la sanction en cas de comportement antisportif avéré.",
     a6Both:
@@ -192,7 +192,7 @@ const I18N = {
     a5Yellow: "Yellow card",
     a5Second: "Second yellow (sent off)",
     a5Red: "Direct red card",
-    a5Pts: (n: number) => `−${n} point${n > 1 ? "s" : ""}`,
+    a5Pts: (n: number) => `-${n} point${n > 1 ? "s" : ""}`,
     a5Outro:
       "Any sending-off results in an automatic suspension for the following match. The organizer may increase the sanction in case of proven unsporting behavior.",
     a6Both:
