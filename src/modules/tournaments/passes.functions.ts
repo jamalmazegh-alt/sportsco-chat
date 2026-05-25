@@ -280,10 +280,23 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
 
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
 
+    // Ensure the organizer has a personal club to host Stripe Connect, branding,
+    // and admin settings. Falls back to null if creation fails for any reason.
+    let personalClubId: string | null = null;
+    try {
+      const { data: clubIdRow } = await supabaseAdmin.rpc(
+        "get_or_create_personal_club",
+        { _user_id: userId },
+      );
+      if (typeof clubIdRow === "string") personalClubId = clubIdRow;
+    } catch {
+      personalClubId = null;
+    }
+
     const { data: tournament, error: tErr } = await supabaseAdmin
       .from("tournaments")
       .insert({
-        club_id: null,
+        club_id: personalClubId,
         name: data.name,
         slug,
         sport: data.sport,
