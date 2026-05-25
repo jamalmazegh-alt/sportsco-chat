@@ -152,6 +152,7 @@ export function mergeRules(settings: unknown): TournamentRules {
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
     forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
     registration: { ...DEFAULT_RULES.registration, ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}) },
+    regulations: { ...DEFAULT_RULES.regulations, ...((s.regulations as Partial<RegulationsConfig> | undefined) ?? {}) },
     scoring: (s.scoring as ScoringRules | undefined) ?? undefined,
     language: (s.language as TournamentLanguage) ?? DEFAULT_RULES.language,
     branding: { ...DEFAULT_RULES.branding, ...(s.branding ?? {}) },
