@@ -192,6 +192,39 @@ export function RegistrationsManager({
     (tournament.payment_mode === "online" || tournament.payment_mode === "both") &&
     !!tournament.club_stripe_charges_enabled;
 
+  const inviteFn = useServerFn(inviteTeamForPayment);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteForm, setInviteForm] = useState({
+    team_name: "",
+    contact_name: "",
+    contact_email: "",
+    contact_phone: "",
+  });
+  const invite = useMutation({
+    mutationFn: () =>
+      inviteFn({
+        data: {
+          tournament_id: tournamentId,
+          team_name: inviteForm.team_name.trim(),
+          contact_name: inviteForm.contact_name.trim(),
+          contact_email: inviteForm.contact_email.trim(),
+          contact_phone: inviteForm.contact_phone.trim() || null,
+          origin: window.location.origin,
+        },
+      }),
+    onSuccess: () => {
+      toast.success(
+        t("registrations.invite.success", {
+          defaultValue: "Invitation envoyée par email",
+        }),
+      );
+      setInviteOpen(false);
+      setInviteForm({ team_name: "", contact_name: "", contact_email: "", contact_phone: "" });
+      qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
+  });
+
   const regs = (q.data?.registrations ?? []) as Reg[];
 
   const counts = useMemo(() => {
@@ -202,11 +235,131 @@ export function RegistrationsManager({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-sm font-medium text-muted-foreground">
           {t("registrations.count", { count: regs.length })}
         </h2>
         <div className="flex items-center gap-2">
+          {canShowSendLink && (
+            <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="h-8 gap-1.5">
+                  <UserPlus className="h-3.5 w-3.5" />
+                  {t("registrations.invite.button", {
+                    defaultValue: "Inviter une équipe",
+                  })}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("registrations.invite.title", {
+                      defaultValue: "Inviter une équipe à payer",
+                    })}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {t("registrations.invite.description", {
+                      defaultValue:
+                        "L'équipe recevra un email personnalisé avec son lien de paiement sécurisé.",
+                    })}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="invite-team-name">
+                      {t("registrations.invite.teamName", { defaultValue: "Nom de l'équipe" })} *
+                    </Label>
+                    <Input
+                      id="invite-team-name"
+                      value={inviteForm.team_name}
+                      onChange={(e) =>
+                        setInviteForm((f) => ({ ...f, team_name: e.target.value }))
+                      }
+                      placeholder="FC Demo"
+                      maxLength={120}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="invite-contact-name">
+                      {t("registrations.invite.contactName", {
+                        defaultValue: "Nom du contact",
+                      })}{" "}
+                      *
+                    </Label>
+                    <Input
+                      id="invite-contact-name"
+                      value={inviteForm.contact_name}
+                      onChange={(e) =>
+                        setInviteForm((f) => ({ ...f, contact_name: e.target.value }))
+                      }
+                      maxLength={120}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="invite-contact-email">
+                      {t("registrations.invite.email", { defaultValue: "Email" })} *
+                    </Label>
+                    <Input
+                      id="invite-contact-email"
+                      type="email"
+                      value={inviteForm.contact_email}
+                      onChange={(e) =>
+                        setInviteForm((f) => ({ ...f, contact_email: e.target.value }))
+                      }
+                      placeholder="contact@equipe.com"
+                      maxLength={200}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="invite-contact-phone">
+                      {t("registrations.invite.phone", {
+                        defaultValue: "Téléphone (optionnel)",
+                      })}
+                    </Label>
+                    <Input
+                      id="invite-contact-phone"
+                      type="tel"
+                      value={inviteForm.contact_phone}
+                      onChange={(e) =>
+                        setInviteForm((f) => ({ ...f, contact_phone: e.target.value }))
+                      }
+                      maxLength={40}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setInviteOpen(false)}
+                    disabled={invite.isPending}
+                  >
+                    {t("common.cancel", { defaultValue: "Annuler" })}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => invite.mutate()}
+                    disabled={
+                      invite.isPending ||
+                      !inviteForm.team_name.trim() ||
+                      !inviteForm.contact_name.trim() ||
+                      !inviteForm.contact_email.trim()
+                    }
+                    className="gap-1.5"
+                  >
+                    {invite.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                    {t("registrations.invite.send", {
+                      defaultValue: "Envoyer l'invitation",
+                    })}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
           <Filter className="h-4 w-4 text-muted-foreground" />
           <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
             <SelectTrigger className="h-8 w-40 text-xs">
@@ -222,6 +375,7 @@ export function RegistrationsManager({
           </Select>
         </div>
       </div>
+
 
       {q.isLoading ? (
         <div className="py-10 flex justify-center">
