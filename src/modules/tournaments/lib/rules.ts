@@ -60,6 +60,7 @@ export interface TournamentRules {
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
   forfeit: ForfeitRules;
   registration: RegistrationRules;
+  regulations: RegulationsConfig;
   scoring?: ScoringRules;
   language: TournamentLanguage;
   branding: {
@@ -68,6 +69,15 @@ export interface TournamentRules {
     sponsors?: Sponsor[];
     sponsorsTitle?: string;
   };
+}
+
+export type RegulationsMode = "generated" | "uploaded";
+
+export interface RegulationsConfig {
+  mode: RegulationsMode;
+  uploadedUrl?: string | null;
+  uploadedName?: string | null;
+  uploadedAt?: string | null;
 }
 
 export const DEFAULT_RULES: TournamentRules = {
