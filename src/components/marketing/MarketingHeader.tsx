@@ -7,11 +7,21 @@ import { cn } from "@/lib/utils";
 import logo from "@/assets/clubero-logo.png";
 
 const NAV = [
-  { to: "/features", key: "features" },
+  { to: "/why-clubero", key: "why" },
+  { to: "/tournament-experience", key: "tournaments" },
+  { to: "/club-onboarding", key: "onboarding" },
   { to: "/pricing", key: "pricing" },
   { to: "/faq", key: "faq" },
-  { to: "/contact", key: "contact" },
 ] as const;
+
+const NAV_LABELS: Record<(typeof NAV)[number]["key"], string> = {
+  why: "Why Clubero",
+  tournaments: "Tournaments",
+  onboarding: "Onboarding",
+  pricing: "Pricing",
+  faq: "FAQ",
+};
+
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
@@ -35,13 +45,14 @@ export function MarketingHeader() {
             <Link
               key={item.to}
               to={item.to}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+              className="rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "text-primary" }}
             >
-              {t(`nav.${item.key}`)}
+              {NAV_LABELS[item.key]}
             </Link>
           ))}
         </nav>
+
 
         <div className="hidden items-center gap-3 md:flex">
           {/* Language switch */}
@@ -102,12 +113,13 @@ export function MarketingHeader() {
                 key={item.to}
                 to={item.to}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+                className="rounded-lg px-3 py-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground hover:bg-muted hover:text-foreground"
+                activeProps={{ className: "text-primary" }}
               >
-                {t(`nav.${item.key}`)}
+                {NAV_LABELS[item.key]}
               </Link>
             ))}
+
             <div className="mt-3 flex items-center justify-center gap-1 rounded-lg border border-border p-1">
               {([
                 { value: "fr", label: "FR", flag: "🇫🇷" },

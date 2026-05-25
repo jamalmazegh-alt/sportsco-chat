@@ -14,6 +14,13 @@
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
+@import "@fontsource/bebas-neue/400.css";
+@import "@fontsource/barlow/300.css";
+@import "@fontsource/barlow/400.css";
+@import "@fontsource/barlow/500.css";
+@import "@fontsource/barlow/600.css";
+@import "@fontsource/barlow/700.css";
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -283,3 +290,73 @@
 .phone-input .PhoneInputCountry {
   margin-right: 0.25rem;
 }
+
+/* ============================================================
+ * Stadium Night — marketing site scoped theme
+ * Applied via the .theme-stadium wrapper in MarketingLayout.
+ * Overrides all design tokens for the public marketing pages
+ * (does NOT touch the authenticated app theme).
+ * ============================================================ */
+.theme-stadium {
+  --background: oklch(0.13 0.005 200);            /* #0a0e0f */
+  --foreground: oklch(0.97 0.003 80);             /* #f5f5f4 */
+  --card: oklch(0.18 0.006 200);                  /* #13181a */
+  --card-foreground: oklch(0.97 0.003 80);
+  --popover: oklch(0.18 0.006 200);
+  --popover-foreground: oklch(0.97 0.003 80);
+  --primary: oklch(0.72 0.17 162);                /* #10b981 electric green */
+  --primary-foreground: oklch(0.13 0.005 200);
+  --secondary: oklch(0.22 0.008 200);
+  --secondary-foreground: oklch(0.97 0.003 80);
+  --muted: oklch(0.22 0.008 200);
+  --muted-foreground: oklch(0.70 0.005 200);
+  --accent: oklch(0.22 0.04 162);
+  --accent-foreground: oklch(0.97 0.003 80);
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 10%);
+  --ring: oklch(0.72 0.17 162);
+  --destructive: oklch(0.62 0.22 22);
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --energy: oklch(0.72 0.17 162);
+  --energy-foreground: oklch(0.13 0.005 200);
+  --victory: oklch(0.78 0.14 155);
+
+  --font-display: "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+
+  background-color: var(--background);
+  color: var(--foreground);
+}
+.theme-stadium h1, .theme-stadium h2, .theme-stadium h3, .theme-stadium h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.theme-stadium .font-display { font-family: var(--font-display); }
+.theme-stadium .font-sans { font-family: var(--font-sans); }
+
+/* Stadium ambient glows */
+.theme-stadium .stadium-glow {
+  background:
+    radial-gradient(50% 40% at 20% 0%, color-mix(in oklab, var(--primary) 18%, transparent) 0%, transparent 60%),
+    radial-gradient(40% 30% at 90% 10%, color-mix(in oklab, var(--primary) 12%, transparent) 0%, transparent 60%);
+}
+.theme-stadium .stadium-grid-bg {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 4%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@keyframes stadium-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.theme-stadium .stadium-marquee { animation: stadium-marquee 40s linear infinite; }
+
+@keyframes stadium-blip {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.theme-stadium .stadium-blip { animation: stadium-blip 1.6s ease-in-out infinite; }
