@@ -1710,6 +1710,31 @@ export const decideRegistration = createServerFn({ method: "POST" })
       .eq("id", data.registration_id);
     if (updErr) throw updErr;
 
+    // Send roster-link email so the team contact can compose their squad now
+    try {
+      const { data: tFull } = await supabase
+        .from("tournaments")
+        .select("name, slug")
+        .eq("id", reg.tournament_id)
+        .maybeSingle();
+      const origin = process.env.APP_URL || "https://www.clubero.app";
+      const rosterUrl = `${origin}/tournament/${tFull?.slug ?? ""}/roster/${(reg as any).roster_token}`;
+      await enqueueTransactionalEmailServer({
+        templateName: "tournament-roster-link",
+        recipientEmail: reg.contact_email,
+        templateData: {
+          contactName: reg.contact_name,
+          tournamentName: tFull?.name ?? "",
+          teamName: reg.team_name,
+          rosterUrl,
+          status: "approved",
+        },
+        idempotencyKey: `roster-link-approved:${reg.id}`,
+      });
+    } catch (e) {
+      console.error("Failed to send roster email on approve", e);
+    }
+
     return {
       ok: true,
       tournament_team_id: team.id,
