@@ -3,6 +3,6 @@ import { test } from "@playwright/test";
 test("E2E backend config is available", () => {
   test.skip(
     true,
-    "SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_PUBLISHABLE_KEY are not configured; backend E2E tests skipped.",
+    "Missing one of SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD — backend E2E tests skipped.",
   );
 });
