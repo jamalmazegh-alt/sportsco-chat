@@ -15,7 +15,17 @@ import { createTestClub, type SeededClub } from "./_fixtures/club";
 test.describe("Coach feedback + AI synthesis", () => {
   let club: SeededClub;
   test.beforeAll(async () => { club = await createTestClub("feedback"); });
-  test.afterAll(async () => { await club.cleanup(); });
+  test.afterAll(async () => {
+    await admin
+      .from("player_reviews")
+      .delete()
+      .in("player_id", [club.player1.id, club.player2WithParent.id]);
+    await admin
+      .from("player_feedback")
+      .delete()
+      .in("player_id", [club.player1.id, club.player2WithParent.id]);
+    await club.cleanup();
+  });
 
   test("coach writes feedback for two players", async () => {
     const c = await clientFor(club.coach);
