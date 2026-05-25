@@ -437,6 +437,7 @@ function TournamentDetailPage() {
           <RegistrationsManager
             tournamentId={tournament.id}
             tournament={{
+              club_id: tournament.club_id ?? null,
               registration_fee: (tournament as any).registration_fee ?? 0,
               payment_mode: (tournament as any).payment_mode ?? "offline",
               club_stripe_charges_enabled:
