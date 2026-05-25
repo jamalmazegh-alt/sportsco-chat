@@ -560,19 +560,33 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           {rules.regulations.mode === "generated" ? (
             <div className="space-y-3 pt-2 border-t border-border">
               <p className="text-xs text-muted-foreground">{t("rules.pdfHint")}</p>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => generate.mutate()}
-                disabled={generate.isPending}
-              >
-                {generate.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <FileDown className="h-4 w-4" />
-                )}
-                {t("rules.generatePdf")}
-              </Button>
+              <div className="flex flex-wrap items-end gap-2">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">{t("rules.language")}</Label>
+                  <Select value={pdfLang} onValueChange={(v) => setPdfLang(v as "fr" | "en")}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => generate.mutate()}
+                  disabled={generate.isPending}
+                >
+                  {generate.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileDown className="h-4 w-4" />
+                  )}
+                  {t("rules.generatePdf")}
+                </Button>
+              </div>
               {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
                 <ul className="space-y-1.5 pt-2">
                   {docsQuery.data.documents.slice(0, 5).map((d: any) => (
