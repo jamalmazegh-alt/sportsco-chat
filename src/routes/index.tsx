@@ -66,7 +66,8 @@ function Landing() {
 }
 
 function TournamentsSection() {
-  const { t } = useTranslation("marketing");
+  const { t, i18n } = useTranslation("marketing");
+  const tournamentsTo = i18n.language?.slice(0, 2) === "fr" ? "/fr/tournois" : "/en/tournaments";
   const features = [
     { t: t("tournaments.home.feat1Title"), d: t("tournaments.home.feat1Body") },
     { t: t("tournaments.home.feat2Title"), d: t("tournaments.home.feat2Body") },
