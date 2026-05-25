@@ -322,7 +322,7 @@ export async function buildRegulationsPdf(
 
   drawArticle(ctx, 1, [
     I18N[lang].a1(t.num_teams, cat, fmt, dateStr, loc),
-    I18N[lang].a1Roster(rules.roster.maxSubstitutes, rules.roster.jokersPerTeam),
+    I18N[lang].a1Roster(rules.roster.playersPerTeam, rules.roster.maxSubstitutes),
   ]);
 
   // Article 2
