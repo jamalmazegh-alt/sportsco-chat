@@ -36,7 +36,7 @@ export default async function globalSetup() {
   const adminPassword = process.env[ENV_KEYS.admin.password];
   if (!adminEmail || !adminPassword) return;
 
-  async function signIn(role: Role): Promise<void> {
+  async function signIn(role: Role): Promise<string | null> {
     const email = process.env[ENV_KEYS[role].email];
     const password = process.env[ENV_KEYS[role].password];
     if (!email || !password) {
@@ -44,7 +44,7 @@ export default async function globalSetup() {
       console.warn(
         `[globalSetup] ${role}: missing ${ENV_KEYS[role].email}/${ENV_KEYS[role].password} — falling back to admin user for this role.`,
       );
-      return;
+      return null;
     }
     const client = createClient(url!, anonKey!, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -60,21 +60,31 @@ export default async function globalSetup() {
     process.env[`E2E_${upper}_ACCESS_TOKEN`] = data.session.access_token;
     process.env[`E2E_${upper}_REFRESH_TOKEN`] = data.session.refresh_token;
     process.env[`E2E_${upper}_USER_ID`] = data.user.id;
+    return data.session.access_token;
   }
 
-  // Sign in all 4 roles in parallel.
-  await Promise.all((Object.keys(ENV_KEYS) as Role[]).map(signIn));
+  // 1. Sign in admin first — required for the authenticated club lookup below.
+  const adminToken = await signIn("admin");
+  if (!adminToken) {
+    throw new Error("[globalSetup] admin sign-in returned no token");
+  }
 
-  // Resolve the pre-existing test club id via the admin client.
-  const adminClient = createClient(url, anonKey, {
+  // 2. Sign in the other roles in parallel (independent of the club lookup).
+  await Promise.all(
+    (["coach", "player", "parent"] as Role[]).map((r) => signIn(r)),
+  );
+
+  // 3. Resolve the pre-existing test club id using an authenticated client
+  //    (RLS on `clubs` blocks anonymous SELECT).
+  const authedClient = createClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: {
-      headers: { Authorization: `Bearer ${process.env.E2E_ADMIN_ACCESS_TOKEN}` },
+      headers: { Authorization: `Bearer ${adminToken}` },
     },
   });
-  const { data: club, error: clubErr } = await adminClient
+  const { data: club, error: clubErr } = await authedClient
     .from("clubs")
-    .select("id")
+    .select("id, name")
     .eq("name", clubName)
     .maybeSingle();
   if (clubErr || !club) {
