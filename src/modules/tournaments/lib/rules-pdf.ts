@@ -70,8 +70,9 @@ const I18N = {
     perGroup: "Teams qualified per group",
     bestThirds: "Best Nth-place qualified",
     roster: "Squad composition",
+    playersPerTeam: "Players per team",
     maxSubstitutes: "Max substitutes",
-    jokersPerTeam: "Jokers per team",
+
     fairPlay: "Fair play (deductions)",
     yellow: "Yellow card",
     secondYellow: "Second yellow (sent off)",
