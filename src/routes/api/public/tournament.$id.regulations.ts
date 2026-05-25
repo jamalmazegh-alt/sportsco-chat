@@ -279,7 +279,7 @@ type Ctx = {
   pageNo: number;
 };
 
-async function buildRegulationsPdf(
+export async function buildRegulationsPdf(
   t: Tournament,
   rules: ReturnType<typeof mergeRules>,
   lang: Lang,
