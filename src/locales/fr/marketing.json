@@ -483,5 +483,99 @@
     "ctaBody": "Parlons de votre club. On vous montre Clubero et on prépare la migration ensemble.",
     "ctaPrimary": "Demander une démo",
     "ctaSecondary": "Nous contacter"
+  },
+  "tournamentsPage": {
+    "kicker": "Tournois",
+    "title": "Des tournois modernes, vivants et publics.",
+    "subtitle": "Organisez vos tournois avec scores live, classements publics, arbitrage mobile et expérience communautaire.",
+    "ctaPrimary": "Créer un tournoi",
+    "ctaSecondary": "Voir une démo",
+    "heroBadge": "Live · en direct",
+    "heroMatch": "Quart de finale · Terrain 2",
+    "heroTeamA": "AS Riverside",
+    "heroTeamB": "FC Lakeside",
+    "heroStandings": "Classement groupe A",
+    "heroBracket": "Tableau final",
+    "heroTv": "Mode TV",
+    "everythingTitle": "Tout pour vos tournois, au même endroit.",
+    "everythingSubtitle": "Un écosystème complet pensé pour le terrain comme pour les écrans.",
+    "ecosystem": [
+      { "t": "Équipes", "b": "Inscriptions, effectifs, contacts." },
+      { "t": "Groupes", "b": "Tirage et composition automatiques." },
+      { "t": "Matchs", "b": "Programmation et suivi en temps réel." },
+      { "t": "Classements", "b": "Calculés automatiquement, en direct." },
+      { "t": "Plannings", "b": "Multi-terrains, multi-jours." },
+      { "t": "Arbitres", "b": "Validation des résultats sur mobile." },
+      { "t": "Pages publiques", "b": "Lien partageable pour tous." },
+      { "t": "Mode TV", "b": "Affichage plein écran en salle." },
+      { "t": "Scores live", "b": "Mises à jour immédiates partout." }
+    ],
+    "liveTitle": "Pensé pour vivre le tournoi en direct.",
+    "liveSubtitle": "Vos arbitres et organisateurs gardent la main, sans quitter le terrain.",
+    "livePoints": [
+      { "t": "Scores depuis le terrain", "b": "Saisissez les scores directement depuis votre téléphone." },
+      { "t": "Validation arbitres", "b": "Les arbitres valident les résultats en direct sur mobile." },
+      { "t": "Mises à jour instantanées", "b": "Classements et tableaux se mettent à jour immédiatement." },
+      { "t": "Gestion des terrains", "b": "Affectez et réorganisez vos terrains en quelques secondes." },
+      { "t": "Programmation auto", "b": "Calendrier optimisé selon vos contraintes." },
+      { "t": "Gestion des litiges", "b": "Historique clair et traçable de chaque décision." },
+      { "t": "Accès QR code", "b": "Un QR à scanner pour ouvrir la page publique." }
+    ],
+    "publicTitle": "Une expérience publique, partagée.",
+    "publicSubtitle": "Parents, joueurs et supporters suivent le tournoi en direct, depuis n'importe où.",
+    "publicPoints": [
+      { "t": "Classements publics", "b": "Toujours à jour, accessibles d'un lien." },
+      { "t": "Pages match", "b": "Composition, score, événements clés." },
+      { "t": "Derniers résultats", "b": "Fil en temps réel des rencontres terminées." },
+      { "t": "Pages équipe", "b": "Calendrier, classement, parcours dans le tournoi." },
+      { "t": "Mobile en priorité", "b": "Pensé pour être consulté depuis les tribunes." },
+      { "t": "Partage facile", "b": "Lien, QR code, réseaux — un clic suffit." }
+    ],
+    "tvTitle": "Mode TV & écran central.",
+    "tvSubtitle": "Affichez le tournoi en grand format, en salle, au club house ou sur le terrain.",
+    "tvPoints": [
+      "Classements en direct sur écran",
+      "Programme des prochains matchs",
+      "Matchs en cours, terrain par terrain",
+      "Mode plein écran sans installation"
+    ],
+    "tvBadge": "Plein écran",
+    "tvCurrent": "Match en cours",
+    "tvNext": "À venir",
+    "formatsTitle": "Tous les formats de tournoi.",
+    "formatsSubtitle": "Adaptez Clubero à votre compétition, pas l'inverse.",
+    "formats": [
+      { "t": "Phase de groupes", "b": "Avec qualifications automatiques." },
+      { "t": "Élimination directe", "b": "Tableaux à 4, 8, 16, 32 équipes." },
+      { "t": "Round robin", "b": "Toutes les équipes se rencontrent." },
+      { "t": "Ligue / championnat", "b": "Sur une saison complète." },
+      { "t": "Playoffs", "b": "Phases finales après une saison régulière." }
+    ],
+    "formatsExtras": [
+      "Programmation automatique",
+      "Affectation des terrains",
+      "Gestion des qualifications"
+    ],
+    "mobileTitle": "Mobile first, sur le terrain.",
+    "mobileSubtitle": "Pensé pour être utilisé d'une main, entre deux matchs.",
+    "mobilePoints": [
+      { "t": "Saisie arbitre", "b": "Boutons larges, peu de clics, validation rapide." },
+      { "t": "Organisateurs sur le terrain", "b": "Toutes les actions essentielles à portée de pouce." },
+      { "t": "Interface tactile", "b": "Lisible en plein soleil, optimisée mobile." },
+      { "t": "Actions rapides", "b": "Reporter, ajuster, corriger en quelques secondes." },
+      { "t": "Mises à jour live", "b": "Le terrain et le public restent synchronisés." }
+    ],
+    "pricingTitle": "Une tarification simple.",
+    "pricingSubtitle": "Choisissez ce qui correspond à votre événement.",
+    "pricing": [
+      { "name": "Tournoi", "price": "40 €", "per": "par tournoi", "desc": "Organisation d'un tournoi ponctuel.", "cta": "Créer un tournoi" },
+      { "name": "Ligue / championnat", "price": "199 €", "per": "par saison", "desc": "Gestion complète d'une saison.", "cta": "En parler" },
+      { "name": "Clubero Club", "price": "49 €", "per": "/ mois", "desc": "Tournois illimités inclus.", "cta": "Voir Clubero Club", "highlight": true }
+    ],
+    "pricingNote": "Tournois illimités inclus avec Clubero Club.",
+    "finalTitle": "Prêt à moderniser vos tournois ?",
+    "finalBody": "Lancez un tournoi en quelques minutes ou voyez Clubero en action avec notre équipe.",
+    "finalPrimary": "Créer un tournoi",
+    "finalSecondary": "Demander une démo"
   }
 }
