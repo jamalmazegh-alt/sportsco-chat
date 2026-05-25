@@ -536,12 +536,17 @@ function drawItalicNote(ctx: Ctx, text: string) {
   }
 }
 
-function drawFooterOnAllPages(doc: PDFDocument, font: PDFFont, bold: PDFFont, lang: Lang) {
+function drawFooterOnAllPages(
+  doc: PDFDocument,
+  font: PDFFont,
+  bold: PDFFont,
+  lang: Lang,
+  logo: import("pdf-lib").PDFImage | null,
+) {
   const pages = doc.getPages();
   const total = pages.length;
   const dateStr = formatShortDate(new Date(), lang);
   pages.forEach((p, idx) => {
-    // Filet
     p.drawLine({
       start: { x: MARGIN_L, y: MARGIN_B + 18 },
       end: { x: PAGE_W - MARGIN_R, y: MARGIN_B + 18 },
@@ -550,9 +555,24 @@ function drawFooterOnAllPages(doc: PDFDocument, font: PDFFont, bold: PDFFont, la
     });
     const left = safe(I18N[lang].footerLeft(dateStr));
     p.drawText(left, { x: MARGIN_L, y: MARGIN_B + 6, size: 7, font, color: GREY });
+
     const right = safe(I18N[lang].footerRight);
     const rw = bold.widthOfTextAtSize(right, 7);
-    p.drawText(right, { x: PAGE_W - MARGIN_R - rw, y: MARGIN_B + 6, size: 7, font: bold, color: GREY });
+    let rightX = PAGE_W - MARGIN_R - rw;
+
+    // Logo Clubero à gauche du texte "Powered by Clubero" (hauteur 10pt)
+    if (logo) {
+      const logoH = 10;
+      const ratio = logo.width / logo.height;
+      const logoW = logoH * ratio;
+      const gap = 4;
+      const totalW = logoW + gap + rw;
+      const startX = PAGE_W - MARGIN_R - totalW;
+      p.drawImage(logo, { x: startX, y: MARGIN_B + 4, width: logoW, height: logoH });
+      rightX = startX + logoW + gap;
+    }
+    p.drawText(right, { x: rightX, y: MARGIN_B + 6, size: 7, font: bold, color: GREY });
+
     const pageLabel = `${I18N[lang].page} ${idx + 1} ${I18N[lang].of} ${total}`;
     const pw = font.widthOfTextAtSize(pageLabel, 7);
     p.drawText(pageLabel, { x: (PAGE_W - pw) / 2, y: MARGIN_B - 4, size: 7, font, color: GREY });
