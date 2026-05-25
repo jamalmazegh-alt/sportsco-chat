@@ -113,7 +113,11 @@ export const confirmPassSession = createServerFn({ method: "POST" })
 
     const session = await stripe.checkout.sessions.retrieve(data.session_id);
     if (session.payment_status !== "paid") {
-      return { paid: false };
+      return {
+        paid: false,
+        checkoutStatus: session.status,
+        paymentStatus: session.payment_status,
+      };
     }
     const paymentIntentId =
       typeof session.payment_intent === "string"
@@ -175,7 +179,13 @@ export const confirmPassSession = createServerFn({ method: "POST" })
       if (error) throw new Response(error.message, { status: 400 });
     }
 
-    return { paid: true, updated: pending.length, created };
+    return {
+      paid: true,
+      updated: pending.length,
+      created,
+      checkoutStatus: session.status,
+      paymentStatus: session.payment_status,
+    };
   });
 
 
