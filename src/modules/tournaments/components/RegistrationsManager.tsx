@@ -123,6 +123,8 @@ export function RegistrationsManager({
   const markPaidFn = useServerFn(markRegistrationPaidOffline);
   const refundFn = useServerFn(refundRegistrationPayment);
 
+  const sendLinkFn = useServerFn(sendPaymentLinkToTeam);
+
   const decide = useMutation({
     mutationFn: (vars: { id: string; action: "approve" | "reject"; note?: string }) =>
       decideFn({
@@ -132,10 +134,37 @@ export function RegistrationsManager({
           decision_note: vars.note ?? null,
         },
       }),
-    onSuccess: (_res, vars) => {
+    onSuccess: async (res: any, vars) => {
       toast.success(
         vars.action === "approve" ? t("registrations.approved") : t("registrations.rejected"),
       );
+
+      // Auto-send payment link email when approval triggers online payment
+      if (vars.action === "approve" && res?.requires_online_payment) {
+        try {
+          await sendLinkFn({
+            data: {
+              tournament_id: tournamentId,
+              registration_id: vars.id,
+              channel: "email",
+              origin: window.location.origin,
+            },
+          });
+          toast.success(
+            t("registrations.payments.linkSentEmail", {
+              defaultValue: "Lien de paiement envoyé par email",
+            }),
+          );
+        } catch (e: any) {
+          toast.error(
+            e?.message ??
+              t("registrations.payments.linkSendFailed", {
+                defaultValue: "Échec de l'envoi du lien de paiement",
+              }),
+          );
+        }
+      }
+
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
@@ -161,7 +190,6 @@ export function RegistrationsManager({
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
 
-  const sendLinkFn = useServerFn(sendPaymentLinkToTeam);
   const sendLink = useMutation({
     mutationFn: (vars: { id: string; channel: "email" | "whatsapp" | "copy" }) =>
       sendLinkFn({

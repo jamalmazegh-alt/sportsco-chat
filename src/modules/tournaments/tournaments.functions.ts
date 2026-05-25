@@ -1607,19 +1607,39 @@ export const decideRegistration = createServerFn({ method: "POST" })
       }
     }
 
+    // Determine if this approval should trigger online payment workflow
+    const { data: tInfo } = await supabase
+      .from("tournaments")
+      .select("registration_fee, payment_mode")
+      .eq("id", reg.tournament_id)
+      .maybeSingle();
+    const fee = (tInfo as any)?.registration_fee ?? 0;
+    const mode = (tInfo as any)?.payment_mode ?? "offline";
+    const requiresOnlinePayment =
+      fee > 0 && (mode === "online" || mode === "both");
+
+    const updatePayload = {
+      status: "approved" as const,
+      tournament_team_id: team.id,
+      decision_note: data.decision_note ?? null,
+      decided_at: new Date().toISOString(),
+      decided_by: userId,
+      ...(requiresOnlinePayment && !reg.payment_status
+        ? { payment_status: "pending" as const }
+        : {}),
+    };
+
     const { error: updErr } = await supabase
       .from("tournament_registrations")
-      .update({
-        status: "approved",
-        tournament_team_id: team.id,
-        decision_note: data.decision_note ?? null,
-        decided_at: new Date().toISOString(),
-        decided_by: userId,
-      })
+      .update(updatePayload)
       .eq("id", data.registration_id);
     if (updErr) throw updErr;
 
-    return { ok: true, tournament_team_id: team.id };
+    return {
+      ok: true,
+      tournament_team_id: team.id,
+      requires_online_payment: requiresOnlinePayment,
+    };
   });
 
 // ---------- Tirage au sort (Draw): applique une composition fournie par le client (auto/progressif/manuel)
