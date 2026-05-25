@@ -66,7 +66,8 @@ function Landing() {
 }
 
 function TournamentsSection() {
-  const { t } = useTranslation("marketing");
+  const { t, i18n } = useTranslation("marketing");
+  const tournamentsTo = i18n.language?.slice(0, 2) === "fr" ? "/fr/tournois" : "/en/tournaments";
   const features = [
     { t: t("tournaments.home.feat1Title"), d: t("tournaments.home.feat1Body") },
     { t: t("tournaments.home.feat2Title"), d: t("tournaments.home.feat2Body") },
@@ -111,7 +112,7 @@ function TournamentsSection() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6">
-                <Link to="/features">{t("tournaments.home.ctaFeatures")}</Link>
+                <Link to={tournamentsTo}>{t("tournaments.home.ctaFeatures")}</Link>
               </Button>
             </div>
           </div>
@@ -719,7 +720,8 @@ function ForEveryone() {
 }
 
 function CTA() {
-  const { t } = useTranslation("marketing");
+  const { t, i18n } = useTranslation("marketing");
+  const onboardingTo = i18n.language?.slice(0, 2) === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
 
   return (
     <section>
@@ -755,6 +757,9 @@ function CTA() {
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
                 <Link to="/pricing">{t("home.ctaPricing")}</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
+                <Link to={onboardingTo}>{t("nav.onboarding")}</Link>
               </Button>
             </div>
           </div>

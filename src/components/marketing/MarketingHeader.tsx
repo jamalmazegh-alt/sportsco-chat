@@ -13,6 +13,17 @@ const NAV = [
   { to: "/contact", key: "contact" },
 ] as const;
 
+const LOCALIZED_NAV = {
+  fr: [
+    { to: "/fr/tournois", key: "tournaments" },
+    { to: "/fr/onboarding-club", key: "onboarding" },
+  ],
+  en: [
+    { to: "/en/tournaments", key: "tournaments" },
+    { to: "/en/club-onboarding", key: "onboarding" },
+  ],
+} as const;
+
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
   const { t, i18n } = useTranslation("marketing");
@@ -32,6 +43,16 @@ export function MarketingHeader() {
 
         <nav className="hidden items-center gap-1 md:flex">
           {NAV.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+            >
+              {t(`nav.${item.key}`)}
+            </Link>
+          ))}
+          {(LOCALIZED_NAV[current === "fr" ? "fr" : "en"]).map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -98,6 +119,17 @@ export function MarketingHeader() {
         <div className="border-t border-border/60 bg-background md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-5 py-3">
             {NAV.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+              >
+                {t(`nav.${item.key}`)}
+              </Link>
+            ))}
+            {(LOCALIZED_NAV[current === "fr" ? "fr" : "en"]).map((item) => (
               <Link
                 key={item.to}
                 to={item.to}

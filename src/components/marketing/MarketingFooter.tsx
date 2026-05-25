@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import logo from "@/assets/clubero-logo.png";
 
 export function MarketingFooter() {
-  const { t } = useTranslation("marketing");
+  const { t, i18n } = useTranslation("marketing");
+  const current = i18n.language?.slice(0, 2) === "fr" ? "fr" : "en";
+  const tournamentsTo = current === "fr" ? "/fr/tournois" : "/en/tournaments";
+  const onboardingTo = current === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
 
   return (
     <footer className="border-t border-border/60 bg-muted/30">
@@ -24,6 +27,8 @@ export function MarketingFooter() {
             </h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li><Link to="/features" className="hover:text-foreground">{t("nav.features")}</Link></li>
+              <li><Link to={tournamentsTo} className="hover:text-foreground">{t("nav.tournaments")}</Link></li>
+              <li><Link to={onboardingTo} className="hover:text-foreground">{t("nav.onboarding")}</Link></li>
               <li><Link to="/pricing" className="hover:text-foreground">{t("nav.pricing")}</Link></li>
               <li><Link to="/demo" className="hover:text-foreground">{t("nav.demo")}</Link></li>
               <li><Link to="/login" className="hover:text-foreground">{t("nav.login")}</Link></li>
