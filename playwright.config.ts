@@ -1,4 +1,8 @@
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Playwright config for Clubero E2E tests.
@@ -40,7 +44,7 @@ export default defineConfig({
     ? /.*\.e2e\.ts$/
     : /00-missing-supabase-config\.e2e\.ts$/,
   globalSetup: HAS_E2E_CONFIG
-    ? "./tests/e2e/_fixtures/global-setup.ts"
+    ? path.join(__dirname, "tests/e2e/_fixtures/global-setup.ts")
     : undefined,
   timeout: process.env.E2E_UI === "1" ? 90_000 : 30_000,
   expect: { timeout: 15_000 },
