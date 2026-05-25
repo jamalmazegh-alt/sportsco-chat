@@ -5,7 +5,7 @@ import {
   Users,
   UserSquare2,
   Heart,
-  Whistle,
+  ClipboardList,
   CalendarDays,
   Trophy,
   FileSpreadsheet,
