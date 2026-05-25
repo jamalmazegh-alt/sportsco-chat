@@ -148,17 +148,33 @@ export const listMyTournaments = createServerFn({ method: "POST" })
 export const listMyPersonalTournaments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { supabase, userId } = context;
-    const { data: rows, error } = await supabase
+    // Personal organizers own tournaments either:
+    //   - directly (club_id IS NULL, legacy), or
+    //   - via their auto-created "personal" club (clubs.is_personal = true).
+    const { data: personalClubs } = await supabaseAdmin
+      .from("clubs")
+      .select("id")
+      .eq("created_by", userId)
+      .eq("is_personal", true);
+    const personalClubIds = (personalClubs ?? []).map((c) => c.id);
+
+    let q = supabase
       .from("tournaments")
       .select("*")
-      .is("club_id", null)
       .eq("created_by", userId)
-      .is("archived_at", null)
-      .order("starts_on", { ascending: false });
+      .is("archived_at", null);
+    if (personalClubIds.length > 0) {
+      q = q.or(`club_id.is.null,club_id.in.(${personalClubIds.join(",")})`);
+    } else {
+      q = q.is("club_id", null);
+    }
+    const { data: rows, error } = await q.order("starts_on", { ascending: false });
     if (error) throw error;
     return { tournaments: rows ?? [] };
   });
+
 
 export const getTournament = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
