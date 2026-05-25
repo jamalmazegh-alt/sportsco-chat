@@ -40,7 +40,10 @@ function TournamentsList() {
   const role = useActiveRole();
   const roles = useMyRoles();
   const { tournamentOnly } = useTournamentOnlyMode();
-  const noClub = memberships.length === 0;
+  // Treat tournament-only organizers (incl. those whose only club is the
+  // auto-created "personal" club) as no-club for tournament management UI:
+  // they must use the pass-based creation flow.
+  const noClub = memberships.length === 0 || tournamentOnly;
   const canManage = roles.includes("admin") || (role as string) === "dirigeant" || noClub;
   const [open, setOpen] = useState(false);
 
@@ -57,6 +60,7 @@ function TournamentsList() {
         ? personalFn({ data: undefined as never })
         : clubFn({ data: { club_id: activeClubId! } }),
   });
+
 
   // For tournament-only organizers: check available passes to decide whether
   // to show "Create" or "Buy a pass" CTAs.
