@@ -31,8 +31,9 @@ const I18N = {
     perGroup: "Équipes qualifiées par groupe",
     bestThirds: "Meilleurs 3es (ou Ne) qualifiés",
     roster: "Composition d'équipe",
+    playersPerTeam: "Joueurs par équipe",
     maxSubstitutes: "Remplaçants max",
-    jokersPerTeam: "Jokers par équipe",
+
     fairPlay: "Fair-play (déductions)",
     yellow: "Carton jaune",
     secondYellow: "2e jaune (expulsion)",
@@ -69,8 +70,9 @@ const I18N = {
     perGroup: "Teams qualified per group",
     bestThirds: "Best Nth-place qualified",
     roster: "Squad composition",
+    playersPerTeam: "Players per team",
     maxSubstitutes: "Max substitutes",
-    jokersPerTeam: "Jokers per team",
+
     fairPlay: "Fair play (deductions)",
     yellow: "Yellow card",
     secondYellow: "Second yellow (sent off)",
@@ -170,9 +172,10 @@ export async function buildRulesPdf(
   // Roster
   section(ctx, t.roster);
   drawKeyValues(ctx, [
+    [t.playersPerTeam, String(rules.roster.playersPerTeam)],
     [t.maxSubstitutes, String(rules.roster.maxSubstitutes)],
-    [t.jokersPerTeam, String(rules.roster.jokersPerTeam)],
   ]);
+
   ctx.y -= 10;
 
   // Fair-play
