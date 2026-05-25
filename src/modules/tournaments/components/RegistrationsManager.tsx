@@ -109,6 +109,8 @@ export function RegistrationsManager({
 }) {
   const { t, i18n } = useTranslation("tournaments");
   const qc = useQueryClient();
+  const navigate = useNavigate();
+  const { setActiveClubId, refreshMemberships } = useAuth();
   const [filter, setFilter] = useState<Status | "all">("pending");
   const listFn = useServerFn(listTournamentRegistrations);
   const decideFn = useServerFn(decideRegistration);
