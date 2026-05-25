@@ -124,7 +124,7 @@ const I18N = {
     a5Yellow: "Carton jaune",
     a5Second: "Second jaune (expulsion)",
     a5Red: "Carton rouge direct",
-    a5Pts: (n: number) => `−${n} point${n > 1 ? "s" : ""}`,
+    a5Pts: (n: number) => `-${n} point${n > 1 ? "s" : ""}`,
     a5Outro:
       "Toute expulsion entraîne une suspension automatique pour la rencontre suivante. L'organisateur peut aggraver la sanction en cas de comportement antisportif avéré.",
     a6Both:
@@ -192,7 +192,7 @@ const I18N = {
     a5Yellow: "Yellow card",
     a5Second: "Second yellow (sent off)",
     a5Red: "Direct red card",
-    a5Pts: (n: number) => `−${n} point${n > 1 ? "s" : ""}`,
+    a5Pts: (n: number) => `-${n} point${n > 1 ? "s" : ""}`,
     a5Outro:
       "Any sending-off results in an automatic suspension for the following match. The organizer may increase the sanction in case of proven unsporting behavior.",
     a6Both:
@@ -493,10 +493,10 @@ function drawArticle(ctx: Ctx, n: number, paragraphs: string[]) {
 function drawParagraph(ctx: Ctx, text: string) {
   const size = 9;
   const lh = 12.5;
-  const lines = wrap(text, ctx.font, size, CONTENT_W);
+  const lines = wrap(safe(text), ctx.font, size, CONTENT_W);
   for (const line of lines) {
     ensureSpace(ctx, lh);
-    ctx.page.drawText(safe(line), { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: BLACK });
+    ctx.page.drawText(line, { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: BLACK });
     ctx.y -= lh;
   }
   ctx.y -= 4;
@@ -507,16 +507,16 @@ function drawBullets(ctx: Ctx, items: string[], opts: { numbered?: boolean } = {
   const lh = 12.5;
   const indent = 14;
   for (const item of items) {
-    const lines = wrap(item, ctx.font, size, CONTENT_W - indent);
+    const lines = wrap(safe(item), ctx.font, size, CONTENT_W - indent);
     lines.forEach((line, idx) => {
       ensureSpace(ctx, lh);
       if (idx === 0) {
-        const marker = opts.numbered ? "" : "—";
+        const marker = opts.numbered ? "" : "-";
         if (marker) {
           ctx.page.drawText(marker, { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: GREY });
         }
       }
-      ctx.page.drawText(safe(line), { x: MARGIN_L + indent, y: ctx.y, size, font: ctx.font, color: BLACK });
+      ctx.page.drawText(line, { x: MARGIN_L + indent, y: ctx.y, size, font: ctx.font, color: BLACK });
       ctx.y -= lh;
     });
   }
@@ -528,10 +528,10 @@ function drawItalicNote(ctx: Ctx, text: string) {
   ctx.y -= 6;
   const size = 8;
   const lh = 11;
-  const lines = wrap(text, ctx.italic, size, CONTENT_W);
+  const lines = wrap(safe(text), ctx.italic, size, CONTENT_W);
   for (const line of lines) {
     ensureSpace(ctx, lh);
-    ctx.page.drawText(safe(line), { x: MARGIN_L, y: ctx.y, size, font: ctx.italic, color: GREY });
+    ctx.page.drawText(line, { x: MARGIN_L, y: ctx.y, size, font: ctx.italic, color: GREY });
     ctx.y -= lh;
   }
 }
@@ -612,13 +612,12 @@ function wrap(text: string, font: PDFFont, size: number, maxW: number): string[]
 // Helvetica WinAnsi: remplace les caractères non encodables.
 function safe(s: string): string {
   return s
-    .replace(/–/g, "-")
-    .replace(/—/g, "-")
-    .replace(/’/g, "'")
-    .replace(/‘/g, "'")
-    .replace(/“|”/g, '"')
-    .replace(/…/g, "...")
-    .replace(/·/g, "·") // · is in WinAnsi (0xB7), keep
+    .replace(/[\u2212\u2012\u2013\u2014\u2015]/g, "-") // minus, figure/en/em/horizontal dash
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ")
+    .replace(/[\u2022\u25E6]/g, "*")
     .replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "?");
 }
 

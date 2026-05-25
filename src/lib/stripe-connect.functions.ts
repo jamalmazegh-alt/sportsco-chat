@@ -173,17 +173,45 @@ export const createStripeConnectOnboardingLink = createServerFn({ method: "POST"
 
     const { data: club } = await supabaseAdmin
       .from("clubs")
-      .select("id, stripe_account_id")
+      .select("id, name, stripe_account_id")
       .eq("id", data.clubId)
       .single();
-    if (!club?.stripe_account_id) {
-      throw new Error("No Stripe account for this club. Create one first.");
-    }
+    if (!club) throw new Error("Club not found");
 
     const stripe = getStripe();
+
+    // Auto-create the Connect account if it doesn't exist yet, so the UI can
+    // always present a single "Activate / Continue" CTA without needing two
+    // separate calls.
+    let accountId = club.stripe_account_id;
+    if (!accountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        country: "FR",
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+          sepa_debit_payments: { requested: true },
+        },
+        business_profile: { name: club.name },
+        metadata: { clubero_club_id: club.id },
+      });
+      accountId = account.id;
+      await supabaseAdmin
+        .from("clubs")
+        .update({
+          stripe_account_id: account.id,
+          stripe_account_status: "pending",
+          stripe_account_created_at: new Date().toISOString(),
+          stripe_charges_enabled: !!account.charges_enabled,
+          stripe_payouts_enabled: !!account.payouts_enabled,
+        })
+        .eq("id", club.id);
+    }
+
     const origin = getOrigin();
     const link = await stripe.accountLinks.create({
-      account: club.stripe_account_id,
+      account: accountId,
       refresh_url: `${origin}/admin/settings/payments?refresh=1`,
       return_url: `${origin}/admin/settings/payments?success=1`,
       type: "account_onboarding",
@@ -191,6 +219,7 @@ export const createStripeConnectOnboardingLink = createServerFn({ method: "POST"
 
     return { url: link.url, expiresAt: link.expires_at };
   });
+
 
 /**
  * Pull the latest account state from Stripe and persist it locally.
