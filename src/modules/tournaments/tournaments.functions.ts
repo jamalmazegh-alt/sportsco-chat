@@ -1618,16 +1618,16 @@ export const decideRegistration = createServerFn({ method: "POST" })
     const requiresOnlinePayment =
       fee > 0 && (mode === "online" || mode === "both");
 
-    const updatePayload: Record<string, any> = {
-      status: "approved",
+    const updatePayload = {
+      status: "approved" as const,
       tournament_team_id: team.id,
       decision_note: data.decision_note ?? null,
       decided_at: new Date().toISOString(),
       decided_by: userId,
+      ...(requiresOnlinePayment && !reg.payment_status
+        ? { payment_status: "pending" as const }
+        : {}),
     };
-    if (requiresOnlinePayment && !reg.payment_status) {
-      updatePayload.payment_status = "pending";
-    }
 
     const { error: updErr } = await supabase
       .from("tournament_registrations")
