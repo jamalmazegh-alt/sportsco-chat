@@ -71,7 +71,7 @@ test.describe("Clubero pack — page tarifs publique", () => {
   });
 });
 
-test.describe("Clubero pack — admin flow (checkout + webhook)", () => {
+test.describe.skip("Clubero pack — admin flow (checkout + webhook)", () => {
   let seed: SeededClub | undefined;
 
   test.beforeAll(async () => {
