@@ -493,10 +493,10 @@ function drawArticle(ctx: Ctx, n: number, paragraphs: string[]) {
 function drawParagraph(ctx: Ctx, text: string) {
   const size = 9;
   const lh = 12.5;
-  const lines = wrap(text, ctx.font, size, CONTENT_W);
+  const lines = wrap(safe(text), ctx.font, size, CONTENT_W);
   for (const line of lines) {
     ensureSpace(ctx, lh);
-    ctx.page.drawText(safe(line), { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: BLACK });
+    ctx.page.drawText(line, { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: BLACK });
     ctx.y -= lh;
   }
   ctx.y -= 4;
@@ -507,16 +507,16 @@ function drawBullets(ctx: Ctx, items: string[], opts: { numbered?: boolean } = {
   const lh = 12.5;
   const indent = 14;
   for (const item of items) {
-    const lines = wrap(item, ctx.font, size, CONTENT_W - indent);
+    const lines = wrap(safe(item), ctx.font, size, CONTENT_W - indent);
     lines.forEach((line, idx) => {
       ensureSpace(ctx, lh);
       if (idx === 0) {
-        const marker = opts.numbered ? "" : "—";
+        const marker = opts.numbered ? "" : "-";
         if (marker) {
           ctx.page.drawText(marker, { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: GREY });
         }
       }
-      ctx.page.drawText(safe(line), { x: MARGIN_L + indent, y: ctx.y, size, font: ctx.font, color: BLACK });
+      ctx.page.drawText(line, { x: MARGIN_L + indent, y: ctx.y, size, font: ctx.font, color: BLACK });
       ctx.y -= lh;
     });
   }
@@ -528,10 +528,10 @@ function drawItalicNote(ctx: Ctx, text: string) {
   ctx.y -= 6;
   const size = 8;
   const lh = 11;
-  const lines = wrap(text, ctx.italic, size, CONTENT_W);
+  const lines = wrap(safe(text), ctx.italic, size, CONTENT_W);
   for (const line of lines) {
     ensureSpace(ctx, lh);
-    ctx.page.drawText(safe(line), { x: MARGIN_L, y: ctx.y, size, font: ctx.italic, color: GREY });
+    ctx.page.drawText(line, { x: MARGIN_L, y: ctx.y, size, font: ctx.italic, color: GREY });
     ctx.y -= lh;
   }
 }
