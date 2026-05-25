@@ -504,7 +504,7 @@ function TournamentDetailPage() {
             teams={teams as any}
             canManage={canManage}
             fields={((tournament as any).fields as string[] | null) ?? []}
-            scoring={scoring}
+            scoring={scoring ?? undefined}
           />
         )}
         {section === "play" && sub === "standings" && (
