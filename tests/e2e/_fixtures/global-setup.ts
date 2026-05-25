@@ -74,6 +74,19 @@ export default async function globalSetup() {
     (["coach", "player", "parent"] as Role[]).map((r) => signIn(r)),
   );
 
+  // Fail fast in CI if coach/player/parent creds are missing — otherwise the
+  // fixture silently falls back to the admin user and RLS-scoped tests pass
+  // for the wrong reason.
+  for (const r of ["coach", "player", "parent"] as Role[]) {
+    const upper = r.toUpperCase();
+    if (!process.env[`E2E_${upper}_USER_ID`]) {
+      throw new Error(
+        `[globalSetup] E2E_${upper}_EMAIL/E2E_${upper}_PASSWORD missing — ` +
+          `multi-role E2E tests require a distinct ${r} user.`,
+      );
+    }
+  }
+
   // 3. Resolve the pre-existing test club id using an authenticated client
   //    (RLS on `clubs` blocks anonymous SELECT).
   const authedClient = createClient(url, anonKey, {
