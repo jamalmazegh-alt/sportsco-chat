@@ -190,7 +190,6 @@ export function RegistrationsManager({
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
 
-  const sendLinkFn = useServerFn(sendPaymentLinkToTeam);
   const sendLink = useMutation({
     mutationFn: (vars: { id: string; channel: "email" | "whatsapp" | "copy" }) =>
       sendLinkFn({
