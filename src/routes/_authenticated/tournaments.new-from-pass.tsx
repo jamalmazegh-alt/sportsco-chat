@@ -161,6 +161,32 @@ function NewFromPassPage() {
         <p className="mt-3 text-sm text-muted-foreground">
           {t("newFromPass.validatingBody")}
         </p>
+        {waitedTooLong && (
+          <div className="mt-8 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {t("newFromPass.stillWaitingBody", {
+                defaultValue:
+                  "Cela prend plus de temps que prévu. Si votre paiement a bien été effectué, rafraîchissez la page — votre pass apparaîtra dès qu'il sera confirmé.",
+              })}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (sessionId) {
+                  confirmFn({ data: { session_id: sessionId } })
+                    .catch(() => null)
+                    .finally(() => passesQ.refetch());
+                } else {
+                  passesQ.refetch();
+                }
+              }}
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t("newFromPass.refresh", { defaultValue: "Rafraîchir" })}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
