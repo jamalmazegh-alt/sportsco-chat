@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WhyCluberoRouteImport } from './routes/why-clubero'
+import { Route as TournamentExperienceRouteImport } from './routes/tournament-experience'
 import { Route as SuperadminRouteImport } from './routes/superadmin'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -21,6 +23,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DnsCheckRouteImport } from './routes/dns-check'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ClubOnboardingRouteImport } from './routes/club-onboarding'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
@@ -99,6 +102,16 @@ import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './ro
 import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './routes/_authenticated/admin/settings.communications'
 import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
 
+const WhyCluberoRoute = WhyCluberoRouteImport.update({
+  id: '/why-clubero',
+  path: '/why-clubero',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentExperienceRoute = TournamentExperienceRouteImport.update({
+  id: '/tournament-experience',
+  path: '/tournament-experience',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuperadminRoute = SuperadminRouteImport.update({
   id: '/superadmin',
   path: '/superadmin',
@@ -157,6 +170,11 @@ const DemoRoute = DemoRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClubOnboardingRoute = ClubOnboardingRouteImport.update({
+  id: '/club-onboarding',
+  path: '/club-onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -580,6 +598,7 @@ const AuthenticatedAdminSettingsBrandingRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/club-onboarding': typeof ClubOnboardingRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -592,6 +611,8 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
+  '/tournament-experience': typeof TournamentExperienceRoute
+  '/why-clubero': typeof WhyCluberoRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/assistant': typeof AuthenticatedAssistantRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
@@ -670,6 +691,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/club-onboarding': typeof ClubOnboardingRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -681,6 +703,8 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/tournament-experience': typeof TournamentExperienceRoute
+  '/why-clubero': typeof WhyCluberoRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
   '/follow-ups': typeof AuthenticatedFollowUpsRoute
@@ -758,6 +782,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/club-onboarding': typeof ClubOnboardingRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
@@ -770,6 +795,8 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
+  '/tournament-experience': typeof TournamentExperienceRoute
+  '/why-clubero': typeof WhyCluberoRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
@@ -850,6 +877,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/club-onboarding'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -862,6 +890,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/superadmin'
+    | '/tournament-experience'
+    | '/why-clubero'
     | '/admin'
     | '/assistant'
     | '/events'
@@ -940,6 +970,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/club-onboarding'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -951,6 +982,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/tournament-experience'
+    | '/why-clubero'
     | '/assistant'
     | '/events'
     | '/follow-ups'
@@ -1027,6 +1060,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/club-onboarding'
     | '/contact'
     | '/demo'
     | '/dns-check'
@@ -1039,6 +1073,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/superadmin'
+    | '/tournament-experience'
+    | '/why-clubero'
     | '/_authenticated/admin'
     | '/_authenticated/assistant'
     | '/_authenticated/events'
@@ -1119,6 +1155,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  ClubOnboardingRoute: typeof ClubOnboardingRoute
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
   DnsCheckRoute: typeof DnsCheckRoute
@@ -1131,6 +1168,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuperadminRoute: typeof SuperadminRouteWithChildren
+  TournamentExperienceRoute: typeof TournamentExperienceRoute
+  WhyCluberoRoute: typeof WhyCluberoRoute
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   LegalKindRoute: typeof LegalKindRoute
@@ -1162,6 +1201,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/why-clubero': {
+      id: '/why-clubero'
+      path: '/why-clubero'
+      fullPath: '/why-clubero'
+      preLoaderRoute: typeof WhyCluberoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament-experience': {
+      id: '/tournament-experience'
+      path: '/tournament-experience'
+      fullPath: '/tournament-experience'
+      preLoaderRoute: typeof TournamentExperienceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/superadmin': {
       id: '/superadmin'
       path: '/superadmin'
@@ -1244,6 +1297,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/club-onboarding': {
+      id: '/club-onboarding'
+      path: '/club-onboarding'
+      fullPath: '/club-onboarding'
+      preLoaderRoute: typeof ClubOnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -2029,6 +2089,7 @@ const TournamentSlugRegisterRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  ClubOnboardingRoute: ClubOnboardingRoute,
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
   DnsCheckRoute: DnsCheckRoute,
@@ -2041,6 +2102,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuperadminRoute: SuperadminRouteWithChildren,
+  TournamentExperienceRoute: TournamentExperienceRoute,
+  WhyCluberoRoute: WhyCluberoRoute,
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   LegalKindRoute: LegalKindRoute,
