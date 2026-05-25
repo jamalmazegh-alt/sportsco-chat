@@ -40,7 +40,33 @@ export const Route = createFileRoute("/api/public/tournament/$id/regulations")({
         if (!t) return new Response("Tournament not found", { status: 404 });
 
         const rules = mergeRules(t.settings);
-        const pdf = await buildRegulationsPdf(t, rules, lang);
+
+        // Mode "uploaded" — stream the organizer-provided PDF instead of generating one.
+        if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
+          const upstream = await fetch(rules.regulations.uploadedUrl);
+          if (!upstream.ok) {
+            return new Response("Uploaded regulations not available", { status: 502 });
+          }
+          return new Response(upstream.body, {
+            status: 200,
+            headers: {
+              "Content-Type": "application/pdf",
+              "Content-Disposition": `inline; filename="reglement-${t.slug}.pdf"`,
+              "Cache-Control": "public, max-age=300",
+            },
+          });
+        }
+
+        // Try to embed the Clubero logo (best effort).
+        let logoBytes: ArrayBuffer | null = null;
+        try {
+          const logoRes = await fetch(new URL("/clubero-logo.png", request.url));
+          if (logoRes.ok) logoBytes = await logoRes.arrayBuffer();
+        } catch {
+          logoBytes = null;
+        }
+
+        const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes);
 
         return new Response(pdf as unknown as BodyInit, {
           status: 200,
