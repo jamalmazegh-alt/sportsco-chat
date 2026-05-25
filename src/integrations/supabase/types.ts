@@ -161,6 +161,7 @@ export type Database = {
           event_chat_parents_enabled: boolean
           event_chat_players_enabled: boolean
           id: string
+          is_personal: boolean
           logo_url: string | null
           name: string
           stripe_account_created_at: string | null
@@ -183,6 +184,7 @@ export type Database = {
           event_chat_parents_enabled?: boolean
           event_chat_players_enabled?: boolean
           id?: string
+          is_personal?: boolean
           logo_url?: string | null
           name: string
           stripe_account_created_at?: string | null
@@ -205,6 +207,7 @@ export type Database = {
           event_chat_parents_enabled?: boolean
           event_chat_players_enabled?: boolean
           id?: string
+          is_personal?: boolean
           logo_url?: string | null
           name?: string
           stripe_account_created_at?: string | null
@@ -2741,6 +2744,10 @@ export type Database = {
           suggested_last_name: string
           used: boolean
         }[]
+      }
+      get_or_create_personal_club: {
+        Args: { _user_id: string }
+        Returns: string
       }
       get_platform_stats: { Args: never; Returns: Json }
       get_tournament_invite_by_token: {
