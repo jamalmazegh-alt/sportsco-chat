@@ -66,6 +66,7 @@ export interface TournamentRules {
   penaltyShootout: { enabled: boolean };
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
   forfeit: ForfeitRules;
+  roster: RosterRules;
   registration: RegistrationRules;
   regulations: RegulationsConfig;
   scoring?: ScoringRules;
