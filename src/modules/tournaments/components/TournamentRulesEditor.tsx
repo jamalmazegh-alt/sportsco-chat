@@ -524,55 +524,91 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
-      {/* PDF generation */}
+      {/* Regulations: generated vs uploaded */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t("rules.pdfTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-xs text-muted-foreground">
-            {t("rules.pdfHint")}
-          </p>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => generate.mutate()}
-            disabled={generate.isPending}
-          >
-            {generate.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <FileDown className="h-4 w-4" />
-            )}
-            {t("rules.generatePdf")}
-          </Button>
-          {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
-            <ul className="space-y-1.5 pt-2">
-              {docsQuery.data.documents.slice(0, 5).map((d: any) => (
-                <li
-                  key={d.id}
-                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
-                >
-                  <span className="truncate">
-                    <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
-                      {d.language}
-                    </span>
-                    {new Date(d.generated_at).toLocaleString(lang.startsWith("en") ? "en-US" : "fr-FR")}
-                  </span>
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary hover:underline inline-flex items-center gap-1 text-xs"
-                  >
-                    {t("rules.open")} <ExternalLink className="h-3 w-3" />
-                  </a>
-                </li>
-              ))}
-            </ul>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <ModeTile
+              active={rules.regulations.mode === "generated"}
+              title={t("rules.regulationsModeGenerated")}
+              description={t("rules.regulationsModeGeneratedHint")}
+              onClick={() =>
+                setRules({
+                  ...rules,
+                  regulations: { ...rules.regulations, mode: "generated" },
+                })
+              }
+            />
+            <ModeTile
+              active={rules.regulations.mode === "uploaded"}
+              title={t("rules.regulationsModeUploaded")}
+              description={t("rules.regulationsModeUploadedHint")}
+              onClick={() =>
+                setRules({
+                  ...rules,
+                  regulations: { ...rules.regulations, mode: "uploaded" },
+                })
+              }
+            />
+          </div>
+
+          {rules.regulations.mode === "generated" ? (
+            <div className="space-y-3 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">{t("rules.pdfHint")}</p>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => generate.mutate()}
+                disabled={generate.isPending}
+              >
+                {generate.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileDown className="h-4 w-4" />
+                )}
+                {t("rules.generatePdf")}
+              </Button>
+              {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
+                <ul className="space-y-1.5 pt-2">
+                  {docsQuery.data.documents.slice(0, 5).map((d: any) => (
+                    <li
+                      key={d.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
+                    >
+                      <span className="truncate">
+                        <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
+                          {d.language}
+                        </span>
+                        {new Date(d.generated_at).toLocaleString(lang.startsWith("en") ? "en-US" : "fr-FR")}
+                      </span>
+                      <a
+                        href={d.file_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:underline inline-flex items-center gap-1 text-xs"
+                      >
+                        {t("rules.open")} <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <UploadedRegulations
+              tournamentId={tournamentId}
+              regulations={rules.regulations}
+              onChange={(reg) =>
+                setRules({ ...rules, regulations: { ...rules.regulations, ...reg } })
+              }
+            />
           )}
         </CardContent>
       </Card>
+
 
 
       <div className="flex gap-2 sticky bottom-0 bg-background/95 backdrop-blur py-3 border-t border-border">
