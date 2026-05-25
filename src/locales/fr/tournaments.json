@@ -945,6 +945,8 @@
     "validatingBody": "Merci pour votre achat. Nous activons votre pass tournoi… cela ne prend que quelques secondes.",
     "paymentConfirmed": "Paiement confirmé",
     "paymentStillPending": "Paiement encore en attente",
+    "paymentNotCompletedTitle": "Paiement non finalisé",
+    "paymentNotCompletedBody": "Stripe indique que ce paiement n'est pas finalisé. Si vous avez quitté la page de paiement avant la confirmation, relancez l'achat du pass.",
     "refreshError": "Validation impossible pour le moment",
     "noPassTitle": "Aucun pass disponible",
     "noPassBody": "Achetez un pass tournoi à 40 € pour créer votre tournoi. Aucun abonnement requis — un paiement unique par tournoi.",
