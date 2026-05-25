@@ -129,6 +129,17 @@ export function MarketingHeader() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
+            {(LOCALIZED_NAV[current === "fr" ? "fr" : "en"]).map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+              >
+                {t(`nav.${item.key}`)}
+              </Link>
+            ))}
             <div className="mt-3 flex items-center justify-center gap-1 rounded-lg border border-border p-1">
               {([
                 { value: "fr", label: "FR", flag: "🇫🇷" },
