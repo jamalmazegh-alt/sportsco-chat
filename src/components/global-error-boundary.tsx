@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Sentry } from "@/lib/sentry";
+import { useAuth } from "@/lib/auth-context";
 
 interface Props {
   error?: Error;
@@ -12,14 +13,24 @@ interface Props {
 
 /**
  * Global fallback used as `defaultErrorComponent` on the router.
- * Keeps tone friendly and offers retry + home navigation. Avoids
- * leaking stack traces in production.
+ * Keeps tone friendly and offers retry + home navigation. Authenticated
+ * users land on the in-app home (/home), not the marketing landing.
  */
 export function GlobalErrorBoundary({ error, reset }: Props) {
-  const isDev = import.meta.env.DEV;
   const { t } = useTranslation("common");
+  let session: unknown = null;
+  try {
+    session = useAuth().session;
+  } catch {
+    // Rendered outside AuthProvider — fall back to public root.
+  }
+  const homeHref = session ? "/home" : "/";
   useEffect(() => {
-    if (error) Sentry.captureException(error);
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error("[GlobalErrorBoundary]", error);
+      Sentry.captureException(error);
+    }
   }, [error]);
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-6 py-12">
@@ -31,8 +42,8 @@ export function GlobalErrorBoundary({ error, reset }: Props) {
         <p className="text-sm text-muted-foreground">
           {t("common.errorSubtitle")}
         </p>
-        {isDev && error?.message ? (
-          <pre className="text-left text-xs bg-muted rounded-md p-3 overflow-auto max-h-48">
+        {error?.message ? (
+          <pre className="text-left text-xs bg-muted rounded-md p-3 overflow-auto max-h-48 whitespace-pre-wrap break-words">
             {error.message}
           </pre>
         ) : null}
@@ -43,7 +54,7 @@ export function GlobalErrorBoundary({ error, reset }: Props) {
             </Button>
           ) : null}
           <Button asChild>
-            <Link to="/">{t("nav.home")}</Link>
+            <Link to={homeHref}>{t("nav.home")}</Link>
           </Button>
         </div>
       </div>
