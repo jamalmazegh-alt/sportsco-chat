@@ -12,6 +12,7 @@ import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
 const TOURNAMENT_ONLY_ALLOWED = [
   "/tournaments",
   "/profile",
+  "/admin",
   "/support",
   "/assistant",
 ];
