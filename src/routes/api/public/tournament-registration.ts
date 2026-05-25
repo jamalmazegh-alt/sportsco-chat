@@ -2,14 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.server";
-
-const PlayerSchema = z.object({
-  first_name: z.string().trim().min(1).max(80),
-  last_name: z.string().trim().min(1).max(80),
-  jersey_number: z.number().int().min(0).max(999).nullable().optional(),
-  position: z.string().trim().max(40).nullable().optional(),
-  is_captain: z.boolean().optional(),
-});
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const Schema = z.object({
   tournament_slug: z.string().trim().min(1).max(120),
@@ -19,7 +12,6 @@ const Schema = z.object({
   contact_email: z.string().trim().email().max(255),
   contact_phone: z.string().trim().max(40).optional().nullable(),
   notes: z.string().trim().max(2000).optional().nullable(),
-  players: z.array(PlayerSchema).max(40).optional().default([]),
 });
 
 export const Route = createFileRoute("/api/public/tournament-registration")({
@@ -47,7 +39,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         const { data: tournament, error: tErr } = await supabase
           .from("tournaments")
-          .select("id, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode")
+          .select("id, name, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode")
           .eq("slug", parsed.tournament_slug)
           .maybeSingle();
         if (tErr) {
@@ -92,8 +84,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           );
         }
 
-        // Capacity cap: explicit reg.maxTeams takes precedence, otherwise fall
-        // back to the tournament's num_teams to prevent unbounded registrations.
+        // Capacity cap
         const capRaw =
           typeof reg.maxTeams === "number" && reg.maxTeams > 0
             ? reg.maxTeams
@@ -120,9 +111,6 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           }
         }
 
-
-        const players = reg.collectPlayers ? parsed.players : [];
-
         const { data: row, error: insErr } = await supabase
           .from("tournament_registrations")
           .insert({
@@ -133,15 +121,18 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             contact_email: parsed.contact_email.toLowerCase(),
             contact_phone: parsed.contact_phone || null,
             notes: parsed.notes || null,
-            players,
+            players: [],
             status: reg.requiresApproval ? "pending" : "approved",
           })
-          .select("id, status")
+          .select("id, status, roster_token")
           .single();
         if (insErr) {
           console.error("Registration insert failed", insErr);
           return Response.json({ error: "Failed to register" }, { status: 500 });
         }
+
+        const origin = new URL(request.url).origin;
+        const rosterUrl = `${origin}/tournament/${tournament.slug}/roster/${row.roster_token}`;
 
         // Auto-approval path: create team immediately
         if (!reg.requiresApproval) {
@@ -157,19 +148,6 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             .select("id")
             .single();
           if (!teamErr && team) {
-            if (players.length > 0) {
-              await supabase.from("tournament_team_players").insert(
-                players.map((p) => ({
-                  tournament_team_id: team.id,
-                  tournament_id: tournament.id,
-                  first_name: p.first_name,
-                  last_name: p.last_name,
-                  jersey_number: p.jersey_number ?? null,
-                  position: p.position || null,
-                  is_captain: !!p.is_captain,
-                })),
-              );
-            }
             await supabase
               .from("tournament_registrations")
               .update({
@@ -178,15 +156,50 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
               })
               .eq("id", row.id);
           }
+
+          // Send roster link email
+          try {
+            await enqueueTransactionalEmailServer({
+              templateName: "tournament-roster-link",
+              recipientEmail: parsed.contact_email,
+              templateData: {
+                contactName: parsed.contact_name,
+                tournamentName: tournament.name,
+                teamName: parsed.team_name,
+                rosterUrl,
+                status: "approved",
+              },
+              idempotencyKey: `roster-link:${row.id}`,
+            });
+          } catch (e) {
+            console.error("Failed to send roster email", e);
+          }
+        } else {
+          // Pending approval: acknowledge with a roster link (active once approved)
+          try {
+            await enqueueTransactionalEmailServer({
+              templateName: "tournament-roster-link",
+              recipientEmail: parsed.contact_email,
+              templateData: {
+                contactName: parsed.contact_name,
+                tournamentName: tournament.name,
+                teamName: parsed.team_name,
+                rosterUrl,
+                status: "pending",
+              },
+              idempotencyKey: `roster-link-pending:${row.id}`,
+            });
+          } catch (e) {
+            console.error("Failed to send pending email", e);
+          }
         }
 
-        // If tournament requires online payment, build a Stripe Checkout url.
+        // Online payment
         const fee = (tournament as any).registration_fee ?? 0;
         const mode = (tournament as any).payment_mode ?? "offline";
         let checkout_url: string | null = null;
         if (fee > 0 && (mode === "online" || mode === "both")) {
           try {
-            const origin = new URL(request.url).origin;
             const co = await buildCheckoutForRegistration({
               registrationId: row.id,
               origin,
@@ -204,6 +217,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
           requires_approval: !!reg.requiresApproval,
           requires_payment: fee > 0 && mode !== "offline",
           checkout_url,
+          roster_url: rosterUrl,
         });
       },
     },
