@@ -945,6 +945,8 @@
     "validatingBody": "Thanks for your purchase. We're activating your tournament pass… this only takes a few seconds.",
     "paymentConfirmed": "Payment confirmed",
     "paymentStillPending": "Payment still pending",
+    "paymentNotCompletedTitle": "Payment not completed",
+    "paymentNotCompletedBody": "Stripe says this payment was not completed. If you left the payment page before confirmation, start the pass purchase again.",
     "refreshError": "Unable to validate right now",
     "noPassTitle": "No pass available",
     "noPassBody": "Buy a tournament pass for €40 to create your tournament. No subscription required — a one-time payment per tournament.",
