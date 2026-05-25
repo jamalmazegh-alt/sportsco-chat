@@ -125,6 +125,7 @@
       "notes": "Notes (optionnel)"
     },
     "addPlayer": "Ajouter",
+    "rosterLater": "La composition de l'effectif se fait dans un second temps : dès que votre candidature est validée, vous recevrez un lien par email pour ajouter vos joueurs.",
     "submit": "Envoyer l'inscription",
     "redirectingToPayment": "Redirection vers le paiement…",
     "success": {
