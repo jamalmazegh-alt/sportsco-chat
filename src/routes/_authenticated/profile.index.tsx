@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
 import { cn } from "@/lib/utils";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
@@ -36,6 +37,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();
+  const { tournamentOnly } = useTournamentOnlyMode();
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
@@ -168,7 +170,7 @@ function ProfilePage() {
 
       {isAdmin && (
         <Link
-          to="/admin"
+          to={tournamentOnly ? "/admin/settings/payments" : "/admin"}
           className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 active:scale-[0.99] transition-all hover:border-primary/40 hover:shadow-sm"
         >
           <div className="h-11 w-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">

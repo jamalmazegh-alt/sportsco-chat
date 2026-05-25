@@ -1284,11 +1284,41 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
     const { mergeRules } = await import("./lib/rules");
-    const { buildRulesPdf } = await import("./lib/rules-pdf");
     const rules = mergeRules(tournament.settings);
-    const bytes = await buildRulesPdf(
+
+    if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
+      const { data: row, error: insErr } = await (await import("@/integrations/supabase/client.server"))
+        .supabaseAdmin
+        .from("tournament_documents")
+        .insert({
+          tournament_id: tournament.id,
+          kind: "rules",
+          language: rules.language,
+          file_url: rules.regulations.uploadedUrl,
+          storage_path: null,
+          generated_by: userId,
+        })
+        .select("*")
+        .single();
+      if (insErr) throw new Response(insErr.message, { status: 500 });
+      return { document: row };
+    }
+
+    const { buildRegulationsPdf } = await import("@/routes/api/public/tournament.$id.regulations");
+    const lang = rules.language === "en" ? "en" : "fr";
+    let logoBytes: ArrayBuffer | null = null;
+    try {
+      const origin = process.env.APP_URL || "https://www.clubero.app";
+      const logoRes = await fetch(`${origin}/clubero-logo.png`);
+      if (logoRes.ok) logoBytes = await logoRes.arrayBuffer();
+    } catch {
+      logoBytes = null;
+    }
+    const bytes = await buildRegulationsPdf(
       {
+        id: tournament.id,
         name: tournament.name,
+        slug: tournament.slug,
         sport: tournament.sport,
         category: tournament.category,
         starts_on: tournament.starts_on,
@@ -1296,9 +1326,17 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
         location: tournament.location,
         format: tournament.format,
         num_teams: tournament.num_teams,
+        points_win: tournament.points_win,
+        points_draw: tournament.points_draw,
+        points_loss: tournament.points_loss,
+        tiebreakers: tournament.tiebreakers,
+        settings: tournament.settings,
       },
       rules,
+      lang,
+      logoBytes,
     );
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const ts = Date.now();
     const path = `${tournament.id}/rules-${rules.language}-${ts}.pdf`;
