@@ -42,7 +42,7 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     const stripe = getStripe();
     // Prefer the caller's origin so Stripe redirects back to the same host
     // (app subdomain vs marketing). Only accept trusted clubero.app hosts.
-    const safeOrigin = data.origin && /^https?:\/\/([a-z0-9-]+\.)*clubero\.app(:\d+)?$/i.test(data.origin)
+    const safeOrigin = data.origin && /^https?:\/\/([a-z0-9-]+\.)*(clubero\.app|lovable\.app|localhost)(:\d+)?$/i.test(data.origin)
       ? data.origin
       : null;
     const origin = safeOrigin ?? getOrigin();
