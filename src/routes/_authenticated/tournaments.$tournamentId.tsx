@@ -180,19 +180,22 @@ function TournamentDetailPage() {
     matches: [] as any[],
   });
   const canManage =
-    (q.data as any).canManage === true ||
+    (q.data as any)?.canManage === true ||
     roles.includes("admin") || roles.includes("tournament_manager") ||
     (role as string) === "dirigeant";
-  const publicUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/tournament/${tournament.slug}`
-      : `/tournament/${tournament.slug}`;
-  const scoring = resolveScoring(
-    (tournament as any).sport,
-    ((tournament as any).settings as any)?.scoring,
-  );
-  const mergedRules = mergeRules((tournament as any).settings);
-  const registrationEnabled = mergedRules.registration.enabled;
+  const publicUrl = tournament?.slug
+    ? (typeof window !== "undefined"
+        ? `${window.location.origin}/tournament/${tournament.slug}`
+        : `/tournament/${tournament.slug}`)
+    : "";
+  const scoring = tournament
+    ? resolveScoring(
+        (tournament as any).sport,
+        ((tournament as any).settings as any)?.scoring,
+      )
+    : null;
+  const mergedRules = tournament ? mergeRules((tournament as any).settings) : null;
+  const registrationEnabled = mergedRules?.registration.enabled ?? false;
 
   // Section definitions
   const playSubs: { id: Sub; icon: any; label: string }[] = [
