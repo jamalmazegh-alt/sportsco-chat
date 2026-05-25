@@ -112,7 +112,7 @@ function TournamentsSection() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6">
-                <Link to="/features">{t("tournaments.home.ctaFeatures")}</Link>
+                <Link to={tournamentsTo}>{t("tournaments.home.ctaFeatures")}</Link>
               </Button>
             </div>
           </div>
