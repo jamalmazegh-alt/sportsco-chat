@@ -1327,6 +1327,11 @@
       "title": "Clubero — La coordination d'équipe pour clubs sportifs",
       "description": "Convocations, présences, rappels et communication de club dans une seule app mobile. WhatsApp reste disponible en option.",
       "ogDescription": "Convocations, présences, rappels — tout dans un seul outil. En un clic."
+    },
+    "onboarding": {
+      "title": "Onboarding club — Clubero",
+      "description": "Nous vous aidons à migrer votre club, vos équipes et vos données vers Clubero en quelques jours. Accompagnement humain, import Excel et outils existants.",
+      "ogDescription": "Passez à Clubero simplement. Nous migrons votre club pour vous."
     }
   },
   "trial": {

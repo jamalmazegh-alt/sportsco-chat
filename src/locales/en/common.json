@@ -1327,6 +1327,11 @@
       "title": "Clubero — Team coordination for sports clubs",
       "description": "Call-ups, attendance, reminders and club communication in a single mobile app. WhatsApp remains available as an option.",
       "ogDescription": "Call-ups, attendance, reminders — all in one tool. In one click."
+    },
+    "onboarding": {
+      "title": "Club onboarding — Clubero",
+      "description": "We help you migrate your club, teams and data to Clubero in just a few days. Human support, import from Excel and existing tools.",
+      "ogDescription": "Switch to Clubero with ease. We migrate your club for you."
     }
   },
   "trial": {

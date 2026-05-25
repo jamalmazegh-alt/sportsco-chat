@@ -432,5 +432,56 @@
       "resendCta": "Renvoyer",
       "resendSent": "Email de confirmation renvoyé. Vérifiez votre boîte de réception."
     }
+  },
+  "onboarding": {
+    "kicker": "Mise en place",
+    "title": "Passez à Clubero simplement.",
+    "subtitle": "Nous vous aidons à migrer votre club, vos équipes et vos données en quelques jours.",
+    "ctaDemo": "Demander une démo",
+    "ctaContact": "Nous contacter",
+    "reassure1": "Sans carte bancaire",
+    "reassure2": "Accompagnement humain",
+    "reassure3": "Données hébergées en Europe",
+    "importTitle": "Ce que nous pouvons importer pour vous.",
+    "importSubtitle": "Apportez ce que vous avez — fichiers, tableurs, listings. On s'occupe du reste.",
+    "imports": [
+      { "t": "Équipes", "b": "Toutes vos équipes, catégories et saisons." },
+      { "t": "Joueurs", "b": "Effectifs, numéros, postes, photos." },
+      { "t": "Parents", "b": "Contacts parents et liens avec leurs enfants." },
+      { "t": "Coachs & staff", "b": "Entraîneurs, managers et rôles." },
+      { "t": "Plannings", "b": "Calendriers de matchs et d'entraînements." },
+      { "t": "Tournois existants", "b": "Équipes inscrites, groupes et résultats." },
+      { "t": "Fichiers Excel / CSV", "b": "Import simplifié depuis vos tableurs." },
+      { "t": "Photos & logos", "b": "Logo du club, photos d'équipes et de joueurs." }
+    ],
+    "howTitle": "Comment ça se passe.",
+    "howSubtitle": "Un parcours en 4 étapes, simple et balisé.",
+    "steps": [
+      { "t": "Vous nous envoyez vos données", "b": "Tableurs, listings ou exports — dans le format que vous avez." },
+      { "t": "Nous préparons l'import", "b": "Nettoyage, structuration et vérification avec vous." },
+      { "t": "Nous configurons votre club", "b": "Équipes, rôles, branding et paramètres adaptés." },
+      { "t": "Votre club est prêt", "b": "On forme vos coachs et vous êtes opérationnels." }
+    ],
+    "humanTitle": "Vous n'êtes pas seul.",
+    "humanSubtitle": "Nous vous accompagnons pendant toute la mise en place.",
+    "humanPoints": [
+      { "t": "Accompagnement à l'onboarding", "b": "Un interlocuteur dédié pendant la configuration de votre club." },
+      { "t": "Aide à la migration", "b": "Nous récupérons vos données existantes et les intégrons proprement." },
+      { "t": "Support à la configuration", "b": "Réglages, rôles, branding, modèles d'emails — on s'occupe de tout avec vous." },
+      { "t": "Support réactif", "b": "Une équipe joignable rapidement par email, en français." }
+    ],
+    "faqTitle": "Questions fréquentes sur la mise en place",
+    "faq": [
+      { "q": "Doit-on tout recréer manuellement ?", "a": "Non. Nous pouvons importer une grande partie de vos données — équipes, joueurs, parents, plannings — à partir de vos tableurs ou exports existants." },
+      { "q": "Combien de temps prend la migration ?", "a": "La plupart des clubs sont opérationnels en quelques jours. La durée dépend du volume de données et de votre disponibilité pour les valider avec nous." },
+      { "q": "Faut-il un outil informatique particulier ?", "a": "Non. Un simple navigateur suffit. Clubero fonctionne sur ordinateur, tablette et mobile (PWA iOS / Android)." },
+      { "q": "Et si nos données sont dans plusieurs fichiers ?", "a": "Aucun souci. Nous consolidons et structurons l'ensemble pour vous avant l'import." },
+      { "q": "Pouvons-nous démarrer en milieu de saison ?", "a": "Oui. Nous adaptons l'import à votre calendrier et conservons votre historique de matchs et d'événements si vous le souhaitez." },
+      { "q": "Que se passe-t-il après la mise en place ?", "a": "Un support email reste disponible. Nous restons joignables pour les ajustements, formations complémentaires et nouvelles équipes." }
+    ],
+    "ctaTitle": "Prêt à franchir le pas ?",
+    "ctaBody": "Parlons de votre club. On vous montre Clubero et on prépare la migration ensemble.",
+    "ctaPrimary": "Demander une démo",
+    "ctaSecondary": "Nous contacter"
   }
 }
