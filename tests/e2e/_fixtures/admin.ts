@@ -52,8 +52,7 @@ if (!accessToken) {
 
 /**
  * Pre-authenticated Supabase client. Every request carries the E2E admin's
- * bearer token, so RLS sees this user. Use it like a normal client:
- *   await admin.from("clubs").select("*")
+ * bearer token, so RLS sees this user.
  */
 export const admin: SupabaseClient = createClient(url, anonKey, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -61,3 +60,26 @@ export const admin: SupabaseClient = createClient(url, anonKey, {
 });
 
 export const E2E_ADMIN_USER_ID = process.env.E2E_ADMIN_USER_ID ?? "";
+
+/**
+ * Credentials for the other pre-created roles. When the corresponding env
+ * vars are missing, we fall back to the admin user so tests keep running
+ * (role boundaries won't be meaningful in that case).
+ */
+function creds(prefix: "COACH" | "PLAYER" | "PARENT") {
+  const email = process.env[`E2E_${prefix}_EMAIL`] ?? adminEmail!;
+  const password = process.env[`E2E_${prefix}_PASSWORD`] ?? adminPassword!;
+  const userId = process.env[`E2E_${prefix}_USER_ID`] ?? E2E_ADMIN_USER_ID;
+  return { email, password, userId };
+}
+
+export const E2E_COACH = creds("COACH");
+export const E2E_PLAYER = creds("PLAYER");
+export const E2E_PARENT = creds("PARENT");
+
+/** True when each role has its own distinct user (vs falling back to admin). */
+export const HAS_MULTI_ROLE_USERS = Boolean(
+  process.env.E2E_COACH_USER_ID &&
+    process.env.E2E_PLAYER_USER_ID &&
+    process.env.E2E_PARENT_USER_ID,
+);
