@@ -312,9 +312,9 @@ async function buildRegulationsPdf(
   const fp = rules.fairPlay;
   drawArticle(ctx, 5, [I18N[lang].a5Intro]);
   drawBullets(ctx, [
-    `${I18N[lang].a5Yellow} : ${I18N[lang].a5Pts(Math.abs(fp.yellow))}`,
-    `${I18N[lang].a5Second} : ${I18N[lang].a5Pts(Math.abs(fp.secondYellow))}`,
-    `${I18N[lang].a5Red} : ${I18N[lang].a5Pts(Math.abs(fp.red))}`,
+    `${I18N[lang].a5Yellow} : ${I18N[lang].a5Pts(Math.abs(fp.yellow ?? 0))}`,
+    `${I18N[lang].a5Second} : ${I18N[lang].a5Pts(Math.abs(fp.secondYellow ?? 0))}`,
+    `${I18N[lang].a5Red} : ${I18N[lang].a5Pts(Math.abs(fp.red ?? 0))}`,
   ]);
   drawParagraph(ctx, I18N[lang].a5Outro);
 
