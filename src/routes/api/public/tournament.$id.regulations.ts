@@ -283,6 +283,7 @@ async function buildRegulationsPdf(
   t: Tournament,
   rules: ReturnType<typeof mergeRules>,
   lang: Lang,
+  logoBytes: ArrayBuffer | null,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle(`${t.name} — ${I18N[lang].subtitle}`);
