@@ -289,12 +289,24 @@ export function RegistrationsManager({
                   "Ce tournoi est payant en ligne mais votre club n'a pas connecté de compte Stripe. Les équipes ne pourront pas payer tant que le compte n'est pas configuré.",
               })}
             </p>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/admin/settings/payments">
-                {t("registrations.stripeNotConnected.cta", {
-                  defaultValue: "Connecter un compte Stripe",
-                })}
-              </Link>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={async () => {
+                if (tournament?.club_id) {
+                  setActiveClubId(tournament.club_id);
+                  try {
+                    await refreshMemberships();
+                  } catch {
+                    /* ignore */
+                  }
+                }
+                navigate({ to: "/admin/settings/payments" });
+              }}
+            >
+              {t("registrations.stripeNotConnected.cta", {
+                defaultValue: "Connecter un compte Stripe",
+              })}
             </Button>
           </AlertDescription>
         </Alert>
