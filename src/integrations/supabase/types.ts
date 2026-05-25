@@ -2107,6 +2107,8 @@ export type Database = {
           players: Json
           refund_reason: string | null
           refunded_at: string | null
+          roster_submitted_at: string | null
+          roster_token: string
           short_name: string | null
           status: Database["public"]["Enums"]["tournament_registration_status"]
           stripe_charge_id: string | null
@@ -2144,6 +2146,8 @@ export type Database = {
           players?: Json
           refund_reason?: string | null
           refunded_at?: string | null
+          roster_submitted_at?: string | null
+          roster_token?: string
           short_name?: string | null
           status?: Database["public"]["Enums"]["tournament_registration_status"]
           stripe_charge_id?: string | null
@@ -2181,6 +2185,8 @@ export type Database = {
           players?: Json
           refund_reason?: string | null
           refunded_at?: string | null
+          roster_submitted_at?: string | null
+          roster_token?: string
           short_name?: string | null
           status?: Database["public"]["Enums"]["tournament_registration_status"]
           stripe_charge_id?: string | null
@@ -2750,6 +2756,10 @@ export type Database = {
         Returns: string
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_registration_by_roster_token: {
+        Args: { _token: string }
+        Returns: Json
+      }
       get_tournament_invite_by_token: {
         Args: { _token: string }
         Returns: Json
@@ -2887,6 +2897,10 @@ export type Database = {
         Returns: {
           id: string
         }[]
+      }
+      save_roster_via_token: {
+        Args: { _players: Json; _token: string }
+        Returns: Json
       }
       soft_delete_entity: {
         Args: { _id: string; _kind: string }

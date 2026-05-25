@@ -125,6 +125,7 @@
       "notes": "Notes (optional)"
     },
     "addPlayer": "Add",
+    "rosterLater": "Players are added later: once your registration is approved, you will receive an email with a link to compose your squad.",
     "submit": "Submit registration",
     "redirectingToPayment": "Redirecting to payment…",
     "success": {
