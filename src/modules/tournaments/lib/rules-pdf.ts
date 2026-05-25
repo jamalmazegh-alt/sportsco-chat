@@ -307,10 +307,10 @@ function drawList(ctx: Ctx, items: string[]) {
 
 function drawParagraph(ctx: Ctx, text: string) {
   const maxW = PAGE_W - MARGIN * 2 - 6;
-  const lines = wrapText(text, ctx.font, 10, maxW);
+  const lines = wrapText(safe(text), ctx.font, 10, maxW);
   for (const line of lines) {
     ensureSpace(ctx, 14);
-    ctx.page.drawText(safe(line), {
+    ctx.page.drawText(line, {
       x: MARGIN + 6,
       y: ctx.y,
       size: 10,
@@ -350,7 +350,14 @@ function wrapText(text: string, font: PDFFont, size: number, maxW: number): stri
 
 // Helvetica only supports WinAnsi — strip non-encodable chars.
 function safe(s: string): string {
-  return s.replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "?");
+  return s
+    .replace(/[\u2212\u2012\u2013\u2014\u2015]/g, "-")
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ")
+    .replace(/[\u2022\u25E6]/g, "*")
+    .replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "?");
 }
 
 function capitalize(s: string): string {
