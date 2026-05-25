@@ -20,7 +20,9 @@ import {
   Crown,
   Sparkles,
   Activity,
+  FileDown,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -422,6 +424,20 @@ function PublicTournamentPage() {
           )}
         </div>
 
+        {(data as any).rulesDocument?.file_url && (
+          <div className="pb-2">
+            <a
+              href={(data as any).rulesDocument.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition"
+            >
+              <FileDown className="h-4 w-4" />
+              {t("public.downloadRules", { defaultValue: "Télécharger le règlement (PDF)" })}
+            </a>
+          </div>
+        )}
+
         <div className="pb-8">
           <SponsorsStrip
             sponsors={rules.branding.sponsors}
@@ -430,6 +446,7 @@ function PublicTournamentPage() {
             }
           />
         </div>
+
       </div>
     </div>
   );
@@ -1050,16 +1067,30 @@ function PublishedRegistrationView({
         </section>
 
         {/* Public message from organizer (if set) */}
-        {rules.registration.publicMessage && (
-          <section className="rounded-2xl border border-border bg-card p-5">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        {(rules.registration.publicMessage || (data as any).rulesDocument?.file_url) && (
+          <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               {t("tournament.rules")}
             </h2>
-            <div className="whitespace-pre-wrap text-sm">
-              {rules.registration.publicMessage}
-            </div>
+            {rules.registration.publicMessage && (
+              <div className="whitespace-pre-wrap text-sm">
+                {rules.registration.publicMessage}
+              </div>
+            )}
+            {(data as any).rulesDocument?.file_url && (
+              <a
+                href={(data as any).rulesDocument.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition"
+              >
+                <FileDown className="h-4 w-4" />
+                {t("public.downloadRules", { defaultValue: "Télécharger le règlement (PDF)" })}
+              </a>
+            )}
           </section>
         )}
+
 
         {/* Registered teams — names only */}
         <section className="rounded-2xl border border-border bg-card p-5">
