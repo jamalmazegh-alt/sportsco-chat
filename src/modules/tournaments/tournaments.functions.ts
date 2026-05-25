@@ -73,6 +73,22 @@ export const createTournament = createServerFn({ method: "POST" })
       throw new Response("Forbidden — admin/dirigeant required", { status: 403 });
     }
 
+    // Personal (auto-created) clubs are paywalled per-tournament: organizers
+    // must use the pass-based creation flow (createTournamentFromPass), not
+    // this direct club-admin path.
+    const { data: clubRow } = await supabaseAdmin
+      .from("clubs")
+      .select("is_personal")
+      .eq("id", data.club_id)
+      .maybeSingle();
+    if (clubRow?.is_personal) {
+      throw new Response(
+        "Personal organizer clubs must create tournaments via a paid pass",
+        { status: 403 },
+      );
+    }
+
+
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
     const { data: row, error } = await supabase
       .from("tournaments")
