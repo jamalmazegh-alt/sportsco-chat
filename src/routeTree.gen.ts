@@ -37,6 +37,7 @@ import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billi
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
+import { Route as FrTournoisRouteImport } from './routes/fr.tournois'
 import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-club'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -238,6 +239,11 @@ const LegalCookiesRoute = LegalCookiesRouteImport.update({
 const LegalKindRoute = LegalKindRouteImport.update({
   id: '/legal/$kind',
   path: '/legal/$kind',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrTournoisRoute = FrTournoisRouteImport.update({
+  id: '/fr/tournois',
+  path: '/fr/tournois',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FrOnboardingClubRoute = FrOnboardingClubRouteImport.update({
@@ -619,6 +625,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
@@ -707,6 +714,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
@@ -801,6 +809,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
@@ -895,6 +904,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
     | '/r/$token'
@@ -983,6 +993,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
     | '/r/$token'
@@ -1076,6 +1087,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
     | '/r/$token'
@@ -1159,6 +1171,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
   FrOnboardingClubRoute: typeof FrOnboardingClubRoute
+  FrTournoisRoute: typeof FrTournoisRoute
   LegalKindRoute: typeof LegalKindRoute
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
@@ -1382,6 +1395,13 @@ declare module '@tanstack/react-router' {
       path: '/legal/$kind'
       fullPath: '/legal/$kind'
       preLoaderRoute: typeof LegalKindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/tournois': {
+      id: '/fr/tournois'
+      path: '/fr/tournois'
+      fullPath: '/fr/tournois'
+      preLoaderRoute: typeof FrTournoisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fr/onboarding-club': {
@@ -2085,6 +2105,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,
   FrOnboardingClubRoute: FrOnboardingClubRoute,
+  FrTournoisRoute: FrTournoisRoute,
   LegalKindRoute: LegalKindRoute,
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
