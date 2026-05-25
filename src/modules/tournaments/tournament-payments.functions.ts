@@ -458,8 +458,134 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
     return { ok: true, channel: "copy", link };
   });
 
+// ---------- Admin: invite a team by email (creates a pending registration
+// and immediately sends the personalized payment-link email).
+
+export const inviteTeamForPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        team_name: z.string().trim().min(1).max(120),
+        contact_name: z.string().trim().min(1).max(120),
+        contact_email: z.string().trim().email().max(200),
+        contact_phone: z.string().trim().max(40).nullable().optional(),
+        origin: z.string().url(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { data: t } = await supabaseAdmin
+      .from("tournaments")
+      .select(
+        "id, name, slug, registration_fee, registration_currency, payment_mode, club_id",
+      )
+      .eq("id", data.tournament_id)
+      .single();
+    if (!t || !t.registration_fee || t.registration_fee <= 0) {
+      throw new Response("Tournament has no fee", { status: 400 });
+    }
+    if (t.payment_mode === "offline") {
+      throw new Response("Tournament does not accept online payment", { status: 400 });
+    }
+    if (!t.club_id) {
+      throw new Response("Online payment requires a club", { status: 400 });
+    }
+    const { data: club } = await supabaseAdmin
+      .from("clubs")
+      .select("stripe_account_id, stripe_charges_enabled")
+      .eq("id", t.club_id)
+      .single();
+    if (!club?.stripe_account_id || !club.stripe_charges_enabled) {
+      throw new Response("Club Stripe account not ready", { status: 400 });
+    }
+
+    // Create the registration as pre-approved with payment pending.
+    const nowIso = new Date().toISOString();
+    const { data: reg, error: insErr } = await supabaseAdmin
+      .from("tournament_registrations")
+      .insert({
+        tournament_id: t.id,
+        team_name: data.team_name,
+        contact_name: data.contact_name,
+        contact_email: data.contact_email,
+        contact_phone: data.contact_phone ?? null,
+        players: [],
+        status: "approved",
+        payment_status: "pending",
+        decided_at: nowIso,
+        decided_by: userId,
+        decision_note: "Invitation directe par l'organisateur",
+      })
+      .select("id")
+      .single();
+    if (insErr || !reg) {
+      throw new Response(insErr?.message ?? "Failed to create registration", {
+        status: 400,
+      });
+    }
+
+    // Generate the payment link.
+    const now = new Date();
+    const expires = new Date(now.getTime() + LINK_TTL_DAYS * 24 * 3600 * 1000);
+    const link = buildPublicPaymentUrl(data.origin, t.slug, reg.id);
+    await supabaseAdmin
+      .from("tournament_registrations")
+      .update({
+        payment_link: link,
+        payment_link_created_at: now.toISOString(),
+        payment_link_expires_at: expires.toISOString(),
+      })
+      .eq("id", reg.id);
+
+    // Send the personalized payment-request email.
+    const amountLabel = formatMoney(
+      t.registration_fee,
+      t.registration_currency ?? "eur",
+    );
+    try {
+      const { enqueueTransactionalEmailServer } = await import(
+        "@/lib/email/send.server"
+      );
+      await enqueueTransactionalEmailServer({
+        templateName: "tournament-payment-request",
+        recipientEmail: data.contact_email,
+        templateData: {
+          teamName: data.team_name,
+          tournamentName: t.name,
+          amountLabel,
+          paymentUrl: link,
+          expiresInDays: LINK_TTL_DAYS,
+        },
+        idempotencyKey: `tournament-invite-payment-${reg.id}`,
+      });
+      await supabaseAdmin
+        .from("tournament_registrations")
+        .update({
+          payment_link_sent_via: "email",
+          payment_link_sent_at: new Date().toISOString(),
+        })
+        .eq("id", reg.id);
+      await logPaymentEvent(t.id, reg.id, "checkout_created", t.registration_fee, {
+        payment_link_sent: "email",
+        to: data.contact_email,
+        source: "invite",
+      });
+    } catch (e: any) {
+      console.error("[invite team for payment] email failed", e);
+      // Keep the registration even if email fails; admin can resend.
+    }
+
+    return { ok: true, registration_id: reg.id, link };
+  });
+
 // Webhook helpers moved to tournament-payments.server.ts to keep
 // the stripe-webhook route bundle free of the createServerFn graph.
+
 
 // ---------- Admin: publish tournament programme (irreversible)
 // Pre-flight checks → flip status to 'in_progress', stamp published_programme_at,
