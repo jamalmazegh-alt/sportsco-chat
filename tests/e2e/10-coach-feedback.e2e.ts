@@ -66,7 +66,7 @@ test.describe("Coach feedback + AI synthesis", () => {
       process.env.E2E_REAL_AI === "1"
         ? "AI-generated content placeholder"
         : `Mock synthèse pour ${club.prefix}`;
-    const { data, error } = await admin
+    const { data, error } = await coach
       .from("player_reviews")
       .insert({
         club_id: club.clubId,
