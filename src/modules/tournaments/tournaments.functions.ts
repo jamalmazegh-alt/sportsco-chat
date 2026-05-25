@@ -1304,14 +1304,38 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
       return { document: row };
     }
 
+    const { buildRegulationsPdf } = await import("@/routes/api/public/tournament.$id.regulations");
     const lang = rules.language === "en" ? "en" : "fr";
-    const origin = process.env.APP_URL || "https://www.clubero.app";
-    const pdfUrl = `${origin}/api/public/tournament/${tournament.id}/regulations?lang=${lang}`;
-    const pdfRes = await fetch(pdfUrl);
-    if (!pdfRes.ok) {
-      throw new Response("Failed to generate regulations PDF", { status: 500 });
+    let logoBytes: ArrayBuffer | null = null;
+    try {
+      const origin = process.env.APP_URL || "https://www.clubero.app";
+      const logoRes = await fetch(`${origin}/clubero-logo.png`);
+      if (logoRes.ok) logoBytes = await logoRes.arrayBuffer();
+    } catch {
+      logoBytes = null;
     }
-    const bytes = new Uint8Array(await pdfRes.arrayBuffer());
+    const bytes = await buildRegulationsPdf(
+      {
+        id: tournament.id,
+        name: tournament.name,
+        slug: tournament.slug,
+        sport: tournament.sport,
+        category: tournament.category,
+        starts_on: tournament.starts_on,
+        ends_on: tournament.ends_on,
+        location: tournament.location,
+        format: tournament.format,
+        num_teams: tournament.num_teams,
+        points_win: tournament.points_win,
+        points_draw: tournament.points_draw,
+        points_loss: tournament.points_loss,
+        tiebreakers: tournament.tiebreakers,
+        settings: tournament.settings,
+      },
+      rules,
+      lang,
+      logoBytes,
+    );
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const ts = Date.now();
