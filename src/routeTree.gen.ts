@@ -39,6 +39,7 @@ import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as FrTournoisRouteImport } from './routes/fr.tournois'
 import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-club'
+import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -249,6 +250,11 @@ const FrTournoisRoute = FrTournoisRouteImport.update({
 const FrOnboardingClubRoute = FrOnboardingClubRouteImport.update({
   id: '/fr/onboarding-club',
   path: '/fr/onboarding-club',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnTournamentsRoute = EnTournamentsRouteImport.update({
+  id: '/en/tournaments',
+  path: '/en/tournaments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnClubOnboardingRoute = EnClubOnboardingRouteImport.update({
@@ -624,6 +630,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -713,6 +720,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -808,6 +816,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
@@ -903,6 +912,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/tournaments'
     | '/fr/onboarding-club'
     | '/fr/tournois'
     | '/legal/$kind'
@@ -992,6 +1002,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/tournaments'
     | '/fr/onboarding-club'
     | '/fr/tournois'
     | '/legal/$kind'
@@ -1086,6 +1097,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/tournaments'
     | '/fr/onboarding-club'
     | '/fr/tournois'
     | '/legal/$kind'
@@ -1170,6 +1182,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
+  EnTournamentsRoute: typeof EnTournamentsRoute
   FrOnboardingClubRoute: typeof FrOnboardingClubRoute
   FrTournoisRoute: typeof FrTournoisRoute
   LegalKindRoute: typeof LegalKindRoute
@@ -1409,6 +1422,13 @@ declare module '@tanstack/react-router' {
       path: '/fr/onboarding-club'
       fullPath: '/fr/onboarding-club'
       preLoaderRoute: typeof FrOnboardingClubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/tournaments': {
+      id: '/en/tournaments'
+      path: '/en/tournaments'
+      fullPath: '/en/tournaments'
+      preLoaderRoute: typeof EnTournamentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/club-onboarding': {
@@ -2104,6 +2124,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,
+  EnTournamentsRoute: EnTournamentsRoute,
   FrOnboardingClubRoute: FrOnboardingClubRoute,
   FrTournoisRoute: FrTournoisRoute,
   LegalKindRoute: LegalKindRoute,
