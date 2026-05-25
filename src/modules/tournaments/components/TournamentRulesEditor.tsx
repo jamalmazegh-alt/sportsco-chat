@@ -320,6 +320,34 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
+      {/* Roster / Composition d'équipe */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            {t("rules.rosterTitle", { defaultValue: "Composition d'équipe" })}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-3">
+          <NumberField
+            label={t("rules.maxSubstitutes", { defaultValue: "Remplaçants max" })}
+            value={rules.roster.maxSubstitutes}
+            min={0}
+            onChange={(v) =>
+              setRules({ ...rules, roster: { ...rules.roster, maxSubstitutes: v } })
+            }
+          />
+          <NumberField
+            label={t("rules.jokersPerTeam", { defaultValue: "Jokers par équipe" })}
+            value={rules.roster.jokersPerTeam}
+            min={0}
+            onChange={(v) =>
+              setRules({ ...rules, roster: { ...rules.roster, jokersPerTeam: v } })
+            }
+          />
+        </CardContent>
+      </Card>
+
+
       {/* Fair play */}
       <Card>
         <CardHeader>
