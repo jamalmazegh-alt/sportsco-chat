@@ -318,7 +318,10 @@ export async function buildRegulationsPdf(
   const cat = t.category?.trim() || (lang === "fr" ? "toutes catégories" : "all categories");
   const fmt = t.format || "group";
 
-  drawArticle(ctx, 1, [I18N[lang].a1(t.num_teams, cat, fmt, dateStr, loc)]);
+  drawArticle(ctx, 1, [
+    I18N[lang].a1(t.num_teams, cat, fmt, dateStr, loc),
+    I18N[lang].a1Roster(rules.roster.maxSubstitutes, rules.roster.jokersPerTeam),
+  ]);
 
   // Article 2
   drawArticle(ctx, 2, [I18N[lang].a2Intro]);
