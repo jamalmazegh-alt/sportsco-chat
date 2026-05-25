@@ -172,9 +172,10 @@ export async function buildRulesPdf(
   // Roster
   section(ctx, t.roster);
   drawKeyValues(ctx, [
+    [t.playersPerTeam, String(rules.roster.playersPerTeam)],
     [t.maxSubstitutes, String(rules.roster.maxSubstitutes)],
-    [t.jokersPerTeam, String(rules.roster.jokersPerTeam)],
   ]);
+
   ctx.y -= 10;
 
   // Fair-play
