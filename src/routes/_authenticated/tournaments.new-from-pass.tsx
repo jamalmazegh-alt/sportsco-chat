@@ -42,6 +42,7 @@ function NewFromPassPage() {
   const [pollStartedAt] = useState(() => Date.now());
   const [waitedTooLong, setWaitedTooLong] = useState(false);
   const [manualConfirming, setManualConfirming] = useState(false);
+  const [paymentNotCompleted, setPaymentNotCompleted] = useState(false);
 
   const passesQ = useQuery({
     queryKey: ["my-tournament-passes"],
@@ -68,6 +69,8 @@ function NewFromPassPage() {
         const res = await confirmFn({ data: { session_id: sessionId! } });
         if (!cancelled && res.paid) {
           await passesQ.refetch();
+        } else if (!cancelled && res.checkoutStatus === "open" && res.paymentStatus === "unpaid") {
+          setPaymentNotCompleted(true);
         }
       } catch {
         /* ignore — webhook may still resolve it */
@@ -149,7 +152,11 @@ function NewFromPassPage() {
       if (sessionId) {
         const res = await confirmFn({ data: { session_id: sessionId } });
         if (res.paid) {
+          setPaymentNotCompleted(false);
           toast.success(t("newFromPass.paymentConfirmed", { defaultValue: "Paiement confirmé" }));
+        } else if (res.checkoutStatus === "open" && res.paymentStatus === "unpaid") {
+          setPaymentNotCompleted(true);
+          toast.info(t("newFromPass.paymentNotCompletedTitle", { defaultValue: "Paiement non finalisé" }));
         } else {
           toast.info(t("newFromPass.paymentStillPending", { defaultValue: "Paiement encore en attente" }));
         }
@@ -185,10 +192,15 @@ function NewFromPassPage() {
         {waitedTooLong && (
           <div className="mt-8 space-y-3">
             <p className="text-sm text-muted-foreground">
-              {t("newFromPass.stillWaitingBody", {
-                defaultValue:
-                  "Cela prend plus de temps que prévu. Si votre paiement a bien été effectué, rafraîchissez la page — votre pass apparaîtra dès qu'il sera confirmé.",
-              })}
+              {paymentNotCompleted
+                ? t("newFromPass.paymentNotCompletedBody", {
+                    defaultValue:
+                      "Stripe indique que ce paiement n'est pas finalisé. Si vous avez quitté la page de paiement avant la confirmation, relancez l'achat du pass.",
+                  })
+                : t("newFromPass.stillWaitingBody", {
+                    defaultValue:
+                      "Cela prend plus de temps que prévu. Si votre paiement a bien été effectué, rafraîchissez la page — votre pass apparaîtra dès qu'il sera confirmé.",
+                  })}
             </p>
             <Button
               variant="outline"
