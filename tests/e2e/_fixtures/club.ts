@@ -111,14 +111,17 @@ export async function createTestClub(suiteName = "suite"): Promise<SeededClub> {
   if (plErr || !players) throw new Error(`players insert: ${plErr?.message}`);
   const [p1, p2] = players;
 
-  await admin
-    .from("team_members")
-    .insert([
-      { team_id: teamId, user_id: coachUser.userId, role: "coach" },
-      { team_id: teamId, user_id: playerUser.userId, player_id: p1.id, role: "player" },
-      { team_id: teamId, user_id: playerUser.userId, player_id: p2.id, role: "player" },
-    ])
-    .select();
+  {
+    const { error: tmErr } = await admin
+      .from("team_members")
+      .insert([
+        { team_id: teamId, user_id: coachUser.userId, role: "coach" },
+        { team_id: teamId, user_id: playerUser.userId, player_id: p1.id, role: "player" },
+        { team_id: teamId, user_id: playerUser.userId, player_id: p2.id, role: "player" },
+      ])
+      .select();
+    if (tmErr) throw new Error(`team_members insert: ${tmErr.message}`);
+  }
 
   await admin
     .from("player_parents")
