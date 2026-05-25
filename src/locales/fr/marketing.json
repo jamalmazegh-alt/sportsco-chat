@@ -1,6 +1,8 @@
 {
   "nav": {
     "features": "Fonctionnalités",
+    "tournaments": "Tournois",
+    "onboarding": "Onboarding club",
     "pricing": "Tarifs",
     "faq": "FAQ",
     "contact": "Contact",
