@@ -19,8 +19,10 @@ import {
   MessageCircle,
   ChevronDown,
   UserPlus,
-
+  AlertTriangle,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -214,11 +216,16 @@ export function RegistrationsManager({
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
 
-  const canShowSendLink =
+  const isPaidOnline =
     !!tournament &&
     (tournament.registration_fee ?? 0) > 0 &&
-    (tournament.payment_mode === "online" || tournament.payment_mode === "both") &&
-    !!tournament.club_stripe_charges_enabled;
+    (tournament.payment_mode === "online" || tournament.payment_mode === "both");
+
+  const stripeNotConnected =
+    isPaidOnline && !tournament?.club_stripe_charges_enabled;
+
+  const canShowSendLink = isPaidOnline && !!tournament?.club_stripe_charges_enabled;
+
 
   const inviteFn = useServerFn(inviteTeamForPayment);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -263,6 +270,32 @@ export function RegistrationsManager({
 
   return (
     <div className="space-y-3">
+      {stripeNotConnected && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>
+            {t("registrations.stripeNotConnected.title", {
+              defaultValue: "Compte de paiement non connecté",
+            })}
+          </AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>
+              {t("registrations.stripeNotConnected.description", {
+                defaultValue:
+                  "Ce tournoi est payant en ligne mais votre club n'a pas connecté de compte Stripe. Les équipes ne pourront pas payer tant que le compte n'est pas configuré.",
+              })}
+            </p>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/admin/settings/payments">
+                {t("registrations.stripeNotConnected.cta", {
+                  defaultValue: "Connecter un compte Stripe",
+                })}
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-sm font-medium text-muted-foreground">
           {t("registrations.count", { count: regs.length })}
