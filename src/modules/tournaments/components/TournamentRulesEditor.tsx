@@ -21,7 +21,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, RotateCcw, Save, Plus, Loader2, FileDown, ExternalLink, Upload, FileText, X } from "lucide-react";
 import { toast } from "sonner";
-import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
