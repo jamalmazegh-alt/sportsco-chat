@@ -758,6 +758,9 @@ function CTA() {
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
                 <Link to="/pricing">{t("home.ctaPricing")}</Link>
               </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
+                <Link to={onboardingTo}>{t("nav.onboarding")}</Link>
+              </Button>
             </div>
           </div>
         </div>
