@@ -40,7 +40,7 @@ export default defineConfig({
     ? /.*\.e2e\.ts$/
     : /00-missing-supabase-config\.e2e\.ts$/,
   globalSetup: HAS_E2E_CONFIG
-    ? require.resolve("./tests/e2e/_fixtures/global-setup.ts")
+    ? "./tests/e2e/_fixtures/global-setup.ts"
     : undefined,
   timeout: process.env.E2E_UI === "1" ? 90_000 : 30_000,
   expect: { timeout: 15_000 },
