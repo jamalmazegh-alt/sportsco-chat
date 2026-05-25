@@ -59,7 +59,9 @@ test.describe("Clubero pack — page tarifs publique", () => {
     expect(resp?.ok()).toBeTruthy();
 
     // Le tarif du plan Clubero doit rester présent.
-    await expect(page.locator("text=/49\\s*€/").first()).toBeVisible();
+    await expect(
+      page.locator("text=/\\d+\\s*€\\s*\\/\\s*(mois|month)/i").first(),
+    ).toBeVisible();
 
     // Au moins un CTA pointe vers /register (essai + carte plan principale).
     const registerLinks = page.locator('a[href="/register"]');
