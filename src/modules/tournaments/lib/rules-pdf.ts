@@ -31,8 +31,9 @@ const I18N = {
     perGroup: "Équipes qualifiées par groupe",
     bestThirds: "Meilleurs 3es (ou Ne) qualifiés",
     roster: "Composition d'équipe",
+    playersPerTeam: "Joueurs par équipe",
     maxSubstitutes: "Remplaçants max",
-    jokersPerTeam: "Jokers par équipe",
+
     fairPlay: "Fair-play (déductions)",
     yellow: "Carton jaune",
     secondYellow: "2e jaune (expulsion)",
