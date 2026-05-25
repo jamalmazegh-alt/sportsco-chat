@@ -103,7 +103,7 @@ export const DEFAULT_RULES: TournamentRules = {
     abandonedAsForfeit: true,
     minRestMinutes: 30,
   },
-  roster: { maxSubstitutes: 5, jokersPerTeam: 0 },
+  roster: { playersPerTeam: 11, maxSubstitutes: 5 },
   registration: {
     enabled: false,
     opensAt: null,
