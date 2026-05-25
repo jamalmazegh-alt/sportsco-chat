@@ -28,7 +28,7 @@ const IMPORT_ICONS = [
   Users,
   UserSquare2,
   Heart,
-  Whistle,
+  ClipboardList,
   CalendarDays,
   Trophy,
   FileSpreadsheet,
