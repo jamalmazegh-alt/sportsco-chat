@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
   Users,
@@ -58,12 +58,26 @@ type PricingTier = {
 
 export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (i18n.language?.slice(0, 2) !== locale) {
+    const current = i18n.language?.slice(0, 2);
+    if (current && current !== locale) {
+      navigate({ to: current === "fr" ? "/fr/tournois" : "/en/tournaments" });
+      return;
+    }
+    if (current !== locale) {
       i18n.changeLanguage(locale);
     }
-  }, [locale, i18n]);
+    const handler = (lng: string) => {
+      const next = lng?.slice(0, 2);
+      if (next && next !== locale) {
+        navigate({ to: next === "fr" ? "/fr/tournois" : "/en/tournaments" });
+      }
+    };
+    i18n.on("languageChanged", handler);
+    return () => { i18n.off("languageChanged", handler); };
+  }, [locale, i18n, navigate]);
 
   const ecosystem = t("tournamentsPage.ecosystem", { returnObjects: true }) as Item[];
   const livePoints = t("tournamentsPage.livePoints", { returnObjects: true }) as Item[];
