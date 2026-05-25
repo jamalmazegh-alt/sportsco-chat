@@ -1310,13 +1310,18 @@ export const listMatchEvents = createServerFn({ method: "POST" })
 export const generateRulesPdf = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
+    z.object({
+      tournament_id: z.string().uuid(),
+      language: z.enum(["fr", "en"]).optional(),
+    }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
     const { mergeRules } = await import("./lib/rules");
-    const rules = mergeRules(tournament.settings);
+    const rulesRaw = mergeRules(tournament.settings);
+    const lang: "fr" | "en" = data.language ?? (rulesRaw.language === "en" ? "en" : "fr");
+    const rules = { ...rulesRaw, language: lang };
 
     if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
       const { data: row, error: insErr } = await (await import("@/integrations/supabase/client.server"))
@@ -1325,7 +1330,7 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
         .insert({
           tournament_id: tournament.id,
           kind: "rules",
-          language: rules.language,
+          language: lang,
           file_url: rules.regulations.uploadedUrl,
           storage_path: null,
           generated_by: userId,
@@ -1337,7 +1342,6 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
     }
 
     const { buildRegulationsPdf } = await import("@/routes/api/public/tournament.$id.regulations");
-    const lang = rules.language === "en" ? "en" : "fr";
     let logoBytes: ArrayBuffer | null = null;
     try {
       const origin = process.env.APP_URL || "https://www.clubero.app";
