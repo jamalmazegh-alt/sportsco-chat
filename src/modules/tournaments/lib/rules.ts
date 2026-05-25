@@ -30,6 +30,13 @@ export interface ForfeitRules {
   minRestMinutes: number;
 }
 
+export interface RosterRules {
+  /** Nombre maximal de remplaçants autorisés par équipe (en plus des titulaires). */
+  maxSubstitutes: number;
+  /** Nombre de jokers (joueurs supplémentaires hors club autorisés) par équipe. */
+  jokersPerTeam: number;
+}
+
 export interface RegistrationRules {
   enabled: boolean;
   opensAt?: string | null;   // ISO datetime
