@@ -41,12 +41,29 @@ const HUMAN_ICONS = [LifeBuoy, HandHeart, Wand2, MessageCircle];
 
 export function ClubOnboardingPage({ locale }: { locale: "fr" | "en" }) {
   const { t, i18n } = useTranslation("marketing");
+  const navigate = useNavigate();
 
+  // Sync i18n with route locale on mount; if the user switches the language
+  // afterwards, navigate to the counterpart route instead of forcing it back.
   useEffect(() => {
-    if (i18n.language?.slice(0, 2) !== locale) {
+    const current = i18n.language?.slice(0, 2);
+    if (current && current !== locale) {
+      const target = current === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
+      navigate({ to: target });
+      return;
+    }
+    if (current !== locale) {
       i18n.changeLanguage(locale);
     }
-  }, [locale, i18n]);
+    const handler = (lng: string) => {
+      const next = lng?.slice(0, 2);
+      if (next && next !== locale) {
+        navigate({ to: next === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding" });
+      }
+    };
+    i18n.on("languageChanged", handler);
+    return () => { i18n.off("languageChanged", handler); };
+  }, [locale, i18n, navigate]);
 
   const imports = t("onboarding.imports", { returnObjects: true }) as { t: string; b: string }[];
   const steps = t("onboarding.steps", { returnObjects: true }) as { t: string; b: string }[];
