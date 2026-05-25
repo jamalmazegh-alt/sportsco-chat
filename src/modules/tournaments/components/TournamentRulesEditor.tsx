@@ -98,8 +98,10 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     queryKey: ["tournament-documents", tournamentId],
     queryFn: () => listDocsFn({ data: { tournament_id: tournamentId } }),
   });
+  const [pdfLang, setPdfLang] = useState<"fr" | "en">(rules.language);
   const generate = useMutation({
-    mutationFn: () => genPdfFn({ data: { tournament_id: tournamentId } }),
+    mutationFn: () =>
+      genPdfFn({ data: { tournament_id: tournamentId, language: pdfLang } }),
     onSuccess: (res: any) => {
       toast.success(t("rules.pdfGeneratedToast"));
       qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
