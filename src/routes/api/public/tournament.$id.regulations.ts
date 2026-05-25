@@ -612,13 +612,12 @@ function wrap(text: string, font: PDFFont, size: number, maxW: number): string[]
 // Helvetica WinAnsi: remplace les caractères non encodables.
 function safe(s: string): string {
   return s
-    .replace(/–/g, "-")
-    .replace(/—/g, "-")
-    .replace(/’/g, "'")
-    .replace(/‘/g, "'")
-    .replace(/“|”/g, '"')
-    .replace(/…/g, "...")
-    .replace(/·/g, "·") // · is in WinAnsi (0xB7), keep
+    .replace(/[\u2212\u2012\u2013\u2014\u2015]/g, "-") // minus, figure/en/em/horizontal dash
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ")
+    .replace(/[\u2022\u25E6]/g, "*")
     .replace(/[^\x20-\x7E\u00A0-\u00FF]/g, "?");
 }
 
