@@ -68,7 +68,7 @@ test.describe("Coach feedback + AI synthesis", () => {
         club_id: club.clubId,
         player_id: club.player1.id,
         author_user_id: club.coach.userId,
-        kind: "season",
+        kind: "end_of_season",
         content,
         visibility: "coach_only",
       })
