@@ -329,6 +329,14 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           <NumberField
+            label={t("rules.playersPerTeam", { defaultValue: "Joueurs par équipe" })}
+            value={rules.roster.playersPerTeam}
+            min={1}
+            onChange={(v) =>
+              setRules({ ...rules, roster: { ...rules.roster, playersPerTeam: v } })
+            }
+          />
+          <NumberField
             label={t("rules.maxSubstitutes", { defaultValue: "Remplaçants max" })}
             value={rules.roster.maxSubstitutes}
             min={0}
@@ -336,15 +344,8 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               setRules({ ...rules, roster: { ...rules.roster, maxSubstitutes: v } })
             }
           />
-          <NumberField
-            label={t("rules.jokersPerTeam", { defaultValue: "Jokers par équipe" })}
-            value={rules.roster.jokersPerTeam}
-            min={0}
-            onChange={(v) =>
-              setRules({ ...rules, roster: { ...rules.roster, jokersPerTeam: v } })
-            }
-          />
         </CardContent>
+
       </Card>
 
 
