@@ -1332,6 +1332,11 @@
       "title": "Onboarding club — Clubero",
       "description": "Nous vous aidons à migrer votre club, vos équipes et vos données vers Clubero en quelques jours. Accompagnement humain, import Excel et outils existants.",
       "ogDescription": "Passez à Clubero simplement. Nous migrons votre club pour vous."
+    },
+    "tournamentsPage": {
+      "title": "Tournois — Scores live, classements publics, mode TV | Clubero",
+      "description": "Organisez des tournois modernes avec scores en direct, classements publics, arbitrage mobile et mode TV. Pensé pour les organisateurs, joueurs, parents et supporters.",
+      "ogDescription": "Des tournois modernes, vivants et publics. Pensés pour le terrain et les écrans."
     }
   },
   "trial": {

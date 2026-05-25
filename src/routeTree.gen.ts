@@ -37,7 +37,9 @@ import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billi
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
+import { Route as FrTournoisRouteImport } from './routes/fr.tournois'
 import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-club'
+import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -240,9 +242,19 @@ const LegalKindRoute = LegalKindRouteImport.update({
   path: '/legal/$kind',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FrTournoisRoute = FrTournoisRouteImport.update({
+  id: '/fr/tournois',
+  path: '/fr/tournois',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FrOnboardingClubRoute = FrOnboardingClubRouteImport.update({
   id: '/fr/onboarding-club',
   path: '/fr/onboarding-club',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnTournamentsRoute = EnTournamentsRouteImport.update({
+  id: '/en/tournaments',
+  path: '/en/tournaments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnClubOnboardingRoute = EnClubOnboardingRouteImport.update({
@@ -618,7 +630,9 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
@@ -706,7 +720,9 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
@@ -800,7 +816,9 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
   '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
   '/r/$token': typeof RTokenRoute
@@ -894,7 +912,9 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/tournaments'
     | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
     | '/r/$token'
@@ -982,7 +1002,9 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/tournaments'
     | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
     | '/r/$token'
@@ -1075,7 +1097,9 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
+    | '/en/tournaments'
     | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
     | '/r/$token'
@@ -1158,7 +1182,9 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
+  EnTournamentsRoute: typeof EnTournamentsRoute
   FrOnboardingClubRoute: typeof FrOnboardingClubRoute
+  FrTournoisRoute: typeof FrTournoisRoute
   LegalKindRoute: typeof LegalKindRoute
   LegalCookiesRoute: typeof LegalCookiesRoute
   RTokenRoute: typeof RTokenRoute
@@ -1384,11 +1410,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalKindRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fr/tournois': {
+      id: '/fr/tournois'
+      path: '/fr/tournois'
+      fullPath: '/fr/tournois'
+      preLoaderRoute: typeof FrTournoisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fr/onboarding-club': {
       id: '/fr/onboarding-club'
       path: '/fr/onboarding-club'
       fullPath: '/fr/onboarding-club'
       preLoaderRoute: typeof FrOnboardingClubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/tournaments': {
+      id: '/en/tournaments'
+      path: '/en/tournaments'
+      fullPath: '/en/tournaments'
+      preLoaderRoute: typeof EnTournamentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en/club-onboarding': {
@@ -2084,7 +2124,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,
+  EnTournamentsRoute: EnTournamentsRoute,
   FrOnboardingClubRoute: FrOnboardingClubRoute,
+  FrTournoisRoute: FrTournoisRoute,
   LegalKindRoute: LegalKindRoute,
   LegalCookiesRoute: LegalCookiesRoute,
   RTokenRoute: RTokenRoute,
