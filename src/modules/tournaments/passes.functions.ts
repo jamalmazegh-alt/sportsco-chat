@@ -23,6 +23,11 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
       .object({
         email: z.string().email().max(255),
         quantity: z.number().int().min(1).max(20).optional(),
+        origin: z
+          .string()
+          .url()
+          .max(200)
+          .optional(),
         return_to: z
           .string()
           .max(200)
@@ -35,7 +40,13 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     const { getStripe, STRIPE_PRICE_TOURNAMENT } = await import("@/lib/stripe.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const stripe = getStripe();
-    const origin = getOrigin();
+    // Prefer the caller's origin so Stripe redirects back to the same host
+    // (app subdomain vs marketing). Only accept trusted clubero.app hosts.
+    const safeOrigin = data.origin && /^https?:\/\/([a-z0-9-]+\.)*(clubero\.app|lovable\.app|localhost)(:\d+)?$/i.test(data.origin)
+      ? data.origin
+      : null;
+    const origin = safeOrigin ?? getOrigin();
+
     const quantity = data.quantity ?? 1;
     const email = data.email.trim().toLowerCase();
 

@@ -97,6 +97,7 @@ export function TournamentPassButton({
         data: {
           email: emailToUse.trim(),
           quantity: qty,
+          origin: typeof window !== "undefined" ? window.location.origin : undefined,
           ...(user?.email ? { return_to: "/tournaments/new-from-pass" } : {}),
         },
       });
