@@ -99,6 +99,7 @@
     },
     "sponsorsTitleDefault": "With the support of our partners",
     "downloadRules": "Download rules (PDF)"
+  },
   "register": {
     "metaTitle": "Register — Tournament {{slug}} · Clubero",
     "unavailableTitle": "Registration unavailable",
