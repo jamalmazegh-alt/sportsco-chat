@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/public/tournament-roster")({
         });
         const parsed = Body.safeParse(body);
         if (!parsed.success) {
-          return Response.json({ error: "Invalid input", details: parsed.error.errors }, { status: 400 });
+          return Response.json({ error: "Invalid input", details: parsed.error.issues }, { status: 400 });
         }
         const normalized = parsed.data.players.map((p) => ({
           first_name: p.first_name,
