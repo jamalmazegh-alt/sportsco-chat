@@ -102,6 +102,7 @@ import { Route as AuthenticatedAdminSettingsPaymentsRouteImport } from './routes
 import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
 import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './routes/_authenticated/admin/settings.communications'
 import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
+import { Route as ApiPublicTournamentIdRegulationsRouteImport } from './routes/api/public/tournament.$id.regulations'
 
 const SuperadminRoute = SuperadminRouteImport.update({
   id: '/superadmin',
@@ -601,6 +602,12 @@ const AuthenticatedAdminSettingsBrandingRoute =
     path: '/settings/branding',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const ApiPublicTournamentIdRegulationsRoute =
+  ApiPublicTournamentIdRegulationsRouteImport.update({
+    id: '/api/public/tournament/$id/regulations',
+    path: '/api/public/tournament/$id/regulations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -695,6 +702,7 @@ export interface FileRoutesByFullPath {
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -785,6 +793,7 @@ export interface FileRoutesByTo {
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
+  '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -881,6 +890,7 @@ export interface FileRoutesById {
   '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
   '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -977,6 +987,7 @@ export interface FileRouteTypes {
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/admin/users/'
+    | '/api/public/tournament/$id/regulations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1067,6 +1078,7 @@ export interface FileRouteTypes {
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug/register/success'
     | '/admin/users'
+    | '/api/public/tournament/$id/regulations'
   id:
     | '__root__'
     | '/'
@@ -1162,6 +1174,7 @@ export interface FileRouteTypes {
     | '/t/$slug/pay/$registrationId'
     | '/tournament/$slug_/register/success'
     | '/_authenticated/admin/users/'
+    | '/api/public/tournament/$id/regulations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1210,6 +1223,7 @@ export interface RootRouteChildren {
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+  ApiPublicTournamentIdRegulationsRoute: typeof ApiPublicTournamentIdRegulationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1865,6 +1879,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsBrandingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/public/tournament/$id/regulations': {
+      id: '/api/public/tournament/$id/regulations'
+      path: '/api/public/tournament/$id/regulations'
+      fullPath: '/api/public/tournament/$id/regulations'
+      preLoaderRoute: typeof ApiPublicTournamentIdRegulationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2152,17 +2173,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  ApiPublicTournamentIdRegulationsRoute: ApiPublicTournamentIdRegulationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
