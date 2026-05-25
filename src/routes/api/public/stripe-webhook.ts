@@ -35,6 +35,11 @@ function planFromPriceId(priceId?: string | null): "monthly" | "yearly" | null {
   return null;
 }
 
+function readTournamentPassQuantity(value: string | undefined | null): number {
+  const n = parseInt(value ?? "1", 10);
+  return Number.isFinite(n) ? Math.min(20, Math.max(1, n)) : 1;
+}
+
 async function notifyAdmin(
   eventType:
     | "created"
@@ -147,12 +152,28 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                   session.metadata?.email ??
                   null;
                 if (buyerEmail) {
-                  const qty = Math.max(
-                    1,
-                    parseInt(session.metadata?.quantity ?? "1", 10) || 1,
-                  );
+                  const qty = readTournamentPassQuantity(session.metadata?.quantity);
                   const totalCents = session.amount_total ?? 4000 * qty;
                   const perPass = Math.round(totalCents / qty);
+                  const paidAt = new Date().toISOString();
+                  const { data: existing } = await supabaseAdmin
+                    .from("tournament_passes")
+                    .select("id, status")
+                    .eq("stripe_session_id", session.id);
+                  const missing = Math.max(0, qty - (existing?.length ?? 0));
+                  if (missing > 0) {
+                    await supabaseAdmin.from("tournament_passes").insert(
+                      Array.from({ length: missing }, () => ({
+                        email: buyerEmail.toLowerCase(),
+                        stripe_session_id: session.id,
+                        stripe_payment_intent_id: paymentIntentId,
+                        amount_total: perPass,
+                        currency: session.currency ?? "eur",
+                        status: "paid" as const,
+                        paid_at: paidAt,
+                      })),
+                    );
+                  }
                   await supabaseAdmin
                     .from("tournament_passes")
                     .update({
@@ -160,9 +181,10 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                       stripe_payment_intent_id: paymentIntentId,
                       amount_total: perPass,
                       currency: session.currency ?? "eur",
-                      paid_at: new Date().toISOString(),
+                      paid_at: paidAt,
                     })
-                    .eq("stripe_session_id", session.id);
+                    .eq("stripe_session_id", session.id)
+                    .eq("status", "pending");
                   try {
                     await enqueueTransactionalEmailServer({
                       templateName: "tournament-pass-purchased",

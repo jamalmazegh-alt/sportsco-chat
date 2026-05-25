@@ -41,6 +41,7 @@ function NewFromPassPage() {
   const confirmFn = useServerFn(confirmPassSession);
   const [pollStartedAt] = useState(() => Date.now());
   const [waitedTooLong, setWaitedTooLong] = useState(false);
+  const [manualConfirming, setManualConfirming] = useState(false);
 
   const passesQ = useQuery({
     queryKey: ["my-tournament-passes"],
@@ -141,6 +142,26 @@ function NewFromPassPage() {
     create.mutate(pass.id);
   }
 
+  async function refreshPaymentStatus() {
+    if (manualConfirming) return;
+    setManualConfirming(true);
+    try {
+      if (sessionId) {
+        const res = await confirmFn({ data: { session_id: sessionId } });
+        if (res.paid) {
+          toast.success(t("newFromPass.paymentConfirmed", { defaultValue: "Paiement confirmé" }));
+        } else {
+          toast.info(t("newFromPass.paymentStillPending", { defaultValue: "Paiement encore en attente" }));
+        }
+      }
+      await passesQ.refetch();
+    } catch (err: any) {
+      toast.error(err?.message ?? t("newFromPass.refreshError", { defaultValue: "Validation impossible pour le moment" }));
+    } finally {
+      setManualConfirming(false);
+    }
+  }
+
   if (passesQ.isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
@@ -172,17 +193,10 @@ function NewFromPassPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                if (sessionId) {
-                  confirmFn({ data: { session_id: sessionId } })
-                    .catch(() => null)
-                    .finally(() => passesQ.refetch());
-                } else {
-                  passesQ.refetch();
-                }
-              }}
+              onClick={refreshPaymentStatus}
+              disabled={manualConfirming}
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={manualConfirming ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
               {t("newFromPass.refresh", { defaultValue: "Rafraîchir" })}
             </Button>
           </div>
