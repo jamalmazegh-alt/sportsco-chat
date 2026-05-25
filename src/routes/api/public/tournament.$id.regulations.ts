@@ -103,6 +103,11 @@ const I18N = {
     a1: (n: number, cat: string, fmt: string, date: string, loc: string) =>
       `Le tournoi rassemble ${n} équipes de la catégorie ${cat}, au format ${fmt}, le ${date} à ${loc}. ` +
       `Les inscriptions sont validées par l'organisateur après vérification de l'éligibilité et du paiement éventuel des droits d'engagement.`,
+    a1Roster: (subs: number, jokers: number) =>
+      `Chaque équipe peut inscrire jusqu'à ${subs} remplaçant${subs > 1 ? "s" : ""} en plus des titulaires` +
+      (jokers > 0
+        ? `, et bénéficier de ${jokers} joker${jokers > 1 ? "s" : ""} (joueur${jokers > 1 ? "s" : ""} extérieur${jokers > 1 ? "s" : ""} au club autorisé${jokers > 1 ? "s" : ""}).`
+        : `. Aucun joker (joueur extérieur au club) n'est autorisé.`),
     a2Intro:
       "La phase de groupes se joue selon un format toutes rondes. À l'issue de chaque rencontre, les points sont attribués comme suit :",
     a2Win: "Victoire",
