@@ -216,11 +216,16 @@ export function RegistrationsManager({
     onError: (e: any) => toast.error(e?.message ?? t("registrations.errorToast")),
   });
 
-  const canShowSendLink =
+  const isPaidOnline =
     !!tournament &&
     (tournament.registration_fee ?? 0) > 0 &&
-    (tournament.payment_mode === "online" || tournament.payment_mode === "both") &&
-    !!tournament.club_stripe_charges_enabled;
+    (tournament.payment_mode === "online" || tournament.payment_mode === "both");
+
+  const stripeNotConnected =
+    isPaidOnline && !tournament?.club_stripe_charges_enabled;
+
+  const canShowSendLink = isPaidOnline && !!tournament?.club_stripe_charges_enabled;
+
 
   const inviteFn = useServerFn(inviteTeamForPayment);
   const [inviteOpen, setInviteOpen] = useState(false);
