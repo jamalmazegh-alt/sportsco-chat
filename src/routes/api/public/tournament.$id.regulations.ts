@@ -177,6 +177,11 @@ const I18N = {
     a1: (n: number, cat: string, fmt: string, date: string, loc: string) =>
       `The tournament brings together ${n} teams in the ${cat} category, ${fmt} format, on ${date} at ${loc}. ` +
       `Registrations are validated by the organizer after verification of eligibility and payment of entry fees, if applicable.`,
+    a1Roster: (subs: number, jokers: number) =>
+      `Each team may register up to ${subs} substitute${subs > 1 ? "s" : ""} in addition to the starting players` +
+      (jokers > 0
+        ? `, and may use ${jokers} joker${jokers > 1 ? "s" : ""} (player${jokers > 1 ? "s" : ""} from outside the club allowed).`
+        : `. No jokers (players from outside the club) are allowed.`),
     a2Intro:
       "The group stage is played as a round-robin. After each match, points are awarded as follows:",
     a2Win: "Win",
