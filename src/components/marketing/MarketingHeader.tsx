@@ -7,11 +7,21 @@ import { cn } from "@/lib/utils";
 import logo from "@/assets/clubero-logo.png";
 
 const NAV = [
-  { to: "/features", key: "features" },
+  { to: "/why-clubero", key: "why" },
+  { to: "/tournament-experience", key: "tournaments" },
+  { to: "/club-onboarding", key: "onboarding" },
   { to: "/pricing", key: "pricing" },
   { to: "/faq", key: "faq" },
-  { to: "/contact", key: "contact" },
 ] as const;
+
+const NAV_LABELS: Record<(typeof NAV)[number]["key"], string> = {
+  why: "Why Clubero",
+  tournaments: "Tournaments",
+  onboarding: "Onboarding",
+  pricing: "Pricing",
+  faq: "FAQ",
+};
+
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
