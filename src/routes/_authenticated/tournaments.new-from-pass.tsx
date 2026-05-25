@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, Trophy, AlertCircle } from "lucide-react";
+import { Loader2, Trophy, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import i18nInstance from "@/lib/i18n";
 import {
   listMyAvailablePasses,
   createTournamentFromPass,
+  confirmPassSession,
 } from "@/modules/tournaments/passes.functions";
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
