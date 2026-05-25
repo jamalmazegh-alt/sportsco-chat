@@ -424,6 +424,20 @@ function PublicTournamentPage() {
           )}
         </div>
 
+        {(data as any).rulesDocument?.file_url && (
+          <div className="pb-2">
+            <a
+              href={(data as any).rulesDocument.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition"
+            >
+              <FileDown className="h-4 w-4" />
+              {t("public.downloadRules", { defaultValue: "Télécharger le règlement (PDF)" })}
+            </a>
+          </div>
+        )}
+
         <div className="pb-8">
           <SponsorsStrip
             sponsors={rules.branding.sponsors}
@@ -432,6 +446,7 @@ function PublicTournamentPage() {
             }
           />
         </div>
+
       </div>
     </div>
   );
