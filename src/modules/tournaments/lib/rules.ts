@@ -160,6 +160,7 @@ export function mergeRules(settings: unknown): TournamentRules {
     penaltyShootout: { ...DEFAULT_RULES.penaltyShootout, ...(s.penaltyShootout ?? {}) },
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
     forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
+    roster: { ...DEFAULT_RULES.roster, ...((s.roster as Partial<RosterRules> | undefined) ?? {}) },
     registration: { ...DEFAULT_RULES.registration, ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}) },
     regulations: { ...DEFAULT_RULES.regulations, ...((s.regulations as Partial<RegulationsConfig> | undefined) ?? {}) },
     scoring: (s.scoring as ScoringRules | undefined) ?? undefined,
