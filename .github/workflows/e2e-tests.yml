@@ -18,6 +18,9 @@ jobs:
   e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
