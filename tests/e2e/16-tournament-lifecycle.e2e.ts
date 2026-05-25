@@ -207,7 +207,7 @@ test.describe("Tournament lifecycle", () => {
     const { error } = await admin
       .from("tournaments")
       .update({
-        status: "ongoing",
+        status: "in_progress",
         published_programme_at: new Date().toISOString(),
       })
       .eq("id", tournamentId);
@@ -218,7 +218,7 @@ test.describe("Tournament lifecycle", () => {
       .select("status, published_programme_at")
       .eq("id", tournamentId)
       .single();
-    expect(data?.status).toBe("ongoing");
+    expect(data?.status).toBe("in_progress");
     expect(data?.published_programme_at).not.toBeNull();
   });
 
