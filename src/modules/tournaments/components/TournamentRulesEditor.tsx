@@ -704,3 +704,133 @@ function SortableTB({
     </li>
   );
 }
+
+function ModeTile({
+  active,
+  title,
+  description,
+  onClick,
+}: {
+  active: boolean;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-left rounded-lg border p-3 transition-colors ${
+        active
+          ? "border-primary bg-primary/5 ring-1 ring-primary"
+          : "border-border bg-card hover:bg-accent/40"
+      }`}
+    >
+      <div className="font-medium text-sm">{title}</div>
+      <div className="text-xs text-muted-foreground mt-1">{description}</div>
+    </button>
+  );
+}
+
+function UploadedRegulations({
+  tournamentId,
+  regulations,
+  onChange,
+}: {
+  tournamentId: string;
+  regulations: import("../lib/rules").RegulationsConfig;
+  onChange: (patch: Partial<import("../lib/rules").RegulationsConfig>) => void;
+}) {
+  const { t } = useTranslation("tournaments");
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (file: File) => {
+    if (file.type !== "application/pdf") {
+      toast.error(t("rules.regulationsUploadPdfOnly"));
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error(t("rules.regulationsUploadTooLarge"));
+      return;
+    }
+    setUploading(true);
+    try {
+      const path = `${tournamentId}/regulations/${crypto.randomUUID()}.pdf`;
+      const { error } = await supabase.storage
+        .from("tournament-documents")
+        .upload(path, file, { cacheControl: "3600", upsert: false, contentType: "application/pdf" });
+      if (error) throw error;
+      const { data: pub } = supabase.storage
+        .from("tournament-documents")
+        .getPublicUrl(path);
+      onChange({
+        uploadedUrl: pub.publicUrl,
+        uploadedName: file.name,
+        uploadedAt: new Date().toISOString(),
+      });
+      toast.success(t("rules.regulationsUploadedToast"));
+    } catch (e: any) {
+      toast.error(e?.message ?? t("rules.errorToast"));
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const remove = async () => {
+    if (regulations.uploadedUrl) {
+      const marker = "/tournament-documents/";
+      const idx = regulations.uploadedUrl.indexOf(marker);
+      if (idx >= 0) {
+        const path = regulations.uploadedUrl.slice(idx + marker.length);
+        await supabase.storage.from("tournament-documents").remove([path]).catch(() => {});
+      }
+    }
+    onChange({ uploadedUrl: null, uploadedName: null, uploadedAt: null });
+  };
+
+  return (
+    <div className="space-y-3 pt-2 border-t border-border">
+      <p className="text-xs text-muted-foreground">{t("rules.regulationsUploadHint")}</p>
+      {regulations.uploadedUrl ? (
+        <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm">
+          <a
+            href={regulations.uploadedUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 min-w-0 text-primary hover:underline"
+          >
+            <FileText className="h-4 w-4 shrink-0" />
+            <span className="truncate">{regulations.uploadedName ?? t("rules.regulationsCurrentFile")}</span>
+            <ExternalLink className="h-3 w-3 shrink-0" />
+          </a>
+          <Button type="button" size="sm" variant="ghost" onClick={remove}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : null}
+      <div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleUpload(f);
+          }}
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {regulations.uploadedUrl ? t("rules.regulationsReplace") : t("rules.regulationsUpload")}
+        </Button>
+      </div>
+    </div>
+  );
+}
