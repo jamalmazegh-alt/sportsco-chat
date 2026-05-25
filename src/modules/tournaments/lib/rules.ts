@@ -30,6 +30,13 @@ export interface ForfeitRules {
   minRestMinutes: number;
 }
 
+export interface RosterRules {
+  /** Nombre maximal de remplaçants autorisés par équipe (en plus des titulaires). */
+  maxSubstitutes: number;
+  /** Nombre de jokers (joueurs supplémentaires hors club autorisés) par équipe. */
+  jokersPerTeam: number;
+}
+
 export interface RegistrationRules {
   enabled: boolean;
   opensAt?: string | null;   // ISO datetime
@@ -59,6 +66,7 @@ export interface TournamentRules {
   penaltyShootout: { enabled: boolean };
   matchValidation: { requireValidation: boolean }; // si true, standings ne comptent que les matchs validés
   forfeit: ForfeitRules;
+  roster: RosterRules;
   registration: RegistrationRules;
   regulations: RegulationsConfig;
   scoring?: ScoringRules;
@@ -94,6 +102,7 @@ export const DEFAULT_RULES: TournamentRules = {
     abandonedAsForfeit: true,
     minRestMinutes: 30,
   },
+  roster: { maxSubstitutes: 5, jokersPerTeam: 0 },
   registration: {
     enabled: false,
     opensAt: null,
@@ -151,6 +160,7 @@ export function mergeRules(settings: unknown): TournamentRules {
     penaltyShootout: { ...DEFAULT_RULES.penaltyShootout, ...(s.penaltyShootout ?? {}) },
     matchValidation: { ...DEFAULT_RULES.matchValidation, ...(s.matchValidation ?? {}) },
     forfeit: { ...DEFAULT_RULES.forfeit, ...((s.forfeit as Partial<ForfeitRules> | undefined) ?? {}) },
+    roster: { ...DEFAULT_RULES.roster, ...((s.roster as Partial<RosterRules> | undefined) ?? {}) },
     registration: { ...DEFAULT_RULES.registration, ...((s.registration as Partial<RegistrationRules> | undefined) ?? {}) },
     regulations: { ...DEFAULT_RULES.regulations, ...((s.regulations as Partial<RegulationsConfig> | undefined) ?? {}) },
     scoring: (s.scoring as ScoringRules | undefined) ?? undefined,

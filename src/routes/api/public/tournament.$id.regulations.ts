@@ -103,6 +103,11 @@ const I18N = {
     a1: (n: number, cat: string, fmt: string, date: string, loc: string) =>
       `Le tournoi rassemble ${n} équipes de la catégorie ${cat}, au format ${fmt}, le ${date} à ${loc}. ` +
       `Les inscriptions sont validées par l'organisateur après vérification de l'éligibilité et du paiement éventuel des droits d'engagement.`,
+    a1Roster: (subs: number, jokers: number) =>
+      `Chaque équipe peut inscrire jusqu'à ${subs} remplaçant${subs > 1 ? "s" : ""} en plus des titulaires` +
+      (jokers > 0
+        ? `, et bénéficier de ${jokers} joker${jokers > 1 ? "s" : ""} (joueur${jokers > 1 ? "s" : ""} extérieur${jokers > 1 ? "s" : ""} au club autorisé${jokers > 1 ? "s" : ""}).`
+        : `. Aucun joker (joueur extérieur au club) n'est autorisé.`),
     a2Intro:
       "La phase de groupes se joue selon un format toutes rondes. À l'issue de chaque rencontre, les points sont attribués comme suit :",
     a2Win: "Victoire",
@@ -172,6 +177,11 @@ const I18N = {
     a1: (n: number, cat: string, fmt: string, date: string, loc: string) =>
       `The tournament brings together ${n} teams in the ${cat} category, ${fmt} format, on ${date} at ${loc}. ` +
       `Registrations are validated by the organizer after verification of eligibility and payment of entry fees, if applicable.`,
+    a1Roster: (subs: number, jokers: number) =>
+      `Each team may register up to ${subs} substitute${subs > 1 ? "s" : ""} in addition to the starting players` +
+      (jokers > 0
+        ? `, and may use ${jokers} joker${jokers > 1 ? "s" : ""} (player${jokers > 1 ? "s" : ""} from outside the club allowed).`
+        : `. No jokers (players from outside the club) are allowed.`),
     a2Intro:
       "The group stage is played as a round-robin. After each match, points are awarded as follows:",
     a2Win: "Win",
@@ -308,7 +318,10 @@ export async function buildRegulationsPdf(
   const cat = t.category?.trim() || (lang === "fr" ? "toutes catégories" : "all categories");
   const fmt = t.format || "group";
 
-  drawArticle(ctx, 1, [I18N[lang].a1(t.num_teams, cat, fmt, dateStr, loc)]);
+  drawArticle(ctx, 1, [
+    I18N[lang].a1(t.num_teams, cat, fmt, dateStr, loc),
+    I18N[lang].a1Roster(rules.roster.maxSubstitutes, rules.roster.jokersPerTeam),
+  ]);
 
   // Article 2
   drawArticle(ctx, 2, [I18N[lang].a2Intro]);
