@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import logo from "@/assets/clubero-logo.png";
 
 export function MarketingFooter() {
-  const { t } = useTranslation("marketing");
+  const { t, i18n } = useTranslation("marketing");
+  const current = i18n.language?.slice(0, 2) === "fr" ? "fr" : "en";
+  const tournamentsTo = current === "fr" ? "/fr/tournois" : "/en/tournaments";
+  const onboardingTo = current === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
 
   return (
     <footer className="border-t border-border/60 bg-muted/30">
