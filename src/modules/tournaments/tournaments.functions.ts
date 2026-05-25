@@ -1284,21 +1284,35 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
     const { mergeRules } = await import("./lib/rules");
-    const { buildRulesPdf } = await import("./lib/rules-pdf");
     const rules = mergeRules(tournament.settings);
-    const bytes = await buildRulesPdf(
-      {
-        name: tournament.name,
-        sport: tournament.sport,
-        category: tournament.category,
-        starts_on: tournament.starts_on,
-        ends_on: tournament.ends_on,
-        location: tournament.location,
-        format: tournament.format,
-        num_teams: tournament.num_teams,
-      },
-      rules,
-    );
+
+    if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
+      const { data: row, error: insErr } = await (await import("@/integrations/supabase/client.server"))
+        .supabaseAdmin
+        .from("tournament_documents")
+        .insert({
+          tournament_id: tournament.id,
+          kind: "rules",
+          language: rules.language,
+          file_url: rules.regulations.uploadedUrl,
+          storage_path: null,
+          generated_by: userId,
+        })
+        .select("*")
+        .single();
+      if (insErr) throw new Response(insErr.message, { status: 500 });
+      return { document: row };
+    }
+
+    const lang = rules.language === "en" ? "en" : "fr";
+    const origin = process.env.APP_URL || "https://www.clubero.app";
+    const pdfUrl = `${origin}/api/public/tournament/${tournament.id}/regulations?lang=${lang}`;
+    const pdfRes = await fetch(pdfUrl);
+    if (!pdfRes.ok) {
+      throw new Response("Failed to generate regulations PDF", { status: 500 });
+    }
+    const bytes = new Uint8Array(await pdfRes.arrayBuffer());
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const ts = Date.now();
     const path = `${tournament.id}/rules-${rules.language}-${ts}.pdf`;
