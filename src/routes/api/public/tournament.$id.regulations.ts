@@ -357,8 +357,16 @@ async function buildRegulationsPdf(
   // Note italique avant footer
   drawItalicNote(ctx, I18N[lang].italic);
 
-  // Footer sur toutes les pages
-  drawFooterOnAllPages(doc, font, bold, lang);
+  // Footer sur toutes les pages (avec logo Clubero si dispo)
+  let logoImage = null;
+  if (logoBytes) {
+    try {
+      logoImage = await doc.embedPng(logoBytes);
+    } catch {
+      logoImage = null;
+    }
+  }
+  drawFooterOnAllPages(doc, font, bold, lang, logoImage);
 
   return await doc.save();
 }
