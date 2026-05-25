@@ -483,5 +483,99 @@
     "ctaBody": "Let's talk about your club. We'll show you Clubero and plan the migration together.",
     "ctaPrimary": "Book a demo",
     "ctaSecondary": "Contact us"
+  },
+  "tournamentsPage": {
+    "kicker": "Tournaments",
+    "title": "Modern, live and community-driven tournaments.",
+    "subtitle": "Run tournaments with live scores, public standings, mobile referees and a modern fan experience.",
+    "ctaPrimary": "Create a tournament",
+    "ctaSecondary": "Watch demo",
+    "heroBadge": "Live",
+    "heroMatch": "Quarter-final · Field 2",
+    "heroTeamA": "Riverside FC",
+    "heroTeamB": "Lakeside FC",
+    "heroStandings": "Group A standings",
+    "heroBracket": "Final bracket",
+    "heroTv": "TV mode",
+    "everythingTitle": "Everything for your tournaments, in one place.",
+    "everythingSubtitle": "A complete ecosystem designed for the field and the big screen.",
+    "ecosystem": [
+      { "t": "Teams", "b": "Registrations, rosters, contacts." },
+      { "t": "Groups", "b": "Automatic draws and seeding." },
+      { "t": "Matches", "b": "Scheduling and live tracking." },
+      { "t": "Standings", "b": "Computed automatically, in real time." },
+      { "t": "Scheduling", "b": "Multi-field, multi-day." },
+      { "t": "Referees", "b": "Mobile result validation." },
+      { "t": "Public pages", "b": "Shareable link for everyone." },
+      { "t": "TV mode", "b": "Full-screen display on site." },
+      { "t": "Live scores", "b": "Instant updates everywhere." }
+    ],
+    "liveTitle": "Built for live tournaments.",
+    "liveSubtitle": "Your referees and organizers stay in control without leaving the pitch.",
+    "livePoints": [
+      { "t": "Scores from the field", "b": "Enter scores straight from your phone." },
+      { "t": "Referee validation", "b": "Referees confirm results live on mobile." },
+      { "t": "Instant updates", "b": "Standings and brackets update immediately." },
+      { "t": "Field management", "b": "Assign and reshuffle fields in seconds." },
+      { "t": "Auto scheduling", "b": "Calendar optimized for your constraints." },
+      { "t": "Dispute tracking", "b": "Clear, traceable history of every decision." },
+      { "t": "QR code access", "b": "One scan opens the public page." }
+    ],
+    "publicTitle": "A public, shared experience.",
+    "publicSubtitle": "Parents, players and fans follow the tournament live, from anywhere.",
+    "publicPoints": [
+      { "t": "Public standings", "b": "Always up to date, one link away." },
+      { "t": "Match pages", "b": "Lineup, score and key moments." },
+      { "t": "Latest results", "b": "Real-time feed of finished matches." },
+      { "t": "Team pages", "b": "Schedule, ranking, tournament run." },
+      { "t": "Mobile first", "b": "Designed to be checked from the stands." },
+      { "t": "Easy sharing", "b": "Link, QR code, social — one click." }
+    ],
+    "tvTitle": "TV & slideshow mode.",
+    "tvSubtitle": "Show the tournament on a big screen, in the clubhouse or at the venue.",
+    "tvPoints": [
+      "Live standings on screen",
+      "Upcoming match schedule",
+      "Current matches, field by field",
+      "Full-screen mode, zero setup"
+    ],
+    "tvBadge": "Full screen",
+    "tvCurrent": "Live match",
+    "tvNext": "Up next",
+    "formatsTitle": "Every tournament format.",
+    "formatsSubtitle": "Adapt Clubero to your competition, not the other way around.",
+    "formats": [
+      { "t": "Group stage", "b": "With automatic qualification." },
+      { "t": "Knockout", "b": "Brackets for 4, 8, 16, 32 teams." },
+      { "t": "Round robin", "b": "Every team plays every team." },
+      { "t": "League / championship", "b": "Across a full season." },
+      { "t": "Playoffs", "b": "Final phase after a regular season." }
+    ],
+    "formatsExtras": [
+      "Automatic scheduling",
+      "Field assignment",
+      "Qualification management"
+    ],
+    "mobileTitle": "Mobile first, on the field.",
+    "mobileSubtitle": "Designed to be used one-handed, between matches.",
+    "mobilePoints": [
+      { "t": "Referee entry", "b": "Big buttons, few taps, quick validation." },
+      { "t": "Organizers on the pitch", "b": "Every key action within thumb's reach." },
+      { "t": "Touch-friendly UI", "b": "Readable in full sun, mobile-optimized." },
+      { "t": "Fast actions", "b": "Reschedule, adjust, fix in seconds." },
+      { "t": "Live updates", "b": "Field and public stay in sync." }
+    ],
+    "pricingTitle": "Simple pricing.",
+    "pricingSubtitle": "Pick what fits your event.",
+    "pricing": [
+      { "name": "Tournament", "price": "€40", "per": "per tournament", "desc": "Run a one-off tournament.", "cta": "Create a tournament" },
+      { "name": "League / championship", "price": "€199", "per": "per season", "desc": "Full season management.", "cta": "Get in touch" },
+      { "name": "Clubero Club", "price": "€49", "per": "/ month", "desc": "Unlimited tournaments included.", "cta": "See Clubero Club", "highlight": true }
+    ],
+    "pricingNote": "Unlimited tournaments included with Clubero Club.",
+    "finalTitle": "Ready to modernize your tournaments?",
+    "finalBody": "Launch a tournament in minutes, or see Clubero in action with our team.",
+    "finalPrimary": "Create a tournament",
+    "finalSecondary": "Book a demo"
   }
 }
