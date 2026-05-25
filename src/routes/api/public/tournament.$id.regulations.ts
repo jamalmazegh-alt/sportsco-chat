@@ -40,7 +40,33 @@ export const Route = createFileRoute("/api/public/tournament/$id/regulations")({
         if (!t) return new Response("Tournament not found", { status: 404 });
 
         const rules = mergeRules(t.settings);
-        const pdf = await buildRegulationsPdf(t, rules, lang);
+
+        // Mode "uploaded" — stream the organizer-provided PDF instead of generating one.
+        if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
+          const upstream = await fetch(rules.regulations.uploadedUrl);
+          if (!upstream.ok) {
+            return new Response("Uploaded regulations not available", { status: 502 });
+          }
+          return new Response(upstream.body, {
+            status: 200,
+            headers: {
+              "Content-Type": "application/pdf",
+              "Content-Disposition": `inline; filename="reglement-${t.slug}.pdf"`,
+              "Cache-Control": "public, max-age=300",
+            },
+          });
+        }
+
+        // Try to embed the Clubero logo (best effort).
+        let logoBytes: ArrayBuffer | null = null;
+        try {
+          const logoRes = await fetch(new URL("/clubero-logo.png", request.url));
+          if (logoRes.ok) logoBytes = await logoRes.arrayBuffer();
+        } catch {
+          logoBytes = null;
+        }
+
+        const pdf = await buildRegulationsPdf(t, rules, lang, logoBytes);
 
         return new Response(pdf as unknown as BodyInit, {
           status: 200,
@@ -257,6 +283,7 @@ async function buildRegulationsPdf(
   t: Tournament,
   rules: ReturnType<typeof mergeRules>,
   lang: Lang,
+  logoBytes: ArrayBuffer | null,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle(`${t.name} — ${I18N[lang].subtitle}`);
@@ -330,8 +357,16 @@ async function buildRegulationsPdf(
   // Note italique avant footer
   drawItalicNote(ctx, I18N[lang].italic);
 
-  // Footer sur toutes les pages
-  drawFooterOnAllPages(doc, font, bold, lang);
+  // Footer sur toutes les pages (avec logo Clubero si dispo)
+  let logoImage = null;
+  if (logoBytes) {
+    try {
+      logoImage = await doc.embedPng(logoBytes);
+    } catch {
+      logoImage = null;
+    }
+  }
+  drawFooterOnAllPages(doc, font, bold, lang, logoImage);
 
   return await doc.save();
 }
@@ -501,12 +536,17 @@ function drawItalicNote(ctx: Ctx, text: string) {
   }
 }
 
-function drawFooterOnAllPages(doc: PDFDocument, font: PDFFont, bold: PDFFont, lang: Lang) {
+function drawFooterOnAllPages(
+  doc: PDFDocument,
+  font: PDFFont,
+  bold: PDFFont,
+  lang: Lang,
+  logo: import("pdf-lib").PDFImage | null,
+) {
   const pages = doc.getPages();
   const total = pages.length;
   const dateStr = formatShortDate(new Date(), lang);
   pages.forEach((p, idx) => {
-    // Filet
     p.drawLine({
       start: { x: MARGIN_L, y: MARGIN_B + 18 },
       end: { x: PAGE_W - MARGIN_R, y: MARGIN_B + 18 },
@@ -515,9 +555,24 @@ function drawFooterOnAllPages(doc: PDFDocument, font: PDFFont, bold: PDFFont, la
     });
     const left = safe(I18N[lang].footerLeft(dateStr));
     p.drawText(left, { x: MARGIN_L, y: MARGIN_B + 6, size: 7, font, color: GREY });
+
     const right = safe(I18N[lang].footerRight);
     const rw = bold.widthOfTextAtSize(right, 7);
-    p.drawText(right, { x: PAGE_W - MARGIN_R - rw, y: MARGIN_B + 6, size: 7, font: bold, color: GREY });
+    let rightX = PAGE_W - MARGIN_R - rw;
+
+    // Logo Clubero à gauche du texte "Powered by Clubero" (hauteur 10pt)
+    if (logo) {
+      const logoH = 10;
+      const ratio = logo.width / logo.height;
+      const logoW = logoH * ratio;
+      const gap = 4;
+      const totalW = logoW + gap + rw;
+      const startX = PAGE_W - MARGIN_R - totalW;
+      p.drawImage(logo, { x: startX, y: MARGIN_B + 4, width: logoW, height: logoH });
+      rightX = startX + logoW + gap;
+    }
+    p.drawText(right, { x: rightX, y: MARGIN_B + 6, size: 7, font: bold, color: GREY });
+
     const pageLabel = `${I18N[lang].page} ${idx + 1} ${I18N[lang].of} ${total}`;
     const pw = font.widthOfTextAtSize(pageLabel, 7);
     p.drawText(pageLabel, { x: (PAGE_W - pw) / 2, y: MARGIN_B - 4, size: 7, font, color: GREY });

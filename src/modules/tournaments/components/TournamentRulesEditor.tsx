@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -19,8 +19,9 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, RotateCcw, Save, Plus, Loader2, FileDown, ExternalLink } from "lucide-react";
+import { GripVertical, RotateCcw, Save, Plus, Loader2, FileDown, ExternalLink, Upload, FileText, X } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -523,55 +524,91 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
-      {/* PDF generation */}
+      {/* Regulations: generated vs uploaded */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t("rules.pdfTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-xs text-muted-foreground">
-            {t("rules.pdfHint")}
-          </p>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => generate.mutate()}
-            disabled={generate.isPending}
-          >
-            {generate.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <FileDown className="h-4 w-4" />
-            )}
-            {t("rules.generatePdf")}
-          </Button>
-          {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
-            <ul className="space-y-1.5 pt-2">
-              {docsQuery.data.documents.slice(0, 5).map((d: any) => (
-                <li
-                  key={d.id}
-                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
-                >
-                  <span className="truncate">
-                    <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
-                      {d.language}
-                    </span>
-                    {new Date(d.generated_at).toLocaleString(lang.startsWith("en") ? "en-US" : "fr-FR")}
-                  </span>
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary hover:underline inline-flex items-center gap-1 text-xs"
-                  >
-                    {t("rules.open")} <ExternalLink className="h-3 w-3" />
-                  </a>
-                </li>
-              ))}
-            </ul>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <ModeTile
+              active={rules.regulations.mode === "generated"}
+              title={t("rules.regulationsModeGenerated")}
+              description={t("rules.regulationsModeGeneratedHint")}
+              onClick={() =>
+                setRules({
+                  ...rules,
+                  regulations: { ...rules.regulations, mode: "generated" },
+                })
+              }
+            />
+            <ModeTile
+              active={rules.regulations.mode === "uploaded"}
+              title={t("rules.regulationsModeUploaded")}
+              description={t("rules.regulationsModeUploadedHint")}
+              onClick={() =>
+                setRules({
+                  ...rules,
+                  regulations: { ...rules.regulations, mode: "uploaded" },
+                })
+              }
+            />
+          </div>
+
+          {rules.regulations.mode === "generated" ? (
+            <div className="space-y-3 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">{t("rules.pdfHint")}</p>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => generate.mutate()}
+                disabled={generate.isPending}
+              >
+                {generate.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileDown className="h-4 w-4" />
+                )}
+                {t("rules.generatePdf")}
+              </Button>
+              {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
+                <ul className="space-y-1.5 pt-2">
+                  {docsQuery.data.documents.slice(0, 5).map((d: any) => (
+                    <li
+                      key={d.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm"
+                    >
+                      <span className="truncate">
+                        <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
+                          {d.language}
+                        </span>
+                        {new Date(d.generated_at).toLocaleString(lang.startsWith("en") ? "en-US" : "fr-FR")}
+                      </span>
+                      <a
+                        href={d.file_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:underline inline-flex items-center gap-1 text-xs"
+                      >
+                        {t("rules.open")} <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <UploadedRegulations
+              tournamentId={tournamentId}
+              regulations={rules.regulations}
+              onChange={(reg) =>
+                setRules({ ...rules, regulations: { ...rules.regulations, ...reg } })
+              }
+            />
           )}
         </CardContent>
       </Card>
+
 
 
       <div className="flex gap-2 sticky bottom-0 bg-background/95 backdrop-blur py-3 border-t border-border">
@@ -665,5 +702,135 @@ function SortableTB({
         </Button>
       )}
     </li>
+  );
+}
+
+function ModeTile({
+  active,
+  title,
+  description,
+  onClick,
+}: {
+  active: boolean;
+  title: string;
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-left rounded-lg border p-3 transition-colors ${
+        active
+          ? "border-primary bg-primary/5 ring-1 ring-primary"
+          : "border-border bg-card hover:bg-accent/40"
+      }`}
+    >
+      <div className="font-medium text-sm">{title}</div>
+      <div className="text-xs text-muted-foreground mt-1">{description}</div>
+    </button>
+  );
+}
+
+function UploadedRegulations({
+  tournamentId,
+  regulations,
+  onChange,
+}: {
+  tournamentId: string;
+  regulations: import("../lib/rules").RegulationsConfig;
+  onChange: (patch: Partial<import("../lib/rules").RegulationsConfig>) => void;
+}) {
+  const { t } = useTranslation("tournaments");
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (file: File) => {
+    if (file.type !== "application/pdf") {
+      toast.error(t("rules.regulationsUploadPdfOnly"));
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error(t("rules.regulationsUploadTooLarge"));
+      return;
+    }
+    setUploading(true);
+    try {
+      const path = `${tournamentId}/regulations/${crypto.randomUUID()}.pdf`;
+      const { error } = await supabase.storage
+        .from("tournament-documents")
+        .upload(path, file, { cacheControl: "3600", upsert: false, contentType: "application/pdf" });
+      if (error) throw error;
+      const { data: pub } = supabase.storage
+        .from("tournament-documents")
+        .getPublicUrl(path);
+      onChange({
+        uploadedUrl: pub.publicUrl,
+        uploadedName: file.name,
+        uploadedAt: new Date().toISOString(),
+      });
+      toast.success(t("rules.regulationsUploadedToast"));
+    } catch (e: any) {
+      toast.error(e?.message ?? t("rules.errorToast"));
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const remove = async () => {
+    if (regulations.uploadedUrl) {
+      const marker = "/tournament-documents/";
+      const idx = regulations.uploadedUrl.indexOf(marker);
+      if (idx >= 0) {
+        const path = regulations.uploadedUrl.slice(idx + marker.length);
+        await supabase.storage.from("tournament-documents").remove([path]).catch(() => {});
+      }
+    }
+    onChange({ uploadedUrl: null, uploadedName: null, uploadedAt: null });
+  };
+
+  return (
+    <div className="space-y-3 pt-2 border-t border-border">
+      <p className="text-xs text-muted-foreground">{t("rules.regulationsUploadHint")}</p>
+      {regulations.uploadedUrl ? (
+        <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm">
+          <a
+            href={regulations.uploadedUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 min-w-0 text-primary hover:underline"
+          >
+            <FileText className="h-4 w-4 shrink-0" />
+            <span className="truncate">{regulations.uploadedName ?? t("rules.regulationsCurrentFile")}</span>
+            <ExternalLink className="h-3 w-3 shrink-0" />
+          </a>
+          <Button type="button" size="sm" variant="ghost" onClick={remove}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : null}
+      <div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleUpload(f);
+          }}
+        />
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {regulations.uploadedUrl ? t("rules.regulationsReplace") : t("rules.regulationsUpload")}
+        </Button>
+      </div>
+    </div>
   );
 }
