@@ -1,26 +1,29 @@
 /**
  * createTestClub — returns a SeededClub scoped to the pre-existing E2E club.
  *
- * Without service_role we can't create auth users on the fly, so all "role"
- * slots (admin / coach / player1 / player2 / parent) reuse the SAME pre-created
- * E2E admin user. This means tests that strictly assert role boundaries (e.g.
- * "a coach cannot do X") will not be meaningful with this fixture — they
- * should be skipped or rewritten when full multi-user setup is restored.
+ * Uses the 4 pre-created E2E users (admin / coach / player / parent) when
+ * available. When the coach/player/parent env vars are not provided, those
+ * slots fall back to the admin user (see admin.ts → HAS_MULTI_ROLE_USERS).
  *
- * What we DO create per test suite (via RLS as admin):
+ * What we create per test suite (via RLS as admin):
  *   - 1 team scoped to the pre-existing club
- *   - 2 player records
- *   - team_members for those players
+ *   - 2 player records (player2 linked to the player user_id)
+ *   - team_members for coach + both players
  *   - 1 future event
- *   - a player_parents row linking p2 → admin user as "parent"
+ *   - a player_parents row linking p2 → the parent user
  *
  * cleanup() deletes only the rows this fixture created, scoped by team_id /
- * club_id + prefix.
+ * player_id list.
  */
-import { admin, E2E_CLUB_NAME } from "./admin";
-
-const PASSWORD = process.env.E2E_ADMIN_PASSWORD!;
-const EMAIL = process.env.E2E_ADMIN_EMAIL!;
+import {
+  admin,
+  E2E_ADMIN_EMAIL,
+  E2E_ADMIN_PASSWORD,
+  E2E_CLUB_NAME,
+  E2E_COACH,
+  E2E_PLAYER,
+  E2E_PARENT,
+} from "./admin";
 
 export type SeededUser = {
   email: string;
@@ -52,7 +55,7 @@ function resolveAdminUser(): SeededUser {
       "E2E_ADMIN_USER_ID is missing — Playwright globalSetup must run first.",
     );
   }
-  return { email: EMAIL, password: PASSWORD, userId };
+  return { email: E2E_ADMIN_EMAIL, password: E2E_ADMIN_PASSWORD, userId };
 }
 
 function resolveClubId(): string {
@@ -70,16 +73,13 @@ export async function createTestClub(suiteName = "suite"): Promise<SeededClub> {
   const prefix = `__e2e_${suiteName}_${runId}`;
 
   const adminUser = resolveAdminUser();
-  // All other "roles" reuse the same auth user. Tests strictly checking role
-  // boundaries should skip when HAS_ADMIN_PRIVILEGES is false.
-  const coachUser = adminUser;
-  const playerUser1 = adminUser;
-  const playerUser2 = adminUser;
-  const parentUser = adminUser;
+  const coachUser: SeededUser = E2E_COACH;
+  const playerUser: SeededUser = E2E_PLAYER;
+  const parentUser: SeededUser = E2E_PARENT;
 
   const clubId = resolveClubId();
 
-  // Create a team scoped to the pre-existing club.
+  // Per-suite team scoped to the pre-existing club.
   const { data: teamRow, error: teamErr } = await admin
     .from("teams")
     .insert({ club_id: clubId, name: `${prefix}_team`, sport: "football" })
@@ -88,29 +88,38 @@ export async function createTestClub(suiteName = "suite"): Promise<SeededClub> {
   if (teamErr || !teamRow) throw new Error(`team insert: ${teamErr?.message}`);
   const teamId = teamRow.id;
 
-  // Create 2 player records (no user_id link required for most flows).
+  // 2 player records. Link player2 to the player user so RLS lets that
+  // user respond to convocations etc. Player1 stays unlinked (used by
+  // tests that only assert structural permissions).
   const { data: players, error: plErr } = await admin
     .from("players")
     .insert([
-      { club_id: clubId, first_name: "Joueur1", last_name: prefix },
-      { club_id: clubId, first_name: "Joueur2", last_name: prefix },
+      {
+        club_id: clubId,
+        first_name: "Joueur1",
+        last_name: prefix,
+        user_id: playerUser.userId,
+      },
+      {
+        club_id: clubId,
+        first_name: "Joueur2",
+        last_name: prefix,
+        user_id: playerUser.userId,
+      },
     ])
     .select("id");
   if (plErr || !players) throw new Error(`players insert: ${plErr?.message}`);
   const [p1, p2] = players;
 
-  // Add admin user as coach of the team (so coach-only checks pass).
-  // Ignore unique violations: admin may already be on the team.
   await admin
     .from("team_members")
     .insert([
-      { team_id: teamId, user_id: adminUser.userId, role: "coach" },
-      { team_id: teamId, player_id: p1.id, role: "player" },
-      { team_id: teamId, player_id: p2.id, role: "player" },
+      { team_id: teamId, user_id: coachUser.userId, role: "coach" },
+      { team_id: teamId, user_id: playerUser.userId, player_id: p1.id, role: "player" },
+      { team_id: teamId, user_id: playerUser.userId, player_id: p2.id, role: "player" },
     ])
     .select();
 
-  // Link admin as "parent" of player 2 — purely structural, role boundary not tested.
   await admin
     .from("player_parents")
     .insert({
@@ -169,8 +178,8 @@ export async function createTestClub(suiteName = "suite"): Promise<SeededClub> {
     eventId,
     admin: adminUser,
     coach: coachUser,
-    player1: { id: p1.id, user: playerUser1 },
-    player2WithParent: { id: p2.id, user: playerUser2, parent: parentUser },
+    player1: { id: p1.id, user: playerUser },
+    player2WithParent: { id: p2.id, user: playerUser, parent: parentUser },
     cleanup,
   };
 }

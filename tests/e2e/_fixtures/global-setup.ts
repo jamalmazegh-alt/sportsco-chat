@@ -1,15 +1,25 @@
 /**
  * Playwright globalSetup — runs once before all E2E tests.
  *
- * Signs in the pre-created E2E admin user against Supabase using
- * E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD, then exposes the access token + user
- * id via process.env so the synchronous `admin` client in
- * tests/e2e/_fixtures/admin.ts can attach it as a Bearer header.
+ * Signs in the 4 pre-created E2E users (admin / coach / player / parent),
+ * exposes their access tokens + user ids via process.env so the synchronous
+ * `admin` client in tests/e2e/_fixtures/admin.ts can attach the admin token
+ * as a Bearer header, and so the club fixture can wire the real user ids
+ * into team_members / player_parents / etc.
  *
  * Also resolves the pre-existing E2E test club (E2E_CLUB_NAME) and exports
- * its id as E2E_CLUB_ID for the club fixture.
+ * its id as E2E_CLUB_ID.
  */
 import { createClient } from "@supabase/supabase-js";
+
+type Role = "admin" | "coach" | "player" | "parent";
+
+const ENV_KEYS: Record<Role, { email: string; password: string }> = {
+  admin: { email: "E2E_ADMIN_EMAIL", password: "E2E_ADMIN_PASSWORD" },
+  coach: { email: "E2E_COACH_EMAIL", password: "E2E_COACH_PASSWORD" },
+  player: { email: "E2E_PLAYER_EMAIL", password: "E2E_PLAYER_PASSWORD" },
+  parent: { email: "E2E_PARENT_EMAIL", password: "E2E_PARENT_PASSWORD" },
+};
 
 export default async function globalSetup() {
   const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
@@ -17,39 +27,59 @@ export default async function globalSetup() {
     process.env.SUPABASE_PUBLISHABLE_KEY ??
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
     process.env.SUPABASE_ANON_KEY;
-  const email = process.env.E2E_ADMIN_EMAIL;
-  const password = process.env.E2E_ADMIN_PASSWORD;
   const clubName = process.env.E2E_CLUB_NAME ?? "E2E Test Club";
 
-  if (!url || !anonKey || !email || !password) {
-    // Let the missing-config skip test handle the messaging.
-    return;
+  if (!url || !anonKey) return; // missing-config test will report
+
+  // Admin is required; the other 3 are optional (fixture will fall back to admin).
+  const adminEmail = process.env[ENV_KEYS.admin.email];
+  const adminPassword = process.env[ENV_KEYS.admin.password];
+  if (!adminEmail || !adminPassword) return;
+
+  async function signIn(role: Role): Promise<void> {
+    const email = process.env[ENV_KEYS[role].email];
+    const password = process.env[ENV_KEYS[role].password];
+    if (!email || !password) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[globalSetup] ${role}: missing ${ENV_KEYS[role].email}/${ENV_KEYS[role].password} — falling back to admin user for this role.`,
+      );
+      return;
+    }
+    const client = createClient(url!, anonKey!, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error || !data.session || !data.user) {
+      throw new Error(
+        `[globalSetup] ${role} signIn failed for ${email}: ${error?.message ?? "no session"}. ` +
+          "Check the user exists, the password is correct, and the email is confirmed.",
+      );
+    }
+    const upper = role.toUpperCase();
+    process.env[`E2E_${upper}_ACCESS_TOKEN`] = data.session.access_token;
+    process.env[`E2E_${upper}_REFRESH_TOKEN`] = data.session.refresh_token;
+    process.env[`E2E_${upper}_USER_ID`] = data.user.id;
   }
 
-  const client = createClient(url, anonKey, {
+  // Sign in all 4 roles in parallel.
+  await Promise.all((Object.keys(ENV_KEYS) as Role[]).map(signIn));
+
+  // Resolve the pre-existing test club id via the admin client.
+  const adminClient = createClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      headers: { Authorization: `Bearer ${process.env.E2E_ADMIN_ACCESS_TOKEN}` },
+    },
   });
-  const { data, error } = await client.auth.signInWithPassword({ email, password });
-  if (error || !data.session || !data.user) {
-    throw new Error(
-      `[globalSetup] E2E admin signIn failed for ${email}: ${error?.message ?? "no session"}. ` +
-        "Make sure the user exists, the password is correct, and the email is confirmed.",
-    );
-  }
-
-  process.env.E2E_ADMIN_ACCESS_TOKEN = data.session.access_token;
-  process.env.E2E_ADMIN_REFRESH_TOKEN = data.session.refresh_token;
-  process.env.E2E_ADMIN_USER_ID = data.user.id;
-
-  // Resolve the pre-existing test club id (RLS: admin must be a member).
-  const { data: club, error: clubErr } = await client
+  const { data: club, error: clubErr } = await adminClient
     .from("clubs")
     .select("id")
     .eq("name", clubName)
     .maybeSingle();
   if (clubErr || !club) {
     throw new Error(
-      `[globalSetup] Could not find club "${clubName}". Create it manually and add ${email} as admin. ` +
+      `[globalSetup] Could not find club "${clubName}". Create it manually and add ${adminEmail} as admin. ` +
         `(${clubErr?.message ?? "not found"})`,
     );
   }
