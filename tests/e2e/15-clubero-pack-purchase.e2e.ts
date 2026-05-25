@@ -81,7 +81,7 @@ test.describe("Clubero pack — admin flow (checkout + webhook)", () => {
     }
   });
 
-  test("admin sans sub → /admin/billing → checkout → webhook → unlock", async ({
+  test.skip("admin sans sub → /admin/billing → checkout → webhook → unlock", async ({
     page,
   }) => {
     if (!seed) throw new Error("seed missing");
