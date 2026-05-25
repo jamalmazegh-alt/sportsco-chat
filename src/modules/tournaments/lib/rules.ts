@@ -103,6 +103,7 @@ export const DEFAULT_RULES: TournamentRules = {
     collectPlayers: false,
     publicMessage: "",
   },
+  regulations: { mode: "generated", uploadedUrl: null, uploadedName: null, uploadedAt: null },
   scoring: { mode: "simple", sets: DEFAULT_SETS_RULES },
   language: "fr",
   branding: {},
