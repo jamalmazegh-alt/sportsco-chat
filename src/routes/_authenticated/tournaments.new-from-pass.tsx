@@ -35,13 +35,18 @@ function NewFromPassPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const justPaid = search.pass === "success";
+  const sessionId = search.session_id;
   const listFn = useServerFn(listMyAvailablePasses);
   const createFn = useServerFn(createTournamentFromPass);
+  const confirmFn = useServerFn(confirmPassSession);
+  const [pollStartedAt] = useState(() => Date.now());
+  const [waitedTooLong, setWaitedTooLong] = useState(false);
 
   const passesQ = useQuery({
     queryKey: ["my-tournament-passes"],
     queryFn: () => listFn({ data: undefined as never }),
-    // After Stripe redirect, poll until the webhook marks the pass as paid.
+    // After Stripe redirect, poll until the webhook (or our self-heal call)
+    // marks the pass as paid.
     refetchInterval: (q) => {
       const data = q.state.data as { passes?: unknown[] } | undefined;
       if (!justPaid) return false;
@@ -49,6 +54,45 @@ function NewFromPassPage() {
       return 2000;
     },
   });
+
+  // Self-heal: ask Stripe directly whether the session is paid, in case the
+  // webhook is delayed or failed. Re-tries every 4s for ~30s.
+  useEffect(() => {
+    if (!justPaid || !sessionId) return;
+    let cancelled = false;
+    let attempts = 0;
+    async function tick() {
+      attempts += 1;
+      try {
+        const res = await confirmFn({ data: { session_id: sessionId! } });
+        if (!cancelled && res.paid) {
+          await passesQ.refetch();
+        }
+      } catch {
+        /* ignore — webhook may still resolve it */
+      }
+      if (cancelled) return;
+      if ((passesQ.data?.passes?.length ?? 0) > 0) return;
+      if (attempts >= 8) {
+        setWaitedTooLong(true);
+        return;
+      }
+      setTimeout(tick, 4000);
+    }
+    tick();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [justPaid, sessionId]);
+
+  // Surface "still waiting" message after 20s even without session_id.
+  useEffect(() => {
+    if (!justPaid) return;
+    const t = setTimeout(() => setWaitedTooLong(true), 20000);
+    return () => clearTimeout(t);
+  }, [justPaid, pollStartedAt]);
+
 
   const [name, setName] = useState("");
   const [sport, setSport] = useState("football");
