@@ -31,11 +31,12 @@ export interface ForfeitRules {
 }
 
 export interface RosterRules {
+  /** Nombre de joueurs titulaires par équipe (sur le terrain). Ex: 5, 7, 8, 9, 11. */
+  playersPerTeam: number;
   /** Nombre maximal de remplaçants autorisés par équipe (en plus des titulaires). */
   maxSubstitutes: number;
-  /** Nombre de jokers (joueurs supplémentaires hors club autorisés) par équipe. */
-  jokersPerTeam: number;
 }
+
 
 export interface RegistrationRules {
   enabled: boolean;
