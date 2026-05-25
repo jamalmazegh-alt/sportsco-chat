@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, Trophy, AlertCircle } from "lucide-react";
+import { Loader2, Trophy, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import i18nInstance from "@/lib/i18n";
 import {
   listMyAvailablePasses,
   createTournamentFromPass,
+  confirmPassSession,
 } from "@/modules/tournaments/passes.functions";
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
@@ -34,13 +35,18 @@ function NewFromPassPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const justPaid = search.pass === "success";
+  const sessionId = search.session_id;
   const listFn = useServerFn(listMyAvailablePasses);
   const createFn = useServerFn(createTournamentFromPass);
+  const confirmFn = useServerFn(confirmPassSession);
+  const [pollStartedAt] = useState(() => Date.now());
+  const [waitedTooLong, setWaitedTooLong] = useState(false);
 
   const passesQ = useQuery({
     queryKey: ["my-tournament-passes"],
     queryFn: () => listFn({ data: undefined as never }),
-    // After Stripe redirect, poll until the webhook marks the pass as paid.
+    // After Stripe redirect, poll until the webhook (or our self-heal call)
+    // marks the pass as paid.
     refetchInterval: (q) => {
       const data = q.state.data as { passes?: unknown[] } | undefined;
       if (!justPaid) return false;
@@ -48,6 +54,45 @@ function NewFromPassPage() {
       return 2000;
     },
   });
+
+  // Self-heal: ask Stripe directly whether the session is paid, in case the
+  // webhook is delayed or failed. Re-tries every 4s for ~30s.
+  useEffect(() => {
+    if (!justPaid || !sessionId) return;
+    let cancelled = false;
+    let attempts = 0;
+    async function tick() {
+      attempts += 1;
+      try {
+        const res = await confirmFn({ data: { session_id: sessionId! } });
+        if (!cancelled && res.paid) {
+          await passesQ.refetch();
+        }
+      } catch {
+        /* ignore — webhook may still resolve it */
+      }
+      if (cancelled) return;
+      if ((passesQ.data?.passes?.length ?? 0) > 0) return;
+      if (attempts >= 8) {
+        setWaitedTooLong(true);
+        return;
+      }
+      setTimeout(tick, 4000);
+    }
+    tick();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [justPaid, sessionId]);
+
+  // Surface "still waiting" message after 20s even without session_id.
+  useEffect(() => {
+    if (!justPaid) return;
+    const t = setTimeout(() => setWaitedTooLong(true), 20000);
+    return () => clearTimeout(t);
+  }, [justPaid, pollStartedAt]);
+
 
   const [name, setName] = useState("");
   const [sport, setSport] = useState("football");
@@ -116,6 +161,32 @@ function NewFromPassPage() {
         <p className="mt-3 text-sm text-muted-foreground">
           {t("newFromPass.validatingBody")}
         </p>
+        {waitedTooLong && (
+          <div className="mt-8 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              {t("newFromPass.stillWaitingBody", {
+                defaultValue:
+                  "Cela prend plus de temps que prévu. Si votre paiement a bien été effectué, rafraîchissez la page — votre pass apparaîtra dès qu'il sera confirmé.",
+              })}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (sessionId) {
+                  confirmFn({ data: { session_id: sessionId } })
+                    .catch(() => null)
+                    .finally(() => passesQ.refetch());
+                } else {
+                  passesQ.refetch();
+                }
+              }}
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t("newFromPass.refresh", { defaultValue: "Rafraîchir" })}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }
