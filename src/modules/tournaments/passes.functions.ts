@@ -79,6 +79,55 @@ export const createTournamentPassCheckout = createServerFn({ method: "POST" })
     return { url: session.url };
   });
 
+/**
+ * Self-heal endpoint: given a Stripe Checkout session_id (from the success
+ * redirect), call Stripe to verify the payment status and mark the matching
+ * `tournament_passes` rows as paid. This avoids waiting on the webhook when
+ * Stripe is slow or the webhook delivery failed.
+ */
+export const confirmPassSession = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ session_id: z.string().min(8).max(255) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getStripe } = await import("@/lib/stripe.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const stripe = getStripe();
+
+    const session = await stripe.checkout.sessions.retrieve(data.session_id);
+    if (session.payment_status !== "paid") {
+      return { paid: false };
+    }
+    const paymentIntentId =
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent?.id ?? null;
+
+    // Only update rows that haven't been processed yet — webhook may race us.
+    const { data: existing } = await supabaseAdmin
+      .from("tournament_passes")
+      .select("id, status")
+      .eq("stripe_session_id", session.id);
+    const pending = (existing ?? []).filter((r) => r.status === "pending");
+    if (pending.length === 0) return { paid: true, updated: 0 };
+
+    const qty = pending.length;
+    const totalCents = session.amount_total ?? 4000 * qty;
+    const perPass = Math.round(totalCents / qty);
+    await supabaseAdmin
+      .from("tournament_passes")
+      .update({
+        status: "paid",
+        stripe_payment_intent_id: paymentIntentId,
+        amount_total: perPass,
+        currency: session.currency ?? "eur",
+        paid_at: new Date().toISOString(),
+      })
+      .eq("stripe_session_id", session.id)
+      .eq("status", "pending");
+    return { paid: true, updated: pending.length };
+  });
+
 
 /**
  * List available (paid, unused) passes for the current user — matched by user_id or email.
