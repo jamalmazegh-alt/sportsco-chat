@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Loader2, Instagram, Facebook, Twitter, RefreshCw, Unplug, ExternalLink } from "lucide-react";
+import { Loader2, Camera, Users, AtSign, RefreshCw, Unplug, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader } from "@/components/admin/settings-shared";
 import {
@@ -19,10 +19,10 @@ import i18nInstance from "@/lib/i18n";
 
 type Network = "instagram" | "facebook" | "twitter";
 
-const META: Record<Network, { label: string; Icon: typeof Instagram; tint: string }> = {
-  instagram: { label: "Instagram", Icon: Instagram, tint: "text-pink-500" },
-  facebook: { label: "Facebook", Icon: Facebook, tint: "text-blue-600" },
-  twitter: { label: "X / Twitter", Icon: Twitter, tint: "text-foreground" },
+const META: Record<Network, { label: string; Icon: typeof Camera; tint: string }> = {
+  instagram: { label: "Instagram", Icon: Camera, tint: "text-pink-500" },
+  facebook: { label: "Facebook", Icon: Users, tint: "text-blue-600" },
+  twitter: { label: "X / Twitter", Icon: AtSign, tint: "text-foreground" },
 };
 
 export const Route = createFileRoute("/_authenticated/admin/settings/social")({
