@@ -147,7 +147,7 @@ const ConvocationInviteEmail = ({
   const t = T[l];
   return (
 
-  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle} {eventDate ? \` — $${eventDate}\` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>
           {isUpdate
             ? t.headingUpdate
