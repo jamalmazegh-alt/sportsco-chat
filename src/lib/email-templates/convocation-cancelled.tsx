@@ -60,7 +60,7 @@ const ConvocationCancelledEmail = ({
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
   return (
-  <EmailShell preview={`${t.preview}: ${eventTitle} {eventDate ? \` — $${eventDate}\` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${t.preview}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
