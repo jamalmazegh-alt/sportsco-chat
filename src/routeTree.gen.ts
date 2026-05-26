@@ -92,6 +92,8 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicSocialSyncRouteImport } from './routes/api/public/social/sync'
+import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public/social/callback'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
@@ -100,6 +102,7 @@ import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './rout
 import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
+import { Route as AuthenticatedAdminSettingsSocialRouteImport } from './routes/_authenticated/admin/settings.social'
 import { Route as AuthenticatedAdminSettingsRemindersRouteImport } from './routes/_authenticated/admin/settings.reminders'
 import { Route as AuthenticatedAdminSettingsPaymentsRouteImport } from './routes/_authenticated/admin/settings.payments'
 import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
@@ -545,6 +548,16 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSocialSyncRoute = ApiPublicSocialSyncRouteImport.update({
+  id: '/api/public/social/sync',
+  path: '/api/public/social/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSocialCallbackRoute = ApiPublicSocialCallbackRouteImport.update({
+  id: '/api/public/social/callback',
+  path: '/api/public/social/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksTrialRemindersRoute =
   ApiPublicHooksTrialRemindersRouteImport.update({
     id: '/api/public/hooks/trial-reminders',
@@ -591,6 +604,12 @@ const AuthenticatedAdminUsersUserIdRoute =
   AuthenticatedAdminUsersUserIdRouteImport.update({
     id: '/users/$userId',
     path: '/users/$userId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsSocialRoute =
+  AuthenticatedAdminSettingsSocialRouteImport.update({
+    id: '/settings/social',
+    path: '/settings/social',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminSettingsRemindersRoute =
@@ -709,6 +728,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -717,6 +737,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -803,6 +825,7 @@ export interface FileRoutesByTo {
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -811,6 +834,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -903,6 +928,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/_authenticated/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/_authenticated/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/_authenticated/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -911,6 +937,8 @@ export interface FileRoutesById {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1003,6 +1031,7 @@ export interface FileRouteTypes {
     | '/admin/settings/convocations'
     | '/admin/settings/payments'
     | '/admin/settings/reminders'
+    | '/admin/settings/social'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -1011,6 +1040,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1097,6 +1128,7 @@ export interface FileRouteTypes {
     | '/admin/settings/convocations'
     | '/admin/settings/payments'
     | '/admin/settings/reminders'
+    | '/admin/settings/social'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -1105,6 +1137,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1196,6 +1230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings/convocations'
     | '/_authenticated/admin/settings/payments'
     | '/_authenticated/admin/settings/reminders'
+    | '/_authenticated/admin/settings/social'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
@@ -1204,6 +1239,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1258,6 +1295,8 @@ export interface RootRouteChildren {
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
+  ApiPublicSocialCallbackRoute: typeof ApiPublicSocialCallbackRoute
+  ApiPublicSocialSyncRoute: typeof ApiPublicSocialSyncRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1850,6 +1889,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/social/sync': {
+      id: '/api/public/social/sync'
+      path: '/api/public/social/sync'
+      fullPath: '/api/public/social/sync'
+      preLoaderRoute: typeof ApiPublicSocialSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/social/callback': {
+      id: '/api/public/social/callback'
+      path: '/api/public/social/callback'
+      fullPath: '/api/public/social/callback'
+      preLoaderRoute: typeof ApiPublicSocialCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/trial-reminders': {
       id: '/api/public/hooks/trial-reminders'
       path: '/api/public/hooks/trial-reminders'
@@ -1906,6 +1959,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings/social': {
+      id: '/_authenticated/admin/settings/social'
+      path: '/settings/social'
+      fullPath: '/admin/settings/social'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsSocialRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/settings/reminders': {
       id: '/_authenticated/admin/settings/reminders'
       path: '/settings/reminders'
@@ -1959,6 +2019,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSettingsConvocationsRoute: typeof AuthenticatedAdminSettingsConvocationsRoute
   AuthenticatedAdminSettingsPaymentsRoute: typeof AuthenticatedAdminSettingsPaymentsRoute
   AuthenticatedAdminSettingsRemindersRoute: typeof AuthenticatedAdminSettingsRemindersRoute
+  AuthenticatedAdminSettingsSocialRoute: typeof AuthenticatedAdminSettingsSocialRoute
   AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -1976,6 +2037,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminSettingsPaymentsRoute,
   AuthenticatedAdminSettingsRemindersRoute:
     AuthenticatedAdminSettingsRemindersRoute,
+  AuthenticatedAdminSettingsSocialRoute: AuthenticatedAdminSettingsSocialRoute,
   AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
@@ -2233,6 +2295,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
+  ApiPublicSocialCallbackRoute: ApiPublicSocialCallbackRoute,
+  ApiPublicSocialSyncRoute: ApiPublicSocialSyncRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
@@ -2244,13 +2308,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

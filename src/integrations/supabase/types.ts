@@ -148,6 +148,62 @@ export type Database = {
           },
         ]
       }
+      club_social_connections: {
+        Row: {
+          access_token: string
+          account_id: string | null
+          account_name: string | null
+          club_id: string
+          connected_at: string
+          id: string
+          is_active: boolean
+          last_sync_error: string | null
+          last_synced_at: string | null
+          network: string
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          account_id?: string | null
+          account_name?: string | null
+          club_id: string
+          connected_at?: string
+          id?: string
+          is_active?: boolean
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          network: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          account_id?: string | null
+          account_name?: string | null
+          club_id?: string
+          connected_at?: string
+          id?: string
+          is_active?: boolean
+          last_sync_error?: string | null
+          last_synced_at?: string | null
+          network?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_social_connections_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clubs: {
         Row: {
           archived_at: string | null
@@ -2654,33 +2710,45 @@ export type Database = {
       wall_posts: {
         Row: {
           attachments: Json
-          author_user_id: string
+          author_user_id: string | null
           body: string
           club_id: string
           created_at: string
           deleted_at: string | null
+          external_id: string | null
+          external_media_url: string | null
+          external_url: string | null
           id: string
           is_pinned: boolean
+          source: string
         }
         Insert: {
           attachments?: Json
-          author_user_id: string
+          author_user_id?: string | null
           body: string
           club_id: string
           created_at?: string
           deleted_at?: string | null
+          external_id?: string | null
+          external_media_url?: string | null
+          external_url?: string | null
           id?: string
           is_pinned?: boolean
+          source?: string
         }
         Update: {
           attachments?: Json
-          author_user_id?: string
+          author_user_id?: string | null
           body?: string
           club_id?: string
           created_at?: string
           deleted_at?: string | null
+          external_id?: string | null
+          external_media_url?: string | null
+          external_url?: string | null
           id?: string
           is_pinned?: boolean
+          source?: string
         }
         Relationships: []
       }

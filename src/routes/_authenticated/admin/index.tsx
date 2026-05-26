@@ -13,6 +13,7 @@ import {
   Palette,
   Wallet,
   ChevronRight,
+  Share2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -90,6 +91,13 @@ function AdminSettingsPage() {
       title: t("admin.hubCommunications"),
       hint: t("admin.hubCommunicationsHint"),
       tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      to: "/admin/settings/social",
+      icon: Share2,
+      title: "Réseaux sociaux",
+      hint: "Affichez vos posts Instagram, Facebook et X sur le mur du club",
+      tone: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
     },
     {
       to: "/admin/settings/reminders",
