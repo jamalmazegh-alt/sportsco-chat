@@ -377,6 +377,16 @@ export const runImport = createServerFn({ method: "POST" })
     let imported = 0;
     const summary: Record<string, number> = {};
 
+    // Contexte club pour personnaliser les invitations email
+    const { data: clubRow } = await supabaseAdmin
+      .from("clubs")
+      .select("name")
+      .eq("id", data.clubId)
+      .maybeSingle();
+    const clubName = clubRow?.name ?? undefined;
+
+
+
     try {
       if (data.type === "players") {
         const teamCache = new Map<string, string>();
