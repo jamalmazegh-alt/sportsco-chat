@@ -17,17 +17,12 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
   const isStaff = !!roleLabel && roleLabel.toLowerCase() !== "joueur";
   const role = roleLabel ?? "joueur";
   return (
-    <EmailShell preview={`{\`$${club} vous invite à rejoindre Clubero en tant que $${role}\`}`} locale={"fr"} clubName={clubName} clubLogoUrl={clubLogoUrl}>
-          <Section style={clubHeader}>
-            <Img
-              src={clubLogoUrl || "https://www.clubero.app/clubero-logo.png"}
-              alt={club}
-              width="64"
-              height="64"
-              style={clubLogo}
-            />
-            <Text style={clubLabel}>{club}</Text>
-          </Section>
+    <EmailShell
+      preview={`${club} vous invite à rejoindre Clubero en tant que ${role}`}
+      locale="fr"
+      clubName={clubName}
+      clubLogoUrl={clubLogoUrl}
+    >
           <Heading style={h1}>
             {firstName ? `Bonjour ${firstName},` : "Bonjour,"}
           </Heading>
