@@ -451,7 +451,11 @@ export const runImport = createServerFn({ method: "POST" })
               if (!parentUserId) {
                 parentUserId = await findOrCreateProfileByEmail(email, fullName);
                 if (!parentUserId && data.sendInvitations) {
-                  parentUserId = await inviteUserByEmail(email, firstName, lastName);
+                  parentUserId = await inviteUserByEmail(email, firstName, lastName, {
+                    clubName,
+                    inviteRole: "parent",
+                    playerName: `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim(),
+                  });
                   if (parentUserId) invitationsSent++;
                 }
                 if (parentUserId) parentCache.set(email, parentUserId);
