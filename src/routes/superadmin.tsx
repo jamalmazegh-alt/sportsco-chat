@@ -14,15 +14,11 @@ import {
   LogOut,
   Loader2,
   ShieldCheck,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/superadmin")({
-  // Server-side guard: blocks the route before any UI renders.
-  // The loader runs on the server during SSR / direct URL hits, and on the client
-  // during in-app navigation. If the caller is not a super admin, we return 404
-  // (we never reveal the area exists). If the loader can't authenticate yet
-  // (SSR with no bearer token), we fall back to the in-component check.
   loader: async () => {
     try {
       const res = await checkSuperAdmin();
@@ -30,12 +26,9 @@ export const Route = createFileRoute("/superadmin")({
       return { verified: true as const };
     } catch (err) {
       if (isRedirect(err)) throw err;
-      // notFound() throws an object with a specific shape — re-throw it.
       if (err && typeof err === "object" && "isNotFound" in (err as object)) {
         throw err;
       }
-      // Likely "Unauthorized" during SSR before auth header is attached.
-      // Defer to the client-side useEffect check below.
       return { verified: false as const };
     }
   },
@@ -47,12 +40,14 @@ const NAV: NavItem[] = [
   { to: "/superadmin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/superadmin/clubs", label: "Clubs", icon: Building2 },
   { to: "/superadmin/users", label: "Users", icon: Users },
+  { to: "/superadmin/onboarding/import", label: "Import données", icon: Upload },
   { to: "/superadmin/billing", label: "Billing", icon: CreditCard },
   { to: "/superadmin/logs", label: "Activity logs", icon: ScrollText },
   { to: "/superadmin/support", label: "Support hub", icon: LifeBuoy },
   { to: "/superadmin/support-tickets", label: "Tickets", icon: LifeBuoy },
   { to: "/superadmin/settings", label: "Settings", icon: Settings },
 ];
+
 
 function SuperAdminLayout() {
   const { session, loading } = useAuth();

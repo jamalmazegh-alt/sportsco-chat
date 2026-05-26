@@ -65,6 +65,7 @@ import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
 import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
 import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
 import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
+import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicTournamentRosterRouteImport } from './routes/api/public/tournament-roster'
@@ -390,6 +391,12 @@ const SuperadminSupportTicketsTicketIdRoute =
     path: '/support-tickets/$ticketId',
     getParentRoute: () => SuperadminRoute,
   } as any)
+const SuperadminOnboardingImportRoute =
+  SuperadminOnboardingImportRouteImport.update({
+    id: '/onboarding/import',
+    path: '/onboarding/import',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
 const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
   id: '/clubs/$clubId',
   path: '/clubs/$clubId',
@@ -685,6 +692,7 @@ export interface FileRoutesByFullPath {
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
@@ -778,6 +786,7 @@ export interface FileRoutesByTo {
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
@@ -877,6 +886,7 @@ export interface FileRoutesById {
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
   '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
   '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
   '/t/$slug/register': typeof TSlugRegisterRoute
@@ -976,6 +986,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-roster'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
+    | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
@@ -1069,6 +1080,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-roster'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
+    | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
@@ -1167,6 +1179,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-roster'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
+    | '/superadmin/onboarding/import'
     | '/superadmin/support-tickets/$ticketId'
     | '/superadmin/users/$userId'
     | '/t/$slug/register'
@@ -1648,6 +1661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminSupportTicketsTicketIdRouteImport
       parentRoute: typeof SuperadminRoute
     }
+    '/superadmin/onboarding/import': {
+      id: '/superadmin/onboarding/import'
+      path: '/onboarding/import'
+      fullPath: '/superadmin/onboarding/import'
+      preLoaderRoute: typeof SuperadminOnboardingImportRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/superadmin/clubs/$clubId': {
       id: '/superadmin/clubs/$clubId'
       path: '/clubs/$clubId'
@@ -2119,6 +2139,7 @@ interface SuperadminRouteChildren {
   SuperadminUsersRoute: typeof SuperadminUsersRouteWithChildren
   SuperadminIndexRoute: typeof SuperadminIndexRoute
   SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
+  SuperadminOnboardingImportRoute: typeof SuperadminOnboardingImportRoute
   SuperadminSupportTicketsTicketIdRoute: typeof SuperadminSupportTicketsTicketIdRoute
   SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
   SuperadminSupportTicketsIndexRoute: typeof SuperadminSupportTicketsIndexRoute
@@ -2132,6 +2153,7 @@ const SuperadminRouteChildren: SuperadminRouteChildren = {
   SuperadminUsersRoute: SuperadminUsersRouteWithChildren,
   SuperadminIndexRoute: SuperadminIndexRoute,
   SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
+  SuperadminOnboardingImportRoute: SuperadminOnboardingImportRoute,
   SuperadminSupportTicketsTicketIdRoute: SuperadminSupportTicketsTicketIdRoute,
   SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
   SuperadminSupportTicketsIndexRoute: SuperadminSupportTicketsIndexRoute,
