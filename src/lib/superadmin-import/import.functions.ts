@@ -315,10 +315,29 @@ async function findOrCreateProfileByEmail(email: string, fullName: string): Prom
   return null;
 }
 
-async function inviteUserByEmail(email: string, firstName: string, lastName: string): Promise<string | null> {
+async function inviteUserByEmail(
+  email: string,
+  firstName: string,
+  lastName: string,
+  context?: {
+    clubName?: string;
+    inviteRole?: string;
+    playerName?: string;
+    inviterName?: string;
+  },
+): Promise<string | null> {
   try {
     const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: { first_name: firstName, last_name: lastName, full_name: `${firstName} ${lastName}`.trim() },
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName} ${lastName}`.trim(),
+        // Contexte lu par le template auth InviteEmail via user_metadata
+        club_name: context?.clubName,
+        invite_role: context?.inviteRole,
+        player_name: context?.playerName,
+        inviter_name: context?.inviterName,
+      },
     });
     if (error) {
       log.warn("invite failed", { email, error: error.message });
@@ -357,6 +376,16 @@ export const runImport = createServerFn({ method: "POST" })
     const errors: Array<{ row: number; error: string }> = [];
     let imported = 0;
     const summary: Record<string, number> = {};
+
+    // Contexte club pour personnaliser les invitations email
+    const { data: clubRow } = await supabaseAdmin
+      .from("clubs")
+      .select("name")
+      .eq("id", data.clubId)
+      .maybeSingle();
+    const clubName = clubRow?.name ?? undefined;
+
+
 
     try {
       if (data.type === "players") {
@@ -422,7 +451,11 @@ export const runImport = createServerFn({ method: "POST" })
               if (!parentUserId) {
                 parentUserId = await findOrCreateProfileByEmail(email, fullName);
                 if (!parentUserId && data.sendInvitations) {
-                  parentUserId = await inviteUserByEmail(email, firstName, lastName);
+                  parentUserId = await inviteUserByEmail(email, firstName, lastName, {
+                    clubName,
+                    inviteRole: "parent",
+                    playerName: `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim(),
+                  });
                   if (parentUserId) invitationsSent++;
                 }
                 if (parentUserId) parentCache.set(email, parentUserId);
@@ -493,7 +526,10 @@ export const runImport = createServerFn({ method: "POST" })
 
             let userId = await findOrCreateProfileByEmail(email, `${firstName} ${lastName}`);
             if (!userId && data.sendInvitations) {
-              userId = await inviteUserByEmail(email, firstName, lastName);
+              userId = await inviteUserByEmail(email, firstName, lastName, {
+                clubName,
+                inviteRole: r.role || "coach",
+              });
               if (userId) invitationsSent++;
             }
 
