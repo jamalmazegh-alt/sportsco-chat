@@ -102,6 +102,7 @@ import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './rout
 import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
+import { Route as AuthenticatedAdminSettingsSocialRouteImport } from './routes/_authenticated/admin/settings.social'
 import { Route as AuthenticatedAdminSettingsRemindersRouteImport } from './routes/_authenticated/admin/settings.reminders'
 import { Route as AuthenticatedAdminSettingsPaymentsRouteImport } from './routes/_authenticated/admin/settings.payments'
 import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
@@ -605,6 +606,12 @@ const AuthenticatedAdminUsersUserIdRoute =
     path: '/users/$userId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsSocialRoute =
+  AuthenticatedAdminSettingsSocialRouteImport.update({
+    id: '/settings/social',
+    path: '/settings/social',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSettingsRemindersRoute =
   AuthenticatedAdminSettingsRemindersRouteImport.update({
     id: '/settings/reminders',
@@ -721,6 +728,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -817,6 +825,7 @@ export interface FileRoutesByTo {
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -919,6 +928,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
   '/_authenticated/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/_authenticated/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/_authenticated/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
@@ -1021,6 +1031,7 @@ export interface FileRouteTypes {
     | '/admin/settings/convocations'
     | '/admin/settings/payments'
     | '/admin/settings/reminders'
+    | '/admin/settings/social'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -1117,6 +1128,7 @@ export interface FileRouteTypes {
     | '/admin/settings/convocations'
     | '/admin/settings/payments'
     | '/admin/settings/reminders'
+    | '/admin/settings/social'
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
@@ -1218,6 +1230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings/convocations'
     | '/_authenticated/admin/settings/payments'
     | '/_authenticated/admin/settings/reminders'
+    | '/_authenticated/admin/settings/social'
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
@@ -1946,6 +1959,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings/social': {
+      id: '/_authenticated/admin/settings/social'
+      path: '/settings/social'
+      fullPath: '/admin/settings/social'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsSocialRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/settings/reminders': {
       id: '/_authenticated/admin/settings/reminders'
       path: '/settings/reminders'
@@ -1999,6 +2019,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSettingsConvocationsRoute: typeof AuthenticatedAdminSettingsConvocationsRoute
   AuthenticatedAdminSettingsPaymentsRoute: typeof AuthenticatedAdminSettingsPaymentsRoute
   AuthenticatedAdminSettingsRemindersRoute: typeof AuthenticatedAdminSettingsRemindersRoute
+  AuthenticatedAdminSettingsSocialRoute: typeof AuthenticatedAdminSettingsSocialRoute
   AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -2016,6 +2037,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminSettingsPaymentsRoute,
   AuthenticatedAdminSettingsRemindersRoute:
     AuthenticatedAdminSettingsRemindersRoute,
+  AuthenticatedAdminSettingsSocialRoute: AuthenticatedAdminSettingsSocialRoute,
   AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
