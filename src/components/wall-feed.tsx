@@ -313,7 +313,12 @@ function WallGrouped({
 
   const renderItem = (p: Post) => {
     const d = new Date(p.created_at);
-    const canManage = p.author_user_id === currentUserId || role === "admin";
+    const isExternal = p.source && p.source !== "clubero";
+    const sourceMeta = isExternal ? SOURCE_META[p.source as Exclude<PostSource, "clubero">] : null;
+    const canManage = !isExternal && (p.author_user_id === currentUserId || role === "admin");
+    const authorLabel = isExternal
+      ? (sourceMeta?.label ?? "—")
+      : (p.author?.full_name ?? "—");
     return (
       <li
         key={p.id}
@@ -336,12 +341,17 @@ function WallGrouped({
         </div>
         <div className="flex-1 min-w-0 py-3 pr-3">
           <header className="flex items-start justify-between gap-2 mb-1.5">
-            <p className="text-sm font-semibold truncate flex items-center gap-1.5">
-              {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30" />}
-              {p.author?.full_name ?? "—"}
-            </p>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30 shrink-0" />}
+              <p className="text-sm font-semibold truncate">{authorLabel}</p>
+              {sourceMeta && (
+                <span className={cn("text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0", sourceMeta.cls)}>
+                  {sourceMeta.label}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
-              {canPin && (
+              {canPin && !isExternal && (
                 <button
                   onClick={() => onTogglePin(p.id, !p.is_pinned)}
                   className="text-muted-foreground hover:text-primary p-1 -m-1 rounded-md hover:bg-primary/10 transition-colors"
@@ -362,14 +372,39 @@ function WallGrouped({
             </div>
           </header>
           {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
-          {p.attachments?.length > 0 && (
+          {isExternal && p.external_media_url && (
+            <a
+              href={p.external_url ?? p.external_media_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 block overflow-hidden rounded-lg border border-border"
+            >
+              <img
+                src={p.external_media_url}
+                alt=""
+                loading="lazy"
+                className="w-full max-h-96 object-cover"
+              />
+            </a>
+          )}
+          {!isExternal && p.attachments?.length > 0 && (
             <div className="mt-2">
               <AttachmentList items={p.attachments as Attachment[]} />
             </div>
           )}
-          {(p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
+          {isExternal && p.external_url && (
+            <a
+              href={p.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              <ExternalLink className="h-3 w-3" />
+              {t("wall.viewOn", { defaultValue: "Voir sur {{network}}", network: sourceMeta?.label ?? "" })}
+            </a>
+          )}
+          {!isExternal && (p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
             memberCount > 0 && (() => {
-              // Exclude the post author from the denominator: they don't need to "read" their own post
               const denom = Math.max(memberCount - 1, 0);
               const readers = (p.reads ?? []).filter((r) => r.user_id !== p.author_user_id).length;
               const capped = Math.min(readers, denom);
@@ -384,7 +419,7 @@ function WallGrouped({
                 </p>
               );
             })()}
-          {commentsEnabled && (
+          {!isExternal && commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
         </div>
