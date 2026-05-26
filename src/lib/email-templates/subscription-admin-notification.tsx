@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text,
-} from "@react-email/components";
+import { Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type EventType =
@@ -42,11 +41,7 @@ function fmt(d?: string | null) {
 const SubscriptionAdminNotification = (props: Props) => {
   const label = LABELS[props.eventType] ?? props.eventType;
   return (
-    <Html lang="fr" dir="ltr">
-      <Head />
-      <Preview>{label} — {props.clubName ?? "Club"}</Preview>
-      <Body style={main}>
-        <Container style={container}>
+    <EmailShell preview={`${label} — ${props.clubName ?? "Club"}`} locale={"fr"} clubName={clubName}>
           <Heading style={h1}>{label}</Heading>
           <Text style={text}>
             Club : <strong>{props.clubName ?? "—"}</strong>
@@ -61,9 +56,7 @@ const SubscriptionAdminNotification = (props: Props) => {
             <Row k="Subscription ID" v={props.stripeSubscriptionId ?? "—"} />
             <Row k="Club ID" v={props.clubId ?? "—"} />
           </Section>
-        </Container>
-      </Body>
-    </Html>
+        </EmailShell>
   );
 };
 
@@ -95,8 +88,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "14px", color: "#334155", lineHeight: "1.55", margin: "0 0 16px" };
 const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 16px" };

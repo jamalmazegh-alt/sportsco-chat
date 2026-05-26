@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Button,
-} from "@react-email/components";
+import { Button, Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
@@ -49,11 +48,7 @@ const ConvocationResponseEmail = ({
   const t = T[l];
   const statusLabel = t.labels[status];
   return (
-  <Html lang={l} dir="ltr">
-    <Head />
-    <Preview>{t.preview(playerName, statusLabel, eventTitle)}</Preview>
-    <Body style={main}>
-      <Container style={container}>
+  <EmailShell preview={`${t.preview(playerName, statusLabel, eventTitle)}`} locale={l}>
         <Heading style={h1}>{t.hello(coachFirstName)}</Heading>
         <Text style={text}>
           <strong>{playerName}</strong> {t.answered}{" "}
@@ -70,10 +65,7 @@ const ConvocationResponseEmail = ({
           </Section>
         )}
         <Button style={button} href={eventUrl}>{t.seeEvent}</Button>
-        <Text style={footer}>{t.foot}</Text>
-      </Container>
-    </Body>
-  </Html>
+        </EmailShell>
   );
 };
 
@@ -97,8 +89,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 20px" };
 const reasonBox = { backgroundColor: "#f1f5f9", borderRadius: "10px", padding: "12px 16px", margin: "0 0 20px" };
@@ -108,4 +98,3 @@ const button = {
   backgroundColor: "#0f172a", color: "#ffffff", fontSize: "14px",
   borderRadius: "10px", padding: "12px 20px", textDecoration: "none", display: "inline-block",
 };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };

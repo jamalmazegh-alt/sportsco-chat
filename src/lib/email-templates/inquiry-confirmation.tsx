@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text,
-} from "@react-email/components";
+import { Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -15,11 +14,7 @@ const InquiryConfirmationEmail = ({ kind = "contact", name }: Props) => {
     ? "Merci pour votre demande de démo"
     : "Merci de nous avoir contactés";
   return (
-    <Html lang="fr" dir="ltr">
-      <Head />
-      <Preview>{title} — Clubero</Preview>
-      <Body style={main}>
-        <Container style={container}>
+    <EmailShell preview={`${title} — Clubero`} locale={"fr"}>
           <Heading style={h1}>
             {name ? `Bonjour ${name},` : "Bonjour,"}
           </Heading>
@@ -35,10 +30,7 @@ const InquiryConfirmationEmail = ({ kind = "contact", name }: Props) => {
               <a href="https://www.clubero.app" style={link}>www.clubero.app</a>.
             </Text>
           </Section>
-          <Text style={footer}>L'équipe Clubero</Text>
-        </Container>
-      </Body>
-    </Html>
+          </EmailShell>
   );
 };
 
@@ -52,11 +44,8 @@ export const template = {
   previewData: { kind: "contact", name: "Jane" },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "14px", color: "#334155", lineHeight: "1.6", margin: "0 0 14px" };
 const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px 16px", margin: "16px 0" };
 const cardText = { fontSize: "13px", color: "#334155", lineHeight: "1.55", margin: 0 };
 const link = { color: "#2563eb", textDecoration: "none" };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };
