@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Eye, ExternalLink, Facebook, Instagram, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2, Twitter } from "lucide-react";
+import { Eye, ExternalLink, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
