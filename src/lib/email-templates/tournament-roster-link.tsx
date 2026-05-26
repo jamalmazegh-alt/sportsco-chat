@@ -21,7 +21,7 @@ const TournamentRosterLinkEmail = ({
   const tournament = tournamentName ?? "votre tournoi";
   const team = teamName ?? "votre équipe";
   return (
-    <EmailShell preview={`{\`Composez l'effectif de $${team}\`}`} locale={"fr"}>
+    <EmailShell preview={`Composez l'effectif de ${team}`} locale="fr">
           <Section style={header}>
             <Img
               src="https://www.clubero.app/clubero-logo.png"
