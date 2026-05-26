@@ -15,17 +15,28 @@ import { cn } from "@/lib/utils";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
+type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
 type Post = {
   id: string;
   club_id: string;
-  author_user_id: string;
+  author_user_id: string | null;
   body: string;
   created_at: string;
   is_pinned: boolean;
   attachments: Attachment[];
+  source: PostSource;
+  external_id: string | null;
+  external_url: string | null;
+  external_media_url: string | null;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
+};
+
+const SOURCE_META: Record<Exclude<PostSource, "clubero">, { label: string; cls: string }> = {
+  instagram: { label: "Instagram", cls: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30" },
+  facebook: { label: "Facebook", cls: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30" },
+  twitter: { label: "X", cls: "bg-foreground/10 text-foreground border-foreground/20" },
 };
 
 export function WallFeed({ clubId }: { clubId: string }) {
