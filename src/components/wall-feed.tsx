@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Eye, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
+import { Eye, ExternalLink, Loader2, MegaphoneIcon, MessageSquare, Pin, PinOff, Send, Trash2 } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -15,17 +15,28 @@ import { cn } from "@/lib/utils";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
+type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
 type Post = {
   id: string;
   club_id: string;
-  author_user_id: string;
+  author_user_id: string | null;
   body: string;
   created_at: string;
   is_pinned: boolean;
   attachments: Attachment[];
+  source: PostSource;
+  external_id: string | null;
+  external_url: string | null;
+  external_media_url: string | null;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
+};
+
+const SOURCE_META: Record<Exclude<PostSource, "clubero">, { label: string; cls: string }> = {
+  instagram: { label: "Instagram", cls: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30" },
+  facebook: { label: "Facebook", cls: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30" },
+  twitter: { label: "X", cls: "bg-foreground/10 text-foreground border-foreground/20" },
 };
 
 export function WallFeed({ clubId }: { clubId: string }) {
@@ -49,7 +60,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments")
+      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url")
       .eq("club_id", clubId)
       .is("deleted_at", null)
       .order("is_pinned", { ascending: false })
@@ -67,7 +78,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .is("deleted_at", null)
         .order("created_at", { ascending: true });
       const allUserIds = Array.from(new Set([
-        ...ps.map((p) => p.author_user_id),
+        ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
         ...((rawComments ?? []).map((c) => c.author_user_id)),
       ]));
       const { data: profs } = await supabase
@@ -95,7 +106,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         rByPost.set(r.post_id, arr);
       });
       ps.forEach((p) => {
-        p.author = map.get(p.author_user_id) ?? null;
+        p.author = p.author_user_id ? map.get(p.author_user_id) ?? null : null;
         p.comments = cByPost.get(p.id) ?? [];
         p.reads = rByPost.get(p.id) ?? [];
       });
@@ -302,7 +313,12 @@ function WallGrouped({
 
   const renderItem = (p: Post) => {
     const d = new Date(p.created_at);
-    const canManage = p.author_user_id === currentUserId || role === "admin";
+    const isExternal = p.source && p.source !== "clubero";
+    const sourceMeta = isExternal ? SOURCE_META[p.source as Exclude<PostSource, "clubero">] : null;
+    const canManage = !isExternal && (p.author_user_id === currentUserId || role === "admin");
+    const authorLabel = isExternal
+      ? (sourceMeta?.label ?? "—")
+      : (p.author?.full_name ?? "—");
     return (
       <li
         key={p.id}
@@ -325,12 +341,17 @@ function WallGrouped({
         </div>
         <div className="flex-1 min-w-0 py-3 pr-3">
           <header className="flex items-start justify-between gap-2 mb-1.5">
-            <p className="text-sm font-semibold truncate flex items-center gap-1.5">
-              {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30" />}
-              {p.author?.full_name ?? "—"}
-            </p>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {p.is_pinned && <Pin className="h-3.5 w-3.5 text-primary fill-primary/30 shrink-0" />}
+              <p className="text-sm font-semibold truncate">{authorLabel}</p>
+              {sourceMeta && (
+                <span className={cn("text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0", sourceMeta.cls)}>
+                  {sourceMeta.label}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
-              {canPin && (
+              {canPin && !isExternal && (
                 <button
                   onClick={() => onTogglePin(p.id, !p.is_pinned)}
                   className="text-muted-foreground hover:text-primary p-1 -m-1 rounded-md hover:bg-primary/10 transition-colors"
@@ -351,14 +372,39 @@ function WallGrouped({
             </div>
           </header>
           {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
-          {p.attachments?.length > 0 && (
+          {isExternal && p.external_media_url && (
+            <a
+              href={p.external_url ?? p.external_media_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 block overflow-hidden rounded-lg border border-border"
+            >
+              <img
+                src={p.external_media_url}
+                alt=""
+                loading="lazy"
+                className="w-full max-h-96 object-cover"
+              />
+            </a>
+          )}
+          {!isExternal && p.attachments?.length > 0 && (
             <div className="mt-2">
               <AttachmentList items={p.attachments as Attachment[]} />
             </div>
           )}
-          {(p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
+          {isExternal && p.external_url && (
+            <a
+              href={p.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              <ExternalLink className="h-3 w-3" />
+              {t("wall.viewOn", { defaultValue: "Voir sur {{network}}", network: sourceMeta?.label ?? "" })}
+            </a>
+          )}
+          {!isExternal && (p.author_user_id === currentUserId || role === "admin" || role === "coach") &&
             memberCount > 0 && (() => {
-              // Exclude the post author from the denominator: they don't need to "read" their own post
               const denom = Math.max(memberCount - 1, 0);
               const readers = (p.reads ?? []).filter((r) => r.user_id !== p.author_user_id).length;
               const capped = Math.min(readers, denom);
@@ -373,7 +419,7 @@ function WallGrouped({
                 </p>
               );
             })()}
-          {commentsEnabled && (
+          {!isExternal && commentsEnabled && (
             <CommentBlock post={p} currentUserId={currentUserId} role={role} clubId={p.club_id} />
           )}
         </div>
