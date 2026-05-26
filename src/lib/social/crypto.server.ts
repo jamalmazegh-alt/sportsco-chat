@@ -17,12 +17,16 @@ async function getKey(): Promise<CryptoKey> {
     if (buf.length === 32) {
       keyBytes = buf;
     } else {
-      keyBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", TEXT_ENCODER.encode(raw)));
+      keyBytes = new Uint8Array(
+        await crypto.subtle.digest("SHA-256", TEXT_ENCODER.encode(raw) as BufferSource),
+      );
     }
   } catch {
-    keyBytes = new Uint8Array(await crypto.subtle.digest("SHA-256", TEXT_ENCODER.encode(raw)));
+    keyBytes = new Uint8Array(
+      await crypto.subtle.digest("SHA-256", TEXT_ENCODER.encode(raw) as BufferSource),
+    );
   }
-  return crypto.subtle.importKey("raw", keyBytes, { name: "AES-GCM" }, false, [
+  return crypto.subtle.importKey("raw", keyBytes as BufferSource, { name: "AES-GCM" }, false, [
     "encrypt",
     "decrypt",
   ]);
@@ -33,9 +37,9 @@ export async function encryptToken(plaintext: string): Promise<string> {
   const key = await getKey();
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const cipher = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: iv as BufferSource },
     key,
-    TEXT_ENCODER.encode(plaintext),
+    TEXT_ENCODER.encode(plaintext) as BufferSource,
   );
   return `v1:${bytesToBase64(iv)}:${bytesToBase64(new Uint8Array(cipher))}`;
 }
@@ -50,7 +54,11 @@ export async function decryptToken(stored: string): Promise<string> {
   const key = await getKey();
   const iv = base64ToBytes(parts[1]);
   const data = base64ToBytes(parts[2]);
-  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, data);
+  const plain = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: iv as BufferSource },
+    key,
+    data as BufferSource,
+  );
   return TEXT_DECODER.decode(plain);
 }
 
