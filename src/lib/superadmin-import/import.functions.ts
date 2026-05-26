@@ -315,10 +315,29 @@ async function findOrCreateProfileByEmail(email: string, fullName: string): Prom
   return null;
 }
 
-async function inviteUserByEmail(email: string, firstName: string, lastName: string): Promise<string | null> {
+async function inviteUserByEmail(
+  email: string,
+  firstName: string,
+  lastName: string,
+  context?: {
+    clubName?: string;
+    inviteRole?: string;
+    playerName?: string;
+    inviterName?: string;
+  },
+): Promise<string | null> {
   try {
     const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: { first_name: firstName, last_name: lastName, full_name: `${firstName} ${lastName}`.trim() },
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName} ${lastName}`.trim(),
+        // Contexte lu par le template auth InviteEmail via user_metadata
+        club_name: context?.clubName,
+        invite_role: context?.inviteRole,
+        player_name: context?.playerName,
+        inviter_name: context?.inviterName,
+      },
     });
     if (error) {
       log.warn("invite failed", { email, error: error.message });
