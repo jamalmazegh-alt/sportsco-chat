@@ -64,14 +64,18 @@ export const startSocialConnect = createServerFn({ method: "POST" })
         nonce,
         code_verifier: codeVerifier,
       });
-      url = getProvider("twitter").getAuthUrl(state, redirectUri, challenge);
+      const { twitter } = await import("@/lib/social/providers.server");
+      url = twitter.getAuthUrl(state, redirectUri, challenge);
     } else {
       const state = await encodeState({
         club_id: data.clubId,
         network: data.network,
         nonce,
       });
-      url = getProvider(data.network).getAuthUrl(state, redirectUri);
+      const provider = getProvider(data.network) as {
+        getAuthUrl: (s: string, r: string) => string;
+      };
+      url = provider.getAuthUrl(state, redirectUri);
     }
     return { url };
   });

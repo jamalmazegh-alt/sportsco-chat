@@ -92,6 +92,8 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicSocialSyncRouteImport } from './routes/api/public/social/sync'
+import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public/social/callback'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
@@ -545,6 +547,16 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSocialSyncRoute = ApiPublicSocialSyncRouteImport.update({
+  id: '/api/public/social/sync',
+  path: '/api/public/social/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSocialCallbackRoute = ApiPublicSocialCallbackRouteImport.update({
+  id: '/api/public/social/callback',
+  path: '/api/public/social/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksTrialRemindersRoute =
   ApiPublicHooksTrialRemindersRouteImport.update({
     id: '/api/public/hooks/trial-reminders',
@@ -717,6 +729,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -811,6 +825,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -911,6 +927,8 @@ export interface FileRoutesById {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1011,6 +1029,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1105,6 +1125,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1204,6 +1226,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1258,6 +1282,8 @@ export interface RootRouteChildren {
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
+  ApiPublicSocialCallbackRoute: typeof ApiPublicSocialCallbackRoute
+  ApiPublicSocialSyncRoute: typeof ApiPublicSocialSyncRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1850,6 +1876,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/social/sync': {
+      id: '/api/public/social/sync'
+      path: '/api/public/social/sync'
+      fullPath: '/api/public/social/sync'
+      preLoaderRoute: typeof ApiPublicSocialSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/social/callback': {
+      id: '/api/public/social/callback'
+      path: '/api/public/social/callback'
+      fullPath: '/api/public/social/callback'
+      preLoaderRoute: typeof ApiPublicSocialCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/trial-reminders': {
       id: '/api/public/hooks/trial-reminders'
       path: '/api/public/hooks/trial-reminders'
@@ -2233,6 +2273,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
+  ApiPublicSocialCallbackRoute: ApiPublicSocialCallbackRoute,
+  ApiPublicSocialSyncRoute: ApiPublicSocialSyncRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

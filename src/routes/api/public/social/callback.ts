@@ -30,7 +30,11 @@ export const Route = createFileRoute("/api/public/social/callback")({
         const redirectUri = `${url.origin}/api/public/social/callback`;
 
         try {
-          const provider = getProvider(state.network);
+          const provider = getProvider(state.network) as {
+            exchangeCode: (code: string, redirectUri: string, codeVerifier?: string) => Promise<
+              import("@/lib/social/providers.server").OAuthResult
+            >;
+          };
           const oauth =
             state.network === "twitter"
               ? await provider.exchangeCode(code, redirectUri, state.code_verifier ?? "")
