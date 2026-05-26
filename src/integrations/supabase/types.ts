@@ -1347,6 +1347,59 @@ export type Database = {
         }
         Relationships: []
       }
+      superadmin_imports: {
+        Row: {
+          club_id: string
+          created_at: string
+          error_log: Json | null
+          file_name: string | null
+          ia_used: boolean
+          id: string
+          import_type: string
+          imported_by: string
+          invitations_sent: boolean
+          rows_imported: number
+          rows_total: number
+          status: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          error_log?: Json | null
+          file_name?: string | null
+          ia_used?: boolean
+          id?: string
+          import_type: string
+          imported_by: string
+          invitations_sent?: boolean
+          rows_imported?: number
+          rows_total?: number
+          status: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          error_log?: Json | null
+          file_name?: string | null
+          ia_used?: boolean
+          id?: string
+          import_type?: string
+          imported_by?: string
+          invitations_sent?: boolean
+          rows_imported?: number
+          rows_total?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "superadmin_imports_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_messages: {
         Row: {
           attachment_paths: string[]
