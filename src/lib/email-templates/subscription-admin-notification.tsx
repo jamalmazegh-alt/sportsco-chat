@@ -41,7 +41,7 @@ function fmt(d?: string | null) {
 const SubscriptionAdminNotification = (props: Props) => {
   const label = LABELS[props.eventType] ?? props.eventType;
   return (
-    <EmailShell preview={`${label} — ${props.clubName ?? "Club"}`} locale={"fr"} clubName={clubName}>
+    <EmailShell preview={`${label} — ${props.clubName ?? "Club"}`} locale="fr" clubName={props.clubName}>
           <Heading style={h1}>{label}</Heading>
           <Text style={text}>
             Club : <strong>{props.clubName ?? "—"}</strong>
