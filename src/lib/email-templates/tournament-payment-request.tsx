@@ -23,7 +23,7 @@ const TournamentPaymentRequestEmail = ({
   const amount = amountLabel ?? "le montant indiqué";
   const days = expiresInDays ?? 7;
   return (
-    <EmailShell preview={`{\`Paiement inscription — $${tournament}\`}`} locale={"fr"}>
+    <EmailShell preview={`Paiement inscription — ${tournament}`} locale="fr">
           <Section style={header}>
             <Img
               src="https://www.clubero.app/clubero-logo.png"
