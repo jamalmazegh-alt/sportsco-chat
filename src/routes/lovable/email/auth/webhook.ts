@@ -155,6 +155,11 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           oldEmail: (payload.data as any).old_email,
           newEmail: payload.data.new_email,
           locale,
+          // Contexte d'invitation (passé via options.data de inviteUserByEmail)
+          clubName: userMeta.club_name ?? userMeta.clubName,
+          inviteRole: userMeta.invite_role ?? userMeta.role,
+          playerName: userMeta.player_name ?? userMeta.playerName,
+          inviterName: userMeta.inviter_name ?? userMeta.invited_by,
         }
 
         // Render React Email to HTML and plain text
