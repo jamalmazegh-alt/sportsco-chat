@@ -106,7 +106,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         rByPost.set(r.post_id, arr);
       });
       ps.forEach((p) => {
-        p.author = map.get(p.author_user_id) ?? null;
+        p.author = p.author_user_id ? map.get(p.author_user_id) ?? null : null;
         p.comments = cByPost.get(p.id) ?? [];
         p.reads = rByPost.get(p.id) ?? [];
       });
