@@ -526,7 +526,10 @@ export const runImport = createServerFn({ method: "POST" })
 
             let userId = await findOrCreateProfileByEmail(email, `${firstName} ${lastName}`);
             if (!userId && data.sendInvitations) {
-              userId = await inviteUserByEmail(email, firstName, lastName);
+              userId = await inviteUserByEmail(email, firstName, lastName, {
+                clubName,
+                inviteRole: r.role || "coach",
+              });
               if (userId) invitationsSent++;
             }
 
