@@ -78,7 +78,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         .is("deleted_at", null)
         .order("created_at", { ascending: true });
       const allUserIds = Array.from(new Set([
-        ...ps.map((p) => p.author_user_id),
+        ...ps.map((p) => p.author_user_id).filter((x): x is string => !!x),
         ...((rawComments ?? []).map((c) => c.author_user_id)),
       ]));
       const { data: profs } = await supabase
