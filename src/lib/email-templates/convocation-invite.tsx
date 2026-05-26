@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text, Button, Row, Column,
-} from "@react-email/components";
+import { Button, Column, Heading, Row, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
@@ -148,26 +147,7 @@ const ConvocationInviteEmail = ({
   const t = T[l];
   return (
 
-  <Html lang={l} dir="ltr">
-    <Head />
-    <Preview>
-      {isUpdate ? t.update : isReminder ? t.reminder : ""}{t.convocation}: {eventTitle}
-      {eventDate ? ` — ${eventDate}` : ""}
-    </Preview>
-    <Body style={main}>
-      <Container style={container}>
-        {clubLogoUrl ? (
-          <Section style={{ textAlign: "center", margin: "0 0 16px" }}>
-            <img
-              src={clubLogoUrl}
-              alt={clubName ?? ""}
-              width={56}
-              height={56}
-              style={{ borderRadius: 12, objectFit: "cover" }}
-            />
-          </Section>
-        ) : null}
-
+  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>
           {isUpdate
             ? t.headingUpdate
@@ -355,15 +335,9 @@ const ConvocationInviteEmail = ({
           </Section>
         ) : null}
 
-
         <Text style={smallText}>{t.foot}</Text>
 
-        <Text style={footer}>
-          {t.sentBy} <strong>{clubName ?? "Clubero"}</strong> {t.via}
-        </Text>
-      </Container>
-    </Body>
-  </Html>
+        </EmailShell>
   );
 };
 
@@ -396,8 +370,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 16px" };
 const smallText = { fontSize: "12px", color: "#64748b", lineHeight: "1.5", margin: "16px 0 0" };
@@ -430,7 +402,7 @@ const btnBase = {
 const btnPresent = { ...btnBase, backgroundColor: "#16a34a", color: "#ffffff" };
 const btnUncertain = { ...btnBase, backgroundColor: "#f59e0b", color: "#ffffff" };
 const btnAbsent = { ...btnBase, backgroundColor: "#dc2626", color: "#ffffff" };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0", textAlign: "center" as const };
+
 const mapsLink = { color: "#0ea5e9", textDecoration: "underline" };
 const squadCard = {
   backgroundColor: "#f1f5f9",

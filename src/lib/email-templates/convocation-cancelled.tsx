@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text,
-} from "@react-email/components";
+import { Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
@@ -61,26 +60,7 @@ const ConvocationCancelledEmail = ({
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
   return (
-  <Html lang={l} dir="ltr">
-    <Head />
-    <Preview>
-      {t.preview}: {eventTitle}
-      {eventDate ? ` — ${eventDate}` : ""}
-    </Preview>
-    <Body style={main}>
-      <Container style={container}>
-        {clubLogoUrl ? (
-          <Section style={{ textAlign: "center", margin: "0 0 16px" }}>
-            <img
-              src={clubLogoUrl}
-              alt={clubName ?? ""}
-              width={56}
-              height={56}
-              style={{ borderRadius: 12, objectFit: "cover" }}
-            />
-          </Section>
-        ) : null}
-
+  <EmailShell preview={`${t.preview}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
@@ -98,12 +78,7 @@ const ConvocationCancelledEmail = ({
 
         <Text style={smallText}>{t.foot}</Text>
 
-        <Text style={footer}>
-          {t.sentBy} <strong>{clubName ?? "Clubero"}</strong> {t.via}
-        </Text>
-      </Container>
-    </Body>
-  </Html>
+        </EmailShell>
   );
 };
 
@@ -126,8 +101,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 16px" };
 const smallText = { fontSize: "12px", color: "#64748b", lineHeight: "1.5", margin: "16px 0 0" };
@@ -147,4 +120,3 @@ const cardKicker = {
 };
 const cardTitle = { fontSize: "17px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 10px" };
 const cardMeta = { fontSize: "13px", color: "#475569", margin: "0 0 4px" };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0", textAlign: "center" as const };

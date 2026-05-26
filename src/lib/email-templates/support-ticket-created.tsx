@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Body, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
+import { Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -45,11 +46,7 @@ const pick = (locale?: string) => (locale === "en" ? COPY.en : COPY.fr);
 const SupportTicketCreatedEmail = ({ name, subject, ticketShortId, category, ticketUrl, locale }: Props) => {
   const c = pick(locale);
   return (
-    <Html lang={c.lang} dir="ltr">
-      <Head />
-      <Preview>{c.preview}</Preview>
-      <Body style={main}>
-        <Container style={container}>
+    <EmailShell preview={`${c.preview}`} locale={"fr"}>
           <Heading style={h1}>{c.greet(name)}</Heading>
           <Text style={text}>{c.intro}</Text>
           <Section style={card}>
@@ -64,10 +61,7 @@ const SupportTicketCreatedEmail = ({ name, subject, ticketShortId, category, tic
               {c.follow} <a href={ticketUrl} style={link}>{ticketUrl}</a>
             </Text>
           )}
-          <Text style={footer}>{c.sign}</Text>
-        </Container>
-      </Body>
-    </Html>
+          </EmailShell>
   );
 };
 
@@ -78,11 +72,8 @@ export const template = {
   previewData: { name: "Jane", subject: "Problème de connexion", ticketShortId: "A1B2C3", category: "Bug", ticketUrl: "https://www.clubero.app/support", locale: "fr" },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "14px", color: "#334155", lineHeight: "1.6", margin: "0 0 14px" };
 const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px 16px", margin: "16px 0" };
 const cardText = { fontSize: "13px", color: "#334155", lineHeight: "1.55", margin: "0 0 6px" };
 const link = { color: "#2563eb", textDecoration: "none" };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };

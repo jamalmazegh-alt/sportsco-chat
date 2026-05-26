@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Button, Container, Head, Heading, Html, Preview, Section, Text,
-} from "@react-email/components";
+import { Button, Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -28,11 +27,7 @@ const TrialReminderEmail = ({
       : `Plus que ${daysRemaining} jours d'essai gratuit Clubero`;
 
   return (
-    <Html lang="fr" dir="ltr">
-      <Head />
-      <Preview>{previewText}</Preview>
-      <Body style={main}>
-        <Container style={container}>
+    <EmailShell preview={`${previewText}`} locale={"fr"} clubName={clubName}>
           <Heading style={h1}>
             {recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
           </Heading>
@@ -82,10 +77,7 @@ const TrialReminderEmail = ({
             Une question ? Répondez simplement à cet e-mail ou écrivez-nous à hello@clubero.app.
           </Text>
 
-          <Text style={footer}>Clubero — la plateforme des clubs sportifs amateurs</Text>
-        </Container>
-      </Body>
-    </Html>
+          </EmailShell>
   );
 };
 
@@ -107,8 +99,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 16px" };
 const smallText = { fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: "20px 0 0" };
@@ -130,4 +120,3 @@ const button = {
   textDecoration: "none",
   display: "inline-block",
 };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0", textAlign: "center" as const };

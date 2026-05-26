@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Button, Container, Head, Heading, Html, Img, Preview, Section, Text,
-} from "@react-email/components";
+import { Button, Heading, Img, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface TournamentPaymentRequestProps {
@@ -24,11 +23,7 @@ const TournamentPaymentRequestEmail = ({
   const amount = amountLabel ?? "le montant indiqué";
   const days = expiresInDays ?? 7;
   return (
-    <Html lang="fr" dir="ltr">
-      <Head />
-      <Preview>{`Paiement inscription — ${tournament}`}</Preview>
-      <Body style={main}>
-        <Container style={container}>
+    <EmailShell preview={`Paiement inscription — ${tournament}`} locale="fr">
           <Section style={header}>
             <Img
               src="https://www.clubero.app/clubero-logo.png"
@@ -53,12 +48,7 @@ const TournamentPaymentRequestEmail = ({
             Ou copiez ce lien dans votre navigateur :<br />
             <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{paymentUrl}</span>
           </Text>
-          <Text style={footer}>
-            Ce lien est valable {days} jours. Paiement sécurisé via Stripe.
-          </Text>
-        </Container>
-      </Body>
-    </Html>
+          </EmailShell>
   );
 };
 
@@ -78,8 +68,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const header = { textAlign: "center" as const, margin: "0 0 20px" };
 const logo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
 const brand = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "8px 0 0", textAlign: "center" as const };
@@ -97,4 +85,3 @@ const button = {
   display: "inline-block",
 };
 const small = { fontSize: "12px", color: "#64748b", margin: "20px 0 0", lineHeight: "1.5" };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };

@@ -1,7 +1,6 @@
 import * as React from "react";
-import {
-  Body, Container, Head, Heading, Html, Preview, Section, Text,
-} from "@react-email/components";
+import { Heading, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -18,11 +17,7 @@ const TournamentPassPurchasedEmail = (props: Props) => {
       ? (props.amount / 100).toFixed(2) + " " + (props.currency?.toUpperCase() ?? "EUR")
       : "—";
   return (
-    <Html lang="fr" dir="ltr">
-      <Head />
-      <Preview>Nouveau Pass Tournoi acheté — {props.buyerEmail}</Preview>
-      <Body style={main}>
-        <Container style={container}>
+    <EmailShell preview={`Nouveau Pass Tournoi acheté — ${props.buyerEmail}`} locale={"fr"}>
           <Heading style={h1}>Nouveau Pass Tournoi acheté</Heading>
           <Section style={card}>
             <Text style={row}>
@@ -42,9 +37,7 @@ const TournamentPassPurchasedEmail = (props: Props) => {
               </Text>
             )}
           </Section>
-        </Container>
-      </Body>
-    </Html>
+        </EmailShell>
   );
 };
 
@@ -62,8 +55,6 @@ export const template = {
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 16px" };
 const row = { fontSize: "13px", color: "#0f172a", margin: "4px 0", lineHeight: "1.5" };
