@@ -21,7 +21,7 @@ const TournamentInviteEmail = ({
   const tournament = tournamentName ?? "un tournoi";
   const role = roleLabel ?? "collaborateur";
   return (
-    <EmailShell preview={`{\`Vous êtes invité comme $${role} sur $${tournament}\`}`} locale={"fr"}>
+    <EmailShell preview={`Vous êtes invité comme ${role} sur ${tournament}`} locale="fr">
           <Section style={header}>
             <Img
               src="https://www.clubero.app/clubero-logo.png"
