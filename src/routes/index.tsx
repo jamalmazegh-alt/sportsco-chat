@@ -8,6 +8,7 @@ import {
   Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck,
   MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle, Sparkles, BrainCircuit, Send,
   BookOpen, Share2, UploadCloud, FileText, Swords,
+  Instagram, Facebook, Heart, Pin, TrendingUp, Star, ClipboardList, Bot, ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -57,6 +58,9 @@ function Landing() {
     <MarketingLayout>
       <Hero />
       <TournamentsSection />
+      <PlayerJournalSection />
+      <ClubWallSection />
+      <CoachAssistSection />
       <FeaturesGrid />
       <WhatsAppHybrid />
       <AIAssistantSection />
@@ -74,6 +78,8 @@ function TournamentsSection() {
     { t: t("tournaments.home.feat2Title"), d: t("tournaments.home.feat2Body") },
     { t: t("tournaments.home.feat3Title"), d: t("tournaments.home.feat3Body") },
     { t: t("tournaments.home.feat4Title"), d: t("tournaments.home.feat4Body") },
+    { t: t("tournaments.home.feat5Title"), d: t("tournaments.home.feat5Body") },
+    { t: t("tournaments.home.feat6Title"), d: t("tournaments.home.feat6Body") },
   ];
   return (
     <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[color:var(--victory)]/10 via-background to-[color:var(--energy)]/10">
