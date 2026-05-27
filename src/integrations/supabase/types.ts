@@ -77,6 +77,114 @@ export type Database = {
         }
         Relationships: []
       }
+      carpool_needs: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          note: string | null
+          parent_user_id: string
+          player_ids: string[]
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          note?: string | null
+          parent_user_id: string
+          player_ids?: string[]
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          note?: string | null
+          parent_user_id?: string
+          player_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_needs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_passengers: {
+        Row: {
+          carpool_id: string
+          created_at: string
+          id: string
+          passenger_user_id: string
+          player_ids: string[]
+        }
+        Insert: {
+          carpool_id: string
+          created_at?: string
+          id?: string
+          passenger_user_id: string
+          player_ids?: string[]
+        }
+        Update: {
+          carpool_id?: string
+          created_at?: string
+          id?: string
+          passenger_user_id?: string
+          player_ids?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_passengers_carpool_id_fkey"
+            columns: ["carpool_id"]
+            isOneToOne: false
+            referencedRelation: "carpools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpools: {
+        Row: {
+          created_at: string
+          departure_note: string | null
+          driver_name: string
+          driver_user_id: string
+          event_id: string
+          id: string
+          total_seats: number
+          vehicle_type: string
+        }
+        Insert: {
+          created_at?: string
+          departure_note?: string | null
+          driver_name: string
+          driver_user_id: string
+          event_id: string
+          id?: string
+          total_seats: number
+          vehicle_type: string
+        }
+        Update: {
+          created_at?: string
+          departure_note?: string | null
+          driver_name?: string
+          driver_user_id?: string
+          event_id?: string
+          id?: string
+          total_seats?: number
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpools_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_invites: {
         Row: {
           club_id: string
@@ -659,6 +767,7 @@ export type Database = {
           attachments: Json
           cancellation_reason: string | null
           cancelled_at: string | null
+          carpool_enabled: boolean
           competition_name: string | null
           competition_type: string | null
           convocation_last_sent_at: string | null
@@ -687,6 +796,7 @@ export type Database = {
           attachments?: Json
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          carpool_enabled?: boolean
           competition_name?: string | null
           competition_type?: string | null
           convocation_last_sent_at?: string | null
@@ -715,6 +825,7 @@ export type Database = {
           attachments?: Json
           cancellation_reason?: string | null
           cancelled_at?: string | null
+          carpool_enabled?: boolean
           competition_name?: string | null
           competition_type?: string | null
           convocation_last_sent_at?: string | null

@@ -1,67 +1,80 @@
-## Problèmes identifiés
 
-1. **10 onglets en scroll horizontal** — surcharge visuelle, on ne sait plus où trouver quoi.
-2. **Doublons** Équipes / Inscriptions / Staff / Membres — frontières floues.
-3. **Bouton "S'inscrire" invisible** sur la page publique : l'admin doit aller dans l'onglet **Règles** (caché en fin de scroll) pour cocher `registration.enabled = true`. Personne ne le trouve.
+# Covoiturage événements · V1 — Plan d'implémentation
 
-## Nouvelle structure : 3 sections principales
+Feature de mise en relation parents/coaches pour organiser le transport vers les événements (déplacements principalement).
 
-Remplace la barre de 10 onglets par **3 méga-onglets** (Configurer / Gérer / Jouer). À l'intérieur de chaque section, sous-onglets clairs sans doublons.
+## 1. Migration base de données
 
-```
-┌─ Configurer ─┬─ Gérer ─┬─ Jouer ─┐
-│ (avant)      │ (qui)   │ (jour J)│
-└──────────────┴─────────┴─────────┘
-```
+Une seule migration `add_event_carpooling`:
 
-### Configurer — *one-time setup avant ouverture*
-- **Format** (groupes, bracket, poules) — actuel `fixtures`
-- **Règles** (durée, points, tiebreakers) — actuel `rules`
-- **Terrains** — actuel `fields`
-- **Paiements** (frais, mode online/offline) — actuel `payments`
-- **Inscriptions — paramètres** *(nouveau)* : extrait du panneau `rules` → toggle `enabled`, dates ouverture/fermeture, max équipes, requiresApproval, collectPlayers, publicMessage. C'est ici (pas dans "Règles") qu'on active l'inscription publique.
+- `events`: ajouter colonne `carpool_enabled boolean NOT NULL DEFAULT false`. Trigger BEFORE INSERT/UPDATE qui force `carpool_enabled = true` si `is_home = false` ET la colonne n'a pas été explicitement modifiée (via défaut à la création; l'admin garde la main pour désactiver ensuite).
+- Table `carpools` (id, event_id FK CASCADE, driver_user_id FK auth.users, driver_name, vehicle_type CHECK in ('car','van'), total_seats int CHECK 1-8, departure_note, created_at). Unique `(event_id, driver_user_id)`.
+- Table `carpool_passengers` (id, carpool_id FK CASCADE, passenger_user_id FK, player_ids uuid[], created_at). Unique `(carpool_id, passenger_user_id)`. Trigger qui empêche un même `passenger_user_id` d'être dans deux carpools du même event (un seul véhicule par parent par event).
+- Table `carpool_needs` (id, event_id FK CASCADE, parent_user_id FK, player_ids uuid[], note, created_at). Unique `(event_id, parent_user_id)`.
+- GRANTS standards pour `authenticated` + `service_role` sur les trois tables.
+- RLS sur les trois tables, scopée via `events → teams → clubs` et appartenance club:
+  - SELECT: tout membre du club de l'event.
+  - INSERT/UPDATE/DELETE carpools: le conducteur lui-même OU coach/admin du club.
+  - INSERT/DELETE carpool_passengers: le passager lui-même (sur des player_ids dont il est parent et convoqués `present|uncertain`) OU coach/admin.
+  - INSERT/UPDATE/DELETE carpool_needs: le parent lui-même OU coach/admin.
+- Publication realtime: ajouter `carpools`, `carpool_passengers`, `carpool_needs` à `supabase_realtime`.
 
-### Gérer — *les personnes*
-- **Inscriptions** (candidates, validation, paiements) — actuel `registrations`. Si inscription désactivée → CTA direct "Activer les inscriptions" qui ouvre le sous-onglet Configurer › Inscriptions.
-- **Équipes** (roster confirmé, logos, groupes) — actuel `teams`
-- **Staff & arbitres** *(fusion)* — fusionne `team_staff` (CollaboratorsManager) + `members` (MembersManager) dans un seul écran à 2 sous-tabs internes : "Équipe d'organisation" (admins tournoi) + "Arbitres / bénévoles"
+## 2. Notifications
 
-### Jouer — *jour J*
-- **Matchs** — actuel `matches`
-- **Classement** — actuel `standings`
-- **Bracket** — actuel `bracket`
-- **Vue Live / TV** *(nouveau lien)* : raccourci vers `/tournament/$slug/tv`
+Ajouter 4 nouveaux types dans le système de notifications existant (`notifications` table déjà utilisée pour convocations):
+- `carpool_new_driver` → parents convoqués sans transport
+- `carpool_booked` → conducteur
+- `carpool_cancelled` → conducteur
+- `carpool_needs_ride` → coaches/admins du team
 
-## Correctif "bouton inscription invisible"
+Implémenté via triggers Postgres (cohérent avec convocations) qui insèrent dans `notifications`.
 
-Sur la page admin tournoi :
-- Si `payment_mode` configuré OU admin sur l'onglet Inscriptions sans `registration.enabled` → bannière jaune **"Les inscriptions sont désactivées. Activer maintenant →"** qui pousse vers Configurer › Inscriptions.
-- Sur la page publique : si admin connecté visite la page et registration off → bannière discrète "Inscriptions désactivées — visible uniquement par toi".
+## 3. UI — Onglet covoiturage
 
-Aucun changement au flux RegistrationsManager / API publique : juste rendre l'activation découvrable.
+Nouveau composant `src/components/carpool-tab.tsx` rendu dans `src/routes/_authenticated/events/$eventId.tsx`, visible quand `carpool_enabled = true`. Ajout d'un onglet "🚗 Covoiturage" dans la barre d'onglets existante.
 
-## Implémentation technique
+Sous-composants dans `src/components/carpool/`:
+- `CarpoolDisclaimer.tsx` — encart gris en haut.
+- `CoverageBar.tsx` — jauge coach/admin (vert/orange/rouge).
+- `WithoutTransportList.tsx` — liste compacte coach.
+- `DriverCard.tsx` — carte conducteur + bouton Réserver.
+- `OfferSeatsForm.tsx` — formulaire commun coach/parent.
+- `ReserveSeatDialog.tsx` — modal sélection joueurs.
+- `NeedRideButton.tsx` + dialog associé.
+- `CarpoolToggle.tsx` — toggle coach/admin sur la page event (au-dessus de l'onglet).
 
-### Fichiers à créer
-- `src/modules/tournaments/components/RegistrationSettingsPanel.tsx` — extrait propre du bloc registration de `TournamentRulesEditor.tsx` (lignes ~425-560).
-- `src/modules/tournaments/components/StaffAndOfficialsPanel.tsx` — wrapper avec 2 sous-tabs internes regroupant `CollaboratorsManager` + `MembersManager`.
+Realtime via `supabase.channel('carpool:'+eventId)` avec `postgres_changes` sur les 3 tables filtrés par event_id. Optimistic updates côté React Query (`setQueryData` avant mutation).
 
-### Fichiers à modifier
-- `src/routes/_authenticated/tournaments.$tournamentId.tsx` :
-  - Remplacer le `tabs` plat (10 entrées) par une structure groupée `{section: "configure"|"manage"|"play", sub: …}`.
-  - Nouveau composant `SectionTabs` (3 boutons larges) + `SubTabs` (pills sous-jacents) au lieu du scroll-horizontal actuel.
-  - Garder le composant `TabsNav` existant pour les sous-onglets (déjà bien fait).
-  - Routing par `?section=…&sub=…` en query params pour deep-link.
-  - Bannière "Inscriptions désactivées" si l'admin est sur sub=registrations et `rules.registration.enabled === false`.
-- `src/modules/tournaments/components/TournamentRulesEditor.tsx` : retirer le bloc registration (déplacé), garder règles sportives uniquement.
-- `src/locales/{fr,en}/tournaments.json` : nouvelles clés `sections.configure/manage/play` + `tabs.registrationSettings` + `registrations.disabledBanner`.
+## 4. Règles métier (vérifiées côté client + RLS)
 
-### Non touché
-- API publique `/api/public/tournament-registration` : OK.
-- Page publique `/tournament/$slug` : le CTA Register est déjà conditionné correctement sur `registration.enabled` — pas de bug, juste pas activé par défaut.
-- Flux paiement, RegistrationsManager, TeamsManager : aucun changement de logique.
+- Un parent ne peut réserver que dans un véhicule par event (contrainte trigger + UI).
+- Places restantes calculées: `total_seats − sum(carpool_passengers où carpool_id = X)` — chaque passager compte pour 1 (le nombre d'enfants n'occupe pas des places séparées en V1, conforme au prompt qui dit "places dispo (conducteur exclu)" et "Réserver une place").
+- Conducteur ne peut pas réserver dans son propre véhicule (UI + check).
+- Seuls parents de joueurs convoqués (present/uncertain) peuvent agir.
+- Auto-suppression `carpool_needs` quand le parent réserve (déclenché via trigger ou côté client après insert).
 
-## Ce qui reste hors scope
-- Pas de refonte visuelle des panneaux internes.
-- Pas de changement DB / RLS.
-- "Tirage au sort / seeding" mentionné dans la section Gérer existe déjà dans `GroupsAndFixtures` (DrawDialog) — reste sous Configurer › Format pour ne rien casser.
+## 5. Traductions
+
+Ajouter le bloc `carpool.*` dans `src/locales/fr/common.json` et `src/locales/en/common.json` (la structure existante stocke les libellés généraux dans `common.json`; à confirmer en lecture).
+
+## 6. Ce qu'on ne fait PAS en V1
+
+Pas de GPS, auto-matching, minibus, tableau global, heure obligatoire, chat dédié.
+
+## Détails techniques
+
+- Toutes les mutations passent par le client Supabase (RLS), pas de server function nécessaire (cohérent avec les autres actions sur events).
+- Le toggle `carpool_enabled` est un simple `update` sur `events` avec policy existante coach/admin.
+- Les notifications passent par des triggers SQL `AFTER INSERT` sur `carpools`, `carpool_passengers`, `carpool_needs`, qui insèrent dans la table `notifications` en récupérant la liste des destinataires depuis `convocations` (parents) et `team_members` (coaches).
+- Realtime: ajout de la souscription dans un `useEffect` du composant `CarpoolTab`, invalidation des queries React Query au lieu de mutations manuelles (plus simple, optimistic UI conservé via `useMutation onMutate`).
+
+## Fichiers touchés
+
+- migration SQL (1 fichier)
+- `src/routes/_authenticated/events/$eventId.tsx` (ajout onglet + toggle)
+- `src/components/carpool/` (8 nouveaux fichiers)
+- `src/locales/fr/common.json` + `src/locales/en/common.json`
+
+## Hors scope explicite (V1)
+
+Pas de page admin dédiée, pas d'export CSV des trajets, pas d'historique covoiturage par joueur.
