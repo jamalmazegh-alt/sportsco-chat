@@ -2810,6 +2810,10 @@ export type Database = {
         Args: { _club_id: string }
         Returns: boolean
       }
+      convert_personal_club_to_real: {
+        Args: { _club_id: string; _new_name?: string }
+        Returns: string
+      }
       create_player_review: {
         Args: {
           _content: string
