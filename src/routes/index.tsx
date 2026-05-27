@@ -451,6 +451,366 @@ function AIAssistantSection() {
   );
 }
 
+function ClubWallSection() {
+  const { t } = useTranslation("marketing");
+  const points = [
+    { t: t("clubWall.p1Title"), d: t("clubWall.p1Body") },
+    { t: t("clubWall.p2Title"), d: t("clubWall.p2Body") },
+    { t: t("clubWall.p3Title"), d: t("clubWall.p3Body") },
+    { t: t("clubWall.p4Title"), d: t("clubWall.p4Body") },
+  ];
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[color:var(--brand-blue)]/8 via-background to-[color:var(--energy)]/8">
+      <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/15 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--energy)]/15 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+          <div className="lg:col-span-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--brand-blue)]/30 bg-[color:var(--brand-blue)]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
+              <Share2 className="h-3.5 w-3.5" />
+              {t("clubWall.chip")}
+            </div>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+              {t("clubWall.titlePre")}<span className="text-gradient-primary">{t("clubWall.titleHighlight")}</span>{t("clubWall.titlePost")}
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("clubWall.body")}</p>
+            <ul className="mt-7 space-y-3">
+              {points.map((p) => (
+                <li key={p.t} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--brand-blue)]" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                    <p className="text-sm text-muted-foreground">{p.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
+                <Link to="/demo">{t("clubWall.cta")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+              </Button>
+              <span className="text-xs text-muted-foreground">{t("clubWall.ctaNote")}</span>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6">
+            <div className="relative mx-auto max-w-md">
+              <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-50 blur-3xl" style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--brand-blue) 55%, transparent), color-mix(in oklab, var(--energy) 45%, transparent))" }} />
+
+              <div className="rounded-3xl border border-border bg-card shadow-elevated overflow-hidden">
+                <div className="flex items-center justify-between bg-gradient-primary px-4 py-3 text-white">
+                  <div className="flex items-center gap-2.5">
+                    <div className="grid h-9 w-9 place-items-center rounded-xl bg-white/20">
+                      <MessageSquareText className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold leading-tight">{t("clubWall.mockTitle")}</p>
+                      <p className="text-[11px] text-white/80">{t("clubWall.mockSubtitle")}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/20"><Camera className="h-3.5 w-3.5" /></span>
+                    <span className="grid h-7 w-7 place-items-center rounded-lg bg-white/20"><Hash className="h-3.5 w-3.5" /></span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 px-4 py-4">
+                  <div className="rounded-2xl border border-border bg-card p-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-energy text-white text-xs font-bold">FC</div>
+                        <div>
+                          <p className="text-[12px] font-bold leading-tight">{t("clubWall.mockPostAdminName")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("clubWall.mockPostAdminTime")}</p>
+                        </div>
+                      </div>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--energy)]/15 px-2 py-0.5 text-[10px] font-bold text-[color:var(--energy)]">
+                        <Pin className="h-2.5 w-2.5" /> {t("clubWall.mockPostAdminPinned")}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[13px] leading-relaxed text-foreground">{t("clubWall.mockPostAdminBody")}</p>
+                    <p className="mt-2 text-[10px] text-muted-foreground flex items-center gap-1"><Heart className="h-3 w-3 text-[color:var(--energy)]" /> {t("clubWall.mockPostAdminStats")}</p>
+                  </div>
+
+                  <div className="rounded-2xl border border-[color:var(--brand-blue)]/30 bg-[color:var(--brand-blue)]/5 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-pink-500 via-rose-500 to-orange-400 text-white">
+                          <Camera className="h-3.5 w-3.5" />
+                        </div>
+                        <div>
+                          <p className="text-[12px] font-bold leading-tight">{t("clubWall.mockPostSocialName")}</p>
+                          <p className="text-[10px] text-muted-foreground">{t("clubWall.mockPostSocialTime")}</p>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-card px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--brand-blue-deep)] border border-[color:var(--brand-blue)]/30">
+                        {t("clubWall.mockPostSocialTag")}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[13px] leading-relaxed text-foreground">{t("clubWall.mockPostSocialBody")}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 border-t border-border bg-muted/30 px-3 py-2.5">
+                  <div className="flex-1 rounded-full bg-card px-3 py-2 text-xs text-muted-foreground border border-border">{t("clubWall.mockComposerPh")}</div>
+                  <div className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground"><Send className="h-3.5 w-3.5" /></div>
+                </div>
+              </div>
+
+              <div className="absolute -top-4 -right-4 z-10 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 shadow-elevated">
+                <Sparkles className="h-3.5 w-3.5 text-[color:var(--brand-blue)]" />
+                <span className="text-[11px] font-bold uppercase tracking-wider">{t("clubWall.mockBadgeSynced")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PlayerJournalSection() {
+  const { t } = useTranslation("marketing");
+  const points = [
+    { t: t("playerJournal.p1Title"), d: t("playerJournal.p1Body") },
+    { t: t("playerJournal.p2Title"), d: t("playerJournal.p2Body") },
+    { t: t("playerJournal.p3Title"), d: t("playerJournal.p3Body") },
+    { t: t("playerJournal.p4Title"), d: t("playerJournal.p4Body") },
+  ];
+  // 12-week attendance heatmap
+  const heat = [3, 3, 2, 3, 3, 1, 3, 3, 3, 2, 3, 3];
+  const stats = [
+    { l: t("playerJournal.mockStatGames"), v: "18" },
+    { l: t("playerJournal.mockStatGoals"), v: "7" },
+    { l: t("playerJournal.mockStatAssists"), v: "11" },
+    { l: t("playerJournal.mockStatRating"), v: "8.2" },
+  ];
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-muted/20">
+      <div aria-hidden className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/15 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--victory)]/15 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+          <div className="lg:col-span-6 order-2 lg:order-1">
+            <div className="relative mx-auto max-w-md">
+              <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-50 blur-3xl bg-gradient-primary" />
+
+              <div className="rounded-3xl border border-border bg-card shadow-elevated overflow-hidden">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-[color:var(--primary)] to-[color:var(--brand-blue)] px-4 py-3 text-white">
+                  <div className="grid h-11 w-11 place-items-center rounded-2xl bg-white/20 text-base font-bold">LM</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold">{t("playerJournal.mockName")}</p>
+                    <p className="text-[11px] text-white/80">{t("playerJournal.mockMeta")}</p>
+                  </div>
+                  <Star className="h-4 w-4 text-[color:var(--energy)]" />
+                </div>
+
+                <div className="flex items-center gap-1 border-b border-border bg-muted/30 px-2 py-1.5 text-[11px] font-semibold">
+                  <span className="rounded-md bg-card px-2.5 py-1 shadow-sm text-foreground">{t("playerJournal.mockTabStats")}</span>
+                  <span className="rounded-md px-2.5 py-1 text-muted-foreground">{t("playerJournal.mockTabAttendance")}</span>
+                  <span className="rounded-md px-2.5 py-1 text-muted-foreground">{t("playerJournal.mockTabFeedback")}</span>
+                </div>
+
+                <div className="grid grid-cols-4 gap-2 px-4 py-3">
+                  {stats.map((s) => (
+                    <div key={s.l} className="rounded-xl bg-muted/40 p-2 text-center">
+                      <p className="font-display text-lg font-bold tabular-nums text-gradient-primary">{s.v}</p>
+                      <p className="text-[10px] text-muted-foreground">{s.l}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="px-4 pb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">{t("playerJournal.mockAttendanceLabel")}</p>
+                  <div className="grid grid-cols-12 gap-1">
+                    {heat.map((v, i) => (
+                      <div
+                        key={i}
+                        className={`h-5 rounded ${v === 3 ? "bg-[color:var(--primary)]" : v === 2 ? "bg-[color:var(--primary)]/55" : v === 1 ? "bg-[color:var(--primary)]/25" : "bg-muted"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-border bg-muted/20 px-4 py-3 space-y-2">
+                  <p className="text-[11px] font-bold text-foreground">{t("playerJournal.mockFeedbackCoach")}</p>
+                  <p className="text-[12px] text-muted-foreground leading-relaxed">{t("playerJournal.mockFeedbackBody")}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="rounded-full bg-[color:var(--victory)]/15 px-2 py-0.5 text-[10px] font-bold text-[color:var(--victory)]">+ {t("playerJournal.mockFeedbackTagStrong")}</span>
+                    <span className="rounded-full bg-[color:var(--energy)]/15 px-2 py-0.5 text-[10px] font-bold text-[color:var(--energy)]">↗ {t("playerJournal.mockFeedbackTagWork")}</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-border bg-gradient-to-r from-[color:var(--primary)]/10 to-[color:var(--brand-blue)]/10 px-4 py-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[color:var(--brand-blue-deep)] border border-[color:var(--brand-blue)]/30">
+                      <Sparkles className="h-2.5 w-2.5" /> {t("playerJournal.mockAiBadge")}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-foreground leading-relaxed">{t("playerJournal.mockAiBody")}</p>
+                </div>
+              </div>
+
+              <div className="absolute -top-4 -right-4 z-10 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-elevated">
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-energy text-white">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Saison</p>
+                  <p className="text-sm font-bold tabular-nums">+18%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 order-1 lg:order-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
+              <BookOpen className="h-3.5 w-3.5" />
+              {t("playerJournal.chip")}
+            </div>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+              {t("playerJournal.titlePre")}<span className="text-gradient-primary">{t("playerJournal.titleHighlight")}</span>{t("playerJournal.titlePost")}
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("playerJournal.body")}</p>
+            <ul className="mt-7 space-y-3">
+              {points.map((p) => (
+                <li key={p.t} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                    <p className="text-sm text-muted-foreground">{p.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
+                <Link to="/demo">{t("playerJournal.cta")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+              </Button>
+              <span className="text-xs text-muted-foreground">{t("playerJournal.ctaNote")}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CoachAssistSection() {
+  const { t } = useTranslation("marketing");
+  const points = [
+    { t: t("coachAssist.p1Title"), d: t("coachAssist.p1Body") },
+    { t: t("coachAssist.p2Title"), d: t("coachAssist.p2Body") },
+    { t: t("coachAssist.p3Title"), d: t("coachAssist.p3Body") },
+    { t: t("coachAssist.p4Title"), d: t("coachAssist.p4Body") },
+  ];
+  const tasks = [
+    { icon: Bell, body: t("coachAssist.mockTask1"), cta: t("coachAssist.mockTask1Cta"), accent: "text-[color:var(--energy)] bg-[color:var(--energy)]/15" },
+    { icon: ClipboardList, body: t("coachAssist.mockTask2"), cta: t("coachAssist.mockTask2Cta"), accent: "text-[color:var(--brand-blue-deep)] bg-[color:var(--brand-blue)]/15" },
+    { icon: Users, body: t("coachAssist.mockTask3"), cta: t("coachAssist.mockTask3Cta"), accent: "text-[color:var(--victory)] bg-[color:var(--victory)]/15" },
+  ];
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-[color:var(--primary)]/8 via-background to-[color:var(--brand-blue)]/8">
+      <div aria-hidden className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/15 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--energy)]/15 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+          <div className="lg:col-span-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--primary)]/30 bg-[color:var(--primary)]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[color:var(--brand-blue-deep)]">
+              <Bot className="h-3.5 w-3.5" />
+              {t("coachAssist.chip")}
+            </div>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+              {t("coachAssist.titlePre")}<span className="text-gradient-primary">{t("coachAssist.titleHighlight")}</span>{t("coachAssist.titlePost")}
+            </h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("coachAssist.body")}</p>
+            <ul className="mt-7 space-y-3">
+              {points.map((p) => (
+                <li key={p.t} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                    <p className="text-sm text-muted-foreground">{p.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
+                <Link to="/demo">{t("coachAssist.cta")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+              </Button>
+              <span className="text-xs text-muted-foreground">{t("coachAssist.ctaNote")}</span>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6">
+            <div className="relative mx-auto max-w-md">
+              <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2.5rem] opacity-50 blur-3xl bg-gradient-primary" />
+
+              <div className="rounded-3xl border border-border bg-card shadow-elevated overflow-hidden">
+                <div className="bg-gradient-hero px-4 py-4">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[color:var(--energy)]">Clubero · Coach</p>
+                  <p className="mt-1 font-display text-lg font-bold">{t("coachAssist.mockTitle")}</p>
+                  <p className="text-xs text-muted-foreground">{t("coachAssist.mockSubtitle")}</p>
+                </div>
+
+                <div className="px-4 py-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ListChecks className="h-3.5 w-3.5 text-[color:var(--energy)]" />
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("coachAssist.mockInsightsLabel")}</p>
+                  </div>
+                  <div className="space-y-2">
+                    {tasks.map((task) => {
+                      const Icon = task.icon;
+                      return (
+                        <div key={task.body} className="flex items-center gap-2 rounded-xl border border-border bg-card p-2.5">
+                          <span className={`grid h-8 w-8 place-items-center rounded-lg ${task.accent}`}>
+                            <Icon className="h-3.5 w-3.5" />
+                          </span>
+                          <p className="flex-1 text-[12px] font-medium leading-tight">{task.body}</p>
+                          <button className="rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-sm">
+                            {task.cta}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="border-t border-border bg-muted/20 px-4 py-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <BrainCircuit className="h-3.5 w-3.5 text-[color:var(--brand-blue)]" />
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("coachAssist.mockAssistantLabel")}</p>
+                  </div>
+                  <div className="flex justify-end">
+                    <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-3 py-2 text-[12px] text-primary-foreground shadow-sm">
+                      {t("coachAssist.mockAssistantQ")}
+                    </div>
+                  </div>
+                  <p className="text-[12px] leading-relaxed text-foreground">{t("coachAssist.mockAssistantA")}</p>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-4 -left-4 z-10 flex items-center gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-elevated">
+                <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-energy text-white">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Insights</p>
+                  <p className="text-sm font-bold tabular-nums">3 à faire</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 function Hero() {
   const { t } = useTranslation("marketing");
