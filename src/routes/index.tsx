@@ -63,8 +63,8 @@ function Landing() {
       <CoachAssistSection />
       <FeaturesGrid />
       <WhatsAppHybrid />
-      <AIAssistantSection />
       <ForEveryone />
+
       <CTA />
     </MarketingLayout>
   );
