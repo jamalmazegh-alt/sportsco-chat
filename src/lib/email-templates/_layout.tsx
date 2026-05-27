@@ -232,11 +232,14 @@ export const EmailShell = ({
  * ================================================================= */
 
 const HeaderBand = () => (
-  <Section style={headerBand}>
-    <Link href={SITE_URL} style={{ textDecoration: 'none' }}>
-      <Img src={LOGO_URL} alt="Clubero" width="132" height="32" style={logo} />
-    </Link>
-  </Section>
+  <>
+    <Section style={headerAccent} />
+    <Section style={headerBand}>
+      <Link href={SITE_URL} style={{ textDecoration: 'none' }}>
+        <Img src={LOGO_URL} alt="Clubero" width="168" height="112" style={logo} />
+      </Link>
+    </Section>
+  </>
 )
 
 const PreHeader = ({ text }: { text: string }) => (
