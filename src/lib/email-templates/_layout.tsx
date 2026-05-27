@@ -302,16 +302,26 @@ const outer: React.CSSProperties = {
   padding: '0 16px',
 }
 
-const headerBand: React.CSSProperties = {
-  background: `linear-gradient(135deg, ${C.brandDeep} 0%, ${C.brand} 100%)`,
+const headerAccent: React.CSSProperties = {
+  background: `linear-gradient(90deg, ${C.brandDeep} 0%, ${C.brand} 100%)`,
+  height: '4px',
   borderRadius: '18px 18px 0 0',
-  padding: '28px 28px 26px',
+  fontSize: 0,
+  lineHeight: '4px',
+}
+
+const headerBand: React.CSSProperties = {
+  backgroundColor: '#FFFFFF',
+  borderLeft: `1px solid ${C.line}`,
+  borderRight: `1px solid ${C.line}`,
+  padding: '28px 28px 22px',
   textAlign: 'center',
 }
 
 const logo: React.CSSProperties = {
   display: 'inline-block',
-  filter: 'brightness(0) invert(1)',
+  maxWidth: '100%',
+  height: 'auto',
 }
 
 const cardAttached: React.CSSProperties = {
