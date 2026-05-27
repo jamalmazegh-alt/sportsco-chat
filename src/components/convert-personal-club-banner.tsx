@@ -23,9 +23,10 @@ export function ConvertPersonalClubBanner({ clubId, currentName }: Props) {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const trimmed = newName.trim();
       const { error } = await supabase.rpc("convert_personal_club_to_real", {
         _club_id: clubId,
-        _new_name: newName.trim() || null,
+        ...(trimmed ? { _new_name: trimmed } : {}),
       });
       if (error) throw error;
     },
