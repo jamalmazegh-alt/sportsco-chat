@@ -89,7 +89,17 @@
     "audPlayers": "Joueurs",
     "audPlayersP1": "Voyez votre prochain match",
     "audPlayersP2": "Confirmez votre présence",
-    "audPlayersP3": "Restez dans la boucle"
+    "audPlayersP3": "Restez dans la boucle",
+    "feat11Title": "Carnet de suivi du joueur",
+    "feat11Body": "Chaque joueur dispose de son profil complet : carte de présence semaine par semaine, stats (buts, cartons, matchs joués), retours du coach par événement et synthèse IA de fin de saison. Les parents y accèdent directement.",
+    "feat12Title": "Mur du club & réseaux sociaux",
+    "feat12Body": "Les posts Instagram, Facebook et X du club apparaissent automatiquement dans le mur Clubero. Les membres voient tout au même endroit, sans jongler entre les apps.",
+    "feat13Title": "Onboarding en quelques minutes",
+    "feat13Body": "Importez vos joueurs, parents et coachs depuis votre fichier Excel existant. Si les colonnes ne correspondent pas, l'IA mappe et normalise tout automatiquement avant l'import.",
+    "feat14Title": "Règlement officiel généré automatiquement",
+    "feat14Body": "Chaque tournoi génère son règlement PDF en un clic, en français ou en anglais, à partir de sa configuration. Prêt à partager ou à imprimer.",
+    "feat15Title": "Multi-sport nativement",
+    "feat15Body": "Football, basketball, rugby, handball, volleyball — un seul club peut gérer plusieurs sports avec des stats et formats adaptés à chaque discipline."
   },
   "whatsapp": {
     "chip": "Communication flexible",
@@ -216,21 +226,86 @@
     "ctaDemo": "Demander une démo",
     "ctaPricing": "Voir les tarifs",
     "pillars": [
-      { "t": "Convocations & Événements", "b": "Créez matchs, entraînements et tournois en quelques secondes. Les convocations atteignent les bons joueurs et parents instantanément." },
-      { "t": "Équipe & Effectif", "b": "Gérez joueurs, numéros, postes et liens parents. Photo, date de naissance, contact — tout sur une seule fiche." },
-      { "t": "Rappels", "b": "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire." },
-      { "t": "Retours coach par joueur", "b": "Après chaque match ou entraînement, le coach saisit en quelques secondes : note, forces, axes de progrès, tags adaptés au sport. Historique privé conservé sur la fiche du joueur." },
-      { "t": "Synthèses IA itératives", "b": "Génère en un clic un bilan de saison, un rapport de développement ou une préparation d'entretien à partir des retours coachs et des stats. Affine ensuite la synthèse en dialoguant avec l'IA jusqu'au rendu parfait." },
-      { "t": "Assistant IA intégré", "b": "Un assistant en français, connecté à vos données de club. Posez vos questions sur les présences, les convocations, les stats. Réponses instantanées, respect des rôles, hébergé en Europe." },
-      { "t": "WhatsApp & email en option", "b": "Tout est géré dans Clubero. Pour ceux qui préfèrent rester sur WhatsApp ou par email, partagez le message formaté en un clic — sans perdre le suivi dans l'appli." },
-      { "t": "Communication interne", "b": "Mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes. Chat temps réel par événement." },
-      { "t": "Suivi des présences", "b": "Marquez les présences en un clic. Visualisez les tendances par joueur et par équipe sur toute la saison." },
-      { "t": "Tournois clés en main", "b": "Créez un tournoi en quelques minutes : poules, brackets, calendrier auto, classements en direct. Page publique TV partageable pour suivre les scores." },
-      { "t": "Résultats & stats par sport", "b": "Saisissez le score et les statistiques joueurs (buts, essais, paniers à 3 pts, arrêts…) adaptées au sport de chaque équipe." },
-      { "t": "Recherche globale", "b": "Cmd/Ctrl + K pour sauter instantanément à un joueur, une équipe ou un événement." },
-      { "t": "Exports CSV", "b": "Exportez l'effectif d'une équipe ou les présences d'un événement en un clic — prêt pour Excel." },
-      { "t": "Corbeille 7 jours", "b": "Une suppression accidentelle ? Restaurez posts, événements et joueurs pendant 7 jours." },
-      { "t": "Rôles & Permissions", "b": "Admins, coachs, joueurs et parents voient exactement ce qu'il leur faut — et rien d'autre." }
+      {
+        "t": "Convocations & Événements",
+        "b": "Créez matchs, entraînements et tournois en quelques secondes. Les convocations atteignent les bons joueurs et parents instantanément."
+      },
+      {
+        "t": "Équipe & Effectif",
+        "b": "Gérez joueurs, numéros, postes et liens parents. Photo, date de naissance, contact — tout sur une seule fiche."
+      },
+      {
+        "t": "Rappels",
+        "b": "Des relances automatiques s'occupent des réponses manquantes pour que les coachs n'aient pas à le faire."
+      },
+      {
+        "t": "Retours coach par joueur",
+        "b": "Après chaque match ou entraînement, le coach saisit en quelques secondes : note, forces, axes de progrès, tags adaptés au sport. Historique privé conservé sur la fiche du joueur."
+      },
+      {
+        "t": "Synthèses IA itératives",
+        "b": "Génère en un clic un bilan de saison, un rapport de développement ou une préparation d'entretien à partir des retours coachs et des stats. Affine ensuite la synthèse en dialoguant avec l'IA jusqu'au rendu parfait."
+      },
+      {
+        "t": "Assistant IA intégré",
+        "b": "Un assistant en français, connecté à vos données de club. Posez vos questions sur les présences, les convocations, les stats. Réponses instantanées, respect des rôles, hébergé en Europe."
+      },
+      {
+        "t": "WhatsApp & email en option",
+        "b": "Tout est géré dans Clubero. Pour ceux qui préfèrent rester sur WhatsApp ou par email, partagez le message formaté en un clic — sans perdre le suivi dans l'appli."
+      },
+      {
+        "t": "Communication interne",
+        "b": "Mur du club avec @mentions, posts épinglés, accusés de lecture et pièces jointes. Chat temps réel par événement."
+      },
+      {
+        "t": "Suivi des présences",
+        "b": "Marquez les présences en un clic. Visualisez les tendances par joueur et par équipe sur toute la saison."
+      },
+      {
+        "t": "Tournois clés en main",
+        "b": "Créez un tournoi en quelques minutes : poules, brackets, calendrier auto, classements en direct. Page publique TV partageable pour suivre les scores."
+      },
+      {
+        "t": "Résultats & stats par sport",
+        "b": "Saisissez le score et les statistiques joueurs (buts, essais, paniers à 3 pts, arrêts…) adaptées au sport de chaque équipe."
+      },
+      {
+        "t": "Recherche globale",
+        "b": "Cmd/Ctrl + K pour sauter instantanément à un joueur, une équipe ou un événement."
+      },
+      {
+        "t": "Exports CSV",
+        "b": "Exportez l'effectif d'une équipe ou les présences d'un événement en un clic — prêt pour Excel."
+      },
+      {
+        "t": "Corbeille 7 jours",
+        "b": "Une suppression accidentelle ? Restaurez posts, événements et joueurs pendant 7 jours."
+      },
+      {
+        "t": "Rôles & Permissions",
+        "b": "Admin, coach, assistant coach, manager, joueur, parent — chaque rôle voit exactement ce qui le concerne. Les parents accèdent aux informations de leur enfant uniquement."
+      },
+      {
+        "t": "Carnet de suivi du joueur",
+        "b": "Chaque joueur dispose de son profil complet : carte de présence semaine par semaine, stats (buts, cartons, matchs joués), retours du coach par événement et synthèse IA de fin de saison. Les parents y accèdent directement."
+      },
+      {
+        "t": "Mur du club & réseaux sociaux",
+        "b": "Les posts Instagram, Facebook et X du club apparaissent automatiquement dans le mur Clubero. Les membres voient tout au même endroit, sans jongler entre les apps."
+      },
+      {
+        "t": "Onboarding en quelques minutes",
+        "b": "Importez vos joueurs, parents et coachs depuis votre fichier Excel existant. Si les colonnes ne correspondent pas, l'IA mappe et normalise tout automatiquement avant l'import."
+      },
+      {
+        "t": "Règlement officiel généré automatiquement",
+        "b": "Chaque tournoi génère son règlement PDF en un clic, en français ou en anglais, à partir de sa configuration. Prêt à partager ou à imprimer."
+      },
+      {
+        "t": "Multi-sport nativement",
+        "b": "Football, basketball, rugby, handball, volleyball — un seul club peut gérer plusieurs sports avec des stats et formats adaptés à chaque discipline."
+      }
     ],
     "audiences": [
       {
@@ -288,15 +363,42 @@
     "ctaContact": "Nous contacter",
     "ctaDemo": "Demander une démo",
     "items": [
-      { "q": "À qui s'adresse Clubero ?", "a": "Clubero est conçu pour les clubs sportifs amateurs. Coachs, dirigeants, parents et joueurs ont chacun une expérience adaptée." },
-      { "q": "Quels sports sont couverts ?", "a": "En V1, Clubero couvre 8 sports collectifs avec une saisie de score et des statistiques joueurs adaptées au sport : football, futsal, basketball, rugby, handball, volley-ball, hockey sur glace et hockey sur gazon. D'autres sports arriveront ensuite — dites-nous lequel vous manque." },
-      { "q": "Y a-t-il une offre gratuite ?", "a": "Oui. Notre offre Découverte propose une période d'essai gratuit de 30 jours sans carte bancaire, pour une équipe jusqu'à 25 membres. Vous pouvez passer au plan Club quand vous avez besoin de plus d'équipes ou de fonctionnalités." },
-      { "q": "Combien de temps pour mettre en place un club ?", "a": "La plupart des clubs sont opérationnels en moins d'une heure. Un accompagnement guidé est inclus avec les offres Club et Fédération." },
-      { "q": "Comment gérez-vous les mineurs et le consentement parental ?", "a": "Les joueurs de moins de 18 ans peuvent être liés à un ou plusieurs comptes parents. Par défaut, les parents contrôlent les réponses et la visibilité au nom de leur enfant." },
-      { "q": "Où sont stockées les données ?", "a": "Toutes les données du club sont hébergées sur une infrastructure européenne et Clubero est conforme au RGPD. Les membres peuvent demander un export ou une suppression à tout moment." },
-      { "q": "Puis-je importer mon effectif existant ?", "a": "Oui. Nous gérons l'import CSV pendant l'onboarding, et notre équipe peut vous aider à migrer depuis vos tableurs ou autres outils." },
-      { "q": "Clubero fonctionne-t-il sur mobile ?", "a": "Clubero est mobile-first. Il fonctionne dans tout navigateur moderne et peut être installé en PWA sur iOS et Android pour une expérience native." },
-      { "q": "Comment obtenir de l'aide ?", "a": "Le support par e-mail est inclus dans toutes les offres. Les plans Club et Fédération bénéficient d'un support prioritaire et d'un onboarding dédié." }
+      {
+        "q": "À qui s'adresse Clubero ?",
+        "a": "Clubero est conçu pour les clubs sportifs amateurs. Coachs, dirigeants, parents et joueurs ont chacun une expérience adaptée."
+      },
+      {
+        "q": "Quels sports sont couverts ?",
+        "a": "En V1, Clubero couvre 8 sports collectifs avec une saisie de score et des statistiques joueurs adaptées au sport : football, futsal, basketball, rugby, handball, volley-ball, hockey sur glace et hockey sur gazon. D'autres sports arriveront ensuite — dites-nous lequel vous manque."
+      },
+      {
+        "q": "Y a-t-il une offre gratuite ?",
+        "a": "Oui. Notre offre Découverte propose une période d'essai gratuit de 30 jours sans carte bancaire, pour une équipe jusqu'à 25 membres. Vous pouvez passer au plan Club quand vous avez besoin de plus d'équipes ou de fonctionnalités."
+      },
+      {
+        "q": "Combien de temps pour mettre en place un club ?",
+        "a": "La plupart des clubs sont opérationnels en moins d'une heure. Un accompagnement guidé est inclus avec les offres Club et Fédération."
+      },
+      {
+        "q": "Comment gérez-vous les mineurs et le consentement parental ?",
+        "a": "Les joueurs de moins de 18 ans peuvent être liés à un ou plusieurs comptes parents. Par défaut, les parents contrôlent les réponses et la visibilité au nom de leur enfant."
+      },
+      {
+        "q": "Où sont stockées les données ?",
+        "a": "Toutes les données du club sont hébergées sur une infrastructure européenne et Clubero est conforme au RGPD. Les membres peuvent demander un export ou une suppression à tout moment."
+      },
+      {
+        "q": "Puis-je importer mon effectif existant ?",
+        "a": "Oui. Nous gérons l'import CSV pendant l'onboarding, et notre équipe peut vous aider à migrer depuis vos tableurs ou autres outils."
+      },
+      {
+        "q": "Clubero fonctionne-t-il sur mobile ?",
+        "a": "Clubero est mobile-first. Il fonctionne dans tout navigateur moderne et peut être installé en PWA sur iOS et Android pour une expérience native."
+      },
+      {
+        "q": "Comment obtenir de l'aide ?",
+        "a": "Le support par e-mail est inclus dans toutes les offres. Les plans Club et Fédération bénéficient d'un support prioritaire et d'un onboarding dédié."
+      }
     ]
   },
   "contact": {
@@ -329,7 +431,15 @@
     "submitted": "Message envoyé ✓",
     "successToast": "Message envoyé. Nous revenons vers vous sous 48h ouvrées.",
     "errorToast": "Envoi impossible. Réessayez ou écrivez à hello@clubero.app.",
-    "roles": ["Président·e", "Dirigeant·e", "Coach", "Responsable technique", "Parent", "Joueur·euse", "Autre"]
+    "roles": [
+      "Président·e",
+      "Dirigeant·e",
+      "Coach",
+      "Responsable technique",
+      "Parent",
+      "Joueur·euse",
+      "Autre"
+    ]
   },
   "demo": {
     "metaTitle": "Demander une démo — Clubero",
@@ -367,7 +477,15 @@
     "rgpd": "Nous ne partageons jamais vos coordonnées. Conforme RGPD.",
     "successToast": "Demande envoyée. Nous revenons vers vous sous 48h ouvrées.",
     "errorToast": "Envoi impossible. Réessayez ou écrivez à hello@clubero.app.",
-    "roles": ["Président·e", "Dirigeant·e", "Coach", "Responsable technique", "Parent", "Joueur·euse", "Autre"]
+    "roles": [
+      "Président·e",
+      "Dirigeant·e",
+      "Coach",
+      "Responsable technique",
+      "Parent",
+      "Joueur·euse",
+      "Autre"
+    ]
   },
   "tournaments": {
     "home": {
@@ -447,39 +565,105 @@
     "importTitle": "Ce que nous pouvons importer pour vous.",
     "importSubtitle": "Apportez ce que vous avez — fichiers, tableurs, listings. On s'occupe du reste.",
     "imports": [
-      { "t": "Équipes", "b": "Toutes vos équipes, catégories et saisons." },
-      { "t": "Joueurs", "b": "Effectifs, numéros, postes, photos." },
-      { "t": "Parents", "b": "Contacts parents et liens avec leurs enfants." },
-      { "t": "Coachs & staff", "b": "Entraîneurs, managers et rôles." },
-      { "t": "Plannings", "b": "Calendriers de matchs et d'entraînements." },
-      { "t": "Tournois existants", "b": "Équipes inscrites, groupes et résultats." },
-      { "t": "Fichiers Excel / CSV", "b": "Import simplifié depuis vos tableurs." },
-      { "t": "Photos & logos", "b": "Logo du club, photos d'équipes et de joueurs." }
+      {
+        "t": "Équipes",
+        "b": "Toutes vos équipes, catégories et saisons."
+      },
+      {
+        "t": "Joueurs",
+        "b": "Effectifs, numéros, postes, photos."
+      },
+      {
+        "t": "Parents",
+        "b": "Contacts parents et liens avec leurs enfants."
+      },
+      {
+        "t": "Coachs & staff",
+        "b": "Entraîneurs, managers et rôles."
+      },
+      {
+        "t": "Plannings",
+        "b": "Calendriers de matchs et d'entraînements."
+      },
+      {
+        "t": "Tournois existants",
+        "b": "Équipes inscrites, groupes et résultats."
+      },
+      {
+        "t": "Fichiers Excel / CSV",
+        "b": "Import simplifié depuis vos tableurs."
+      },
+      {
+        "t": "Photos & logos",
+        "b": "Logo du club, photos d'équipes et de joueurs."
+      }
     ],
     "howTitle": "Comment ça se passe.",
     "howSubtitle": "Un parcours en 4 étapes, simple et balisé.",
     "steps": [
-      { "t": "Vous nous envoyez vos données", "b": "Tableurs, listings ou exports — dans le format que vous avez." },
-      { "t": "Nous préparons l'import", "b": "Nettoyage, structuration et vérification avec vous." },
-      { "t": "Nous configurons votre club", "b": "Équipes, rôles, branding et paramètres adaptés." },
-      { "t": "Votre club est prêt", "b": "On forme vos coachs et vous êtes opérationnels." }
+      {
+        "t": "Vous nous envoyez vos données",
+        "b": "Tableurs, listings ou exports — dans le format que vous avez."
+      },
+      {
+        "t": "Nous préparons l'import",
+        "b": "Nettoyage, structuration et vérification avec vous."
+      },
+      {
+        "t": "Nous configurons votre club",
+        "b": "Équipes, rôles, branding et paramètres adaptés."
+      },
+      {
+        "t": "Votre club est prêt",
+        "b": "On forme vos coachs et vous êtes opérationnels."
+      }
     ],
     "humanTitle": "Vous n'êtes pas seul.",
     "humanSubtitle": "Nous vous accompagnons pendant toute la mise en place.",
     "humanPoints": [
-      { "t": "Accompagnement à l'onboarding", "b": "Un interlocuteur dédié pendant la configuration de votre club." },
-      { "t": "Aide à la migration", "b": "Nous récupérons vos données existantes et les intégrons proprement." },
-      { "t": "Support à la configuration", "b": "Réglages, rôles, branding, modèles d'emails — on s'occupe de tout avec vous." },
-      { "t": "Support réactif", "b": "Une équipe joignable rapidement par email, en français." }
+      {
+        "t": "Accompagnement à l'onboarding",
+        "b": "Un interlocuteur dédié pendant la configuration de votre club."
+      },
+      {
+        "t": "Aide à la migration",
+        "b": "Nous récupérons vos données existantes et les intégrons proprement."
+      },
+      {
+        "t": "Support à la configuration",
+        "b": "Réglages, rôles, branding, modèles d'emails — on s'occupe de tout avec vous."
+      },
+      {
+        "t": "Support réactif",
+        "b": "Une équipe joignable rapidement par email, en français."
+      }
     ],
     "faqTitle": "Questions fréquentes sur la mise en place",
     "faq": [
-      { "q": "Doit-on tout recréer manuellement ?", "a": "Non. Nous pouvons importer une grande partie de vos données — équipes, joueurs, parents, plannings — à partir de vos tableurs ou exports existants." },
-      { "q": "Combien de temps prend la migration ?", "a": "La plupart des clubs sont opérationnels en quelques jours. La durée dépend du volume de données et de votre disponibilité pour les valider avec nous." },
-      { "q": "Faut-il un outil informatique particulier ?", "a": "Non. Un simple navigateur suffit. Clubero fonctionne sur ordinateur, tablette et mobile (PWA iOS / Android)." },
-      { "q": "Et si nos données sont dans plusieurs fichiers ?", "a": "Aucun souci. Nous consolidons et structurons l'ensemble pour vous avant l'import." },
-      { "q": "Pouvons-nous démarrer en milieu de saison ?", "a": "Oui. Nous adaptons l'import à votre calendrier et conservons votre historique de matchs et d'événements si vous le souhaitez." },
-      { "q": "Que se passe-t-il après la mise en place ?", "a": "Un support email reste disponible. Nous restons joignables pour les ajustements, formations complémentaires et nouvelles équipes." }
+      {
+        "q": "Doit-on tout recréer manuellement ?",
+        "a": "Non. Nous pouvons importer une grande partie de vos données — équipes, joueurs, parents, plannings — à partir de vos tableurs ou exports existants."
+      },
+      {
+        "q": "Combien de temps prend la migration ?",
+        "a": "La plupart des clubs sont opérationnels en quelques jours. La durée dépend du volume de données et de votre disponibilité pour les valider avec nous."
+      },
+      {
+        "q": "Faut-il un outil informatique particulier ?",
+        "a": "Non. Un simple navigateur suffit. Clubero fonctionne sur ordinateur, tablette et mobile (PWA iOS / Android)."
+      },
+      {
+        "q": "Et si nos données sont dans plusieurs fichiers ?",
+        "a": "Aucun souci. Nous consolidons et structurons l'ensemble pour vous avant l'import."
+      },
+      {
+        "q": "Pouvons-nous démarrer en milieu de saison ?",
+        "a": "Oui. Nous adaptons l'import à votre calendrier et conservons votre historique de matchs et d'événements si vous le souhaitez."
+      },
+      {
+        "q": "Que se passe-t-il après la mise en place ?",
+        "a": "Un support email reste disponible. Nous restons joignables pour les ajustements, formations complémentaires et nouvelles équipes."
+      }
     ],
     "ctaTitle": "Prêt à franchir le pas ?",
     "ctaBody": "Parlons de votre club. On vous montre Clubero et on prépare la migration ensemble.",
@@ -502,36 +686,102 @@
     "everythingTitle": "Tout pour vos tournois, au même endroit.",
     "everythingSubtitle": "Un écosystème complet pensé pour le terrain comme pour les écrans.",
     "ecosystem": [
-      { "t": "Équipes", "b": "Inscriptions, effectifs, contacts." },
-      { "t": "Groupes", "b": "Tirage et composition automatiques." },
-      { "t": "Matchs", "b": "Programmation et suivi en temps réel." },
-      { "t": "Classements", "b": "Calculés automatiquement, en direct." },
-      { "t": "Plannings", "b": "Multi-terrains, multi-jours." },
-      { "t": "Arbitres", "b": "Validation des résultats sur mobile." },
-      { "t": "Pages publiques", "b": "Lien partageable pour tous." },
-      { "t": "Mode TV", "b": "Affichage plein écran en salle." },
-      { "t": "Scores live", "b": "Mises à jour immédiates partout." }
+      {
+        "t": "Équipes",
+        "b": "Inscriptions, effectifs, contacts."
+      },
+      {
+        "t": "Groupes",
+        "b": "Tirage et composition automatiques."
+      },
+      {
+        "t": "Matchs",
+        "b": "Programmation et suivi en temps réel."
+      },
+      {
+        "t": "Classements",
+        "b": "Calculés automatiquement, en direct."
+      },
+      {
+        "t": "Plannings",
+        "b": "Multi-terrains, multi-jours."
+      },
+      {
+        "t": "Arbitres",
+        "b": "Validation des résultats sur mobile."
+      },
+      {
+        "t": "Pages publiques",
+        "b": "Lien partageable pour tous."
+      },
+      {
+        "t": "Mode TV",
+        "b": "Affichage plein écran en salle."
+      },
+      {
+        "t": "Scores live",
+        "b": "Mises à jour immédiates partout."
+      }
     ],
     "liveTitle": "Pensé pour vivre le tournoi en direct.",
     "liveSubtitle": "Vos arbitres et organisateurs gardent la main, sans quitter le terrain.",
     "livePoints": [
-      { "t": "Scores depuis le terrain", "b": "Saisissez les scores directement depuis votre téléphone." },
-      { "t": "Validation arbitres", "b": "Les arbitres valident les résultats en direct sur mobile." },
-      { "t": "Mises à jour instantanées", "b": "Classements et tableaux se mettent à jour immédiatement." },
-      { "t": "Gestion des terrains", "b": "Affectez et réorganisez vos terrains en quelques secondes." },
-      { "t": "Programmation auto", "b": "Calendrier optimisé selon vos contraintes." },
-      { "t": "Gestion des litiges", "b": "Historique clair et traçable de chaque décision." },
-      { "t": "Accès QR code", "b": "Un QR à scanner pour ouvrir la page publique." }
+      {
+        "t": "Scores depuis le terrain",
+        "b": "Saisissez les scores directement depuis votre téléphone."
+      },
+      {
+        "t": "Validation arbitres",
+        "b": "Les arbitres valident les résultats en direct sur mobile."
+      },
+      {
+        "t": "Mises à jour instantanées",
+        "b": "Classements et tableaux se mettent à jour immédiatement."
+      },
+      {
+        "t": "Gestion des terrains",
+        "b": "Affectez et réorganisez vos terrains en quelques secondes."
+      },
+      {
+        "t": "Programmation auto",
+        "b": "Calendrier optimisé selon vos contraintes."
+      },
+      {
+        "t": "Gestion des litiges",
+        "b": "Historique clair et traçable de chaque décision."
+      },
+      {
+        "t": "Accès QR code",
+        "b": "Un QR à scanner pour ouvrir la page publique."
+      }
     ],
     "publicTitle": "Une expérience publique, partagée.",
     "publicSubtitle": "Parents, joueurs et supporters suivent le tournoi en direct, depuis n'importe où.",
     "publicPoints": [
-      { "t": "Classements publics", "b": "Toujours à jour, accessibles d'un lien." },
-      { "t": "Pages match", "b": "Composition, score, événements clés." },
-      { "t": "Derniers résultats", "b": "Fil en temps réel des rencontres terminées." },
-      { "t": "Pages équipe", "b": "Calendrier, classement, parcours dans le tournoi." },
-      { "t": "Mobile en priorité", "b": "Pensé pour être consulté depuis les tribunes." },
-      { "t": "Partage facile", "b": "Lien, QR code, réseaux — un clic suffit." }
+      {
+        "t": "Classements publics",
+        "b": "Toujours à jour, accessibles d'un lien."
+      },
+      {
+        "t": "Pages match",
+        "b": "Composition, score, événements clés."
+      },
+      {
+        "t": "Derniers résultats",
+        "b": "Fil en temps réel des rencontres terminées."
+      },
+      {
+        "t": "Pages équipe",
+        "b": "Calendrier, classement, parcours dans le tournoi."
+      },
+      {
+        "t": "Mobile en priorité",
+        "b": "Pensé pour être consulté depuis les tribunes."
+      },
+      {
+        "t": "Partage facile",
+        "b": "Lien, QR code, réseaux — un clic suffit."
+      }
     ],
     "tvTitle": "Mode TV & écran central.",
     "tvSubtitle": "Affichez le tournoi en grand format, en salle, au club house ou sur le terrain.",
@@ -547,11 +797,26 @@
     "formatsTitle": "Tous les formats de tournoi.",
     "formatsSubtitle": "Adaptez Clubero à votre compétition, pas l'inverse.",
     "formats": [
-      { "t": "Phase de groupes", "b": "Avec qualifications automatiques." },
-      { "t": "Élimination directe", "b": "Tableaux à 4, 8, 16, 32 équipes." },
-      { "t": "Round robin", "b": "Toutes les équipes se rencontrent." },
-      { "t": "Ligue / championnat", "b": "Sur une saison complète." },
-      { "t": "Playoffs", "b": "Phases finales après une saison régulière." }
+      {
+        "t": "Phase de groupes",
+        "b": "Avec qualifications automatiques."
+      },
+      {
+        "t": "Élimination directe",
+        "b": "Tableaux à 4, 8, 16, 32 équipes."
+      },
+      {
+        "t": "Round robin",
+        "b": "Toutes les équipes se rencontrent."
+      },
+      {
+        "t": "Ligue / championnat",
+        "b": "Sur une saison complète."
+      },
+      {
+        "t": "Playoffs",
+        "b": "Phases finales après une saison régulière."
+      }
     ],
     "formatsExtras": [
       "Programmation automatique",
@@ -561,18 +826,52 @@
     "mobileTitle": "Mobile first, sur le terrain.",
     "mobileSubtitle": "Pensé pour être utilisé d'une main, entre deux matchs.",
     "mobilePoints": [
-      { "t": "Saisie arbitre", "b": "Boutons larges, peu de clics, validation rapide." },
-      { "t": "Organisateurs sur le terrain", "b": "Toutes les actions essentielles à portée de pouce." },
-      { "t": "Interface tactile", "b": "Lisible en plein soleil, optimisée mobile." },
-      { "t": "Actions rapides", "b": "Reporter, ajuster, corriger en quelques secondes." },
-      { "t": "Mises à jour live", "b": "Le terrain et le public restent synchronisés." }
+      {
+        "t": "Saisie arbitre",
+        "b": "Boutons larges, peu de clics, validation rapide."
+      },
+      {
+        "t": "Organisateurs sur le terrain",
+        "b": "Toutes les actions essentielles à portée de pouce."
+      },
+      {
+        "t": "Interface tactile",
+        "b": "Lisible en plein soleil, optimisée mobile."
+      },
+      {
+        "t": "Actions rapides",
+        "b": "Reporter, ajuster, corriger en quelques secondes."
+      },
+      {
+        "t": "Mises à jour live",
+        "b": "Le terrain et le public restent synchronisés."
+      }
     ],
     "pricingTitle": "Une tarification simple.",
     "pricingSubtitle": "Choisissez ce qui correspond à votre événement.",
     "pricing": [
-      { "name": "Tournoi", "price": "40 €", "per": "par tournoi", "desc": "Organisation d'un tournoi ponctuel.", "cta": "Créer un tournoi" },
-      { "name": "Ligue / championnat", "price": "199 €", "per": "par saison", "desc": "Gestion complète d'une saison.", "cta": "En parler" },
-      { "name": "Clubero Club", "price": "49 €", "per": "/ mois", "desc": "Tournois illimités inclus.", "cta": "Voir Clubero Club", "highlight": true }
+      {
+        "name": "Tournoi",
+        "price": "40 €",
+        "per": "par tournoi",
+        "desc": "Organisation d'un tournoi ponctuel.",
+        "cta": "Créer un tournoi"
+      },
+      {
+        "name": "Ligue / championnat",
+        "price": "199 €",
+        "per": "par saison",
+        "desc": "Gestion complète d'une saison.",
+        "cta": "En parler"
+      },
+      {
+        "name": "Clubero Club",
+        "price": "49 €",
+        "per": "/ mois",
+        "desc": "Tournois illimités inclus.",
+        "cta": "Voir Clubero Club",
+        "highlight": true
+      }
     ],
     "pricingNote": "Tournois illimités inclus avec Clubero Club.",
     "finalTitle": "Prêt à moderniser vos tournois ?",
@@ -581,12 +880,30 @@
     "finalSecondary": "Demander une démo",
     "faqTitle": "Questions fréquentes sur les tournois",
     "faq": [
-      { "q": "Des équipes extérieures peuvent-elles participer ?", "a": "Oui. Les équipes qui n'utilisent pas Clubero au quotidien peuvent s'inscrire via la page publique et être gérées comme les équipes internes." },
-      { "q": "Ça fonctionne avec une connexion limitée sur le terrain ?", "a": "L'interface mobile arbitre est légère et fonctionne en 3G/4G. Les scores se synchronisent dès que la connexion revient." },
-      { "q": "Peut-on modifier le calendrier en cours de tournoi ?", "a": "Absolument. Vous pouvez reprogrammer, changer de terrain ou ajuster les horaires en quelques secondes. La page publique et le mode TV se mettent à jour instantanément." },
-      { "q": "Y a-t-il une limite au nombre d'équipes ?", "a": "Aucune limite stricte. Clubero gère des tournois de 4 à 100+ équipes avec programmation automatique." },
-      { "q": "Les spectateurs peuvent-ils suivre sans compte ?", "a": "Oui. La page publique est accessible à tous via un lien ou un QR code — aucune inscription requise." },
-      { "q": "Comment fonctionne le mode TV ?", "a": "Ouvrez le lien TV dédié sur n'importe quel écran (smart TV, projecteur, ordinateur). Il affiche les classements live, les prochains matchs et les scores en cours en plein écran — zéro installation." }
+      {
+        "q": "Des équipes extérieures peuvent-elles participer ?",
+        "a": "Oui. Les équipes qui n'utilisent pas Clubero au quotidien peuvent s'inscrire via la page publique et être gérées comme les équipes internes."
+      },
+      {
+        "q": "Ça fonctionne avec une connexion limitée sur le terrain ?",
+        "a": "L'interface mobile arbitre est légère et fonctionne en 3G/4G. Les scores se synchronisent dès que la connexion revient."
+      },
+      {
+        "q": "Peut-on modifier le calendrier en cours de tournoi ?",
+        "a": "Absolument. Vous pouvez reprogrammer, changer de terrain ou ajuster les horaires en quelques secondes. La page publique et le mode TV se mettent à jour instantanément."
+      },
+      {
+        "q": "Y a-t-il une limite au nombre d'équipes ?",
+        "a": "Aucune limite stricte. Clubero gère des tournois de 4 à 100+ équipes avec programmation automatique."
+      },
+      {
+        "q": "Les spectateurs peuvent-ils suivre sans compte ?",
+        "a": "Oui. La page publique est accessible à tous via un lien ou un QR code — aucune inscription requise."
+      },
+      {
+        "q": "Comment fonctionne le mode TV ?",
+        "a": "Ouvrez le lien TV dédié sur n'importe quel écran (smart TV, projecteur, ordinateur). Il affiche les classements live, les prochains matchs et les scores en cours en plein écran — zéro installation."
+      }
     ]
   }
 }

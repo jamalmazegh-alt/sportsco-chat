@@ -7,6 +7,7 @@ import { isAppHost } from "@/lib/host";
 import {
   Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck,
   MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle, Sparkles, BrainCircuit, Send,
+  BookOpen, Share2, UploadCloud, FileText, Swords,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -611,6 +612,11 @@ const FEATURE_META = [
   { icon: BrainCircuit, accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]" },
   { icon: Activity, accent: "from-[color:var(--brand-blue)] to-[color:var(--energy)]" },
   { icon: ShieldCheck, accent: "from-[color:var(--secondary)] to-[color:var(--primary)]" },
+  { icon: BookOpen, accent: "from-[color:var(--brand-blue)] to-[color:var(--primary)]" },
+  { icon: Share2, accent: "from-[color:var(--energy)] to-[color:var(--brand-blue)]" },
+  { icon: UploadCloud, accent: "from-[color:var(--victory)] to-[color:var(--secondary)]" },
+  { icon: FileText, accent: "from-[color:var(--primary)] to-[color:var(--energy)]" },
+  { icon: Swords, accent: "from-[color:var(--secondary)] to-[color:var(--victory)]" },
 ];
 
 function FeaturesGrid() {

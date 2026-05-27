@@ -89,7 +89,17 @@
     "audPlayers": "Players",
     "audPlayersP1": "See your next match",
     "audPlayersP2": "Confirm your attendance",
-    "audPlayersP3": "Stay in the loop"
+    "audPlayersP3": "Stay in the loop",
+    "feat11Title": "Player progress journal",
+    "feat11Body": "Every player gets a full profile: week-by-week attendance heatmap, stats (goals, cards, games played), coach feedback per event and AI-generated season review. Parents access it directly.",
+    "feat12Title": "Club wall & social networks",
+    "feat12Body": "Your club's Instagram, Facebook and X posts appear automatically in the Clubero wall. Members see everything in one place, no need to juggle between apps.",
+    "feat13Title": "Smart onboarding import",
+    "feat13Body": "Import your players, parents and coaches from your existing Excel file. If the columns don't match, the AI maps and normalises everything automatically before import.",
+    "feat14Title": "Auto-generated tournament regulations",
+    "feat14Body": "Every tournament generates its official PDF regulations in one click, in French or English, based on its configuration. Ready to share or print.",
+    "feat15Title": "Multi-sport natively",
+    "feat15Body": "Football, basketball, rugby, handball, volleyball — one club can manage multiple sports with stats and formats adapted to each discipline."
   },
   "whatsapp": {
     "chip": "Flexible communication",
@@ -216,21 +226,86 @@
     "ctaDemo": "Request a demo",
     "ctaPricing": "See pricing",
     "pillars": [
-      { "t": "Call-ups & Events", "b": "Create matches, trainings and tournaments in seconds. Call-ups reach the right players and parents instantly." },
-      { "t": "Team & Roster", "b": "Manage players, numbers, positions and parent links. Photo, date of birth, contact — all on a single profile." },
-      { "t": "Reminders", "b": "Automatic follow-ups handle missing responses so coaches don't have to." },
-      { "t": "Per-player coach feedback", "b": "After each match or training, the coach captures in seconds: rating, strengths, areas to improve, sport-specific tags. Private history kept on the player's profile." },
-      { "t": "Iterative AI summaries", "b": "Generate a season review, development report or 1:1 prep in one click from coach feedback and stats. Then refine the summary in dialogue with the AI until it's perfect." },
-      { "t": "Built-in AI assistant", "b": "An assistant connected to your club data. Ask questions about attendance, call-ups, stats. Instant answers, role-aware, hosted in Europe." },
-      { "t": "WhatsApp & email as options", "b": "Everything is handled in Clubero. For those who prefer WhatsApp or email, share the formatted message in one click — without losing tracking in the app." },
-      { "t": "Internal communication", "b": "Club wall with @mentions, pinned posts, read receipts and attachments. Real-time per-event chat." },
-      { "t": "Attendance tracking", "b": "Mark attendance in one click. View trends per player and per team across the season." },
-      { "t": "Turnkey tournaments", "b": "Create a tournament in minutes: groups, brackets, auto schedule, live standings. Shareable public TV page to follow scores." },
-      { "t": "Results & stats per sport", "b": "Enter the score and player stats (goals, tries, 3-pointers, saves…) tailored to each team's sport." },
-      { "t": "Global search", "b": "Cmd/Ctrl + K to jump instantly to a player, team or event." },
-      { "t": "CSV exports", "b": "Export a team roster or an event's attendance in one click — Excel-ready." },
-      { "t": "7-day trash", "b": "Accidental deletion? Restore posts, events and players for 7 days." },
-      { "t": "Roles & Permissions", "b": "Admins, coaches, players and parents see exactly what they need — and nothing else." }
+      {
+        "t": "Call-ups & Events",
+        "b": "Create matches, trainings and tournaments in seconds. Call-ups reach the right players and parents instantly."
+      },
+      {
+        "t": "Team & Roster",
+        "b": "Manage players, numbers, positions and parent links. Photo, date of birth, contact — all on a single profile."
+      },
+      {
+        "t": "Reminders",
+        "b": "Automatic follow-ups handle missing responses so coaches don't have to."
+      },
+      {
+        "t": "Per-player coach feedback",
+        "b": "After each match or training, the coach captures in seconds: rating, strengths, areas to improve, sport-specific tags. Private history kept on the player's profile."
+      },
+      {
+        "t": "Iterative AI summaries",
+        "b": "Generate a season review, development report or 1:1 prep in one click from coach feedback and stats. Then refine the summary in dialogue with the AI until it's perfect."
+      },
+      {
+        "t": "Built-in AI assistant",
+        "b": "An assistant connected to your club data. Ask questions about attendance, call-ups, stats. Instant answers, role-aware, hosted in Europe."
+      },
+      {
+        "t": "WhatsApp & email as options",
+        "b": "Everything is handled in Clubero. For those who prefer WhatsApp or email, share the formatted message in one click — without losing tracking in the app."
+      },
+      {
+        "t": "Internal communication",
+        "b": "Club wall with @mentions, pinned posts, read receipts and attachments. Real-time per-event chat."
+      },
+      {
+        "t": "Attendance tracking",
+        "b": "Mark attendance in one click. View trends per player and per team across the season."
+      },
+      {
+        "t": "Turnkey tournaments",
+        "b": "Create a tournament in minutes: groups, brackets, auto schedule, live standings. Shareable public TV page to follow scores."
+      },
+      {
+        "t": "Results & stats per sport",
+        "b": "Enter the score and player stats (goals, tries, 3-pointers, saves…) tailored to each team's sport."
+      },
+      {
+        "t": "Global search",
+        "b": "Cmd/Ctrl + K to jump instantly to a player, team or event."
+      },
+      {
+        "t": "CSV exports",
+        "b": "Export a team roster or an event's attendance in one click — Excel-ready."
+      },
+      {
+        "t": "7-day trash",
+        "b": "Accidental deletion? Restore posts, events and players for 7 days."
+      },
+      {
+        "t": "Roles & Permissions",
+        "b": "Admin, coach, assistant coach, manager, player, parent — each role sees exactly what concerns them. Parents only access their child's information."
+      },
+      {
+        "t": "Player progress journal",
+        "b": "Every player gets a full profile: week-by-week attendance heatmap, stats (goals, cards, games played), coach feedback per event and AI-generated season review. Parents access it directly."
+      },
+      {
+        "t": "Club wall & social networks",
+        "b": "Your club's Instagram, Facebook and X posts appear automatically in the Clubero wall. Members see everything in one place, no need to juggle between apps."
+      },
+      {
+        "t": "Smart onboarding import",
+        "b": "Import your players, parents and coaches from your existing Excel file. If the columns don't match, the AI maps and normalises everything automatically before import."
+      },
+      {
+        "t": "Auto-generated tournament regulations",
+        "b": "Every tournament generates its official PDF regulations in one click, in French or English, based on its configuration. Ready to share or print."
+      },
+      {
+        "t": "Multi-sport natively",
+        "b": "Football, basketball, rugby, handball, volleyball — one club can manage multiple sports with stats and formats adapted to each discipline."
+      }
     ],
     "audiences": [
       {
@@ -288,15 +363,42 @@
     "ctaContact": "Contact us",
     "ctaDemo": "Request a demo",
     "items": [
-      { "q": "Who is Clubero for?", "a": "Clubero is built for amateur sports clubs. Coaches, club staff, parents and players each get a tailored experience." },
-      { "q": "Which sports are covered?", "a": "In V1, Clubero covers 8 team sports with score entry and sport-specific player stats: football, futsal, basketball, rugby, handball, volleyball, ice hockey and field hockey. More sports are coming — tell us which one you're missing." },
-      { "q": "Is there a free offer?", "a": "Yes. Our Discovery offer gives you a 30-day free trial with no credit card, for one team up to 25 members. Move to the Club plan when you need more teams or features." },
-      { "q": "How long does it take to set up a club?", "a": "Most clubs are operational in under an hour. Guided onboarding is included with the Club and Federation plans." },
-      { "q": "How do you handle minors and parental consent?", "a": "Players under 18 can be linked to one or more parent accounts. By default, parents control responses and visibility on their child's behalf." },
-      { "q": "Where is data stored?", "a": "All club data is hosted on European infrastructure and Clubero is GDPR-compliant. Members can request an export or deletion at any time." },
-      { "q": "Can I import my existing roster?", "a": "Yes. We support CSV import during onboarding, and our team can help you migrate from spreadsheets or other tools." },
-      { "q": "Does Clubero work on mobile?", "a": "Clubero is mobile-first. It works in any modern browser and can be installed as a PWA on iOS and Android for a native experience." },
-      { "q": "How do I get help?", "a": "Email support is included on every plan. The Club and Federation plans get priority support and dedicated onboarding." }
+      {
+        "q": "Who is Clubero for?",
+        "a": "Clubero is built for amateur sports clubs. Coaches, club staff, parents and players each get a tailored experience."
+      },
+      {
+        "q": "Which sports are covered?",
+        "a": "In V1, Clubero covers 8 team sports with score entry and sport-specific player stats: football, futsal, basketball, rugby, handball, volleyball, ice hockey and field hockey. More sports are coming — tell us which one you're missing."
+      },
+      {
+        "q": "Is there a free offer?",
+        "a": "Yes. Our Discovery offer gives you a 30-day free trial with no credit card, for one team up to 25 members. Move to the Club plan when you need more teams or features."
+      },
+      {
+        "q": "How long does it take to set up a club?",
+        "a": "Most clubs are operational in under an hour. Guided onboarding is included with the Club and Federation plans."
+      },
+      {
+        "q": "How do you handle minors and parental consent?",
+        "a": "Players under 18 can be linked to one or more parent accounts. By default, parents control responses and visibility on their child's behalf."
+      },
+      {
+        "q": "Where is data stored?",
+        "a": "All club data is hosted on European infrastructure and Clubero is GDPR-compliant. Members can request an export or deletion at any time."
+      },
+      {
+        "q": "Can I import my existing roster?",
+        "a": "Yes. We support CSV import during onboarding, and our team can help you migrate from spreadsheets or other tools."
+      },
+      {
+        "q": "Does Clubero work on mobile?",
+        "a": "Clubero is mobile-first. It works in any modern browser and can be installed as a PWA on iOS and Android for a native experience."
+      },
+      {
+        "q": "How do I get help?",
+        "a": "Email support is included on every plan. The Club and Federation plans get priority support and dedicated onboarding."
+      }
     ]
   },
   "contact": {
@@ -329,7 +431,15 @@
     "submitted": "Message sent ✓",
     "successToast": "Message sent. We'll get back to you within 48 business hours.",
     "errorToast": "Couldn't send. Try again or write to hello@clubero.app.",
-    "roles": ["President", "Club officer", "Coach", "Technical director", "Parent", "Player", "Other"]
+    "roles": [
+      "President",
+      "Club officer",
+      "Coach",
+      "Technical director",
+      "Parent",
+      "Player",
+      "Other"
+    ]
   },
   "demo": {
     "metaTitle": "Request a demo — Clubero",
@@ -367,7 +477,15 @@
     "rgpd": "We never share your details. GDPR-compliant.",
     "successToast": "Request sent. We'll get back to you within 48 business hours.",
     "errorToast": "Couldn't send. Try again or write to hello@clubero.app.",
-    "roles": ["President", "Club officer", "Coach", "Technical director", "Parent", "Player", "Other"]
+    "roles": [
+      "President",
+      "Club officer",
+      "Coach",
+      "Technical director",
+      "Parent",
+      "Player",
+      "Other"
+    ]
   },
   "tournaments": {
     "home": {
@@ -447,39 +565,105 @@
     "importTitle": "What we can import for you.",
     "importSubtitle": "Bring whatever you have — files, spreadsheets, lists. We'll handle the rest.",
     "imports": [
-      { "t": "Teams", "b": "All your teams, age groups and seasons." },
-      { "t": "Players", "b": "Rosters, numbers, positions, photos." },
-      { "t": "Parents", "b": "Parent contacts and links to their children." },
-      { "t": "Coaches & staff", "b": "Coaches, managers and roles." },
-      { "t": "Schedules", "b": "Match and training calendars." },
-      { "t": "Existing tournaments", "b": "Registered teams, groups and results." },
-      { "t": "Excel / CSV files", "b": "Simple import from your spreadsheets." },
-      { "t": "Photos & logos", "b": "Club logo, team and player photos." }
+      {
+        "t": "Teams",
+        "b": "All your teams, age groups and seasons."
+      },
+      {
+        "t": "Players",
+        "b": "Rosters, numbers, positions, photos."
+      },
+      {
+        "t": "Parents",
+        "b": "Parent contacts and links to their children."
+      },
+      {
+        "t": "Coaches & staff",
+        "b": "Coaches, managers and roles."
+      },
+      {
+        "t": "Schedules",
+        "b": "Match and training calendars."
+      },
+      {
+        "t": "Existing tournaments",
+        "b": "Registered teams, groups and results."
+      },
+      {
+        "t": "Excel / CSV files",
+        "b": "Simple import from your spreadsheets."
+      },
+      {
+        "t": "Photos & logos",
+        "b": "Club logo, team and player photos."
+      }
     ],
     "howTitle": "How it works.",
     "howSubtitle": "A simple, guided 4-step process.",
     "steps": [
-      { "t": "Send us your data", "b": "Spreadsheets, lists or exports — in whatever format you have." },
-      { "t": "We prepare the import", "b": "Cleanup, structuring and validation with you." },
-      { "t": "We configure your club", "b": "Teams, roles, branding and settings tailored to you." },
-      { "t": "Your club is ready", "b": "We train your coaches and you're up and running." }
+      {
+        "t": "Send us your data",
+        "b": "Spreadsheets, lists or exports — in whatever format you have."
+      },
+      {
+        "t": "We prepare the import",
+        "b": "Cleanup, structuring and validation with you."
+      },
+      {
+        "t": "We configure your club",
+        "b": "Teams, roles, branding and settings tailored to you."
+      },
+      {
+        "t": "Your club is ready",
+        "b": "We train your coaches and you're up and running."
+      }
     ],
     "humanTitle": "You're not alone.",
     "humanSubtitle": "We help you throughout the entire onboarding process.",
     "humanPoints": [
-      { "t": "Onboarding assistance", "b": "A dedicated point of contact while we set up your club." },
-      { "t": "Migration help", "b": "We collect your existing data and import it cleanly." },
-      { "t": "Setup support", "b": "Settings, roles, branding, email templates — we handle it with you." },
-      { "t": "Responsive support", "b": "A team reachable quickly by email, in English or French." }
+      {
+        "t": "Onboarding assistance",
+        "b": "A dedicated point of contact while we set up your club."
+      },
+      {
+        "t": "Migration help",
+        "b": "We collect your existing data and import it cleanly."
+      },
+      {
+        "t": "Setup support",
+        "b": "Settings, roles, branding, email templates — we handle it with you."
+      },
+      {
+        "t": "Responsive support",
+        "b": "A team reachable quickly by email, in English or French."
+      }
     ],
     "faqTitle": "Frequently asked questions about onboarding",
     "faq": [
-      { "q": "Do we have to recreate everything manually?", "a": "No. We can import a large part of your data — teams, players, parents, schedules — from your existing spreadsheets or exports." },
-      { "q": "How long does migration take?", "a": "Most clubs are operational within a few days. The exact duration depends on the volume of data and your availability to validate it with us." },
-      { "q": "Do we need any special tools?", "a": "No. A simple browser is enough. Clubero works on desktop, tablet and mobile (PWA on iOS / Android)." },
-      { "q": "What if our data lives in several files?", "a": "No problem. We consolidate and structure everything for you before the import." },
-      { "q": "Can we start mid-season?", "a": "Yes. We adapt the import to your calendar and can preserve your match and event history if you wish." },
-      { "q": "What happens after onboarding?", "a": "Email support stays available. We remain reachable for adjustments, additional training and new teams." }
+      {
+        "q": "Do we have to recreate everything manually?",
+        "a": "No. We can import a large part of your data — teams, players, parents, schedules — from your existing spreadsheets or exports."
+      },
+      {
+        "q": "How long does migration take?",
+        "a": "Most clubs are operational within a few days. The exact duration depends on the volume of data and your availability to validate it with us."
+      },
+      {
+        "q": "Do we need any special tools?",
+        "a": "No. A simple browser is enough. Clubero works on desktop, tablet and mobile (PWA on iOS / Android)."
+      },
+      {
+        "q": "What if our data lives in several files?",
+        "a": "No problem. We consolidate and structure everything for you before the import."
+      },
+      {
+        "q": "Can we start mid-season?",
+        "a": "Yes. We adapt the import to your calendar and can preserve your match and event history if you wish."
+      },
+      {
+        "q": "What happens after onboarding?",
+        "a": "Email support stays available. We remain reachable for adjustments, additional training and new teams."
+      }
     ],
     "ctaTitle": "Ready to make the switch?",
     "ctaBody": "Let's talk about your club. We'll show you Clubero and plan the migration together.",
@@ -502,36 +686,102 @@
     "everythingTitle": "Everything for your tournaments, in one place.",
     "everythingSubtitle": "A complete ecosystem designed for the field and the big screen.",
     "ecosystem": [
-      { "t": "Teams", "b": "Registrations, rosters, contacts." },
-      { "t": "Groups", "b": "Automatic draws and seeding." },
-      { "t": "Matches", "b": "Scheduling and live tracking." },
-      { "t": "Standings", "b": "Computed automatically, in real time." },
-      { "t": "Scheduling", "b": "Multi-field, multi-day." },
-      { "t": "Referees", "b": "Mobile result validation." },
-      { "t": "Public pages", "b": "Shareable link for everyone." },
-      { "t": "TV mode", "b": "Full-screen display on site." },
-      { "t": "Live scores", "b": "Instant updates everywhere." }
+      {
+        "t": "Teams",
+        "b": "Registrations, rosters, contacts."
+      },
+      {
+        "t": "Groups",
+        "b": "Automatic draws and seeding."
+      },
+      {
+        "t": "Matches",
+        "b": "Scheduling and live tracking."
+      },
+      {
+        "t": "Standings",
+        "b": "Computed automatically, in real time."
+      },
+      {
+        "t": "Scheduling",
+        "b": "Multi-field, multi-day."
+      },
+      {
+        "t": "Referees",
+        "b": "Mobile result validation."
+      },
+      {
+        "t": "Public pages",
+        "b": "Shareable link for everyone."
+      },
+      {
+        "t": "TV mode",
+        "b": "Full-screen display on site."
+      },
+      {
+        "t": "Live scores",
+        "b": "Instant updates everywhere."
+      }
     ],
     "liveTitle": "Built for live tournaments.",
     "liveSubtitle": "Your referees and organizers stay in control without leaving the pitch.",
     "livePoints": [
-      { "t": "Scores from the field", "b": "Enter scores straight from your phone." },
-      { "t": "Referee validation", "b": "Referees confirm results live on mobile." },
-      { "t": "Instant updates", "b": "Standings and brackets update immediately." },
-      { "t": "Field management", "b": "Assign and reshuffle fields in seconds." },
-      { "t": "Auto scheduling", "b": "Calendar optimized for your constraints." },
-      { "t": "Dispute tracking", "b": "Clear, traceable history of every decision." },
-      { "t": "QR code access", "b": "One scan opens the public page." }
+      {
+        "t": "Scores from the field",
+        "b": "Enter scores straight from your phone."
+      },
+      {
+        "t": "Referee validation",
+        "b": "Referees confirm results live on mobile."
+      },
+      {
+        "t": "Instant updates",
+        "b": "Standings and brackets update immediately."
+      },
+      {
+        "t": "Field management",
+        "b": "Assign and reshuffle fields in seconds."
+      },
+      {
+        "t": "Auto scheduling",
+        "b": "Calendar optimized for your constraints."
+      },
+      {
+        "t": "Dispute tracking",
+        "b": "Clear, traceable history of every decision."
+      },
+      {
+        "t": "QR code access",
+        "b": "One scan opens the public page."
+      }
     ],
     "publicTitle": "A public, shared experience.",
     "publicSubtitle": "Parents, players and fans follow the tournament live, from anywhere.",
     "publicPoints": [
-      { "t": "Public standings", "b": "Always up to date, one link away." },
-      { "t": "Match pages", "b": "Lineup, score and key moments." },
-      { "t": "Latest results", "b": "Real-time feed of finished matches." },
-      { "t": "Team pages", "b": "Schedule, ranking, tournament run." },
-      { "t": "Mobile first", "b": "Designed to be checked from the stands." },
-      { "t": "Easy sharing", "b": "Link, QR code, social — one click." }
+      {
+        "t": "Public standings",
+        "b": "Always up to date, one link away."
+      },
+      {
+        "t": "Match pages",
+        "b": "Lineup, score and key moments."
+      },
+      {
+        "t": "Latest results",
+        "b": "Real-time feed of finished matches."
+      },
+      {
+        "t": "Team pages",
+        "b": "Schedule, ranking, tournament run."
+      },
+      {
+        "t": "Mobile first",
+        "b": "Designed to be checked from the stands."
+      },
+      {
+        "t": "Easy sharing",
+        "b": "Link, QR code, social — one click."
+      }
     ],
     "tvTitle": "TV & slideshow mode.",
     "tvSubtitle": "Show the tournament on a big screen, in the clubhouse or at the venue.",
@@ -547,11 +797,26 @@
     "formatsTitle": "Every tournament format.",
     "formatsSubtitle": "Adapt Clubero to your competition, not the other way around.",
     "formats": [
-      { "t": "Group stage", "b": "With automatic qualification." },
-      { "t": "Knockout", "b": "Brackets for 4, 8, 16, 32 teams." },
-      { "t": "Round robin", "b": "Every team plays every team." },
-      { "t": "League / championship", "b": "Across a full season." },
-      { "t": "Playoffs", "b": "Final phase after a regular season." }
+      {
+        "t": "Group stage",
+        "b": "With automatic qualification."
+      },
+      {
+        "t": "Knockout",
+        "b": "Brackets for 4, 8, 16, 32 teams."
+      },
+      {
+        "t": "Round robin",
+        "b": "Every team plays every team."
+      },
+      {
+        "t": "League / championship",
+        "b": "Across a full season."
+      },
+      {
+        "t": "Playoffs",
+        "b": "Final phase after a regular season."
+      }
     ],
     "formatsExtras": [
       "Automatic scheduling",
@@ -561,18 +826,52 @@
     "mobileTitle": "Mobile first, on the field.",
     "mobileSubtitle": "Designed to be used one-handed, between matches.",
     "mobilePoints": [
-      { "t": "Referee entry", "b": "Big buttons, few taps, quick validation." },
-      { "t": "Organizers on the pitch", "b": "Every key action within thumb's reach." },
-      { "t": "Touch-friendly UI", "b": "Readable in full sun, mobile-optimized." },
-      { "t": "Fast actions", "b": "Reschedule, adjust, fix in seconds." },
-      { "t": "Live updates", "b": "Field and public stay in sync." }
+      {
+        "t": "Referee entry",
+        "b": "Big buttons, few taps, quick validation."
+      },
+      {
+        "t": "Organizers on the pitch",
+        "b": "Every key action within thumb's reach."
+      },
+      {
+        "t": "Touch-friendly UI",
+        "b": "Readable in full sun, mobile-optimized."
+      },
+      {
+        "t": "Fast actions",
+        "b": "Reschedule, adjust, fix in seconds."
+      },
+      {
+        "t": "Live updates",
+        "b": "Field and public stay in sync."
+      }
     ],
     "pricingTitle": "Simple pricing.",
     "pricingSubtitle": "Pick what fits your event.",
     "pricing": [
-      { "name": "Tournament", "price": "€40", "per": "per tournament", "desc": "Run a one-off tournament.", "cta": "Create a tournament" },
-      { "name": "League / championship", "price": "€199", "per": "per season", "desc": "Full season management.", "cta": "Get in touch" },
-      { "name": "Clubero Club", "price": "€49", "per": "/ month", "desc": "Unlimited tournaments included.", "cta": "See Clubero Club", "highlight": true }
+      {
+        "name": "Tournament",
+        "price": "€40",
+        "per": "per tournament",
+        "desc": "Run a one-off tournament.",
+        "cta": "Create a tournament"
+      },
+      {
+        "name": "League / championship",
+        "price": "€199",
+        "per": "per season",
+        "desc": "Full season management.",
+        "cta": "Get in touch"
+      },
+      {
+        "name": "Clubero Club",
+        "price": "€49",
+        "per": "/ month",
+        "desc": "Unlimited tournaments included.",
+        "cta": "See Clubero Club",
+        "highlight": true
+      }
     ],
     "pricingNote": "Unlimited tournaments included with Clubero Club.",
     "finalTitle": "Ready to modernize your tournaments?",
@@ -581,12 +880,30 @@
     "finalSecondary": "Book a demo",
     "faqTitle": "Frequently asked questions about tournaments",
     "faq": [
-      { "q": "Can external teams participate?", "a": "Yes. Teams that don't use Clubero daily can register via the public page and be managed just like internal teams." },
-      { "q": "Does it work with limited internet on the field?", "a": "The referee mobile interface is lightweight and works on 3G/4G. Score updates sync as soon as the connection is back." },
-      { "q": "Can I change the schedule during the tournament?", "a": "Absolutely. You can reschedule, swap fields, or adjust times in seconds. The public page and TV mode update instantly." },
-      { "q": "Is there a limit on the number of teams?", "a": "No hard limit. Clubero handles tournaments from 4 to 100+ teams with automatic scheduling." },
-      { "q": "Can spectators follow without an account?", "a": "Yes. The public page is accessible to anyone via a link or QR code — no signup required." },
-      { "q": "How does the TV mode work?", "a": "Open the dedicated TV link on any screen (smart TV, projector, laptop). It displays live standings, upcoming matches and current scores in full screen — zero installation." }
+      {
+        "q": "Can external teams participate?",
+        "a": "Yes. Teams that don't use Clubero daily can register via the public page and be managed just like internal teams."
+      },
+      {
+        "q": "Does it work with limited internet on the field?",
+        "a": "The referee mobile interface is lightweight and works on 3G/4G. Score updates sync as soon as the connection is back."
+      },
+      {
+        "q": "Can I change the schedule during the tournament?",
+        "a": "Absolutely. You can reschedule, swap fields, or adjust times in seconds. The public page and TV mode update instantly."
+      },
+      {
+        "q": "Is there a limit on the number of teams?",
+        "a": "No hard limit. Clubero handles tournaments from 4 to 100+ teams with automatic scheduling."
+      },
+      {
+        "q": "Can spectators follow without an account?",
+        "a": "Yes. The public page is accessible to anyone via a link or QR code — no signup required."
+      },
+      {
+        "q": "How does the TV mode work?",
+        "a": "Open the dedicated TV link on any screen (smart TV, projector, laptop). It displays live standings, upcoming matches and current scores in full screen — zero installation."
+      }
     ]
   }
 }
