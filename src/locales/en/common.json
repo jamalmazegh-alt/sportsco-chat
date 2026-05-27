@@ -1372,5 +1372,35 @@
     "present": "Present",
     "absent": "Absent",
     "uncertain": "Uncertain"
+  },
+  "carpool": {
+    "tab": "Carpooling",
+    "disclaimer": "Clubero only facilitates coordination between parents and club members. Transportation responsibility remains entirely with participating adults.",
+    "coverage": "{{n}} / {{total}} players have confirmed transport",
+    "noTransport": "No transport",
+    "offerSeats": "Offer seats",
+    "needTransport": "My child needs a ride",
+    "reserve": "Book a seat",
+    "cancel": "Cancel my booking",
+    "full": "Full",
+    "iCanDrive": "I can drive →",
+    "seatsLeft_one": "{{count}} seat left",
+    "seatsLeft_other": "{{count}} seats left",
+    "vehicleType": { "car": "Car", "van": "Van" },
+    "toggleEnabled": "Carpooling on",
+    "toggleDisabled": "Carpooling off",
+    "seats": "Available seats",
+    "note": "Note (pickup point, time…)",
+    "edit": "Edit",
+    "remove": "Remove",
+    "takes": "Takes",
+    "youTravelWith": "You're riding with {{name}}",
+    "playersCovered": "{{players}} covered",
+    "selectPlayers": "Select player(s)",
+    "confirm": "Confirm",
+    "noDriversYet": "No drivers yet.",
+    "iNeedRide": "Request a ride",
+    "needRideRegistered": "Request sent to coach"
   }
 }
+
