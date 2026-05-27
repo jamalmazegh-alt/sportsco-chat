@@ -37,7 +37,7 @@ function AdminSettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clubs")
-        .select("id, name")
+        .select("id, name, is_personal")
         .eq("id", activeClubId!)
         .single();
       if (error) throw error;
