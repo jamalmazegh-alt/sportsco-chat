@@ -124,6 +124,11 @@ function AdminSettingsPage() {
         {t("admin.subtitle", { club: data.name })}
       </p>
 
+      {data.is_personal && (
+        <ConvertPersonalClubBanner clubId={data.id} currentName={data.name} />
+      )}
+
+
       <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
         {items.map((it) => (
           <li key={it.to}>
