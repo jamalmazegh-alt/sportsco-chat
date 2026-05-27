@@ -232,11 +232,14 @@ export const EmailShell = ({
  * ================================================================= */
 
 const HeaderBand = () => (
-  <Section style={headerBand}>
-    <Link href={SITE_URL} style={{ textDecoration: 'none' }}>
-      <Img src={LOGO_URL} alt="Clubero" width="132" height="32" style={logo} />
-    </Link>
-  </Section>
+  <>
+    <Section style={headerAccent} />
+    <Section style={headerBand}>
+      <Link href={SITE_URL} style={{ textDecoration: 'none' }}>
+        <Img src={LOGO_URL} alt="Clubero" width="168" height="112" style={logo} />
+      </Link>
+    </Section>
+  </>
 )
 
 const PreHeader = ({ text }: { text: string }) => (
@@ -299,16 +302,26 @@ const outer: React.CSSProperties = {
   padding: '0 16px',
 }
 
-const headerBand: React.CSSProperties = {
-  background: `linear-gradient(135deg, ${C.brandDeep} 0%, ${C.brand} 100%)`,
+const headerAccent: React.CSSProperties = {
+  background: `linear-gradient(90deg, ${C.brandDeep} 0%, ${C.brand} 100%)`,
+  height: '4px',
   borderRadius: '18px 18px 0 0',
-  padding: '28px 28px 26px',
+  fontSize: 0,
+  lineHeight: '4px',
+}
+
+const headerBand: React.CSSProperties = {
+  backgroundColor: '#FFFFFF',
+  borderLeft: `1px solid ${C.line}`,
+  borderRight: `1px solid ${C.line}`,
+  padding: '28px 28px 22px',
   textAlign: 'center',
 }
 
 const logo: React.CSSProperties = {
   display: 'inline-block',
-  filter: 'brightness(0) invert(1)',
+  maxWidth: '100%',
+  height: 'auto',
 }
 
 const cardAttached: React.CSSProperties = {
