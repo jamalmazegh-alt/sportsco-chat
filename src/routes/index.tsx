@@ -8,7 +8,7 @@ import {
   Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck,
   MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle, Sparkles, BrainCircuit, Send,
   BookOpen, Share2, UploadCloud, FileText, Swords,
-  Instagram, Facebook, Heart, Pin, TrendingUp, Star, ClipboardList, Bot, ListChecks,
+  Camera, Hash, Heart, Pin, TrendingUp, Star, ClipboardList, Bot, ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
