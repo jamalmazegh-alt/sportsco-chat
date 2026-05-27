@@ -1372,5 +1372,35 @@
     "present": "Présent",
     "absent": "Absent",
     "uncertain": "Incertain"
+  },
+  "carpool": {
+    "tab": "Covoiturage",
+    "disclaimer": "Clubero facilite uniquement la mise en relation entre parents et membres du club. La responsabilité du transport des enfants reste entièrement celle des adultes participants.",
+    "coverage": "{{n}} / {{total}} joueurs ont un transport confirmé",
+    "noTransport": "Sans transport",
+    "offerSeats": "Proposer des places",
+    "needTransport": "Mon enfant a besoin d'un transport",
+    "reserve": "Réserver une place",
+    "cancel": "Annuler ma réservation",
+    "full": "Complet",
+    "iCanDrive": "Je peux conduire →",
+    "seatsLeft_one": "{{count}} place restante",
+    "seatsLeft_other": "{{count}} places restantes",
+    "vehicleType": { "car": "Voiture", "van": "Camionnette" },
+    "toggleEnabled": "Covoiturage activé",
+    "toggleDisabled": "Covoiturage désactivé",
+    "seats": "Places disponibles",
+    "note": "Note (lieu de départ, heure…)",
+    "edit": "Modifier",
+    "remove": "Supprimer",
+    "takes": "Prend",
+    "youTravelWith": "Vous voyagez avec {{name}}",
+    "playersCovered": "{{players}} pris en charge",
+    "selectPlayers": "Sélectionner le(s) joueur(s)",
+    "confirm": "Confirmer",
+    "noDriversYet": "Aucun conducteur pour le moment.",
+    "iNeedRide": "Demander un transport",
+    "needRideRegistered": "Demande envoyée au coach"
   }
 }
+
