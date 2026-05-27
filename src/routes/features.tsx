@@ -22,7 +22,7 @@ export const Route = createFileRoute("/features")({
   }),
 });
 
-const PILLAR_ICONS = [CalendarCheck, Users, Bell, ClipboardList, Wand2, BrainCircuit, MessageCircle, MessageSquareText, BarChart3, Trophy, Trophy, Search, Download, Undo2, ShieldCheck];
+const PILLAR_ICONS = [CalendarCheck, Users, Bell, ClipboardList, Wand2, BrainCircuit, MessageCircle, MessageSquareText, BarChart3, Trophy, Trophy, Search, Download, Undo2, ShieldCheck, BookOpen, Share2, UploadCloud, FileText, Swords];
 
 const SCREENSHOTS = [coachShot, parentShot, clubShot, playerShot];
 
