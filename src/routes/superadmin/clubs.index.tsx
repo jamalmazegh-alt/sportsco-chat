@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { listAllClubs } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Loader2, Search } from "lucide-react";
 
 export const Route = createFileRoute("/superadmin/clubs/")({
@@ -14,6 +16,7 @@ type Club = {
   created_at: string;
   member_count: number;
   archived_at: string | null;
+  is_personal: boolean;
   subscription: {
     status: string;
     trial_end: string | null;
@@ -42,6 +45,8 @@ const TONE: Record<string, string> = {
 
 function SuperAdminClubs() {
   const [search, setSearch] = useState("");
+  const [includePersonal, setIncludePersonal] = useState(false);
+  const [includeSystem, setIncludeSystem] = useState(false);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -49,7 +54,15 @@ function SuperAdminClubs() {
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => {
-      listAllClubs({ data: { search: search || undefined, limit: 50, offset: 0 } })
+      listAllClubs({
+        data: {
+          search: search || undefined,
+          limit: 50,
+          offset: 0,
+          include_personal: includePersonal,
+          include_system: includeSystem,
+        },
+      })
         .then((r) => {
           setClubs(r.items as Club[]);
           setTotal(r.total);
@@ -57,7 +70,7 @@ function SuperAdminClubs() {
         .finally(() => setLoading(false));
     }, 250);
     return () => clearTimeout(t);
-  }, [search]);
+  }, [search, includePersonal, includeSystem]);
 
   return (
     <div className="p-6 md:p-8 max-w-7xl">
@@ -65,17 +78,41 @@ function SuperAdminClubs() {
         <div>
           <h1 className="text-xl font-semibold">Clubs</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {total} club{total === 1 ? "" : "s"} on the platform
+            {total} club{total === 1 ? "" : "s"}
+            {!includePersonal && " (hors orgas libres)"}
+            {!includeSystem && " (hors fixtures de test)"}
           </p>
         </div>
-        <div className="relative w-full sm:w-80">
-          <Search className="h-4 w-4 absolute left-2.5 top-2.5 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name…"
-            className="pl-9 h-9"
-          />
+        <div className="flex items-end gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="inc-personal"
+              checked={includePersonal}
+              onCheckedChange={setIncludePersonal}
+            />
+            <Label htmlFor="inc-personal" className="text-xs cursor-pointer">
+              Orgas libres
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="inc-system"
+              checked={includeSystem}
+              onCheckedChange={setIncludeSystem}
+            />
+            <Label htmlFor="inc-system" className="text-xs cursor-pointer">
+              Test/RLS
+            </Label>
+          </div>
+          <div className="relative w-full sm:w-72">
+            <Search className="h-4 w-4 absolute left-2.5 top-2.5 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name…"
+              className="pl-9 h-9"
+            />
+          </div>
         </div>
       </header>
 
@@ -108,6 +145,8 @@ function SuperAdminClubs() {
             {!loading &&
               clubs.map((c) => {
                 const badge = statusBadge(c.subscription);
+                const isTest =
+                  c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
                 return (
                   <tr key={c.id} className="border-t border-border hover:bg-muted/20">
                     <td className="px-3 py-2">
@@ -118,6 +157,16 @@ function SuperAdminClubs() {
                       >
                         {c.name}
                       </Link>
+                      {c.is_personal && (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-pink-500/10 text-pink-700 dark:text-pink-400 px-2 py-0.5 text-[10px]">
+                          orga libre
+                        </span>
+                      )}
+                      {isTest && (
+                        <span className="ml-2 inline-flex items-center rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px]">
+                          test
+                        </span>
+                      )}
                       {c.archived_at && (
                         <span className="ml-2 inline-flex items-center rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[10px]">
                           archived

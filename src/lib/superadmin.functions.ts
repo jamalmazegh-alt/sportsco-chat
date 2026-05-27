@@ -75,6 +75,8 @@ export const listAllClubs = createServerFn({ method: "POST" })
         search: z.string().trim().max(120).optional(),
         limit: z.number().int().min(1).max(100).default(50),
         offset: z.number().int().min(0).default(0),
+        include_personal: z.boolean().default(false),
+        include_system: z.boolean().default(false),
       })
       .parse(input),
   )
@@ -83,12 +85,22 @@ export const listAllClubs = createServerFn({ method: "POST" })
 
     let query = supabaseAdmin
       .from("clubs")
-      .select("id, name, created_at, created_by, logo_url, archived_at", { count: "exact" })
+      .select(
+        "id, name, created_at, created_by, logo_url, archived_at, is_personal",
+        { count: "exact" },
+      )
       .order("created_at", { ascending: false })
       .range(data.offset, data.offset + data.limit - 1);
 
     if (data.search) {
       query = query.ilike("name", `%${data.search}%`);
+    }
+    if (!data.include_personal) {
+      query = query.eq("is_personal", false);
+    }
+    if (!data.include_system) {
+      // Hide test/e2e orphan clubs by default.
+      query = query.not("name", "ilike", "\\_\\_rls\\_%").not("name", "ilike", "\\_\\_e2e\\_%");
     }
 
     const { data: clubs, error, count } = await query;

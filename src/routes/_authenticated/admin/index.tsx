@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Share2,
 } from "lucide-react";
+import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
@@ -37,7 +38,7 @@ function AdminSettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clubs")
-        .select("id, name")
+        .select("id, name, is_personal")
         .eq("id", activeClubId!)
         .single();
       if (error) throw error;
@@ -122,6 +123,11 @@ function AdminSettingsPage() {
       <p className="text-sm text-muted-foreground">
         {t("admin.subtitle", { club: data.name })}
       </p>
+
+      {data.is_personal && (
+        <ConvertPersonalClubBanner clubId={data.id} currentName={data.name} />
+      )}
+
 
       <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
         {items.map((it) => (
