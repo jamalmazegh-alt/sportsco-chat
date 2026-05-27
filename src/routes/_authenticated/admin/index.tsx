@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Share2,
 } from "lucide-react";
+import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
