@@ -7,6 +7,7 @@ import { isAppHost } from "@/lib/host";
 import {
   Loader2, ArrowRight, CalendarCheck, Users, Bell, ShieldCheck,
   MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle, Sparkles, BrainCircuit, Send,
+  BookOpen, Share2, UploadCloud, FileText, Swords,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
