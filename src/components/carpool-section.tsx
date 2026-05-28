@@ -297,7 +297,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
       {reserveCarpool && (
         <ReserveDialog
           carpool={reserveCarpool}
-          myConvokedChildren={myConvokedChildren}
+          selectablePlayers={isCoach ? convokedPlayers : myConvokedChildren}
           onClose={() => setReserveCarpool(null)}
           onDone={() => { qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] }); setReserveCarpool(null); }}
         />
