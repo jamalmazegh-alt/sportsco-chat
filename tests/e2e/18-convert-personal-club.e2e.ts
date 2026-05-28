@@ -38,12 +38,14 @@ test.describe("Convert personal club → real club", () => {
     personalClubId = club1.id;
 
     // Insérer l'admin dans club_members et vérifier que ça passe
+    // NB: has_club_role lit le tableau `roles` (text[]), pas la colonne legacy `role`.
     const { error: cm1Err } = await adminClient
       .from("club_members")
       .insert({
         club_id: personalClubId,
         user_id: helperClub.admin.userId,
         role: "admin",
+        roles: ["admin"],
       });
     if (cm1Err) throw new Error(`club_members insert club1: ${cm1Err.message}`);
 
@@ -66,6 +68,7 @@ test.describe("Convert personal club → real club", () => {
         club_id: personalClub2Id,
         user_id: helperClub.admin.userId,
         role: "admin",
+        roles: ["admin"],
       });
     if (cm2Err) throw new Error(`club_members insert club2: ${cm2Err.message}`);
   });
