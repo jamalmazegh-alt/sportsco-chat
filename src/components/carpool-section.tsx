@@ -373,15 +373,17 @@ function OfferDialog({ eventId, open, onClose }: { eventId: string; open: boolea
   );
 }
 
-function ReserveDialog({ carpool, myConvokedChildren, onClose, onDone }: {
+function ReserveDialog({ carpool, selectablePlayers, onClose, onDone }: {
   carpool: Carpool;
-  myConvokedChildren: Convocation[];
+  selectablePlayers: Convocation[];
   onClose: () => void;
   onDone: () => void;
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [selected, setSelected] = useState<string[]>(myConvokedChildren.map((c) => c.player_id));
+  const [selected, setSelected] = useState<string[]>(
+    selectablePlayers.length === 1 ? [selectablePlayers[0].player_id] : [],
+  );
   const [busy, setBusy] = useState(false);
 
   async function submit() {
@@ -401,8 +403,11 @@ function ReserveDialog({ carpool, myConvokedChildren, onClose, onDone }: {
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
         <DialogHeader><DialogTitle>{t("carpool.selectPlayers")}</DialogTitle></DialogHeader>
-        <div className="space-y-2">
-          {myConvokedChildren.map((c) => (
+        <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+          {selectablePlayers.length === 0 && (
+            <p className="text-sm text-muted-foreground italic">{t("carpool.noTransport")}</p>
+          )}
+          {selectablePlayers.map((c) => (
             <label key={c.player_id} className="flex items-center gap-2 cursor-pointer rounded-lg border border-border p-2">
               <Checkbox
                 checked={selected.includes(c.player_id)}
