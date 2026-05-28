@@ -1,10 +1,13 @@
 /**
- * 10 — Coach feedback + AI review (synthèse) — v2
+ * 10 — Coach feedback + AI review — v3
  *
- * Corrections :
- * - player_reviews : colonnes réelles = kind (pas review_type), pas de season
- * - test 4 (update) : utilise maybeSingle() + skip si pas de données
- * - test 3 (player cannot read) : guard si RLS retourne [] ou null
+ * Fix test 2 : admin fixture n'est pas service_role → ne peut pas bypass RLS.
+ * Solution : utiliser clientFor(club.coach) directement.
+ * La RLS player_reviews_insert autorise si :
+ *   - author_user_id = auth.uid()  ✅ (on passe coach.userId)
+ *   - can_author_player_feedback(uid, player_id) = true
+ *     → has_club_role(uid, club_id, 'coach') via club_members
+ *     ✅ Le coach E2E est dans club_members du club E2E permanent
  */
 import { test, expect } from "@playwright/test";
 import { admin } from "./_fixtures/admin";
@@ -30,7 +33,7 @@ test.describe("Coach feedback + AI synthesis", () => {
     await club.cleanup();
   });
 
-  // ── 1. Coach insère du feedback sur 2 joueurs ───────────────────────────
+  // ── 1. Coach écrit du feedback sur 2 joueurs ────────────────────────────
   test("coach writes feedback for two players", async () => {
     const c = await clientFor(club.coach);
     const { error } = await c.from("player_feedback").insert([
@@ -60,49 +63,34 @@ test.describe("Coach feedback + AI synthesis", () => {
     expect(error).toBeNull();
   });
 
-  // ── 2. Synthèse IA (mock via admin) ────────────────────────────────────
-  // Colonnes réelles : kind (enum), content, club_id, player_id, author_user_id
-  // Pas de review_type ni season
-  test("coach creates a player synthesis (mock via admin)", async () => {
+  // ── 2. Coach crée une synthèse (via son propre client, pas admin) ────────
+  test("coach creates a player synthesis (mock via coach client)", async () => {
     const REAL_AI = process.env.E2E_REAL_AI === "1";
+    const c = await clientFor(club.coach);
 
-    if (REAL_AI) {
-      const c = await clientFor(club.coach);
-      const { error } = await c.from("player_reviews").insert({
+    const { data: inserted, error: insErr } = await c
+      .from("player_reviews")
+      .insert({
         player_id: club.player1.id,
         club_id: club.clubId,
         author_user_id: club.coach.userId,
-        kind: "end_of_season",
-        content: "Synthèse IA test",
-      });
-      expect(error).toBeNull();
-    } else {
-      // Insert via admin pour bypass RLS écriture
-      const { data: inserted, error: insErr } = await admin
-        .from("player_reviews")
-        .insert({
-          player_id: club.player1.id,
-          club_id: club.clubId,
-          author_user_id: club.coach.userId,
-          kind: "end_of_season",
-          content: "Synthèse mock E2E",
-          visibility: "coach_only",
-        })
-        .select("id")
-        .single();
-      expect(insErr).toBeNull();
-      expect(inserted?.id).toBeTruthy();
+        kind: REAL_AI ? "end_of_season" : "coaching",
+        content: REAL_AI ? "Synthèse IA test" : "Synthèse mock E2E",
+      })
+      .select("id, content")
+      .single();
 
-      // Le coach peut lire sa review
-      const c = await clientFor(club.coach);
-      const { data: readable, error: readErr } = await c
-        .from("player_reviews")
-        .select("id, content")
-        .eq("id", inserted!.id)
-        .single();
-      expect(readErr).toBeNull();
-      expect(readable?.content).toBe("Synthèse mock E2E");
-    }
+    expect(insErr).toBeNull();
+    expect(inserted?.id).toBeTruthy();
+
+    // Vérifier la lecture
+    const { data: readable, error: readErr } = await c
+      .from("player_reviews")
+      .select("id, content")
+      .eq("id", inserted!.id)
+      .single();
+    expect(readErr).toBeNull();
+    expect(readable?.content).toBeTruthy();
   });
 
   // ── 3. Un joueur ne peut PAS lire les feedbacks coach_only ─────────────
@@ -118,7 +106,6 @@ test.describe("Coach feedback + AI synthesis", () => {
 
   // ── 4. Le coach peut modifier son propre feedback ───────────────────────
   test("coach can update their own feedback", async () => {
-    // Chercher via admin (pas de filtre RLS)
     const { data: fb } = await admin
       .from("player_feedback")
       .select("id")
@@ -127,8 +114,7 @@ test.describe("Coach feedback + AI synthesis", () => {
       .maybeSingle();
 
     if (!fb) {
-      // Pas de feedback trouvé — le test 1 a peut-être échoué, on skip
-      test.skip(true, "No feedback found from test 1 — skipping update test");
+      test.skip(true, "No feedback from test 1 — skipping");
       return;
     }
 
