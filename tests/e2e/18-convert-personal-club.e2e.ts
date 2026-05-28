@@ -1,86 +1,83 @@
 /**
- * 18 — Conversion club perso → vrai club — v2
+ * 18 — Conversion club perso → vrai club — v3
  *
- * Corrections :
- * - N'utilise plus E2E_ADMIN_USER_ID (non dispo en CI)
- * - Crée le club perso via admin service_role puis ajoute l'admin E2E
- *   en récupérant son user_id depuis global-setup (via E2E_ADMIN_USER_ID
- *   injecté par globalSetup) OU en cherchant dans club_members du club
- *   E2E existant créé par createTestClub
- * - Toute la suite est auto-contenue et se nettoie dans afterAll
+ * Fix : créer le club perso via clientFor(helperClub.admin) pour que
+ * created_by = auth.uid() → clubs_insert_self RLS passe.
+ * Ensuite s'insérer soi-même dans club_members via le même client
+ * → club_members_insert_admin_or_self_first : user_id = auth.uid() ✅
  */
 import { test, expect } from "@playwright/test";
-import { admin, E2E_ADMIN_USER_ID } from "./_fixtures/admin";
+import { admin } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Convert personal club → real club", () => {
   let personalClubId: string;
   let personalClub2Id: string;
-  // Utiliser le club de la fixture pour récupérer l'userId admin de façon fiable
   let helperClub: SeededClub;
 
   test.beforeAll(async () => {
-    // On crée un club de fixture juste pour récupérer les user IDs
     helperClub = await createTestClub("convpersonal");
 
-    const adminUserId = helperClub.admin.userId;
-    if (!adminUserId) throw new Error("Admin userId unavailable");
+    // Créer les clubs persos via le client admin E2E
+    // → clubs_insert_self : created_by = auth.uid() ✅
+    const adminClient = await clientFor(helperClub.admin);
 
-    // Club perso 1 — pour les tests principaux
-    const { data: club1, error: e1 } = await admin
+    const { data: club1, error: e1 } = await adminClient
       .from("clubs")
       .insert({
         name: "__e2e_personal_test_1",
         is_personal: true,
-        created_by: adminUserId,
+        created_by: helperClub.admin.userId,
       })
       .select("id")
       .single();
-    if (e1 || !club1) throw new Error(`club1: ${e1?.message}`);
+    if (e1 || !club1) throw new Error(`club1 insert: ${e1?.message}`);
     personalClubId = club1.id;
 
-    await admin.from("club_members").insert({
+    // S'insérer dans club_members → user_id = auth.uid() ✅
+    await adminClient.from("club_members").insert({
       club_id: personalClubId,
-      user_id: adminUserId,
+      user_id: helperClub.admin.userId,
       role: "admin",
     });
 
-    // Club perso 2 — pour test idempotence/sans nom
-    const { data: club2, error: e2 } = await admin
+    const { data: club2, error: e2 } = await adminClient
       .from("clubs")
       .insert({
         name: "__e2e_personal_test_2",
         is_personal: true,
-        created_by: adminUserId,
+        created_by: helperClub.admin.userId,
       })
       .select("id")
       .single();
-    if (e2 || !club2) throw new Error(`club2: ${e2?.message}`);
+    if (e2 || !club2) throw new Error(`club2 insert: ${e2?.message}`);
     personalClub2Id = club2.id;
 
-    await admin.from("club_members").insert({
+    await adminClient.from("club_members").insert({
       club_id: personalClub2Id,
-      user_id: adminUserId,
+      user_id: helperClub.admin.userId,
       role: "admin",
     });
   });
 
   test.afterAll(async () => {
     try {
-      await admin.from("club_members").delete().eq("club_id", personalClubId);
-      await admin.from("clubs").delete().eq("id", personalClubId);
-      await admin.from("club_members").delete().eq("club_id", personalClub2Id);
-      await admin.from("clubs").delete().eq("id", personalClub2Id);
+      const adminClient = await clientFor(helperClub.admin);
+      await adminClient.from("club_members").delete().eq("club_id", personalClubId);
+      await adminClient.from("clubs").delete().eq("id", personalClubId);
+      await adminClient.from("club_members").delete().eq("club_id", personalClub2Id);
+      await adminClient.from("clubs").delete().eq("id", personalClub2Id);
     } catch { /* best-effort */ }
     await helperClub.cleanup();
   });
 
-  // ── 1. Club perso existe avec is_personal = true ──────────────────────
+  // ── 1. Club perso créé avec is_personal = true ────────────────────────
   test("personal club is created with is_personal = true", async () => {
-    const { data, error } = await admin
+    const c = await clientFor(helperClub.admin);
+    const { data, error } = await c
       .from("clubs")
-      .select("id, is_personal, name")
+      .select("is_personal, name")
       .eq("id", personalClubId)
       .single();
     expect(error).toBeNull();
@@ -107,7 +104,7 @@ test.describe("Convert personal club → real club", () => {
     });
     expect(error).toBeNull();
 
-    const { data } = await admin
+    const { data } = await c
       .from("clubs")
       .select("is_personal, name")
       .eq("id", personalClubId)
@@ -136,9 +133,10 @@ test.describe("Convert personal club → real club", () => {
     expect(error).not.toBeNull();
   });
 
-  // ── 6. Club converti visible sans flag perso ──────────────────────────
+  // ── 6. Club converti sans flag perso ─────────────────────────────────
   test("converted club appears without is_personal flag", async () => {
-    const { data } = await admin
+    const c = await clientFor(helperClub.admin);
+    const { data } = await c
       .from("clubs")
       .select("is_personal")
       .eq("id", personalClubId)
@@ -146,7 +144,7 @@ test.describe("Convert personal club → real club", () => {
     expect(data?.is_personal).toBe(false);
   });
 
-  // ── 7. Conversion sans nouveau nom → préserve le nom existant ─────────
+  // ── 7. Sans nouveau nom → préserve le nom ────────────────────────────
   test("converting without new_name preserves existing name", async () => {
     const c = await clientFor(helperClub.admin);
     const { error } = await c.rpc("convert_personal_club_to_real", {
@@ -154,7 +152,7 @@ test.describe("Convert personal club → real club", () => {
     });
     expect(error).toBeNull();
 
-    const { data } = await admin
+    const { data } = await c
       .from("clubs")
       .select("name, is_personal")
       .eq("id", personalClub2Id)
