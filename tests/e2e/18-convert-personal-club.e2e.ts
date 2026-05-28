@@ -68,6 +68,7 @@ test.describe("Convert personal club → real club", () => {
         club_id: personalClub2Id,
         user_id: helperClub.admin.userId,
         role: "admin",
+        roles: ["admin"],
       });
     if (cm2Err) throw new Error(`club_members insert club2: ${cm2Err.message}`);
   });
