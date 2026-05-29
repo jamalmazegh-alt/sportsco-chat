@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Members can view their club subscription" ON public.subscriptions;

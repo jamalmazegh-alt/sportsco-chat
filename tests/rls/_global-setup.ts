@@ -81,14 +81,17 @@ async function seedAll(): Promise<Fixtures> {
 
   // 5. club_members
   {
+    // NOTE: club_members has BOTH `role` (single enum, legacy) AND `roles` (text[]).
+    // RLS helpers like `has_club_role` check the `roles` array, while `is_team_coach`
+    // checks the single `role`. Populate both to satisfy every policy path.
     const { error } = await admin.from("club_members").insert([
-      { club_id: clubA, user_id: users.adminA.userId, role: "admin" },
-      { club_id: clubA, user_id: users.coachA.userId, role: "coach" },
-      { club_id: clubA, user_id: users.playerA.userId, role: "player" },
-      { club_id: clubA, user_id: users.parentA.userId, role: "parent" },
-      { club_id: clubB, user_id: users.adminB.userId, role: "admin" },
-      { club_id: clubB, user_id: users.coachB.userId, role: "coach" },
-      { club_id: clubB, user_id: users.playerB.userId, role: "player" },
+      { club_id: clubA, user_id: users.adminA.userId, role: "admin", roles: ["admin"] },
+      { club_id: clubA, user_id: users.coachA.userId, role: "coach", roles: ["coach"] },
+      { club_id: clubA, user_id: users.playerA.userId, role: "player", roles: ["player"] },
+      { club_id: clubA, user_id: users.parentA.userId, role: "parent", roles: ["parent"] },
+      { club_id: clubB, user_id: users.adminB.userId, role: "admin", roles: ["admin"] },
+      { club_id: clubB, user_id: users.coachB.userId, role: "coach", roles: ["coach"] },
+      { club_id: clubB, user_id: users.playerB.userId, role: "player", roles: ["player"] },
     ]);
     if (error) throw new Error(`club_members insert: ${error.message}`);
   }
