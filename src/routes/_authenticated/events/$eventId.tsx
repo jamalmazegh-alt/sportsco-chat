@@ -2138,6 +2138,39 @@ function EventDetail() {
                   </p>
                 )}
               </div>
+              {(() => {
+                const suspendedSelected = Array.from(selectedIds)
+                  .map((pid) => {
+                    const s = suspensionByPlayer.get(pid);
+                    if (!s) return null;
+                    const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
+                    const p = tp?.players;
+                    return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), remaining: s.remaining } : null;
+                  })
+                  .filter(Boolean) as Array<{ id: string; name: string; remaining: number }>;
+                if (suspendedSelected.length === 0) return null;
+                const isOfficial = (event as any)?.is_official === true && event.type === "match";
+                return (
+                  <div className={cn(
+                    "rounded-xl border p-3 text-xs space-y-1",
+                    isOfficial
+                      ? "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
+                      : "border-muted bg-muted/40 text-muted-foreground"
+                  )}>
+                    <p className="font-semibold flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      {isOfficial
+                        ? t("suspensions.warningOfficial", { defaultValue: "Joueurs suspendus dans la sélection (match officiel)" })
+                        : t("suspensions.warningNonOfficial", { defaultValue: "Joueurs suspendus dans la sélection (ce match ne décompte pas leur suspension)" })}
+                    </p>
+                    <ul className="list-disc pl-5">
+                      {suspendedSelected.map((s) => (
+                        <li key={s.id}>{s.name} — {t("suspensions.remaining", { defaultValue: "{{count}} match(s) restant(s)", count: s.remaining })}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                   {t("attendance.recipients", { defaultValue: "Destinataires" })} ({selectedIds.size})
@@ -2147,17 +2180,24 @@ function EventDetail() {
                     .filter((tp: any) => selectedIds.has(tp.player_id))
                     .map((tp: any) => {
                       const p = tp.players;
+                      const susp = suspensionByPlayer.get(tp.player_id);
                       return (
                         <div key={tp.player_id} className="flex items-center gap-2 px-3 py-2 text-sm">
                           <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
                             {(p?.first_name?.[0] ?? "") + (p?.last_name?.[0] ?? "")}
                           </span>
-                          <span className="truncate">
+                          <span className="truncate flex-1">
                             {p?.first_name} {p?.last_name}
                             {p?.jersey_number ? (
                               <span className="text-muted-foreground"> · #{p.jersey_number}</span>
                             ) : null}
                           </span>
+                          {susp && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase text-amber-700 dark:text-amber-300">
+                              <AlertTriangle className="h-3 w-3" />
+                              {susp.remaining}
+                            </span>
+                          )}
                         </div>
                       );
                     })}
