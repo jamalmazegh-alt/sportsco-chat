@@ -1448,6 +1448,50 @@
     "noDriversYet": "Aucun conducteur pour le moment.",
     "iNeedRide": "Demander un transport",
     "needRideRegistered": "Demande envoyée au coach"
+  },
+  "journey": {
+    "tab": { "season": "Saison", "achievements": "Palmarès", "timeline": "Timeline" },
+    "achievement": {
+      "addBtn": "Ajouter un palmarès",
+      "pendingTitle": "En attente de confirmation",
+      "noneTitle": "Aucun palmarès",
+      "noneHint": "Les trophées et distinctions apparaîtront ici.",
+      "confirm": "Confirmer", "reject": "Refuser",
+      "type": {
+        "champion": "Champion", "runner_up": "Vice-champion",
+        "tournament_winner": "Vainqueur tournoi", "tournament_finalist": "Finaliste tournoi",
+        "semi_finalist": "Demi-finaliste", "mvp": "MVP",
+        "top_scorer": "Meilleur buteur", "best_goalkeeper": "Meilleur gardien",
+        "best_defender": "Meilleur défenseur", "captain": "Capitaine",
+        "matches_100": "100 matchs", "selection": "Sélection",
+        "special_award": "Récompense spéciale", "other": "Autre"
+      },
+      "status": { "suggested": "En attente", "confirmed": "Confirmé", "hidden": "Masqué", "rejected": "Refusé" },
+      "visibility": { "private": "Privé", "club": "Club", "public": "Public" },
+      "fields": { "title": "Titre", "season": "Saison", "date": "Date", "description": "Description", "type": "Type", "visibility": "Visibilité" }
+    },
+    "season": {
+      "noneTitle": "Aucune saison",
+      "noneHint": "Les saisons apparaîtront dès que des matchs auront eu lieu.",
+      "matches": "{{n}} matchs", "goals": "{{n}} buts", "assists": "{{n}} passes",
+      "attendance": "{{n}}% présence",
+      "coachSummary": "Note du coach", "coachSummaryPlaceholder": "Résumé de la saison…",
+      "save": "Enregistrer"
+    },
+    "timeline": {
+      "addBtn": "Ajouter un moment",
+      "noneTitle": "Pas encore de moments",
+      "noneHint": "Les jalons s'ajouteront automatiquement.",
+      "fields": { "title": "Titre", "description": "Description", "date": "Date", "type": "Type" },
+      "event": {
+        "joined_club": "A rejoint le club", "joined_team": "A rejoint l'équipe",
+        "first_match": "Premier match officiel", "first_goal": "Premier but",
+        "matches_milestone": "Jalon matchs", "achievement": "Palmarès",
+        "tournament_participation": "Participation tournoi",
+        "season_completed": "Saison terminée", "transfer": "Transfert",
+        "selection": "Sélection", "other": "Moment"
+      }
+    }
   }
 }
 
