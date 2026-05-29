@@ -1,80 +1,68 @@
 
-# Covoiturage événements · V1 — Plan d'implémentation
+# Player Journey — Plan d'implémentation
 
-Feature de mise en relation parents/coaches pour organiser le transport vers les événements (déplacements principalement).
+Transformer le profil joueur en parcours sportif long-terme avec saisons, palmarès et timeline.
 
-## 1. Migration base de données
+## 1. Base de données (1 migration)
 
-Une seule migration `add_event_carpooling`:
+**Tables créées** :
+- `player_achievements` — palmarès (champion, MVP, top scorer, etc.) avec status (suggested/confirmed/hidden/rejected), visibility (private/club/public), source (manual/tournament/league/coach/system).
+- `player_seasons` — une ligne par (joueur, club, saison), avec coach_summary manuel. Stats (matches/goals/assists/attendance) calculées à la volée via vue SQL — pas stockées.
+- `player_timeline_events` — fil chronologique (joined_club, first_match, first_goal, matches_milestone, achievement, season_completed, etc.).
 
-- `events`: ajouter colonne `carpool_enabled boolean NOT NULL DEFAULT false`. Trigger BEFORE INSERT/UPDATE qui force `carpool_enabled = true` si `is_home = false` ET la colonne n'a pas été explicitement modifiée (via défaut à la création; l'admin garde la main pour désactiver ensuite).
-- Table `carpools` (id, event_id FK CASCADE, driver_user_id FK auth.users, driver_name, vehicle_type CHECK in ('car','van'), total_seats int CHECK 1-8, departure_note, created_at). Unique `(event_id, driver_user_id)`.
-- Table `carpool_passengers` (id, carpool_id FK CASCADE, passenger_user_id FK, player_ids uuid[], created_at). Unique `(carpool_id, passenger_user_id)`. Trigger qui empêche un même `passenger_user_id` d'être dans deux carpools du même event (un seul véhicule par parent par event).
-- Table `carpool_needs` (id, event_id FK CASCADE, parent_user_id FK, player_ids uuid[], note, created_at). Unique `(event_id, parent_user_id)`.
-- GRANTS standards pour `authenticated` + `service_role` sur les trois tables.
-- RLS sur les trois tables, scopée via `events → teams → clubs` et appartenance club:
-  - SELECT: tout membre du club de l'event.
-  - INSERT/UPDATE/DELETE carpools: le conducteur lui-même OU coach/admin du club.
-  - INSERT/DELETE carpool_passengers: le passager lui-même (sur des player_ids dont il est parent et convoqués `present|uncertain`) OU coach/admin.
-  - INSERT/UPDATE/DELETE carpool_needs: le parent lui-même OU coach/admin.
-- Publication realtime: ajouter `carpools`, `carpool_passengers`, `carpool_needs` à `supabase_realtime`.
+**GRANTs + RLS** :
+- SELECT : private = joueur + parents liés + coach/admin ; club = membres du club ; public = tout le monde (anon inclus).
+- INSERT : coaches/admins, parents pour leur enfant.
+- UPDATE status : coach/admin/parent. UPDATE visibility : parents/admins seulement. UPDATE title/desc : coach/admin.
+- DELETE : admins.
+- `player_seasons` : SELECT membres club, INSERT/UPDATE coach/admin, DELETE admin.
 
-## 2. Notifications
+**Triggers auto** :
+- `AFTER INSERT club_members` → timeline `joined_club`.
+- `AFTER UPDATE convocations` (présence sur match) → `first_match` + `matches_milestone` (10/25/50/100).
+- `AFTER INSERT match_events` (goal) → `first_goal`.
+- `AFTER UPDATE player_achievements` (status → confirmed) → timeline `achievement`.
+- `AFTER UPDATE tournaments` (status → closed) → suggested achievements pour finalistes/vainqueurs.
 
-Ajouter 4 nouveaux types dans le système de notifications existant (`notifications` table déjà utilisée pour convocations):
-- `carpool_new_driver` → parents convoqués sans transport
-- `carpool_booked` → conducteur
-- `carpool_cancelled` → conducteur
-- `carpool_needs_ride` → coaches/admins du team
+**Vue `player_season_stats`** : calcule matches/goals/assists/attendance par (player, club, season) depuis convocations + match_events.
 
-Implémenté via triggers Postgres (cohérent avec convocations) qui insèrent dans `notifications`.
+**Forçage privacy mineurs** : trigger BEFORE INSERT qui force visibility='private' si âge < 18.
 
-## 3. UI — Onglet covoiturage
+## 2. Server functions (`src/lib/player-journey.functions.ts`)
 
-Nouveau composant `src/components/carpool-tab.tsx` rendu dans `src/routes/_authenticated/events/$eventId.tsx`, visible quand `carpool_enabled = true`. Ajout d'un onglet "🚗 Covoiturage" dans la barre d'onglets existante.
+- `getPlayerAchievements(playerId)` — liste filtrée par RLS.
+- `createAchievement / updateAchievement / deleteAchievement`.
+- `confirmAchievement / rejectAchievement` — change status.
+- `getPlayerSeasons(playerId)` — joint vue stats + coach_summary.
+- `updateSeasonSummary(seasonId, text)`.
+- `getPlayerTimeline(playerId)`.
+- `createTimelineEvent / deleteTimelineEvent`.
 
-Sous-composants dans `src/components/carpool/`:
-- `CarpoolDisclaimer.tsx` — encart gris en haut.
-- `CoverageBar.tsx` — jauge coach/admin (vert/orange/rouge).
-- `WithoutTransportList.tsx` — liste compacte coach.
-- `DriverCard.tsx` — carte conducteur + bouton Réserver.
-- `OfferSeatsForm.tsx` — formulaire commun coach/parent.
-- `ReserveSeatDialog.tsx` — modal sélection joueurs.
-- `NeedRideButton.tsx` + dialog associé.
-- `CarpoolToggle.tsx` — toggle coach/admin sur la page event (au-dessus de l'onglet).
+## 3. UI — onglets sur `/players/$playerId`
 
-Realtime via `supabase.channel('carpool:'+eventId)` avec `postgres_changes` sur les 3 tables filtrés par event_id. Optimistic updates côté React Query (`setQueryData` avant mutation).
+Ajouter 3 nouveaux onglets après "Profil" : **Saison · Palmarès · Timeline**. Onglets existants (Retours coach, Suspensions, etc.) préservés.
 
-## 4. Règles métier (vérifiées côté client + RLS)
+**Composants créés** dans `src/components/player-journey/` :
+- `achievements-tab.tsx` — grille de badges (icônes par type), section "En attente de confirmation" pour coach/admin/parent, bouton "Ajouter un palmarès" → sheet form.
+- `seasons-tab.tsx` — cards empilées (saison récente en haut) : titre saison, club + équipe + catégorie, stats inline, mini-badges achievements liés, coach_summary éditable inline pour coach/admin.
+- `timeline-tab.tsx` — fil vertical chronologique, icône + date + titre + description, bouton "Ajouter un moment" (coach/admin/parent).
+- `achievement-badge.tsx` — composant visuel réutilisable (icône emoji + label + variant).
+- `achievement-form-sheet.tsx` — form ajout/édition (type select, titre, saison, date, description, visibility).
+- `timeline-event-form-sheet.tsx` — form ajout moment manuel.
+- `visibility-select.tsx` — petit select private/club/public.
 
-- Un parent ne peut réserver que dans un véhicule par event (contrainte trigger + UI).
-- Places restantes calculées: `total_seats − sum(carpool_passengers où carpool_id = X)` — chaque passager compte pour 1 (le nombre d'enfants n'occupe pas des places séparées en V1, conforme au prompt qui dit "places dispo (conducteur exclu)" et "Réserver une place").
-- Conducteur ne peut pas réserver dans son propre véhicule (UI + check).
-- Seuls parents de joueurs convoqués (present/uncertain) peuvent agir.
-- Auto-suppression `carpool_needs` quand le parent réserve (déclenché via trigger ou côté client après insert).
+Design mobile-first : cards, badges, pas de tableaux. Tons sobres, palette existante.
 
-## 5. Traductions
+## 4. i18n
 
-Ajouter le bloc `carpool.*` dans `src/locales/fr/common.json` et `src/locales/en/common.json` (la structure existante stocke les libellés généraux dans `common.json`; à confirmer en lecture).
+Ajouter le namespace dans `src/locales/fr/common.json` et `en/common.json` : `journey.tab.*`, `achievement.type.*`, `achievement.status.*`, `achievement.visibility.*`, `timeline.event.*`, `season.*`.
 
-## 6. Ce qu'on ne fait PAS en V1
+## 5. Hors scope MVP (préparé architecturalement)
 
-Pas de GPS, auto-matching, minibus, tableau global, heure obligatoire, chat dédié.
+- Résumés IA, profil public partageable, vidéos, profil recrutement → pas implémentés mais le champ `visibility='public'` et la séparation `player_seasons` permettront l'extension.
 
-## Détails techniques
+---
 
-- Toutes les mutations passent par le client Supabase (RLS), pas de server function nécessaire (cohérent avec les autres actions sur events).
-- Le toggle `carpool_enabled` est un simple `update` sur `events` avec policy existante coach/admin.
-- Les notifications passent par des triggers SQL `AFTER INSERT` sur `carpools`, `carpool_passengers`, `carpool_needs`, qui insèrent dans la table `notifications` en récupérant la liste des destinataires depuis `convocations` (parents) et `team_members` (coaches).
-- Realtime: ajout de la souscription dans un `useEffect` du composant `CarpoolTab`, invalidation des queries React Query au lieu de mutations manuelles (plus simple, optimistic UI conservé via `useMutation onMutate`).
+**Ordre d'exécution** : migration DB (avec ta confirmation) → server functions → composants UI + onglets → i18n → vérif build.
 
-## Fichiers touchés
-
-- migration SQL (1 fichier)
-- `src/routes/_authenticated/events/$eventId.tsx` (ajout onglet + toggle)
-- `src/components/carpool/` (8 nouveaux fichiers)
-- `src/locales/fr/common.json` + `src/locales/en/common.json`
-
-## Hors scope explicite (V1)
-
-Pas de page admin dédiée, pas d'export CSV des trajets, pas d'historique covoiturage par joueur.
+Approuvé ?
