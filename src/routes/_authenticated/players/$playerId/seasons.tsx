@@ -40,7 +40,7 @@ function SeasonsTab() {
 
   const { data: teams = [] } = useQuery({
     queryKey: ["season-teams"],
-    queryFn: async () => (await supabase.from("teams").select("id,name,sport,category")).data ?? [],
+    queryFn: async () => (await supabase.from("teams").select("id,name,sport")).data ?? [],
   });
   const teamById = new Map(teams.map((t) => [t.id, t]));
 
@@ -64,7 +64,7 @@ function SeasonsTab() {
           <div key={`${s.season_label}-${s.team_id}`} className="rounded-2xl border bg-card p-4 space-y-3">
             <div>
               <div className="text-xl font-bold">{s.season_label}</div>
-              {team && <div className="text-sm text-muted-foreground">{team.name}{team.category ? ` — ${team.category}` : ""}</div>}
+              {team && <div className="text-sm text-muted-foreground">{team.name}</div>}
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
               <span>⚽ {t("journey.season.matches", { n: s.matches_count })}</span>
