@@ -1,22 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Trophy, History, CalendarDays, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/p/$slug")({
-  component: PublicPlayerProfile,
-  head: ({ params }) => ({
-    meta: [
-      { title: `Clubero — ${params.slug}` },
-      { name: "description", content: "Public player profile on Clubero." },
-      { property: "og:title", content: `Clubero — Player profile` },
-      { property: "og:description", content: "Public player profile on Clubero." },
-    ],
-  }),
-});
+const SITE_URL = "https://www.clubero.app";
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
 type PublicProfile = {
   player: {
@@ -59,18 +50,124 @@ type PublicProfile = {
   }>;
 };
 
+const publicProfileQuery = (slug: string) =>
+  queryOptions({
+    queryKey: ["public-player-profile", slug],
+    queryFn: async (): Promise<PublicProfile | null> => {
+      const { data, error } = await supabase.rpc("get_public_player_profile", { _slug: slug });
+      if (error) throw error;
+      return (data as PublicProfile | null) ?? null;
+    },
+    staleTime: 60_000,
+  });
+
+function buildMeta(slug: string, profile: PublicProfile | null) {
+  const url = `${SITE_URL}/p/${slug}`;
+  if (!profile) {
+    const title = "Player profile — Clubero";
+    const description = "This Clubero player profile is private or no longer available.";
+    return {
+      title,
+      description,
+      ogImage: DEFAULT_OG_IMAGE,
+      url,
+      robots: "noindex,follow",
+    };
+  }
+  const { player, club, achievements, seasons } = profile;
+  const fullName = `${player.first_name} ${player.last_name}`;
+  const pos = player.preferred_position || player.position || null;
+  const clubBit = club?.name ? ` — ${club.name}` : "";
+  const title = `${fullName}${clubBit} | Clubero`;
+  const parts: string[] = [];
+  if (pos) parts.push(pos);
+  if (player.jersey_number != null) parts.push(`#${player.jersey_number}`);
+  if (club?.sport) parts.push(club.sport);
+  const summary = parts.join(" · ");
+  const trophyCount = achievements.length;
+  const seasonCount = seasons.length;
+  const stats: string[] = [];
+  if (trophyCount) stats.push(`${trophyCount} achievement${trophyCount > 1 ? "s" : ""}`);
+  if (seasonCount) stats.push(`${seasonCount} season${seasonCount > 1 ? "s" : ""}`);
+  const description = [
+    summary || fullName,
+    stats.length ? `Public profile — ${stats.join(", ")}.` : "Public player profile on Clubero.",
+  ]
+    .filter(Boolean)
+    .join(" · ")
+    .slice(0, 160);
+  const ogImage = player.photo_url || club?.logo_url || DEFAULT_OG_IMAGE;
+  return { title, description, ogImage, url, robots: "index,follow" };
+}
+
+export const Route = createFileRoute("/p/$slug")({
+  component: PublicPlayerProfile,
+  loader: ({ params, context }) =>
+    context.queryClient.ensureQueryData(publicProfileQuery(params.slug)),
+  head: ({ params, loaderData }) => {
+    const m = buildMeta(params.slug, (loaderData as PublicProfile | null) ?? null);
+    const player = (loaderData as PublicProfile | null)?.player;
+    const club = (loaderData as PublicProfile | null)?.club;
+    const fullName = player ? `${player.first_name} ${player.last_name}` : "Player";
+
+    const ld =
+      player && {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        url: m.url,
+        mainEntity: {
+          "@type": "Person",
+          name: fullName,
+          image: player.photo_url || undefined,
+          jobTitle: player.preferred_position || player.position || undefined,
+          memberOf: club
+            ? {
+                "@type": "SportsTeam",
+                name: club.name,
+                logo: club.logo_url || undefined,
+                sport: club.sport || undefined,
+              }
+            : undefined,
+        },
+      };
+
+    return {
+      meta: [
+        { title: m.title },
+        { name: "description", content: m.description },
+        { name: "robots", content: m.robots },
+        { property: "og:type", content: "profile" },
+        { property: "og:site_name", content: "Clubero" },
+        { property: "og:title", content: m.title },
+        { property: "og:description", content: m.description },
+        { property: "og:url", content: m.url },
+        { property: "og:image", content: m.ogImage },
+        { property: "og:image:alt", content: fullName },
+        ...(player
+          ? [
+              { property: "profile:first_name", content: player.first_name },
+              { property: "profile:last_name", content: player.last_name },
+            ]
+          : []),
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: m.title },
+        { name: "twitter:description", content: m.description },
+        { name: "twitter:image", content: m.ogImage },
+        { name: "twitter:image:alt", content: fullName },
+      ],
+      links: [{ rel: "canonical", href: m.url }],
+      scripts: ld
+        ? [{ type: "application/ld+json", children: JSON.stringify(ld) }]
+        : [],
+    };
+  },
+});
+
 function PublicPlayerProfile() {
   const { slug } = Route.useParams();
   const { t } = useTranslation();
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["public-player-profile", slug],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_public_player_profile", { _slug: slug });
-      if (error) throw error;
-      return data as PublicProfile | null;
-    },
-  });
+  const { data, error } = useSuspenseQuery(publicProfileQuery(slug));
 
   if (isLoading) {
     return (
