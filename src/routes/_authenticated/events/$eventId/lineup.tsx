@@ -533,20 +533,31 @@ function LineupPage() {
                 {available.length === 0 && (
                   <p className="text-xs text-muted-foreground">{t("lineup.allPlaced", "Tous les joueurs sont placés.")}</p>
                 )}
-                {available.map((p) => (
-                  <div key={p.id} className={cn(!p.convocated && "opacity-60")}>
-                    <DraggablePlayer
-                      id={`avail:${p.id}`}
-                      player={p}
-                      size="sm"
-                      selected={selectedPid === p.id}
-                      onSelect={() => handleChipTap(p.id, "available")}
-                    />
-                    {!p.convocated && (
-                      <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
-                    )}
-                  </div>
-                ))}
+                {available.map((p) => {
+                  const remaining = suspensionMap.get(p.id);
+                  return (
+                    <div key={p.id} className={cn(!p.convocated && "opacity-60", "relative")}>
+                      <DraggablePlayer
+                        id={`avail:${p.id}`}
+                        player={p}
+                        size="sm"
+                        selected={selectedPid === p.id}
+                        onSelect={() => handleChipTap(p.id, "available")}
+                      />
+                      {remaining && remaining > 0 ? (
+                        <p
+                          title={t("suspensions.warningTooltip", { defaultValue: "{{count}} match(s) restant(s) à purger", count: remaining })}
+                          className="text-[9px] text-center font-semibold text-amber-700 dark:text-amber-300 mt-0.5"
+                        >
+                          ⚠ {t("suspensions.suspendedShort", "Suspendu")} · {remaining}
+                        </p>
+                      ) : !p.convocated ? (
+                        <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
+                      ) : null}
+                    </div>
+                  );
+                })}
+
               </DroppableAvailable>
             </div>
           </div>
