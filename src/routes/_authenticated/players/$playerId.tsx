@@ -102,7 +102,9 @@ function PlayerProfile() {
             clubName: clubRow?.name ?? undefined,
             clubLogoUrl: clubRow?.logo_url ?? undefined,
             inviteUrl,
+            roleLabel: "parent",
           },
+
         });
         toast.success(t("players.inviteSent"));
       } catch (e: any) {
