@@ -31,6 +31,15 @@
     "reason_club_sanction": "Club sanction",
     "reason_other": "Other"
   },
+  "suspensions": {
+    "suspendedShort": "Suspended",
+    "warningTooltip_one": "{{count}} match left to serve",
+    "warningTooltip_other": "{{count}} matches left to serve",
+    "remaining_one": "{{count}} match remaining",
+    "remaining_other": "{{count}} matches remaining",
+    "warningOfficial": "Suspended players in the selection (official match — their suspension will count down)",
+    "warningNonOfficial": "Suspended players in the selection (this match does not count toward their suspension)"
+  },
   "app": {
     "name": "Clubero",
     "tagline": "Team coordination, made simple."

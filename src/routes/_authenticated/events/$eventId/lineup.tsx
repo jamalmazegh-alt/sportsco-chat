@@ -120,6 +120,27 @@ function LineupPage() {
     },
   });
 
+  // Active suspensions for warning badges in the available roster
+  const { data: suspensions } = useQuery({
+    queryKey: ["lineup-suspensions", ctx?.event?.team_id],
+    enabled: !!ctx?.event?.team_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served")
+        .eq("team_id", ctx!.event.team_id as string)
+        .eq("status", "active");
+      if (error) throw error;
+      return (data ?? []).filter((s: any) => s.matches_served < s.matches_to_serve);
+    },
+  });
+  const suspensionMap = useMemo(() => {
+    const m = new Map<string, number>();
+    (suspensions ?? []).forEach((s: any) => m.set(s.player_id, s.matches_to_serve - s.matches_served));
+    return m;
+  }, [suspensions]);
+
+
   // Local state
   const [formation, setFormation] = useState<FormationKey>("4-4-2");
   const [slots, setSlots] = useState<LineupSlot[]>(() => makeEmptySlots("4-4-2"));
@@ -512,20 +533,31 @@ function LineupPage() {
                 {available.length === 0 && (
                   <p className="text-xs text-muted-foreground">{t("lineup.allPlaced", "Tous les joueurs sont placés.")}</p>
                 )}
-                {available.map((p) => (
-                  <div key={p.id} className={cn(!p.convocated && "opacity-60")}>
-                    <DraggablePlayer
-                      id={`avail:${p.id}`}
-                      player={p}
-                      size="sm"
-                      selected={selectedPid === p.id}
-                      onSelect={() => handleChipTap(p.id, "available")}
-                    />
-                    {!p.convocated && (
-                      <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
-                    )}
-                  </div>
-                ))}
+                {available.map((p) => {
+                  const remaining = suspensionMap.get(p.id);
+                  return (
+                    <div key={p.id} className={cn(!p.convocated && "opacity-60", "relative")}>
+                      <DraggablePlayer
+                        id={`avail:${p.id}`}
+                        player={p}
+                        size="sm"
+                        selected={selectedPid === p.id}
+                        onSelect={() => handleChipTap(p.id, "available")}
+                      />
+                      {remaining && remaining > 0 ? (
+                        <p
+                          title={t("suspensions.warningTooltip", { defaultValue: "{{count}} match(s) restant(s) à purger", count: remaining })}
+                          className="text-[9px] text-center font-semibold text-amber-700 dark:text-amber-300 mt-0.5"
+                        >
+                          ⚠ {t("suspensions.suspendedShort", "Suspendu")} · {remaining}
+                        </p>
+                      ) : !p.convocated ? (
+                        <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
+                      ) : null}
+                    </div>
+                  );
+                })}
+
               </DroppableAvailable>
             </div>
           </div>

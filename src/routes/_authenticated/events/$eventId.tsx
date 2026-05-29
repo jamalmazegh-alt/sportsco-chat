@@ -9,7 +9,7 @@ import i18n from "@/lib/i18n";
 const emailLocale = (): "fr" | "en" => ((i18n.language ?? "en").toLowerCase().startsWith("fr") ? "fr" : "en");
 import { fmt } from "@/lib/date-locale";
 import {
-  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus,
+  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import {
@@ -270,7 +270,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled")
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -337,6 +337,32 @@ function EventDetail() {
       });
     },
   });
+
+  // Active suspensions for players in this team (for convocation warnings)
+  const { data: activeSuspensions } = useQuery({
+    queryKey: ["active-suspensions", event?.team_id],
+    enabled: !!event?.team_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served, suspension_reason")
+        .eq("team_id", event!.team_id)
+        .eq("status", "active");
+      if (error) throw error;
+      return (data ?? []).filter((s: any) => s.matches_served < s.matches_to_serve);
+    },
+  });
+  const suspensionByPlayer = useMemo(() => {
+    const m = new Map<string, { remaining: number; reason: string }>();
+    (activeSuspensions ?? []).forEach((s: any) => {
+      m.set(s.player_id, {
+        remaining: s.matches_to_serve - s.matches_served,
+        reason: s.suspension_reason,
+      });
+    });
+    return m;
+  }, [activeSuspensions]);
+
 
   // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
   const { data: lineupData } = useQuery({
@@ -2037,6 +2063,7 @@ function EventDetail() {
                     (c: any) => c.player_id === tp.player_id
                   );
                   const checked = alreadyConvoked || selectedIds.has(tp.player_id);
+                  const susp = suspensionByPlayer.get(tp.player_id);
                   return (
                     <label
                       key={tp.player_id}
@@ -2075,12 +2102,25 @@ function EventDetail() {
                           <span className="text-muted-foreground"> · {p.preferred_position}</span>
                         ) : null}
                       </span>
+                      {susp && (
+                        <span
+                          title={t("suspensions.warningTooltip", {
+                            defaultValue: "{{count}} match(s) restant(s) à purger",
+                            count: susp.remaining,
+                          })}
+                          className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 dark:bg-amber-950 dark:text-amber-300 px-1.5 py-0.5 rounded"
+                        >
+                          <AlertTriangle className="h-3 w-3" />
+                          {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} · {susp.remaining}
+                        </span>
+                      )}
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
                       )}
                     </label>
                   );
                 })}
+
               </div>
             </>
           )}
@@ -2098,6 +2138,39 @@ function EventDetail() {
                   </p>
                 )}
               </div>
+              {(() => {
+                const suspendedSelected = Array.from(selectedIds)
+                  .map((pid) => {
+                    const s = suspensionByPlayer.get(pid);
+                    if (!s) return null;
+                    const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
+                    const p = tp?.players;
+                    return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), remaining: s.remaining } : null;
+                  })
+                  .filter(Boolean) as Array<{ id: string; name: string; remaining: number }>;
+                if (suspendedSelected.length === 0) return null;
+                const isOfficial = (event as any)?.is_official === true && event.type === "match";
+                return (
+                  <div className={cn(
+                    "rounded-xl border p-3 text-xs space-y-1",
+                    isOfficial
+                      ? "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
+                      : "border-muted bg-muted/40 text-muted-foreground"
+                  )}>
+                    <p className="font-semibold flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      {isOfficial
+                        ? t("suspensions.warningOfficial", { defaultValue: "Joueurs suspendus dans la sélection (match officiel)" })
+                        : t("suspensions.warningNonOfficial", { defaultValue: "Joueurs suspendus dans la sélection (ce match ne décompte pas leur suspension)" })}
+                    </p>
+                    <ul className="list-disc pl-5">
+                      {suspendedSelected.map((s) => (
+                        <li key={s.id}>{s.name} — {t("suspensions.remaining", { defaultValue: "{{count}} match(s) restant(s)", count: s.remaining })}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                   {t("attendance.recipients", { defaultValue: "Destinataires" })} ({selectedIds.size})
@@ -2107,17 +2180,24 @@ function EventDetail() {
                     .filter((tp: any) => selectedIds.has(tp.player_id))
                     .map((tp: any) => {
                       const p = tp.players;
+                      const susp = suspensionByPlayer.get(tp.player_id);
                       return (
                         <div key={tp.player_id} className="flex items-center gap-2 px-3 py-2 text-sm">
                           <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
                             {(p?.first_name?.[0] ?? "") + (p?.last_name?.[0] ?? "")}
                           </span>
-                          <span className="truncate">
+                          <span className="truncate flex-1">
                             {p?.first_name} {p?.last_name}
                             {p?.jersey_number ? (
                               <span className="text-muted-foreground"> · #{p.jersey_number}</span>
                             ) : null}
                           </span>
+                          {susp && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase text-amber-700 dark:text-amber-300">
+                              <AlertTriangle className="h-3 w-3" />
+                              {susp.remaining}
+                            </span>
+                          )}
                         </div>
                       );
                     })}
