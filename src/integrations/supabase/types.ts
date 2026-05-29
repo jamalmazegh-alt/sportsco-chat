@@ -781,6 +781,7 @@ export type Database = {
           ends_at: string | null
           id: string
           is_home: boolean | null
+          is_official: boolean
           location: string | null
           location_url: string | null
           meeting_point: string | null
@@ -810,6 +811,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           is_home?: boolean | null
+          is_official?: boolean
           location?: string | null
           location_url?: string | null
           meeting_point?: string | null
@@ -839,6 +841,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           is_home?: boolean | null
+          is_official?: boolean
           location?: string | null
           location_url?: string | null
           meeting_point?: string | null
@@ -1237,6 +1240,89 @@ export type Database = {
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_suspensions: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string | null
+          first_match_id: string | null
+          id: string
+          matches_served: number
+          matches_to_serve: number
+          player_id: string
+          served_event_ids: string[]
+          status: string
+          suspension_notes: string | null
+          suspension_reason: string
+          suspension_start_date: string
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          first_match_id?: string | null
+          id?: string
+          matches_served?: number
+          matches_to_serve: number
+          player_id: string
+          served_event_ids?: string[]
+          status?: string
+          suspension_notes?: string | null
+          suspension_reason: string
+          suspension_start_date?: string
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          first_match_id?: string | null
+          id?: string
+          matches_served?: number
+          matches_to_serve?: number
+          player_id?: string
+          served_event_ids?: string[]
+          status?: string
+          suspension_notes?: string | null
+          suspension_reason?: string
+          suspension_start_date?: string
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_suspensions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_suspensions_first_match_id_fkey"
+            columns: ["first_match_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_suspensions_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_suspensions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
             referencedColumns: ["id"]
           },
         ]

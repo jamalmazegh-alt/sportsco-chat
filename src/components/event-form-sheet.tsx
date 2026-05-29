@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -87,6 +88,7 @@ export type EventFormValues = {
   ends_at: string | null;
   convocation_time: string | null;
   attachments?: Attachment[] | null;
+  is_official?: boolean | null;
 };
 
 type Team = { id: string; name: string };
@@ -414,6 +416,9 @@ export function EventFormSheet({
     initial?.is_home === false ? "away" : "home",
   );
   const [meetingPoint, setMeetingPoint] = useState(initial?.meeting_point ?? "");
+  const [isOfficial, setIsOfficial] = useState<boolean>(
+    initial?.is_official ?? ((initial?.type as EventType) === "match"),
+  );
   const [attachments, setAttachments] = useState<Attachment[]>((initial?.attachments as Attachment[] | undefined) ?? []);
 
   const startsInit = splitDateTime(initial?.starts_at);
@@ -449,6 +454,7 @@ export function EventFormSheet({
     setCompetitionName(initial?.competition_name ?? "");
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
+    setIsOfficial(initial?.is_official ?? ((initial?.type as EventType) === "match"));
     setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
@@ -526,6 +532,7 @@ export function EventFormSheet({
       ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
       convocation_time: eventConvocationTime,
       attachments: attachments as unknown as never,
+      is_official: type === "match" ? true : type === "tournament" ? isOfficial : false,
     };
 
     if (mode === "create") {
@@ -660,6 +667,14 @@ export function EventFormSheet({
               </SelectContent>
             </Select>
           </div>
+
+          {type === "tournament" && (
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2.5">
+              <Label className="text-sm font-normal">{t("events.isOfficial")}</Label>
+              <Switch checked={isOfficial} onCheckedChange={setIsOfficial} />
+            </div>
+          )}
+
 
           {type !== "match" && (
             <div className="space-y-1.5">
