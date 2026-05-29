@@ -422,6 +422,7 @@
     "removed": "Player removed from the team"
   },
   "events": {
+    "isOfficial": "Official match",
     "whatsappShare": {
       "modeWhatsappOnly": "WhatsApp only",
       "modeHybrid": "Hybrid",

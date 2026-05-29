@@ -422,6 +422,7 @@
     "removed": "Joueur retiré de l'équipe"
   },
   "events": {
+    "isOfficial": "Match officiel",
     "whatsappShare": {
       "modeWhatsappOnly": "WhatsApp uniquement",
       "modeHybrid": "Hybride",
