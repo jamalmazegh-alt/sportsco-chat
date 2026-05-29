@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { AttendanceHeatmap } from "@/components/attendance-heatmap";
 import { PlayerSuspensions } from "@/components/player-suspensions";
+import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
