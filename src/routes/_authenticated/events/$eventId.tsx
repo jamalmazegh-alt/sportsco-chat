@@ -2063,6 +2063,7 @@ function EventDetail() {
                     (c: any) => c.player_id === tp.player_id
                   );
                   const checked = alreadyConvoked || selectedIds.has(tp.player_id);
+                  const susp = suspensionByPlayer.get(tp.player_id);
                   return (
                     <label
                       key={tp.player_id}
@@ -2101,12 +2102,25 @@ function EventDetail() {
                           <span className="text-muted-foreground"> · {p.preferred_position}</span>
                         ) : null}
                       </span>
+                      {susp && (
+                        <span
+                          title={t("suspensions.warningTooltip", {
+                            defaultValue: "{{count}} match(s) restant(s) à purger",
+                            count: susp.remaining,
+                          })}
+                          className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 dark:bg-amber-950 dark:text-amber-300 px-1.5 py-0.5 rounded"
+                        >
+                          <AlertTriangle className="h-3 w-3" />
+                          {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} · {susp.remaining}
+                        </span>
+                      )}
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
                       )}
                     </label>
                   );
                 })}
+
               </div>
             </>
           )}
