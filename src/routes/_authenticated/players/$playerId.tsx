@@ -492,7 +492,14 @@ function PlayerProfile() {
         <Outlet />
       ) : (
       <>
-      <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
+      {(isCoach || isSelf || isParentOfThisPlayer) && !minor && (
+        <PublicProfileCard
+          playerId={player.id}
+          enabled={!!(player as { public_profile_enabled?: boolean }).public_profile_enabled}
+          slug={(player as { public_slug?: string | null }).public_slug ?? null}
+          onChanged={() => qc.invalidateQueries({ queryKey: ["player", playerId] })}
+        />
+      )}
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("players.details")}
         </h2>
