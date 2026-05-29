@@ -224,31 +224,8 @@ async function seedAll(): Promise<Fixtures> {
   if (notifErr || !notif) throw new Error(`notifications insert: ${notifErr?.message}`);
   const notificationA = notif.id;
 
-  // 13. Subscriptions (one per club) — a trigger may have already created
-  // them on club insert, so we upsert/fetch instead of failing on the unique
-  // subscriptions_club_id_key.
-  async function ensureSubscription(clubId: string): Promise<string> {
-    // Upsert handles the case where a DB trigger auto-created the subscription
-    // right after the club insert. onConflict on club_id (unique) keeps it idempotent.
-    const { data, error } = await admin
-      .from("subscriptions")
-      .upsert({ club_id: clubId, status: "trialing" }, { onConflict: "club_id" })
-      .select("id")
-      .single();
-    if (error || !data) {
-      // Fallback: just read whatever is there.
-      const { data: existing } = await admin
-        .from("subscriptions")
-        .select("id")
-        .eq("club_id", clubId)
-        .maybeSingle();
-      if (!existing) throw new Error(`subscriptions ensure: ${error?.message}`);
-      return existing.id;
-    }
-    return data.id;
-  }
-  const subscriptionA = await ensureSubscription(clubA);
-  const subscriptionB = await ensureSubscription(clubB);
+
+
 
 
 
