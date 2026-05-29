@@ -210,7 +210,8 @@ export const getTournament = createServerFn({ method: "POST" })
     if (!tRes.data) throw new Response("Not found", { status: 404 });
     let club_stripe_charges_enabled = false;
     if (tRes.data.club_id) {
-      const { data: club } = await supabase
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: club } = await supabaseAdmin
         .from("clubs")
         .select("stripe_charges_enabled")
         .eq("id", tRes.data.club_id)
