@@ -56,6 +56,10 @@ function PlayerProfile() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isFeedback = pathname === `/players/${playerId}/feedback`;
+  const isAchievements = pathname === `/players/${playerId}/achievements`;
+  const isSeasons = pathname === `/players/${playerId}/seasons`;
+  const isTimeline = pathname === `/players/${playerId}/timeline`;
+  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
