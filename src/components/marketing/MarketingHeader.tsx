@@ -115,18 +115,11 @@ export function MarketingHeader() {
       {open && (
         <div className="border-t border-border/60 bg-background md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-5 py-3">
-            {NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
-              >
-                {t(`nav.${item.key}`)}
-              </Link>
-            ))}
-            {(LOCALIZED_NAV[current === "fr" ? "fr" : "en"]).map((item) => (
+            {[
+              ...NAV_LEFT,
+              ...LOCALIZED_NAV[current === "fr" ? "fr" : "en"],
+              ...NAV_RIGHT,
+            ].map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
