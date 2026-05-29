@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit, ClipboardList, Wand2, BookOpen, Share2, UploadCloud, FileText, Swords } from "lucide-react";
+import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit, ClipboardList, Wand2, BookOpen, Share2, UploadCloud, FileText, Swords, History, AlertTriangle, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import coachShot from "@/assets/features/coach-attendance.png";
