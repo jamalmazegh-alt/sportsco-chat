@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/clubero-logo.png";
 
-const NAV = [
+const NAV_LEFT = [
   { to: "/features", key: "features" },
   { to: "/pricing", key: "pricing" },
+] as const;
+
+const NAV_RIGHT = [
   { to: "/faq", key: "faq" },
   { to: "/contact", key: "contact" },
 ] as const;
