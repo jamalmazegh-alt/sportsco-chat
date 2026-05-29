@@ -1448,6 +1448,50 @@
     "noDriversYet": "No drivers yet.",
     "iNeedRide": "Request a ride",
     "needRideRegistered": "Request sent to coach"
+  },
+  "journey": {
+    "tab": { "season": "Season", "achievements": "Achievements", "timeline": "Timeline" },
+    "achievement": {
+      "addBtn": "Add achievement",
+      "pendingTitle": "Pending confirmation",
+      "noneTitle": "No achievements yet",
+      "noneHint": "Trophies and awards will show up here.",
+      "confirm": "Confirm", "reject": "Reject",
+      "type": {
+        "champion": "Champion", "runner_up": "Runner-up",
+        "tournament_winner": "Tournament winner", "tournament_finalist": "Tournament finalist",
+        "semi_finalist": "Semi-finalist", "mvp": "MVP",
+        "top_scorer": "Top scorer", "best_goalkeeper": "Best goalkeeper",
+        "best_defender": "Best defender", "captain": "Captain",
+        "matches_100": "100 matches", "selection": "Selection",
+        "special_award": "Special award", "other": "Other"
+      },
+      "status": { "suggested": "Pending", "confirmed": "Confirmed", "hidden": "Hidden", "rejected": "Rejected" },
+      "visibility": { "private": "Private", "club": "Club", "public": "Public" },
+      "fields": { "title": "Title", "season": "Season", "date": "Date", "description": "Description", "type": "Type", "visibility": "Visibility" }
+    },
+    "season": {
+      "noneTitle": "No seasons yet",
+      "noneHint": "Seasons appear as soon as matches are played.",
+      "matches": "{{n}} matches", "goals": "{{n}} goals", "assists": "{{n}} assists",
+      "attendance": "{{n}}% attendance",
+      "coachSummary": "Coach note", "coachSummaryPlaceholder": "Season summary…",
+      "save": "Save"
+    },
+    "timeline": {
+      "addBtn": "Add a moment",
+      "noneTitle": "No moments yet",
+      "noneHint": "Milestones will be added automatically.",
+      "fields": { "title": "Title", "description": "Description", "date": "Date", "type": "Type" },
+      "event": {
+        "joined_club": "Joined the club", "joined_team": "Joined the team",
+        "first_match": "First official match", "first_goal": "First goal",
+        "matches_milestone": "Matches milestone", "achievement": "Achievement",
+        "tournament_participation": "Tournament participation",
+        "season_completed": "Season completed", "transfer": "Transfer",
+        "selection": "Selection", "other": "Moment"
+      }
+    }
   }
 }
 
