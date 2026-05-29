@@ -85,7 +85,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "style-src 'self' 'unsafe-inline'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://www.googletagmanager.com",
     "frame-src https://js.stripe.com https://hooks.stripe.com",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://maps.googleapis.com https://*.googleapis.com https://ai.gateway.lovable.dev",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.cloud wss://*.lovable.cloud https://api.stripe.com https://maps.googleapis.com https://*.googleapis.com https://ai.gateway.lovable.dev",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "form-action 'self'",
