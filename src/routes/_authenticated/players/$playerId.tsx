@@ -425,13 +425,13 @@ function PlayerProfile() {
 
       {/* Tabs */}
       {isCoach && (
-        <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1">
+        <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1 overflow-x-auto">
           <Link
             to="/players/$playerId"
             params={{ playerId }}
             className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors",
-              !isFeedback
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              !isSubRoute
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
@@ -440,10 +440,43 @@ function PlayerProfile() {
             {t("players.tabProfile", { defaultValue: "Profil" })}
           </Link>
           <Link
+            to="/players/$playerId/seasons"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isSeasons ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <CalendarDays className="h-3.5 w-3.5" />
+            {t("journey.tab.season", { defaultValue: "Saison" })}
+          </Link>
+          <Link
+            to="/players/$playerId/achievements"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isAchievements ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Trophy className="h-3.5 w-3.5" />
+            {t("journey.tab.achievements", { defaultValue: "Palmarès" })}
+          </Link>
+          <Link
+            to="/players/$playerId/timeline"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isTimeline ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <History className="h-3.5 w-3.5" />
+            {t("journey.tab.timeline", { defaultValue: "Timeline" })}
+          </Link>
+          <Link
             to="/players/$playerId/feedback"
             params={{ playerId }}
             className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors",
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
               isFeedback
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -455,7 +488,7 @@ function PlayerProfile() {
         </div>
       )}
 
-      {isFeedback ? (
+      {isSubRoute ? (
         <Outlet />
       ) : (
       <>
