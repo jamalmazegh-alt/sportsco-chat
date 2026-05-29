@@ -45,17 +45,11 @@ export function MarketingHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
-            >
-              {t(`nav.${item.key}`)}
-            </Link>
-          ))}
-          {(LOCALIZED_NAV[current === "fr" ? "fr" : "en"]).map((item) => (
+          {[
+            ...NAV_LEFT,
+            ...LOCALIZED_NAV[current === "fr" ? "fr" : "en"],
+            ...NAV_RIGHT,
+          ].map((item) => (
             <Link
               key={item.to}
               to={item.to}
