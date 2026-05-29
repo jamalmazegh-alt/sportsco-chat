@@ -1057,6 +1057,92 @@ export type Database = {
         }
         Relationships: []
       }
+      player_achievements: {
+        Row: {
+          achievement_date: string | null
+          achievement_type: string
+          club_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          player_id: string
+          related_tournament_id: string | null
+          season_label: string | null
+          source: string
+          status: string
+          team_id: string | null
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          achievement_date?: string | null
+          achievement_type: string
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          player_id: string
+          related_tournament_id?: string | null
+          season_label?: string | null
+          source?: string
+          status?: string
+          team_id?: string | null
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          achievement_date?: string | null
+          achievement_type?: string
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          player_id?: string
+          related_tournament_id?: string | null
+          season_label?: string | null
+          source?: string
+          status?: string
+          team_id?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_achievements_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_achievements_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_achievements_related_tournament_id_fkey"
+            columns: ["related_tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_achievements_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_feedback: {
         Row: {
           author_user_id: string
@@ -1244,6 +1330,73 @@ export type Database = {
           },
         ]
       }
+      player_seasons: {
+        Row: {
+          category: string | null
+          club_id: string
+          coach_summary: string | null
+          created_at: string
+          id: string
+          player_id: string
+          primary_position: string | null
+          season_label: string
+          secondary_position: string | null
+          sport: string | null
+          team_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          club_id: string
+          coach_summary?: string | null
+          created_at?: string
+          id?: string
+          player_id: string
+          primary_position?: string | null
+          season_label: string
+          secondary_position?: string | null
+          sport?: string | null
+          team_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          club_id?: string
+          coach_summary?: string | null
+          created_at?: string
+          id?: string
+          player_id?: string
+          primary_position?: string | null
+          season_label?: string
+          secondary_position?: string | null
+          sport?: string | null
+          team_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_seasons_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_seasons_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_seasons_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_suspensions: {
         Row: {
           club_id: string
@@ -1320,6 +1473,96 @@ export type Database = {
           },
           {
             foreignKeyName: "player_suspensions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_timeline_events: {
+        Row: {
+          club_id: string
+          created_at: string
+          created_by: string | null
+          dedup_key: string | null
+          description: string | null
+          event_date: string
+          event_type: string
+          id: string
+          player_id: string
+          related_achievement_id: string | null
+          related_event_id: string | null
+          source: string
+          team_id: string | null
+          title: string
+          visibility: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          created_by?: string | null
+          dedup_key?: string | null
+          description?: string | null
+          event_date: string
+          event_type: string
+          id?: string
+          player_id: string
+          related_achievement_id?: string | null
+          related_event_id?: string | null
+          source?: string
+          team_id?: string | null
+          title: string
+          visibility?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          created_by?: string | null
+          dedup_key?: string | null
+          description?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          player_id?: string
+          related_achievement_id?: string | null
+          related_event_id?: string | null
+          source?: string
+          team_id?: string | null
+          title?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_timeline_events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_timeline_events_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_timeline_events_related_achievement_id_fkey"
+            columns: ["related_achievement_id"]
+            isOneToOne: false
+            referencedRelation: "player_achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_timeline_events_related_event_id_fkey"
+            columns: ["related_event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_timeline_events_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
@@ -2951,7 +3194,41 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      player_season_stats: {
+        Row: {
+          assists_count: number | null
+          attendance_rate: number | null
+          club_id: string | null
+          goals_count: number | null
+          matches_count: number | null
+          player_id: string | null
+          season_label: string | null
+          team_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convocations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "players_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_tournament_invite: { Args: { _token: string }; Returns: Json }
@@ -2964,6 +3241,10 @@ export type Database = {
         Returns: boolean
       }
       can_author_player_feedback: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_edit_player_journey: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
@@ -2987,6 +3268,10 @@ export type Database = {
         Args: { _feedback_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_player_journey: {
+        Args: { _player_id: string; _user_id: string; _visibility: string }
+        Returns: boolean
+      }
       can_view_player_media: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
@@ -3007,6 +3292,7 @@ export type Database = {
         Args: { _club_id: string }
         Returns: boolean
       }
+      compute_season_label: { Args: { _dt: string }; Returns: string }
       convert_personal_club_to_real: {
         Args: { _club_id: string; _new_name?: string }
         Returns: string
@@ -3122,6 +3408,10 @@ export type Database = {
         Returns: boolean
       }
       is_parent_of_player: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_player_club_admin: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
