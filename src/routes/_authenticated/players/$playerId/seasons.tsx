@@ -40,7 +40,7 @@ function SeasonsTab() {
 
   const { data: teams = [] } = useQuery({
     queryKey: ["season-teams"],
-    queryFn: async () => (await supabase.from("teams").select("id,name,sport,category")).data ?? [],
+    queryFn: async () => (await supabase.from("teams").select("id,name,sport")).data ?? [],
   });
   const teamById = new Map(teams.map((t) => [t.id, t]));
 
