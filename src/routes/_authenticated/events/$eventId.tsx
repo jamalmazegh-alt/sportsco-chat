@@ -270,7 +270,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled")
         .eq("id", eventId)
         .single();
       if (error) throw error;
