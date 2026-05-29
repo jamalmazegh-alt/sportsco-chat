@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { AttendanceHeatmap } from "@/components/attendance-heatmap";
 import { PlayerSuspensions } from "@/components/player-suspensions";
+import { PublicProfileCard } from "@/components/public-profile-card";
 import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
@@ -17,7 +18,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User, Trophy, CalendarDays, History } from "lucide-react";
+import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User, Trophy, CalendarDays, History, Globe, Copy } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { PositionCombobox } from "@/components/position-combobox";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
@@ -126,7 +127,7 @@ function PlayerProfile() {
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, jersey_number, license_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status")
+        .select("id, first_name, last_name, jersey_number, license_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status, public_profile_enabled, public_slug")
         .eq("id", playerId)
         .single();
       return data;
@@ -492,6 +493,14 @@ function PlayerProfile() {
         <Outlet />
       ) : (
       <>
+      {(isCoach || isSelf || isParentOfThisPlayer) && !minor && (
+        <PublicProfileCard
+          playerId={player.id}
+          enabled={!!(player as { public_profile_enabled?: boolean }).public_profile_enabled}
+          slug={(player as { public_slug?: string | null }).public_slug ?? null}
+          onChanged={() => qc.invalidateQueries({ queryKey: ["player", playerId] })}
+        />
+      )}
       <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("players.details")}

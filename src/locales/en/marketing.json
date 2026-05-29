@@ -397,6 +397,18 @@
       {
         "t": "Multi-sport natively",
         "b": "Football, basketball, rugby, handball, volleyball — one club can manage multiple sports with stats and formats adapted to each discipline."
+      },
+      {
+        "t": "Player journey",
+        "b": "Seasons, achievements and automatic timeline: every match, goal and trophy enriches the player's story."
+      },
+      {
+        "t": "Sanctions & suspensions",
+        "b": "Track cards, suspensions and games served. Alerts before each call-up to avoid line-up mistakes."
+      },
+      {
+        "t": "Public player profile",
+        "b": "Shareable offline link for adults: achievements, seasons and timeline visible publicly (opt-in, never for minors)."
       }
     ],
     "audiences": [

@@ -1589,6 +1589,8 @@ export type Database = {
           photo_url: string | null
           position: string | null
           preferred_position: string | null
+          public_profile_enabled: boolean
+          public_slug: string | null
           user_id: string | null
         }
         Insert: {
@@ -1609,6 +1611,8 @@ export type Database = {
           photo_url?: string | null
           position?: string | null
           preferred_position?: string | null
+          public_profile_enabled?: boolean
+          public_slug?: string | null
           user_id?: string | null
         }
         Update: {
@@ -1629,6 +1633,8 @@ export type Database = {
           photo_url?: string | null
           position?: string | null
           preferred_position?: string | null
+          public_profile_enabled?: boolean
+          public_slug?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -3328,6 +3334,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      gen_player_public_slug: { Args: never; Returns: string }
       get_convocation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -3364,6 +3371,7 @@ export type Database = {
         Returns: string
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_public_player_profile: { Args: { _slug: string }; Returns: Json }
       get_registration_by_roster_token: {
         Args: { _token: string }
         Returns: Json
@@ -3512,6 +3520,10 @@ export type Database = {
       }
       save_roster_via_token: {
         Args: { _players: Json; _token: string }
+        Returns: Json
+      }
+      set_player_public_profile: {
+        Args: { _enabled: boolean; _player_id: string }
         Returns: Json
       }
       soft_delete_entity: {

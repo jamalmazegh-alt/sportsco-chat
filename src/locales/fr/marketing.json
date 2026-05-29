@@ -397,6 +397,18 @@
       {
         "t": "Multi-sport nativement",
         "b": "Football, basketball, rugby, handball, volleyball — un seul club peut gérer plusieurs sports avec des stats et formats adaptés à chaque discipline."
+      },
+      {
+        "t": "Parcours du joueur",
+        "b": "Saisons, palmarès et timeline automatiques : chaque match, but et trophée enrichit l'histoire du joueur."
+      },
+      {
+        "t": "Sanctions & suspensions",
+        "b": "Suivez cartons, suspensions et matchs purgés. Alertes avant chaque convocation pour éviter les erreurs d'alignement."
+      },
+      {
+        "t": "Profil joueur public",
+        "b": "Lien partageable hors connexion pour les majeurs : palmarès, saisons et timeline visibles publiquement (opt-in, jamais pour les mineurs)."
       }
     ],
     "audiences": [
