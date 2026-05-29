@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.get_member_invite_info(text) TO anon, authenticated;
