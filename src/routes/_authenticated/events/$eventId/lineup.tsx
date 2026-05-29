@@ -120,6 +120,27 @@ function LineupPage() {
     },
   });
 
+  // Active suspensions for warning badges in the available roster
+  const { data: suspensions } = useQuery({
+    queryKey: ["lineup-suspensions", ctx?.event?.team_id],
+    enabled: !!ctx?.event?.team_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served")
+        .eq("team_id", ctx!.event.team_id as string)
+        .eq("status", "active");
+      if (error) throw error;
+      return (data ?? []).filter((s: any) => s.matches_served < s.matches_to_serve);
+    },
+  });
+  const suspensionMap = useMemo(() => {
+    const m = new Map<string, number>();
+    (suspensions ?? []).forEach((s: any) => m.set(s.player_id, s.matches_to_serve - s.matches_served));
+    return m;
+  }, [suspensions]);
+
+
   // Local state
   const [formation, setFormation] = useState<FormationKey>("4-4-2");
   const [slots, setSlots] = useState<LineupSlot[]>(() => makeEmptySlots("4-4-2"));
