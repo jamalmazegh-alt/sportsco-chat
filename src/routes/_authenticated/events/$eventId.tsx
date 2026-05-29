@@ -338,6 +338,32 @@ function EventDetail() {
     },
   });
 
+  // Active suspensions for players in this team (for convocation warnings)
+  const { data: activeSuspensions } = useQuery({
+    queryKey: ["active-suspensions", event?.team_id],
+    enabled: !!event?.team_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served, suspension_reason")
+        .eq("team_id", event!.team_id)
+        .eq("status", "active");
+      if (error) throw error;
+      return (data ?? []).filter((s: any) => s.matches_served < s.matches_to_serve);
+    },
+  });
+  const suspensionByPlayer = useMemo(() => {
+    const m = new Map<string, { remaining: number; reason: string }>();
+    (activeSuspensions ?? []).forEach((s: any) => {
+      m.set(s.player_id, {
+        remaining: s.matches_to_serve - s.matches_served,
+        reason: s.suspension_reason,
+      });
+    });
+    return m;
+  }, [activeSuspensions]);
+
+
   // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
   const { data: lineupData } = useQuery({
     queryKey: ["event-lineup-wa", eventId],
