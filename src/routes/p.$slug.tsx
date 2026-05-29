@@ -169,13 +169,6 @@ function PublicPlayerProfile() {
 
   const { data, error } = useSuspenseQuery(publicProfileQuery(slug));
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-muted-foreground text-sm">Loading…</div>
-      </div>
-    );
-  }
 
   if (error || !data) {
     return (
