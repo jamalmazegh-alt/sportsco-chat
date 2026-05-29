@@ -87,6 +87,7 @@ export type EventFormValues = {
   ends_at: string | null;
   convocation_time: string | null;
   attachments?: Attachment[] | null;
+  is_official?: boolean | null;
 };
 
 type Team = { id: string; name: string };
