@@ -35,6 +35,7 @@ import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/sett
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
 import { Route as RTokenRouteImport } from './routes/r.$token'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
 import { Route as FrTournoisRouteImport } from './routes/fr.tournois'
@@ -240,6 +241,11 @@ const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
 const RTokenRoute = RTokenRouteImport.update({
   id: '/r/$token',
   path: '/r/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalCookiesRoute = LegalCookiesRouteImport.update({
@@ -703,6 +709,7 @@ export interface FileRoutesByFullPath {
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
+  '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
@@ -803,6 +810,7 @@ export interface FileRoutesByTo {
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
+  '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
@@ -909,6 +917,7 @@ export interface FileRoutesById {
   '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
   '/legal/cookies': typeof LegalCookiesRoute
+  '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
@@ -1015,6 +1024,7 @@ export interface FileRouteTypes {
     | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
+    | '/p/$slug'
     | '/r/$token'
     | '/superadmin/billing'
     | '/superadmin/logs'
@@ -1115,6 +1125,7 @@ export interface FileRouteTypes {
     | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
+    | '/p/$slug'
     | '/r/$token'
     | '/superadmin/billing'
     | '/superadmin/logs'
@@ -1220,6 +1231,7 @@ export interface FileRouteTypes {
     | '/fr/tournois'
     | '/legal/$kind'
     | '/legal/cookies'
+    | '/p/$slug'
     | '/r/$token'
     | '/superadmin/billing'
     | '/superadmin/logs'
@@ -1315,6 +1327,7 @@ export interface RootRouteChildren {
   FrTournoisRoute: typeof FrTournoisRoute
   LegalKindRoute: typeof LegalKindRoute
   LegalCookiesRoute: typeof LegalCookiesRoute
+  PSlugRoute: typeof PSlugRoute
   RTokenRoute: typeof RTokenRoute
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
@@ -1527,6 +1540,13 @@ declare module '@tanstack/react-router' {
       path: '/r/$token'
       fullPath: '/r/$token'
       preLoaderRoute: typeof RTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/cookies': {
@@ -2345,6 +2365,7 @@ const rootRouteChildren: RootRouteChildren = {
   FrTournoisRoute: FrTournoisRoute,
   LegalKindRoute: LegalKindRoute,
   LegalCookiesRoute: LegalCookiesRoute,
+  PSlugRoute: PSlugRoute,
   RTokenRoute: RTokenRoute,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentInviteTokenRoute: TournamentInviteTokenRoute,
