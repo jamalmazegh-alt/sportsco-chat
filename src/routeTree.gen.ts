@@ -98,7 +98,10 @@ import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
+import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
+import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
+import { Route as AuthenticatedPlayersPlayerIdAchievementsRouteImport } from './routes/_authenticated/players/$playerId/achievements'
 import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
 import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
@@ -582,10 +585,28 @@ const ApiPublicHooksCoachInsightsRoute =
     path: '/api/public/hooks/coach-insights',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedPlayersPlayerIdTimelineRoute =
+  AuthenticatedPlayersPlayerIdTimelineRouteImport.update({
+    id: '/timeline',
+    path: '/timeline',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdSeasonsRoute =
+  AuthenticatedPlayersPlayerIdSeasonsRouteImport.update({
+    id: '/seasons',
+    path: '/seasons',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
 const AuthenticatedPlayersPlayerIdFeedbackRoute =
   AuthenticatedPlayersPlayerIdFeedbackRouteImport.update({
     id: '/feedback',
     path: '/feedback',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdAchievementsRoute =
+  AuthenticatedPlayersPlayerIdAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
     getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
   } as any)
 const AuthenticatedEventsEventIdLineupRoute =
@@ -732,7 +753,10 @@ export interface FileRoutesByFullPath {
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
+  '/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -829,7 +853,10 @@ export interface FileRoutesByTo {
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
+  '/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -932,7 +959,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
   '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
   '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
+  '/_authenticated/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/_authenticated/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -1035,7 +1065,10 @@ export interface FileRouteTypes {
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
+    | '/players/$playerId/achievements'
     | '/players/$playerId/feedback'
+    | '/players/$playerId/seasons'
+    | '/players/$playerId/timeline'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1132,7 +1165,10 @@ export interface FileRouteTypes {
     | '/admin/users/$userId'
     | '/events/$eventId/feedback'
     | '/events/$eventId/lineup'
+    | '/players/$playerId/achievements'
     | '/players/$playerId/feedback'
+    | '/players/$playerId/seasons'
+    | '/players/$playerId/timeline'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1234,7 +1270,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users/$userId'
     | '/_authenticated/events/$eventId/feedback'
     | '/_authenticated/events/$eventId/lineup'
+    | '/_authenticated/players/$playerId/achievements'
     | '/_authenticated/players/$playerId/feedback'
+    | '/_authenticated/players/$playerId/seasons'
+    | '/_authenticated/players/$playerId/timeline'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1931,11 +1970,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCoachInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/players/$playerId/timeline': {
+      id: '/_authenticated/players/$playerId/timeline'
+      path: '/timeline'
+      fullPath: '/players/$playerId/timeline'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdTimelineRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/players/$playerId/seasons': {
+      id: '/_authenticated/players/$playerId/seasons'
+      path: '/seasons'
+      fullPath: '/players/$playerId/seasons'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdSeasonsRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
     '/_authenticated/players/$playerId/feedback': {
       id: '/_authenticated/players/$playerId/feedback'
       path: '/feedback'
       fullPath: '/players/$playerId/feedback'
       preLoaderRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/players/$playerId/achievements': {
+      id: '/_authenticated/players/$playerId/achievements'
+      path: '/achievements'
+      fullPath: '/players/$playerId/achievements'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdAchievementsRouteImport
       parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
     }
     '/_authenticated/events/$eventId/lineup': {
@@ -2132,13 +2192,22 @@ const AuthenticatedTournamentsRouteWithChildren =
   )
 
 interface AuthenticatedPlayersPlayerIdRouteChildren {
+  AuthenticatedPlayersPlayerIdAchievementsRoute: typeof AuthenticatedPlayersPlayerIdAchievementsRoute
   AuthenticatedPlayersPlayerIdFeedbackRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  AuthenticatedPlayersPlayerIdSeasonsRoute: typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  AuthenticatedPlayersPlayerIdTimelineRoute: typeof AuthenticatedPlayersPlayerIdTimelineRoute
 }
 
 const AuthenticatedPlayersPlayerIdRouteChildren: AuthenticatedPlayersPlayerIdRouteChildren =
   {
+    AuthenticatedPlayersPlayerIdAchievementsRoute:
+      AuthenticatedPlayersPlayerIdAchievementsRoute,
     AuthenticatedPlayersPlayerIdFeedbackRoute:
       AuthenticatedPlayersPlayerIdFeedbackRoute,
+    AuthenticatedPlayersPlayerIdSeasonsRoute:
+      AuthenticatedPlayersPlayerIdSeasonsRoute,
+    AuthenticatedPlayersPlayerIdTimelineRoute:
+      AuthenticatedPlayersPlayerIdTimelineRoute,
   }
 
 const AuthenticatedPlayersPlayerIdRouteWithChildren =
