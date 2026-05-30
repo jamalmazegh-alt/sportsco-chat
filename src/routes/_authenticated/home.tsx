@@ -19,6 +19,8 @@ import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
 import { DisciplineWidget } from "@/components/discipline-widget";
+import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -46,6 +48,7 @@ function HomePage() {
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = useState(false);
+  const [absenceOpen, setAbsenceOpen] = useState(false);
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
   if (!tOnlyLoading && tournamentOnly) return <Navigate to="/tournaments" replace />;
 
@@ -212,6 +215,11 @@ function HomePage() {
       {/* Discipline & suspensions */}
       {isCoach && activeClubId && <DisciplineWidget clubId={activeClubId} />}
 
+      {/* Upcoming player absences */}
+      {isCoach && activeClubId && <UpcomingAbsencesWidget clubId={activeClubId} />}
+
+
+
 
       {/* Onboarding checklist (admins) */}
       {isAdmin && activeClubId && (
@@ -251,6 +259,21 @@ function HomePage() {
             <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />
           )}
         </div>
+      )}
+
+      {/* For players/parents: quick absence declaration */}
+      {!isCoach && myTeams && myTeams.length > 0 && (
+        <section>
+          <Button
+            variant="outline"
+            className="w-full h-11"
+            onClick={() => setAbsenceOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+          <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />
+        </section>
       )}
 
       {/* For players/parents: shortcut to team(s) */}

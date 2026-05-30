@@ -18,7 +18,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User, Trophy, CalendarDays, History, Globe, Copy } from "lucide-react";
+import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User, Trophy, CalendarDays, History, Globe, Copy, Palmtree } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { PositionCombobox } from "@/components/position-combobox";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
@@ -60,7 +60,8 @@ function PlayerProfile() {
   const isAchievements = pathname === `/players/${playerId}/achievements`;
   const isSeasons = pathname === `/players/${playerId}/seasons`;
   const isTimeline = pathname === `/players/${playerId}/timeline`;
-  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline;
+  const isAvailability = pathname === `/players/${playerId}/availability`;
+  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -432,8 +433,10 @@ function PlayerProfile() {
       </div>
 
       {/* Tabs */}
-      {isCoach && (
+      {(isCoach || isSelf || isParentOfThisPlayer) && (
         <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1 overflow-x-auto">
+          {isCoach && (
+          <>
           <Link
             to="/players/$playerId"
             params={{ playerId }}
@@ -493,8 +496,24 @@ function PlayerProfile() {
             <ClipboardList className="h-3.5 w-3.5" />
             {t("players.tabFeedback", { defaultValue: "Retours coach" })}
           </Link>
+          </>
+          )}
+          <Link
+            to="/players/$playerId/availability"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isAvailability
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Palmtree className="h-3.5 w-3.5" />
+            {t("availability.title", { defaultValue: "Disponibilités" })}
+          </Link>
         </div>
       )}
+
 
       {isSubRoute ? (
         <Outlet />

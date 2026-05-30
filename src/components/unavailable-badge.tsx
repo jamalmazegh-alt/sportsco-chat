@@ -1,13 +1,17 @@
 import { useTranslation } from "react-i18next";
-import { ShieldAlert, AlertTriangle, Plane, GraduationCap, Heart } from "lucide-react";
+import {
+  ShieldAlert, HeartPulse, Palmtree, GraduationCap, Users, Briefcase, HelpCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type UnavailableReason =
   | "suspension"
-  | "injury"
   | "vacation"
+  | "injury"
   | "school"
-  | "family";
+  | "family"
+  | "work"
+  | "other";
 
 interface Props {
   reason: UnavailableReason;
@@ -26,24 +30,34 @@ const REASON_META: Record<
     i18n: "unavailable.suspension",
   },
   injury: {
-    Icon: Heart,
+    Icon: HeartPulse,
     tone: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30",
-    i18n: "unavailable.injury",
+    i18n: "availability.reason.injury",
   },
   vacation: {
-    Icon: Plane,
+    Icon: Palmtree,
     tone: "bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/30",
-    i18n: "unavailable.vacation",
+    i18n: "availability.reason.vacation",
   },
   school: {
     Icon: GraduationCap,
     tone: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/30",
-    i18n: "unavailable.school",
+    i18n: "availability.reason.school",
   },
   family: {
-    Icon: AlertTriangle,
+    Icon: Users,
+    tone: "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30",
+    i18n: "availability.reason.family",
+  },
+  work: {
+    Icon: Briefcase,
+    tone: "bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/30",
+    i18n: "availability.reason.work",
+  },
+  other: {
+    Icon: HelpCircle,
     tone: "bg-muted text-muted-foreground border-border",
-    i18n: "unavailable.family",
+    i18n: "availability.reason.other",
   },
 };
 

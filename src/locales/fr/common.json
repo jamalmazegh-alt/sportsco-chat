@@ -1,4 +1,47 @@
 {
+  "availability": {
+    "title": "Disponibilités",
+    "declare": "Déclarer une absence",
+    "save": "Enregistrer l'absence",
+    "cancel": "Annuler",
+    "cancelled": "Absence annulée",
+    "confirmCancel": "Annuler cette absence ?",
+    "saved": "Absence enregistrée",
+    "forChild": "Pour quel enfant ?",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "reasonLabel": "Motif",
+    "comment": "Commentaire",
+    "commentPlaceholder": "Optionnel",
+    "history": "Historique",
+    "empty": "Aucune absence enregistrée.",
+    "consolidated": "Disponibilité actuelle",
+    "allAvailable": "✅ Aucune indisponibilité déclarée",
+    "upcomingWidget": "Absences à venir",
+    "noneUpcoming": "Aucune absence à venir",
+    "reducedSquad": "⚠️ {{n}} joueurs indisponibles dans les 14 prochains jours",
+    "overlapWarning": "⚠️ Une absence est déjà déclarée sur cette période. Confirmer quand même ?",
+    "drawerHint": "Indique la période et le motif. Le coach sera informé.",
+    "absent": "Absent",
+    "unavailable": "Indisponible",
+    "reason": {
+      "vacation": "Vacances",
+      "injury": "Blessure",
+      "school": "École / examens",
+      "family": "Raisons familiales",
+      "work": "Travail",
+      "other": "Autre"
+    },
+    "status": {
+      "active": "Active",
+      "cancelled": "Annulée",
+      "completed": "Terminée"
+    },
+    "errors": {
+      "missingPlayer": "Sélectionnez un joueur.",
+      "invalidRange": "Dates invalides."
+    }
+  },
   "discipline": {
     "title": "Discipline",
     "subtitle": "Vue globale des suspensions du club.",
@@ -49,7 +92,8 @@
   },
   "notification": {
     "sanctionCreated_one": "{{name}} a reçu une suspension de {{n}} match.",
-    "sanctionCreated_other": "{{name}} a reçu une suspension de {{n}} matchs."
+    "sanctionCreated_other": "{{name}} a reçu une suspension de {{n}} matchs.",
+    "absenceDeclared": "{{name}} sera absent(e) du {{start}} au {{end}}. Motif : {{reason}}"
   },
   "suspension": {
     "title": "Discipline",
