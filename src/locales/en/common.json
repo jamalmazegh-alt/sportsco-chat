@@ -21,6 +21,7 @@
     "noneUpcoming": "No upcoming absence",
     "reducedSquad": "⚠️ {{n}} players unavailable in the next 14 days",
     "overlapWarning": "⚠️ An absence is already declared for this period. Confirm anyway?",
+    "warningSelected": "Players flagged unavailable for this date",
     "drawerHint": "Set the period and reason. Coaches will be notified.",
     "absent": "Absent",
     "unavailable": "Unavailable",
