@@ -23,7 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Palmtree, HeartPulse, GraduationCap, Users, Briefcase, HelpCircle } from "lucide-react";
+import { Loader2, Palmtree, HeartPulse, GraduationCap, Users, Briefcase, HelpCircle, Swords, Dumbbell, Trophy, Calendar } from "lucide-react";
+
+type ImpactedEvent = { id: string; title: string; starts_at: string; type: string };
 
 type Reason = "vacation" | "injury" | "school" | "family" | "work" | "other";
 
@@ -108,6 +110,51 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     return candidates.find((c) => c.id === playerId) ?? null;
   }, [candidates, playerId, initialPlayerId]);
 
+  // Debounced dates for impacted-events query
+  const [debouncedDates, setDebouncedDates] = useState<{ s: string; e: string }>({ s: startDate, e: endDate });
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedDates({ s: startDate, e: endDate }), 400);
+    return () => clearTimeout(t);
+  }, [startDate, endDate]);
+
+  const { data: impactedEvents = [] } = useQuery({
+    queryKey: ["absence-impacted-events", playerId, debouncedDates.s, debouncedDates.e],
+    enabled: open && !!playerId && !!debouncedDates.s && !!debouncedDates.e && debouncedDates.e >= debouncedDates.s,
+    queryFn: async (): Promise<ImpactedEvent[]> => {
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("player_id", playerId)
+        .eq("role", "player");
+      const teamIds = Array.from(new Set((tm ?? []).map((r: any) => r.team_id))).filter(Boolean);
+      if (teamIds.length === 0) return [];
+      const startIso = `${debouncedDates.s}T00:00:00`;
+      const endIso = `${debouncedDates.e}T23:59:59`;
+      const { data } = await supabase
+        .from("events")
+        .select("id, title, starts_at, type, status")
+        .in("team_id", teamIds)
+        .gte("starts_at", startIso)
+        .lte("starts_at", endIso)
+        .neq("status", "cancelled")
+        .is("deleted_at", null)
+        .order("starts_at", { ascending: true })
+        .limit(11);
+      return (data ?? []).map((r: any) => ({ id: r.id, title: r.title, starts_at: r.starts_at, type: r.type }));
+    },
+    staleTime: 30_000,
+  });
+
+  function eventIcon(type: string) {
+    switch (type) {
+      case "match": return Swords;
+      case "training": return Dumbbell;
+      case "tournament": return Trophy;
+      case "meeting": return Users;
+      default: return Calendar;
+    }
+  }
+
   async function checkOverlap(): Promise<boolean> {
     const { count } = await supabase
       .from("player_availabilities")
@@ -119,7 +166,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     return (count ?? 0) > 0;
   }
 
-  async function notifyCoaches(playerName: string, startStr: string, endStr: string, reasonLabel: string) {
+  async function notifyCoaches(playerName: string, startStr: string, endStr: string, reasonLabel: string, events: ImpactedEvent[]) {
     // Find teams of the player, then coaches/assistants
     const { data: tm } = await supabase
       .from("team_members")
@@ -137,13 +184,32 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       new Set((coaches ?? []).map((c: any) => c.user_id).filter((u: string | null) => u && u !== user?.id)),
     );
     if (uids.length === 0) return;
-    const body = t("notification.absenceDeclared", {
+    let body = t("notification.absenceDeclared", {
       name: playerName,
       start: startStr,
       end: endStr,
       reason: reasonLabel,
       defaultValue: `${playerName} sera absent(e) du ${startStr} au ${endStr}. Motif : ${reasonLabel}`,
     });
+    if (events.length > 0) {
+      const labelFor = (type: string) => {
+        switch (type) {
+          case "match": return t("eventType.match", { defaultValue: "Match" });
+          case "training": return t("eventType.training", { defaultValue: "Entraînement" });
+          case "tournament": return t("eventType.tournament", { defaultValue: "Tournoi" });
+          case "meeting": return t("eventType.meeting", { defaultValue: "Réunion" });
+          default: return t("eventType.other", { defaultValue: "Événement" });
+        }
+      };
+      const fmtShort = (d: string) =>
+        new Date(d).toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" });
+      const top = events.slice(0, 3).map((ev) => `${labelFor(ev.type)} ${fmtShort(ev.starts_at)}`);
+      let eventsStr = top.join(", ");
+      if (events.length > 3) {
+        eventsStr += `, ${t("availability.impactedEventsMore", { n: events.length - 3, defaultValue: `et ${events.length - 3} autre(s) événement(s)` })}`;
+      }
+      body += "\n" + t("availability.notifImpacted", { events: eventsStr, defaultValue: `Événements impactés : ${eventsStr}` });
+    }
     await supabase.from("notifications").insert(
       uids.map((uid) => ({
         user_id: uid,
@@ -154,6 +220,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       })),
     );
   }
+
 
   async function onSubmit() {
     if (!playerId) {
@@ -201,7 +268,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
         const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
         const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
         const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel);
+        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel, impactedEvents);
       } catch {
         /* ignore notify errors */
       }
@@ -308,7 +375,42 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
             />
             <p className="text-[10px] text-muted-foreground text-right">{comment.length}/300</p>
           </div>
+
+          {impactedEvents.length > 0 && (
+            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
+              <p className="text-xs font-medium text-foreground">
+                {t("availability.impactedEvents", { defaultValue: "📅 Cette absence impactera :" })}
+              </p>
+              <ul className="space-y-1.5">
+                {impactedEvents.slice(0, 10).map((ev) => {
+                  const Icon = eventIcon(ev.type);
+                  return (
+                    <li key={ev.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                      <span className="truncate flex-1">{ev.title}</span>
+                      <span className="shrink-0">
+                        {new Date(ev.starts_at).toLocaleDateString(undefined, {
+                          weekday: "short",
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              {impactedEvents.length > 10 && (
+                <p className="text-[11px] text-muted-foreground">
+                  {t("availability.impactedEventsMore", {
+                    n: impactedEvents.length - 10,
+                    defaultValue: `et ${impactedEvents.length - 10} autre(s) événement(s)`,
+                  })}
+                </p>
+              )}
+            </div>
+          )}
         </div>
+
 
         <SheetFooter className="mt-6 flex-row gap-2 sm:justify-end">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>

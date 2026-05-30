@@ -26,6 +26,9 @@
     "drawerHint": "Indique la période et le motif. Le coach sera informé.",
     "absent": "Absent",
     "unavailable": "Indisponible",
+    "impactedEvents": "📅 Cette absence impactera :",
+    "impactedEventsMore": "et {{n}} autre(s) événement(s)",
+    "notifImpacted": "Événements impactés : {{events}}",
     "reason": {
       "vacation": "Vacances",
       "injury": "Blessure",

@@ -26,6 +26,9 @@
     "drawerHint": "Set the period and reason. Coaches will be notified.",
     "absent": "Absent",
     "unavailable": "Unavailable",
+    "impactedEvents": "📅 This absence will impact:",
+    "impactedEventsMore": "and {{n}} more event(s)",
+    "notifImpacted": "Impacted events: {{events}}",
     "reason": {
       "vacation": "Vacation",
       "injury": "Injury",
