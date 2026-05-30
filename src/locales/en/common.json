@@ -22,6 +22,7 @@
     "reducedSquad": "⚠️ {{n}} players unavailable in the next 14 days",
     "overlapWarning": "⚠️ An absence is already declared for this period. Confirm anyway?",
     "warningSelected": "Players flagged unavailable for this date",
+    "until": "until {{date}}",
     "drawerHint": "Set the period and reason. Coaches will be notified.",
     "absent": "Absent",
     "unavailable": "Unavailable",
@@ -1654,5 +1655,18 @@
     "emptyCoaches": "You don't follow any coaches yet.",
     "emptyClubs": "You don't follow any clubs yet.",
     "discoverPlayers": "Discover players"
+  },
+  "widget": {
+    "availability": {
+      "title": "Club availability",
+      "suspended": "{{n}} suspended",
+      "absent": "{{n}} absent",
+      "injured": "{{n}} injured",
+      "total": "Total unavailable: {{n}}",
+      "allAvailable": "✅ All players are available",
+      "more": "+ {{n}} more",
+      "viewSuspensions": "View suspensions",
+      "viewAbsences": "View absences"
+    }
   }
 }

@@ -18,8 +18,7 @@ import { HomeSkeleton } from "@/components/skeletons";
 import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
-import { DisciplineWidget } from "@/components/discipline-widget";
-import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+import { ClubAvailabilityWidget } from "@/components/club-availability-widget";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 
 export const Route = createFileRoute("/_authenticated/home")({
@@ -212,11 +211,9 @@ function HomePage() {
       {/* Insights (admins/coaches) */}
       {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
 
-      {/* Discipline & suspensions */}
-      {isCoach && activeClubId && <DisciplineWidget clubId={activeClubId} />}
+      {/* Club availability (suspensions + absences unified) */}
+      {isCoach && activeClubId && <ClubAvailabilityWidget clubId={activeClubId} />}
 
-      {/* Upcoming player absences */}
-      {isCoach && activeClubId && <UpcomingAbsencesWidget clubId={activeClubId} />}
 
 
 
