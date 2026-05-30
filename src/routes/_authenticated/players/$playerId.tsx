@@ -433,8 +433,9 @@ function PlayerProfile() {
       </div>
 
       {/* Tabs */}
-      {isCoach && (
+      {(isCoach || isSelf || isParentOfThisPlayer) && (
         <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1 overflow-x-auto">
+          {isCoach && (
           <Link
             to="/players/$playerId"
             params={{ playerId }}
