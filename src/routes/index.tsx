@@ -134,7 +134,7 @@ function HomeFeatureTiles() {
   );
 }
 
-function TournamentsSection() {
+export function TournamentsSection() {
   const { t, i18n } = useTranslation("marketing");
   const tournamentsTo = i18n.language?.slice(0, 2) === "fr" ? "/fr/tournois" : "/en/tournaments";
   const features = [
