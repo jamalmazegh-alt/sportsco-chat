@@ -166,7 +166,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     return (count ?? 0) > 0;
   }
 
-  async function notifyCoaches(playerName: string, startStr: string, endStr: string, reasonLabel: string) {
+  async function notifyCoaches(playerName: string, startStr: string, endStr: string, reasonLabel: string, events: ImpactedEvent[]) {
     // Find teams of the player, then coaches/assistants
     const { data: tm } = await supabase
       .from("team_members")
@@ -184,13 +184,32 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       new Set((coaches ?? []).map((c: any) => c.user_id).filter((u: string | null) => u && u !== user?.id)),
     );
     if (uids.length === 0) return;
-    const body = t("notification.absenceDeclared", {
+    let body = t("notification.absenceDeclared", {
       name: playerName,
       start: startStr,
       end: endStr,
       reason: reasonLabel,
       defaultValue: `${playerName} sera absent(e) du ${startStr} au ${endStr}. Motif : ${reasonLabel}`,
     });
+    if (events.length > 0) {
+      const labelFor = (type: string) => {
+        switch (type) {
+          case "match": return t("eventType.match", { defaultValue: "Match" });
+          case "training": return t("eventType.training", { defaultValue: "Entraînement" });
+          case "tournament": return t("eventType.tournament", { defaultValue: "Tournoi" });
+          case "meeting": return t("eventType.meeting", { defaultValue: "Réunion" });
+          default: return t("eventType.other", { defaultValue: "Événement" });
+        }
+      };
+      const fmtShort = (d: string) =>
+        new Date(d).toLocaleDateString(undefined, { day: "2-digit", month: "2-digit" });
+      const top = events.slice(0, 3).map((ev) => `${labelFor(ev.type)} ${fmtShort(ev.starts_at)}`);
+      let eventsStr = top.join(", ");
+      if (events.length > 3) {
+        eventsStr += `, ${t("availability.impactedEventsMore", { n: events.length - 3, defaultValue: `et ${events.length - 3} autre(s) événement(s)` })}`;
+      }
+      body += "\n" + t("availability.notifImpacted", { events: eventsStr, defaultValue: `Événements impactés : ${eventsStr}` });
+    }
     await supabase.from("notifications").insert(
       uids.map((uid) => ({
         user_id: uid,
@@ -201,6 +220,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       })),
     );
   }
+
 
   async function onSubmit() {
     if (!playerId) {
