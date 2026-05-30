@@ -175,10 +175,37 @@ export function ReviewRefineDialog({
               </div>
             ) : (
               <div key={i} className="space-y-1.5">
-                <p className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  {turn.changes}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    {turn.changes}
+                  </p>
+                  {(turn.changes || turn.preview) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (speakingTurn === i) {
+                          stopSpeech();
+                          setSpeakingTurn(null);
+                        } else {
+                          const textToRead = `${turn.changes}. ${turn.preview}`;
+                          speak(textToRead);
+                          setSpeakingTurn(i);
+                          const duration = Math.min(30000, textToRead.length * 80);
+                          setTimeout(() => setSpeakingTurn((cur) => cur === i ? null : cur), duration);
+                        }
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
+                        speakingTurn === i ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                      )}
+                      aria-label={speakingTurn === i ? "Arrêter la lecture" : "Lire à voix haute"}
+                    >
+                      {speakingTurn === i ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
+                      {speakingTurn === i ? "Arrêter" : "Écouter"}
+                    </button>
+                  )}
+                </div>
                 {turn.preview && (
                   <p className="text-xs text-muted-foreground italic line-clamp-3 border-l-2 border-primary/30 pl-2">
                     {turn.preview}
