@@ -59,6 +59,9 @@ function Landing() {
       <Hero />
       <TournamentsSection />
       <PlayerJournalSection />
+      <PlayersSection />
+      <CoachProfileSection />
+      <NetworkSection />
       <ClubWallSection />
       <CoachAssistSection />
       <FeaturesGrid />
@@ -732,24 +735,31 @@ function Hero() {
                 <span className="absolute inset-0 rounded-full bg-[color:var(--energy)] animate-ping opacity-75" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-[color:var(--energy)]" />
               </span>
-              {t("home.badge")}
+              {t("home.badge2")}
             </div>
             <h1 className="mt-5 font-display text-[2.5rem] font-bold leading-[1.02] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              {t("home.title")}
+              {t("home.heroLine1")}
+              <br />
+              {t("home.heroLine2")}
+              <br />
+              <span className="text-gradient-primary">{t("home.heroLine3")}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              {t("home.subtitle")}
-            </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 text-base shadow-elevated hover:shadow-glow transition-shadow">
-                <Link to="/demo">
-                  {t("home.ctaDemo")} <ArrowRight className="ml-1.5 h-4 w-4" />
+                <Link to="/register">
+                  {t("home.ctaClub")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link to="/features">{t("home.ctaFeatures")}</Link>
+                <Link to="/register/player">{t("home.ctaPlayer")}</Link>
               </Button>
             </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              {t("home.ctaCoachHint")}{" "}
+              <Link to="/register" className="font-semibold text-primary hover:underline">
+                {t("home.ctaCoach")} <ArrowRight className="inline h-3 w-3" />
+              </Link>
+            </p>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.freeTrial")}</span>
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.noCard")}</span>
@@ -873,6 +883,8 @@ const FEATURE_META = [
   { icon: UploadCloud, accent: "from-[color:var(--victory)] to-[color:var(--secondary)]" },
   { icon: FileText, accent: "from-[color:var(--primary)] to-[color:var(--energy)]" },
   { icon: Swords, accent: "from-[color:var(--secondary)] to-[color:var(--victory)]" },
+  { icon: Activity, accent: "from-[color:var(--brand-blue)] to-[color:var(--primary)]" },
+  { icon: ShieldCheck, accent: "from-[color:var(--energy)] to-[color:var(--secondary)]" },
 ];
 
 function FeaturesGrid() {
@@ -982,8 +994,9 @@ function ForEveryone() {
 }
 
 function CTA() {
-  const { t, i18n } = useTranslation("marketing");
-  const onboardingTo = i18n.language?.slice(0, 2) === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
+  const { t } = useTranslation("marketing");
+
+
 
   return (
     <section>
@@ -1008,25 +1021,154 @@ function CTA() {
               <Flame className="h-3 w-3" /> {t("home.ctaSeason")}
             </div>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-5xl">
-              {t("home.ctaTitle")}
+              {t("home.ctaEcosystem")}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
-              {t("home.ctaBody")}
+              {t("home.ctaEcosystemSub")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 bg-white text-[color:var(--brand-blue-deep)] hover:bg-white/90 hover:scale-105 transition-transform shadow-lg">
-                <Link to="/demo">{t("home.ctaButton")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                <Link to="/register">{t("home.ctaClub")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link to="/pricing">{t("home.ctaPricing")}</Link>
+                <Link to="/register/player">{t("home.ctaPlayer")}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link to={onboardingTo}>{t("nav.onboarding")}</Link>
+                <Link to="/players">{t("home.ctaExplore")}</Link>
               </Button>
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function MarketingProfileSection({
+  bgClass,
+  chipColorClass,
+  bulletColorClass,
+  chipIcon: ChipIcon,
+  chip,
+  title,
+  subtitle,
+  points,
+  ctaLabel,
+  ctaTo,
+}: {
+  bgClass: string;
+  chipColorClass: string;
+  bulletColorClass: string;
+  chipIcon: React.ComponentType<{ className?: string }>;
+  chip: string;
+  title: string;
+  subtitle: string;
+  points: { t: string; d: string }[];
+  ctaLabel: string;
+  ctaTo: string;
+}) {
+  return (
+    <section className={`relative border-b border-border/60 overflow-hidden ${bgClass}`}>
+      <div aria-hidden className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/10 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/10 blur-3xl" />
+      <div className="relative mx-auto max-w-3xl px-5 py-20 lg:px-8 lg:py-24 text-center">
+        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${chipColorClass}`}>
+          <ChipIcon className="h-3.5 w-3.5" />
+          {chip}
+        </div>
+        <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+          {title}
+        </h2>
+        <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+          {subtitle}
+        </p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 text-left">
+          {points.map((p) => (
+            <li key={p.t} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
+              <CheckCircle2 className={`mt-0.5 h-5 w-5 shrink-0 ${bulletColorClass}`} />
+              <div>
+                <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{p.d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 flex justify-center">
+          <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
+            <Link to={ctaTo}>
+              {ctaLabel} <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PlayersSection() {
+  const { t } = useTranslation("marketing");
+  return (
+    <MarketingProfileSection
+      bgClass="bg-gradient-to-br from-[color:var(--primary)]/8 via-background to-[color:var(--brand-blue)]/8"
+      chipColorClass="border-[color:var(--primary)]/30 bg-[color:var(--primary)]/10 text-[color:var(--brand-blue-deep)]"
+      bulletColorClass="text-[color:var(--primary)]"
+      chipIcon={Activity}
+      chip={t("players.sectionChip")}
+      title={t("players.sectionTitle")}
+      subtitle={t("players.sectionSub")}
+      points={[
+        { t: t("players.p1Title"), d: t("players.p1Body") },
+        { t: t("players.p2Title"), d: t("players.p2Body") },
+        { t: t("players.p3Title"), d: t("players.p3Body") },
+        { t: t("players.p4Title"), d: t("players.p4Body") },
+      ]}
+      ctaLabel={t("home.ctaPlayer")}
+      ctaTo="/register/player"
+    />
+  );
+}
+
+function CoachProfileSection() {
+  const { t } = useTranslation("marketing");
+  return (
+    <MarketingProfileSection
+      bgClass="bg-gradient-to-br from-[color:var(--brand-blue)]/8 via-background to-[color:var(--victory)]/8"
+      chipColorClass="border-[color:var(--brand-blue)]/30 bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue-deep)]"
+      bulletColorClass="text-[color:var(--brand-blue)]"
+      chipIcon={Star}
+      chip={t("coachProfile.sectionChip")}
+      title={t("coachProfile.sectionTitle")}
+      subtitle={t("coachProfile.sectionSub")}
+      points={[
+        { t: t("coachProfile.p1Title"), d: t("coachProfile.p1Body") },
+        { t: t("coachProfile.p2Title"), d: t("coachProfile.p2Body") },
+        { t: t("coachProfile.p3Title"), d: t("coachProfile.p3Body") },
+        { t: t("coachProfile.p4Title"), d: t("coachProfile.p4Body") },
+      ]}
+      ctaLabel={t("home.ctaCoach")}
+      ctaTo="/register"
+    />
+  );
+}
+
+function NetworkSection() {
+  const { t } = useTranslation("marketing");
+  return (
+    <MarketingProfileSection
+      bgClass="bg-gradient-to-br from-[color:var(--energy)]/8 via-background to-[color:var(--victory)]/8"
+      chipColorClass="border-[color:var(--energy)]/30 bg-[color:var(--energy)]/10 text-[color:var(--energy)]"
+      bulletColorClass="text-[color:var(--energy)]"
+      chipIcon={Share2}
+      chip={t("network.sectionChip")}
+      title={t("network.sectionTitle")}
+      subtitle={t("network.sectionSub")}
+      points={[
+        { t: t("network.p1Title"), d: t("network.p1Body") },
+        { t: t("network.p2Title"), d: t("network.p2Body") },
+        { t: t("network.p3Title"), d: t("network.p3Body") },
+      ]}
+      ctaLabel={t("home.ctaExplore")}
+      ctaTo="/players"
+    />
   );
 }

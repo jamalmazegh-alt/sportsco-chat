@@ -1,5 +1,8 @@
 {
-  "search": { "filterRegion": "Région", "filterSport": "Sport" },
+  "search": {
+    "filterRegion": "Région",
+    "filterSport": "Sport"
+  },
   "nav": {
     "features": "Fonctionnalités",
     "players": "Joueurs",
@@ -101,7 +104,22 @@
     "feat14Title": "Règlement officiel généré automatiquement",
     "feat14Body": "Chaque tournoi génère son règlement PDF en un clic, en français ou en anglais, à partir de sa configuration. Prêt à partager ou à imprimer.",
     "feat15Title": "Multi-sport nativement",
-    "feat15Body": "Football, basketball, rugby, handball, volleyball — un seul club peut gérer plusieurs sports avec des stats et formats adaptés à chaque discipline."
+    "feat15Body": "Football, basketball, rugby, handball, volleyball — un seul club peut gérer plusieurs sports avec des stats et formats adaptés à chaque discipline.",
+    "badge2": "La plateforme football qui connecte clubs, joueurs et coachs",
+    "heroLine1": "Gérez votre club.",
+    "heroLine2": "Valorisez vos joueurs.",
+    "heroLine3": "Développez votre réseau football.",
+    "ctaClub": "Créer mon club",
+    "ctaPlayer": "Créer mon profil joueur",
+    "ctaCoachHint": "Déjà entraîneur ?",
+    "ctaCoach": "Créer mon profil coach",
+    "ctaExplore": "Explorer les profils",
+    "ctaEcosystem": "Rejoignez l'écosystème Clubero",
+    "ctaEcosystemSub": "Club, joueur ou coach — commencez gratuitement.",
+    "feat16Title": "Disponibilités & Absences",
+    "feat16Body": "Joueurs et parents déclarent leurs absences. Le coach voit l'effectif disponible avant même de créer la convocation.",
+    "feat17Title": "Discipline & Suspensions",
+    "feat17Body": "Gérez les suspensions, suivez les matchs purgés et recevez des alertes lors des convocations."
   },
   "whatsapp": {
     "chip": "Communication flexible",
@@ -1015,5 +1033,42 @@
         "a": "Ouvrez le lien TV dédié sur n'importe quel écran (smart TV, projecteur, ordinateur). Il affiche les classements live, les prochains matchs et les scores en cours en plein écran — zéro installation."
       }
     ]
+  },
+  "players": {
+    "sectionChip": "Pour les joueurs",
+    "sectionTitle": "Votre parcours football vous appartient",
+    "sectionSub": "Construisez votre CV sportif, même sans club.",
+    "p1Title": "Profil public joueur",
+    "p1Body": "Chaque joueur peut créer une page publique avec ses stats, son palmarès et sa timeline. Partageable en un lien.",
+    "p2Title": "Player Journey à vie",
+    "p2Body": "Clubs, saisons, buts, distinctions — votre histoire sportive reste avec vous même si vous changez de club.",
+    "p3Title": "Indépendant de tout club",
+    "p3Body": "Créez votre profil sans invitation. Rejoignez un club quand vous le souhaitez.",
+    "p4Title": "Visibilité pour les recruteurs",
+    "p4Body": "Préparez votre profil pour être progressivement visible auprès des clubs et recruteurs amateurs."
+  },
+  "coachProfile": {
+    "sectionChip": "Pour les coachs",
+    "sectionTitle": "Valorisez votre parcours d'entraîneur",
+    "sectionSub": "Un profil public pour vos diplômes, vos expériences et votre philosophie de jeu.",
+    "p1Title": "Profil public coach",
+    "p1Body": "Diplômes UEFA, parcours clubs, philosophie de jeu — tout sur une page accessible sans compte.",
+    "p2Title": "Diplômes et certifications",
+    "p2Body": "UEFA C, B, A, BEPF — affichez vos qualifications et leur organisme de délivrance.",
+    "p3Title": "Historique des clubs",
+    "p3Body": "Retracez votre parcours club par club, saison par saison.",
+    "p4Title": "Ouvert aux opportunités ?",
+    "p4Body": "Signalez votre disponibilité et soyez visible auprès des dirigeants qui cherchent un éducateur."
+  },
+  "network": {
+    "sectionChip": "Réseau Football",
+    "sectionTitle": "Le réseau football amateur",
+    "sectionSub": "Suivez joueurs, coachs et clubs. Restez informé de leur actualité sportive.",
+    "p1Title": "Suivre un joueur ou un coach",
+    "p1Body": "Abonnez-vous à un profil public et suivez son actualité : nouveau club, palmarès, milestone.",
+    "p2Title": "Recherche publique",
+    "p2Body": "Découvrez progressivement les profils publics de joueurs et coachs sur Clubero, filtrés par sport, club ou région.",
+    "p3Title": "Profils enrichis par les clubs",
+    "p3Body": "Les profils peuvent être enrichis et complétés par les clubs Clubero — stats, palmarès, historique de saison."
   }
 }
