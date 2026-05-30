@@ -994,8 +994,9 @@ function ForEveryone() {
 }
 
 function CTA() {
-  const { t, i18n } = useTranslation("marketing");
-  const onboardingTo = i18n.language?.slice(0, 2) === "fr" ? "/fr/onboarding-club" : "/en/club-onboarding";
+  const { t } = useTranslation("marketing");
+
+
 
   return (
     <section>
