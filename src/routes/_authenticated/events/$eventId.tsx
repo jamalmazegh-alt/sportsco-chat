@@ -29,6 +29,7 @@ import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailSkeleton } from "@/components/skeletons";
+import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -362,6 +363,42 @@ function EventDetail() {
     });
     return m;
   }, [activeSuspensions]);
+
+  // Player absences (availabilities) overlapping the event date
+  const eventDateStr = useMemo(() => {
+    if (!event?.starts_at) return null;
+    const d = new Date(event.starts_at as any);
+    if (isNaN(d.getTime())) return null;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }, [event?.starts_at]);
+
+  const { data: eventAbsences } = useQuery({
+    queryKey: ["event-absences", event?.team_id, eventDateStr, (teamPlayers ?? []).length],
+    enabled: !!event?.team_id && !!eventDateStr && (teamPlayers?.length ?? 0) > 0,
+    queryFn: async () => {
+      const playerIds = (teamPlayers ?? []).map((tp: any) => tp.player_id);
+      if (playerIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("player_availabilities")
+        .select("player_id, reason, start_date, end_date")
+        .in("player_id", playerIds)
+        .eq("status", "active")
+        .lte("start_date", eventDateStr!)
+        .gte("end_date", eventDateStr!);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const absenceByPlayer = useMemo(() => {
+    const m = new Map<string, { reason: string }>();
+    (eventAbsences ?? []).forEach((a: any) => {
+      m.set(a.player_id, { reason: a.reason });
+    });
+    return m;
+  }, [eventAbsences]);
 
 
   // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
@@ -2064,6 +2101,7 @@ function EventDetail() {
                   );
                   const checked = alreadyConvoked || selectedIds.has(tp.player_id);
                   const susp = suspensionByPlayer.get(tp.player_id);
+                  const abs = absenceByPlayer.get(tp.player_id);
                   return (
                     <label
                       key={tp.player_id}
@@ -2113,6 +2151,9 @@ function EventDetail() {
                           <AlertTriangle className="h-3 w-3" />
                           {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} · {susp.remaining}
                         </span>
+                      )}
+                      {abs && (
+                        <UnavailableBadge reason={abs.reason as UnavailableReason} />
                       )}
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
@@ -2171,6 +2212,33 @@ function EventDetail() {
                   </div>
                 );
               })()}
+              {(() => {
+                const absentSelected = Array.from(selectedIds)
+                  .map((pid) => {
+                    const a = absenceByPlayer.get(pid);
+                    if (!a) return null;
+                    const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
+                    const p = tp?.players;
+                    return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), reason: a.reason as UnavailableReason } : null;
+                  })
+                  .filter(Boolean) as Array<{ id: string; name: string; reason: UnavailableReason }>;
+                if (absentSelected.length === 0) return null;
+                return (
+                  <div className="rounded-xl border border-sky-300 bg-sky-50 dark:border-sky-800 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 p-3 text-xs space-y-2">
+                    <p className="font-semibold">
+                      {t("availability.warningSelected", { defaultValue: "Joueurs signalés indisponibles pour cette date" })}
+                    </p>
+                    <ul className="space-y-1">
+                      {absentSelected.map((a) => (
+                        <li key={a.id} className="flex items-center gap-2">
+                          <span className="flex-1">{a.name}</span>
+                          <UnavailableBadge reason={a.reason} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                   {t("attendance.recipients", { defaultValue: "Destinataires" })} ({selectedIds.size})
@@ -2181,6 +2249,7 @@ function EventDetail() {
                     .map((tp: any) => {
                       const p = tp.players;
                       const susp = suspensionByPlayer.get(tp.player_id);
+                      const abs = absenceByPlayer.get(tp.player_id);
                       return (
                         <div key={tp.player_id} className="flex items-center gap-2 px-3 py-2 text-sm">
                           <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
@@ -2198,6 +2267,7 @@ function EventDetail() {
                               {susp.remaining}
                             </span>
                           )}
+                          {abs && <UnavailableBadge reason={abs.reason as UnavailableReason} />}
                         </div>
                       );
                     })}

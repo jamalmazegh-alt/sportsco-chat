@@ -33,6 +33,7 @@ import {
   type PlayerLite,
 } from "@/components/lineup/pitch-pieces";
 import { PitchSvg } from "@/components/lineup/pitch-svg";
+import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -79,7 +80,7 @@ function LineupPage() {
     queryFn: async () => {
       const { data: event } = await supabase
         .from("events")
-        .select("id, team_id, type, title, convocations_sent, teams:team_id(name, sport)")
+        .select("id, team_id, type, title, convocations_sent, starts_at, teams:team_id(name, sport)")
         .eq("id", eventId)
         .maybeSingle();
       if (!event) return null;
@@ -139,6 +140,38 @@ function LineupPage() {
     (suspensions ?? []).forEach((s: any) => m.set(s.player_id, s.matches_to_serve - s.matches_served));
     return m;
   }, [suspensions]);
+
+  // Absences overlapping the event date
+  const eventDateStr = useMemo(() => {
+    const sa = (ctx?.event as any)?.starts_at;
+    if (!sa) return null;
+    const d = new Date(sa);
+    if (isNaN(d.getTime())) return null;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, [ctx?.event]);
+
+  const { data: absences } = useQuery({
+    queryKey: ["lineup-absences", ctx?.event?.team_id, eventDateStr, (roster ?? []).length],
+    enabled: !!ctx?.event?.team_id && !!eventDateStr && (roster?.length ?? 0) > 0,
+    queryFn: async () => {
+      const ids = (roster ?? []).map((p) => p.id);
+      if (ids.length === 0) return [];
+      const { data, error } = await supabase
+        .from("player_availabilities")
+        .select("player_id, reason")
+        .in("player_id", ids)
+        .eq("status", "active")
+        .lte("start_date", eventDateStr!)
+        .gte("end_date", eventDateStr!);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const absenceMap = useMemo(() => {
+    const m = new Map<string, string>();
+    (absences ?? []).forEach((a: any) => m.set(a.player_id, a.reason));
+    return m;
+  }, [absences]);
 
 
   // Local state
@@ -535,6 +568,7 @@ function LineupPage() {
                 )}
                 {available.map((p) => {
                   const remaining = suspensionMap.get(p.id);
+                  const absReason = absenceMap.get(p.id);
                   return (
                     <div key={p.id} className={cn(!p.convocated && "opacity-60", "relative")}>
                       <DraggablePlayer
@@ -551,6 +585,10 @@ function LineupPage() {
                         >
                           ⚠ {t("suspensions.suspendedShort", "Suspendu")} · {remaining}
                         </p>
+                      ) : absReason ? (
+                        <div className="flex justify-center mt-0.5">
+                          <UnavailableBadge reason={absReason as UnavailableReason} />
+                        </div>
                       ) : !p.convocated ? (
                         <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
                       ) : null}
