@@ -2249,6 +2249,7 @@ function EventDetail() {
                     .map((tp: any) => {
                       const p = tp.players;
                       const susp = suspensionByPlayer.get(tp.player_id);
+                      const abs = absenceByPlayer.get(tp.player_id);
                       return (
                         <div key={tp.player_id} className="flex items-center gap-2 px-3 py-2 text-sm">
                           <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
