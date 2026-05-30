@@ -64,6 +64,20 @@ const publicProfileQuery = (slug: string) =>
     staleTime: 60_000,
   });
 
+function isMinorWithoutConsent(p: PublicProfile["player"]) {
+  if (!p.birth_date) return false;
+  const ageMs = Date.now() - new Date(p.birth_date).getTime();
+  const age = ageMs / (365.25 * 24 * 3600 * 1000);
+  return age < 18 && p.parental_public_consent !== true;
+}
+
+function displayLastName(p: PublicProfile["player"]) {
+  if (isMinorWithoutConsent(p) && p.last_name) {
+    return `${p.last_name.charAt(0).toUpperCase()}.`;
+  }
+  return p.last_name;
+}
+
 function buildMeta(slug: string, profile: PublicProfile | null) {
   const url = `${SITE_URL}/p/${slug}`;
   if (!profile) {
@@ -78,7 +92,7 @@ function buildMeta(slug: string, profile: PublicProfile | null) {
     };
   }
   const { player, club, achievements, seasons } = profile;
-  const fullName = `${player.first_name} ${player.last_name}`;
+  const fullName = `${player.first_name} ${displayLastName(player)}`;
   const pos = player.preferred_position || player.position || null;
   const clubBit = club?.name ? ` — ${club.name}` : "";
   const title = `${fullName}${clubBit} | Clubero`;
