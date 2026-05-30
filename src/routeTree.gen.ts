@@ -44,6 +44,7 @@ import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-clu
 import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CoachSlugRouteImport } from './routes/coach.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedTournamentsRouteImport } from './routes/_authenticated/tournaments'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
@@ -287,6 +288,11 @@ const EnClubOnboardingRoute = EnClubOnboardingRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachSlugRoute = CoachSlugRouteImport.update({
+  id: '/coach/$slug',
+  path: '/coach/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -709,6 +715,7 @@ export interface FileRoutesByFullPath {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/en/tournaments': typeof EnTournamentsRoute
@@ -811,6 +818,7 @@ export interface FileRoutesByTo {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/en/tournaments': typeof EnTournamentsRoute
@@ -919,6 +927,7 @@ export interface FileRoutesById {
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/_authenticated/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/en/tournaments': typeof EnTournamentsRoute
@@ -1027,6 +1036,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/tournaments'
     | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/en/tournaments'
@@ -1129,6 +1139,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/tournaments'
     | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/en/tournaments'
@@ -1236,6 +1247,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams'
     | '/_authenticated/tournaments'
     | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/en/tournaments'
@@ -1333,6 +1345,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuperadminRoute: typeof SuperadminRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
+  CoachSlugRoute: typeof CoachSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
   EnTournamentsRoute: typeof EnTournamentsRoute
@@ -1616,6 +1629,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach/$slug': {
+      id: '/coach/$slug'
+      path: '/coach/$slug'
+      fullPath: '/coach/$slug'
+      preLoaderRoute: typeof CoachSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -2379,6 +2399,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuperadminRoute: SuperadminRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
+  CoachSlugRoute: CoachSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,
   EnTournamentsRoute: EnTournamentsRoute,
