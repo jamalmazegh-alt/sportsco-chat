@@ -1419,6 +1419,53 @@ export type Database = {
           },
         ]
       }
+      player_availabilities: {
+        Row: {
+          comment: string | null
+          created_at: string
+          created_by_user_id: string
+          end_date: string
+          id: string
+          player_id: string
+          reason: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          created_by_user_id: string
+          end_date: string
+          id?: string
+          player_id: string
+          reason: string
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          created_by_user_id?: string
+          end_date?: string
+          id?: string
+          player_id?: string
+          reason?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_availabilities_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_feedback: {
         Row: {
           author_user_id: string
@@ -3809,6 +3856,7 @@ export type Database = {
         }
         Returns: string
       }
+      mark_expired_availabilities_completed: { Args: never; Returns: number }
       mark_support_ticket_read: {
         Args: { _ticket_id: string }
         Returns: undefined
