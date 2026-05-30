@@ -732,24 +732,31 @@ function Hero() {
                 <span className="absolute inset-0 rounded-full bg-[color:var(--energy)] animate-ping opacity-75" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-[color:var(--energy)]" />
               </span>
-              {t("home.badge")}
+              {t("home.badge2")}
             </div>
             <h1 className="mt-5 font-display text-[2.5rem] font-bold leading-[1.02] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              {t("home.title")}
+              {t("home.heroLine1")}
+              <br />
+              {t("home.heroLine2")}
+              <br />
+              <span className="text-gradient-primary">{t("home.heroLine3")}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              {t("home.subtitle")}
-            </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 text-base shadow-elevated hover:shadow-glow transition-shadow">
-                <Link to="/demo">
-                  {t("home.ctaDemo")} <ArrowRight className="ml-1.5 h-4 w-4" />
+                <Link to="/register">
+                  {t("home.ctaClub")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link to="/features">{t("home.ctaFeatures")}</Link>
+                <Link to="/register/player">{t("home.ctaPlayer")}</Link>
               </Button>
             </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              {t("home.ctaCoachHint")}{" "}
+              <Link to="/register" className="font-semibold text-primary hover:underline">
+                {t("home.ctaCoach")} <ArrowRight className="inline h-3 w-3" />
+              </Link>
+            </p>
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.freeTrial")}</span>
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-primary" /> {t("home.noCard")}</span>
