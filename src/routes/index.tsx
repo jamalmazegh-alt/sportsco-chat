@@ -1164,3 +1164,173 @@ function NetworkSection() {
     />
   );
 }
+
+function ProductPreview() {
+  const { t } = useTranslation("marketing");
+
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background">
+      <div aria-hidden className="absolute -top-32 left-1/2 -translate-x-1/2 h-96 w-[40rem] rounded-full bg-[color:var(--brand-blue)]/15 blur-3xl" />
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
+            {t("home.previewTitle")}
+          </h2>
+        </div>
+
+        <div className="mt-14 grid gap-8 md:grid-cols-3 lg:gap-6">
+          {/* Mock 1 — Coach dashboard */}
+          <div className="relative mx-auto w-full max-w-xs">
+            <div
+              aria-hidden
+              className="absolute -inset-4 -z-10 rounded-[2rem] opacity-50 blur-2xl"
+              style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--primary) 50%, transparent), color-mix(in oklab, var(--brand-blue) 40%, transparent))" }}
+            />
+            <div className="rounded-[2rem] border border-border bg-card p-4 shadow-elevated rotate-[-1.5deg] hover:rotate-0 transition-transform">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("home.previewMock1Title")}</p>
+                <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-primary text-white">
+                  <CalendarCheck className="h-3.5 w-3.5" />
+                </div>
+              </div>
+              <div className="rounded-2xl bg-muted/50 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--energy)]">{t("home.previewMock1Avail")}</p>
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex -space-x-2">
+                    {["L", "E", "N", "H"].map((c) => (
+                      <div key={c} className="h-6 w-6 rounded-full bg-gradient-to-br from-[color:var(--brand-blue)] to-[color:var(--secondary)] text-[10px] font-bold text-white grid place-items-center ring-2 ring-card">{c}</div>
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold tabular-nums">14/18</span>
+                </div>
+              </div>
+              <div className="mt-3 rounded-2xl bg-muted/50 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("home.previewMock1Upcoming")}</p>
+                <div className="mt-1.5 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold truncate">U13 vs FC Riverside</span>
+                    <span className="text-[10px] text-muted-foreground">Sam 14:30</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold truncate">U15 Entraînement</span>
+                    <span className="text-[10px] text-muted-foreground">Mer 18:00</span>
+                  </div>
+                </div>
+              </div>
+              <button className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-primary px-3 py-2 text-xs font-bold text-white shadow-sm">
+                <Plus className="h-3.5 w-3.5" /> {t("home.previewMock1Cta")}
+              </button>
+            </div>
+          </div>
+
+          {/* Mock 2 — Public player profile */}
+          <div className="relative mx-auto w-full max-w-xs">
+            <div
+              aria-hidden
+              className="absolute -inset-4 -z-10 rounded-[2rem] opacity-50 blur-2xl"
+              style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--victory) 50%, transparent), color-mix(in oklab, var(--energy) 40%, transparent))" }}
+            />
+            <div className="rounded-[2rem] border border-border bg-card p-4 shadow-elevated md:translate-y-4 hover:translate-y-0 transition-transform">
+              <div className="flex items-center gap-3">
+                <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[color:var(--brand-blue)] to-[color:var(--secondary)] text-lg font-bold text-white grid place-items-center ring-4 ring-card shadow-md">
+                  LM
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-base font-bold truncate">Lucas Martin</p>
+                  <p className="text-[11px] text-muted-foreground truncate">FC Clubero · U15</p>
+                </div>
+              </div>
+              <div className="mt-3 rounded-2xl bg-muted/50 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t("home.previewMock2Season")}</p>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                  <div><p className="font-display text-base font-bold tabular-nums">18</p><p className="text-[9px] uppercase text-muted-foreground">Matchs</p></div>
+                  <div><p className="font-display text-base font-bold tabular-nums">12</p><p className="text-[9px] uppercase text-muted-foreground">Buts</p></div>
+                  <div><p className="font-display text-base font-bold tabular-nums">94%</p><p className="text-[9px] uppercase text-muted-foreground">Présence</p></div>
+                </div>
+              </div>
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[color:var(--victory)]/40 bg-[color:var(--victory)]/15 px-2.5 py-1 text-[10px] font-bold text-[color:var(--victory)]">
+                <Trophy className="h-3 w-3" /> {t("home.previewMock2Badge")}
+              </div>
+              <button className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-xs font-bold hover:bg-muted">
+                <UserPlus className="h-3.5 w-3.5" /> {t("home.previewMock2Follow")}
+              </button>
+            </div>
+          </div>
+
+          {/* Mock 3 — Club wall */}
+          <div className="relative mx-auto w-full max-w-xs">
+            <div
+              aria-hidden
+              className="absolute -inset-4 -z-10 rounded-[2rem] opacity-50 blur-2xl"
+              style={{ background: "linear-gradient(135deg, color-mix(in oklab, var(--energy) 50%, transparent), color-mix(in oklab, var(--brand-blue) 40%, transparent))" }}
+            />
+            <div className="rounded-[2rem] border border-border bg-card p-4 shadow-elevated rotate-[1.5deg] hover:rotate-0 transition-transform">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t("home.previewMock3Title")}</p>
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 px-2 py-0.5 text-[9px] font-bold text-white">
+                  <Camera className="h-2.5 w-2.5" /> {t("home.previewMock3Ig")}
+                </span>
+              </div>
+              <div className="rounded-2xl border border-border bg-muted/30 p-3">
+                <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-[color:var(--energy)]/15 px-2 py-0.5 text-[10px] font-bold text-[color:var(--energy)]">
+                  <Pin className="h-2.5 w-2.5" /> {t("home.previewMock3Pinned")}
+                </div>
+                <div className="h-20 rounded-xl bg-gradient-to-br from-[color:var(--brand-blue)]/30 to-[color:var(--victory)]/30 grid place-items-center">
+                  <Trophy className="h-7 w-7 text-white/80" />
+                </div>
+                <p className="mt-2 text-xs leading-snug text-foreground">{t("home.previewMock3Post")}</p>
+                <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+                  <span className="inline-flex items-center gap-1"><Heart className="h-3 w-3 text-red-500" /> 42</span>
+                  <span className="inline-flex items-center gap-1"><MessageCircle className="h-3 w-3" /> 8</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const PROMISE_META = [
+  { icon: Shield, accent: "from-[color:var(--brand-blue)] to-[color:var(--secondary)]", to: "/features" },
+  { icon: Trophy, accent: "from-[color:var(--victory)] to-[color:var(--energy)]", to: "/register/player" },
+  { icon: GraduationCap, accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]", to: "/register" },
+] as const;
+
+function Promises() {
+  const { t } = useTranslation("marketing");
+
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-muted/20">
+      <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-28">
+        <div className="grid gap-6 lg:grid-cols-3">
+          {PROMISE_META.map((p, i) => {
+            const Icon = p.icon;
+            const title = t(`home.promise${i + 1}Title`);
+            const body = t(`home.promise${i + 1}Body`);
+            const cta = t(`home.promise${i + 1}Cta`);
+            return (
+              <div
+                key={title}
+                className="group relative flex flex-col rounded-3xl border border-border bg-card p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-[color:var(--brand-blue)]/40"
+              >
+                <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${p.accent} text-white shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-6 font-display text-2xl font-bold tracking-tight">{title}</h3>
+                <p className="mt-3 flex-1 text-base leading-relaxed text-muted-foreground">{body}</p>
+                <Link
+                  to={p.to}
+                  className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline"
+                >
+                  {cta}
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
