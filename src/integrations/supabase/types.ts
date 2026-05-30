@@ -324,9 +324,11 @@ export type Database = {
           event_chat_enabled: boolean
           event_chat_parents_enabled: boolean
           event_chat_players_enabled: boolean
+          followers_count: number | null
           id: string
           is_personal: boolean
           logo_url: string | null
+          looking_for_coach: boolean | null
           name: string
           stripe_account_created_at: string | null
           stripe_account_id: string | null
@@ -347,9 +349,11 @@ export type Database = {
           event_chat_enabled?: boolean
           event_chat_parents_enabled?: boolean
           event_chat_players_enabled?: boolean
+          followers_count?: number | null
           id?: string
           is_personal?: boolean
           logo_url?: string | null
+          looking_for_coach?: boolean | null
           name: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
@@ -370,9 +374,11 @@ export type Database = {
           event_chat_enabled?: boolean
           event_chat_parents_enabled?: boolean
           event_chat_players_enabled?: boolean
+          followers_count?: number | null
           id?: string
           is_personal?: boolean
           logo_url?: string | null
+          looking_for_coach?: boolean | null
           name?: string
           stripe_account_created_at?: string | null
           stripe_account_id?: string | null
@@ -383,6 +389,98 @@ export type Database = {
           wall_comments_enabled?: boolean
         }
         Relationships: []
+      }
+      coach_club_history: {
+        Row: {
+          club_id: string | null
+          club_name: string
+          coach_id: string
+          created_at: string | null
+          id: string
+          is_current: boolean | null
+          joined_at: string | null
+          left_at: string | null
+          role: string | null
+          sport: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          club_name: string
+          coach_id: string
+          created_at?: string | null
+          id?: string
+          is_current?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          role?: string | null
+          sport?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          club_name?: string
+          coach_id?: string
+          created_at?: string | null
+          id?: string
+          is_current?: boolean | null
+          joined_at?: string | null
+          left_at?: string | null
+          role?: string | null
+          sport?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_club_history_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_club_history_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coach_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_diplomas: {
+        Row: {
+          coach_id: string
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          issuing_body: string | null
+          name: string
+          obtained_at: string | null
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          issuing_body?: string | null
+          name: string
+          obtained_at?: string | null
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          issuing_body?: string | null
+          name?: string
+          obtained_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_diplomas_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "coach_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       coach_insights: {
         Row: {
@@ -449,6 +547,65 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_profiles: {
+        Row: {
+          created_at: string | null
+          current_club_id: string | null
+          followers_count: number | null
+          id: string
+          looking_for_club: boolean | null
+          philosophy: string | null
+          profile_visibility: string | null
+          public_profile_enabled: boolean | null
+          public_slug: string | null
+          speciality: string | null
+          sport: string | null
+          updated_at: string | null
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_club_id?: string | null
+          followers_count?: number | null
+          id?: string
+          looking_for_club?: boolean | null
+          philosophy?: string | null
+          profile_visibility?: string | null
+          public_profile_enabled?: boolean | null
+          public_slug?: string | null
+          speciality?: string | null
+          sport?: string | null
+          updated_at?: string | null
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          current_club_id?: string | null
+          followers_count?: number | null
+          id?: string
+          looking_for_club?: boolean | null
+          philosophy?: string | null
+          profile_visibility?: string | null
+          public_profile_enabled?: boolean | null
+          public_slug?: string | null
+          speciality?: string | null
+          sport?: string | null
+          updated_at?: string | null
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_profiles_current_club_id_fkey"
+            columns: ["current_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -859,6 +1016,125 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_events: {
+        Row: {
+          actor_club_id: string | null
+          actor_coach_id: string | null
+          actor_player_id: string | null
+          created_at: string | null
+          description: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          occurred_at: string | null
+          target_type: string
+          title: string
+          visibility: string | null
+        }
+        Insert: {
+          actor_club_id?: string | null
+          actor_coach_id?: string | null
+          actor_player_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          occurred_at?: string | null
+          target_type: string
+          title: string
+          visibility?: string | null
+        }
+        Update: {
+          actor_club_id?: string | null
+          actor_coach_id?: string | null
+          actor_player_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          occurred_at?: string | null
+          target_type?: string
+          title?: string
+          visibility?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_events_actor_club_id_fkey"
+            columns: ["actor_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_events_actor_coach_id_fkey"
+            columns: ["actor_coach_id"]
+            isOneToOne: false
+            referencedRelation: "coach_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_events_actor_player_id_fkey"
+            columns: ["actor_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follows: {
+        Row: {
+          created_at: string | null
+          followed_club_id: string | null
+          followed_coach_id: string | null
+          followed_player_id: string | null
+          follower_id: string
+          id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          followed_club_id?: string | null
+          followed_coach_id?: string | null
+          followed_player_id?: string | null
+          follower_id: string
+          id?: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string | null
+          followed_club_id?: string | null
+          followed_coach_id?: string | null
+          followed_player_id?: string | null
+          follower_id?: string
+          id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follows_followed_club_id_fkey"
+            columns: ["followed_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follows_followed_coach_id_fkey"
+            columns: ["followed_coach_id"]
+            isOneToOne: false
+            referencedRelation: "coach_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follows_followed_player_id_fkey"
+            columns: ["followed_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
             referencedColumns: ["id"]
           },
         ]
@@ -1575,7 +1851,10 @@ export type Database = {
           birth_date: string | null
           can_respond: boolean
           child_platform_access: boolean
-          club_id: string
+          claim_requested_at: string | null
+          claim_requested_by: string | null
+          claim_status: string | null
+          club_id: string | null
           created_at: string
           deleted_at: string | null
           email: string | null
@@ -1597,7 +1876,10 @@ export type Database = {
           birth_date?: string | null
           can_respond?: boolean
           child_platform_access?: boolean
-          club_id: string
+          claim_requested_at?: string | null
+          claim_requested_by?: string | null
+          claim_status?: string | null
+          club_id?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -1619,7 +1901,10 @@ export type Database = {
           birth_date?: string | null
           can_respond?: boolean
           child_platform_access?: boolean
-          club_id?: string
+          claim_requested_at?: string | null
+          claim_requested_by?: string | null
+          claim_status?: string | null
+          club_id?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -1650,44 +1935,80 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          birth_date: string | null
+          city: string | null
+          country: string | null
           created_at: string
           first_name: string | null
+          followers_count: number | null
           full_name: string | null
           id: string
+          is_independent: boolean | null
           last_name: string | null
+          looking_for_club: boolean | null
           notifications_email: boolean
           notifications_push: boolean
+          parental_public_consent: boolean | null
+          person_type: string | null
           phone: string | null
           phone_verified_at: string | null
           preferred_language: string
+          profile_visibility: string | null
+          public_slug: string | null
+          region: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          birth_date?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           first_name?: string | null
+          followers_count?: number | null
           full_name?: string | null
           id: string
+          is_independent?: boolean | null
           last_name?: string | null
+          looking_for_club?: boolean | null
           notifications_email?: boolean
           notifications_push?: boolean
+          parental_public_consent?: boolean | null
+          person_type?: string | null
           phone?: string | null
           phone_verified_at?: string | null
           preferred_language?: string
+          profile_visibility?: string | null
+          public_slug?: string | null
+          region?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          birth_date?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           first_name?: string | null
+          followers_count?: number | null
           full_name?: string | null
           id?: string
+          is_independent?: boolean | null
           last_name?: string | null
+          looking_for_club?: boolean | null
           notifications_email?: boolean
           notifications_push?: boolean
+          parental_public_consent?: boolean | null
+          person_type?: string | null
           phone?: string | null
           phone_verified_at?: string | null
           preferred_language?: string
+          profile_visibility?: string | null
+          public_slug?: string | null
+          region?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -3334,7 +3655,20 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
-      gen_player_public_slug: { Args: never; Returns: string }
+      gen_coach_public_slug: {
+        Args: { _first_name: string; _last_name: string }
+        Returns: string
+      }
+      gen_player_public_slug:
+        | { Args: never; Returns: string }
+        | {
+            Args: {
+              _birth_date?: string
+              _first_name?: string
+              _last_name?: string
+            }
+            Returns: string
+          }
       get_convocation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -3540,6 +3874,7 @@ export type Database = {
         Args: { _id: string; _kind: string }
         Returns: undefined
       }
+      unaccent_compat: { Args: { t: string }; Returns: string }
       update_player_review_content: {
         Args: { _content: string; _id: string; _model: string }
         Returns: {
