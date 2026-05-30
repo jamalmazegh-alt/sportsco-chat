@@ -2152,6 +2152,9 @@ function EventDetail() {
                           {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} · {susp.remaining}
                         </span>
                       )}
+                      {abs && (
+                        <UnavailableBadge reason={abs.reason as UnavailableReason} />
+                      )}
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
                       )}
