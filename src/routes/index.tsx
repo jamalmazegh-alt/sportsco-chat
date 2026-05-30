@@ -57,17 +57,8 @@ function Landing() {
   return (
     <MarketingLayout>
       <Hero />
-      <TournamentsSection />
-      <PlayerJournalSection />
-      <PlayersSection />
-      <CoachProfileSection />
-      <NetworkSection />
-      <ClubWallSection />
-      <CoachAssistSection />
-      <FeaturesGrid />
-      <WhatsAppHybrid />
-      <ForEveryone />
-
+      <ProductPreview />
+      <Promises />
       <CTA />
     </MarketingLayout>
   );
