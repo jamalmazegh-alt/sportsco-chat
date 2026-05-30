@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { Loader2, Sparkles, Send, Wand2 } from "lucide-react";
+import { Loader2, Sparkles, Send, Wand2, Volume2, Square } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { refinePlayerReview } from "@/lib/player-feedback.functions";
+import { useTextToSpeech } from "@/hooks/use-text-to-speech";
+import { cn } from "@/lib/utils";
 
 type Turn =
   | { role: "user"; text: string }
