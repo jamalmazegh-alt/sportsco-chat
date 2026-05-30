@@ -268,7 +268,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
         const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
         const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
         const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel);
+        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel, impactedEvents);
       } catch {
         /* ignore notify errors */
       }
