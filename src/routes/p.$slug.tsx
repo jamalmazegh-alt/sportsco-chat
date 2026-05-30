@@ -205,7 +205,8 @@ function PublicPlayerProfile() {
   }
 
   const { player, club, achievements, timeline, seasons } = data;
-  const fullName = `${player.first_name} ${player.last_name}`;
+  const lastShown = displayLastName(player);
+  const fullName = `${player.first_name} ${lastShown}`;
 
   return (
     <div className="min-h-screen bg-background">
