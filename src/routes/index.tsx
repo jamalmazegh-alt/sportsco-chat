@@ -1212,7 +1212,7 @@ export function CoachProfileSection() {
   );
 }
 
-function NetworkSection() {
+export function NetworkSection() {
   const { t } = useTranslation("marketing");
   return (
     <MarketingProfileSection
