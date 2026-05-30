@@ -1189,7 +1189,7 @@ export function PlayersSection() {
   );
 }
 
-function CoachProfileSection() {
+export function CoachProfileSection() {
   const { t } = useTranslation("marketing");
   return (
     <MarketingProfileSection
