@@ -3705,6 +3705,7 @@ export type Database = {
         Returns: string
       }
       get_platform_stats: { Args: never; Returns: Json }
+      get_public_coach_profile: { Args: { _slug: string }; Returns: Json }
       get_public_player_profile: { Args: { _slug: string }; Returns: Json }
       get_registration_by_roster_token: {
         Args: { _token: string }
