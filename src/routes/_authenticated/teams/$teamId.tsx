@@ -823,6 +823,14 @@ function TeamDetail() {
                       <span className="text-muted-foreground font-normal"> · #{p.jersey_number}</span>
                     ) : null}
                   </p>
+                  {susp && (
+                    <div className="mt-1">
+                      <UnavailableBadge
+                        reason="suspension"
+                        detail={t("discipline.matchesRemaining", { count: susp.remaining, defaultValue: `${susp.remaining} match(s)` })}
+                      />
+                    </div>
+                  )}
                   <p className="text-xs mt-0.5 truncate">
                     {linked ? (
                       <span className="text-muted-foreground">
