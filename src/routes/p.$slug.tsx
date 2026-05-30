@@ -125,7 +125,8 @@ export const Route = createFileRoute("/p/$slug")({
     const m = buildMeta(params.slug, (loaderData as PublicProfile | null) ?? null);
     const player = (loaderData as PublicProfile | null)?.player;
     const club = (loaderData as PublicProfile | null)?.club;
-    const fullName = player ? `${player.first_name} ${player.last_name}` : "Player";
+    const displayedLast = player ? displayLastName(player) : "";
+    const fullName = player ? `${player.first_name} ${displayedLast}` : "Player";
 
     const ld =
       player && {
