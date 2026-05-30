@@ -199,10 +199,10 @@ export function ReviewRefineDialog({
                         "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
                         speakingTurn === i ? "text-primary" : "text-muted-foreground hover:text-foreground"
                       )}
-                      aria-label={speakingTurn === i ? "Arrêter la lecture" : "Lire à voix haute"}
+                      aria-label={speakingTurn === i ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
                     >
                       {speakingTurn === i ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
-                      {speakingTurn === i ? "Arrêter" : "Écouter"}
+                      {speakingTurn === i ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
                     </button>
                   )}
                 </div>
