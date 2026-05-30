@@ -1,4 +1,5 @@
 {
+  "search": { "filterRegion": "Région", "filterSport": "Sport" },
   "nav": {
     "features": "Fonctionnalités",
     "players": "Joueurs",

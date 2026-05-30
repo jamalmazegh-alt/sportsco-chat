@@ -19,6 +19,8 @@ type PublicProfile = {
     preferred_position: string | null;
     position: string | null;
     jersey_number: number | null;
+    birth_date: string | null;
+    parental_public_consent: boolean | null;
   };
   club: {
     id: string;
@@ -62,6 +64,20 @@ const publicProfileQuery = (slug: string) =>
     staleTime: 60_000,
   });
 
+function isMinorWithoutConsent(p: PublicProfile["player"]) {
+  if (!p.birth_date) return false;
+  const ageMs = Date.now() - new Date(p.birth_date).getTime();
+  const age = ageMs / (365.25 * 24 * 3600 * 1000);
+  return age < 18 && p.parental_public_consent !== true;
+}
+
+function displayLastName(p: PublicProfile["player"]) {
+  if (isMinorWithoutConsent(p) && p.last_name) {
+    return `${p.last_name.charAt(0).toUpperCase()}.`;
+  }
+  return p.last_name;
+}
+
 function buildMeta(slug: string, profile: PublicProfile | null) {
   const url = `${SITE_URL}/p/${slug}`;
   if (!profile) {
@@ -76,7 +92,7 @@ function buildMeta(slug: string, profile: PublicProfile | null) {
     };
   }
   const { player, club, achievements, seasons } = profile;
-  const fullName = `${player.first_name} ${player.last_name}`;
+  const fullName = `${player.first_name} ${displayLastName(player)}`;
   const pos = player.preferred_position || player.position || null;
   const clubBit = club?.name ? ` — ${club.name}` : "";
   const title = `${fullName}${clubBit} | Clubero`;
@@ -109,7 +125,8 @@ export const Route = createFileRoute("/p/$slug")({
     const m = buildMeta(params.slug, (loaderData as PublicProfile | null) ?? null);
     const player = (loaderData as PublicProfile | null)?.player;
     const club = (loaderData as PublicProfile | null)?.club;
-    const fullName = player ? `${player.first_name} ${player.last_name}` : "Player";
+    const displayedLast = player ? displayLastName(player) : "";
+    const fullName = player ? `${player.first_name} ${displayedLast}` : "Player";
 
     const ld =
       player && {
@@ -147,7 +164,7 @@ export const Route = createFileRoute("/p/$slug")({
         ...(player
           ? [
               { property: "profile:first_name", content: player.first_name },
-              { property: "profile:last_name", content: player.last_name },
+              { property: "profile:last_name", content: displayedLast },
             ]
           : []),
         { name: "twitter:card", content: "summary_large_image" },
@@ -188,7 +205,8 @@ function PublicPlayerProfile() {
   }
 
   const { player, club, achievements, timeline, seasons } = data;
-  const fullName = `${player.first_name} ${player.last_name}`;
+  const lastShown = displayLastName(player);
+  const fullName = `${player.first_name} ${lastShown}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -221,7 +239,7 @@ function PublicPlayerProfile() {
                 className="h-full w-full rounded-full object-cover"
               />
             ) : (
-              initialsFrom(player.first_name, player.last_name)
+              initialsFrom(player.first_name, lastShown)
             )}
           </div>
           <div className="min-w-0">

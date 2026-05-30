@@ -3791,6 +3791,7 @@ export type Database = {
           _club_id?: string
           _limit?: number
           _offset?: number
+          _region?: string
           _search?: string
           _sport?: string
         }

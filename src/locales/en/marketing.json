@@ -1,4 +1,5 @@
 {
+  "search": { "filterRegion": "Region", "filterSport": "Sport" },
   "nav": {
     "features": "Features",
     "players": "Players",
