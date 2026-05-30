@@ -5,6 +5,7 @@ import { Trophy, History, CalendarDays, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
+import { FollowButton } from "@/components/follow-button";
 
 const SITE_URL = "https://www.clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
