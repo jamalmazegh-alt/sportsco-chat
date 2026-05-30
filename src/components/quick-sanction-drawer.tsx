@@ -266,10 +266,18 @@ export function QuickSanctionDrawer({
               <Label>{t("suspension.matchesToServe")}</Label>
               <Input
                 type="number"
+                inputMode="numeric"
                 min={1}
-                value={matches}
-                onChange={(e) => setMatches(Math.max(1, Number(e.target.value) || 1))}
+                value={matches === 0 ? "" : matches}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setMatches(v === "" ? 0 : Math.max(1, Number(v) || 0));
+                }}
+                onBlur={() => {
+                  if (!matches || matches < 1) setMatches(1);
+                }}
               />
+
             </div>
             <div className="space-y-1.5">
               <Label>{t("suspension.startDate")}</Label>
