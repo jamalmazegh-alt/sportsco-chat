@@ -1,5 +1,8 @@
 {
-  "search": { "filterRegion": "Region", "filterSport": "Sport" },
+  "search": {
+    "filterRegion": "Region",
+    "filterSport": "Sport"
+  },
   "nav": {
     "features": "Features",
     "players": "Players",
@@ -101,7 +104,22 @@
     "feat14Title": "Auto-generated tournament regulations",
     "feat14Body": "Every tournament generates its official PDF regulations in one click, in French or English, based on its configuration. Ready to share or print.",
     "feat15Title": "Multi-sport natively",
-    "feat15Body": "Football, basketball, rugby, handball, volleyball — one club can manage multiple sports with stats and formats adapted to each discipline."
+    "feat15Body": "Football, basketball, rugby, handball, volleyball — one club can manage multiple sports with stats and formats adapted to each discipline.",
+    "badge2": "The football platform connecting clubs, players and coaches",
+    "heroLine1": "Manage your club.",
+    "heroLine2": "Showcase your players.",
+    "heroLine3": "Build your football network.",
+    "ctaClub": "Create my club",
+    "ctaPlayer": "Create my player profile",
+    "ctaCoachHint": "Are you a coach?",
+    "ctaCoach": "Create my coach profile",
+    "ctaExplore": "Explore profiles",
+    "ctaEcosystem": "Join the Clubero ecosystem",
+    "ctaEcosystemSub": "Club, player or coach — start for free.",
+    "feat16Title": "Availability & Absences",
+    "feat16Body": "Players and parents declare absences. The coach sees the available squad before creating the convocation.",
+    "feat17Title": "Discipline & Suspensions",
+    "feat17Body": "Manage suspensions, track served matches and receive alerts during convocations."
   },
   "whatsapp": {
     "chip": "Flexible communication",
@@ -1015,5 +1033,42 @@
         "a": "Open the dedicated TV link on any screen (smart TV, projector, laptop). It displays live standings, upcoming matches and current scores in full screen — zero installation."
       }
     ]
+  },
+  "players": {
+    "sectionChip": "For players",
+    "sectionTitle": "Your football journey belongs to you",
+    "sectionSub": "Build your sports profile, even without a club.",
+    "p1Title": "Public player profile",
+    "p1Body": "Every player can create a public page with stats, achievements and timeline. Share it with one link.",
+    "p2Title": "Lifelong player journey",
+    "p2Body": "Clubs, seasons, goals, achievements — your sports history stays with you even if you change clubs.",
+    "p3Title": "Independent from any club",
+    "p3Body": "Create your profile without an invitation. Join a club whenever you're ready.",
+    "p4Title": "Visibility for scouts",
+    "p4Body": "Prepare your profile to be progressively visible to clubs and amateur scouts."
+  },
+  "coachProfile": {
+    "sectionChip": "For coaches",
+    "sectionTitle": "Showcase your coaching journey",
+    "sectionSub": "A public profile for your diplomas, your experience and your coaching philosophy.",
+    "p1Title": "Public coach profile",
+    "p1Body": "UEFA diplomas, club history, coaching philosophy — all on one page, no account needed to view.",
+    "p2Title": "Diplomas and certifications",
+    "p2Body": "UEFA C, B, A, BEPF — display your qualifications and issuing bodies.",
+    "p3Title": "Club history",
+    "p3Body": "Trace your journey club by club, season by season.",
+    "p4Title": "Open to opportunities?",
+    "p4Body": "Signal your availability and become visible to club managers searching for a coach."
+  },
+  "network": {
+    "sectionChip": "Football Network",
+    "sectionTitle": "The amateur football network",
+    "sectionSub": "Follow players, coaches and clubs. Stay informed about their sporting news.",
+    "p1Title": "Follow a player or coach",
+    "p1Body": "Subscribe to a public profile and follow their news: new club, achievements, milestones.",
+    "p2Title": "Public search",
+    "p2Body": "Progressively discover public profiles of players and coaches on Clubero, filtered by sport, club or region.",
+    "p3Title": "Club-enriched profiles",
+    "p3Body": "Profiles can be enriched and completed by Clubero clubs — stats, achievements, season history."
   }
 }
