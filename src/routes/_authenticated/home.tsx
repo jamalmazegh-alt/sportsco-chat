@@ -19,6 +19,8 @@ import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
 import { DisciplineWidget } from "@/components/discipline-widget";
+import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
