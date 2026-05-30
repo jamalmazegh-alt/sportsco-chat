@@ -23,7 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Palmtree, HeartPulse, GraduationCap, Users, Briefcase, HelpCircle } from "lucide-react";
+import { Loader2, Palmtree, HeartPulse, GraduationCap, Users, Briefcase, HelpCircle, Swords, Dumbbell, Trophy, Calendar } from "lucide-react";
+
+type ImpactedEvent = { id: string; title: string; starts_at: string; type: string };
 
 type Reason = "vacation" | "injury" | "school" | "family" | "work" | "other";
 
