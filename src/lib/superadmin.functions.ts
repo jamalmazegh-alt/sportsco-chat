@@ -868,11 +868,14 @@ export const getUserDetail = createServerFn({ method: "POST" })
     ]);
 
     const clubIds = Array.from(
-      new Set([
-        ...(memberships ?? []).map((m) => m.club_id),
-        ...(playerSelf ?? []).map((p) => p.club_id),
-      ]),
+      new Set(
+        [
+          ...(memberships ?? []).map((m) => m.club_id),
+          ...(playerSelf ?? []).map((p) => p.club_id),
+        ].filter((v): v is string => !!v),
+      ),
     );
+
     const teamIds = Array.from(new Set((teamRoles ?? []).map((t) => t.team_id)));
     const [{ data: clubs }, { data: teams }, { data: subs }] = await Promise.all([
       clubIds.length
