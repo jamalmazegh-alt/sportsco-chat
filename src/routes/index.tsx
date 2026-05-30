@@ -405,7 +405,7 @@ export function WhatsAppHybrid() {
 }
 
 
-function ClubWallSection() {
+export function ClubWallSection() {
   const { t } = useTranslation("marketing");
   const points = [
     { t: t("clubWall.p1Title"), d: t("clubWall.p1Body") },
