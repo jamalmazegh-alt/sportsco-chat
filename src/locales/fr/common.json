@@ -173,6 +173,8 @@
     "viewStats": "Voir les statistiques"
   },
   "auth": {
+    "playerSignupLink": "Vous êtes joueur ? Créez votre profil ici →",
+    "publicSignupClubAdminOnly": "Cette inscription est destinée aux dirigeants de club. Les joueurs et parents rattachés à un club rejoignent Clubero via une invitation.",
     "login": "Se connecter",
     "register": "Créer un compte",
     "email": "E-mail",
