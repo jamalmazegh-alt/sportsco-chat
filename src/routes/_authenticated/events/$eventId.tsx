@@ -2212,6 +2212,33 @@ function EventDetail() {
                   </div>
                 );
               })()}
+              {(() => {
+                const absentSelected = Array.from(selectedIds)
+                  .map((pid) => {
+                    const a = absenceByPlayer.get(pid);
+                    if (!a) return null;
+                    const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
+                    const p = tp?.players;
+                    return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), reason: a.reason as UnavailableReason } : null;
+                  })
+                  .filter(Boolean) as Array<{ id: string; name: string; reason: UnavailableReason }>;
+                if (absentSelected.length === 0) return null;
+                return (
+                  <div className="rounded-xl border border-sky-300 bg-sky-50 dark:border-sky-800 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 p-3 text-xs space-y-2">
+                    <p className="font-semibold">
+                      {t("availability.warningSelected", { defaultValue: "Joueurs signalés indisponibles pour cette date" })}
+                    </p>
+                    <ul className="space-y-1">
+                      {absentSelected.map((a) => (
+                        <li key={a.id} className="flex items-center gap-2">
+                          <span className="flex-1">{a.name}</span>
+                          <UnavailableBadge reason={a.reason} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
                   {t("attendance.recipients", { defaultValue: "Destinataires" })} ({selectedIds.size})
