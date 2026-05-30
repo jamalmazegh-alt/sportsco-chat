@@ -72,18 +72,30 @@ function PublicPlayersDirectory() {
   const [searchInput, setSearchInput] = useState("");
   const [sport, setSport] = useState<string>("all");
   const [clubId, setClubId] = useState<string>("all");
+  const [regionInput, setRegionInput] = useState("");
+  const [region, setRegion] = useState("");
   const [page, setPage] = useState(0);
 
+  // Debounce region input (300ms)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setRegion(regionInput.trim());
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [regionInput]);
+
   const query = useQuery({
-    queryKey: ["public-players", search, sport, clubId, page],
+    queryKey: ["public-players", search, sport, clubId, region, page],
     queryFn: async (): Promise<ListResponse> => {
       const { data, error } = await supabase.rpc("list_public_players", {
         _search: search || undefined,
         _sport: sport === "all" ? undefined : sport,
         _club_id: clubId === "all" ? undefined : clubId,
+        _region: region || undefined,
         _limit: PAGE_SIZE,
         _offset: page * PAGE_SIZE,
-      });
+      } as any);
       if (error) throw error;
       return data as unknown as ListResponse;
     },
