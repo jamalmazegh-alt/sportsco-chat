@@ -11,7 +11,7 @@ import { PhoneInput } from "@/components/phone-input";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail, LifeBuoy } from "lucide-react";
+import { LogOut, Camera, Loader2, ShieldCheck, ChevronRight, Sun, Moon, Monitor, ExternalLink, KeyRound, Mail, LifeBuoy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
@@ -388,6 +388,22 @@ function ProfilePage() {
           {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save", { defaultValue: "Save" })}
         </Button>
       </div>
+
+      <Link
+        to="/following"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
+      >
+        <div className="flex items-center gap-3">
+          <Users className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("following.title", { defaultValue: "Mes abonnements" })}</div>
+            <p className="text-xs text-muted-foreground">
+              {t("following.menuSubtitle", { defaultValue: "Joueurs, coachs et clubs que tu suis" })}
+            </p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
 
       <Link
         to="/profile/password"

@@ -4,6 +4,7 @@ import { Trophy, MapPin, GraduationCap, History, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
+import { FollowButton } from "@/components/follow-button";
 
 const SITE_URL = "https://www.clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
@@ -120,7 +121,7 @@ function CoachPublicPage() {
                   <Sparkles className="h-3.5 w-3.5" /> Disponible — Open to opportunities
                 </span>
               )}
-              <span className="text-sm text-muted-foreground">{coach.followers_count} abonné(s)</span>
+              <FollowButton targetType="coach" targetId={coach.id} initialFollowersCount={coach.followers_count} />
             </div>
           </div>
         </header>
