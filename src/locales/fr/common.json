@@ -1,4 +1,56 @@
 {
+  "discipline": {
+    "title": "Discipline",
+    "subtitle": "Vue globale des suspensions du club.",
+    "active": "Suspensions actives",
+    "activeCount_one": "{{count}} suspension active",
+    "activeCount_other": "{{count}} suspensions actives",
+    "history": "Historique",
+    "historyEmpty": "Aucun résultat.",
+    "stats": "Statistiques",
+    "none": "✅ Aucune suspension active",
+    "noneInClub": "✅ Aucune suspension active dans le club.",
+    "createSanction": "Créer une sanction",
+    "viewAll": "Voir tout",
+    "matchesLeft_one": "{{count}} match restant",
+    "matchesLeft_other": "{{count}} matchs restants",
+    "suspended": "Suspendu",
+    "urgentFirst": "Plus urgentes d'abord",
+    "allTeams": "Toutes les équipes",
+    "allReasons": "Toutes raisons",
+    "player": "Joueur",
+    "searchPlayer": "Rechercher un joueur…",
+    "noPlayer": "Aucun joueur",
+    "drawerHint": "Renseigne le joueur et la sanction. La logique métier existante prend le relais.",
+    "statusActive": "Active",
+    "col": {
+      "player": "Joueur",
+      "team": "Équipe",
+      "remaining": "Restants",
+      "status": "Statut"
+    },
+    "kpi": {
+      "yellows": "Cartons jaunes",
+      "reds": "Cartons rouges",
+      "active": "Actives",
+      "completed": "Purgées",
+      "windowHint": "Sur les 12 derniers mois."
+    },
+    "errors": {
+      "missingSelection": "Sélectionnez un joueur et une équipe."
+    }
+  },
+  "unavailable": {
+    "suspension": "Suspendu",
+    "injury": "Blessé",
+    "vacation": "Vacances",
+    "school": "École",
+    "family": "Familial"
+  },
+  "notification": {
+    "sanctionCreated_one": "{{name}} a reçu une suspension de {{n}} match.",
+    "sanctionCreated_other": "{{name}} a reçu une suspension de {{n}} matchs."
+  },
   "suspension": {
     "title": "Discipline",
     "active": "Suspendu",
