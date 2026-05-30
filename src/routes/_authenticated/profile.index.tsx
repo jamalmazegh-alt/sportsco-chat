@@ -390,6 +390,22 @@ function ProfilePage() {
       </div>
 
       <Link
+        to="/following"
+        className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
+      >
+        <div className="flex items-center gap-3">
+          <Users className="h-5 w-5 text-primary" />
+          <div>
+            <div className="text-sm font-medium">{t("following.title", { defaultValue: "Mes abonnements" })}</div>
+            <p className="text-xs text-muted-foreground">
+              {t("following.menuSubtitle", { defaultValue: "Joueurs, coachs et clubs que tu suis" })}
+            </p>
+          </div>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </Link>
+
+      <Link
         to="/profile/password"
         className="flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:bg-accent/30"
       >
