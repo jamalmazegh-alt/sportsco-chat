@@ -1,13 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
-import { CalendarCheck, Users, Bell, ShieldCheck, MessageSquareText, BarChart3, CheckCircle2, ArrowRight, Trophy, Search, Download, Undo2, MessageCircle, BrainCircuit, ClipboardList, Wand2, BookOpen, Share2, UploadCloud, FileText, Swords, History, AlertTriangle, Globe } from "lucide-react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
-import coachShot from "@/assets/features/coach-attendance.png";
-import parentShot from "@/assets/features/parent-convocation.png";
-import clubShot from "@/assets/features/club-dashboard.png";
-import playerShot from "@/assets/features/player-home.png";
+import {
+  TournamentsSection,
+  CoachAssistSection,
+  WhatsAppHybrid,
+  ClubWallSection,
+  PlayerJournalSection,
+  PlayersSection,
+  CoachProfileSection,
+  NetworkSection,
+} from "./index";
 
 export const Route = createFileRoute("/features")({
   component: FeaturesPage,
@@ -22,17 +28,19 @@ export const Route = createFileRoute("/features")({
   }),
 });
 
-const PILLAR_ICONS = [CalendarCheck, Users, Bell, ClipboardList, Wand2, BrainCircuit, MessageCircle, MessageSquareText, BarChart3, Trophy, Trophy, Search, Download, Undo2, ShieldCheck, BookOpen, Share2, UploadCloud, FileText, Swords, History, AlertTriangle, Globe];
-
-const SCREENSHOTS = [coachShot, parentShot, clubShot, playerShot];
-
 const SPORTS = ["Football", "Futsal", "Basketball", "Rugby", "Handball", "Volleyball", "Ice hockey", "Field hockey"];
-
 const AUDIENCE_COLORS = ["var(--brand-blue-deep)", "var(--brand-blue)", "var(--secondary)", "var(--primary)"];
+
+function Anchor({ id, children }: { id: string; children: React.ReactNode }) {
+  return (
+    <div id={id} className="scroll-mt-20">
+      {children}
+    </div>
+  );
+}
 
 function FeaturesPage() {
   const { t } = useTranslation("marketing");
-  const pillars = t("features.pillars", { returnObjects: true }) as { t: string; b: string }[];
   const audiences = t("features.audiences", { returnObjects: true }) as { t: string; p: string[] }[];
 
   return (
@@ -51,59 +59,14 @@ function FeaturesPage() {
         </div>
       </section>
 
-      <section className="border-b border-border/60">
-        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {pillars.map((f, i) => {
-              const Icon = PILLAR_ICONS[i] ?? CalendarCheck;
-              return (
-                <div key={f.t} className="rounded-2xl border border-border bg-card p-6">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h2 className="mt-5 font-display text-lg font-semibold">{f.t}</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.b}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-b border-border/60 bg-muted/20">
-        <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-              {t("features.screenshotsTitle")}
-            </h2>
-            <p className="mt-4 text-muted-foreground">
-              {t("features.screenshotsSubtitle")}
-            </p>
-          </div>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {SCREENSHOTS.map((src, i) => {
-              const title = t(`features.shot${i + 1}Title`);
-              const body = t(`features.shot${i + 1}Body`);
-              return (
-                <figure key={i} className="space-y-3">
-                  <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-                    <img
-                      src={src}
-                      alt={title}
-                      className="aspect-[4/5] w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <figcaption>
-                    <p className="font-display text-sm font-semibold">{title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{body}</p>
-                  </figcaption>
-                </figure>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <Anchor id="tournaments"><TournamentsSection /></Anchor>
+      <Anchor id="coach-ai"><CoachAssistSection /></Anchor>
+      <Anchor id="wall"><ClubWallSection /></Anchor>
+      <Anchor id="whatsapp"><WhatsAppHybrid /></Anchor>
+      <Anchor id="player"><PlayerJournalSection /></Anchor>
+      <Anchor id="players"><PlayersSection /></Anchor>
+      <Anchor id="coach-profile"><CoachProfileSection /></Anchor>
+      <Anchor id="network"><NetworkSection /></Anchor>
 
       <section className="border-b border-border/60">
         <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8">
