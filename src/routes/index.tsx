@@ -880,6 +880,8 @@ const FEATURE_META = [
   { icon: UploadCloud, accent: "from-[color:var(--victory)] to-[color:var(--secondary)]" },
   { icon: FileText, accent: "from-[color:var(--primary)] to-[color:var(--energy)]" },
   { icon: Swords, accent: "from-[color:var(--secondary)] to-[color:var(--victory)]" },
+  { icon: Activity, accent: "from-[color:var(--brand-blue)] to-[color:var(--primary)]" },
+  { icon: ShieldCheck, accent: "from-[color:var(--energy)] to-[color:var(--secondary)]" },
 ];
 
 function FeaturesGrid() {
