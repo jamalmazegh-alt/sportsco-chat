@@ -568,6 +568,7 @@ function LineupPage() {
                 )}
                 {available.map((p) => {
                   const remaining = suspensionMap.get(p.id);
+                  const absReason = absenceMap.get(p.id);
                   return (
                     <div key={p.id} className={cn(!p.convocated && "opacity-60", "relative")}>
                       <DraggablePlayer
@@ -584,6 +585,10 @@ function LineupPage() {
                         >
                           ⚠ {t("suspensions.suspendedShort", "Suspendu")} · {remaining}
                         </p>
+                      ) : absReason ? (
+                        <div className="flex justify-center mt-0.5">
+                          <UnavailableBadge reason={absReason as UnavailableReason} />
+                        </div>
                       ) : !p.convocated ? (
                         <p className="text-[9px] text-center text-muted-foreground mt-0.5">{t("lineup.notCalled", "Non convoqué")}</p>
                       ) : null}
