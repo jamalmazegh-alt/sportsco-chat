@@ -92,7 +92,8 @@
   },
   "notification": {
     "sanctionCreated_one": "{{name}} a reçu une suspension de {{n}} match.",
-    "sanctionCreated_other": "{{name}} a reçu une suspension de {{n}} matchs."
+    "sanctionCreated_other": "{{name}} a reçu une suspension de {{n}} matchs.",
+    "absenceDeclared": "{{name}} sera absent(e) du {{start}} au {{end}}. Motif : {{reason}}"
   },
   "suspension": {
     "title": "Discipline",
