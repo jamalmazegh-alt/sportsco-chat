@@ -140,6 +140,38 @@ function LineupPage() {
     return m;
   }, [suspensions]);
 
+  // Absences overlapping the event date
+  const eventDateStr = useMemo(() => {
+    const sa = (ctx?.event as any)?.starts_at;
+    if (!sa) return null;
+    const d = new Date(sa);
+    if (isNaN(d.getTime())) return null;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, [ctx?.event]);
+
+  const { data: absences } = useQuery({
+    queryKey: ["lineup-absences", ctx?.event?.team_id, eventDateStr, (roster ?? []).length],
+    enabled: !!ctx?.event?.team_id && !!eventDateStr && (roster?.length ?? 0) > 0,
+    queryFn: async () => {
+      const ids = (roster ?? []).map((p) => p.id);
+      if (ids.length === 0) return [];
+      const { data, error } = await supabase
+        .from("player_availabilities")
+        .select("player_id, reason")
+        .in("player_id", ids)
+        .eq("status", "active")
+        .lte("start_date", eventDateStr!)
+        .gte("end_date", eventDateStr!);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const absenceMap = useMemo(() => {
+    const m = new Map<string, string>();
+    (absences ?? []).forEach((a: any) => m.set(a.player_id, a.reason));
+    return m;
+  }, [absences]);
+
 
   // Local state
   const [formation, setFormation] = useState<FormationKey>("4-4-2");
