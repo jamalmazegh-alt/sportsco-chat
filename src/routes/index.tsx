@@ -276,7 +276,7 @@ export function TournamentsSection() {
 
 
 
-function WhatsAppHybrid() {
+export function WhatsAppHybrid() {
   const { t } = useTranslation("marketing");
   const points = [
     { t: t("whatsapp.p1Title"), d: t("whatsapp.p1Body") },
