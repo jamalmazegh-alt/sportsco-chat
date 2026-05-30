@@ -9,6 +9,7 @@ import logo from "@/assets/clubero-logo.png";
 const NAV_LEFT = [
   { to: "/features", key: "features" },
   { to: "/pricing", key: "pricing" },
+  { to: "/players", key: "players" },
 ] as const;
 
 const NAV_RIGHT = [
