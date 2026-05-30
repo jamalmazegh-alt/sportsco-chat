@@ -792,6 +792,7 @@ function TeamDetail() {
             const linked = !!p.user_id;
             const checked = selectedIds.has(p.id);
             const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const susp = activeSuspensionsByPlayer?.get(p.id);
             const inner = (
               <>
                 <div className="relative h-12 w-12 shrink-0 rounded-full bg-muted overflow-hidden">
