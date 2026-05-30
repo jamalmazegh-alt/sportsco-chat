@@ -735,6 +735,9 @@ function Hero() {
               <br />
               <span className="text-gradient-primary">{t("home.heroLine3")}</span>
             </h1>
+            <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
+              {t("home.heroSub")}
+            </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 text-base shadow-elevated hover:shadow-glow transition-shadow">
                 <Link to="/register">
