@@ -524,7 +524,7 @@ export function ClubWallSection() {
   );
 }
 
-function PlayerJournalSection() {
+export function PlayerJournalSection() {
   const { t } = useTranslation("marketing");
   const points = [
     { t: t("playerJournal.p1Title"), d: t("playerJournal.p1Body") },
