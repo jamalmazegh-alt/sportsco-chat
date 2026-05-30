@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Users, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
