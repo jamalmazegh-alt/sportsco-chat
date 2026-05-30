@@ -110,6 +110,51 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     return candidates.find((c) => c.id === playerId) ?? null;
   }, [candidates, playerId, initialPlayerId]);
 
+  // Debounced dates for impacted-events query
+  const [debouncedDates, setDebouncedDates] = useState<{ s: string; e: string }>({ s: startDate, e: endDate });
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedDates({ s: startDate, e: endDate }), 400);
+    return () => clearTimeout(t);
+  }, [startDate, endDate]);
+
+  const { data: impactedEvents = [] } = useQuery({
+    queryKey: ["absence-impacted-events", playerId, debouncedDates.s, debouncedDates.e],
+    enabled: open && !!playerId && !!debouncedDates.s && !!debouncedDates.e && debouncedDates.e >= debouncedDates.s,
+    queryFn: async (): Promise<ImpactedEvent[]> => {
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("team_id")
+        .eq("player_id", playerId)
+        .eq("role", "player");
+      const teamIds = Array.from(new Set((tm ?? []).map((r: any) => r.team_id))).filter(Boolean);
+      if (teamIds.length === 0) return [];
+      const startIso = `${debouncedDates.s}T00:00:00`;
+      const endIso = `${debouncedDates.e}T23:59:59`;
+      const { data } = await supabase
+        .from("events")
+        .select("id, title, starts_at, type, status")
+        .in("team_id", teamIds)
+        .gte("starts_at", startIso)
+        .lte("starts_at", endIso)
+        .neq("status", "cancelled")
+        .is("deleted_at", null)
+        .order("starts_at", { ascending: true })
+        .limit(11);
+      return (data ?? []).map((r: any) => ({ id: r.id, title: r.title, starts_at: r.starts_at, type: r.type }));
+    },
+    staleTime: 30_000,
+  });
+
+  function eventIcon(type: string) {
+    switch (type) {
+      case "match": return Swords;
+      case "training": return Dumbbell;
+      case "tournament": return Trophy;
+      case "meeting": return Users;
+      default: return Calendar;
+    }
+  }
+
   async function checkOverlap(): Promise<boolean> {
     const { count } = await supabase
       .from("player_availabilities")
