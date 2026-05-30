@@ -240,6 +240,9 @@ function PublicPlayerProfile() {
                 </span>
               )}
             </div>
+            <div className="mt-3">
+              <FollowButton targetType="player" targetId={player.id} />
+            </div>
           </div>
         </section>
 
