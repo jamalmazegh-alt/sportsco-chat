@@ -2267,6 +2267,7 @@ function EventDetail() {
                               {susp.remaining}
                             </span>
                           )}
+                          {abs && <UnavailableBadge reason={abs.reason as UnavailableReason} />}
                         </div>
                       );
                     })}
