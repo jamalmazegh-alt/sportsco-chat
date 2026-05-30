@@ -1,4 +1,50 @@
 {
+  "availability": {
+    "title": "Availability",
+    "declare": "Declare absence",
+    "save": "Save absence",
+    "cancel": "Cancel",
+    "cancelled": "Absence cancelled",
+    "confirmCancel": "Cancel this absence?",
+    "saved": "Absence saved",
+    "forChild": "For which child?",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "reasonLabel": "Reason",
+    "comment": "Comment",
+    "commentPlaceholder": "Optional",
+    "history": "History",
+    "empty": "No absences recorded.",
+    "consolidated": "Current availability",
+    "allAvailable": "✅ No unavailability declared",
+    "upcomingWidget": "Upcoming absences",
+    "noneUpcoming": "No upcoming absence",
+    "reducedSquad": "⚠️ {{n}} players unavailable in the next 14 days",
+    "overlapWarning": "⚠️ An absence is already declared for this period. Confirm anyway?",
+    "drawerHint": "Set the period and reason. Coaches will be notified.",
+    "absent": "Absent",
+    "unavailable": "Unavailable",
+    "reason": {
+      "vacation": "Vacation",
+      "injury": "Injury",
+      "school": "School / exams",
+      "family": "Family reasons",
+      "work": "Work",
+      "other": "Other"
+    },
+    "status": {
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "errors": {
+      "missingPlayer": "Select a player.",
+      "invalidRange": "Invalid dates."
+    }
+  },
+  "notification": {
+    "absenceDeclared": "{{name}} will be unavailable {{start}}–{{end}}. Reason: {{reason}}"
+  },
   "discipline": {
     "title": "Discipline",
     "subtitle": "Club-wide view of active and past suspensions.",
