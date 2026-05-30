@@ -101,7 +101,8 @@ function PlayerProfile() {
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     if (pp.email) {
       try {
-        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", player.club_id).maybeSingle();
+        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+
         await sendTransactionalEmail({
           templateName: "player-invite",
           recipientEmail: pp.email,
