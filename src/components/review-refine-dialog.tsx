@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { Loader2, Sparkles, Send, Wand2 } from "lucide-react";
+import { Loader2, Sparkles, Send, Wand2, Volume2, Square } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { refinePlayerReview } from "@/lib/player-feedback.functions";
+import { useTextToSpeech } from "@/hooks/use-text-to-speech";
+import { cn } from "@/lib/utils";
 
 type Turn =
   | { role: "user"; text: string }
@@ -36,10 +38,12 @@ export function ReviewRefineDialog({
   const { t } = useTranslation();
   const qc = useQueryClient();
   const refineFn = useServerFn(refinePlayerReview);
+  const { speak, stop: stopSpeech, isSpeaking } = useTextToSpeech();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [currentContent, setCurrentContent] = useState(initialContent);
   const [busy, setBusy] = useState(false);
+  const [speakingTurn, setSpeakingTurn] = useState<number | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -171,10 +175,37 @@ export function ReviewRefineDialog({
               </div>
             ) : (
               <div key={i} className="space-y-1.5">
-                <p className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  {turn.changes}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    {turn.changes}
+                  </p>
+                  {(turn.changes || turn.preview) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (speakingTurn === i) {
+                          stopSpeech();
+                          setSpeakingTurn(null);
+                        } else {
+                          const textToRead = `${turn.changes}. ${turn.preview}`;
+                          speak(textToRead);
+                          setSpeakingTurn(i);
+                          const duration = Math.min(30000, textToRead.length * 80);
+                          setTimeout(() => setSpeakingTurn((cur) => cur === i ? null : cur), duration);
+                        }
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
+                        speakingTurn === i ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                      )}
+                      aria-label={speakingTurn === i ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
+                    >
+                      {speakingTurn === i ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
+                      {speakingTurn === i ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
+                    </button>
+                  )}
+                </div>
                 {turn.preview && (
                   <p className="text-xs text-muted-foreground italic line-clamp-3 border-l-2 border-primary/30 pl-2">
                     {turn.preview}

@@ -257,7 +257,9 @@
     "exportCsv": "Exporter CSV",
     "undo": "Annuler",
     "remove": "Retirer",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "listen": "Écouter",
+    "stop": "Arrêter"
   },
   "notFound": {
     "code": "404",
