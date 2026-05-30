@@ -652,7 +652,7 @@ export function PlayerJournalSection() {
   );
 }
 
-function CoachAssistSection() {
+export function CoachAssistSection() {
   const { t } = useTranslation("marketing");
   const points = [
     { t: t("coachAssist.p1Title"), d: t("coachAssist.p1Body") },
