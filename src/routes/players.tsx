@@ -145,7 +145,7 @@ function PublicPlayersDirectory() {
             )}
           </p>
 
-          <form onSubmit={submitSearch} className="mt-8 grid gap-3 md:grid-cols-[1fr_180px_220px_auto]">
+          <form onSubmit={submitSearch} className="mt-8 grid gap-3 md:grid-cols-[1fr_160px_200px_160px_auto]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -156,7 +156,7 @@ function PublicPlayersDirectory() {
               />
             </div>
             <Select value={sport} onValueChange={(v) => { setSport(v); setPage(0); }}>
-              <SelectTrigger><SelectValue placeholder="Sport" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t("search.filterSport", "Sport")} /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("publicPlayers.allSports", "Tous les sports")}</SelectItem>
                 {sports.map((s) => (
@@ -173,6 +173,11 @@ function PublicPlayersDirectory() {
                 ))}
               </SelectContent>
             </Select>
+            <Input
+              value={regionInput}
+              onChange={(e) => setRegionInput(e.target.value)}
+              placeholder={t("search.filterRegion", "Région")}
+            />
             <div className="flex gap-2">
               <Button type="submit">{t("publicPlayers.search", "Rechercher")}</Button>
               <Button type="button" variant="ghost" onClick={resetFilters}>
