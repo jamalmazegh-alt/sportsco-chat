@@ -827,7 +827,7 @@ function TeamDetail() {
                     <div className="mt-1">
                       <UnavailableBadge
                         reason="suspension"
-                        detail={t("discipline.matchesRemaining", { count: susp.remaining, defaultValue: `${susp.remaining} match(s)` })}
+                        detail={t("discipline.matchesLeft", { count: susp.remaining })}
                       />
                     </div>
                   )}
