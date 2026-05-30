@@ -214,6 +214,11 @@ function HomePage() {
       {/* Discipline & suspensions */}
       {isCoach && activeClubId && <DisciplineWidget clubId={activeClubId} />}
 
+      {/* Upcoming player absences */}
+      {isCoach && activeClubId && <UpcomingAbsencesWidget clubId={activeClubId} />}
+
+
+
 
       {/* Onboarding checklist (admins) */}
       {isAdmin && activeClubId && (
