@@ -19,6 +19,8 @@ type PublicProfile = {
     preferred_position: string | null;
     position: string | null;
     jersey_number: number | null;
+    birth_date: string | null;
+    parental_public_consent: boolean | null;
   };
   club: {
     id: string;
