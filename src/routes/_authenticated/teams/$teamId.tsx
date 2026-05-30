@@ -23,6 +23,7 @@ import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
+import { UnavailableBadge } from "@/components/unavailable-badge";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
@@ -78,6 +79,32 @@ function TeamDetail() {
           return true;
         })
         .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
+    },
+  });
+
+  // Active suspensions for players in this team, used to display unavailability badge.
+  const { data: activeSuspensionsByPlayer } = useQuery({
+    queryKey: ["team-active-suspensions", teamId],
+    enabled: !!players && players.length > 0,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Map<string, { remaining: number; reason: string }>();
+      const { data } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served, suspension_reason, status")
+        .in("player_id", ids)
+        .eq("team_id", teamId)
+        .eq("status", "active");
+      const map = new Map<string, { remaining: number; reason: string }>();
+      for (const row of (data ?? []) as any[]) {
+        const remaining = Math.max(0, (row.matches_to_serve ?? 0) - (row.matches_served ?? 0));
+        if (remaining <= 0) continue;
+        const prev = map.get(row.player_id);
+        if (!prev || remaining > prev.remaining) {
+          map.set(row.player_id, { remaining, reason: row.suspension_reason });
+        }
+      }
+      return map;
     },
   });
 
@@ -765,6 +792,7 @@ function TeamDetail() {
             const linked = !!p.user_id;
             const checked = selectedIds.has(p.id);
             const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const susp = activeSuspensionsByPlayer?.get(p.id);
             const inner = (
               <>
                 <div className="relative h-12 w-12 shrink-0 rounded-full bg-muted overflow-hidden">
@@ -795,6 +823,14 @@ function TeamDetail() {
                       <span className="text-muted-foreground font-normal"> · #{p.jersey_number}</span>
                     ) : null}
                   </p>
+                  {susp && (
+                    <div className="mt-1">
+                      <UnavailableBadge
+                        reason="suspension"
+                        detail={t("discipline.matchesLeft", { count: susp.remaining })}
+                      />
+                    </div>
+                  )}
                   <p className="text-xs mt-0.5 truncate">
                     {linked ? (
                       <span className="text-muted-foreground">
