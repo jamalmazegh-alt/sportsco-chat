@@ -87,6 +87,7 @@ import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authe
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
+import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
 import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
@@ -524,6 +525,12 @@ const AuthenticatedEventsEventIdRoute =
     path: '/$eventId',
     getParentRoute: () => AuthenticatedEventsRoute,
   } as any)
+const AuthenticatedClubDisciplineRoute =
+  AuthenticatedClubDisciplineRouteImport.update({
+    id: '/club/discipline',
+    path: '/club/discipline',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminBillingRoute =
   AuthenticatedAdminBillingRouteImport.update({
     id: '/billing',
@@ -751,6 +758,7 @@ export interface FileRoutesByFullPath {
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
@@ -856,6 +864,7 @@ export interface FileRoutesByTo {
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
@@ -967,6 +976,7 @@ export interface FileRoutesById {
   '/tournaments/start': typeof TournamentsStartRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
@@ -1078,6 +1088,7 @@ export interface FileRouteTypes {
     | '/tournaments/start'
     | '/superadmin/'
     | '/admin/billing'
+    | '/club/discipline'
     | '/events/$eventId'
     | '/players/$playerId'
     | '/profile/password'
@@ -1183,6 +1194,7 @@ export interface FileRouteTypes {
     | '/tournaments/start'
     | '/superadmin'
     | '/admin/billing'
+    | '/club/discipline'
     | '/events/$eventId'
     | '/players/$playerId'
     | '/profile/password'
@@ -1293,6 +1305,7 @@ export interface FileRouteTypes {
     | '/tournaments/start'
     | '/superadmin/'
     | '/_authenticated/admin/billing'
+    | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/password'
@@ -1956,6 +1969,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport
       parentRoute: typeof AuthenticatedEventsRoute
     }
+    '/_authenticated/club/discipline': {
+      id: '/_authenticated/club/discipline'
+      path: '/club/discipline'
+      fullPath: '/club/discipline'
+      preLoaderRoute: typeof AuthenticatedClubDisciplineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/billing': {
       id: '/_authenticated/admin/billing'
       path: '/billing'
@@ -2326,6 +2346,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRouteWithChildren
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
   AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
+  AuthenticatedClubDisciplineRoute: typeof AuthenticatedClubDisciplineRoute
   AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
 }
 
@@ -2342,6 +2363,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSupportRoute: AuthenticatedSupportRouteWithChildren,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
   AuthenticatedTournamentsRoute: AuthenticatedTournamentsRouteWithChildren,
+  AuthenticatedClubDisciplineRoute: AuthenticatedClubDisciplineRoute,
   AuthenticatedPlayersPlayerIdRoute:
     AuthenticatedPlayersPlayerIdRouteWithChildren,
 }

@@ -18,6 +18,7 @@ import { HomeSkeleton } from "@/components/skeletons";
 import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
+import { DisciplineWidget } from "@/components/discipline-widget";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -207,6 +208,10 @@ function HomePage() {
 
       {/* Insights (admins/coaches) */}
       {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
+
+      {/* Discipline & suspensions */}
+      {isCoach && activeClubId && <DisciplineWidget clubId={activeClubId} />}
+
 
       {/* Onboarding checklist (admins) */}
       {isAdmin && activeClubId && (
