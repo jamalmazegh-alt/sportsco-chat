@@ -24,6 +24,7 @@ import {
 } from "@/lib/player-feedback.functions";
 import { cn } from "@/lib/utils";
 import { ReviewRefineDialog } from "@/components/review-refine-dialog";
+import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 
 export function CoachFeedbackTab({
   playerId,
