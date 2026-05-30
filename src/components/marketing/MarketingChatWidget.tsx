@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { MessageCircle, X, Sparkles, RotateCcw } from "lucide-react";
+import { MessageCircle, X, Sparkles, RotateCcw, Volume2, Square } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import {
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { cn } from "@/lib/utils";
+import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 
 const SUGGESTIONS = [
   "C'est quoi Clubero, en 1 phrase ?",
@@ -43,6 +44,8 @@ export function MarketingChatWidget() {
     id: "clubero-marketing",
     transport,
   });
+
+  const { speak, stop: stopSpeech, isSpeaking } = useTextToSpeech();
 
   useEffect(() => {
     if (open && status === "ready") textareaRef.current?.focus();
@@ -152,7 +155,10 @@ export function MarketingChatWidget() {
                       {m.parts.map((part, idx) => {
                         if (part.type === "text") {
                           return m.role === "assistant" ? (
-                            <MessageResponse key={idx}>{part.text}</MessageResponse>
+                            <div key={idx} className="space-y-2">
+                              <MessageResponse>{part.text}</MessageResponse>
+                              <TtsButton text={part.text} speak={speak} stopSpeech={stopSpeech} isSpeaking={isSpeaking} />
+                            </div>
                           ) : (
                             <span key={idx} className="whitespace-pre-wrap">
                               {part.text}
@@ -194,5 +200,47 @@ export function MarketingChatWidget() {
         </div>
       </div>
     </>
+  );
+}
+
+function TtsButton({
+  text,
+  speak,
+  stopSpeech,
+  isSpeaking,
+}: {
+  text: string;
+  speak: (text: string) => void;
+  stopSpeech: () => void;
+  isSpeaking: boolean;
+}) {
+  const [active, setActive] = useState(false);
+
+  const handleClick = useCallback(() => {
+    if (active) {
+      stopSpeech();
+      setActive(false);
+    } else {
+      speak(text);
+      setActive(true);
+      // Reset after speech ends (approximate fallback since we don't get per-utterance state here)
+      const duration = Math.min(30000, text.length * 80);
+      setTimeout(() => setActive(false), duration);
+    }
+  }, [active, text, speak, stopSpeech]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className={cn(
+        "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
+        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+      )}
+      aria-label={active ? "Arrêter la lecture" : "Lire à voix haute"}
+    >
+      {active ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
+      {active ? "Arrêter" : "Écouter"}
+    </button>
   );
 }
