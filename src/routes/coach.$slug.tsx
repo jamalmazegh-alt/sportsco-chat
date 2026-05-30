@@ -121,7 +121,7 @@ function CoachPublicPage() {
                   <Sparkles className="h-3.5 w-3.5" /> Disponible — Open to opportunities
                 </span>
               )}
-              <span className="text-sm text-muted-foreground">{coach.followers_count} abonné(s)</span>
+              <FollowButton targetType="coach" targetId={coach.id} initialFollowersCount={coach.followers_count} />
             </div>
           </div>
         </header>
