@@ -143,26 +143,49 @@ export function CoachFeedbackTab({
                 </span>
               </summary>
               <div className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{r.content}</div>
-              {isCoach && (
-                <div className="mt-3 flex items-center justify-between gap-2 border-t border-primary/15 pt-3">
-                  <button
-                    type="button"
-                    onClick={() => onDeleteRv(r.id)}
-                    className="text-[11px] text-destructive inline-flex items-center gap-1"
-                  >
-                    <Trash2 className="h-3 w-3" /> {t("common.delete")}
-                  </button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8"
-                    onClick={() => setRefineTarget({ id: r.id, content: r.content, revision: Date.now() })}
-                  >
-                    <Wand2 className="h-3.5 w-3.5" />
-                    {t("feedback.refineWithAi", { defaultValue: "Affiner avec l'IA" })}
-                  </Button>
-                </div>
-              )}
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-primary/15 pt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (speakingId === r.id) {
+                      stopSpeech();
+                      setSpeakingId(null);
+                    } else {
+                      speak(r.content);
+                      setSpeakingId(r.id);
+                      const duration = Math.min(60000, r.content.length * 80);
+                      setTimeout(() => setSpeakingId((cur) => cur === r.id ? null : cur), duration);
+                    }
+                  }}
+                  className={cn(
+                    "text-[11px] inline-flex items-center gap-1 font-medium transition-colors",
+                    speakingId === r.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {speakingId === r.id ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
+                  {speakingId === r.id ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
+                </button>
+                {isCoach && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onDeleteRv(r.id)}
+                      className="text-[11px] text-destructive inline-flex items-center gap-1"
+                    >
+                      <Trash2 className="h-3 w-3" /> {t("common.delete")}
+                    </button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8"
+                      onClick={() => setRefineTarget({ id: r.id, content: r.content, revision: Date.now() })}
+                    >
+                      <Wand2 className="h-3.5 w-3.5" />
+                      {t("feedback.refineWithAi", { defaultValue: "Affiner avec l'IA" })}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </details>
           ))
         ) : !lRv ? (
