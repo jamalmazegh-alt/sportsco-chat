@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Loader2, Lock, Sparkles, Trash2, Star, Wand2 } from "lucide-react";
+import { Loader2, Lock, Sparkles, Trash2, Star, Wand2, Volume2, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
