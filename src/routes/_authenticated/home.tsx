@@ -209,6 +209,10 @@ function HomePage() {
       {/* Insights (admins/coaches) */}
       {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
 
+      {/* Discipline & suspensions */}
+      {isCoach && activeClubId && <DisciplineWidget clubId={activeClubId} />}
+
+
       {/* Onboarding checklist (admins) */}
       {isAdmin && activeClubId && (
         <OnboardingChecklist
