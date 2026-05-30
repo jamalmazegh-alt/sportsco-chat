@@ -173,6 +173,8 @@
     "viewStats": "View statistics"
   },
   "auth": {
+    "playerSignupLink": "Are you a player? Create your profile here →",
+    "publicSignupClubAdminOnly": "This signup is for club managers. Players and parents attached to a club join Clubero via an invitation.",
     "login": "Log in",
     "register": "Create account",
     "email": "Email",
