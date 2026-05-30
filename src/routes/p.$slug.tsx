@@ -164,7 +164,7 @@ export const Route = createFileRoute("/p/$slug")({
         ...(player
           ? [
               { property: "profile:first_name", content: player.first_name },
-              { property: "profile:last_name", content: player.last_name },
+              { property: "profile:last_name", content: displayedLast },
             ]
           : []),
         { name: "twitter:card", content: "summary_large_image" },
