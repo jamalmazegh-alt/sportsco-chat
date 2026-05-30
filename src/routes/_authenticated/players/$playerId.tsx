@@ -86,19 +86,23 @@ function PlayerProfile() {
 
   async function resendParentInvite(pp: { id: string; full_name: string | null; email: string | null; phone: string | null; parent_user_id: string | null }) {
     if (!player || !user) return;
+    if (!player.club_id) { toast.warning(t("players.inviteNoContact")); return; }
+    const clubId = player.club_id;
     if (pp.parent_user_id) { toast.info(t("players.alreadyLinked")); return; }
     if (!pp.email && !pp.phone) { toast.warning(t("players.inviteNoContact")); return; }
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
-      club_id: player.club_id, created_by: user.id, token,
+      club_id: clubId, created_by: user.id, token,
       parent_for_player_id: player.id, role: "parent",
       email: pp.email ?? null, phone: pp.phone ?? null,
     });
+
     if (invErr) { toast.error(invErr.message); return; }
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     if (pp.email) {
       try {
-        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", player.club_id).maybeSingle();
+        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+
         await sendTransactionalEmail({
           templateName: "player-invite",
           recipientEmail: pp.email,
@@ -194,9 +198,11 @@ function PlayerProfile() {
 
   async function sendChildOnboardingInvite(targetEmail: string) {
     if (!player || !user) return;
+    if (!player.club_id) { toast.warning(t("players.inviteNoContact")); return; }
+    const clubId = player.club_id;
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
-      club_id: player.club_id,
+      club_id: clubId,
       created_by: user.id,
       player_id: player.id,
       role: "player",
@@ -206,7 +212,8 @@ function PlayerProfile() {
     if (invErr) { toast.error(invErr.message); return; }
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     try {
-      const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", player.club_id).maybeSingle();
+      const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+
       await sendTransactionalEmail({
         templateName: "player-invite",
         recipientEmail: targetEmail,

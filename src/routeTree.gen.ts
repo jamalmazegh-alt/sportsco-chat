@@ -35,6 +35,7 @@ import { Route as SuperadminSupportRouteImport } from './routes/superadmin/suppo
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
+import { Route as RegisterPlayerRouteImport } from './routes/register.player'
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
@@ -44,6 +45,7 @@ import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-clu
 import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CoachSlugRouteImport } from './routes/coach.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedTournamentsRouteImport } from './routes/_authenticated/tournaments'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
@@ -244,6 +246,11 @@ const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => SuperadminRoute,
 } as any)
+const RegisterPlayerRoute = RegisterPlayerRouteImport.update({
+  id: '/player',
+  path: '/player',
+  getParentRoute: () => RegisterRoute,
+} as any)
 const RTokenRoute = RTokenRouteImport.update({
   id: '/r/$token',
   path: '/r/$token',
@@ -287,6 +294,11 @@ const EnClubOnboardingRoute = EnClubOnboardingRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachSlugRoute = CoachSlugRouteImport.update({
+  id: '/coach/$slug',
+  path: '/coach/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -693,7 +705,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
-  '/register': typeof RegisterRoute
+  '/register': typeof RegisterRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
@@ -709,6 +721,7 @@ export interface FileRoutesByFullPath {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/en/tournaments': typeof EnTournamentsRoute
@@ -718,6 +731,7 @@ export interface FileRoutesByFullPath {
   '/legal/cookies': typeof LegalCookiesRoute
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
+  '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
@@ -799,7 +813,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
-  '/register': typeof RegisterRoute
+  '/register': typeof RegisterRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/assistant': typeof AuthenticatedAssistantRoute
@@ -811,6 +825,7 @@ export interface FileRoutesByTo {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/en/tournaments': typeof EnTournamentsRoute
@@ -820,6 +835,7 @@ export interface FileRoutesByTo {
   '/legal/cookies': typeof LegalCookiesRoute
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
+  '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
@@ -903,7 +919,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
-  '/register': typeof RegisterRoute
+  '/register': typeof RegisterRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
@@ -919,6 +935,7 @@ export interface FileRoutesById {
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/_authenticated/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
   '/en/tournaments': typeof EnTournamentsRoute
@@ -928,6 +945,7 @@ export interface FileRoutesById {
   '/legal/cookies': typeof LegalCookiesRoute
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
+  '/register/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
@@ -1027,6 +1045,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/tournaments'
     | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/en/tournaments'
@@ -1036,6 +1055,7 @@ export interface FileRouteTypes {
     | '/legal/cookies'
     | '/p/$slug'
     | '/r/$token'
+    | '/register/player'
     | '/superadmin/billing'
     | '/superadmin/logs'
     | '/superadmin/settings'
@@ -1129,6 +1149,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/tournaments'
     | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/en/tournaments'
@@ -1138,6 +1159,7 @@ export interface FileRouteTypes {
     | '/legal/cookies'
     | '/p/$slug'
     | '/r/$token'
+    | '/register/player'
     | '/superadmin/billing'
     | '/superadmin/logs'
     | '/superadmin/settings'
@@ -1236,6 +1258,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams'
     | '/_authenticated/tournaments'
     | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
     | '/en/tournaments'
@@ -1245,6 +1268,7 @@ export interface FileRouteTypes {
     | '/legal/cookies'
     | '/p/$slug'
     | '/r/$token'
+    | '/register/player'
     | '/superadmin/billing'
     | '/superadmin/logs'
     | '/superadmin/settings'
@@ -1328,11 +1352,12 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PlayersRoute: typeof PlayersRoute
   PricingRoute: typeof PricingRoute
-  RegisterRoute: typeof RegisterRoute
+  RegisterRoute: typeof RegisterRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuperadminRoute: typeof SuperadminRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
+  CoachSlugRoute: typeof CoachSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
   EnTournamentsRoute: typeof EnTournamentsRoute
@@ -1555,6 +1580,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminBillingRouteImport
       parentRoute: typeof SuperadminRoute
     }
+    '/register/player': {
+      id: '/register/player'
+      path: '/player'
+      fullPath: '/register/player'
+      preLoaderRoute: typeof RegisterPlayerRouteImport
+      parentRoute: typeof RegisterRoute
+    }
     '/r/$token': {
       id: '/r/$token'
       path: '/r/$token'
@@ -1616,6 +1648,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coach/$slug': {
+      id: '/coach/$slug'
+      path: '/coach/$slug'
+      fullPath: '/coach/$slug'
+      preLoaderRoute: typeof CoachSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -2290,6 +2329,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface RegisterRouteChildren {
+  RegisterPlayerRoute: typeof RegisterPlayerRoute
+}
+
+const RegisterRouteChildren: RegisterRouteChildren = {
+  RegisterPlayerRoute: RegisterPlayerRoute,
+}
+
+const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
+  RegisterRouteChildren,
+)
+
 interface SuperadminUsersRouteChildren {
   SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
 }
@@ -2374,11 +2425,12 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PlayersRoute: PlayersRoute,
   PricingRoute: PricingRoute,
-  RegisterRoute: RegisterRoute,
+  RegisterRoute: RegisterRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuperadminRoute: SuperadminRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
+  CoachSlugRoute: CoachSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,
   EnTournamentsRoute: EnTournamentsRoute,
@@ -2419,13 +2471,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
