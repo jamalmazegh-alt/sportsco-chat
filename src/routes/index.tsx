@@ -59,6 +59,9 @@ function Landing() {
       <Hero />
       <TournamentsSection />
       <PlayerJournalSection />
+      <PlayersSection />
+      <CoachProfileSection />
+      <NetworkSection />
       <ClubWallSection />
       <CoachAssistSection />
       <FeaturesGrid />
