@@ -1655,5 +1655,18 @@
     "emptyCoaches": "Tu ne suis aucun coach.",
     "emptyClubs": "Tu ne suis aucun club.",
     "discoverPlayers": "Découvrir des joueurs"
+  },
+  "widget": {
+    "availability": {
+      "title": "Disponibilité du club",
+      "suspended": "{{n}} suspendu(s)",
+      "absent": "{{n}} absent(s)",
+      "injured": "{{n}} blessé(s)",
+      "total": "Total indisponibles : {{n}}",
+      "allAvailable": "✅ Tous les joueurs sont disponibles",
+      "more": "+ {{n}} autres",
+      "viewSuspensions": "Voir les suspensions",
+      "viewAbsences": "Voir les absences"
+    }
   }
 }
