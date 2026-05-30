@@ -1428,7 +1428,10 @@
     "iCanDrive": "I can drive →",
     "seatsLeft_one": "{{count}} seat left",
     "seatsLeft_other": "{{count}} seats left",
-    "vehicleType": { "car": "Car", "van": "Van" },
+    "vehicleType": {
+      "car": "Car",
+      "van": "Van"
+    },
     "toggleEnabled": "Carpooling on",
     "toggleDisabled": "Carpooling off",
     "toggleTitle": "Carpooling",
@@ -1450,48 +1453,109 @@
     "needRideRegistered": "Request sent to coach"
   },
   "journey": {
-    "tab": { "season": "Season", "achievements": "Achievements", "timeline": "Timeline" },
+    "tab": {
+      "season": "Season",
+      "achievements": "Achievements",
+      "timeline": "Timeline"
+    },
     "achievement": {
       "addBtn": "Add achievement",
       "pendingTitle": "Pending confirmation",
       "noneTitle": "No achievements yet",
       "noneHint": "Trophies and awards will show up here.",
-      "confirm": "Confirm", "reject": "Reject",
+      "confirm": "Confirm",
+      "reject": "Reject",
       "type": {
-        "champion": "Champion", "runner_up": "Runner-up",
-        "tournament_winner": "Tournament winner", "tournament_finalist": "Tournament finalist",
-        "semi_finalist": "Semi-finalist", "mvp": "MVP",
-        "top_scorer": "Top scorer", "best_goalkeeper": "Best goalkeeper",
-        "best_defender": "Best defender", "captain": "Captain",
-        "matches_100": "100 matches", "selection": "Selection",
-        "special_award": "Special award", "other": "Other"
+        "champion": "Champion",
+        "runner_up": "Runner-up",
+        "tournament_winner": "Tournament winner",
+        "tournament_finalist": "Tournament finalist",
+        "semi_finalist": "Semi-finalist",
+        "mvp": "MVP",
+        "top_scorer": "Top scorer",
+        "best_goalkeeper": "Best goalkeeper",
+        "best_defender": "Best defender",
+        "captain": "Captain",
+        "matches_100": "100 matches",
+        "selection": "Selection",
+        "special_award": "Special award",
+        "other": "Other"
       },
-      "status": { "suggested": "Pending", "confirmed": "Confirmed", "hidden": "Hidden", "rejected": "Rejected" },
-      "visibility": { "private": "Private", "club": "Club", "public": "Public" },
-      "fields": { "title": "Title", "season": "Season", "date": "Date", "description": "Description", "type": "Type", "visibility": "Visibility" }
+      "status": {
+        "suggested": "Pending",
+        "confirmed": "Confirmed",
+        "hidden": "Hidden",
+        "rejected": "Rejected"
+      },
+      "visibility": {
+        "private": "Private",
+        "club": "Club",
+        "public": "Public"
+      },
+      "fields": {
+        "title": "Title",
+        "season": "Season",
+        "date": "Date",
+        "description": "Description",
+        "type": "Type",
+        "visibility": "Visibility"
+      }
     },
     "season": {
       "noneTitle": "No seasons yet",
       "noneHint": "Seasons appear as soon as matches are played.",
-      "matches": "{{n}} matches", "goals": "{{n}} goals", "assists": "{{n}} assists",
+      "matches": "{{n}} matches",
+      "goals": "{{n}} goals",
+      "assists": "{{n}} assists",
       "attendance": "{{n}}% attendance",
-      "coachSummary": "Coach note", "coachSummaryPlaceholder": "Season summary…",
+      "coachSummary": "Coach note",
+      "coachSummaryPlaceholder": "Season summary…",
       "save": "Save"
     },
     "timeline": {
       "addBtn": "Add a moment",
       "noneTitle": "No moments yet",
       "noneHint": "Milestones will be added automatically.",
-      "fields": { "title": "Title", "description": "Description", "date": "Date", "type": "Type" },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "date": "Date",
+        "type": "Type"
+      },
       "event": {
-        "joined_club": "Joined the club", "joined_team": "Joined the team",
-        "first_match": "First official match", "first_goal": "First goal",
-        "matches_milestone": "Matches milestone", "achievement": "Achievement",
+        "joined_club": "Joined the club",
+        "joined_team": "Joined the team",
+        "first_match": "First official match",
+        "first_goal": "First goal",
+        "matches_milestone": "Matches milestone",
+        "achievement": "Achievement",
         "tournament_participation": "Tournament participation",
-        "season_completed": "Season completed", "transfer": "Transfer",
-        "selection": "Selection", "other": "Moment"
+        "season_completed": "Season completed",
+        "transfer": "Transfer",
+        "selection": "Selection",
+        "other": "Moment"
       }
     }
+  },
+  "follow": {
+    "follow": "Follow",
+    "following": "Following ✓",
+    "unfollow": "Unfollow",
+    "followers_one": "{{count}} follower",
+    "followers_other": "{{count}} followers",
+    "loginRequired": "Log in to follow this profile",
+    "error": "Something went wrong, try again"
+  },
+  "following": {
+    "title": "Following",
+    "menuSubtitle": "Players, coaches and clubs you follow",
+    "summary": "You follow {{p}} player(s), {{c}} coach(es), {{cl}} club(s)",
+    "players": "Players",
+    "coaches": "Coaches",
+    "clubs": "Clubs",
+    "emptyPlayers": "You don't follow any players yet.",
+    "emptyCoaches": "You don't follow any coaches yet.",
+    "emptyClubs": "You don't follow any clubs yet.",
+    "discoverPlayers": "Discover players"
   }
 }
-
