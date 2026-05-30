@@ -1043,3 +1043,132 @@ function CTA() {
     </section>
   );
 }
+
+function MarketingProfileSection({
+  bgClass,
+  chipColorClass,
+  bulletColorClass,
+  chipIcon: ChipIcon,
+  chip,
+  title,
+  subtitle,
+  points,
+  ctaLabel,
+  ctaTo,
+}: {
+  bgClass: string;
+  chipColorClass: string;
+  bulletColorClass: string;
+  chipIcon: React.ComponentType<{ className?: string }>;
+  chip: string;
+  title: string;
+  subtitle: string;
+  points: { t: string; d: string }[];
+  ctaLabel: string;
+  ctaTo: string;
+}) {
+  return (
+    <section className={`relative border-b border-border/60 overflow-hidden ${bgClass}`}>
+      <div aria-hidden className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[color:var(--primary)]/10 blur-3xl" />
+      <div aria-hidden className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--brand-blue)]/10 blur-3xl" />
+      <div className="relative mx-auto max-w-3xl px-5 py-20 lg:px-8 lg:py-24 text-center">
+        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wider ${chipColorClass}`}>
+          <ChipIcon className="h-3.5 w-3.5" />
+          {chip}
+        </div>
+        <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+          {title}
+        </h2>
+        <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+          {subtitle}
+        </p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 text-left">
+          {points.map((p) => (
+            <li key={p.t} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4">
+              <CheckCircle2 className={`mt-0.5 h-5 w-5 shrink-0 ${bulletColorClass}`} />
+              <div>
+                <p className="text-sm font-semibold text-foreground">{p.t}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{p.d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 flex justify-center">
+          <Button asChild size="lg" className="h-12 px-6 shadow-elevated hover:shadow-glow transition-shadow">
+            <Link to={ctaTo}>
+              {ctaLabel} <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PlayersSection() {
+  const { t } = useTranslation("marketing");
+  return (
+    <MarketingProfileSection
+      bgClass="bg-gradient-to-br from-[color:var(--primary)]/8 via-background to-[color:var(--brand-blue)]/8"
+      chipColorClass="border-[color:var(--primary)]/30 bg-[color:var(--primary)]/10 text-[color:var(--brand-blue-deep)]"
+      bulletColorClass="text-[color:var(--primary)]"
+      chipIcon={Activity}
+      chip={t("players.sectionChip")}
+      title={t("players.sectionTitle")}
+      subtitle={t("players.sectionSub")}
+      points={[
+        { t: t("players.p1Title"), d: t("players.p1Body") },
+        { t: t("players.p2Title"), d: t("players.p2Body") },
+        { t: t("players.p3Title"), d: t("players.p3Body") },
+        { t: t("players.p4Title"), d: t("players.p4Body") },
+      ]}
+      ctaLabel={t("home.ctaPlayer")}
+      ctaTo="/register/player"
+    />
+  );
+}
+
+function CoachProfileSection() {
+  const { t } = useTranslation("marketing");
+  return (
+    <MarketingProfileSection
+      bgClass="bg-gradient-to-br from-[color:var(--brand-blue)]/8 via-background to-[color:var(--victory)]/8"
+      chipColorClass="border-[color:var(--brand-blue)]/30 bg-[color:var(--brand-blue)]/10 text-[color:var(--brand-blue-deep)]"
+      bulletColorClass="text-[color:var(--brand-blue)]"
+      chipIcon={Star}
+      chip={t("coachProfile.sectionChip")}
+      title={t("coachProfile.sectionTitle")}
+      subtitle={t("coachProfile.sectionSub")}
+      points={[
+        { t: t("coachProfile.p1Title"), d: t("coachProfile.p1Body") },
+        { t: t("coachProfile.p2Title"), d: t("coachProfile.p2Body") },
+        { t: t("coachProfile.p3Title"), d: t("coachProfile.p3Body") },
+        { t: t("coachProfile.p4Title"), d: t("coachProfile.p4Body") },
+      ]}
+      ctaLabel={t("home.ctaCoach")}
+      ctaTo="/register"
+    />
+  );
+}
+
+function NetworkSection() {
+  const { t } = useTranslation("marketing");
+  return (
+    <MarketingProfileSection
+      bgClass="bg-gradient-to-br from-[color:var(--energy)]/8 via-background to-[color:var(--victory)]/8"
+      chipColorClass="border-[color:var(--energy)]/30 bg-[color:var(--energy)]/10 text-[color:var(--energy)]"
+      bulletColorClass="text-[color:var(--energy)]"
+      chipIcon={Share2}
+      chip={t("network.sectionChip")}
+      title={t("network.sectionTitle")}
+      subtitle={t("network.sectionSub")}
+      points={[
+        { t: t("network.p1Title"), d: t("network.p1Body") },
+        { t: t("network.p2Title"), d: t("network.p2Body") },
+        { t: t("network.p3Title"), d: t("network.p3Body") },
+      ]}
+      ctaLabel={t("home.ctaExplore")}
+      ctaTo="/players"
+    />
+  );
+}
