@@ -40,6 +40,8 @@ export function CoachFeedbackTab({
   const genFn = useServerFn(generatePlayerReview);
   const delFb = useServerFn(deletePlayerFeedback);
   const delRv = useServerFn(deletePlayerReview);
+  const { speak, stop: stopSpeech } = useTextToSpeech();
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [refineTarget, setRefineTarget] = useState<{ id: string; content: string; revision: number } | null>(null);
 
   const { data: fb, isLoading: lFb } = useQuery({
