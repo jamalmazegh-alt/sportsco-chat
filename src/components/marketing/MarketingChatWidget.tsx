@@ -214,6 +214,7 @@ function TtsButton({
   stopSpeech: () => void;
   isSpeaking: boolean;
 }) {
+  const { t } = useTranslation();
   const [active, setActive] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -223,7 +224,6 @@ function TtsButton({
     } else {
       speak(text);
       setActive(true);
-      // Reset after speech ends (approximate fallback since we don't get per-utterance state here)
       const duration = Math.min(30000, text.length * 80);
       setTimeout(() => setActive(false), duration);
     }
@@ -237,10 +237,10 @@ function TtsButton({
         "inline-flex items-center gap-1 text-[11px] font-medium transition-colors",
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       )}
-      aria-label={active ? "Arrêter la lecture" : "Lire à voix haute"}
+      aria-label={active ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
     >
       {active ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
-      {active ? "Arrêter" : "Écouter"}
+      {active ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
     </button>
   );
 }
