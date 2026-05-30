@@ -3451,6 +3451,16 @@ export type Database = {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
+      list_public_players: {
+        Args: {
+          _club_id?: string
+          _limit?: number
+          _offset?: number
+          _search?: string
+          _sport?: string
+        }
+        Returns: Json
+      }
       log_superadmin_action: {
         Args: {
           _action: string
