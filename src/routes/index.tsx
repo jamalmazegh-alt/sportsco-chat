@@ -9,6 +9,7 @@ import {
   MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle, Sparkles, BrainCircuit, Send,
   BookOpen, Share2, UploadCloud, FileText, Swords,
   Camera, Hash, Heart, Pin, TrendingUp, Star, ClipboardList, Bot, ListChecks,
+  Shield, GraduationCap, Award, UserPlus, Plus, Instagram,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
