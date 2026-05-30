@@ -120,6 +120,8 @@ function PublicPlayersDirectory() {
     setSearchInput("");
     setSport("all");
     setClubId("all");
+    setRegionInput("");
+    setRegion("");
     setPage(0);
   };
 
