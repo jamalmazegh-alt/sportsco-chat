@@ -1020,20 +1020,20 @@ function CTA() {
               <Flame className="h-3 w-3" /> {t("home.ctaSeason")}
             </div>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-5xl">
-              {t("home.ctaTitle")}
+              {t("home.ctaEcosystem")}
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
-              {t("home.ctaBody")}
+              {t("home.ctaEcosystemSub")}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 bg-white text-[color:var(--brand-blue-deep)] hover:bg-white/90 hover:scale-105 transition-transform shadow-lg">
-                <Link to="/demo">{t("home.ctaButton")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                <Link to="/register">{t("home.ctaClub")} <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link to="/pricing">{t("home.ctaPricing")}</Link>
+                <Link to="/register/player">{t("home.ctaPlayer")}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link to={onboardingTo}>{t("nav.onboarding")}</Link>
+                <Link to="/players">{t("home.ctaExplore")}</Link>
               </Button>
             </div>
           </div>
