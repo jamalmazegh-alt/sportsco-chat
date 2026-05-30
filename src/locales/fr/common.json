@@ -42,9 +42,6 @@
       "invalidRange": "Dates invalides."
     }
   },
-  "notification": {
-    "absenceDeclared": "{{name}} sera absent(e) du {{start}} au {{end}}. Motif : {{reason}}"
-  },
   "discipline": {
     "title": "Discipline",
     "subtitle": "Vue globale des suspensions du club.",
