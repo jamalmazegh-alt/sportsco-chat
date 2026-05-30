@@ -59,9 +59,78 @@ function Landing() {
     <MarketingLayout>
       <Hero />
       <ProductPreview />
+      <TournamentsSection />
+      <HomeFeatureTiles />
       <Promises />
       <CTA />
     </MarketingLayout>
+  );
+}
+
+const HOME_TILES = [
+  { key: "tournaments", icon: Trophy, to: "/features", hash: "tournaments", accent: "from-[color:var(--victory)] to-[color:var(--energy)]" },
+  { key: "convocations", icon: CalendarCheck, to: "/features", hash: "coach-ai", accent: "from-[color:var(--brand-blue)] to-[color:var(--secondary)]" },
+  { key: "wall", icon: MessageSquareText, to: "/features", hash: "wall", accent: "from-[color:var(--brand-blue)] to-[color:var(--energy)]" },
+  { key: "whatsapp", icon: MessageCircle, to: "/features", hash: "whatsapp", accent: "from-[#25D366] to-[#075E54]" },
+  { key: "player", icon: Activity, to: "/features", hash: "player", accent: "from-[color:var(--primary)] to-[color:var(--brand-blue)]" },
+  { key: "coach", icon: GraduationCap, to: "/features", hash: "coach-profile", accent: "from-[color:var(--brand-blue)] to-[color:var(--victory)]" },
+  { key: "network", icon: Share2, to: "/features", hash: "network", accent: "from-[color:var(--energy)] to-[color:var(--brand-blue)]" },
+  { key: "ai", icon: BrainCircuit, to: "/features", hash: "coach-ai", accent: "from-[color:var(--primary)] to-[color:var(--energy)]" },
+] as const;
+
+function HomeFeatureTiles() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="relative border-b border-border/60 overflow-hidden bg-gradient-to-br from-background via-muted/15 to-background">
+      <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--energy)]/40 to-transparent" />
+      <div className="relative mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-2xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
+            <Zap className="h-3 w-3 text-[color:var(--energy)]" />
+            {t("home.allChip")}
+          </div>
+          <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+            {t("home.allTitle")}
+          </h2>
+          <p className="mt-4 text-muted-foreground">{t("home.allSub")}</p>
+        </div>
+
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {HOME_TILES.map((tile) => {
+            const Icon = tile.icon;
+            return (
+              <Link
+                key={tile.key}
+                to={tile.to}
+                hash={tile.hash}
+                className="group relative flex flex-col rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated hover:border-[color:var(--brand-blue)]/40"
+              >
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${tile.accent} text-white shadow-md group-hover:scale-110 transition-transform`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-4 font-display text-base font-bold tracking-tight">
+                  {t(`home.tile_${tile.key}_t`)}
+                </h3>
+                <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  {t(`home.tile_${tile.key}_b`)}
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  {t("home.allCta")} <ArrowRight className="h-3 w-3" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <Button asChild size="lg" variant="outline" className="h-12 px-6">
+            <Link to="/features">
+              {t("home.allCtaAll")} <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }
 
