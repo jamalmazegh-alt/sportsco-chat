@@ -375,7 +375,42 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
             />
             <p className="text-[10px] text-muted-foreground text-right">{comment.length}/300</p>
           </div>
+
+          {impactedEvents.length > 0 && (
+            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
+              <p className="text-xs font-medium text-foreground">
+                {t("availability.impactedEvents", { defaultValue: "📅 Cette absence impactera :" })}
+              </p>
+              <ul className="space-y-1.5">
+                {impactedEvents.slice(0, 10).map((ev) => {
+                  const Icon = eventIcon(ev.type);
+                  return (
+                    <li key={ev.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                      <span className="truncate flex-1">{ev.title}</span>
+                      <span className="shrink-0">
+                        {new Date(ev.starts_at).toLocaleDateString(undefined, {
+                          weekday: "short",
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+              {impactedEvents.length > 10 && (
+                <p className="text-[11px] text-muted-foreground">
+                  {t("availability.impactedEventsMore", {
+                    n: impactedEvents.length - 10,
+                    defaultValue: `et ${impactedEvents.length - 10} autre(s) événement(s)`,
+                  })}
+                </p>
+              )}
+            </div>
+          )}
         </div>
+
 
         <SheetFooter className="mt-6 flex-row gap-2 sm:justify-end">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>
