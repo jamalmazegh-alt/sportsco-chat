@@ -319,7 +319,7 @@ function PublicPlayersDirectory() {
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button asChild size="lg">
-              <Link to="/register">{t("publicPlayers.ctaJoin", "Créer mon compte")}</Link>
+              <Link to="/register/player">{t("publicPlayers.ctaJoin", "Créer mon compte")}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link to="/features">{t("publicPlayers.ctaFeatures", "Voir les fonctionnalités")}</Link>
