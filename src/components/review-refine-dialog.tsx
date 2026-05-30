@@ -38,10 +38,12 @@ export function ReviewRefineDialog({
   const { t } = useTranslation();
   const qc = useQueryClient();
   const refineFn = useServerFn(refinePlayerReview);
+  const { speak, stop: stopSpeech, isSpeaking } = useTextToSpeech();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [currentContent, setCurrentContent] = useState(initialContent);
   const [busy, setBusy] = useState(false);
+  const [speakingTurn, setSpeakingTurn] = useState<number | null>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
