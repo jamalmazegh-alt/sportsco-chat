@@ -363,6 +363,42 @@ function EventDetail() {
     return m;
   }, [activeSuspensions]);
 
+  // Player absences (availabilities) overlapping the event date
+  const eventDateStr = useMemo(() => {
+    if (!event?.starts_at) return null;
+    const d = new Date(event.starts_at as any);
+    if (isNaN(d.getTime())) return null;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }, [event?.starts_at]);
+
+  const { data: eventAbsences } = useQuery({
+    queryKey: ["event-absences", event?.team_id, eventDateStr, (teamPlayers ?? []).length],
+    enabled: !!event?.team_id && !!eventDateStr && (teamPlayers?.length ?? 0) > 0,
+    queryFn: async () => {
+      const playerIds = (teamPlayers ?? []).map((tp: any) => tp.player_id);
+      if (playerIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("player_availabilities")
+        .select("player_id, reason, start_date, end_date")
+        .in("player_id", playerIds)
+        .eq("status", "active")
+        .lte("start_date", eventDateStr!)
+        .gte("end_date", eventDateStr!);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const absenceByPlayer = useMemo(() => {
+    const m = new Map<string, { reason: string }>();
+    (eventAbsences ?? []).forEach((a: any) => {
+      m.set(a.player_id, { reason: a.reason });
+    });
+    return m;
+  }, [eventAbsences]);
+
 
   // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
   const { data: lineupData } = useQuery({
