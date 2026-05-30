@@ -33,6 +33,7 @@ import {
   type PlayerLite,
 } from "@/components/lineup/pitch-pieces";
 import { PitchSvg } from "@/components/lineup/pitch-svg";
+import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 import { Button } from "@/components/ui/button";
 import {
   Select,
