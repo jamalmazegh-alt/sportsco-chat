@@ -78,9 +78,9 @@ function PublicPlayersDirectory() {
     queryKey: ["public-players", search, sport, clubId, page],
     queryFn: async (): Promise<ListResponse> => {
       const { data, error } = await supabase.rpc("list_public_players", {
-        _search: search || null,
-        _sport: sport === "all" ? null : sport,
-        _club_id: clubId === "all" ? null : clubId,
+        _search: search || undefined,
+        _sport: sport === "all" ? undefined : sport,
+        _club_id: clubId === "all" ? undefined : clubId,
         _limit: PAGE_SIZE,
         _offset: page * PAGE_SIZE,
       });
