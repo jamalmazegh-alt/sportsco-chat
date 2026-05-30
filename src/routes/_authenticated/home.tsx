@@ -261,6 +261,21 @@ function HomePage() {
         </div>
       )}
 
+      {/* For players/parents: quick absence declaration */}
+      {!isCoach && myTeams && myTeams.length > 0 && (
+        <section>
+          <Button
+            variant="outline"
+            className="w-full h-11"
+            onClick={() => setAbsenceOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+          <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />
+        </section>
+      )}
+
       {/* For players/parents: shortcut to team(s) */}
       {!isCoach && myTeams && myTeams.length > 0 && (
         <section className="space-y-2">
