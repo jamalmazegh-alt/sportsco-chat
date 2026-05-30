@@ -82,6 +82,32 @@ function TeamDetail() {
     },
   });
 
+  // Active suspensions for players in this team, used to display unavailability badge.
+  const { data: activeSuspensionsByPlayer } = useQuery({
+    queryKey: ["team-active-suspensions", teamId],
+    enabled: !!players && players.length > 0,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Map<string, { remaining: number; reason: string }>();
+      const { data } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served, suspension_reason, status")
+        .in("player_id", ids)
+        .eq("team_id", teamId)
+        .eq("status", "active");
+      const map = new Map<string, { remaining: number; reason: string }>();
+      for (const row of (data ?? []) as any[]) {
+        const remaining = Math.max(0, (row.matches_to_serve ?? 0) - (row.matches_served ?? 0));
+        if (remaining <= 0) continue;
+        const prev = map.get(row.player_id);
+        if (!prev || remaining > prev.remaining) {
+          map.set(row.player_id, { remaining, reason: row.suspension_reason });
+        }
+      }
+      return map;
+    },
+  });
+
   // Track which players already have a pending (unaccepted) invite.
   const { data: pendingInvitePlayerIds } = useQuery({
     queryKey: ["team-pending-invites", teamId, activeClubId],
