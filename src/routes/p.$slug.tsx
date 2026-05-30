@@ -239,7 +239,7 @@ function PublicPlayerProfile() {
                 className="h-full w-full rounded-full object-cover"
               />
             ) : (
-              initialsFrom(player.first_name, player.last_name)
+              initialsFrom(player.first_name, lastShown)
             )}
           </div>
           <div className="min-w-0">
