@@ -152,11 +152,16 @@ function RegisterPage() {
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           {showRoleSelector ? (
-            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-1">
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-2">
               <div className="font-medium">{t("auth.roleClubAdmin")}</div>
               <div className="text-xs text-muted-foreground">
                 {t("auth.publicSignupClubAdminOnly") ||
-                  "L'inscription publique est réservée aux dirigeants de club. Les joueurs et parents rejoignent Clubero uniquement via une invitation envoyée par leur club."}
+                  "Cette inscription est destinée aux dirigeants de club. Les joueurs et parents rattachés à un club rejoignent Clubero via une invitation."}
+              </div>
+              <div className="text-xs">
+                <Link to="/register/player" className="font-semibold text-primary hover:underline">
+                  {t("auth.playerSignupLink") || "Vous êtes joueur ? Créez votre profil ici →"}
+                </Link>
               </div>
             </div>
           ) : (
