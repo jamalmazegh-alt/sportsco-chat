@@ -1166,7 +1166,7 @@ function MarketingProfileSection({
   );
 }
 
-function PlayersSection() {
+export function PlayersSection() {
   const { t } = useTranslation("marketing");
   return (
     <MarketingProfileSection
