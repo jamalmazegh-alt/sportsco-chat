@@ -2101,6 +2101,7 @@ function EventDetail() {
                   );
                   const checked = alreadyConvoked || selectedIds.has(tp.player_id);
                   const susp = suspensionByPlayer.get(tp.player_id);
+                  const abs = absenceByPlayer.get(tp.player_id);
                   return (
                     <label
                       key={tp.player_id}
