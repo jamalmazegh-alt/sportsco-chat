@@ -20,6 +20,9 @@ test.describe("Player public profile", () => {
   let club: SeededClub;
   let publicSlug: string;
 
+  test.describe.configure({ mode: "serial" });
+
+
   test.beforeAll(async () => {
     club = await createTestClub("pubprofile");
   });
