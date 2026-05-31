@@ -91,8 +91,7 @@ test.describe("Follows", () => {
   });
 
   test("user can unfollow a player", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").delete()
+    const { error } = await coachClient.from("follows").delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_player_id", club.player1.id);
     expect(error).toBeNull();
