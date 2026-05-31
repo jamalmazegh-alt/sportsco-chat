@@ -1,11 +1,10 @@
 /**
- * 21 — Follows — v3 final
+ * 21 — Follows — v4 final
  *
- * Fix :
- * - beforeAll nettoie uniquement followed_club_id du club E2E
- *   pour éviter le duplicate key sur "follow a club"
- * - "cannot follow same player twice" : INSERT dans le même test,
- *   pas de dépendance sur l'état du test précédent
+ * "follow a club" : le club E2E permanent est déjà suivi par le coach
+ * depuis un run précédent. Le beforeAll ne peut pas supprimer ce follow
+ * car il utilise le coach client (RLS) et le club permanent est partagé.
+ * Solution : upsert au lieu d'insert pour follow club.
  */
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
@@ -18,13 +17,9 @@ test.describe("Follows", () => {
 
   test.beforeAll(async () => {
     club = await createTestClub("follows");
-    // Cleanup ciblé — seulement les follows liés à ce test
+    // Cleanup via admin (service role) — contourne la RLS
     await admin.from("follows").delete()
-      .eq("follower_id", E2E_COACH.userId)
-      .not("followed_player_id", "is", null);
-    await admin.from("follows").delete()
-      .eq("follower_id", E2E_COACH.userId)
-      .not("followed_club_id", "is", null);
+      .eq("follower_id", E2E_COACH.userId);
   });
 
   test.afterAll(async () => {
@@ -45,27 +40,28 @@ test.describe("Follows", () => {
     expect(error).toBeNull();
   });
 
+  // Upsert pour éviter le duplicate sur le club E2E permanent
   test("authenticated user can follow a club", async () => {
     const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await c.from("follows").upsert({
       follower_id: club.coach.userId,
       target_type: "club",
       followed_club_id: club.clubId,
-    }).select("id").single();
+    }, { onConflict: "follower_id,followed_club_id" })
+      .select("id").single();
     expect(error).toBeNull();
   });
 
-  // Insert + doublon dans le même test — pas de dépendance externe
   test("cannot follow the same player twice", async () => {
     const c = await clientFor(club.coach);
-    // Premier insert — doit passer (ou déjà présent)
+    // Garantir qu'une ligne existe via upsert
     await c.from("follows").upsert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player2WithParent.id,
     }, { onConflict: "follower_id,followed_player_id" });
 
-    // Second insert — doit échouer (UNIQUE constraint)
+    // Second insert → doit échouer UNIQUE constraint
     const { error } = await c.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
@@ -80,8 +76,7 @@ test.describe("Follows", () => {
       .select("followers_count").eq("id", club.player1.id).single();
     if ((data?.followers_count ?? 0) === 0) {
       test.skip(true,
-        "followers_count trigger not implemented on players. " +
-        "Validated manually via follow button UI."
+        "followers_count trigger not implemented. Validated manually via UI."
       );
       return;
     }
