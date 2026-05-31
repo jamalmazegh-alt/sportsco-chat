@@ -28,6 +28,8 @@ test.describe("Follows", () => {
   let followId: string;
   let clubFollowId: string;
 
+  test.describe.configure({ mode: "serial" });
+
   test.beforeAll(async () => {
     club = await createTestClub("follows");
   });
