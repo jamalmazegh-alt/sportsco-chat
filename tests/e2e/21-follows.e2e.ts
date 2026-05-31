@@ -40,15 +40,18 @@ test.describe("Follows", () => {
     expect(error).toBeNull();
   });
 
-  // Upsert pour éviter le duplicate sur le club E2E permanent
+  // Pas de policy UPDATE sur follows → upsert échoue en RLS si la ligne existe.
+  // On supprime via admin (service role, bypass RLS) puis insert via le client coach.
   test("authenticated user can follow a club", async () => {
+    await admin.from("follows").delete()
+      .eq("follower_id", club.coach.userId)
+      .eq("followed_club_id", club.clubId);
     const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").upsert({
+    const { error } = await c.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "club",
       followed_club_id: club.clubId,
-    }, { onConflict: "follower_id,followed_club_id" })
-      .select("id").single();
+    }).select("id").single();
     expect(error).toBeNull();
   });
 
