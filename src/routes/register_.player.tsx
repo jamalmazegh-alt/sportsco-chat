@@ -152,11 +152,11 @@ function RegisterPlayerPage() {
             <>
               <div>
                 <Label htmlFor="sp">Sport principal</Label>
-                <Input id="sp" required value={sport} onChange={(e) => setSport(e.target.value)} placeholder="Football, Basketball…" />
+                <SportSelect value={sport} onValueChange={(v) => { setSport(v); setPosition(""); }} placeholder="Choisis ton sport" />
               </div>
               <div>
                 <Label htmlFor="po">Poste préféré</Label>
-                <Input id="po" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="Optionnel" />
+                <PositionCombobox value={position} onChange={setPosition} sport={sport} placeholder="Optionnel" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
