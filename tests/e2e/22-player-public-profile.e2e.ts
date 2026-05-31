@@ -56,7 +56,7 @@ test.describe("Player public profile", () => {
   // ── 7. set_player_public_profile active le profil ───────────
   test("set_player_public_profile enables public profile", async () => {
     // Activer via admin (le joueur a un user_id)
-    if (!club.player1.userId) {
+    if (!club.player1.user?.userId) {
       test.skip(true, "player1 has no userId — cannot activate public profile");
       return;
     }
