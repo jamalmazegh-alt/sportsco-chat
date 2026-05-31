@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/password-input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SportSelect } from "@/components/sport-select";
+import { PositionCombobox } from "@/components/position-combobox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
@@ -150,11 +152,11 @@ function RegisterPlayerPage() {
             <>
               <div>
                 <Label htmlFor="sp">Sport principal</Label>
-                <Input id="sp" required value={sport} onChange={(e) => setSport(e.target.value)} placeholder="Football, Basketball…" />
+                <SportSelect value={sport} onValueChange={(v) => { setSport(v); setPosition(""); }} placeholder="Choisis ton sport" />
               </div>
               <div>
                 <Label htmlFor="po">Poste préféré</Label>
-                <Input id="po" value={position} onChange={(e) => setPosition(e.target.value)} placeholder="Optionnel" />
+                <PositionCombobox value={position} onChange={setPosition} sport={sport} placeholder="Optionnel" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
