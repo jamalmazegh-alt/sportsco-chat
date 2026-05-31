@@ -8,31 +8,35 @@
  */
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { admin, SUPABASE_URL, SUPABASE_ANON_KEY, E2E_COACH } from "./_fixtures/admin";
+import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 test.describe("Follows", () => {
   let club: SeededClub;
 
+  let coachClient: Awaited<ReturnType<typeof clientFor>>;
+
   test.beforeAll(async () => {
     club = await createTestClub("follows");
-    // Cleanup via admin (service role) — contourne la RLS
-    await admin.from("follows").delete()
-      .eq("follower_id", E2E_COACH.userId);
+    // `admin` n'est PAS service_role — c'est l'utilisateur admin. RLS s'applique
+    // et il ne peut pas supprimer les follows d'un autre user. On nettoie donc
+    // via le client coach (RLS lui permet de supprimer ses propres follows).
+    coachClient = await clientFor(club.coach);
+    await coachClient.from("follows").delete()
+      .eq("follower_id", club.coach.userId);
   });
 
   test.afterAll(async () => {
     try {
-      await admin.from("follows").delete()
-        .eq("follower_id", E2E_COACH.userId);
+      await coachClient.from("follows").delete()
+        .eq("follower_id", club.coach.userId);
     } catch { /* best-effort */ }
     await club.cleanup();
   });
 
   test("authenticated user can follow a player", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player1.id,
@@ -40,14 +44,13 @@ test.describe("Follows", () => {
     expect(error).toBeNull();
   });
 
-  // Pas de policy UPDATE sur follows → upsert échoue en RLS si la ligne existe.
-  // On supprime via admin (service role, bypass RLS) puis insert via le client coach.
   test("authenticated user can follow a club", async () => {
-    await admin.from("follows").delete()
+    // Nettoyage via le client coach (RLS) — admin ne peut pas supprimer
+    // les follows d'un autre user.
+    await coachClient.from("follows").delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_club_id", club.clubId);
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "club",
       followed_club_id: club.clubId,
@@ -56,19 +59,17 @@ test.describe("Follows", () => {
   });
 
   test("cannot follow the same player twice", async () => {
-    const c = await clientFor(club.coach);
-    // Garantir un état propre via admin (bypass RLS), puis insert via le client
-    await admin.from("follows").delete()
+    await coachClient.from("follows").delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_player_id", club.player2WithParent.id);
-    await c.from("follows").insert({
+    await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player2WithParent.id,
     });
 
     // Second insert → doit échouer UNIQUE constraint
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player2WithParent.id,
@@ -90,8 +91,7 @@ test.describe("Follows", () => {
   });
 
   test("user can unfollow a player", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").delete()
+    const { error } = await coachClient.from("follows").delete()
       .eq("follower_id", club.coach.userId)
       .eq("followed_player_id", club.player1.id);
     expect(error).toBeNull();
@@ -116,8 +116,7 @@ test.describe("Follows", () => {
   });
 
   test("invalid target_type is rejected", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "tournament",
       followed_player_id: club.player1.id,
@@ -126,8 +125,7 @@ test.describe("Follows", () => {
   });
 
   test("follow with two targets is rejected", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player1.id,
