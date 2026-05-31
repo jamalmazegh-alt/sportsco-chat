@@ -144,6 +144,7 @@ test.describe("Player public profile", () => {
       _offset: 0,
     });
     expect(error).toBeNull();
-    expect((data ?? []).length).toBe(0);
+    const items = ((data as any)?.items ?? []) as unknown[];
+    expect(items.length).toBe(0);
   });
 });
