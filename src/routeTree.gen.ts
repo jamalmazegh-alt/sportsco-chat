@@ -35,7 +35,7 @@ import { Route as SuperadminSupportRouteImport } from './routes/superadmin/suppo
 import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
 import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
 import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
-import { Route as RegisterPlayerRouteImport } from './routes/register.player'
+import { Route as RegisterPlayerRouteImport } from './routes/register_.player'
 import { Route as RTokenRouteImport } from './routes/r.$token'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
@@ -250,9 +250,9 @@ const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
   getParentRoute: () => SuperadminRoute,
 } as any)
 const RegisterPlayerRoute = RegisterPlayerRouteImport.update({
-  id: '/player',
-  path: '/player',
-  getParentRoute: () => RegisterRoute,
+  id: '/register_/player',
+  path: '/register/player',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RTokenRoute = RTokenRouteImport.update({
   id: '/r/$token',
@@ -725,7 +725,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
-  '/register': typeof RegisterRouteWithChildren
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
@@ -836,7 +836,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
-  '/register': typeof RegisterRouteWithChildren
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/assistant': typeof AuthenticatedAssistantRoute
@@ -945,7 +945,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
-  '/register': typeof RegisterRouteWithChildren
+  '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/superadmin': typeof SuperadminRouteWithChildren
@@ -972,7 +972,7 @@ export interface FileRoutesById {
   '/legal/cookies': typeof LegalCookiesRoute
   '/p/$slug': typeof PSlugRoute
   '/r/$token': typeof RTokenRoute
-  '/register/player': typeof RegisterPlayerRoute
+  '/register_/player': typeof RegisterPlayerRoute
   '/superadmin/billing': typeof SuperadminBillingRoute
   '/superadmin/logs': typeof SuperadminLogsRoute
   '/superadmin/settings': typeof SuperadminSettingsRoute
@@ -1304,7 +1304,7 @@ export interface FileRouteTypes {
     | '/legal/cookies'
     | '/p/$slug'
     | '/r/$token'
-    | '/register/player'
+    | '/register_/player'
     | '/superadmin/billing'
     | '/superadmin/logs'
     | '/superadmin/settings'
@@ -1390,7 +1390,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PlayersRoute: typeof PlayersRoute
   PricingRoute: typeof PricingRoute
-  RegisterRoute: typeof RegisterRouteWithChildren
+  RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuperadminRoute: typeof SuperadminRouteWithChildren
@@ -1405,6 +1405,7 @@ export interface RootRouteChildren {
   LegalCookiesRoute: typeof LegalCookiesRoute
   PSlugRoute: typeof PSlugRoute
   RTokenRoute: typeof RTokenRoute
+  RegisterPlayerRoute: typeof RegisterPlayerRoute
   TSlugRoute: typeof TSlugRouteWithChildren
   TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
   TournamentSlugRoute: typeof TournamentSlugRoute
@@ -1618,12 +1619,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperadminBillingRouteImport
       parentRoute: typeof SuperadminRoute
     }
-    '/register/player': {
-      id: '/register/player'
-      path: '/player'
+    '/register_/player': {
+      id: '/register_/player'
+      path: '/register/player'
       fullPath: '/register/player'
       preLoaderRoute: typeof RegisterPlayerRouteImport
-      parentRoute: typeof RegisterRoute
+      parentRoute: typeof rootRouteImport
     }
     '/r/$token': {
       id: '/r/$token'
@@ -2395,18 +2396,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface RegisterRouteChildren {
-  RegisterPlayerRoute: typeof RegisterPlayerRoute
-}
-
-const RegisterRouteChildren: RegisterRouteChildren = {
-  RegisterPlayerRoute: RegisterPlayerRoute,
-}
-
-const RegisterRouteWithChildren = RegisterRoute._addFileChildren(
-  RegisterRouteChildren,
-)
-
 interface SuperadminUsersRouteChildren {
   SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
 }
@@ -2491,7 +2480,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PlayersRoute: PlayersRoute,
   PricingRoute: PricingRoute,
-  RegisterRoute: RegisterRouteWithChildren,
+  RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuperadminRoute: SuperadminRouteWithChildren,
@@ -2506,6 +2495,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalCookiesRoute: LegalCookiesRoute,
   PSlugRoute: PSlugRoute,
   RTokenRoute: RTokenRoute,
+  RegisterPlayerRoute: RegisterPlayerRoute,
   TSlugRoute: TSlugRouteWithChildren,
   TournamentInviteTokenRoute: TournamentInviteTokenRoute,
   TournamentSlugRoute: TournamentSlugRoute,
