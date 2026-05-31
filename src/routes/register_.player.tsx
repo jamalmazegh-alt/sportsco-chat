@@ -45,7 +45,7 @@ function RegisterPlayerPage() {
   const [sport, setSport] = useState("");
   const [position, setPosition] = useState("");
   const [city, setCity] = useState("");
-  const [region, setRegion] = useState("");
+  const [country, setCountry] = useState("");
 
   // step 3
   const [lookingForClub, setLookingForClub] = useState(false);
