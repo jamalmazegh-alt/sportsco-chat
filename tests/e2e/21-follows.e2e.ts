@@ -28,6 +28,8 @@ test.describe("Follows", () => {
   let followId: string;
   let clubFollowId: string;
 
+  test.describe.configure({ mode: "serial" });
+
   test.beforeAll(async () => {
     club = await createTestClub("follows");
   });
@@ -84,12 +86,12 @@ test.describe("Follows", () => {
     expect(error).not.toBeNull();
   });
 
-  // ── 4. followers_count incrémenté (trigger) ─────────────────
+  // ── 4. followers_count incrémenté (trigger sur profiles) ────
   test("followers_count is incremented after follow", async () => {
     const { data } = await admin
-      .from("players")
+      .from("profiles")
       .select("followers_count")
-      .eq("id", club.player1.id)
+      .eq("id", club.player1.user.userId)
       .single();
     expect((data?.followers_count ?? 0)).toBeGreaterThan(0);
   });
@@ -104,12 +106,12 @@ test.describe("Follows", () => {
     expect(error).toBeNull();
   });
 
-  // ── 6. followers_count décrémenté (trigger) ─────────────────
+  // ── 6. followers_count décrémenté (trigger sur profiles) ────
   test("followers_count is decremented after unfollow", async () => {
     const { data } = await admin
-      .from("players")
+      .from("profiles")
       .select("followers_count")
-      .eq("id", club.player1.id)
+      .eq("id", club.player1.user.userId)
       .single();
     expect(data?.followers_count ?? 0).toBe(0);
   });

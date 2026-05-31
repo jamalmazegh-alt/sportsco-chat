@@ -52,8 +52,8 @@ test.describe("Tournament lifecycle", () => {
         name: `__e2e_tournament_${club.prefix}`,
         status: "draft",
         sport: "football",
-        start_date: future,
-        end_date: future,
+        starts_on: future,
+        ends_on: future,
         created_by: club.admin.userId,
       })
       .select("id")

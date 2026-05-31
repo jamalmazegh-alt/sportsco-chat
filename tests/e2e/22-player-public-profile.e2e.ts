@@ -20,6 +20,9 @@ test.describe("Player public profile", () => {
   let club: SeededClub;
   let publicSlug: string;
 
+  test.describe.configure({ mode: "serial" });
+
+
   test.beforeAll(async () => {
     club = await createTestClub("pubprofile");
   });
@@ -48,14 +51,15 @@ test.describe("Player public profile", () => {
     });
     expect(error).toBeNull();
     // Le joueur de test n'est pas public → ne doit pas apparaître
-    const found = (data ?? []).find((p: any) => p.id === club.player1.id);
+    const items = ((data as any)?.items ?? []) as Array<{ id: string }>;
+    const found = items.find((p) => p.id === club.player1.id);
     expect(found).toBeUndefined();
   });
 
   // ── 7. set_player_public_profile active le profil ───────────
   test("set_player_public_profile enables public profile", async () => {
     // Activer via admin (le joueur a un user_id)
-    if (!club.player1.userId) {
+    if (!club.player1.user?.userId) {
       test.skip(true, "player1 has no userId — cannot activate public profile");
       return;
     }
@@ -113,7 +117,8 @@ test.describe("Player public profile", () => {
       _offset: 0,
     });
     expect(error).toBeNull();
-    const found = (data ?? []).find((p: any) => p.id === club.player1.id);
+    const items = ((data as any)?.items ?? []) as Array<{ id: string }>;
+    const found = items.find((p) => p.id === club.player1.id);
     expect(found).toBeDefined();
   });
 
@@ -142,6 +147,7 @@ test.describe("Player public profile", () => {
       _offset: 0,
     });
     expect(error).toBeNull();
-    expect((data ?? []).length).toBe(0);
+    const items = ((data as any)?.items ?? []) as unknown[];
+    expect(items.length).toBe(0);
   });
 });
