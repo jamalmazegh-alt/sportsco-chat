@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Clock, UserX, Trophy, Shield, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { dismissInsight } from "@/lib/insights.functions";
 import { toast } from "sonner";
