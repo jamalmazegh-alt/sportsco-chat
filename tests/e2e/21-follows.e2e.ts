@@ -40,26 +40,32 @@ test.describe("Follows", () => {
     expect(error).toBeNull();
   });
 
-  // Upsert pour éviter le duplicate sur le club E2E permanent
+  // Pas de policy UPDATE sur follows → upsert échoue en RLS si la ligne existe.
+  // On supprime via admin (service role, bypass RLS) puis insert via le client coach.
   test("authenticated user can follow a club", async () => {
+    await admin.from("follows").delete()
+      .eq("follower_id", club.coach.userId)
+      .eq("followed_club_id", club.clubId);
     const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").upsert({
+    const { error } = await c.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "club",
       followed_club_id: club.clubId,
-    }, { onConflict: "follower_id,followed_club_id" })
-      .select("id").single();
+    }).select("id").single();
     expect(error).toBeNull();
   });
 
   test("cannot follow the same player twice", async () => {
     const c = await clientFor(club.coach);
-    // Garantir qu'une ligne existe via upsert
-    await c.from("follows").upsert({
+    // Garantir un état propre via admin (bypass RLS), puis insert via le client
+    await admin.from("follows").delete()
+      .eq("follower_id", club.coach.userId)
+      .eq("followed_player_id", club.player2WithParent.id);
+    await c.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player2WithParent.id,
-    }, { onConflict: "follower_id,followed_player_id" });
+    });
 
     // Second insert → doit échouer UNIQUE constraint
     const { error } = await c.from("follows").insert({
