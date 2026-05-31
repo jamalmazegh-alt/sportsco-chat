@@ -58,10 +58,10 @@ test.describe("Tournament lifecycle", () => {
 
   test("admin adds 4 teams", async () => {
     if (!tournamentId) { test.skip(true, "No tournamentId"); return; }
+    // tournament_teams has no club_id column — use team_id (nullable) instead
     const teams = ["Team A", "Team B", "Team C", "Team D"].map(name => ({
       tournament_id: tournamentId,
       name,
-      club_id: club.clubId,
     }));
     const { error } = await admin.from("tournament_teams").insert(teams);
     expect(error).toBeNull();

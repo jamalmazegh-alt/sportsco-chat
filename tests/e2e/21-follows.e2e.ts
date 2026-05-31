@@ -41,12 +41,14 @@ test.describe("Follows", () => {
 
   test("authenticated user can follow a club", async () => {
     const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { data, error } = await c.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "club",
       followed_club_id: club.clubId,
     }).select("id").single();
+    if (error) console.error("follow club error:", JSON.stringify(error));
     expect(error).toBeNull();
+    expect(data?.id).toBeTruthy();
   });
 
   test("cannot follow the same player twice", async () => {
@@ -56,6 +58,14 @@ test.describe("Follows", () => {
       target_type: "player",
       followed_player_id: club.player1.id,
     });
+    if (!error) {
+      // Diagnose: count existing rows
+      const { data: existing } = await admin.from("follows")
+        .select("id, target_type, followed_player_id")
+        .eq("follower_id", club.coach.userId)
+        .eq("followed_player_id", club.player1.id);
+      console.error("dup player did not fail — existing rows:", JSON.stringify(existing));
+    }
     expect(error).not.toBeNull();
   });
 
