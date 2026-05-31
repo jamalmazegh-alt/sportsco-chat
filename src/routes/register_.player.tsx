@@ -45,7 +45,7 @@ function RegisterPlayerPage() {
   const [sport, setSport] = useState("");
   const [position, setPosition] = useState("");
   const [city, setCity] = useState("");
-  const [region, setRegion] = useState("");
+  const [country, setCountry] = useState("");
 
   // step 3
   const [lookingForClub, setLookingForClub] = useState(false);
@@ -85,7 +85,7 @@ function RegisterPlayerPage() {
         full_name: `${firstName} ${lastName}`.trim(),
         birth_date: birthDate || null,
         city: city || null,
-        region: region || null,
+        country: country || null,
         is_independent: true,
         person_type: "player",
         looking_for_club: lookingForClub,
@@ -164,8 +164,31 @@ function RegisterPlayerPage() {
                   <Input id="ci" value={city} onChange={(e) => setCity(e.target.value)} />
                 </div>
                 <div>
-                  <Label htmlFor="re">Région</Label>
-                  <Input id="re" value={region} onChange={(e) => setRegion(e.target.value)} />
+                  <Label htmlFor="co">Pays</Label>
+                  <select
+                    id="co"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="">Choisir…</option>
+                    <option value="France">France</option>
+                    <option value="Belgique">Belgique</option>
+                    <option value="Suisse">Suisse</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Luxembourg">Luxembourg</option>
+                    <option value="Maroc">Maroc</option>
+                    <option value="Tunisie">Tunisie</option>
+                    <option value="Algérie">Algérie</option>
+                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                    <option value="Sénégal">Sénégal</option>
+                    <option value="Réunion">Réunion</option>
+                    <option value="Guadeloupe">Guadeloupe</option>
+                    <option value="Martinique">Martinique</option>
+                    <option value="Polynésie française">Polynésie française</option>
+                    <option value="Nouvelle-Calédonie">Nouvelle-Calédonie</option>
+                    <option value="Autre">Autre</option>
+                  </select>
                 </div>
               </div>
               <div className="flex gap-2">
