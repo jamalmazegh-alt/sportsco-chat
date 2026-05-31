@@ -8,7 +8,7 @@
  */
 import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
-import { admin, SUPABASE_URL, SUPABASE_ANON_KEY, E2E_COACH } from "./_fixtures/admin";
+import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
