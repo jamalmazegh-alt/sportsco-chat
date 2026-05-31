@@ -48,7 +48,8 @@ test.describe("Player public profile", () => {
     });
     expect(error).toBeNull();
     // Le joueur de test n'est pas public → ne doit pas apparaître
-    const found = (data ?? []).find((p: any) => p.id === club.player1.id);
+    const items = ((data as any)?.items ?? []) as Array<{ id: string }>;
+    const found = items.find((p) => p.id === club.player1.id);
     expect(found).toBeUndefined();
   });
 
