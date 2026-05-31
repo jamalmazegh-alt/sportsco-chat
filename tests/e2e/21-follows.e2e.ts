@@ -69,7 +69,7 @@ test.describe("Follows", () => {
     });
 
     // Second insert → doit échouer UNIQUE constraint
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player2WithParent.id,
