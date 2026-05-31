@@ -114,7 +114,8 @@ test.describe("Player public profile", () => {
       _offset: 0,
     });
     expect(error).toBeNull();
-    const found = (data ?? []).find((p: any) => p.id === club.player1.id);
+    const items = ((data as any)?.items ?? []) as Array<{ id: string }>;
+    const found = items.find((p) => p.id === club.player1.id);
     expect(found).toBeDefined();
   });
 
