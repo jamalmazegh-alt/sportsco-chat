@@ -57,12 +57,15 @@ test.describe("Follows", () => {
 
   test("cannot follow the same player twice", async () => {
     const c = await clientFor(club.coach);
-    // Garantir qu'une ligne existe via upsert
-    await c.from("follows").upsert({
+    // Garantir un état propre via admin (bypass RLS), puis insert via le client
+    await admin.from("follows").delete()
+      .eq("follower_id", club.coach.userId)
+      .eq("followed_player_id", club.player2WithParent.id);
+    await c.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player2WithParent.id,
-    }, { onConflict: "follower_id,followed_player_id" });
+    });
 
     // Second insert → doit échouer UNIQUE constraint
     const { error } = await c.from("follows").insert({
