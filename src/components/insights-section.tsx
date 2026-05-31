@@ -142,7 +142,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   };
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-2">
       <div className="flex items-center justify-between px-0.5">
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.14em]">
           {t("insights.title")}
@@ -151,7 +151,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           {insights.length}
         </span>
       </div>
-      <div className="flex gap-3 overflow-x-auto sm:overflow-visible sm:flex-col sm:gap-2.5 -mx-5 px-5 sm:mx-0 sm:px-0 snap-x snap-mandatory pb-1">
+      <div className="space-y-1">
         {insights.map((ins) => {
           const Icon = TYPE_ICON[ins.insight_type] ?? Clock;
           const msg = locale === "en" ? ins.message_en : ins.message_fr;
@@ -161,50 +161,30 @@ export function InsightsSection({ clubId }: { clubId: string }) {
             <div
               key={ins.id}
               className={cn(
-                "relative shrink-0 snap-start w-[85%] sm:w-auto overflow-hidden rounded-2xl bg-card p-4 pl-5 ring-1 shadow-sm transition-shadow hover:shadow-md",
-                "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1",
-                tone.ring,
-                tone.accent,
+                "group flex items-start gap-2.5 rounded-lg border border-border/60 bg-card px-3 py-2 transition-colors",
+                tone.hoverBg,
               )}
             >
-              <button
-                aria-label={t("insights.dismiss")}
-                onClick={() => setPendingDismiss(ins.id)}
-                className="absolute top-2.5 right-2.5 p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-              <div className="flex items-start gap-3 pr-6">
-                <div
-                  className={cn(
-                    "h-10 w-10 rounded-xl flex items-center justify-center shrink-0",
-                    tone.iconBg,
-                  )}
-                >
-                  <Icon className={cn("h-5 w-5", tone.iconFg)} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span
-                    className={cn(
-                      "inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
-                      tone.badge,
-                    )}
+              <Icon className={cn("h-4 w-4 shrink-0 mt-0.5", tone.iconFg)} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm leading-snug text-foreground">{msg}</p>
+              </div>
+              <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                {label && (
+                  <button
+                    className="text-xs text-primary hover:underline underline-offset-2 font-medium"
+                    onClick={() => handleAction(ins)}
                   >
-                    {t(`insights.${ins.priority}`)}
-                  </span>
-                  <p className="text-sm mt-2 leading-snug text-foreground">{msg}</p>
-                  {label && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="mt-2 h-8 px-2 -ml-2 text-primary hover:text-primary hover:bg-primary/10"
-                      onClick={() => handleAction(ins)}
-                    >
-                      {label}
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </div>
+                    {label}
+                  </button>
+                )}
+                <button
+                  aria-label={t("insights.dismiss")}
+                  onClick={() => setPendingDismiss(ins.id)}
+                  className="p-1 rounded-md text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted hover:text-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </div>
             </div>
           );
