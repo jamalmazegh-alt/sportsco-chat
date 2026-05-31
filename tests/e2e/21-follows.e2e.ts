@@ -116,8 +116,7 @@ test.describe("Follows", () => {
   });
 
   test("invalid target_type is rejected", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "tournament",
       followed_player_id: club.player1.id,
@@ -126,8 +125,7 @@ test.describe("Follows", () => {
   });
 
   test("follow with two targets is rejected", async () => {
-    const c = await clientFor(club.coach);
-    const { error } = await c.from("follows").insert({
+    const { error } = await coachClient.from("follows").insert({
       follower_id: club.coach.userId,
       target_type: "player",
       followed_player_id: club.player1.id,
