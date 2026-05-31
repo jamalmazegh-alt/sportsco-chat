@@ -47,28 +47,22 @@ const TYPE_ICON = {
 
 const PRIORITY_TONE: Record<
   InsightRow["priority"],
-  { ring: string; iconBg: string; iconFg: string; badge: string; accent: string }
+  { iconFg: string; dot: string; hoverBg: string }
 > = {
   high: {
-    ring: "ring-destructive/20",
-    iconBg: "bg-destructive/10",
     iconFg: "text-destructive",
-    badge: "bg-destructive/10 text-destructive",
-    accent: "before:bg-destructive",
+    dot: "bg-destructive",
+    hoverBg: "hover:bg-destructive/5",
   },
   medium: {
-    ring: "ring-pending/20",
-    iconBg: "bg-pending/10",
     iconFg: "text-pending",
-    badge: "bg-pending/10 text-pending",
-    accent: "before:bg-pending",
+    dot: "bg-pending",
+    hoverBg: "hover:bg-pending/5",
   },
   low: {
-    ring: "ring-primary/15",
-    iconBg: "bg-primary/10",
     iconFg: "text-primary",
-    badge: "bg-primary/10 text-primary",
-    accent: "before:bg-primary",
+    dot: "bg-primary",
+    hoverBg: "hover:bg-primary/5",
   },
 };
 
