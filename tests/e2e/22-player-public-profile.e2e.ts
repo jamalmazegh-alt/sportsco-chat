@@ -42,7 +42,8 @@ test.describe("Player public profile", () => {
       return;
     }
     expect(error).toBeNull();
-    const found = (data ?? []).find((p: any) => p.id === club.player1.id);
+    const items = (data as any)?.items ?? [];
+    const found = items.find((p: any) => p.id === club.player1.id);
     expect(found).toBeUndefined();
   });
 
@@ -127,6 +128,7 @@ test.describe("Player public profile", () => {
       return;
     }
     expect(error).toBeNull();
-    expect((data ?? []).length).toBe(0);
+    const items = (data as any)?.items ?? [];
+    expect(items.length).toBe(0);
   });
 });
