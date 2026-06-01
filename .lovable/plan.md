@@ -1,108 +1,108 @@
-# Plan — Fondation Entité Personne (v2)
+## Contexte
 
-Implémentation fidèle du prompt joint. **Non-destructif** : aucune donnée existante n'est modifiée, toutes les features actuelles continuent de fonctionner.
+Le code existant couvre déjà une bonne partie du périmètre :
 
-## Vue d'ensemble
+- **Ranking / tie-breakers** : `src/modules/tournaments/lib/standings.ts` implémente déjà points / GD / GF / head-to-head (points/GD/GF) / fair-play / draw-lot, avec ordre configurable par tournoi (`tiebreakers: Tiebreaker[]`). Pas besoin de schéma DB — l'ordre est déjà persisté dans `tournaments.settings`. → il manque surtout **les tests** et la valeur par défaut alignée avec la spec.
+- **Freeze tournoi** : pas de garde-fou unifié. Les server fns laissent supprimer équipes / changer format même après démarrage. → ajout d'un helper `assertTournamentMutable` + tests cross-tenant via les guards `assertClubRole` déjà testés.
+- **Paiement atomicité** : flux Stripe → `tournament_registrations`. Aujourd'hui le webhook met juste `payment_status='paid_online'` mais ne crée pas la team (sauf en auto-approval avant paiement). Pas de self-heal. Pas de statut explicite `paid_pending_team`. Montant déjà recalculé serveur (✅), mais pas d'idempotency stricte sur eventId.
 
-Le principe : une Personne existe indépendamment d'un club. Les clubs enrichissent son profil mais ne le possèdent pas. On pose les fondations DB + 2 surfaces UI minimales (inscription joueur indépendant, profil public coach). Le feed et le claim profile sont préparés en DB mais sans UI.
+Je découpe en 3 lots livrables séparément.
 
-## Étape 1 — Migration DB (un seul fichier)
+---
 
-### 1.1 `players.club_id` nullable
-- `ALTER TABLE players ALTER COLUMN club_id DROP NOT NULL`
-- Mise à jour RLS players : si `club_id IS NULL` → lecture/écriture par `user_id = auth.uid()` + super-admin uniquement. Sinon RLS club-scoped inchangée.
-- Ajout colonnes claim : `claim_requested_by uuid`, `claim_status text CHECK (...)`, `claim_requested_at timestamptz` (architecture seulement, pas d'UI).
+## Lot 1 — Ranking tie-breakers (tests + défaut aligné spec)
 
-### 1.2 Enrichissement `profiles`
-- `ADD COLUMN IF NOT EXISTS` : `first_name`, `last_name`, `birth_date`, `city`, `region`, `country DEFAULT 'FR'`, `bio`, `public_slug UNIQUE`, `profile_visibility` (private/club/public), `is_independent`, `person_type` (player/coach/parent/staff/user), `looking_for_club`, `followers_count`, `parental_public_consent`, `updated_at`.
-- Index unique partiel sur `public_slug WHERE NOT NULL`.
+**Changements code (minimes)**
+- `src/modules/tournaments/lib/standings.ts` : ajuster `DEFAULT_TIEBREAKERS` pour matcher exactement l'ordre demandé :
+  `points → goal_diff → goals_for → head_to_head_points → head_to_head_gd → head_to_head_gf → fair_play → draw_lot`.
+  (actuellement : points → h2h_points → h2h_gd → goal_diff → goals_for ; on inverse pour mettre GD/GF avant H2H comme spec.)
 
-### 1.3 Nouvelles tables
-- `coach_profiles` (avec `current_club_id`, `sport`, `speciality`, `philosophy`, `years_experience`, `looking_for_club`, `public_slug`, `public_profile_enabled`, `profile_visibility`, `followers_count`, UNIQUE(user_id))
-- `coach_diplomas` (rattachée à `coach_profiles`)
-- `coach_club_history` (rattachée à `coach_profiles`)
-- `follows` (cible polymorphique player/coach/club via `target_type` + 3 FK exclusives, contraintes CHECK + UNIQUE)
-- `feed_events` (log immuable, actor polymorphique, metadata jsonb, visibility, occurred_at)
+**Tests (`src/tests/unit/standings-tiebreakers.test.ts`)**
+- Tied points, séparés par GD
+- Tied GD, séparés par GF
+- Tied stats générales, séparés par H2H points
+- Tied H2H, séparés par fair-play
+- Tied total → résolu par `draw_lot` déterministe (salt stable)
+- Ordre custom : tournoi qui met `fair_play` avant `goal_diff` produit un classement différent
 
-### 1.4 `clubs`
-- `ADD COLUMN followers_count integer DEFAULT 0`
-- `ADD COLUMN looking_for_coach boolean DEFAULT false`
+---
 
-### 1.5 GRANTs + RLS sur toutes les nouvelles tables
-Suivant exactement la section 12 du prompt (coach_profiles, coach_diplomas, coach_club_history, follows, feed_events) + grants `authenticated`/`anon` selon visibilité.
+## Lot 2 — Tournament freeze + cross-tenant
 
-### 1.6 Triggers
-- `follows` INSERT/DELETE → incrément/décrément `followers_count` sur la bonne table cible (floor à 0).
-- `club_members` AFTER INSERT → `feed_events` (player_joined_club / coach_joined_club) si profil public activé.
-- `player_achievements` AFTER UPDATE (status → confirmed) → `feed_events` (player_achievement) si visibilité public.
-- `coach_diplomas` AFTER INSERT → `feed_events` (coach_diploma) si coach public.
-- `players` AFTER UPDATE (public_profile_enabled → true) → `feed_events` (player_public_profile_created).
-- `coach_profiles` AFTER UPDATE (public_profile_enabled → true) → `feed_events` (coach_public_profile_created).
-- `clubs` AFTER INSERT → `feed_events` (club_created), en excluant les clubs `is_personal=true` et `__rls_*`/`__e2e_*`.
-- Mineurs sans `parental_public_consent=true` → aucun feed_event public.
-- Tous SECURITY DEFINER, idempotents (guard anti-doublon), immutables.
+**Nouveau helper** : `src/lib/tournament-guards.server.ts`
+- `assertTournamentMutable(tournamentId, { allow: 'structure' | 'scores' | 'logistics' })`
+  - lit `tournaments.status` via supabaseAdmin
+  - `structure` (delete team, change format, change groups, change ranking rules, delete matches) → throw 409 si status ∈ `in_progress | completed`
+  - `scores` / `logistics` → toujours autorisés
+- `assertCanSubmitMatchScore({ userId, matchId, role: 'referee' | 'organizer' })`
+  - referee : doit être assigné au match (table `tournament_matches.referee_user_id` ou équivalent)
+  - organizer : doit être admin/tournament_manager du club du tournoi (→ délègue à `assertClubRole`)
+  - match `locked=true` → referee refusé, organizer OK avec `correction_reason` non vide
+- `assertCanLockMatch(...)` : organizer only
 
-### 1.7 Slugs
-- Étendre `gen_player_public_slug()` : adultes `{first}-{last}-{4 alphanum}`, mineurs `10 alphanum` sans nom.
-- Nouvelle `gen_coach_public_slug()` même format adulte.
+**Câblage minimal côté server fns** (pas de réécriture massive) :
+- ajouter `assertTournamentMutable` dans : `deleteTournamentTeam`, `updateTournamentFormat`, `updateGroupComposition`, `updateRankingRules`, `regenerateMatches`/`deleteMatch` (identifier les fns exactes dans `tournaments.functions.ts`).
+- ajouter `assertCanSubmitMatchScore` dans `submitMatchScore` / `updateMatchScore` / `lockMatchResult`.
 
-## Étape 2 — Inscription joueur indépendant
+**Tests (`src/tests/unit/tournament-guards.test.ts`)** (même pattern que `authz.test.ts`, mocks via `vi.hoisted`)
+- `assertTournamentMutable` : draft → autorisé ; in_progress + structure → 409 ; in_progress + scores → autorisé
+- Locked match : referee re-edit → 403 ; organizer sans reason → 400 ; organizer + reason → OK + audit log
+- Cross-tenant :
+  - organizer club A + tournoi club B → 403
+  - referee match A + score match B → 403
+  - staff tournoi A + edit tournoi B → 403
+  - user public (pas de userId) → 401/403
 
-Route `/register/player` (publique, 3 étapes) :
-1. Identité : prénom, nom, date de naissance, email, mot de passe.
-2. Sport : sport, poste (optionnel), pied fort (optionnel), ville/région (optionnel).
-3. Confidentialité : explication visibilité publique, checkbox consentement parental si mineur, toggle `looking_for_club`.
+---
 
-À la fin :
-- Crée `auth.users` (signUp standard, pas anonyme)
-- `profiles` rempli (`is_independent=true`, `person_type='player'`, champs identité)
-- `players` créé avec `club_id=NULL`, `user_id=new_user.id`
-- Redirection vers le dashboard joueur existant
+## Lot 3 — Payment atomicity
 
-Lien depuis `/register` (CTA secondaire "Je suis joueur, créer mon profil") et depuis l'annuaire public `/players`.
+**Migration DB** (`tournament_registrations`)
+- Nouvelle colonne `registration_state text` (enum-like check) avec valeurs :
+  `pending_payment | paid_pending_team | confirmed | failed | cancelled`
+  (on garde `payment_status` legacy pour rétrocompat ; `registration_state` devient la source de vérité).
+- Index unique partiel : `(tournament_id, tournament_team_id)` où `tournament_team_id is not null` (évite la double-team).
+- Table `stripe_webhook_events (event_id text primary key, processed_at timestamptz)` pour idempotency stricte au niveau webhook (si pas déjà existante).
 
-## Étape 3 — Profil public coach
+**Code**
+- `src/routes/api/public/stripe-webhook.ts` :
+  - en tout début de handler, `INSERT … ON CONFLICT DO NOTHING` dans `stripe_webhook_events`. Si conflict → 200 immédiat.
+- `src/modules/tournaments/tournament-payments.server.ts` :
+  - `handleTournamentCheckoutCompleted` :
+    1. transition `registration_state → paid_pending_team` (idempotent)
+    2. appelle `ensureRegistrationTeam(registrationId)` :
+       - SELECT `tournament_team_id` ; si non null → no-op (idempotent)
+       - sinon INSERT team + UPDATE registration en une transaction RPC (`create_team_for_registration` SECURITY DEFINER, returns team_id, exception-safe sur unique violation → retourne team existante)
+    3. transition `→ confirmed`
+  - `buildCheckoutForRegistration` : déjà OK (montant serveur), on ajoute une assertion explicite que `metadata.tournament_id` côté checkout est ignoré et toujours re-résolu depuis la registration côté webhook.
+- **Self-heal** : route `/api/public/hooks/payment-self-heal.ts` (cron-friendly) qui repère `registration_state='paid_pending_team'` depuis > 5 min et rejoue `ensureRegistrationTeam`.
+- `checkout.session.expired` / `payment_intent.payment_failed` → `registration_state='failed'`.
+- `checkout.session.async_payment_failed` + cancel URL hit → `cancelled`.
 
-Route `/coach/$slug` (publique, SSR + SEO complet comme `/p/$slug`) :
-- Nom, photo/avatar, club actuel, sport+spécialité, diplômes, historique clubs, philosophie, années d'expérience.
-- Badge `looking_for_club` si actif.
-- Bouton Follow (no-op si non connecté → CTA login) + `followers_count`.
-- Meta tags OG/Twitter, JSON-LD Person, noindex si profil non public.
+**Tests (`src/tests/unit/tournament-payment-atomicity.test.ts`)**
+- Webhook livré 2× même eventId → 1 seule team créée
+- `paid_pending_team` puis team-creation échoue puis retry → exactement 1 team
+- Client POSTant un amount custom → ignoré (montant relu depuis `tournaments.registration_fee`)
+- Client POSTant `tournament_id` d'un autre club → registration créée sur le bon tournoi (slug-driven, déjà OK) + assertion explicite
+- `payment_intent.payment_failed` → `failed`, pas de team
+- Cancel → `cancelled`, pas de team
 
-## Étape 4 — i18n
+---
 
-Ajout des clés FR/EN listées section 13 dans `common.json` (namespace `person`, `coach`, `follow`, `availability`, `feed`, `register`).
+## Section technique (pour les développeurs)
 
-## Étape 5 — Hors scope (préparé, non implémenté)
+- **Stack** : TanStack Start + Supabase. Guards = pures fonctions serveur testables avec mocks `vi.hoisted` (déjà en place dans `authz.test.ts`).
+- **Tests** : Vitest (déjà câblé via `unit-tests.yml` après le fix `bun run test`).
+- **Idempotency Stripe** : table `stripe_webhook_events` est la barrière #1. La transition d'état dans `tournament_registrations` est la barrière #2 (les UPDATE sont conditionnés sur l'état attendu : `WHERE registration_state IN ('pending_payment','paid_pending_team')`).
+- **RLS** : `tournament_registrations` reste write-only via supabaseAdmin côté server (déjà le cas).
+- **Pas d'edge function** : tout reste dans server routes TanStack.
 
-- UI feed d'actualité (tables + triggers OK, pas de page).
-- UI claim profile (colonnes OK, pas de flow).
-- Bouton Follow côté UI joueur/club (table OK, on n'ajoute que sur `/coach/$slug` cette fois pour vérifier la mécanique).
+---
 
-## Détails techniques
+## Ordre d'exécution proposé
 
-- **Migration unique** via `supabase--migration` : tout en une fois, avec GRANT + RLS dans le même fichier (sinon PostgREST refuse l'accès).
-- **Respect mémoire projet** : les RPC SECURITY DEFINER protégées par contrôles internes restent acceptées par le linter (rule core).
-- **Clubs personnels** : `handle_new_user` reste inchangé (memory rule). Le trigger `club_created` exclut `is_personal=true`.
-- **Realtime** : aucune nouvelle subscription (les nouvelles tables sont consommées via requêtes classiques).
-- **Routes TanStack** : fichiers plat `register.player.tsx` et `coach.$slug.tsx` sous `src/routes/`.
+1. **Lot 1** (1 fichier code + 1 fichier test) — risque ~nul, valide la base.
+2. **Lot 2** (1 helper + ~5 call-sites + 1 fichier test) — risque modéré, mais aucune migration DB.
+3. **Lot 3** (1 migration + helpers webhook + 1 route self-heal + 1 fichier test) — risque le plus élevé, fait en dernier pour bénéficier des guards du Lot 2.
 
-## Fichiers créés/modifiés
-
-Migrations :
-- `supabase/migrations/<ts>_person_entity_foundation.sql`
-
-Code :
-- `src/routes/register.player.tsx` (nouveau, wizard 3 étapes)
-- `src/routes/coach.$slug.tsx` (nouveau, profil public coach)
-- `src/routes/register.tsx` (ajout CTA secondaire vers `/register/player`)
-- `src/routes/players.tsx` (ajout CTA "Crée ton profil joueur" → `/register/player`)
-- `src/locales/fr/common.json` + `src/locales/en/common.json` (clés i18n)
-- `src/integrations/supabase/types.ts` (auto-régénéré après migration)
-- `src/routeTree.gen.ts` (auto-régénéré)
-
-## Validation
-
-- Lint Supabase après migration (warnings SECURITY DEFINER attendus sur les helpers de slug et triggers — acceptables d'après la memory).
-- Smoke test : un user existant continue de voir ses players liés à son club sans changement.
-- Test manuel : `/register/player` crée bien profile + players avec club_id NULL ; `/coach/$slug` renvoie 200 pour un coach public, noindex sinon.
+Chaque lot est mergeable indépendamment. Confirme si tu veux que je démarre par le Lot 1, ou les 3 d'affilée.
