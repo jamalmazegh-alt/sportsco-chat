@@ -4,7 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe } from "@/lib/stripe.server";
-import { computeFeeForClub } from "@/lib/platform-fee";
 import { createLogger } from "@/lib/logger.server";
 import { generateReceiptPdf, signedReceiptUrl } from "@/lib/payment-receipt.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
@@ -13,49 +12,48 @@ const log = createLogger("payment-checkout");
 
 const MANUAL_METHODS = ["cash", "cheque", "bank_transfer", "manual"] as const;
 
+// FIX 7: Financial actions require the financial_admin role. Club Admin
+// can ASSIGN the financial_admin role but does NOT inherit it. The only
+// bypass is super-admin (handled by RLS / service-role admin tools).
 async function assertFinAdmin(
-  supabase: SupabaseClient,
+  _supabase: SupabaseClient,
   userId: string,
   clubId: string,
 ): Promise<void> {
-  const { data } = await supabase
-    .from("club_members")
-    .select("roles, role")
-    .eq("club_id", clubId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
-  if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
     _club_id: clubId,
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only club admins or financial admins can record payments");
+  throw new Error("Only financial admins can perform this action");
 }
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
 }
 
-async function hasActiveSubscription(clubId: string): Promise<boolean> {
-  const { data: sub } = await supabaseAdmin
-    .from("subscriptions")
-    .select("status, trial_end, current_period_end")
-    .eq("club_id", clubId)
-    .maybeSingle();
-  const now = Date.now();
-  return (
-    !!sub &&
-    ((sub.status === "trialing" &&
-      sub.trial_end &&
-      new Date(sub.trial_end).getTime() > now) ||
-      ((sub.status === "active" || sub.status === "past_due") &&
-        (!sub.current_period_end ||
-          new Date(sub.current_period_end).getTime() > now)))
-  );
+// FIX 6: Stripe statement_descriptor_suffix limits — 22 chars, alphanumeric
+// plus spaces, no special chars. Build from club name; fall back to short
+// safe default. Never use "CLUBERO" for club payments.
+function buildStatementDescriptor(clubName: string | null | undefined): string {
+  const cleaned = (clubName ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toUpperCase();
+  return cleaned.slice(0, 22) || "CLUB";
+}
+
+async function sumPaid(obligationId: string): Promise<number> {
+  const { data } = await supabaseAdmin
+    .from("payment_transactions")
+    .select("amount_gross_cents")
+    .eq("obligation_id", obligationId)
+    .eq("status", "succeeded");
+  return (data ?? []).reduce((s, r) => s + (r.amount_gross_cents ?? 0), 0);
 }
 
 async function sumPaid(obligationId: string): Promise<number> {
