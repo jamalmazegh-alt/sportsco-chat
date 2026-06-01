@@ -83,9 +83,10 @@ export async function expectUpdateBlocked(
   table: string,
   rowId: string,
   patch: Record<string, unknown>,
+  idColumn = "id",
 ) {
   const { data, error } = await (client.from(table as any).update(patch) as any)
-    .eq("id", rowId)
+    .eq(idColumn, rowId)
     .select();
   const blocked = !!error || !data || data.length === 0;
   expect(blocked, `UPDATE on ${table}#${rowId} should have been blocked`).toBe(true);
