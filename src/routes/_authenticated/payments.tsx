@@ -124,10 +124,8 @@ function MyPaymentsPage() {
 
 function ObligationRow({
   obligation,
-  onPaid,
 }: {
   obligation: Obligation;
-  onPaid: () => void;
 }) {
   const checkoutFn = useServerFn(createObligationCheckout);
   const [partialOpen, setPartialOpen] = useState(false);
