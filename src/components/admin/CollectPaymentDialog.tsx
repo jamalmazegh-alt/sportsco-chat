@@ -539,7 +539,7 @@ function ManualPaymentForm({
   const remaining = obligation.amount_due_cents - obligation.amount_paid_cents;
   const currency = (obligation.currency || "eur").toUpperCase();
   const [method, setMethod] = useState<
-    "cash" | "cheque" | "bank_transfer" | "manual"
+    "cash" | "cheque" | "bank_transfer" | "manual" | "helloasso"
   >("cash");
   const [amount, setAmount] = useState((remaining / 100).toFixed(2));
   const [reference, setReference] = useState("");
