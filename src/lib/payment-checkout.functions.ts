@@ -518,9 +518,23 @@ export async function finalizeStripeTransactionByPI(params: {
   amountReceivedCents: number;
   feeCents: number | null;
   sessionId: string | null;
+  currency?: string | null;
+  // Session.metadata — used to self-heal when no pending tx exists.
+  metadata?: {
+    obligation_id?: string | null;
+    club_id?: string | null;
+    payer_user_id?: string | null;
+  } | null;
 }): Promise<void> {
-  const { paymentIntentId, chargeId, amountReceivedCents, feeCents, sessionId } =
-    params;
+  const {
+    paymentIntentId,
+    chargeId,
+    amountReceivedCents,
+    feeCents,
+    sessionId,
+    currency,
+    metadata,
+  } = params;
 
   // Locate the pending tx via session id (external_reference) or PI
   let txRow: { id: string; obligation_id: string; club_id: string; status: string } | null = null;
@@ -533,7 +547,7 @@ export async function finalizeStripeTransactionByPI(params: {
       .maybeSingle();
     txRow = data ?? null;
   }
-  if (!txRow) {
+  if (!txRow && paymentIntentId) {
     const { data } = await supabaseAdmin
       .from("payment_transactions")
       .select("id, obligation_id, club_id, status")
@@ -541,10 +555,86 @@ export async function finalizeStripeTransactionByPI(params: {
       .maybeSingle();
     txRow = data ?? null;
   }
+
+  // SELF-HEAL: webhook arrived but no pending row exists (e.g. the original
+  // insert failed, or the webhook beat it). Reconstruct the transaction from
+  // session metadata and converge with the partial unique index on
+  // external_reference so we can never create duplicates.
   if (!txRow) {
-    log.warn("Stripe success but no matching pending tx", {
-      paymentIntentId,
+    const obligationId = metadata?.obligation_id ?? null;
+    const clubId = metadata?.club_id ?? null;
+    if (!sessionId || !obligationId || !clubId) {
+      log.warn("Stripe success but no matching pending tx and no recoverable metadata", {
+        paymentIntentId,
+        sessionId,
+      });
+      return;
+    }
+    const cur = (currency || "eur").toLowerCase();
+    const fee = feeCents ?? 0;
+    const { data: healed, error: healErr } = await supabaseAdmin
+      .from("payment_transactions")
+      .upsert(
+        {
+          obligation_id: obligationId,
+          club_id: clubId,
+          method: "stripe",
+          status: "succeeded",
+          amount_gross_cents: amountReceivedCents,
+          provider_fee_cents: fee,
+          amount_net_cents: amountReceivedCents - fee,
+          currency: cur,
+          external_reference: sessionId,
+          stripe_payment_intent_id: paymentIntentId || null,
+          stripe_charge_id: chargeId,
+          recorded_by: metadata?.payer_user_id ?? null,
+          paid_at: new Date().toISOString(),
+        },
+        { onConflict: "external_reference" },
+      )
+      .select("id, obligation_id, club_id, status")
+      .single();
+    if (healErr || !healed) {
+      log.error("Self-heal upsert failed", {
+        sessionId,
+        paymentIntentId,
+        error: healErr?.message,
+      });
+      return;
+    }
+    // If the row already existed and was already succeeded, stop here (idempotent).
+    if (healed.status !== "succeeded") {
+      // Race: another writer created it in pending — promote it.
+      await supabaseAdmin
+        .from("payment_transactions")
+        .update({
+          status: "succeeded",
+          stripe_payment_intent_id: paymentIntentId || null,
+          stripe_charge_id: chargeId,
+          amount_gross_cents: amountReceivedCents,
+          provider_fee_cents: fee,
+          amount_net_cents: amountReceivedCents - fee,
+          paid_at: new Date().toISOString(),
+        })
+        .eq("id", healed.id);
+    }
+    await maybeIssueReceipt(healed.id);
+    await supabaseAdmin.from("payment_audit_logs").insert({
+      club_id: healed.club_id,
+      actor_user_id: null,
+      action: "stripe_payment_succeeded_self_heal",
+      entity_type: "payment_transaction",
+      entity_id: healed.id,
+      new_value: {
+        payment_intent: paymentIntentId,
+        session_id: sessionId,
+        obligation_id: healed.obligation_id,
+      } as unknown as never,
+    });
+    log.warn("Self-healed Stripe transaction from webhook", {
       sessionId,
+      paymentIntentId,
+      transactionId: healed.id,
     });
     return;
   }
@@ -582,6 +672,7 @@ export async function finalizeStripeTransactionByPI(params: {
     } as unknown as never,
   });
 }
+
 
 /* ----------------------- LIST OBLIGATIONS (admin) ----------------------- */
 
