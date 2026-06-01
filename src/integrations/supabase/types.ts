@@ -1929,8 +1929,13 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_provider"]
           obligation_id: string
           paid_at: string | null
+          parent_transaction_id: string | null
           provider_fee_cents: number
           recorded_by: string | null
+          refund_reason: string | null
+          refunded_amount_cents: number
+          refunded_at: string | null
+          refunded_by: string | null
           status: Database["public"]["Enums"]["payment_tx_status"]
           stripe_charge_id: string | null
           stripe_payment_intent_id: string | null
@@ -1949,8 +1954,13 @@ export type Database = {
           method: Database["public"]["Enums"]["payment_provider"]
           obligation_id: string
           paid_at?: string | null
+          parent_transaction_id?: string | null
           provider_fee_cents?: number
           recorded_by?: string | null
+          refund_reason?: string | null
+          refunded_amount_cents?: number
+          refunded_at?: string | null
+          refunded_by?: string | null
           status?: Database["public"]["Enums"]["payment_tx_status"]
           stripe_charge_id?: string | null
           stripe_payment_intent_id?: string | null
@@ -1969,8 +1979,13 @@ export type Database = {
           method?: Database["public"]["Enums"]["payment_provider"]
           obligation_id?: string
           paid_at?: string | null
+          parent_transaction_id?: string | null
           provider_fee_cents?: number
           recorded_by?: string | null
+          refund_reason?: string | null
+          refunded_amount_cents?: number
+          refunded_at?: string | null
+          refunded_by?: string | null
           status?: Database["public"]["Enums"]["payment_tx_status"]
           stripe_charge_id?: string | null
           stripe_payment_intent_id?: string | null
@@ -1989,6 +2004,13 @@ export type Database = {
             columns: ["obligation_id"]
             isOneToOne: false
             referencedRelation: "payment_obligations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_parent_transaction_id_fkey"
+            columns: ["parent_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
             referencedColumns: ["id"]
           },
         ]
