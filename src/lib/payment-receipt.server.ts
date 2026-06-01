@@ -43,7 +43,7 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
 
   const { data: club } = await supabaseAdmin
     .from("clubs")
-    .select("name, address, postal_code, city, email, phone, siret")
+    .select("name")
     .eq("id", r.club_id)
     .maybeSingle();
 
@@ -57,7 +57,7 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
   const page = doc.addPage([595.28, 841.89]); // A4
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const { width, height } = page.size();
+  const { width, height } = page.getSize();
   const ink = rgb(0.06, 0.09, 0.16);
   const muted = rgb(0.39, 0.45, 0.55);
 
@@ -73,12 +73,6 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
     color: ink,
   });
   y -= 22;
-  const subAddr = [club?.address, [club?.postal_code, club?.city].filter(Boolean).join(" ")]
-    .filter(Boolean)
-    .join(" — ");
-  if (subAddr) {
-    page.drawText(subAddr, { x: 50, y, font, size: 10, color: muted });
-  }
   const num = `N° ${String(r.receipt_number).padStart(6, "0")}`;
   page.drawText(num, {
     x: width - 50 - font.widthOfTextAtSize(num, 10),
@@ -87,22 +81,11 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
     size: 10,
     color: muted,
   });
-  y -= 14;
-  if (club?.email || club?.phone) {
-    page.drawText([club?.email, club?.phone].filter(Boolean).join(" — "), {
-      x: 50, y, font, size: 10, color: muted,
-    });
-  }
   const dateText = `Émis le ${fmtDate(r.issued_at)}`;
   page.drawText(dateText, {
-    x: width - 50 - font.widthOfTextAtSize(dateText, 10),
-    y, font, size: 10, color: muted,
+    x: 50, y, font, size: 10, color: muted,
   });
-  y -= 12;
-  if (club?.siret) {
-    page.drawText(`SIRET : ${club.siret}`, { x: 50, y, font, size: 9, color: muted });
-    y -= 12;
-  }
+  y -= 14;
 
   y -= 18;
   page.drawLine({
