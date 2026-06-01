@@ -145,8 +145,28 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
           return new Response("Invalid signature", { status: 400 });
         }
 
+        // Idempotency barrier #1: short-circuit if we've already processed this event.
+        // INSERT ... ON CONFLICT DO NOTHING is the atomic "did we see this?" probe.
+        const { error: dedupErr, data: dedupRow } = await supabaseAdmin
+          .from("stripe_webhook_events")
+          .insert({ event_id: event.id, event_type: event.type })
+          .select("event_id")
+          .maybeSingle();
+        if (dedupErr && (dedupErr as any).code !== "23505") {
+          // Real DB error — let Stripe retry.
+          console.error("stripe_webhook_events insert failed", dedupErr);
+          return new Response("dedup error", { status: 500 });
+        }
+        if (!dedupRow) {
+          // Conflict (23505) → already processed. Ack so Stripe stops retrying.
+          return new Response(JSON.stringify({ received: true, duplicate: true }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
 
         try {
+
           switch (event.type) {
             case "checkout.session.completed": {
               const session = event.data.object as Stripe.Checkout.Session;
