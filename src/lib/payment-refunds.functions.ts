@@ -9,27 +9,20 @@ import { createLogger } from "@/lib/logger.server";
 const log = createLogger("payment-refunds");
 
 async function assertFinAdmin(
-  supabase: SupabaseClient,
+  _supabase: SupabaseClient,
   userId: string,
   clubId: string,
 ): Promise<void> {
-  const { data } = await supabase
-    .from("club_members")
-    .select("roles, role")
-    .eq("club_id", clubId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
-  if (isAdmin) return;
+  // Fix 7: admin role does NOT inherit financial_admin — only explicit financial_admin
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
     _club_id: clubId,
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only club admins or financial admins can manage refunds/exemptions");
+  throw new Error("Only financial admins can manage refunds/exemptions");
 }
+
 
 async function sumPaid(obligationId: string): Promise<number> {
   const { data } = await supabaseAdmin
