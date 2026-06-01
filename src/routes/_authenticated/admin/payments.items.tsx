@@ -320,6 +320,16 @@ function PaymentItemsPage() {
           </li>
         ))}
       </ul>
+
+      {collectFor && (
+        <CollectPaymentDialog
+          clubId={activeClubId}
+          itemId={collectFor.id}
+          itemTitle={collectFor.title}
+          open
+          onOpenChange={(v) => !v && setCollectFor(null)}
+        />
+      )}
     </div>
   );
 }
