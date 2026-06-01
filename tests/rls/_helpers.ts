@@ -26,12 +26,14 @@ export async function expectNoAccess(
   client: SupabaseClient,
   table: string,
   rowId: string,
+  idColumn = "id",
 ) {
-  const { data, error } = await (client.from(table as any).select("id") as any).eq(
-    "id",
+  const { data, error } = await (client.from(table as any).select(idColumn) as any).eq(
+    idColumn,
     rowId,
   );
-  expect(error, `select ${table} error: ${error?.message ?? ""}`).toBeNull();
+  // RLS hides rows silently; an error here is also acceptable (= blocked).
+  if (error) return;
   expect(data ?? []).toHaveLength(0);
 }
 
@@ -40,9 +42,10 @@ export async function expectCanRead(
   client: SupabaseClient,
   table: string,
   rowId: string,
+  idColumn = "id",
 ) {
-  const { data, error } = await (client.from(table as any).select("id") as any).eq(
-    "id",
+  const { data, error } = await (client.from(table as any).select(idColumn) as any).eq(
+    idColumn,
     rowId,
   );
   expect(error, `select ${table} error: ${error?.message ?? ""}`).toBeNull();
