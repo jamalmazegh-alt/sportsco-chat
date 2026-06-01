@@ -9,27 +9,20 @@ import { createLogger } from "@/lib/logger.server";
 const log = createLogger("payment-refunds");
 
 async function assertFinAdmin(
-  supabase: SupabaseClient,
+  _supabase: SupabaseClient,
   userId: string,
   clubId: string,
 ): Promise<void> {
-  const { data } = await supabase
-    .from("club_members")
-    .select("roles, role")
-    .eq("club_id", clubId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
-  if (isAdmin) return;
+  // Fix 7: admin role does NOT inherit financial_admin — only explicit financial_admin
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
     _club_id: clubId,
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only club admins or financial admins can manage refunds/exemptions");
+  throw new Error("Only financial admins can manage refunds/exemptions");
 }
+
 
 async function sumPaid(obligationId: string): Promise<number> {
   const { data } = await supabaseAdmin
@@ -133,8 +126,10 @@ export const refundTransaction = createServerFn({ method: "POST" })
             payment_intent: tx.stripe_payment_intent_id,
             amount,
             reason: "requested_by_customer",
+            // Fix 4: Direct Charge model — refund_application_fee returns the
+            // platform fee to the customer. reverse_transfer is destination-charge
+            // only and MUST NOT be set here.
             refund_application_fee: true,
-            reverse_transfer: true,
             metadata: {
               purpose: "obligation_refund",
               obligation_id: tx.obligation_id,
@@ -143,6 +138,7 @@ export const refundTransaction = createServerFn({ method: "POST" })
           },
           { stripeAccount: club.stripe_account_id },
         );
+
         stripeRefundId = refund.id;
       } catch (err) {
         log.error("Stripe refund failed", {
