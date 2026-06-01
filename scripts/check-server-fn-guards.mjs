@@ -29,19 +29,22 @@ const GUARD_TOKENS = [
   "assertClubRole",
   "assertClubAdmin",
   "assertTournamentAdmin",
+  "assertCanManage",
   "has_super_admin",
   "has_club_role",
   "has_club_role_text",
   "can_manage_tournament_members",
+  "can_respond_for_player",
 ];
 
-// Files exempt from the guard requirement. Add a one-line reason.
+// Files exempt from the guard requirement. Each entry MUST include a reason.
 const ALLOWLIST = new Set([
-  // Queries scoped by context.userId only (own profile / own session).
-  "src/lib/auth-context.tsx",
-  // Public surfaces — guard happens via token / signature in caller.
-  "src/lib/legal.functions.ts",
-  "src/lib/maps.functions.ts",
+  // Inline guard: membership lookup via context.supabase with .eq("role", "admin").
+  "src/lib/admin.functions.ts",
+  "src/lib/billing.functions.ts",
+  "src/lib/insights.functions.ts",
+  // All queries scoped strictly by context.userId / parent links — no client-provided clubId trusted.
+  "src/lib/payment-family.functions.ts",
 ]);
 
 // Only server-fn ENTRY POINTS (.functions.ts) are checked. Leaf .server.ts
