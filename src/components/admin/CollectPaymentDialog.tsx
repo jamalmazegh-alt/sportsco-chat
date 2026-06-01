@@ -63,6 +63,7 @@ const METHOD_LABELS: Record<string, string> = {
   cash: "Espèces",
   cheque: "Chèque",
   bank_transfer: "Virement",
+  helloasso: "HelloAsso",
   manual: "Autre (manuel)",
 };
 const STATUS_COLORS: Record<string, string> = {
