@@ -44,12 +44,14 @@ const ALLOWLIST = new Set([
   "src/lib/maps.functions.ts",
 ]);
 
+// Only server-fn ENTRY POINTS (.functions.ts) are checked. Leaf .server.ts
+// helpers cannot be invoked from the client; their callers must hold the guard.
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     const s = statSync(p);
     if (s.isDirectory()) walk(p, out);
-    else if (/\.(functions|server)\.tsx?$/.test(name)) out.push(p);
+    else if (/\.functions\.tsx?$/.test(name)) out.push(p);
   }
   return out;
 }
