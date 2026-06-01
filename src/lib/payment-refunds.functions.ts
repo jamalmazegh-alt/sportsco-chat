@@ -126,8 +126,10 @@ export const refundTransaction = createServerFn({ method: "POST" })
             payment_intent: tx.stripe_payment_intent_id,
             amount,
             reason: "requested_by_customer",
+            // Fix 4: Direct Charge model — refund_application_fee returns the
+            // platform fee to the customer. reverse_transfer is destination-charge
+            // only and MUST NOT be set here.
             refund_application_fee: true,
-            reverse_transfer: true,
             metadata: {
               purpose: "obligation_refund",
               obligation_id: tx.obligation_id,
@@ -136,6 +138,7 @@ export const refundTransaction = createServerFn({ method: "POST" })
           },
           { stripeAccount: club.stripe_account_id },
         );
+
         stripeRefundId = refund.id;
       } catch (err) {
         log.error("Stripe refund failed", {
