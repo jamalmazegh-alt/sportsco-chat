@@ -131,6 +131,40 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
           switch (event.type) {
             case "checkout.session.completed": {
               const session = event.data.object as Stripe.Checkout.Session;
+              // Payment obligation (license / membership / equipment...)
+              if (
+                session.mode === "payment" &&
+                session.metadata?.purpose === "payment_obligation"
+              ) {
+                const piId =
+                  typeof session.payment_intent === "string"
+                    ? session.payment_intent
+                    : session.payment_intent?.id ?? null;
+                let chargeId: string | null = null;
+                let amount = session.amount_total ?? 0;
+                let fee: number | null = null;
+                if (piId) {
+                  try {
+                    const pi = await stripe.paymentIntents.retrieve(piId, {
+                      expand: ["latest_charge"],
+                    });
+                    const charge = pi.latest_charge as Stripe.Charge | null;
+                    chargeId = charge?.id ?? null;
+                    amount = pi.amount_received ?? amount;
+                    fee = pi.application_fee_amount ?? null;
+                  } catch (e) {
+                    console.warn("PI retrieve failed", e);
+                  }
+                }
+                await finalizeStripeTransactionByPI({
+                  paymentIntentId: piId ?? "",
+                  chargeId,
+                  amountReceivedCents: amount,
+                  feeCents: fee,
+                  sessionId: session.id,
+                });
+                break;
+              }
               // Tournament registration: one-time destination charge
               if (
                 session.mode === "payment" &&
