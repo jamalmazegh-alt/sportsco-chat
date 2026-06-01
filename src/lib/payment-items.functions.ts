@@ -203,9 +203,9 @@ export const updatePaymentItem = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertFinAdmin(context.supabase, context.userId, data.clubId);
-    const patch: Record<string, unknown> = { ...data.patch };
+    const patch = { ...data.patch };
     if (typeof patch.currency === "string") {
-      patch.currency = (patch.currency as string).toLowerCase();
+      patch.currency = patch.currency.toLowerCase();
     }
     const { error } = await supabaseAdmin
       .from("payment_items")
