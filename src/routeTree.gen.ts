@@ -103,6 +103,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicSocialSyncRouteImport } from './routes/api/public/social/sync'
 import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public/social/callback'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
+import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api/public/hooks/payment-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
@@ -619,6 +620,12 @@ const ApiPublicHooksTrialRemindersRoute =
     path: '/api/public/hooks/trial-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPaymentRemindersRoute =
+  ApiPublicHooksPaymentRemindersRouteImport.update({
+    id: '/api/public/hooks/payment-reminders',
+    path: '/api/public/hooks/payment-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksEventRemindersRoute =
   ApiPublicHooksEventRemindersRouteImport.update({
     id: '/api/public/hooks/event-reminders',
@@ -834,6 +841,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
+  '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
   '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
@@ -944,6 +952,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
+  '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
   '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
@@ -1060,6 +1069,7 @@ export interface FileRoutesById {
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
+  '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
   '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
@@ -1176,6 +1186,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
+    | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/social/callback'
     | '/api/public/social/sync'
@@ -1286,6 +1297,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
+    | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/social/callback'
     | '/api/public/social/sync'
@@ -1401,6 +1413,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
+    | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/social/callback'
     | '/api/public/social/sync'
@@ -1461,6 +1474,7 @@ export interface RootRouteChildren {
   ApiPublicHooksCoachInsightsRoute: typeof ApiPublicHooksCoachInsightsRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
+  ApiPublicHooksPaymentRemindersRoute: typeof ApiPublicHooksPaymentRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicSocialCallbackRoute: typeof ApiPublicSocialCallbackRoute
   ApiPublicSocialSyncRoute: typeof ApiPublicSocialSyncRoute
@@ -2133,6 +2147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTrialRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/payment-reminders': {
+      id: '/api/public/hooks/payment-reminders'
+      path: '/api/public/hooks/payment-reminders'
+      fullPath: '/api/public/hooks/payment-reminders'
+      preLoaderRoute: typeof ApiPublicHooksPaymentRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/event-reminders': {
       id: '/api/public/hooks/event-reminders'
       path: '/api/public/hooks/event-reminders'
@@ -2589,6 +2610,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksCoachInsightsRoute: ApiPublicHooksCoachInsightsRoute,
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
+  ApiPublicHooksPaymentRemindersRoute: ApiPublicHooksPaymentRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicSocialCallbackRoute: ApiPublicSocialCallbackRoute,
   ApiPublicSocialSyncRoute: ApiPublicSocialSyncRoute,
