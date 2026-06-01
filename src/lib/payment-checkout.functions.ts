@@ -10,7 +10,7 @@ import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const log = createLogger("payment-checkout");
 
-const MANUAL_METHODS = ["cash", "cheque", "bank_transfer", "manual"] as const;
+const MANUAL_METHODS = ["cash", "cheque", "bank_transfer", "manual", "helloasso"] as const;
 
 // FIX 7: Financial actions require the financial_admin role. Club Admin
 // can ASSIGN the financial_admin role but does NOT inherit it. The only
@@ -198,6 +198,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
             year: "numeric",
           }),
           downloadUrl: url,
+          method: tx.method,
         },
       });
     }
