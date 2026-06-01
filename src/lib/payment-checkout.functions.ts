@@ -343,53 +343,71 @@ export const createObligationCheckout = createServerFn({ method: "POST" })
       throw new Error("Online payment is not available for this club yet");
     }
 
-    const subActive = await hasActiveSubscription(obl.club_id);
-    const fee = computeFeeForClub(amount, subActive);
+    // FIX 3: Platform fee = 0 in MVP. Read platform_fee_bps from settings
+    // (server source of truth). If 0, OMIT application_fee_amount entirely.
+    const { data: feeSettings } = await supabaseAdmin
+      .from("club_payment_settings")
+      .select("platform_fee_bps")
+      .eq("club_id", obl.club_id)
+      .maybeSingle();
+    const platformFeeBps = feeSettings?.platform_fee_bps ?? 0;
+    const fee = platformFeeBps > 0 ? Math.round((amount * platformFeeBps) / 10000) : 0;
 
     const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
     const payerEmail = authUser?.user?.email ?? undefined;
 
     const origin = getOrigin();
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card", "sepa_debit", "link"],
-      customer_email: payerEmail,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: (obl.currency || "eur").toLowerCase(),
-            unit_amount: amount,
-            product_data: {
-              name: `${item.title} — ${club.name}`,
+
+    // FIX 2: DIRECT CHARGES on the connected club account.
+    // - No transfer_data.destination, no destination charge.
+    // - The club is Merchant of Record.
+    // - payment_method_types: card only for MVP (Apple/Google Pay come along).
+    // FIX 6: statement_descriptor_suffix shows the club name, never "CLUBERO".
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        payment_method_types: ["card"],
+        customer_email: payerEmail,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: (obl.currency || "eur").toLowerCase(),
+              unit_amount: amount,
+              product_data: {
+                name: `${item.title} — ${club.name}`,
+              },
             },
           },
+        ],
+        payment_intent_data: {
+          statement_descriptor_suffix: buildStatementDescriptor(club.name),
+          // application_fee_amount intentionally omitted (FIX 3 — fee=0 in MVP)
+          ...(fee > 0 ? { application_fee_amount: fee } : {}),
+          metadata: {
+            purpose: "payment_obligation",
+            obligation_id: obl.id,
+            club_id: obl.club_id,
+            payer_user_id: userId,
+          },
         },
-      ],
-      payment_intent_data: {
-        application_fee_amount: fee,
-        transfer_data: { destination: club.stripe_account_id },
         metadata: {
           purpose: "payment_obligation",
           obligation_id: obl.id,
           club_id: obl.club_id,
           payer_user_id: userId,
         },
+        success_url: `${origin}/payments?success=1`,
+        cancel_url: `${origin}/payments?cancelled=1`,
       },
-      metadata: {
-        purpose: "payment_obligation",
-        obligation_id: obl.id,
-        club_id: obl.club_id,
-        payer_user_id: userId,
-      },
-      success_url: `${origin}/payments?success=1`,
-      cancel_url: `${origin}/payments?cancelled=1`,
-    });
+      { stripeAccount: club.stripe_account_id },
+    );
 
     if (!session.url) throw new Error("Stripe did not return a session URL");
 
-    // Insert pending transaction so admins can track it
+    // Insert pending transaction keyed by session id so the Connect webhook
+    // can finalize it (FIX 11).
     await supabaseAdmin.from("payment_transactions").insert({
       obligation_id: obl.id,
       club_id: obl.club_id,
