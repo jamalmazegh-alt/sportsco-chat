@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "check:i18n": "node scripts/check-i18n-parity.mjs"
+    "check:i18n": "node scripts/check-i18n-parity.mjs",
+    "check:guards": "node scripts/check-server-fn-guards.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.47",
