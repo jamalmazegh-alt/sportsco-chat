@@ -358,14 +358,14 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
       </AccordionTrigger>
       <AccordionContent className="pt-1 pb-3 space-y-3">
         {/* Reason for closed states */}
-        {obligation.status === "exempted" && obligation.exemption_reason && (
+        {obligation.status === "exempted" && obligation.exempted_reason && (
           <p className="text-xs text-muted-foreground italic">
-            Exempté — {obligation.exemption_reason}
+            Exempté — {obligation.exempted_reason}
           </p>
         )}
-        {obligation.status === "cancelled" && obligation.cancellation_reason && (
+        {obligation.status === "cancelled" && obligation.cancelled_reason && (
           <p className="text-xs text-muted-foreground italic">
-            Annulé — {obligation.cancellation_reason}
+            Annulé — {obligation.cancelled_reason}
           </p>
         )}
 
