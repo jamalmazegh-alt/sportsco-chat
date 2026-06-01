@@ -440,16 +440,16 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
                       ? "Carte bancaire"
                       : t.method === "cash"
                         ? "Espèces"
-                        : t.method === "check"
+                        : t.method === "cheque"
                           ? "Chèque"
-                          : t.method === "transfer"
+                          : t.method === "bank_transfer"
                             ? "Virement"
                             : t.method;
                 const isExternal =
                   t.method === "helloasso" ||
                   t.method === "cash" ||
-                  t.method === "check" ||
-                  t.method === "transfer";
+                  t.method === "cheque" ||
+                  t.method === "bank_transfer";
                 return (
                   <li
                     key={t.id}
