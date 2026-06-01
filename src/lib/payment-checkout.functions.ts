@@ -409,18 +409,30 @@ export const createObligationCheckout = createServerFn({ method: "POST" })
 
     // Insert pending transaction keyed by session id so the Connect webhook
     // can finalize it (FIX 11).
-    await supabaseAdmin.from("payment_transactions").insert({
-      obligation_id: obl.id,
-      club_id: obl.club_id,
-      method: "stripe",
-      status: "pending",
-      amount_gross_cents: amount,
-      provider_fee_cents: fee,
-      amount_net_cents: amount - fee,
-      currency: (obl.currency || "eur").toLowerCase(),
-      external_reference: session.id,
-      recorded_by: userId,
-    });
+    const { error: pendingErr } = await supabaseAdmin
+      .from("payment_transactions")
+      .insert({
+        obligation_id: obl.id,
+        club_id: obl.club_id,
+        method: "stripe",
+        status: "pending",
+        amount_gross_cents: amount,
+        provider_fee_cents: fee,
+        amount_net_cents: amount - fee,
+        currency: (obl.currency || "eur").toLowerCase(),
+        external_reference: session.id,
+        recorded_by: userId,
+      });
+    if (pendingErr) {
+      // Non-fatal: the webhook will self-heal on success. We still want the
+      // failure visible in logs to investigate root cause.
+      log.error("Failed to insert pending Stripe tx (webhook will self-heal)", {
+        obligation: obl.id,
+        session: session.id,
+        error: pendingErr.message,
+      });
+    }
+
 
     log.info("Created obligation checkout", {
       obligation: obl.id,
