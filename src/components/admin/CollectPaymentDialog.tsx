@@ -96,6 +96,27 @@ export function CollectPaymentDialog({
   });
 
   const [active, setActive] = useState<Obligation | null>(null);
+  const [reasonDialog, setReasonDialog] = useState<
+    | { kind: "exempt" | "cancel"; obligation: Obligation }
+    | null
+  >(null);
+  const [refundDialog, setRefundDialog] = useState<Obligation | null>(null);
+
+  const exemptFn = useServerFn(exemptObligation);
+  const cancelFn = useServerFn(cancelObligation);
+  const reopenFn = useServerFn(reopenObligation);
+
+  const invalidate = () =>
+    qc.invalidateQueries({ queryKey: ["item-obligations", clubId, itemId] });
+
+  const reopenMut = useMutation({
+    mutationFn: (id: string) => reopenFn({ data: { obligationId: id } }),
+    onSuccess: () => {
+      toast.success("Obligation réouverte");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,6 +144,8 @@ export function CollectPaymentDialog({
               `${o.players?.first_name ?? ""} ${o.players?.last_name ?? ""}`.trim() ||
               "—";
             const currency = (o.currency || "eur").toUpperCase();
+            const isClosed = o.status === "cancelled" || o.status === "exempted";
+            const hasPaid = o.amount_paid_cents > 0;
             return (
               <li
                 key={o.id}
@@ -146,20 +169,67 @@ export function CollectPaymentDialog({
                     {(o.amount_paid_cents / 100).toFixed(2)} /{" "}
                     {(o.amount_due_cents / 100).toFixed(2)} {currency}
                   </p>
-                  {remaining > 0 && (
+                  {remaining > 0 && !isClosed && (
                     <p className="text-[11px] text-muted-foreground">
                       reste {(remaining / 100).toFixed(2)} {currency}
                     </p>
                   )}
                 </div>
-                {remaining > 0 &&
-                  o.status !== "cancelled" &&
-                  o.status !== "exempted" && (
-                    <Button size="sm" onClick={() => setActive(o)}>
-                      <BanknoteArrowDown className="h-3.5 w-3.5" />
-                      Encaisser
+                {remaining > 0 && !isClosed && (
+                  <Button size="sm" onClick={() => setActive(o)}>
+                    <BanknoteArrowDown className="h-3.5 w-3.5" />
+                    Encaisser
+                  </Button>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
-                  )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {isClosed ? (
+                      <DropdownMenuItem
+                        onClick={() => reopenMut.mutate(o.id)}
+                        disabled={reopenMut.isPending}
+                      >
+                        <RotateCcw className="h-4 w-4 mr-2" /> Rouvrir
+                      </DropdownMenuItem>
+                    ) : (
+                      <>
+                        {!hasPaid && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setReasonDialog({ kind: "exempt", obligation: o })
+                              }
+                            >
+                              <ShieldOff className="h-4 w-4 mr-2" /> Exempter
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setReasonDialog({ kind: "cancel", obligation: o })
+                              }
+                            >
+                              <Ban className="h-4 w-4 mr-2" /> Annuler
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {hasPaid && (
+                          <>
+                            <DropdownMenuItem onClick={() => setRefundDialog(o)}>
+                              <Undo2 className="h-4 w-4 mr-2" /> Rembourser…
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <p className="px-2 py-1 text-[10px] text-muted-foreground">
+                              Annulation impossible — paiements existants
+                            </p>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </li>
             );
           })}
@@ -172,12 +242,282 @@ export function CollectPaymentDialog({
             onClose={() => setActive(null)}
             onSaved={() => {
               setActive(null);
-              qc.invalidateQueries({
-                queryKey: ["item-obligations", clubId, itemId],
-              });
+              invalidate();
             }}
           />
         )}
+
+        {reasonDialog && (
+          <ReasonDialog
+            title={
+              reasonDialog.kind === "exempt"
+                ? "Exempter cette obligation"
+                : "Annuler cette obligation"
+            }
+            description={
+              reasonDialog.kind === "exempt"
+                ? "Le joueur sera marqué comme exempté de ce paiement. Indiquez la raison (bourse, situation familiale, etc.)."
+                : "L'obligation sera annulée et ne pourra plus être payée. Précisez la raison."
+            }
+            confirmLabel={reasonDialog.kind === "exempt" ? "Exempter" : "Annuler l'obligation"}
+            onClose={() => setReasonDialog(null)}
+            onConfirm={async (reason) => {
+              const fn = reasonDialog.kind === "exempt" ? exemptFn : cancelFn;
+              try {
+                await fn({ data: { obligationId: reasonDialog.obligation.id, reason } });
+                toast.success(
+                  reasonDialog.kind === "exempt"
+                    ? "Obligation exemptée"
+                    : "Obligation annulée",
+                );
+                setReasonDialog(null);
+                invalidate();
+              } catch (e) {
+                toast.error((e as Error).message);
+              }
+            }}
+          />
+        )}
+
+        {refundDialog && (
+          <RefundDialog
+            clubId={clubId}
+            obligation={refundDialog}
+            onClose={() => setRefundDialog(null)}
+            onDone={() => {
+              setRefundDialog(null);
+              invalidate();
+            }}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ---------------------------- Reason dialog ---------------------------- */
+
+function ReasonDialog({
+  title,
+  description,
+  confirmLabel,
+  onClose,
+  onConfirm,
+}: {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  onClose: () => void;
+  onConfirm: (reason: string) => Promise<void> | void;
+}) {
+  const [reason, setReason] = useState("");
+  const [pending, setPending] = useState(false);
+  return (
+    <Dialog open onOpenChange={(v) => !v && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <p className="text-xs text-muted-foreground">{description}</p>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Raison</Label>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            maxLength={500}
+            rows={3}
+            placeholder="Justification interne (visible dans les audits)"
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
+          <Button
+            disabled={!reason.trim() || pending}
+            onClick={async () => {
+              setPending(true);
+              try {
+                await onConfirm(reason.trim());
+              } finally {
+                setPending(false);
+              }
+            }}
+          >
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : confirmLabel}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ---------------------------- Refund dialog ---------------------------- */
+
+function RefundDialog({
+  clubId: _clubId,
+  obligation,
+  onClose,
+  onDone,
+}: {
+  clubId: string;
+  obligation: Obligation;
+  onClose: () => void;
+  onDone: () => void;
+}) {
+  const refundFn = useServerFn(refundTransaction);
+  const currency = (obligation.currency || "eur").toUpperCase();
+
+  // Load refundable transactions for this obligation
+  const txQ = useQuery({
+    queryKey: ["obligation-refundable", obligation.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payment_transactions")
+        .select(
+          "id, method, status, amount_gross_cents, refunded_amount_cents, currency, created_at, paid_at",
+        )
+        .eq("obligation_id", obligation.id)
+        .eq("status", "succeeded")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []).filter(
+        (t) => (t.amount_gross_cents ?? 0) > (t.refunded_amount_cents ?? 0),
+      );
+    },
+  });
+
+  const [selectedTx, setSelectedTx] = useState<string | null>(null);
+  const [amount, setAmount] = useState("");
+  const [reason, setReason] = useState("");
+  const [pending, setPending] = useState(false);
+
+  const current = txQ.data?.find((t) => t.id === selectedTx) ?? null;
+  const maxRefundable = current
+    ? current.amount_gross_cents - (current.refunded_amount_cents ?? 0)
+    : 0;
+
+  return (
+    <Dialog open onOpenChange={(v) => !v && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Rembourser un paiement</DialogTitle>
+        </DialogHeader>
+
+        {txQ.isLoading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          </div>
+        ) : (txQ.data ?? []).length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">
+            Aucune transaction remboursable.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Transaction à rembourser</Label>
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {txQ.data!.map((t) => {
+                  const refundable =
+                    t.amount_gross_cents - (t.refunded_amount_cents ?? 0);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTx(t.id);
+                        setAmount((refundable / 100).toFixed(2));
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded-md border text-xs flex justify-between items-center ${
+                        selectedTx === t.id
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <span>
+                        {t.method} ·{" "}
+                        {new Date(t.paid_at ?? t.created_at).toLocaleDateString(
+                          "fr-FR",
+                        )}
+                      </span>
+                      <span className="font-medium">
+                        {(refundable / 100).toFixed(2)} {currency}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {current && (
+              <>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Montant à rembourser ({currency})</Label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    max={(maxRefundable / 100).toFixed(2)}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    Maximum : {(maxRefundable / 100).toFixed(2)} {currency}
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Raison (optionnel)</Label>
+                  <Textarea
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    rows={2}
+                    maxLength={500}
+                  />
+                </div>
+                <Badge variant="outline" className="text-[10px]">
+                  {current.method === "stripe"
+                    ? "Remboursement Stripe automatique"
+                    : "Écriture comptable manuelle (aucun mouvement bancaire)"}
+                </Badge>
+              </>
+            )}
+          </div>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Fermer
+          </Button>
+          <Button
+            disabled={
+              !selectedTx ||
+              pending ||
+              !parseFloat(amount) ||
+              Math.round(parseFloat(amount || "0") * 100) > maxRefundable
+            }
+            onClick={async () => {
+              if (!selectedTx) return;
+              setPending(true);
+              try {
+                await refundFn({
+                  data: {
+                    transactionId: selectedTx,
+                    amountCents: Math.round(parseFloat(amount || "0") * 100),
+                    reason: reason.trim() || null,
+                  },
+                });
+                toast.success("Remboursement enregistré");
+                onDone();
+              } catch (e) {
+                toast.error((e as Error).message);
+              } finally {
+                setPending(false);
+              }
+            }}
+          >
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Rembourser"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
