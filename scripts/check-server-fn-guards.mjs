@@ -47,6 +47,8 @@ const ALLOWLIST = new Set([
   "src/lib/payment-family.functions.ts",
   // Public read of legal documents — no per-tenant scoping.
   "src/lib/legal.functions.ts",
+]);
+
 
 // Only server-fn ENTRY POINTS (.functions.ts) are checked. Leaf .server.ts
 // helpers cannot be invoked from the client; their callers must hold the guard.
