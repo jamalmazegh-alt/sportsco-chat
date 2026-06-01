@@ -97,7 +97,15 @@ async function paidCentsForObligation(obligationId: string): Promise<number> {
 export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        // Shared cron secret — required to prevent public abuse (mass-email trigger).
+        const secret = process.env.DATA_RETENTION_SECRET;
+        if (!secret) return new Response("Not configured", { status: 503 });
+        const provided =
+          request.headers.get("x-cron-secret") ||
+          request.headers.get("x-retention-secret");
+        if (provided !== secret) return new Response("Forbidden", { status: 403 });
+
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
         const todayMs = today.getTime();
