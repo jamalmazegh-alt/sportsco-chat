@@ -6,6 +6,8 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe } from "@/lib/stripe.server";
 import { computeFeeForClub } from "@/lib/platform-fee";
 import { createLogger } from "@/lib/logger.server";
+import { generateReceiptPdf, signedReceiptUrl } from "@/lib/payment-receipt.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const log = createLogger("payment-checkout");
 
@@ -120,23 +122,101 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
   });
   const receiptNumber = (numRow as unknown as number) ?? 0;
 
-  await supabaseAdmin.from("payment_receipts").insert({
-    club_id: tx.club_id,
-    transaction_id: tx.id,
-    obligation_id: obl.id,
-    receipt_number: receiptNumber,
-    kind: "confirmation",
-    payer_name: payer
-      ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
-      : null,
-    player_name: player
-      ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
-      : null,
-    item_title: item?.title ?? null,
-    amount_gross_cents: tx.amount_gross_cents,
-    currency: tx.currency,
-    method: tx.method,
-  });
+  const { data: inserted } = await supabaseAdmin
+    .from("payment_receipts")
+    .insert({
+      club_id: tx.club_id,
+      transaction_id: tx.id,
+      obligation_id: obl.id,
+      receipt_number: receiptNumber,
+      kind: "confirmation",
+      payer_name: payer
+        ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
+        : null,
+      player_name: player
+        ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
+        : null,
+      item_title: item?.title ?? null,
+      amount_gross_cents: tx.amount_gross_cents,
+      currency: tx.currency,
+      method: tx.method,
+    })
+    .select("id")
+    .single();
+  if (!inserted) return;
+
+  // Generate the PDF + send email — best-effort, never block the transaction
+  try {
+    const pdfPath = await generateReceiptPdf(inserted.id);
+    const url = pdfPath ? await signedReceiptUrl(pdfPath) : null;
+
+    // Locate recipient email
+    let recipientEmail: string | null = null;
+    if (obl.payer_user_id) {
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(obl.payer_user_id);
+      recipientEmail = u?.user?.email ?? null;
+    }
+    if (!recipientEmail && obl.player_id) {
+      const { data: guardians } = await supabaseAdmin
+        .from("player_guardians")
+        .select("user_id, is_primary_payer")
+        .eq("player_id", obl.player_id)
+        .order("is_primary_payer", { ascending: false });
+      for (const g of guardians ?? []) {
+        const { data: u } = await supabaseAdmin.auth.admin.getUserById(g.user_id);
+        if (u?.user?.email) {
+          recipientEmail = u.user.email;
+          break;
+        }
+      }
+    }
+
+    if (recipientEmail) {
+      const { data: club } = await supabaseAdmin
+        .from("clubs")
+        .select("name")
+        .eq("id", tx.club_id)
+        .maybeSingle();
+      const methodLabel =
+        ({
+          stripe: "Carte (Stripe)",
+          helloasso: "HelloAsso",
+          cash: "Espèces",
+          cheque: "Chèque",
+          bank_transfer: "Virement bancaire",
+          manual: "Manuel",
+        } as Record<string, string>)[tx.method] ?? tx.method;
+      await enqueueTransactionalEmailServer({
+        templateName: "payment-receipt",
+        recipientEmail,
+        idempotencyKey: `receipt-${inserted.id}`,
+        templateData: {
+          clubName: club?.name ?? "Votre club",
+          payerName: payer
+            ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
+            : null,
+          playerName: player
+            ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
+            : null,
+          itemTitle: item?.title ?? "Paiement",
+          amountLabel: `${(tx.amount_gross_cents / 100).toFixed(2)} ${(tx.currency || "eur").toUpperCase()}`,
+          methodLabel,
+          receiptNumber: String(receiptNumber).padStart(6, "0"),
+          paidAt: new Date().toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+          downloadUrl: url,
+        },
+      });
+    }
+  } catch (err) {
+    log.error("Failed to generate/send receipt", {
+      receiptId: inserted.id,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
 }
 
 /* ----------------------- PARENT: LIST MY OBLIGATIONS ----------------------- */

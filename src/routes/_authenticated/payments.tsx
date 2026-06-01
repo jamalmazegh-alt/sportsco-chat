@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -77,10 +77,15 @@ function MyPaymentsPage() {
       <BackLink to="/home" label={t("common.back")} />
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold flex items-center gap-2">
-          <Wallet className="h-6 w-6 text-primary" />
-          Mes paiements
-        </h1>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <h1 className="text-2xl font-semibold flex items-center gap-2">
+            <Wallet className="h-6 w-6 text-primary" />
+            Mes paiements
+          </h1>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/payments/receipts">Mes reçus</Link>
+          </Button>
+        </div>
         <p className="text-sm text-muted-foreground">
           Cotisations, licences et autres frais à régler à votre club.
         </p>
