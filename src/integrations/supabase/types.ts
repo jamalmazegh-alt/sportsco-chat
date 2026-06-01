@@ -267,6 +267,8 @@ export type Database = {
           helloasso_shop_url: string | null
           helloasso_tournament_url: string | null
           min_partial_amount_cents: number
+          payment_reminder_offsets_days: number[]
+          payment_reminders_enabled: boolean
           platform_fee_bps: number
           updated_at: string
         }
@@ -280,6 +282,8 @@ export type Database = {
           helloasso_shop_url?: string | null
           helloasso_tournament_url?: string | null
           min_partial_amount_cents?: number
+          payment_reminder_offsets_days?: number[]
+          payment_reminders_enabled?: boolean
           platform_fee_bps?: number
           updated_at?: string
         }
@@ -293,6 +297,8 @@ export type Database = {
           helloasso_shop_url?: string | null
           helloasso_tournament_url?: string | null
           min_partial_amount_cents?: number
+          payment_reminder_offsets_days?: number[]
+          payment_reminders_enabled?: boolean
           platform_fee_bps?: number
           updated_at?: string
         }
@@ -1847,6 +1853,64 @@ export type Database = {
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_reminder_log: {
+        Row: {
+          channel: string
+          club_id: string
+          id: string
+          obligation_id: string
+          offset_days: number
+          payment_item_id: string
+          recipient_email: string
+          sent_at: string
+          triggered_by: string | null
+        }
+        Insert: {
+          channel?: string
+          club_id: string
+          id?: string
+          obligation_id: string
+          offset_days: number
+          payment_item_id: string
+          recipient_email: string
+          sent_at?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          channel?: string
+          club_id?: string
+          id?: string
+          obligation_id?: string
+          offset_days?: number
+          payment_item_id?: string
+          recipient_email?: string
+          sent_at?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_reminder_log_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_reminder_log_obligation_id_fkey"
+            columns: ["obligation_id"]
+            isOneToOne: false
+            referencedRelation: "payment_obligations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_reminder_log_payment_item_id_fkey"
+            columns: ["payment_item_id"]
+            isOneToOne: false
+            referencedRelation: "payment_items"
             referencedColumns: ["id"]
           },
         ]

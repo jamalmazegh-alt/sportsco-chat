@@ -20,6 +20,10 @@ import {
   setCurrentSeason,
   deleteSeason,
 } from "@/lib/seasons.functions";
+import {
+  getReminderSettings,
+  updateReminderSettings,
+} from "@/lib/payment-reminders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +42,7 @@ import {
   Plus,
   Trash2,
   Star,
+  BellRing,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -47,7 +52,7 @@ import { BackLink } from "@/components/back-link";
 const searchSchema = z.object({
   success: z.literal("1").optional(),
   refresh: z.literal("1").optional(),
-  tab: z.enum(["stripe", "helloasso", "seasons", "general"]).optional(),
+  tab: z.enum(["stripe", "helloasso", "seasons", "reminders", "general"]).optional(),
 });
 
 export const Route = createFileRoute("/_authenticated/admin/settings/payments")({
@@ -91,7 +96,7 @@ function PaymentsSettingsPage() {
       </header>
 
       <Tabs defaultValue={search.tab ?? "stripe"} className="w-full">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="stripe" className="gap-1.5">
             <CreditCard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Stripe</span>
@@ -103,6 +108,10 @@ function PaymentsSettingsPage() {
           <TabsTrigger value="seasons" className="gap-1.5">
             <CalendarRange className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Saisons</span>
+          </TabsTrigger>
+          <TabsTrigger value="reminders" className="gap-1.5">
+            <BellRing className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Rappels</span>
           </TabsTrigger>
           <TabsTrigger value="general" className="gap-1.5">
             <Settings2 className="h-3.5 w-3.5" />
@@ -118,6 +127,9 @@ function PaymentsSettingsPage() {
         </TabsContent>
         <TabsContent value="seasons" className="mt-5">
           <SeasonsTab clubId={activeClubId} />
+        </TabsContent>
+        <TabsContent value="reminders" className="mt-5">
+          <RemindersTab clubId={activeClubId} />
         </TabsContent>
         <TabsContent value="general" className="mt-5">
           <GeneralTab clubId={activeClubId} />
@@ -551,6 +563,127 @@ function GeneralTab({ clubId }: { clubId: string }) {
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
           {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
         </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------- Reminders tab ----------------------------- */
+
+const PRESET_OFFSETS: { label: string; value: number[] }[] = [
+  { label: "Standard (J-7, J-1, J+3, J+7)", value: [-7, -1, 3, 7] },
+  { label: "Strict (J-14, J-3, J+1, J+7, J+14)", value: [-14, -3, 1, 7, 14] },
+  { label: "Léger (J-3, J+7)", value: [-3, 7] },
+  { label: "Échéance + retard (J0, J+3, J+7)", value: [0, 3, 7] },
+];
+
+function offsetLabel(o: number) {
+  if (o === 0) return "Le jour J";
+  if (o < 0) return `${Math.abs(o)} j. avant`;
+  return `${o} j. après`;
+}
+
+function RemindersTab({ clubId }: { clubId: string }) {
+  const getFn = useServerFn(getReminderSettings);
+  const updateFn = useServerFn(updateReminderSettings);
+  const qc = useQueryClient();
+
+  const q = useQuery({
+    queryKey: ["reminder-settings", clubId],
+    queryFn: () => getFn({ data: { clubId } }),
+  });
+
+  const [enabled, setEnabled] = useState(true);
+  const [offsets, setOffsets] = useState<number[]>([-7, -1, 3, 7]);
+
+  useEffect(() => {
+    if (q.data) {
+      setEnabled(q.data.enabled);
+      setOffsets(q.data.offsets);
+    }
+  }, [q.data]);
+
+  const save = useMutation({
+    mutationFn: () => updateFn({ data: { clubId, enabled, offsets } }),
+    onSuccess: () => {
+      toast.success("Rappels enregistrés");
+      qc.invalidateQueries({ queryKey: ["reminder-settings", clubId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (q.isLoading) {
+    return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
+        <div className="flex items-start gap-3">
+          <div className="rounded-xl bg-amber-500/10 p-2.5">
+            <BellRing className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold">Rappels automatiques de paiement</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Envoyés chaque matin par email aux familles dont les obligations sont impayées,
+              en fonction de la date d'échéance configurée sur chaque item.
+            </p>
+          </div>
+          <Switch checked={enabled} onCheckedChange={setEnabled} />
+        </div>
+
+        <div className={enabled ? "" : "opacity-50 pointer-events-none"}>
+          <Label className="text-xs mb-2 block">Préréglage</Label>
+          <div className="grid gap-2">
+            {PRESET_OFFSETS.map((p) => {
+              const selected =
+                p.value.length === offsets.length &&
+                p.value.every((v) => offsets.includes(v));
+              return (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => setOffsets(p.value)}
+                  className={`text-left rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+                    selected
+                      ? "border-primary bg-primary/5 font-medium"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 space-y-1.5">
+            <Label className="text-xs">Jalons sélectionnés</Label>
+            <div className="flex flex-wrap gap-1.5">
+              {offsets.length === 0 ? (
+                <span className="text-xs text-muted-foreground">Aucun rappel ne sera envoyé.</span>
+              ) : (
+                offsets.map((o) => (
+                  <span
+                    key={o}
+                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium"
+                  >
+                    {offsetLabel(o)}
+                  </span>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>
+          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+        </Button>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground space-y-1">
+        <p><strong>Note :</strong> Les rappels sont envoyés aux payeurs, joueurs et parents/tuteurs reliés. Chaque famille ne reçoit qu'un email par jalon.</p>
+        <p>Vous pouvez également déclencher une relance manuelle depuis la page <em>Items de paiement</em> via le bouton « Relancer ».</p>
       </div>
     </div>
   );
