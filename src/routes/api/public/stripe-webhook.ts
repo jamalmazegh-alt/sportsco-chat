@@ -52,7 +52,12 @@ async function notifyAdmin(
   sub: Stripe.Subscription,
   clubId: string | null,
 ) {
-  await notifySubscriptionAdmin(eventType, sub, clubId);
+  // FIX D: never let a notification failure trigger a Stripe redelivery.
+  try {
+    await notifySubscriptionAdmin(eventType, sub, clubId);
+  } catch (e) {
+    console.error("notifySubscriptionAdmin failed (swallowed)", { eventType, error: String(e) });
+  }
 }
 
 async function upsertSubscription(sub: Stripe.Subscription) {
