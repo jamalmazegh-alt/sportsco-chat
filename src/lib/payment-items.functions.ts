@@ -339,17 +339,17 @@ async function applyTarget(
   if (target.kind === "player") {
     target.player_ids.forEach((id) => playerIds.add(id));
   } else if (target.kind === "team") {
-    const { data: tp } = await supabaseAdmin
-      .from("players")
-      .select("id")
-      .in("team_id", target.team_ids)
-      .eq("club_id", clubId);
-    tp?.forEach((p) => playerIds.add(p.id));
+    const { data: tm } = await supabaseAdmin
+      .from("team_members")
+      .select("player_id")
+      .in("team_id", target.team_ids);
+    tm?.forEach((m) => m.player_id && playerIds.add(m.player_id));
   } else {
     const { data: tp } = await supabaseAdmin
       .from("players")
       .select("id")
-      .eq("club_id", clubId);
+      .eq("club_id", clubId)
+      .is("deleted_at", null);
     tp?.forEach((p) => playerIds.add(p.id));
   }
 
