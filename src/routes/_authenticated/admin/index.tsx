@@ -14,6 +14,7 @@ import {
   Wallet,
   ChevronRight,
   Share2,
+  Receipt,
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 
