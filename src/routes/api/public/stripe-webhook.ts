@@ -159,9 +159,12 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                 let fee: number | null = null;
                 if (piId) {
                   try {
-                    const pi = await stripe.paymentIntents.retrieve(piId, {
-                      expand: ["latest_charge"],
-                    });
+                    const connectedAccountId = event.account ?? undefined;
+                    const pi = await stripe.paymentIntents.retrieve(
+                      piId,
+                      { expand: ["latest_charge"] },
+                      connectedAccountId ? { stripeAccount: connectedAccountId } : undefined,
+                    );
                     const charge = pi.latest_charge as Stripe.Charge | null;
                     chargeId = charge?.id ?? null;
                     amount = pi.amount_received ?? amount;
