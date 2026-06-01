@@ -275,6 +275,13 @@ function PaymentItemsPage() {
               </p>
             </div>
             <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCollectFor({ id: it.id, title: it.title })}
+              >
+                <BanknoteArrowDown className="h-3.5 w-3.5" /> Suivi
+              </Button>
               {it.status === "open" ? (
                 <Button
                   variant="ghost"
