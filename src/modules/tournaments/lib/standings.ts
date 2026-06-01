@@ -123,12 +123,17 @@ export type Tiebreaker =
   | "head_to_head";
 
 export const DEFAULT_POINTS: PointsConfig = { win: 3, draw: 1, loss: 0 };
+// Default tie-break order (spec-aligned): general stats first, then
+// head-to-head sub-criteria, then fair-play, then deterministic draw lot.
 export const DEFAULT_TIEBREAKERS: Tiebreaker[] = [
   "points",
-  "head_to_head_points",
-  "head_to_head_gd",
   "goal_diff",
   "goals_for",
+  "head_to_head_points",
+  "head_to_head_gd",
+  "head_to_head_gf",
+  "fair_play",
+  "draw_lot",
 ];
 export const DEFAULT_FAIR_PLAY: FairPlayConfig = {
   enabled: false,
