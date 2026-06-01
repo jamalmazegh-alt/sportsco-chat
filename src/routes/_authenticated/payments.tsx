@@ -83,6 +83,9 @@ function MyPaymentsPage() {
             Mes paiements
           </h1>
           <Button variant="outline" size="sm" asChild>
+            <Link to="/payments/family">Vue famille</Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
             <Link to="/payments/receipts">Mes reçus</Link>
           </Button>
         </div>
