@@ -81,6 +81,13 @@ function AdminSettingsPage() {
       tone: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
     },
     {
+      to: "/admin/payments/items",
+      icon: Receipt,
+      title: "Items de paiement",
+      hint: "Licences, cotisations, équipements, déplacements",
+      tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    },
+    {
       to: "/admin/settings/convocations",
       icon: Send,
       title: t("admin.hubConvocations"),
