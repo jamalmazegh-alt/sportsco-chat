@@ -359,13 +359,13 @@ async function applyTarget(
   const ids = Array.from(playerIds);
   const { data: guardians } = await supabaseAdmin
     .from("player_guardians")
-    .select("player_id, user_id, is_primary")
+    .select("player_id, user_id, is_primary_payer")
     .in("player_id", ids);
 
   const payerByPlayer = new Map<string, string | null>();
   ids.forEach((pid) => payerByPlayer.set(pid, null));
   guardians?.forEach((g) => {
-    if (g.is_primary) payerByPlayer.set(g.player_id, g.user_id);
+    if (g.is_primary_payer) payerByPlayer.set(g.player_id, g.user_id);
   });
   // fallback: any guardian if no primary set
   guardians?.forEach((g) => {
