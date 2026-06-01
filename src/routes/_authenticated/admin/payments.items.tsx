@@ -13,6 +13,7 @@ import {
   deletePaymentItem,
   updatePaymentItem,
 } from "@/lib/payment-items.functions";
+import { sendItemRemindersNow } from "@/lib/payment-reminders.functions";
 import { BackLink } from "@/components/back-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ import {
   CheckCircle2,
   XCircle,
   BanknoteArrowDown,
+  BellRing,
 } from "lucide-react";
 import { toast } from "sonner";
 import { CollectPaymentDialog } from "@/components/admin/CollectPaymentDialog";
@@ -152,6 +154,13 @@ function PaymentItemsPage() {
       toast.success("Statut mis à jour");
       qc.invalidateQueries({ queryKey: ["payment-items"] });
     },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const remindFn = useServerFn(sendItemRemindersNow);
+  const remind = useMutation({
+    mutationFn: (itemId: string) => remindFn({ data: { paymentItemId: itemId } }),
+    onSuccess: (res) => toast.success(`Rappels envoyés (${res.sent})`),
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -281,6 +290,19 @@ function PaymentItemsPage() {
                 onClick={() => setCollectFor({ id: it.id, title: it.title })}
               >
                 <BanknoteArrowDown className="h-3.5 w-3.5" /> Suivi
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  if (confirm(`Envoyer un rappel pour "${it.title}" maintenant ?`)) {
+                    remind.mutate(it.id);
+                  }
+                }}
+                disabled={remind.isPending}
+                title="Relancer maintenant"
+              >
+                <BellRing className="h-3.5 w-3.5" />
               </Button>
               {it.status === "open" ? (
                 <Button
