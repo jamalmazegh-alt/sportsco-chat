@@ -396,11 +396,33 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
         )}
         {(obligation.status === "pending" ||
           obligation.status === "partially_paid") &&
+          !isHelloAsso &&
           !stripeReady && (
             <p className="text-xs text-muted-foreground">
               Paiement en ligne indisponible — contactez le club.
             </p>
           )}
+
+        {/* HelloAsso external payment */}
+        {canPayHelloAsso && (
+          <div className="space-y-2">
+            {helloAssoUrl ? (
+              <Button size="sm" variant="outline" asChild>
+                <a href={helloAssoUrl} target="_blank" rel="noopener noreferrer">
+                  <CreditCard className="h-4 w-4" />
+                  Payer sur HelloAsso {fmt(remaining, currency)}
+                </a>
+              </Button>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Contactez le club pour le lien de paiement HelloAsso.
+              </p>
+            )}
+            <p className="text-[11px] text-muted-foreground italic">
+              Paiement traité hors de Clubero — le statut sera mis à jour par le club après réception.
+            </p>
+          </div>
+        )}
 
         {/* Transactions */}
         {obligation.transactions.length > 0 && (
