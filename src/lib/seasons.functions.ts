@@ -19,14 +19,12 @@ async function assertClubAdmin(
     !!data &&
     ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (isAdmin) return;
-  // Also allow financial_admin via user_roles
-  const { data: fr } = await supabaseAdmin
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "financial_admin")
-    .maybeSingle();
-  if (fr) return;
+  const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
+    _user_id: userId,
+    _club_id: clubId,
+    _role: "financial_admin",
+  });
+  if (isFin === true) return;
   throw new Error("Only club admins or financial admins can manage seasons");
 }
 
