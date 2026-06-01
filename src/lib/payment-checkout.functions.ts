@@ -408,11 +408,12 @@ export const recordManualPayment = createServerFn({ method: "POST" })
       club_id: obl.club_id,
       actor_user_id: context.userId,
       action: "manual_payment_recorded",
-      target_obligation_id: obl.id,
-      target_transaction_id: tx.id,
-      metadata: {
+      entity_type: "payment_transaction",
+      entity_id: tx.id,
+      new_value: {
         method: data.method,
         amount_cents: data.amountCents,
+        obligation_id: obl.id,
       } as unknown as never,
     });
 
