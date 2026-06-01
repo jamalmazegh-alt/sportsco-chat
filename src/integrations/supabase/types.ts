@@ -2829,6 +2829,27 @@ export type Database = {
         }
         Relationships: []
       }
+      public_rate_limits: {
+        Row: {
+          count: number
+          ip: string
+          route: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          ip: string
+          route: string
+          window_start: string
+        }
+        Update: {
+          count?: number
+          ip?: string
+          route?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       reminders: {
         Row: {
           channel: Database["public"]["Enums"]["reminder_channel"]
