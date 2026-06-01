@@ -276,18 +276,15 @@ export const createObligationCheckout = createServerFn({ method: "POST" })
     const subActive = await hasActiveSubscription(obl.club_id);
     const fee = computeFeeForClub(amount, subActive);
 
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("email")
-      .eq("id", userId)
-      .maybeSingle();
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const payerEmail = authUser?.user?.email ?? undefined;
 
     const origin = getOrigin();
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card", "sepa_debit", "link"],
-      customer_email: profile?.email ?? undefined,
+      customer_email: payerEmail,
       line_items: [
         {
           quantity: 1,
