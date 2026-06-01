@@ -26,6 +26,7 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
+import { VoiceInputButton } from "@/components/voice-input-button";
 
 const SUGGESTIONS = [
   "C'est quoi Clubero, en 1 phrase ?",
@@ -189,7 +190,8 @@ export function MarketingChatWidget() {
                 ref={textareaRef}
                 placeholder="Posez votre question..."
               />
-              <PromptInputFooter className="justify-end">
+              <PromptInputFooter className="justify-end gap-1">
+                <VoiceInputButton textareaRef={textareaRef} />
                 <PromptInputSubmit
                   status={status}
                   onStop={stop}

@@ -26,6 +26,7 @@ import {
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { VoiceInputButton } from "@/components/voice-input-button";
 import { useAuth } from "@/lib/auth-context";
 import i18n from "@/lib/i18n";
 
@@ -290,7 +291,8 @@ function AssistantPage() {
             placeholder={t("assistant.placeholder", { defaultValue: "Pose ta question..." })}
             disabled={!authToken || !user}
           />
-          <PromptInputFooter className="justify-end">
+          <PromptInputFooter className="justify-end gap-1">
+            <VoiceInputButton textareaRef={textareaRef} disabled={!authToken || !user} />
             <PromptInputSubmit status={status} onStop={stop} disabled={!authToken || !user || isLoading} />
           </PromptInputFooter>
         </PromptInput>
