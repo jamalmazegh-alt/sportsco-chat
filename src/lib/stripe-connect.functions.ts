@@ -92,8 +92,13 @@ export const getStripeConnectStatus = createServerFn({ method: "POST" })
   });
 
 /**
- * Create a Stripe Connect Express account for the club.
+ * Create a Stripe Connect STANDARD account for the club.
+ * The club is Merchant of Record — it owns KYC, payouts, refunds, disputes,
+ * and chargebacks. Clubero never holds club funds.
+ *
  * Admin-only. Idempotent: returns the existing account id if already created.
+ * Onboarding mechanism: stripe.accounts.create({ type: "standard" }) + Account Links.
+ * (We do NOT use Stripe OAuth — see createStripeConnectOnboardingLink below.)
  */
 export const createStripeConnectAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -115,17 +120,12 @@ export const createStripeConnectAccount = createServerFn({ method: "POST" })
     }
 
     const stripe = getStripe();
+    // Standard accounts: Stripe collects all KYC, business_profile, capabilities
+    // during onboarding. We don't pre-request capabilities — that's an
+    // Express/Custom pattern. The club gets a full Stripe Dashboard.
     const account = await stripe.accounts.create({
-      type: "express",
+      type: "standard",
       country: "FR",
-      capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true },
-        sepa_debit_payments: { requested: true },
-      },
-      // business_type is intentionally not set — Stripe will ask the user
-      // during the Express onboarding flow so it matches the club's real
-      // legal structure (non-profit, individual, company, ...).
       business_profile: {
         name: club.name,
       },
@@ -150,7 +150,7 @@ export const createStripeConnectAccount = createServerFn({ method: "POST" })
         scope: "club",
         scope_id: club.id,
         action: "stripe_connect_account_created",
-        note: `Stripe Connect account ${account.id} created`,
+        note: `Stripe Connect Standard account ${account.id} created`,
       });
     } catch (e) {
       log.warn("Failed to insert permission_changes_log entry", { error: String(e) });
@@ -186,13 +186,8 @@ export const createStripeConnectOnboardingLink = createServerFn({ method: "POST"
     let accountId = club.stripe_account_id;
     if (!accountId) {
       const account = await stripe.accounts.create({
-        type: "express",
+        type: "standard",
         country: "FR",
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
-          sepa_debit_payments: { requested: true },
-        },
         business_profile: { name: club.name },
         metadata: { clubero_club_id: club.id },
       });

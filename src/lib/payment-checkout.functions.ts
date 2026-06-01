@@ -4,7 +4,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getStripe } from "@/lib/stripe.server";
-import { computeFeeForClub } from "@/lib/platform-fee";
 import { createLogger } from "@/lib/logger.server";
 import { generateReceiptPdf, signedReceiptUrl } from "@/lib/payment-receipt.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
@@ -13,49 +12,39 @@ const log = createLogger("payment-checkout");
 
 const MANUAL_METHODS = ["cash", "cheque", "bank_transfer", "manual"] as const;
 
+// FIX 7: Financial actions require the financial_admin role. Club Admin
+// can ASSIGN the financial_admin role but does NOT inherit it. The only
+// bypass is super-admin (handled by RLS / service-role admin tools).
 async function assertFinAdmin(
-  supabase: SupabaseClient,
+  _supabase: SupabaseClient,
   userId: string,
   clubId: string,
 ): Promise<void> {
-  const { data } = await supabase
-    .from("club_members")
-    .select("roles, role")
-    .eq("club_id", clubId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
-  if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
     _club_id: clubId,
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only club admins or financial admins can record payments");
+  throw new Error("Only financial admins can perform this action");
 }
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
 }
 
-async function hasActiveSubscription(clubId: string): Promise<boolean> {
-  const { data: sub } = await supabaseAdmin
-    .from("subscriptions")
-    .select("status, trial_end, current_period_end")
-    .eq("club_id", clubId)
-    .maybeSingle();
-  const now = Date.now();
-  return (
-    !!sub &&
-    ((sub.status === "trialing" &&
-      sub.trial_end &&
-      new Date(sub.trial_end).getTime() > now) ||
-      ((sub.status === "active" || sub.status === "past_due") &&
-        (!sub.current_period_end ||
-          new Date(sub.current_period_end).getTime() > now)))
-  );
+// FIX 6: Stripe statement_descriptor_suffix limits — 22 chars, alphanumeric
+// plus spaces, no special chars. Build from club name; fall back to short
+// safe default. Never use "CLUBERO" for club payments.
+function buildStatementDescriptor(clubName: string | null | undefined): string {
+  const cleaned = (clubName ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toUpperCase();
+  return cleaned.slice(0, 22) || "CLUB";
 }
 
 async function sumPaid(obligationId: string): Promise<number> {
@@ -66,6 +55,7 @@ async function sumPaid(obligationId: string): Promise<number> {
     .eq("status", "succeeded");
   return (data ?? []).reduce((s, r) => s + (r.amount_gross_cents ?? 0), 0);
 }
+
 
 async function maybeIssueReceipt(transactionId: string): Promise<void> {
   // Idempotent: skip if a receipt already exists for this transaction
@@ -129,7 +119,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
       transaction_id: tx.id,
       obligation_id: obl.id,
       receipt_number: receiptNumber,
-      kind: "confirmation",
+      kind: tx.method === "stripe" ? "official" : "confirmation",
       payer_name: payer
         ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
         : null,
@@ -353,53 +343,71 @@ export const createObligationCheckout = createServerFn({ method: "POST" })
       throw new Error("Online payment is not available for this club yet");
     }
 
-    const subActive = await hasActiveSubscription(obl.club_id);
-    const fee = computeFeeForClub(amount, subActive);
+    // FIX 3: Platform fee = 0 in MVP. Read platform_fee_bps from settings
+    // (server source of truth). If 0, OMIT application_fee_amount entirely.
+    const { data: feeSettings } = await supabaseAdmin
+      .from("club_payment_settings")
+      .select("platform_fee_bps")
+      .eq("club_id", obl.club_id)
+      .maybeSingle();
+    const platformFeeBps = feeSettings?.platform_fee_bps ?? 0;
+    const fee = platformFeeBps > 0 ? Math.round((amount * platformFeeBps) / 10000) : 0;
 
     const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
     const payerEmail = authUser?.user?.email ?? undefined;
 
     const origin = getOrigin();
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card", "sepa_debit", "link"],
-      customer_email: payerEmail,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: (obl.currency || "eur").toLowerCase(),
-            unit_amount: amount,
-            product_data: {
-              name: `${item.title} — ${club.name}`,
+
+    // FIX 2: DIRECT CHARGES on the connected club account.
+    // - No transfer_data.destination, no destination charge.
+    // - The club is Merchant of Record.
+    // - payment_method_types: card only for MVP (Apple/Google Pay come along).
+    // FIX 6: statement_descriptor_suffix shows the club name, never "CLUBERO".
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        payment_method_types: ["card"],
+        customer_email: payerEmail,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: (obl.currency || "eur").toLowerCase(),
+              unit_amount: amount,
+              product_data: {
+                name: `${item.title} — ${club.name}`,
+              },
             },
           },
+        ],
+        payment_intent_data: {
+          statement_descriptor_suffix: buildStatementDescriptor(club.name),
+          // application_fee_amount intentionally omitted (FIX 3 — fee=0 in MVP)
+          ...(fee > 0 ? { application_fee_amount: fee } : {}),
+          metadata: {
+            purpose: "payment_obligation",
+            obligation_id: obl.id,
+            club_id: obl.club_id,
+            payer_user_id: userId,
+          },
         },
-      ],
-      payment_intent_data: {
-        application_fee_amount: fee,
-        transfer_data: { destination: club.stripe_account_id },
         metadata: {
           purpose: "payment_obligation",
           obligation_id: obl.id,
           club_id: obl.club_id,
           payer_user_id: userId,
         },
+        success_url: `${origin}/payments?success=1`,
+        cancel_url: `${origin}/payments?cancelled=1`,
       },
-      metadata: {
-        purpose: "payment_obligation",
-        obligation_id: obl.id,
-        club_id: obl.club_id,
-        payer_user_id: userId,
-      },
-      success_url: `${origin}/payments?success=1`,
-      cancel_url: `${origin}/payments?cancelled=1`,
-    });
+      { stripeAccount: club.stripe_account_id },
+    );
 
     if (!session.url) throw new Error("Stripe did not return a session URL");
 
-    // Insert pending transaction so admins can track it
+    // Insert pending transaction keyed by session id so the Connect webhook
+    // can finalize it (FIX 11).
     await supabaseAdmin.from("payment_transactions").insert({
       obligation_id: obl.id,
       club_id: obl.club_id,
