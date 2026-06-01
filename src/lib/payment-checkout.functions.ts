@@ -479,11 +479,12 @@ export async function finalizeStripeTransactionByPI(params: {
     club_id: txRow.club_id,
     actor_user_id: null,
     action: "stripe_payment_succeeded",
-    target_obligation_id: txRow.obligation_id,
-    target_transaction_id: txRow.id,
-    metadata: {
+    entity_type: "payment_transaction",
+    entity_id: txRow.id,
+    new_value: {
       payment_intent: paymentIntentId,
       session_id: sessionId,
+      obligation_id: txRow.obligation_id,
     } as unknown as never,
   });
 }
