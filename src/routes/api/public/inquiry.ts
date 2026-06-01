@@ -77,6 +77,19 @@ export const Route = createFileRoute("/api/public/inquiry")({
           return Response.json({ error: "Invalid input" }, { status: 400 });
         }
 
+        // Honeypot: silently accept and drop bot submissions.
+        if (parsed.website && parsed.website.length > 0) {
+          return Response.json({ success: true });
+        }
+
+        // Per-IP rate limit (fixed hourly window).
+        const ip = getClientIp(request);
+        const allowed = await checkRateLimit(ip, "inquiry", INQUIRY_RATE_LIMIT_PER_HOUR);
+        if (!allowed) {
+          return Response.json({ error: "Too many requests" }, { status: 429 });
+        }
+
+
         const adminTemplate = TEMPLATES[ADMIN_TEMPLATE];
         const confirmTemplate = TEMPLATES[CONFIRM_TEMPLATE];
         if (!adminTemplate?.to || !confirmTemplate) {
