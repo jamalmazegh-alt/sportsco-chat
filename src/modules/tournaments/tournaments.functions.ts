@@ -8,6 +8,8 @@ import { generateKnockoutBracket } from "./lib/bracket";
 import { mergeRules, DEFAULT_RULES } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { assertTournamentMutable } from "@/lib/tournament-guards.server";
+
 
 
 
