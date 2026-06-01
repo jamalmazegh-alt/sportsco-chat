@@ -8,6 +8,8 @@ import { generateKnockoutBracket } from "./lib/bracket";
 import { mergeRules, DEFAULT_RULES } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { assertTournamentMutable } from "@/lib/tournament-guards.server";
+
 
 
 
@@ -411,6 +413,7 @@ export const removeTournamentTeam = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
+    await assertTournamentMutable(data.tournament_id, "structure");
     const { error } = await supabase
       .from("tournament_teams")
       .delete()
@@ -436,6 +439,7 @@ export const autoCreateGroupsAndFixtures = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
+    await assertTournamentMutable(data.tournament_id, "structure");
 
     const { data: teams, error: teamsErr } = await supabase
       .from("tournament_teams")
@@ -689,6 +693,7 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
+    await assertTournamentMutable(data.tournament_id, "structure");
 
     const { data: t } = await supabase
       .from("tournaments")

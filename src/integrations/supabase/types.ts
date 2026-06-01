@@ -2926,6 +2926,24 @@ export type Database = {
           },
         ]
       }
+      stripe_webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string | null
+          processed_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type?: string | null
+          processed_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string | null
+          processed_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at: string | null
@@ -3861,6 +3879,7 @@ export type Database = {
           players: Json
           refund_reason: string | null
           refunded_at: string | null
+          registration_state: string
           roster_submitted_at: string | null
           roster_token: string
           short_name: string | null
@@ -3900,6 +3919,7 @@ export type Database = {
           players?: Json
           refund_reason?: string | null
           refunded_at?: string | null
+          registration_state?: string
           roster_submitted_at?: string | null
           roster_token?: string
           short_name?: string | null
@@ -3939,6 +3959,7 @@ export type Database = {
           players?: Json
           refund_reason?: string | null
           refunded_at?: string | null
+          registration_state?: string
           roster_submitted_at?: string | null
           roster_token?: string
           short_name?: string | null
@@ -4541,6 +4562,10 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      ensure_team_for_registration: {
+        Args: { _registration_id: string }
+        Returns: string
       }
       gen_coach_public_slug: {
         Args: { _first_name: string; _last_name: string }

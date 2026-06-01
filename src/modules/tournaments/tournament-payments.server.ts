@@ -159,10 +159,14 @@ export async function handleTournamentCheckoutCompleted(
   }
 
   const now = new Date().toISOString();
+  // Transition: pending_payment | paid_pending_team → paid_pending_team.
+  // The WHERE clause is conditioned on the expected source state so a
+  // late-arriving duplicate webhook can never move a `confirmed` row back.
   const { data: reg } = await supabaseAdmin
     .from("tournament_registrations")
     .update({
       payment_status: "paid_online",
+      registration_state: "paid_pending_team",
       payment_intent_id: paymentIntentId,
       stripe_payment_intent_id: paymentIntentId,
       stripe_charge_id: chargeId,
@@ -172,8 +176,25 @@ export async function handleTournamentCheckoutCompleted(
       paid_at: now,
     })
     .eq("id", registrationId)
+    .in("registration_state", ["pending_payment", "paid_pending_team"])
     .select("tournament_id")
     .maybeSingle();
+
+  // Self-heal / atomic team creation. Idempotent: if a team is already
+  // linked we get its id back; otherwise the RPC creates one and flips
+  // registration_state → 'confirmed' in the same transaction.
+  try {
+    await supabaseAdmin.rpc("ensure_team_for_registration", {
+      _registration_id: registrationId,
+    });
+  } catch (e) {
+    log.error("ensure_team_for_registration failed", {
+      registrationId,
+      error: String(e),
+    });
+    // Don't 500 the webhook — the self-heal hook will retry. Stripe must not
+    // re-deliver because we already inserted the event into stripe_webhook_events.
+  }
 
   await logPaymentEvent(
     reg?.tournament_id ?? null,
@@ -188,6 +209,7 @@ export async function handleTournamentCheckoutCompleted(
     eventId,
   );
 }
+
 
 export async function handleTournamentChargeRefunded(
   charge: Stripe.Charge,
