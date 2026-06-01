@@ -3942,7 +3942,13 @@ export type Database = {
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "coach" | "parent" | "player" | "dirigeant"
+      app_role:
+        | "admin"
+        | "coach"
+        | "parent"
+        | "player"
+        | "dirigeant"
+        | "financial_admin"
       attendance_status: "present" | "absent" | "uncertain" | "pending"
       consent_kind:
         | "terms"
@@ -4162,7 +4168,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "coach", "parent", "player", "dirigeant"],
+      app_role: [
+        "admin",
+        "coach",
+        "parent",
+        "player",
+        "dirigeant",
+        "financial_admin",
+      ],
       attendance_status: ["present", "absent", "uncertain", "pending"],
       consent_kind: [
         "terms",
