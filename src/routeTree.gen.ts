@@ -87,6 +87,7 @@ import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
+import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_authenticated/payments.receipts'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
@@ -527,6 +528,12 @@ const AuthenticatedPlayersPlayerIdRoute =
     path: '/players/$playerId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPaymentsReceiptsRoute =
+  AuthenticatedPaymentsReceiptsRouteImport.update({
+    id: '/receipts',
+    path: '/receipts',
+    getParentRoute: () => AuthenticatedPaymentsRoute,
+  } as any)
 const AuthenticatedEventsEventIdRoute =
   AuthenticatedEventsEventIdRouteImport.update({
     id: '/$eventId',
@@ -749,7 +756,7 @@ export interface FileRoutesByFullPath {
   '/following': typeof AuthenticatedFollowingRoute
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/payments': typeof AuthenticatedPaymentsRoute
+  '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/stats': typeof AuthenticatedStatsRoute
   '/support': typeof AuthenticatedSupportRouteWithChildren
@@ -781,6 +788,7 @@ export interface FileRoutesByFullPath {
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -860,7 +868,7 @@ export interface FileRoutesByTo {
   '/following': typeof AuthenticatedFollowingRoute
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
-  '/payments': typeof AuthenticatedPaymentsRoute
+  '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/stats': typeof AuthenticatedStatsRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
@@ -890,6 +898,7 @@ export interface FileRoutesByTo {
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -973,7 +982,7 @@ export interface FileRoutesById {
   '/_authenticated/following': typeof AuthenticatedFollowingRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
-  '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
+  '/_authenticated/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/support': typeof AuthenticatedSupportRouteWithChildren
@@ -1005,6 +1014,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/_authenticated/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -1120,6 +1130,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/club/discipline'
     | '/events/$eventId'
+    | '/payments/receipts'
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
@@ -1229,6 +1240,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/club/discipline'
     | '/events/$eventId'
+    | '/payments/receipts'
     | '/players/$playerId'
     | '/profile/password'
     | '/profile/privacy'
@@ -1343,6 +1355,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/billing'
     | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
+    | '/_authenticated/payments/receipts'
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
@@ -2008,6 +2021,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlayersPlayerIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/payments/receipts': {
+      id: '/_authenticated/payments/receipts'
+      path: '/receipts'
+      fullPath: '/payments/receipts'
+      preLoaderRoute: typeof AuthenticatedPaymentsReceiptsRouteImport
+      parentRoute: typeof AuthenticatedPaymentsRoute
+    }
     '/_authenticated/events/$eventId': {
       id: '/_authenticated/events/$eventId'
       path: '/$eventId'
@@ -2314,6 +2334,19 @@ const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
 const AuthenticatedEventsRouteWithChildren =
   AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
+interface AuthenticatedPaymentsRouteChildren {
+  AuthenticatedPaymentsReceiptsRoute: typeof AuthenticatedPaymentsReceiptsRoute
+}
+
+const AuthenticatedPaymentsRouteChildren: AuthenticatedPaymentsRouteChildren = {
+  AuthenticatedPaymentsReceiptsRoute: AuthenticatedPaymentsReceiptsRoute,
+}
+
+const AuthenticatedPaymentsRouteWithChildren =
+  AuthenticatedPaymentsRoute._addFileChildren(
+    AuthenticatedPaymentsRouteChildren,
+  )
+
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfilePasswordRoute: typeof AuthenticatedProfilePasswordRoute
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
@@ -2406,7 +2439,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedFollowingRoute: typeof AuthenticatedFollowingRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
-  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
+  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRouteWithChildren
@@ -2424,7 +2457,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFollowingRoute: AuthenticatedFollowingRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
-  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
+  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRouteWithChildren,
