@@ -115,7 +115,7 @@ function MyPaymentsPage() {
 
       <ul className="space-y-3">
         {(q.data?.obligations as Obligation[] | undefined)?.map((o) => (
-          <ObligationRow key={o.id} obligation={o} onPaid={() => q.refetch()} />
+          <ObligationRow key={o.id} obligation={o} />
         ))}
       </ul>
     </div>
