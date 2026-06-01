@@ -184,7 +184,14 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                   amountReceivedCents: amount,
                   feeCents: fee,
                   sessionId: session.id,
+                  currency: session.currency ?? null,
+                  metadata: {
+                    obligation_id: session.metadata?.obligation_id ?? null,
+                    club_id: session.metadata?.club_id ?? null,
+                    payer_user_id: session.metadata?.payer_user_id ?? null,
+                  },
                 });
+
                 break;
               }
               // Tournament registration: one-time destination charge
