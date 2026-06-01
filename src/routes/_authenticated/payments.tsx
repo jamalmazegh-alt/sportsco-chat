@@ -70,7 +70,7 @@ function MyPaymentsPage() {
     queryFn: () => listFn({ data: {} }),
   });
 
-  const search = Route.useSearch() as { success?: string; cancelled?: string };
+  const search = Route.useSearch();
 
   return (
     <div className="px-5 py-4 space-y-5 max-w-3xl">
