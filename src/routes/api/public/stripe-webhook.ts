@@ -111,21 +111,35 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
     handlers: {
       POST: async ({ request }) => {
         const signature = request.headers.get("stripe-signature");
-        const secret = process.env.STRIPE_WEBHOOK_SECRET;
-        if (!signature || !secret) {
+        const platformSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        const connectSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
+        if (!signature || (!platformSecret && !connectSecret)) {
           return new Response("Missing signature or secret", { status: 400 });
         }
 
         const body = await request.text();
         const stripe = getStripe();
 
-        let event: Stripe.Event;
-        try {
-          event = await stripe.webhooks.constructEventAsync(body, signature, secret);
-        } catch (err) {
-          console.error("Stripe webhook signature failed:", err);
+        // Fix 11: try the platform secret first, then the Connect secret.
+        // Connect events (Direct Charges from connected accounts) come with
+        // event.account populated and are signed with the Connect endpoint secret.
+        let event: Stripe.Event | null = null;
+        const secrets = [platformSecret, connectSecret].filter(Boolean) as string[];
+        let lastErr: unknown = null;
+        for (const secret of secrets) {
+          try {
+            event = await stripe.webhooks.constructEventAsync(body, signature, secret);
+            lastErr = null;
+            break;
+          } catch (err) {
+            lastErr = err;
+          }
+        }
+        if (!event) {
+          console.error("Stripe webhook signature failed:", lastErr);
           return new Response("Invalid signature", { status: 400 });
         }
+
 
         try {
           switch (event.type) {
