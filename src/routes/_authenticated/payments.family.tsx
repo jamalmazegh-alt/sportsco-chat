@@ -401,6 +401,23 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
             <ul className="space-y-1">
               {obligation.transactions.map((t) => {
                 const refunded = t.refunded_amount_cents ?? 0;
+                const methodLabel =
+                  t.method === "helloasso"
+                    ? "HelloAsso"
+                    : t.method === "stripe"
+                      ? "Carte bancaire"
+                      : t.method === "cash"
+                        ? "Espèces"
+                        : t.method === "check"
+                          ? "Chèque"
+                          : t.method === "transfer"
+                            ? "Virement"
+                            : t.method;
+                const isExternal =
+                  t.method === "helloasso" ||
+                  t.method === "cash" ||
+                  t.method === "check" ||
+                  t.method === "transfer";
                 return (
                   <li
                     key={t.id}
@@ -410,7 +427,12 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
                       {new Date(t.paid_at ?? t.created_at).toLocaleDateString(
                         "fr-FR",
                       )}{" "}
-                      · {t.method}
+                      · {methodLabel}
+                      {isExternal && (
+                        <span className="ml-1 text-muted-foreground">
+                          (enregistré par le club)
+                        </span>
+                      )}
                       {refunded > 0 && (
                         <span className="ml-1 text-amber-600 dark:text-amber-400">
                           (remb. {fmt(refunded, t.currency)})
@@ -423,6 +445,7 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
                   </li>
                 );
               })}
+
             </ul>
           </div>
         )}
