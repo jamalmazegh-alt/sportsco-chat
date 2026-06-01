@@ -301,6 +301,104 @@ async function seedAll(): Promise<Fixtures> {
   if (audErr || !aud) throw new Error(`audit_logs insert: ${audErr?.message}`);
   const auditLogA = aud.id;
 
+  // 19. Payments — seasons, item, obligations, transaction, settings
+  const today = new Date();
+  const startDate = `${today.getUTCFullYear()}-01-01`;
+  const endDate = `${today.getUTCFullYear()}-12-31`;
+  const { data: seasonsRows, error: seasonsErr } = await admin
+    .from("seasons")
+    .insert([
+      { club_id: clubA, label: `${PREFIX}_seasonA`, start_date: startDate, end_date: endDate, is_current: true },
+      { club_id: clubB, label: `${PREFIX}_seasonB`, start_date: startDate, end_date: endDate, is_current: true },
+    ])
+    .select("id, club_id");
+  if (seasonsErr || !seasonsRows) throw new Error(`seasons insert: ${seasonsErr?.message}`);
+  const seasonA = seasonsRows.find((s) => s.club_id === clubA)!.id;
+  const seasonB = seasonsRows.find((s) => s.club_id === clubB)!.id;
+
+  const { data: piRow, error: piErr } = await admin
+    .from("payment_items")
+    .insert({
+      club_id: clubA,
+      season_id: seasonA,
+      type: "membership",
+      title: `${PREFIX}_itemA`,
+      amount_cents: 10000,
+      provider: "stripe",
+      created_by: users.adminA.userId,
+    })
+    .select("id")
+    .single();
+  if (piErr || !piRow) throw new Error(`payment_items insert: ${piErr?.message}`);
+  const paymentItemA = piRow.id;
+
+  const { data: poRows, error: poErr } = await admin
+    .from("payment_obligations")
+    .insert([
+      {
+        payment_item_id: paymentItemA,
+        club_id: clubA,
+        player_id: playerA,
+        payer_user_id: users.parentA.userId,
+        amount_due_cents: 10000,
+      },
+    ])
+    .select("id")
+    .single();
+  if (poErr || !poRows) throw new Error(`payment_obligations A insert: ${poErr?.message}`);
+  const obligationA = poRows.id;
+
+  // obligationB: clubB needs its own item first
+  const { data: piB, error: piBErr } = await admin
+    .from("payment_items")
+    .insert({
+      club_id: clubB,
+      season_id: seasonB,
+      type: "membership",
+      title: `${PREFIX}_itemB`,
+      amount_cents: 5000,
+      provider: "stripe",
+      created_by: users.adminB.userId,
+    })
+    .select("id")
+    .single();
+  if (piBErr || !piB) throw new Error(`payment_items B insert: ${piBErr?.message}`);
+  const { data: poB, error: poBErr } = await admin
+    .from("payment_obligations")
+    .insert({
+      payment_item_id: piB.id,
+      club_id: clubB,
+      player_id: playerB,
+      amount_due_cents: 5000,
+    })
+    .select("id")
+    .single();
+  if (poBErr || !poB) throw new Error(`payment_obligations B insert: ${poBErr?.message}`);
+  const obligationB = poB.id;
+
+  const { data: txRow, error: txErr } = await admin
+    .from("payment_transactions")
+    .insert({
+      obligation_id: obligationA,
+      club_id: clubA,
+      method: "cash",
+      status: "succeeded",
+      amount_gross_cents: 5000,
+      amount_net_cents: 5000,
+    })
+    .select("id")
+    .single();
+  if (txErr || !txRow) throw new Error(`payment_transactions insert: ${txErr?.message}`);
+  const transactionA = txRow.id;
+
+  {
+    const { error } = await admin
+      .from("club_payment_settings")
+      .upsert({ club_id: clubA, platform_fee_bps: 0 }, { onConflict: "club_id" });
+    if (error) throw new Error(`club_payment_settings insert: ${error.message}`);
+  }
+  const paymentSettingsA = clubA;
+
   return {
     runId: RUN_ID,
     users: users as Fixtures["users"],
@@ -322,6 +420,13 @@ async function seedAll(): Promise<Fixtures> {
     exportRequestA,
     deletionRequestA,
     auditLogA,
+    seasonA,
+    seasonB,
+    paymentItemA,
+    obligationA,
+    obligationB,
+    transactionA,
+    paymentSettingsA,
   };
 }
 
