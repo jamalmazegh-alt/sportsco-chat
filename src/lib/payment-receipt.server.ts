@@ -142,6 +142,13 @@ export async function generateReceiptPdf(receiptId: string): Promise<string | nu
   }
   y = cardY - 30;
 
+  if (r.method === "helloasso") {
+    page.drawText("Paiement traité hors de Clubero via HelloAsso.", {
+      x: 50, y, font, size: 10, color: muted,
+    });
+    y -= 18;
+  }
+
   // Footer
   page.drawText(
     "Ce reçu atteste du paiement effectué. Il ne tient pas lieu de facture.",
