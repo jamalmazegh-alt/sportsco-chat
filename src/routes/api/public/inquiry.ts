@@ -5,12 +5,14 @@ import { render } from "@react-email/components";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { TEMPLATES } from "@/lib/email-templates/registry";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 
 const SITE_NAME = "Clubero";
 const SENDER_DOMAIN = "notify.clubero.app";
 const FROM_DOMAIN = "clubero.app";
 const ADMIN_TEMPLATE = "inbound-inquiry";
 const CONFIRM_TEMPLATE = "inquiry-confirmation";
+const INQUIRY_RATE_LIMIT_PER_HOUR = 5;
 
 const InquirySchema = z.object({
   kind: z.enum(["contact", "demo"]),
@@ -24,7 +26,10 @@ const InquirySchema = z.object({
   teams: z.string().trim().max(40).optional().default(""),
   message: z.string().trim().max(4000).optional().default(""),
   notes: z.string().trim().max(4000).optional().default(""),
+  // Honeypot: must be empty. Bots filling every field will populate it.
+  website: z.string().max(0).optional().default(""),
 });
+
 
 function generateToken(): string {
   const bytes = new Uint8Array(32);
