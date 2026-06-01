@@ -56,14 +56,6 @@ async function sumPaid(obligationId: string): Promise<number> {
   return (data ?? []).reduce((s, r) => s + (r.amount_gross_cents ?? 0), 0);
 }
 
-async function sumPaid(obligationId: string): Promise<number> {
-  const { data } = await supabaseAdmin
-    .from("payment_transactions")
-    .select("amount_gross_cents")
-    .eq("obligation_id", obligationId)
-    .eq("status", "succeeded");
-  return (data ?? []).reduce((s, r) => s + (r.amount_gross_cents ?? 0), 0);
-}
 
 async function maybeIssueReceipt(transactionId: string): Promise<void> {
   // Idempotent: skip if a receipt already exists for this transaction
