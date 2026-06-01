@@ -374,6 +374,7 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                 .eq("stripe_account_id", account.id)
                 .maybeSingle();
               if (club) {
+                // Core write — must succeed (idempotent).
                 await supabaseAdmin
                   .from("clubs")
                   .update({
@@ -382,27 +383,157 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                     stripe_payouts_enabled: payoutsEnabled,
                   })
                   .eq("id", club.id);
-                await supabaseAdmin.from("tournament_payment_events").insert({
-                  tournament_id: null,
-                  event_type: "account_updated",
-                  stripe_event_id: event.id,
-                  metadata: {
+
+                // FIX C: upsert tournament_payment_events to make redelivery safe.
+                try {
+                  await supabaseAdmin
+                    .from("tournament_payment_events")
+                    .upsert(
+                      {
+                        tournament_id: null,
+                        event_type: "account_updated",
+                        stripe_event_id: event.id,
+                        metadata: {
+                          club_id: club.id,
+                          stripe_account_id: account.id,
+                          status,
+                          charges_enabled: chargesEnabled,
+                          payouts_enabled: payoutsEnabled,
+                          disabled_reason: disabledReason,
+                        } as unknown as never,
+                      },
+                      { onConflict: "stripe_event_id", ignoreDuplicates: true },
+                    );
+                } catch (e) {
+                  console.error("tournament_payment_events upsert failed (swallowed)", e);
+                }
+
+                // FIX F: provider-change audit log in payment_audit_logs.
+                try {
+                  await supabaseAdmin.from("payment_audit_logs").insert({
                     club_id: club.id,
-                    stripe_account_id: account.id,
-                    status,
-                    charges_enabled: chargesEnabled,
-                    payouts_enabled: payoutsEnabled,
-                    disabled_reason: disabledReason,
-                  } as unknown as never,
-                });
+                    actor_user_id: null,
+                    action: "provider_changed",
+                    entity_type: "club",
+                    entity_id: club.id,
+                    new_value: {
+                      stripe_account_id: account.id,
+                      status,
+                      charges_enabled: chargesEnabled,
+                      payouts_enabled: payoutsEnabled,
+                      disabled_reason: disabledReason,
+                    } as unknown as never,
+                  });
+                } catch (e) {
+                  console.error("payment_audit_logs provider_changed failed (swallowed)", e);
+                }
               }
               break;
             }
             case "charge.refunded": {
-              await handleTournamentChargeRefunded(
-                event.data.object as Stripe.Charge,
-                event.id,
-              );
+              // FIX A: an out-of-band refund on a connected club account must sync
+              // the obligation transaction. The club is Merchant of Record on a
+              // Standard account and can refund directly from its Stripe dashboard.
+              const charge = event.data.object as Stripe.Charge;
+              const piId =
+                typeof charge.payment_intent === "string"
+                  ? charge.payment_intent
+                  : charge.payment_intent?.id ?? null;
+              const totalRefunded = charge.amount_refunded ?? 0;
+
+              if (piId) {
+                const { data: tx } = await supabaseAdmin
+                  .from("payment_transactions")
+                  .select("id, club_id, refunded_amount_cents")
+                  .eq("stripe_payment_intent_id", piId)
+                  .eq("method", "stripe")
+                  .maybeSingle();
+
+                if (tx) {
+                  const prev = tx.refunded_amount_cents ?? 0;
+                  // Last-write-wins (absolute value) — naturally idempotent;
+                  // converges with in-app refunds which also set this column.
+                  if (prev !== totalRefunded) {
+                    await supabaseAdmin
+                      .from("payment_transactions")
+                      .update({ refunded_amount_cents: totalRefunded })
+                      .eq("id", tx.id);
+
+                    try {
+                      await supabaseAdmin.from("payment_audit_logs").insert({
+                        club_id: tx.club_id,
+                        actor_user_id: null,
+                        action: "stripe_refund_synced",
+                        entity_type: "payment_transaction",
+                        entity_id: tx.id,
+                        new_value: {
+                          charge_id: charge.id,
+                          payment_intent: piId,
+                          refunded_amount_cents: totalRefunded,
+                          previous_refunded_amount_cents: prev,
+                          stripe_event_id: event.id,
+                        } as unknown as never,
+                      });
+                    } catch (e) {
+                      console.error("stripe_refund_synced audit failed (swallowed)", e);
+                    }
+                  }
+                  break;
+                }
+              }
+              // No matching obligation tx → tournament path.
+              await handleTournamentChargeRefunded(charge, event.id);
+              break;
+            }
+            case "payment_intent.payment_failed": {
+              // FIX E: mark stale pending obligation tx as failed.
+              const pi = event.data.object as Stripe.PaymentIntent;
+              const { data: tx } = await supabaseAdmin
+                .from("payment_transactions")
+                .select("id, status")
+                .eq("stripe_payment_intent_id", pi.id)
+                .eq("method", "stripe")
+                .maybeSingle();
+              if (tx && tx.status === "pending") {
+                await supabaseAdmin
+                  .from("payment_transactions")
+                  .update({ status: "failed" })
+                  .eq("id", tx.id);
+              }
+              break;
+            }
+            case "checkout.session.expired": {
+              // FIX E: mark stale pending obligation tx as failed.
+              const session = event.data.object as Stripe.Checkout.Session;
+              const piId =
+                typeof session.payment_intent === "string"
+                  ? session.payment_intent
+                  : session.payment_intent?.id ?? null;
+              let tx: { id: string; status: string } | null = null;
+              {
+                const { data } = await supabaseAdmin
+                  .from("payment_transactions")
+                  .select("id, status")
+                  .eq("external_reference", session.id)
+                  .eq("method", "stripe")
+                  .maybeSingle();
+                tx = data ?? null;
+              }
+              if (!tx && piId) {
+                const { data } = await supabaseAdmin
+                  .from("payment_transactions")
+                  .select("id, status")
+                  .eq("stripe_payment_intent_id", piId)
+                  .eq("method", "stripe")
+                  .maybeSingle();
+                tx = data ?? null;
+              }
+              if (tx && tx.status === "pending") {
+                await supabaseAdmin
+                  .from("payment_transactions")
+                  .update({ status: "failed" })
+                  .eq("id", tx.id);
+              }
               break;
             }
             default:
