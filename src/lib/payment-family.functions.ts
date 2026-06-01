@@ -43,6 +43,28 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
     const list = obls ?? [];
     const ids = list.map((o) => o.id);
 
+    type TxRow = {
+      id: string;
+      obligation_id: string;
+      method: string;
+      status: string;
+      amount_gross_cents: number;
+      amount_net_cents: number | null;
+      refunded_amount_cents: number | null;
+      currency: string | null;
+      paid_at: string | null;
+      created_at: string;
+    };
+    type RcRow = {
+      id: string;
+      obligation_id: string;
+      receipt_number: number;
+      amount_gross_cents: number;
+      currency: string;
+      method: string;
+      issued_at: string;
+    };
+
     // 3. Fetch all transactions and receipts in two batched queries.
     const [txRes, rcRes] = await Promise.all([
       ids.length
@@ -53,7 +75,7 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
             )
             .in("obligation_id", ids)
             .order("created_at", { ascending: false })
-        : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
+        : Promise.resolve({ data: [] as TxRow[] }),
       ids.length
         ? supabaseAdmin
             .from("payment_receipts")
@@ -62,34 +84,31 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
             )
             .in("obligation_id", ids)
             .order("issued_at", { ascending: false })
-        : Promise.resolve({ data: [] as Array<Record<string, unknown>> }),
+        : Promise.resolve({ data: [] as RcRow[] }),
     ]);
 
-    const txByObl = new Map<string, Array<Record<string, unknown>>>();
-    (txRes.data ?? []).forEach((t) => {
-      const key = (t as { obligation_id: string }).obligation_id;
-      if (!txByObl.has(key)) txByObl.set(key, []);
-      txByObl.get(key)!.push(t);
+    const txByObl = new Map<string, TxRow[]>();
+    ((txRes.data ?? []) as TxRow[]).forEach((t) => {
+      if (!txByObl.has(t.obligation_id)) txByObl.set(t.obligation_id, []);
+      txByObl.get(t.obligation_id)!.push(t);
     });
 
-    const rcByObl = new Map<string, Array<Record<string, unknown>>>();
-    (rcRes.data ?? []).forEach((r) => {
-      const key = (r as { obligation_id: string }).obligation_id;
-      if (!rcByObl.has(key)) rcByObl.set(key, []);
-      rcByObl.get(key)!.push(r);
+    const rcByObl = new Map<string, RcRow[]>();
+    ((rcRes.data ?? []) as RcRow[]).forEach((r) => {
+      if (!rcByObl.has(r.obligation_id)) rcByObl.set(r.obligation_id, []);
+      rcByObl.get(r.obligation_id)!.push(r);
     });
 
     // 4. Compute paid (succeeded - refunded) per obligation.
     const enriched = list.map((o) => {
       const txs = txByObl.get(o.id) ?? [];
       const paid = txs
-        .filter((t) => (t as { status: string }).status === "succeeded")
+        .filter((t) => t.status === "succeeded")
         .reduce(
           (sum, t) =>
             sum +
-            ((t as { amount_gross_cents: number }).amount_gross_cents ?? 0) -
-            ((t as { refunded_amount_cents: number | null })
-              .refunded_amount_cents ?? 0),
+            (t.amount_gross_cents ?? 0) -
+            (t.refunded_amount_cents ?? 0),
           0,
         );
       return {
