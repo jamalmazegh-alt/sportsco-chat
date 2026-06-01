@@ -43,7 +43,12 @@ async function logAction(opts: {
   }
 }
 
-/** Returns whether the caller is a super admin. Safe to call from any user. */
+/**
+ * Returns whether the caller is a super admin.
+ * INTENTIONALLY PUBLIC (no assertSuperAdmin): any authenticated user must be
+ * able to ask "am I admin?" to decide whether to render the superadmin shell.
+ * Returns only a boolean — no privileged data leaks.
+ */
 export const checkSuperAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
