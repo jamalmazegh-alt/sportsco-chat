@@ -186,13 +186,8 @@ export const createStripeConnectOnboardingLink = createServerFn({ method: "POST"
     let accountId = club.stripe_account_id;
     if (!accountId) {
       const account = await stripe.accounts.create({
-        type: "express",
+        type: "standard",
         country: "FR",
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
-          sepa_debit_payments: { requested: true },
-        },
         business_profile: { name: club.name },
         metadata: { clubero_club_id: club.id },
       });
