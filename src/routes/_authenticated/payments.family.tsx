@@ -295,13 +295,21 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
   const Icon = meta.icon;
   const currency = obligation.currency;
   const remaining = obligation.amount_due_cents - obligation.amount_paid_cents;
+  const isHelloAsso = obligation.items?.provider === "helloasso";
   const stripeReady =
     !!obligation.clubs?.stripe_account_id &&
     !!obligation.clubs?.stripe_charges_enabled;
   const canPay =
+    !isHelloAsso &&
     (obligation.status === "pending" || obligation.status === "partially_paid") &&
     remaining > 0 &&
     stripeReady;
+  const helloAssoUrl =
+    isHelloAsso && obligation.items?.description?.match(/https?:\/\/\S+/)?.[0];
+  const canPayHelloAsso =
+    isHelloAsso &&
+    (obligation.status === "pending" || obligation.status === "partially_paid") &&
+    remaining > 0;
 
   const checkout = useMutation({
     mutationFn: () =>
