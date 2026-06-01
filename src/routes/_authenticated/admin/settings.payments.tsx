@@ -20,6 +20,10 @@ import {
   setCurrentSeason,
   deleteSeason,
 } from "@/lib/seasons.functions";
+import {
+  getReminderSettings,
+  updateReminderSettings,
+} from "@/lib/payment-reminders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +42,7 @@ import {
   Plus,
   Trash2,
   Star,
+  BellRing,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -47,7 +52,7 @@ import { BackLink } from "@/components/back-link";
 const searchSchema = z.object({
   success: z.literal("1").optional(),
   refresh: z.literal("1").optional(),
-  tab: z.enum(["stripe", "helloasso", "seasons", "general"]).optional(),
+  tab: z.enum(["stripe", "helloasso", "seasons", "reminders", "general"]).optional(),
 });
 
 export const Route = createFileRoute("/_authenticated/admin/settings/payments")({
@@ -91,7 +96,7 @@ function PaymentsSettingsPage() {
       </header>
 
       <Tabs defaultValue={search.tab ?? "stripe"} className="w-full">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="stripe" className="gap-1.5">
             <CreditCard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Stripe</span>
@@ -103,6 +108,10 @@ function PaymentsSettingsPage() {
           <TabsTrigger value="seasons" className="gap-1.5">
             <CalendarRange className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Saisons</span>
+          </TabsTrigger>
+          <TabsTrigger value="reminders" className="gap-1.5">
+            <BellRing className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Rappels</span>
           </TabsTrigger>
           <TabsTrigger value="general" className="gap-1.5">
             <Settings2 className="h-3.5 w-3.5" />
@@ -118,6 +127,9 @@ function PaymentsSettingsPage() {
         </TabsContent>
         <TabsContent value="seasons" className="mt-5">
           <SeasonsTab clubId={activeClubId} />
+        </TabsContent>
+        <TabsContent value="reminders" className="mt-5">
+          <RemindersTab clubId={activeClubId} />
         </TabsContent>
         <TabsContent value="general" className="mt-5">
           <GeneralTab clubId={activeClubId} />
