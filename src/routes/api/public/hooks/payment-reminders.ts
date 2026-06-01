@@ -4,8 +4,8 @@ import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 /**
  * Daily payment reminders cron.
- * Auth: bypassed via /api/public/* prefix; the apikey header on pg_net call
- * is for Supabase edge gateway only — no additional secret needed.
+ * Auth: bypassed via /api/public/* prefix; protected by x-cron-secret
+ * header checked against DATA_RETENTION_SECRET.
  *
  * Logic:
  *   - For each club with payment_reminders_enabled:
