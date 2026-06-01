@@ -109,6 +109,9 @@ function PaymentItemsPage() {
   const deleteFn = useServerFn(deletePaymentItem);
   const updateFn = useServerFn(updatePaymentItem);
   const qc = useQueryClient();
+  const [collectFor, setCollectFor] = useState<
+    { id: string; title: string } | null
+  >(null);
 
   const seasonsQ = useQuery({
     queryKey: ["seasons", activeClubId],
