@@ -102,7 +102,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
     obl.payer_user_id
       ? supabaseAdmin
           .from("profiles")
-          .select("first_name, last_name, email")
+          .select("first_name, last_name")
           .eq("id", obl.payer_user_id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
@@ -127,8 +127,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
     receipt_number: receiptNumber,
     kind: "confirmation",
     payer_name: payer
-      ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() ||
-        payer.email
+      ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
       : null,
     player_name: player
       ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
