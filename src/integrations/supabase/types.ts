@@ -256,6 +256,79 @@ export type Database = {
           },
         ]
       }
+      club_payment_settings: {
+        Row: {
+          club_id: string
+          created_at: string
+          currency: string
+          helloasso_enabled: boolean
+          helloasso_fundraising_url: string | null
+          helloasso_membership_url: string | null
+          helloasso_shop_url: string | null
+          helloasso_tournament_url: string | null
+          min_partial_amount_cents: number
+          platform_fee_bps: number
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          currency?: string
+          helloasso_enabled?: boolean
+          helloasso_fundraising_url?: string | null
+          helloasso_membership_url?: string | null
+          helloasso_shop_url?: string | null
+          helloasso_tournament_url?: string | null
+          min_partial_amount_cents?: number
+          platform_fee_bps?: number
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          currency?: string
+          helloasso_enabled?: boolean
+          helloasso_fundraising_url?: string | null
+          helloasso_membership_url?: string | null
+          helloasso_shop_url?: string | null
+          helloasso_tournament_url?: string | null
+          min_partial_amount_cents?: number
+          platform_fee_bps?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_payment_settings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_receipt_counters: {
+        Row: {
+          club_id: string
+          last_number: number
+        }
+        Insert: {
+          club_id: string
+          last_number?: number
+        }
+        Update: {
+          club_id?: string
+          last_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_receipt_counters_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_social_connections: {
         Row: {
           access_token: string
@@ -1139,6 +1212,156 @@ export type Database = {
           },
         ]
       }
+      fundraising_campaigns: {
+        Row: {
+          club_id: string
+          collected_cents: number
+          cover_url: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          end_date: string | null
+          goal_cents: number
+          id: string
+          provider: Database["public"]["Enums"]["payment_provider"]
+          season_id: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["fundraising_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          collected_cents?: number
+          cover_url?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          description?: string | null
+          end_date?: string | null
+          goal_cents: number
+          id?: string
+          provider?: Database["public"]["Enums"]["payment_provider"]
+          season_id: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["fundraising_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          collected_cents?: number
+          cover_url?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          end_date?: string | null
+          goal_cents?: number
+          id?: string
+          provider?: Database["public"]["Enums"]["payment_provider"]
+          season_id?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["fundraising_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fundraising_campaigns_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fundraising_campaigns_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fundraising_contributions: {
+        Row: {
+          amount_gross_cents: number
+          amount_net_cents: number
+          campaign_id: string
+          club_id: string
+          comment: string | null
+          created_at: string
+          currency: string
+          donor_email: string | null
+          donor_name: string | null
+          donor_user_id: string | null
+          external_reference: string | null
+          id: string
+          is_anonymous: boolean
+          method: Database["public"]["Enums"]["payment_provider"]
+          paid_at: string | null
+          provider_fee_cents: number
+          recorded_by: string | null
+          stripe_payment_intent_id: string | null
+        }
+        Insert: {
+          amount_gross_cents: number
+          amount_net_cents: number
+          campaign_id: string
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          currency?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          donor_user_id?: string | null
+          external_reference?: string | null
+          id?: string
+          is_anonymous?: boolean
+          method: Database["public"]["Enums"]["payment_provider"]
+          paid_at?: string | null
+          provider_fee_cents?: number
+          recorded_by?: string | null
+          stripe_payment_intent_id?: string | null
+        }
+        Update: {
+          amount_gross_cents?: number
+          amount_net_cents?: number
+          campaign_id?: string
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          currency?: string
+          donor_email?: string | null
+          donor_name?: string | null
+          donor_user_id?: string | null
+          external_reference?: string | null
+          id?: string
+          is_anonymous?: boolean
+          method?: Database["public"]["Enums"]["payment_provider"]
+          paid_at?: string | null
+          provider_fee_cents?: number
+          recorded_by?: string | null
+          stripe_payment_intent_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fundraising_contributions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "fundraising_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fundraising_contributions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_results: {
         Row: {
           away_score: number
@@ -1290,6 +1513,421 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      payment_assignments: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          payment_item_id: string
+          target_kind: Database["public"]["Enums"]["payment_target_kind"]
+          target_player_id: string | null
+          target_team_id: string | null
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          payment_item_id: string
+          target_kind: Database["public"]["Enums"]["payment_target_kind"]
+          target_player_id?: string | null
+          target_team_id?: string | null
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          payment_item_id?: string
+          target_kind?: Database["public"]["Enums"]["payment_target_kind"]
+          target_player_id?: string | null
+          target_team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_assignments_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_assignments_payment_item_id_fkey"
+            columns: ["payment_item_id"]
+            isOneToOne: false
+            referencedRelation: "payment_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_assignments_target_player_id_fkey"
+            columns: ["target_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_assignments_target_team_id_fkey"
+            columns: ["target_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          club_id: string
+          comment: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          new_value: Json | null
+          previous_value: Json | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_audit_logs_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_items: {
+        Row: {
+          allow_partial: boolean
+          amount_cents: number
+          club_id: string
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          due_date: string | null
+          id: string
+          provider: Database["public"]["Enums"]["payment_provider"]
+          season_id: string
+          status: Database["public"]["Enums"]["payment_item_status"]
+          team_id: string | null
+          title: string
+          type: Database["public"]["Enums"]["payment_item_type"]
+          updated_at: string
+        }
+        Insert: {
+          allow_partial?: boolean
+          amount_cents: number
+          club_id: string
+          created_at?: string
+          created_by: string
+          currency?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          provider?: Database["public"]["Enums"]["payment_provider"]
+          season_id: string
+          status?: Database["public"]["Enums"]["payment_item_status"]
+          team_id?: string | null
+          title: string
+          type: Database["public"]["Enums"]["payment_item_type"]
+          updated_at?: string
+        }
+        Update: {
+          allow_partial?: boolean
+          amount_cents?: number
+          club_id?: string
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          provider?: Database["public"]["Enums"]["payment_provider"]
+          season_id?: string
+          status?: Database["public"]["Enums"]["payment_item_status"]
+          team_id?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["payment_item_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_items_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_items_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_items_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_obligations: {
+        Row: {
+          amount_due_cents: number
+          cancelled_at: string | null
+          cancelled_by: string | null
+          cancelled_reason: string | null
+          club_id: string
+          created_at: string
+          currency: string
+          exempted_at: string | null
+          exempted_by: string | null
+          exempted_reason: string | null
+          id: string
+          payer_user_id: string | null
+          payment_item_id: string
+          player_id: string | null
+          status: Database["public"]["Enums"]["payment_obligation_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount_due_cents: number
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          cancelled_reason?: string | null
+          club_id: string
+          created_at?: string
+          currency?: string
+          exempted_at?: string | null
+          exempted_by?: string | null
+          exempted_reason?: string | null
+          id?: string
+          payer_user_id?: string | null
+          payment_item_id: string
+          player_id?: string | null
+          status?: Database["public"]["Enums"]["payment_obligation_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount_due_cents?: number
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          cancelled_reason?: string | null
+          club_id?: string
+          created_at?: string
+          currency?: string
+          exempted_at?: string | null
+          exempted_by?: string | null
+          exempted_reason?: string | null
+          id?: string
+          payer_user_id?: string | null
+          payment_item_id?: string
+          player_id?: string | null
+          status?: Database["public"]["Enums"]["payment_obligation_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_obligations_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_obligations_payment_item_id_fkey"
+            columns: ["payment_item_id"]
+            isOneToOne: false
+            referencedRelation: "payment_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_obligations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_receipts: {
+        Row: {
+          amount_gross_cents: number
+          club_id: string
+          currency: string
+          id: string
+          issued_at: string
+          item_title: string | null
+          kind: Database["public"]["Enums"]["receipt_kind"]
+          method: Database["public"]["Enums"]["payment_provider"]
+          obligation_id: string
+          payer_name: string | null
+          pdf_url: string | null
+          player_name: string | null
+          receipt_number: number
+          transaction_id: string
+        }
+        Insert: {
+          amount_gross_cents: number
+          club_id: string
+          currency?: string
+          id?: string
+          issued_at?: string
+          item_title?: string | null
+          kind: Database["public"]["Enums"]["receipt_kind"]
+          method: Database["public"]["Enums"]["payment_provider"]
+          obligation_id: string
+          payer_name?: string | null
+          pdf_url?: string | null
+          player_name?: string | null
+          receipt_number: number
+          transaction_id: string
+        }
+        Update: {
+          amount_gross_cents?: number
+          club_id?: string
+          currency?: string
+          id?: string
+          issued_at?: string
+          item_title?: string | null
+          kind?: Database["public"]["Enums"]["receipt_kind"]
+          method?: Database["public"]["Enums"]["payment_provider"]
+          obligation_id?: string
+          payer_name?: string | null
+          pdf_url?: string | null
+          player_name?: string | null
+          receipt_number?: number
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_receipts_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_receipts_obligation_id_fkey"
+            columns: ["obligation_id"]
+            isOneToOne: false
+            referencedRelation: "payment_obligations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_receipts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_transactions: {
+        Row: {
+          amount_gross_cents: number
+          amount_net_cents: number
+          attachment_url: string | null
+          club_id: string
+          comment: string | null
+          created_at: string
+          currency: string
+          external_reference: string | null
+          id: string
+          method: Database["public"]["Enums"]["payment_provider"]
+          obligation_id: string
+          paid_at: string | null
+          provider_fee_cents: number
+          recorded_by: string | null
+          status: Database["public"]["Enums"]["payment_tx_status"]
+          stripe_charge_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_refund_id: string | null
+        }
+        Insert: {
+          amount_gross_cents: number
+          amount_net_cents: number
+          attachment_url?: string | null
+          club_id: string
+          comment?: string | null
+          created_at?: string
+          currency?: string
+          external_reference?: string | null
+          id?: string
+          method: Database["public"]["Enums"]["payment_provider"]
+          obligation_id: string
+          paid_at?: string | null
+          provider_fee_cents?: number
+          recorded_by?: string | null
+          status?: Database["public"]["Enums"]["payment_tx_status"]
+          stripe_charge_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_refund_id?: string | null
+        }
+        Update: {
+          amount_gross_cents?: number
+          amount_net_cents?: number
+          attachment_url?: string | null
+          club_id?: string
+          comment?: string | null
+          created_at?: string
+          currency?: string
+          external_reference?: string | null
+          id?: string
+          method?: Database["public"]["Enums"]["payment_provider"]
+          obligation_id?: string
+          paid_at?: string | null
+          provider_fee_cents?: number
+          recorded_by?: string | null
+          status?: Database["public"]["Enums"]["payment_tx_status"]
+          stripe_charge_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_refund_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_obligation_id_fkey"
+            columns: ["obligation_id"]
+            isOneToOne: false
+            referencedRelation: "payment_obligations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permission_changes_log: {
         Row: {
@@ -1551,6 +2189,51 @@ export type Database = {
             columns: ["team_id"]
             isOneToOne: false
             referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_guardians: {
+        Row: {
+          club_id: string
+          created_at: string
+          id: string
+          is_primary_payer: boolean
+          player_id: string
+          relation: string | null
+          user_id: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          id?: string
+          is_primary_payer?: boolean
+          player_id: string
+          relation?: string | null
+          user_id: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          id?: string
+          is_primary_payer?: boolean
+          player_id?: string
+          relation?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_guardians_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_guardians_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
             referencedColumns: ["id"]
           },
         ]
@@ -2091,6 +2774,47 @@ export type Database = {
             columns: ["convocation_id"]
             isOneToOne: false
             referencedRelation: "convocations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seasons: {
+        Row: {
+          club_id: string
+          created_at: string
+          end_date: string
+          id: string
+          is_current: boolean
+          label: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          club_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          is_current?: boolean
+          label: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          is_current?: boolean
+          label?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seasons_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
             referencedColumns: ["id"]
           },
         ]
@@ -3666,6 +4390,15 @@ export type Database = {
         Args: { _club_id: string }
         Returns: boolean
       }
+      coach_player_payment_status: {
+        Args: { _club_id: string }
+        Returns: {
+          is_paid: boolean
+          item_title: string
+          payment_item_id: string
+          player_id: string
+        }[]
+      }
       compute_season_label: { Args: { _dt: string }; Returns: string }
       convert_personal_club_to_real: {
         Args: { _club_id: string; _new_name?: string }
@@ -3870,6 +4603,7 @@ export type Database = {
         }
         Returns: number
       }
+      next_receipt_number: { Args: { _club_id: string }; Returns: number }
       player_is_minor: { Args: { _player_id: string }; Returns: boolean }
       purge_soft_deleted: { Args: never; Returns: undefined }
       read_email_batch: {
@@ -3966,14 +4700,41 @@ export type Database = {
         | "share_summary"
         | "parent_summary"
         | "player_summary"
+      fundraising_status: "draft" | "active" | "closed" | "archived"
       lineup_visibility: "draft" | "staff" | "selected_players" | "team"
       media_consent_status: "pending" | "granted" | "denied"
+      payment_item_status: "draft" | "open" | "closed" | "cancelled"
+      payment_item_type:
+        | "membership"
+        | "license"
+        | "equipment"
+        | "trip"
+        | "tournament"
+        | "fundraising"
+        | "other"
+      payment_obligation_status:
+        | "pending"
+        | "partially_paid"
+        | "paid"
+        | "cancelled"
+        | "exempted"
+        | "refunded"
+      payment_provider:
+        | "stripe"
+        | "helloasso"
+        | "cash"
+        | "cheque"
+        | "bank_transfer"
+        | "manual"
+      payment_target_kind: "player" | "team" | "club"
+      payment_tx_status: "pending" | "succeeded" | "failed" | "refunded"
       privacy_request_status:
         | "pending"
         | "processing"
         | "completed"
         | "failed"
         | "cancelled"
+      receipt_kind: "official" | "confirmation"
       reminder_channel: "in_app" | "email" | "push"
       subscription_plan: "monthly" | "yearly"
       subscription_status:
@@ -4195,8 +4956,37 @@ export const Constants = {
         "parent_summary",
         "player_summary",
       ],
+      fundraising_status: ["draft", "active", "closed", "archived"],
       lineup_visibility: ["draft", "staff", "selected_players", "team"],
       media_consent_status: ["pending", "granted", "denied"],
+      payment_item_status: ["draft", "open", "closed", "cancelled"],
+      payment_item_type: [
+        "membership",
+        "license",
+        "equipment",
+        "trip",
+        "tournament",
+        "fundraising",
+        "other",
+      ],
+      payment_obligation_status: [
+        "pending",
+        "partially_paid",
+        "paid",
+        "cancelled",
+        "exempted",
+        "refunded",
+      ],
+      payment_provider: [
+        "stripe",
+        "helloasso",
+        "cash",
+        "cheque",
+        "bank_transfer",
+        "manual",
+      ],
+      payment_target_kind: ["player", "team", "club"],
+      payment_tx_status: ["pending", "succeeded", "failed", "refunded"],
       privacy_request_status: [
         "pending",
         "processing",
@@ -4204,6 +4994,7 @@ export const Constants = {
         "failed",
         "cancelled",
       ],
+      receipt_kind: ["official", "confirmation"],
       reminder_channel: ["in_app", "email", "push"],
       subscription_plan: ["monthly", "yearly"],
       subscription_status: [
