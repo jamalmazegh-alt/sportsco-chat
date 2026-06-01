@@ -52,6 +52,7 @@ import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedFollowingRouteImport } from './routes/_authenticated/following'
@@ -334,6 +335,11 @@ const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
@@ -743,6 +749,7 @@ export interface FileRoutesByFullPath {
   '/following': typeof AuthenticatedFollowingRoute
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/payments': typeof AuthenticatedPaymentsRoute
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/stats': typeof AuthenticatedStatsRoute
   '/support': typeof AuthenticatedSupportRouteWithChildren
@@ -853,6 +860,7 @@ export interface FileRoutesByTo {
   '/following': typeof AuthenticatedFollowingRoute
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/payments': typeof AuthenticatedPaymentsRoute
   '/stats': typeof AuthenticatedStatsRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
@@ -965,6 +973,7 @@ export interface FileRoutesById {
   '/_authenticated/following': typeof AuthenticatedFollowingRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/stats': typeof AuthenticatedStatsRoute
   '/_authenticated/support': typeof AuthenticatedSupportRouteWithChildren
@@ -1079,6 +1088,7 @@ export interface FileRouteTypes {
     | '/following'
     | '/home'
     | '/inbox'
+    | '/payments'
     | '/profile'
     | '/stats'
     | '/support'
@@ -1189,6 +1199,7 @@ export interface FileRouteTypes {
     | '/following'
     | '/home'
     | '/inbox'
+    | '/payments'
     | '/stats'
     | '/teams'
     | '/tournaments'
@@ -1300,6 +1311,7 @@ export interface FileRouteTypes {
     | '/_authenticated/following'
     | '/_authenticated/home'
     | '/_authenticated/inbox'
+    | '/_authenticated/payments'
     | '/_authenticated/profile'
     | '/_authenticated/stats'
     | '/_authenticated/support'
@@ -1749,6 +1761,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/payments': {
+      id: '/_authenticated/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof AuthenticatedPaymentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/inbox': {
@@ -2387,6 +2406,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedFollowingRoute: typeof AuthenticatedFollowingRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRouteWithChildren
@@ -2404,6 +2424,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFollowingRoute: AuthenticatedFollowingRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedStatsRoute: AuthenticatedStatsRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRouteWithChildren,
@@ -2549,13 +2570,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
