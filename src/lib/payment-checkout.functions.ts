@@ -119,7 +119,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
       transaction_id: tx.id,
       obligation_id: obl.id,
       receipt_number: receiptNumber,
-      kind: "confirmation",
+      kind: tx.method === "stripe" ? "official" : "confirmation",
       payer_name: payer
         ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
         : null,
