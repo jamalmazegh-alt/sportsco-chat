@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Share2,
   Receipt,
+  TrendingUp,
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 
@@ -86,6 +87,13 @@ function AdminSettingsPage() {
       title: "Items de paiement",
       hint: "Licences, cotisations, équipements, déplacements",
       tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    },
+    {
+      to: "/admin/payments/dashboard",
+      icon: TrendingUp,
+      title: "Tableau de bord financier",
+      hint: "KPIs, taux d'encaissement, exports CSV",
+      tone: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
     },
     {
       to: "/admin/settings/convocations",

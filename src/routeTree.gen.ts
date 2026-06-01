@@ -122,6 +122,7 @@ import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './ro
 import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './routes/_authenticated/admin/settings.communications'
 import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
 import { Route as AuthenticatedAdminPaymentsItemsRouteImport } from './routes/_authenticated/admin/payments.items'
+import { Route as AuthenticatedAdminPaymentsDashboardRouteImport } from './routes/_authenticated/admin/payments.dashboard'
 import { Route as ApiPublicTournamentIdRegulationsRouteImport } from './routes/api/public/tournament.$id.regulations'
 
 const SuperadminRoute = SuperadminRouteImport.update({
@@ -734,6 +735,12 @@ const AuthenticatedAdminPaymentsItemsRoute =
     path: '/payments/items',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminPaymentsDashboardRoute =
+  AuthenticatedAdminPaymentsDashboardRouteImport.update({
+    id: '/payments/dashboard',
+    path: '/payments/dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicTournamentIdRegulationsRoute =
   ApiPublicTournamentIdRegulationsRouteImport.update({
     id: '/api/public/tournament/$id/regulations',
@@ -823,6 +830,7 @@ export interface FileRoutesByFullPath {
   '/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
@@ -934,6 +942,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
@@ -1051,6 +1060,7 @@ export interface FileRoutesById {
   '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
   '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
   '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/_authenticated/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
   '/_authenticated/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
   '/_authenticated/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/_authenticated/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
@@ -1168,6 +1178,7 @@ export interface FileRouteTypes {
     | '/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/admin/payments/dashboard'
     | '/admin/payments/items'
     | '/admin/settings/branding'
     | '/admin/settings/communications'
@@ -1279,6 +1290,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/superadmin/clubs'
     | '/superadmin/support-tickets'
+    | '/admin/payments/dashboard'
     | '/admin/payments/items'
     | '/admin/settings/branding'
     | '/admin/settings/communications'
@@ -1395,6 +1407,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support/'
     | '/superadmin/clubs/'
     | '/superadmin/support-tickets/'
+    | '/_authenticated/admin/payments/dashboard'
     | '/_authenticated/admin/payments/items'
     | '/_authenticated/admin/settings/branding'
     | '/_authenticated/admin/settings/communications'
@@ -2280,6 +2293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPaymentsItemsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/payments/dashboard': {
+      id: '/_authenticated/admin/payments/dashboard'
+      path: '/payments/dashboard'
+      fullPath: '/admin/payments/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/tournament/$id/regulations': {
       id: '/api/public/tournament/$id/regulations'
       path: '/api/public/tournament/$id/regulations'
@@ -2293,6 +2313,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminPaymentsDashboardRoute: typeof AuthenticatedAdminPaymentsDashboardRoute
   AuthenticatedAdminPaymentsItemsRoute: typeof AuthenticatedAdminPaymentsItemsRoute
   AuthenticatedAdminSettingsBrandingRoute: typeof AuthenticatedAdminSettingsBrandingRoute
   AuthenticatedAdminSettingsCommunicationsRoute: typeof AuthenticatedAdminSettingsCommunicationsRoute
@@ -2307,6 +2328,8 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminPaymentsDashboardRoute:
+    AuthenticatedAdminPaymentsDashboardRoute,
   AuthenticatedAdminPaymentsItemsRoute: AuthenticatedAdminPaymentsItemsRoute,
   AuthenticatedAdminSettingsBrandingRoute:
     AuthenticatedAdminSettingsBrandingRoute,
