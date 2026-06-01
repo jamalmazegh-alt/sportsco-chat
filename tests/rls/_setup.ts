@@ -45,6 +45,14 @@ export interface Fixtures {
   exportRequestA: string;
   deletionRequestA: string;
   auditLogA: string;
+  // Payments
+  seasonA: string;
+  seasonB: string;
+  paymentItemA: string;
+  obligationA: string; // payer = parentA
+  obligationB: string; // clubB
+  transactionA: string;
+  paymentSettingsA: string; // = clubA (PK is club_id)
 }
 
 const FIXTURES_FILE = join(tmpdir(), "clubero-rls-fixtures.json");
