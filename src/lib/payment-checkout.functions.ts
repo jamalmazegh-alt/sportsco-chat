@@ -523,11 +523,11 @@ export async function finalizeStripeTransactionByPI(params: {
     params;
 
   // Locate the pending tx via session id (external_reference) or PI
-  let txRow: { id: string; obligation_id: string; club_id: string } | null = null;
+  let txRow: { id: string; obligation_id: string; club_id: string; status: string } | null = null;
   if (sessionId) {
     const { data } = await supabaseAdmin
       .from("payment_transactions")
-      .select("id, obligation_id, club_id")
+      .select("id, obligation_id, club_id, status")
       .eq("external_reference", sessionId)
       .eq("method", "stripe")
       .maybeSingle();
@@ -536,7 +536,7 @@ export async function finalizeStripeTransactionByPI(params: {
   if (!txRow) {
     const { data } = await supabaseAdmin
       .from("payment_transactions")
-      .select("id, obligation_id, club_id")
+      .select("id, obligation_id, club_id, status")
       .eq("stripe_payment_intent_id", paymentIntentId)
       .maybeSingle();
     txRow = data ?? null;
@@ -546,6 +546,11 @@ export async function finalizeStripeTransactionByPI(params: {
       paymentIntentId,
       sessionId,
     });
+    return;
+  }
+
+  // Idempotency: if already succeeded, do nothing (no update, no receipt, no audit).
+  if (txRow.status === "succeeded") {
     return;
   }
 
