@@ -9,11 +9,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ---------- supabaseAdmin mock (must be hoisted before importing authz) ----
-const superAdminMaybeSingle = vi.fn();
-const rpcMock = vi.fn();
+const { superAdminMaybeSingle, rpcMock } = vi.hoisted(() => ({
+  superAdminMaybeSingle: vi.fn(),
+  rpcMock: vi.fn(),
+}));
 
 vi.mock("@/integrations/supabase/client.server", () => {
-  const from = vi.fn((table: string) => {
+  const from = (table: string) => {
     if (table !== "super_admins") {
       throw new Error(`unexpected admin .from(${table})`);
     }
@@ -22,11 +24,12 @@ vi.mock("@/integrations/supabase/client.server", () => {
         eq: () => ({ maybeSingle: superAdminMaybeSingle }),
       }),
     };
-  });
+  };
   return {
     supabaseAdmin: { from, rpc: rpcMock },
   };
 });
+
 
 import { assertSuperAdmin, assertClubRole } from "@/lib/authz.server";
 
