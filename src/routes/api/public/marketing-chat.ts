@@ -2,6 +2,11 @@ import "@tanstack/react-start";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, stepCountIs, type UIMessage } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
+
+const MARKETING_CHAT_RATE_LIMIT_PER_HOUR = 20;
+const MAX_MESSAGE_CHARS = 2000;
+
 
 type ChatRequestBody = { messages?: unknown };
 
