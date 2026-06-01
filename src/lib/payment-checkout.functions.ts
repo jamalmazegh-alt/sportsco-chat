@@ -198,6 +198,7 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
             year: "numeric",
           }),
           downloadUrl: url,
+          method: tx.method,
         },
       });
     }
