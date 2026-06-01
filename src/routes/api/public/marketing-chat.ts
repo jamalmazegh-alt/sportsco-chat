@@ -77,10 +77,31 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
           return new Response("Invalid messages", { status: 400 });
         }
 
+        // Reject oversized prompts (LLM cost abuse).
+        for (const m of messages as Array<{ content?: unknown; parts?: Array<{ text?: string }> }>) {
+          const text =
+            typeof m?.content === "string"
+              ? m.content
+              : Array.isArray(m?.parts)
+                ? m.parts.map((p) => p?.text ?? "").join("")
+                : "";
+          if (text.length > MAX_MESSAGE_CHARS) {
+            return new Response("Message too long", { status: 413 });
+          }
+        }
+
+        // Per-IP hourly rate limit.
+        const ip = getClientIp(request);
+        const allowed = await checkRateLimit(ip, "marketing-chat", MARKETING_CHAT_RATE_LIMIT_PER_HOUR);
+        if (!allowed) {
+          return new Response("Trop de requêtes. Merci de réessayer dans un instant.", { status: 429 });
+        }
+
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) {
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
+
 
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
