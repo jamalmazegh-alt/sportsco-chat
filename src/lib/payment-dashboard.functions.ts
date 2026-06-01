@@ -377,7 +377,6 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
       "item_type",
       "player",
       "payer",
-      "payer_email",
       "stripe_payment_intent",
       "external_reference",
       "comment",
@@ -390,9 +389,7 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
       const pl = o?.player_id ? playerById.get(o.player_id) : null;
       const pr = o?.payer_user_id ? profileById.get(o.payer_user_id) : null;
       const payer = pr
-        ? [pr.first_name, pr.last_name].filter(Boolean).join(" ") ||
-
-          ""
+        ? [pr.first_name, pr.last_name].filter(Boolean).join(" ")
         : "";
       lines.push(
         [
@@ -409,7 +406,6 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
           it?.type ?? "",
           pl ? `${pl.first_name} ${pl.last_name}` : "",
           payer,
-          pr?.email ?? "",
           t.stripe_payment_intent_id ?? "",
           t.external_reference ?? "",
           t.comment ?? "",
