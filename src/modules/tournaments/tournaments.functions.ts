@@ -413,6 +413,7 @@ export const removeTournamentTeam = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
+    await assertTournamentMutable(data.tournament_id, "structure");
     const { error } = await supabase
       .from("tournament_teams")
       .delete()
