@@ -32,7 +32,7 @@ export const listFamilyPayments = createServerFn({ method: "POST" })
       .select(
         `id, payment_item_id, club_id, player_id, payer_user_id,
          amount_due_cents, currency, status, created_at,
-         exemption_reason, cancellation_reason,
+         exempted_reason, cancelled_reason,
          items:payment_item_id (id, title, type, due_date, provider, allow_partial, status),
          clubs:club_id (id, name, stripe_account_id, stripe_charges_enabled),
          players:player_id (id, first_name, last_name)`,

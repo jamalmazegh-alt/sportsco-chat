@@ -76,8 +76,8 @@ type Obligation = {
   amount_paid_cents: number;
   currency: string | null;
   status: string;
-  exemption_reason: string | null;
-  cancellation_reason: string | null;
+  exempted_reason: string | null;
+  cancelled_reason: string | null;
   items: {
     id: string;
     title: string;
