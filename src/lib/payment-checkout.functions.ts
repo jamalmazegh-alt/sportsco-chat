@@ -531,17 +531,16 @@ export const listObligationsForItem = createServerFn({ method: "POST" })
     const payerIds = Array.from(
       new Set((obls ?? []).map((o) => o.payer_user_id).filter(Boolean)),
     ) as string[];
-    let payerMap = new Map<string, { name: string | null; email: string | null }>();
+    const payerMap = new Map<string, { name: string | null }>();
     if (payerIds.length > 0) {
       const { data: profiles } = await supabaseAdmin
         .from("profiles")
-        .select("id, first_name, last_name, email")
+        .select("id, first_name, last_name")
         .in("id", payerIds);
       profiles?.forEach((p) =>
         payerMap.set(p.id, {
           name:
             `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || null,
-          email: p.email ?? null,
         }),
       );
     }
