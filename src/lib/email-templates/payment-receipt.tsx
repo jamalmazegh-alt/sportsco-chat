@@ -13,36 +13,52 @@ interface Props {
   receiptNumber: string;
   paidAt?: string | null;
   downloadUrl?: string | null;
+  method?: string | null;
+  locale?: "fr" | "en";
 }
 
-const PaymentReceiptEmail = (p: Props) => (
-  <EmailShell preview={`Reçu de paiement — ${p.itemTitle}`} locale="fr">
-    <Heading style={h1}>Merci pour votre paiement</Heading>
-    <Text style={lead}>
-      {p.clubName} confirme la bonne réception de votre paiement.
-    </Text>
-    <Section style={card}>
-      <Row k="Objet" v={p.itemTitle} />
-      {p.playerName && <Row k="Joueur" v={p.playerName} />}
-      <Row k="Montant" v={p.amountLabel} />
-      <Row k="Mode" v={p.methodLabel} />
-      {p.paidAt && <Row k="Date" v={p.paidAt} />}
-      <Row k="N° de reçu" v={p.receiptNumber} />
-    </Section>
-    {p.downloadUrl && (
-      <Section style={{ textAlign: "center", margin: "24px 0" }}>
-        <Button href={p.downloadUrl} style={btn}>
-          Télécharger le reçu (PDF)
-        </Button>
-        <Text style={muted}>Le lien expire après quelques minutes.</Text>
+const PaymentReceiptEmail = (p: Props) => {
+  const isEn = p.locale === "en";
+  const helloAssoNote = p.method === "helloasso"
+    ? (isEn
+        ? "Payment processed outside Clubero via HelloAsso."
+        : "Paiement traité hors de Clubero via HelloAsso.")
+    : null;
+  return (
+    <EmailShell preview={`Reçu de paiement — ${p.itemTitle}`} locale={isEn ? "en" : "fr"}>
+      <Heading style={h1}>{isEn ? "Thank you for your payment" : "Merci pour votre paiement"}</Heading>
+      <Text style={lead}>
+        {isEn
+          ? `${p.clubName} confirms receipt of your payment.`
+          : `${p.clubName} confirme la bonne réception de votre paiement.`}
+      </Text>
+      <Section style={card}>
+        <Row k={isEn ? "Item" : "Objet"} v={p.itemTitle} />
+        {p.playerName && <Row k={isEn ? "Player" : "Joueur"} v={p.playerName} />}
+        <Row k={isEn ? "Amount" : "Montant"} v={p.amountLabel} />
+        <Row k={isEn ? "Method" : "Mode"} v={p.methodLabel} />
+        {p.paidAt && <Row k={isEn ? "Date" : "Date"} v={p.paidAt} />}
+        <Row k={isEn ? "Receipt #" : "N° de reçu"} v={p.receiptNumber} />
       </Section>
-    )}
-    <Text style={muted}>
-      Vous pouvez retrouver tous vos paiements et reçus à tout moment depuis votre
-      espace Clubero.
-    </Text>
-  </EmailShell>
-);
+      {helloAssoNote && (
+        <Text style={muted}>{helloAssoNote}</Text>
+      )}
+      {p.downloadUrl && (
+        <Section style={{ textAlign: "center", margin: "24px 0" }}>
+          <Button href={p.downloadUrl} style={btn}>
+            {isEn ? "Download receipt (PDF)" : "Télécharger le reçu (PDF)"}
+          </Button>
+          <Text style={muted}>{isEn ? "The link expires in a few minutes." : "Le lien expire après quelques minutes."}</Text>
+        </Section>
+      )}
+      <Text style={muted}>
+        {isEn
+          ? "You can find all your payments and receipts in your Clubero account."
+          : "Vous pouvez retrouver tous vos paiements et reçus à tout moment depuis votre espace Clubero."}
+      </Text>
+    </EmailShell>
+  );
+};
 
 const Row = ({ k, v }: { k: string; v: string }) => (
   <Text style={row}>
