@@ -26,6 +26,10 @@ import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/payments")({
   component: MyPaymentsPage,
+  validateSearch: z.object({
+    success: z.string().optional(),
+    cancelled: z.string().optional(),
+  }),
   head: () => ({
     meta: [
       { title: i18nInstance.t("meta.payments.title", { defaultValue: "Mes paiements" }) },
