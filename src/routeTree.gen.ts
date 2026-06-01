@@ -88,6 +88,7 @@ import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authe
 import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
 import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_authenticated/payments.receipts'
+import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authenticated/payments.family'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
 import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
 import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
@@ -536,6 +537,12 @@ const AuthenticatedPaymentsReceiptsRoute =
     path: '/receipts',
     getParentRoute: () => AuthenticatedPaymentsRoute,
   } as any)
+const AuthenticatedPaymentsFamilyRoute =
+  AuthenticatedPaymentsFamilyRouteImport.update({
+    id: '/family',
+    path: '/family',
+    getParentRoute: () => AuthenticatedPaymentsRoute,
+  } as any)
 const AuthenticatedEventsEventIdRoute =
   AuthenticatedEventsEventIdRouteImport.update({
     id: '/$eventId',
@@ -802,6 +809,7 @@ export interface FileRoutesByFullPath {
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
@@ -914,6 +922,7 @@ export interface FileRoutesByTo {
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/profile/password': typeof AuthenticatedProfilePasswordRoute
@@ -1032,6 +1041,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
   '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/_authenticated/payments/family': typeof AuthenticatedPaymentsFamilyRoute
   '/_authenticated/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
   '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
   '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
@@ -1150,6 +1160,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/club/discipline'
     | '/events/$eventId'
+    | '/payments/family'
     | '/payments/receipts'
     | '/players/$playerId'
     | '/profile/password'
@@ -1262,6 +1273,7 @@ export interface FileRouteTypes {
     | '/admin/billing'
     | '/club/discipline'
     | '/events/$eventId'
+    | '/payments/family'
     | '/payments/receipts'
     | '/players/$playerId'
     | '/profile/password'
@@ -1379,6 +1391,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/billing'
     | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
+    | '/_authenticated/payments/family'
     | '/_authenticated/payments/receipts'
     | '/_authenticated/players/$playerId'
     | '/_authenticated/profile/password'
@@ -2055,6 +2068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPaymentsReceiptsRouteImport
       parentRoute: typeof AuthenticatedPaymentsRoute
     }
+    '/_authenticated/payments/family': {
+      id: '/_authenticated/payments/family'
+      path: '/family'
+      fullPath: '/payments/family'
+      preLoaderRoute: typeof AuthenticatedPaymentsFamilyRouteImport
+      parentRoute: typeof AuthenticatedPaymentsRoute
+    }
     '/_authenticated/events/$eventId': {
       id: '/_authenticated/events/$eventId'
       path: '/$eventId'
@@ -2379,10 +2399,12 @@ const AuthenticatedEventsRouteWithChildren =
   AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
 interface AuthenticatedPaymentsRouteChildren {
+  AuthenticatedPaymentsFamilyRoute: typeof AuthenticatedPaymentsFamilyRoute
   AuthenticatedPaymentsReceiptsRoute: typeof AuthenticatedPaymentsReceiptsRoute
 }
 
 const AuthenticatedPaymentsRouteChildren: AuthenticatedPaymentsRouteChildren = {
+  AuthenticatedPaymentsFamilyRoute: AuthenticatedPaymentsFamilyRoute,
   AuthenticatedPaymentsReceiptsRoute: AuthenticatedPaymentsReceiptsRoute,
 }
 
@@ -2648,13 +2670,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
