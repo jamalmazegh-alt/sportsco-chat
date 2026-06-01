@@ -252,9 +252,9 @@ export const listClubTransactions = createServerFn({ method: "POST" })
     const { data: profiles } = payerIds.length
       ? await supabaseAdmin
           .from("profiles")
-          .select("id, first_name, last_name, email")
+          .select("id, first_name, last_name")
           .in("id", payerIds)
-      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null; email: string | null }> };
+      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null}> };
 
     const itemById = new Map((itemsList ?? []).map((i) => [i.id, i]));
     const playerById = new Map((players ?? []).map((p) => [p.id, p]));
@@ -283,7 +283,7 @@ export const listClubTransactions = createServerFn({ method: "POST" })
         item_type: it?.type ?? null,
         player_name: pl ? `${pl.first_name} ${pl.last_name}` : null,
         payer_name: pr
-          ? [pr.first_name, pr.last_name].filter(Boolean).join(" ") || pr.email
+          ? [pr.first_name, pr.last_name].filter(Boolean).join(" ")
           : null,
         payer_email: pr?.email ?? null,
       };
@@ -354,9 +354,9 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
     const { data: profiles } = payerIds.length
       ? await supabaseAdmin
           .from("profiles")
-          .select("id, first_name, last_name, email")
+          .select("id, first_name, last_name")
           .in("id", payerIds)
-      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null; email: string | null }> };
+      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null}> };
 
     const itemById = new Map((itemsList ?? []).map((i) => [i.id, i]));
     const playerById = new Map((players ?? []).map((p) => [p.id, p]));
@@ -391,7 +391,7 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
       const pr = o?.payer_user_id ? profileById.get(o.payer_user_id) : null;
       const payer = pr
         ? [pr.first_name, pr.last_name].filter(Boolean).join(" ") ||
-          pr.email ||
+
           ""
         : "";
       lines.push(
