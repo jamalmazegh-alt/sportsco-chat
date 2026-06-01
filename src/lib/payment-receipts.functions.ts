@@ -63,7 +63,7 @@ export const getReceiptDownloadUrl = createServerFn({ method: "POST" })
       if (!path) throw new Error("Failed to generate receipt PDF");
       r = { pdf_url: path };
     }
-    const url = await signedReceiptUrl(r.pdf_url);
+    const url = r.pdf_url ? await signedReceiptUrl(r.pdf_url) : null;
     if (!url) throw new Error("Failed to sign receipt URL");
     return { url };
   });
