@@ -83,6 +83,8 @@ type Obligation = {
     title: string;
     type: string;
     due_date: string | null;
+    provider: string | null;
+    description: string | null;
     allow_partial: boolean | null;
   } | null;
   clubs: {
