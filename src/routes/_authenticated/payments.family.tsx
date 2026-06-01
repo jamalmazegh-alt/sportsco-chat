@@ -83,6 +83,8 @@ type Obligation = {
     title: string;
     type: string;
     due_date: string | null;
+    provider: string | null;
+    description: string | null;
     allow_partial: boolean | null;
   } | null;
   clubs: {
@@ -293,13 +295,21 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
   const Icon = meta.icon;
   const currency = obligation.currency;
   const remaining = obligation.amount_due_cents - obligation.amount_paid_cents;
+  const isHelloAsso = obligation.items?.provider === "helloasso";
   const stripeReady =
     !!obligation.clubs?.stripe_account_id &&
     !!obligation.clubs?.stripe_charges_enabled;
   const canPay =
+    !isHelloAsso &&
     (obligation.status === "pending" || obligation.status === "partially_paid") &&
     remaining > 0 &&
     stripeReady;
+  const helloAssoUrl =
+    isHelloAsso && obligation.items?.description?.match(/https?:\/\/\S+/)?.[0];
+  const canPayHelloAsso =
+    isHelloAsso &&
+    (obligation.status === "pending" || obligation.status === "partially_paid") &&
+    remaining > 0;
 
   const checkout = useMutation({
     mutationFn: () =>
@@ -386,11 +396,33 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
         )}
         {(obligation.status === "pending" ||
           obligation.status === "partially_paid") &&
+          !isHelloAsso &&
           !stripeReady && (
             <p className="text-xs text-muted-foreground">
               Paiement en ligne indisponible — contactez le club.
             </p>
           )}
+
+        {/* HelloAsso external payment */}
+        {canPayHelloAsso && (
+          <div className="space-y-2">
+            {helloAssoUrl ? (
+              <Button size="sm" variant="outline" asChild>
+                <a href={helloAssoUrl} target="_blank" rel="noopener noreferrer">
+                  <CreditCard className="h-4 w-4" />
+                  Payer sur HelloAsso {fmt(remaining, currency)}
+                </a>
+              </Button>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Contactez le club pour le lien de paiement HelloAsso.
+              </p>
+            )}
+            <p className="text-[11px] text-muted-foreground italic">
+              Paiement traité hors de Clubero — le statut sera mis à jour par le club après réception.
+            </p>
+          </div>
+        )}
 
         {/* Transactions */}
         {obligation.transactions.length > 0 && (
@@ -408,16 +440,16 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
                       ? "Carte bancaire"
                       : t.method === "cash"
                         ? "Espèces"
-                        : t.method === "check"
+                        : t.method === "cheque"
                           ? "Chèque"
-                          : t.method === "transfer"
+                          : t.method === "bank_transfer"
                             ? "Virement"
                             : t.method;
                 const isExternal =
                   t.method === "helloasso" ||
                   t.method === "cash" ||
-                  t.method === "check" ||
-                  t.method === "transfer";
+                  t.method === "cheque" ||
+                  t.method === "bank_transfer";
                 return (
                   <li
                     key={t.id}
