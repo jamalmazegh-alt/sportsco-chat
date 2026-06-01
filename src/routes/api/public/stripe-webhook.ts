@@ -205,7 +205,14 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
                   null;
                 if (buyerEmail) {
                   const qty = readTournamentPassQuantity(session.metadata?.quantity);
-                  const totalCents = session.amount_total ?? 4000 * qty;
+                  const totalCents = session.amount_total;
+                  if (totalCents == null) {
+                    console.warn(
+                      "tournament_pass checkout completed without amount_total — skipping",
+                      { sessionId: session.id },
+                    );
+                    break;
+                  }
                   const perPass = Math.round(totalCents / qty);
                   const paidAt = new Date().toISOString();
                   const { data: existing } = await supabaseAdmin
