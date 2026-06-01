@@ -45,8 +45,10 @@ import {
   Building2,
   CheckCircle2,
   XCircle,
+  BanknoteArrowDown,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CollectPaymentDialog } from "@/components/admin/CollectPaymentDialog";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/payments/items")({
