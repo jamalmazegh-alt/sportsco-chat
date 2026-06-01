@@ -25,19 +25,27 @@ Stripe billing events. Verified with `STRIPE_WEBHOOK_SECRET` via
 
 ## `POST /api/public/inquiry`
 
-Marketing contact form submissions. Rate-limited by IP + honeypot field.
+Marketing contact form submissions. Protected by a honeypot field and a
+fixed-window per-IP rate limit (5 requests/hour) backed by the
+`public_rate_limits` table.
 
-- **Auth**: honeypot (`website` field must be empty) + per-IP throttle
-- **Body**: `{ name, email, message, source?, website? }`
-- **Response**: `200 {ok:true}` or `400` validation error / `429` throttle
+- **Auth**: honeypot (`website` field must be empty — bot submissions are
+  silently accepted and dropped) + per-IP throttle (5/h)
+- **Body**: `{ kind, name, email, message, ..., website? }`
+- **Response**: `200 {success:true}` (also on honeypot drop), `400` on
+  validation error, `429` on throttle
 
 ## `POST /api/public/marketing-chat`
 
-Public chat widget streaming to the AI gateway. Rate-limited per IP.
+Public chat widget streaming to the AI gateway. Per-IP fixed-window rate
+limit (20 requests/hour) and a 2000-character cap per message to prevent
+LLM cost abuse.
 
-- **Auth**: per-IP throttle, prompt length cap
-- **Body**: `{ messages: [{role, content}] }`
-- **Response**: text/event-stream
+- **Auth**: per-IP throttle (20/h), 2000-char cap per message
+- **Body**: `{ messages: [{role, content}] }` (max 40 messages)
+- **Response**: text/event-stream, `413` if a message exceeds the size cap,
+  `429` on throttle
+
 
 ## `POST /api/public/hooks/event-reminders`
 
