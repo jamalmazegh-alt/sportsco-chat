@@ -16,4 +16,4 @@ jobs:
           bun-version: latest
       - run: bun install --frozen-lockfile
       - run: node scripts/check-server-fn-guards.mjs
-      - run: bun test
+      - run: bun run test
