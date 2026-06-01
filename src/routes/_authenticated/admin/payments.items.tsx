@@ -363,7 +363,7 @@ function CreateItemDialog({
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, team_id")
+        .select("id, first_name, last_name")
         .eq("club_id", clubId)
         .is("deleted_at", null)
         .order("last_name");
