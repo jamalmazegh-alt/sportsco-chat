@@ -8,6 +8,7 @@ import {
   handleTournamentCheckoutCompleted,
   handleTournamentChargeRefunded,
 } from "@/modules/tournaments/tournament-payments.server";
+import { finalizeStripeTransactionByPI } from "@/lib/payment-checkout.functions";
 
 
 type SubStatus =
