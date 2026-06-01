@@ -45,8 +45,10 @@ import {
   Building2,
   CheckCircle2,
   XCircle,
+  BanknoteArrowDown,
 } from "lucide-react";
 import { toast } from "sonner";
+import { CollectPaymentDialog } from "@/components/admin/CollectPaymentDialog";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/payments/items")({
@@ -107,6 +109,9 @@ function PaymentItemsPage() {
   const deleteFn = useServerFn(deletePaymentItem);
   const updateFn = useServerFn(updatePaymentItem);
   const qc = useQueryClient();
+  const [collectFor, setCollectFor] = useState<
+    { id: string; title: string } | null
+  >(null);
 
   const seasonsQ = useQuery({
     queryKey: ["seasons", activeClubId],
@@ -270,6 +275,13 @@ function PaymentItemsPage() {
               </p>
             </div>
             <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCollectFor({ id: it.id, title: it.title })}
+              >
+                <BanknoteArrowDown className="h-3.5 w-3.5" /> Suivi
+              </Button>
               {it.status === "open" ? (
                 <Button
                   variant="ghost"
@@ -308,6 +320,16 @@ function PaymentItemsPage() {
           </li>
         ))}
       </ul>
+
+      {collectFor && (
+        <CollectPaymentDialog
+          clubId={activeClubId}
+          itemId={collectFor.id}
+          itemTitle={collectFor.title}
+          open
+          onOpenChange={(v) => !v && setCollectFor(null)}
+        />
+      )}
     </div>
   );
 }
