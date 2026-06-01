@@ -285,7 +285,7 @@ export const listClubTransactions = createServerFn({ method: "POST" })
         payer_name: pr
           ? [pr.first_name, pr.last_name].filter(Boolean).join(" ")
           : null,
-        payer_email: pr?.email ?? null,
+        
       };
     });
 
