@@ -647,7 +647,7 @@ function EventDetail() {
         const { data: clubRow } = event.team_id
           ? await supabase
               .from("teams")
-              .select("name, clubs:club_id(name, logo_url)")
+              .select("name, clubs:club_id(name, logo_url, default_language)")
               .eq("id", event.team_id)
               .maybeSingle()
           : { data: null };
@@ -671,7 +671,7 @@ function EventDetail() {
               teamName,
               clubName,
               clubLogoUrl,
-              locale: emailLocale(),
+              locale: pickEmailLocale(clubDefaultLang),
             },
           } as any).catch(() => undefined);
 
@@ -802,7 +802,7 @@ function EventDetail() {
       const { data: clubRow } = event.team_id
         ? await supabase
             .from("teams")
-            .select("name, clubs:club_id(name, logo_url)")
+            .select("name, clubs:club_id(name, logo_url, default_language)")
             .eq("id", event.team_id)
             .maybeSingle()
         : { data: null };
@@ -897,7 +897,7 @@ function EventDetail() {
             clubLogoUrl,
             respondUrl: `${origin}/r/${token}`,
             lineup: lineupEmail,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
         });
 
@@ -1117,7 +1117,7 @@ function EventDetail() {
       // Club + team info for email branding & wall post
       const { data: teamRow } = await supabase
         .from("teams")
-        .select("name, club_id, clubs:club_id(name, logo_url)")
+        .select("name, club_id, clubs:club_id(name, logo_url, default_language)")
         .eq("id", event.team_id)
         .maybeSingle();
       const teamName = (teamRow as any)?.name as string | undefined;
@@ -1155,7 +1155,7 @@ function EventDetail() {
             teamName,
             clubName,
             clubLogoUrl,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
         }).catch(() => undefined);
 
@@ -1275,7 +1275,7 @@ function EventDetail() {
 
       const { data: teamRow } = await supabase
         .from("teams")
-        .select("name, club_id, clubs:club_id(name, logo_url)")
+        .select("name, club_id, clubs:club_id(name, logo_url, default_language)")
         .eq("id", event.team_id)
         .maybeSingle();
       const teamName = (teamRow as any)?.name as string | undefined;
@@ -1313,7 +1313,7 @@ function EventDetail() {
             teamName,
             clubName,
             clubLogoUrl,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
         }).catch(() => undefined);
 
@@ -1371,7 +1371,7 @@ function EventDetail() {
 
       const { data: clubRow } = await supabase
         .from("teams")
-        .select("name, clubs:club_id(name, logo_url)")
+        .select("name, clubs:club_id(name, logo_url, default_language)")
         .eq("id", event.team_id)
         .maybeSingle();
       const teamName = (clubRow as any)?.name as string | undefined;
@@ -1428,7 +1428,7 @@ function EventDetail() {
             isUpdate: true,
             changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
             lineup: lineupEmail,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
 
         }).catch(() => undefined);
