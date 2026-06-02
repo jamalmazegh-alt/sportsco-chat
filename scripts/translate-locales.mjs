@@ -72,9 +72,7 @@ async function callAI(messages, retries=4) {
   }
 }
 
-async function translateSection(lang, ns, sectionKey, sectionValue) {
-  const glossary = SPORTS_GLOSSARY[lang];
-async function translateOne(lang, ns, sectionKey, sectionValue, attempt=0) {
+async function translateOne(lang, ns, sectionKey, sectionValue) {
   const glossary = SPORTS_GLOSSARY[lang];
   const sys = `You are a professional sports-app localizer translating from German (DE) to ${LANG_NAMES[lang]}.
 Audience: amateur sports clubs (football-first), coaches, players, parents, tournament organizers.
