@@ -6,8 +6,17 @@ import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
 
-function frDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
+function resolveLocale(...candidates: Array<string | null | undefined>): string {
+  for (const c of candidates) {
+    const v = (c ?? "").toLowerCase().slice(0, 2);
+    if (SUPPORTED.has(v)) return v;
+  }
+  return "fr";
+}
+function fmtDate(iso: string, locale: string) {
+  const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
+  return new Date(iso).toLocaleDateString(bcp, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -38,7 +47,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
         const { data: events, error } = await supabaseAdmin
           .from("events")
           .select(
-            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before))"
+            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before, default_language))"
           )
           .is("cancelled_at", null)
           .is("deleted_at", null)
@@ -97,15 +106,33 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           const [{ data: players }, { data: parents }] = await Promise.all([
             supabaseAdmin
               .from("players")
-              .select("id, first_name, last_name, email")
+              .select("id, first_name, last_name, email, user_id")
               .in("id", playerIds),
             supabaseAdmin
               .from("player_parents")
-              .select("player_id, email, full_name")
+              .select("player_id, email, full_name, parent_user_id")
               .in("player_id", playerIds),
           ]);
 
-          const eventDateLabel = frDate(ev.starts_at);
+          // Fetch preferred_language for any linked profiles (player or parent)
+          const profileIds = Array.from(new Set([
+            ...((players ?? []).map((p: any) => p.user_id).filter(Boolean)),
+            ...((parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean)),
+          ]));
+          const langByUser = new Map<string, string>();
+          if (profileIds.length > 0) {
+            const { data: profs } = await supabaseAdmin
+              .from("profiles")
+              .select("id, preferred_language")
+              .in("id", profileIds);
+            for (const p of profs ?? []) {
+              if ((p as any).preferred_language) {
+                langByUser.set((p as any).id, (p as any).preferred_language);
+              }
+            }
+          }
+
+          const clubLang = (club as any).default_language as string | null | undefined;
           const baseUrl =
             process.env.SITE_URL ||
             "https://www.clubero.app";
@@ -128,17 +155,20 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
             const respondUrl = `${baseUrl}/r/${conv.response_token}`;
 
-            const recipients: { email: string; firstName?: string }[] = [];
+            const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
             if (player.email) {
-              recipients.push({ email: player.email, firstName: player.first_name ?? undefined });
+              recipients.push({ email: player.email, firstName: player.first_name ?? undefined, userId: player.user_id ?? null });
             }
             for (const pp of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
               if (!pp.email) continue;
               const first = (pp.full_name ?? "").split(" ")[0] || undefined;
-              recipients.push({ email: pp.email, firstName: first });
+              recipients.push({ email: pp.email, firstName: first, userId: pp.parent_user_id ?? null });
             }
 
             for (const r of recipients) {
+              const recipientLang = r.userId ? langByUser.get(r.userId) : undefined;
+              const locale = resolveLocale(recipientLang, clubLang);
+              const eventDateLabel = fmtDate(ev.starts_at, locale);
               try {
                 await enqueueTransactionalEmailServer({
                   templateName: "convocation-invite",
@@ -152,7 +182,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     eventDate: eventDateLabel,
                     eventDescription: ev.description ?? undefined,
                     convocationTime: ev.convocation_time
-                      ? frDate(ev.convocation_time)
+                      ? fmtDate(ev.convocation_time, locale)
                       : undefined,
                     eventLocation: ev.location ?? undefined,
                     locationMapsUrl,
@@ -167,7 +197,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     isReminder: true,
                     reminderHoursBefore: milestone,
                     lineup: lineupEmail,
-                    locale: "fr",
+                    locale,
                   },
 
                 });

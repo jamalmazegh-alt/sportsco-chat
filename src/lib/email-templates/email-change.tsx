@@ -33,7 +33,7 @@ const COPY = {
 
 export const EmailChangeEmail = ({ confirmationUrl, oldEmail, newEmail, locale }: Props) => {
   const l: Locale = pickLocale(locale)
-  const c = COPY[l]
+  const c = COPY[l === 'fr' ? 'fr' : 'en']
   const detail =
     oldEmail && newEmail
       ? l === 'fr'

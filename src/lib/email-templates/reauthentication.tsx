@@ -29,7 +29,7 @@ const COPY = {
 
 export const ReauthenticationEmail = ({ token, locale }: Props) => {
   const l: Locale = pickLocale(locale)
-  const c = COPY[l]
+  const c = COPY[l === 'fr' ? 'fr' : 'en']
   return (
     <BrandedEmail
       locale={l}

@@ -23,11 +23,12 @@ const ROLE_LABEL: Record<string, { fr: string; en: string }> = {
 }
 
 function buildIntro(
-  l: Locale,
+  rawL: Locale,
   clubName?: string,
   inviteRole?: string,
   playerName?: string,
 ): string {
+  const l: 'fr' | 'en' = rawL === 'fr' ? 'fr' : 'en'
   const club = clubName?.trim()
   const roleKey = inviteRole?.toLowerCase()
   const roleLabel = roleKey && ROLE_LABEL[roleKey] ? ROLE_LABEL[roleKey][l] : undefined
@@ -92,7 +93,7 @@ export const InviteEmail = ({
   inviterName,
 }: Props) => {
   const l: Locale = pickLocale(locale)
-  const c = COPY[l]
+  const c = COPY[l === 'fr' ? 'fr' : 'en']
   const club = clubName?.trim() || undefined
   const intro = buildIntro(l, club, inviteRole, playerName?.trim() || undefined)
   const body = inviterName?.trim() ? (

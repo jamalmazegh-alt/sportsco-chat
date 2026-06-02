@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Button, Column, Heading, Row, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale } from "./_layout";
+import type { Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
-
-type Locale = "fr" | "en";
 
 interface LineupPlayer {
   name: string;
@@ -46,76 +45,159 @@ interface Props {
   locale?: Locale;
 }
 
-const T = {
+const T: Record<Locale, {
+  update: string; reminder: string; convocation: string;
+  subjUpdate: string; subjReminder: string; subjDefault: string;
+  headingUpdate: string; headingReminder: (h?: number) => string;
+  helloName: (n: string) => string; helloDefault: string;
+  yourPlayer: string; bodyUpdate: string; bodyReminder: string; bodyDefault: string;
+  withTeam: string; changesTitle: string; cardKickerDefault: string;
+  meetingTime: string; meetingPointLabel: string; coachLabel: string;
+  respondPrompt: string; btnPresent: string; btnUncertain: string; btnAbsent: string;
+  squadTitle: (n: number) => string; lineupTitle: string; formationLabel: string;
+  startingXI: string; benchTitle: string; foot: string; sentBy: string; via: string;
+}> = {
   fr: {
-    update: "Mise à jour — ",
-    reminder: "Rappel — ",
-    convocation: "Convocation",
-    subjUpdate: "🔄 Mise à jour — ",
-    subjReminder: "⏰ Rappel — ",
-    subjDefault: "📣 ",
+    update: "Mise à jour — ", reminder: "Rappel — ", convocation: "Convocation",
+    subjUpdate: "🔄 Mise à jour — ", subjReminder: "⏰ Rappel — ", subjDefault: "📣 ",
     headingUpdate: "🔄 Mise à jour de la convocation",
-    headingReminder: (h?: number) => `⏰ Rappel — réponse attendue${h ? ` (${h}h avant)` : ""}`,
-    helloName: (n: string) => `Bonjour ${n},`,
-    helloDefault: "Bonjour,",
+    headingReminder: (h) => `⏰ Rappel — réponse attendue${h ? ` (${h}h avant)` : ""}`,
+    helloName: (n) => `Bonjour ${n},`, helloDefault: "Bonjour,",
     yourPlayer: "Votre joueur",
     bodyUpdate: "— les informations de la convocation ont été mises à jour. Merci de vérifier et de confirmer votre réponse.",
     bodyReminder: "n'a pas encore répondu à la convocation",
     bodyDefault: "est convoqué·e",
-    withTeam: "avec",
-    changesTitle: "⚠️ Ce qui a changé",
-    cardKickerDefault: "ÉVÉNEMENT",
-    meetingTime: "Heure de RDV",
-    meetingPointLabel: "Point de RDV",
-    coachLabel: "Coach",
+    withTeam: "avec", changesTitle: "⚠️ Ce qui a changé", cardKickerDefault: "ÉVÉNEMENT",
+    meetingTime: "Heure de RDV", meetingPointLabel: "Point de RDV", coachLabel: "Coach",
     respondPrompt: "Répondez en un clic :",
-    btnPresent: "✅ Présent",
-    btnUncertain: "❔ Incertain",
-    btnAbsent: "❌ Absent",
-    squadTitle: (n: number) => `Joueurs convoqués (${n})`,
-    lineupTitle: "⚽ Composition prévue",
-    formationLabel: "Formation",
-    startingXI: "XI de départ",
-    benchTitle: "Remplaçants",
+    btnPresent: "✅ Présent", btnUncertain: "❔ Incertain", btnAbsent: "❌ Absent",
+    squadTitle: (n) => `Joueurs convoqués (${n})`,
+    lineupTitle: "⚽ Composition prévue", formationLabel: "Formation",
+    startingXI: "XI de départ", benchTitle: "Remplaçants",
     foot: "Pas besoin de vous connecter — votre réponse est enregistrée automatiquement et vous pourrez la modifier plus tard.",
-    sentBy: "Envoyé par",
-    via: "via Clubero",
+    sentBy: "Envoyé par", via: "via Clubero",
   },
   en: {
-    update: "Update — ",
-    reminder: "Reminder — ",
-    convocation: "Call-up",
-    subjUpdate: "🔄 Update — ",
-    subjReminder: "⏰ Reminder — ",
-    subjDefault: "📣 ",
+    update: "Update — ", reminder: "Reminder — ", convocation: "Call-up",
+    subjUpdate: "🔄 Update — ", subjReminder: "⏰ Reminder — ", subjDefault: "📣 ",
     headingUpdate: "🔄 Call-up updated",
-    headingReminder: (h?: number) => `⏰ Reminder — response needed${h ? ` (${h}h before)` : ""}`,
-    helloName: (n: string) => `Hi ${n},`,
-    helloDefault: "Hi,",
+    headingReminder: (h) => `⏰ Reminder — response needed${h ? ` (${h}h before)` : ""}`,
+    helloName: (n) => `Hi ${n},`, helloDefault: "Hi,",
     yourPlayer: "Your player",
     bodyUpdate: "— the call-up details have been updated. Please review and confirm your response.",
     bodyReminder: "hasn't responded to the call-up yet",
     bodyDefault: "has been called up",
-    withTeam: "with",
-    changesTitle: "⚠️ What changed",
-    cardKickerDefault: "EVENT",
-    meetingTime: "Meeting time",
-    meetingPointLabel: "Meeting point",
-    coachLabel: "Coach",
+    withTeam: "with", changesTitle: "⚠️ What changed", cardKickerDefault: "EVENT",
+    meetingTime: "Meeting time", meetingPointLabel: "Meeting point", coachLabel: "Coach",
     respondPrompt: "Reply in one tap:",
-    btnPresent: "✅ Present",
-    btnUncertain: "❔ Uncertain",
-    btnAbsent: "❌ Absent",
-    squadTitle: (n: number) => `Squad (${n})`,
-    lineupTitle: "⚽ Planned line-up",
-    formationLabel: "Formation",
-    startingXI: "Starting XI",
-    benchTitle: "Bench",
+    btnPresent: "✅ Present", btnUncertain: "❔ Uncertain", btnAbsent: "❌ Absent",
+    squadTitle: (n) => `Squad (${n})`,
+    lineupTitle: "⚽ Planned line-up", formationLabel: "Formation",
+    startingXI: "Starting XI", benchTitle: "Bench",
     foot: "No need to sign in — your response is saved automatically and you can change it later.",
-    sentBy: "Sent by",
-    via: "via Clubero",
+    sentBy: "Sent by", via: "via Clubero",
   },
-} as const;
+  es: {
+    update: "Actualización — ", reminder: "Recordatorio — ", convocation: "Convocatoria",
+    subjUpdate: "🔄 Actualización — ", subjReminder: "⏰ Recordatorio — ", subjDefault: "📣 ",
+    headingUpdate: "🔄 Convocatoria actualizada",
+    headingReminder: (h) => `⏰ Recordatorio — respuesta pendiente${h ? ` (${h}h antes)` : ""}`,
+    helloName: (n) => `Hola ${n},`, helloDefault: "Hola,",
+    yourPlayer: "Tu jugador/a",
+    bodyUpdate: "— los datos de la convocatoria han sido actualizados. Por favor, revisa y confirma tu respuesta.",
+    bodyReminder: "aún no ha respondido a la convocatoria",
+    bodyDefault: "ha sido convocado/a",
+    withTeam: "con", changesTitle: "⚠️ Lo que ha cambiado", cardKickerDefault: "EVENTO",
+    meetingTime: "Hora de quedada", meetingPointLabel: "Punto de encuentro", coachLabel: "Entrenador",
+    respondPrompt: "Responde en un clic:",
+    btnPresent: "✅ Presente", btnUncertain: "❔ Tal vez", btnAbsent: "❌ Ausente",
+    squadTitle: (n) => `Convocados (${n})`,
+    lineupTitle: "⚽ Alineación prevista", formationLabel: "Formación",
+    startingXI: "Once inicial", benchTitle: "Suplentes",
+    foot: "No hace falta iniciar sesión — tu respuesta se guarda automáticamente y podrás modificarla más tarde.",
+    sentBy: "Enviado por", via: "vía Clubero",
+  },
+  de: {
+    update: "Update — ", reminder: "Erinnerung — ", convocation: "Aufgebot",
+    subjUpdate: "🔄 Update — ", subjReminder: "⏰ Erinnerung — ", subjDefault: "📣 ",
+    headingUpdate: "🔄 Aufgebot aktualisiert",
+    headingReminder: (h) => `⏰ Erinnerung — Antwort erwartet${h ? ` (${h}h vorher)` : ""}`,
+    helloName: (n) => `Hallo ${n},`, helloDefault: "Hallo,",
+    yourPlayer: "Dein Spieler",
+    bodyUpdate: "— die Aufgebotsdaten wurden aktualisiert. Bitte überprüfe und bestätige deine Antwort.",
+    bodyReminder: "hat noch nicht auf das Aufgebot geantwortet",
+    bodyDefault: "wurde aufgeboten",
+    withTeam: "mit", changesTitle: "⚠️ Was sich geändert hat", cardKickerDefault: "EVENT",
+    meetingTime: "Treffzeit", meetingPointLabel: "Treffpunkt", coachLabel: "Trainer",
+    respondPrompt: "Antworte mit einem Klick:",
+    btnPresent: "✅ Anwesend", btnUncertain: "❔ Vielleicht", btnAbsent: "❌ Abwesend",
+    squadTitle: (n) => `Aufgebot (${n})`,
+    lineupTitle: "⚽ Geplante Aufstellung", formationLabel: "Formation",
+    startingXI: "Startelf", benchTitle: "Bank",
+    foot: "Kein Login nötig — deine Antwort wird automatisch gespeichert und kann später geändert werden.",
+    sentBy: "Gesendet von", via: "über Clubero",
+  },
+  it: {
+    update: "Aggiornamento — ", reminder: "Promemoria — ", convocation: "Convocazione",
+    subjUpdate: "🔄 Aggiornamento — ", subjReminder: "⏰ Promemoria — ", subjDefault: "📣 ",
+    headingUpdate: "🔄 Convocazione aggiornata",
+    headingReminder: (h) => `⏰ Promemoria — risposta attesa${h ? ` (${h}h prima)` : ""}`,
+    helloName: (n) => `Ciao ${n},`, helloDefault: "Ciao,",
+    yourPlayer: "Il tuo giocatore",
+    bodyUpdate: "— le informazioni della convocazione sono state aggiornate. Per favore verifica e conferma la tua risposta.",
+    bodyReminder: "non ha ancora risposto alla convocazione",
+    bodyDefault: "è stato convocato",
+    withTeam: "con", changesTitle: "⚠️ Cosa è cambiato", cardKickerDefault: "EVENTO",
+    meetingTime: "Ora del ritrovo", meetingPointLabel: "Punto di ritrovo", coachLabel: "Allenatore",
+    respondPrompt: "Rispondi in un clic:",
+    btnPresent: "✅ Presente", btnUncertain: "❔ Forse", btnAbsent: "❌ Assente",
+    squadTitle: (n) => `Convocati (${n})`,
+    lineupTitle: "⚽ Formazione prevista", formationLabel: "Modulo",
+    startingXI: "Titolari", benchTitle: "Panchina",
+    foot: "Nessun login necessario — la tua risposta viene salvata automaticamente e potrai modificarla in seguito.",
+    sentBy: "Inviato da", via: "tramite Clubero",
+  },
+  nl: {
+    update: "Update — ", reminder: "Herinnering — ", convocation: "Oproep",
+    subjUpdate: "🔄 Update — ", subjReminder: "⏰ Herinnering — ", subjDefault: "📣 ",
+    headingUpdate: "🔄 Oproep bijgewerkt",
+    headingReminder: (h) => `⏰ Herinnering — reactie verwacht${h ? ` (${h}u vooraf)` : ""}`,
+    helloName: (n) => `Hallo ${n},`, helloDefault: "Hallo,",
+    yourPlayer: "Je speler",
+    bodyUpdate: "— de gegevens van de oproep zijn bijgewerkt. Controleer en bevestig je antwoord.",
+    bodyReminder: "heeft nog niet gereageerd op de oproep",
+    bodyDefault: "is opgeroepen",
+    withTeam: "met", changesTitle: "⚠️ Wat is gewijzigd", cardKickerDefault: "EVENEMENT",
+    meetingTime: "Verzameltijd", meetingPointLabel: "Verzamelpunt", coachLabel: "Coach",
+    respondPrompt: "Antwoord in één klik:",
+    btnPresent: "✅ Aanwezig", btnUncertain: "❔ Misschien", btnAbsent: "❌ Afwezig",
+    squadTitle: (n) => `Selectie (${n})`,
+    lineupTitle: "⚽ Geplande opstelling", formationLabel: "Formatie",
+    startingXI: "Basiself", benchTitle: "Bank",
+    foot: "Geen aanmelding nodig — je antwoord wordt automatisch opgeslagen en kan later worden gewijzigd.",
+    sentBy: "Verzonden door", via: "via Clubero",
+  },
+  pt: {
+    update: "Atualização — ", reminder: "Lembrete — ", convocation: "Convocatória",
+    subjUpdate: "🔄 Atualização — ", subjReminder: "⏰ Lembrete — ", subjDefault: "📣 ",
+    headingUpdate: "🔄 Convocatória atualizada",
+    headingReminder: (h) => `⏰ Lembrete — resposta em falta${h ? ` (${h}h antes)` : ""}`,
+    helloName: (n) => `Olá ${n},`, helloDefault: "Olá,",
+    yourPlayer: "O teu jogador",
+    bodyUpdate: "— os dados da convocatória foram atualizados. Por favor verifica e confirma a tua resposta.",
+    bodyReminder: "ainda não respondeu à convocatória",
+    bodyDefault: "foi convocado(a)",
+    withTeam: "com", changesTitle: "⚠️ O que mudou", cardKickerDefault: "EVENTO",
+    meetingTime: "Hora de encontro", meetingPointLabel: "Ponto de encontro", coachLabel: "Treinador",
+    respondPrompt: "Responde com um clique:",
+    btnPresent: "✅ Presente", btnUncertain: "❔ Talvez", btnAbsent: "❌ Ausente",
+    squadTitle: (n) => `Convocados (${n})`,
+    lineupTitle: "⚽ Equipa prevista", formationLabel: "Formação",
+    startingXI: "Onze inicial", benchTitle: "Suplentes",
+    foot: "Não é preciso iniciar sessão — a tua resposta é guardada automaticamente e podes alterá-la mais tarde.",
+    sentBy: "Enviado por", via: "via Clubero",
+  },
+};
 
 const ConvocationInviteEmail = ({
   recipientFirstName,
@@ -143,7 +225,7 @@ const ConvocationInviteEmail = ({
   lineup,
   locale,
 }: Props) => {
-  const l: Locale = locale === "fr" ? "fr" : "en";
+  const l: Locale = pickLocale(locale);
   const t = T[l];
   return (
 
@@ -344,7 +426,7 @@ const ConvocationInviteEmail = ({
 export const template = {
   component: ConvocationInviteEmail,
   subject: (d) => {
-    const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
+    const l: Locale = pickLocale((d as any).locale);
     const t = T[l];
     const prefix = d.isUpdate ? t.subjUpdate : d.isReminder ? t.subjReminder : t.subjDefault;
     return `${prefix}${t.convocation}: ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`;

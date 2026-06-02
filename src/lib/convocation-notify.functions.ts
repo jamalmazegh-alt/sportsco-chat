@@ -19,11 +19,11 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const { convocationId } = data;
     const { userId } = context;
 
-    // Fetch convocation + event + player
+    // Fetch convocation + event + player + team's club default_language
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id)"
+        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id,teams:team_id(clubs:club_id(default_language)))"
       )
       .eq("id", convocationId)
       .single();
@@ -33,6 +33,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     if (status !== "absent" && status !== "uncertain") return { sent: 0 };
 
     const ev: any = conv.events;
+    const clubDefaultLang = ev?.teams?.clubs?.default_language as string | null | undefined;
     const player: any = conv.players ?? {};
     const playerName =
       `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
@@ -75,12 +76,20 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       const email = u?.user?.email;
       if (!email) continue;
 
-      const lang = ((p as any).preferred_language ?? "en").toLowerCase();
-      const locale: "fr" | "en" = lang.startsWith("fr") ? "fr" : "en";
+      const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
+      const resolveLocale = (...c: Array<string | null | undefined>) => {
+        for (const x of c) {
+          const v = (x ?? "").toLowerCase().slice(0, 2);
+          if (SUPPORTED.has(v)) return v;
+        }
+        return "fr";
+      };
+      const locale = resolveLocale((p as any).preferred_language, clubDefaultLang);
+      const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
 
       const startsAt = ev.starts_at ? new Date(ev.starts_at) : null;
       const eventDate = startsAt
-        ? startsAt.toLocaleDateString(locale === "fr" ? "fr-FR" : "en-GB", {
+        ? startsAt.toLocaleDateString(bcp, {
             weekday: "long",
             day: "numeric",
             month: "long",

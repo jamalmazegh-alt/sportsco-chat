@@ -6,7 +6,14 @@ import { domToPng } from "modern-screenshot";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
-const emailLocale = (): "fr" | "en" => ((i18n.language ?? "en").toLowerCase().startsWith("fr") ? "fr" : "en");
+const SUPPORTED_LOCALES = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
+const pickEmailLocale = (...candidates: Array<string | null | undefined>): string => {
+  for (const c of candidates) {
+    const v = (c ?? "").toLowerCase().slice(0, 2);
+    if (SUPPORTED_LOCALES.has(v)) return v;
+  }
+  return "fr";
+};
 import { fmt } from "@/lib/date-locale";
 import {
   MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle,
@@ -640,13 +647,14 @@ function EventDetail() {
         const { data: clubRow } = event.team_id
           ? await supabase
               .from("teams")
-              .select("name, clubs:club_id(name, logo_url)")
+              .select("name, clubs:club_id(name, logo_url, default_language)")
               .eq("id", event.team_id)
               .maybeSingle()
           : { data: null };
         const teamName = (clubRow as any)?.name as string | undefined;
         const clubName = (clubRow as any)?.clubs?.name as string | undefined;
         const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+        const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
         const sendOne = (toEmail: string, recipientFirstName: string | undefined, idemSuffix: string) =>
@@ -664,7 +672,7 @@ function EventDetail() {
               teamName,
               clubName,
               clubLogoUrl,
-              locale: emailLocale(),
+              locale: pickEmailLocale(clubDefaultLang),
             },
           } as any).catch(() => undefined);
 
@@ -795,13 +803,14 @@ function EventDetail() {
       const { data: clubRow } = event.team_id
         ? await supabase
             .from("teams")
-            .select("name, clubs:club_id(name, logo_url)")
+            .select("name, clubs:club_id(name, logo_url, default_language)")
             .eq("id", event.team_id)
             .maybeSingle()
         : { data: null };
       const teamName = (clubRow as any)?.name as string | undefined;
       const clubName = (clubRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -890,7 +899,7 @@ function EventDetail() {
             clubLogoUrl,
             respondUrl: `${origin}/r/${token}`,
             lineup: lineupEmail,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
         });
 
@@ -1110,13 +1119,14 @@ function EventDetail() {
       // Club + team info for email branding & wall post
       const { data: teamRow } = await supabase
         .from("teams")
-        .select("name, club_id, clubs:club_id(name, logo_url)")
+        .select("name, club_id, clubs:club_id(name, logo_url, default_language)")
         .eq("id", event.team_id)
         .maybeSingle();
       const teamName = (teamRow as any)?.name as string | undefined;
       const clubId = (teamRow as any)?.club_id as string | undefined;
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as string | null | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
       // Player emails
@@ -1148,7 +1158,7 @@ function EventDetail() {
             teamName,
             clubName,
             clubLogoUrl,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
         }).catch(() => undefined);
 
@@ -1268,13 +1278,14 @@ function EventDetail() {
 
       const { data: teamRow } = await supabase
         .from("teams")
-        .select("name, club_id, clubs:club_id(name, logo_url)")
+        .select("name, club_id, clubs:club_id(name, logo_url, default_language)")
         .eq("id", event.team_id)
         .maybeSingle();
       const teamName = (teamRow as any)?.name as string | undefined;
       const clubId = (teamRow as any)?.club_id as string | undefined;
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as string | null | undefined;
 
       const { data: playersInfo } = playerIds.length > 0
         ? await supabase
@@ -1306,7 +1317,7 @@ function EventDetail() {
             teamName,
             clubName,
             clubLogoUrl,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
         }).catch(() => undefined);
 
@@ -1364,12 +1375,13 @@ function EventDetail() {
 
       const { data: clubRow } = await supabase
         .from("teams")
-        .select("name, clubs:club_id(name, logo_url)")
+        .select("name, clubs:club_id(name, logo_url, default_language)")
         .eq("id", event.team_id)
         .maybeSingle();
       const teamName = (clubRow as any)?.name as string | undefined;
       const clubName = (clubRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -1421,7 +1433,7 @@ function EventDetail() {
             isUpdate: true,
             changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
             lineup: lineupEmail,
-            locale: emailLocale(),
+            locale: pickEmailLocale(clubDefaultLang),
           },
 
         }).catch(() => undefined);
