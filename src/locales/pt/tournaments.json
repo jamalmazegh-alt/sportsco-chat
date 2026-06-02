@@ -33,7 +33,7 @@
     "metaDesc": "Acompanhe {{name}} ao vivo: Equipas, calendário, resultados e classificações{{locationSuffix}}.",
     "metaDescFallback": "Acompanhe este torneio ao vivo: Equipas, calendário, resultados e classificações.",
     "unavailableTitle": "Torneio indisponível",
-    "unavailableBody": "Este torneio ainda não foi publicado ou o link expirou.",
+    "unavailableBody": "Este torneio ainda não foi publicado ou o link expirou. Se és o organizador, abre o teu torneio e clica em <1>Publicar</1>.",
     "backHome": "Voltar à página inicial",
     "register": "Registar",
     "tvSlideshow": "Apresentação para TV",

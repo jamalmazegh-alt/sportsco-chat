@@ -33,7 +33,7 @@
     "metaDesc": "Verfolge {{name}} live: Teams, Spielplan, Ergebnisse und Tabellen{{locationSuffix}}.",
     "metaDescFallback": "Verfolge dieses Turnier live: Teams, Spielplan, Ergebnisse und Tabellen.",
     "unavailableTitle": "Turnier nicht verfügbar",
-    "unavailableBody": "Dieses Turnier wurde noch nicht veröffentlicht oder der Link ist abgelaufen.",
+    "unavailableBody": "Dieses Turnier wurde noch nicht veröffentlicht oder der Link ist abgelaufen. Wenn du der Organisator bist, öffne dein Turnier und klicke auf <1>Veröffentlichen</1>.",
     "backHome": "Zur Startseite",
     "register": "Anmelden",
     "tvSlideshow": "TV-Präsentation",

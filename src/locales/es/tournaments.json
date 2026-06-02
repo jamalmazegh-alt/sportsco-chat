@@ -33,7 +33,7 @@
     "metaDesc": "Sigue a {{name}} en vivo: Equipos, calendario, resultados y clasificación{{locationSuffix}}.",
     "metaDescFallback": "Sigue este torneo en vivo: equipos, calendario, resultados y clasificaciones.",
     "unavailableTitle": "Torneo no disponible",
-    "unavailableBody": "Este torneo aún no se ha publicado o el enlace ha caducado.",
+    "unavailableBody": "Este torneo aún no se ha publicado o el enlace ha caducado. Si eres el organizador, abre tu torneo y haz clic en <1>Publicar</1>.",
     "backHome": "Volver a la página de inicio",
     "register": "Inscribirse",
     "tvSlideshow": "Presentación en TV",
