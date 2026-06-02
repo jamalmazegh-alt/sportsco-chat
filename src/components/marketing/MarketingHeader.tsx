@@ -138,11 +138,8 @@ export function MarketingHeader() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <div className="mt-3 flex items-center justify-center gap-1 rounded-lg border border-border p-1">
-              {([
-                { value: "fr", label: "FR", flag: "🇫🇷" },
-                { value: "en", label: "EN", flag: "🇬🇧" },
-              ] as const).map((opt) => {
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-1 rounded-lg border border-border p-1">
+              {LANG_OPTS.map((opt) => {
                 const active = current === opt.value;
                 return (
                   <button
