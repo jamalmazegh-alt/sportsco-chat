@@ -426,7 +426,7 @@ const ConvocationInviteEmail = ({
 export const template = {
   component: ConvocationInviteEmail,
   subject: (d) => {
-    const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
+    const l: Locale = pickLocale((d as any).locale);
     const t = T[l];
     const prefix = d.isUpdate ? t.subjUpdate : d.isReminder ? t.subjReminder : t.subjDefault;
     return `${prefix}${t.convocation}: ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`;
