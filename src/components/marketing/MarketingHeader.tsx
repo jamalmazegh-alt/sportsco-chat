@@ -28,6 +28,16 @@ const LOCALIZED_NAV = {
   ],
 } as const;
 
+const LANG_OPTS = [
+  { value: "fr", label: "FR", flag: "🇫🇷" },
+  { value: "en", label: "EN", flag: "🇬🇧" },
+  { value: "de", label: "DE", flag: "🇩🇪" },
+  { value: "es", label: "ES", flag: "🇪🇸" },
+  { value: "pt", label: "PT", flag: "🇵🇹" },
+  { value: "it", label: "IT", flag: "🇮🇹" },
+  { value: "nl", label: "NL", flag: "🇳🇱" },
+] as const;
+
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
   const { t, i18n } = useTranslation("marketing");
