@@ -654,6 +654,7 @@ function EventDetail() {
         const teamName = (clubRow as any)?.name as string | undefined;
         const clubName = (clubRow as any)?.clubs?.name as string | undefined;
         const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+        const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
         const sendOne = (toEmail: string, recipientFirstName: string | undefined, idemSuffix: string) =>
@@ -809,6 +810,7 @@ function EventDetail() {
       const teamName = (clubRow as any)?.name as string | undefined;
       const clubName = (clubRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
@@ -1124,6 +1126,7 @@ function EventDetail() {
       const clubId = (teamRow as any)?.club_id as string | undefined;
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as string | null | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
       // Player emails
@@ -1282,6 +1285,7 @@ function EventDetail() {
       const clubId = (teamRow as any)?.club_id as string | undefined;
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as string | null | undefined;
 
       const { data: playersInfo } = playerIds.length > 0
         ? await supabase
@@ -1377,6 +1381,7 @@ function EventDetail() {
       const teamName = (clubRow as any)?.name as string | undefined;
       const clubName = (clubRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
