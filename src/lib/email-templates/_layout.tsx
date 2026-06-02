@@ -13,10 +13,14 @@ import {
   Text,
 } from '@react-email/components'
 
-export type Locale = 'fr' | 'en'
+export type Locale = 'fr' | 'en' | 'es' | 'de' | 'it' | 'nl' | 'pt'
 
-export const pickLocale = (input?: string | null): Locale =>
-  (input ?? '').toLowerCase().startsWith('fr') ? 'fr' : 'en'
+const SUPPORTED_LOCALES: Locale[] = ['fr', 'en', 'es', 'de', 'it', 'nl', 'pt']
+
+export const pickLocale = (input?: string | null): Locale => {
+  const v = (input ?? '').toLowerCase().slice(0, 2)
+  return (SUPPORTED_LOCALES as string[]).includes(v) ? (v as Locale) : 'fr'
+}
 
 const LOGO_URL = 'https://www.clubero.app/clubero-logo.png'
 const SITE_URL = 'https://www.clubero.app'
