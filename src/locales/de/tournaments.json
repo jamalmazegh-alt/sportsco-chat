@@ -69,11 +69,11 @@
       "draftBadge": "Entwurf",
       "publishedBadge": "Veröffentlicht",
       "completedBadge": "Abgeschlossen",
-      "teamsCount_one": "{{count}} team",
-      "teamsCount_other": "{{count}} teams",
-      "matchesPlayed": "{{played}}/{{total}} spiele gespielt",
-      "liveCount_one": "{{count}} spiel live",
-      "liveCount_other": "{{count}} spiele live"
+      "teamsCount_one": "{{count}} Team",
+      "teamsCount_other": "{{count}} Teams",
+      "matchesPlayed": "{{played}}/{{total}} Spiele gespielt",
+      "liveCount_one": "{{count}} Spiel live",
+      "liveCount_other": "{{count}} Spiele live"
     },
     "round": {
       "group": "Gruppe",

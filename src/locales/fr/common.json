@@ -174,7 +174,7 @@
   },
   "auth": {
     "playerSignupLink": "Vous êtes joueur ? Créez votre profil ici →",
-    "publicSignupClubAdminOnly": "Cette inscription est destinée aux dirigeants de club. Les joueurs et parents rattachés à un club rejoignent Clubero via une invitation.",
+    "publicSignupClubAdminOnly": "L'inscription publique est réservée aux dirigeants de club. Les joueurs et parents rejoignent Clubero uniquement via une invitation envoyée par leur club.",
     "login": "Se connecter",
     "register": "Créer un compte",
     "email": "E-mail",
@@ -197,7 +197,6 @@
     "rolePlayerHint": "Rejoindre votre club via un lien d'invitation.",
     "roleParent": "Parent",
     "roleParentHint": "Répondre aux convocations de votre enfant.",
-    "publicSignupClubAdminOnly": "L'inscription publique est réservée aux dirigeants de club. Les joueurs et parents rejoignent Clubero uniquement via une invitation envoyée par leur club.",
     "invitedAsHint": "Vous avez été invité — votre rôle est défini automatiquement.",
     "inviteCode": "Code d'invitation",
     "inviteHint": "Demandez à l'admin de votre club un lien ou code d'invitation.",
@@ -444,8 +443,8 @@
     "coachDetached": "Coach retiré",
     "noAvailableCoach": "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs.",
     "noCoachYet": "Aucun coach attaché. Cliquez sur Attacher pour en ajouter.",
-    "emptyHintAdmin": "Crée ta première équipe pour commencer à programmer entraînements et matchs.",
-    "emptyHintMember": "Tu n'es membre d'aucune équipe pour le moment. Demande à un admin de t'ajouter.",
+    "emptyHintAdmin": "Créez votre première équipe pour commencer à programmer entraînements et matchs.",
+    "emptyHintMember": "Vous n'êtes membre d'aucune équipe pour le moment. Demandez à un admin de vous ajouter.",
     "imageTooLarge": "Image trop lourde (max 5 Mo).",
     "imageInvalidType": "Format de fichier non supporté.",
     "whatsappGroupLink": "WhatsApp — lien du groupe d'équipe",
@@ -673,11 +672,11 @@
     "duplicateExists": "Un événement existe déjà pour cette équipe à cette date/heure.",
     "someDuplicatesSkipped": "{{count}} doublon(s) ignoré(s).",
     "openConvocationAfterCreate": "Choisir les convoqués juste après",
-    "openConvocationAfterCreateHint": "L'écran de convocation s'ouvrira pour que tu sélectionnes les joueurs.",
+    "openConvocationAfterCreateHint": "L'écran de convocation s'ouvrira pour que vous sélectionniez les joueurs.",
     "viewCalendar": "Calendrier",
     "viewList": "Liste",
-    "emptyHintCoach": "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
-    "emptyHintPlayer": "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un."
+    "emptyHintCoach": "Créez votre premier entraînement ou match — les joueurs seront convoqués automatiquement.",
+    "emptyHintPlayer": "Aucun événement prévu pour le moment. Vous serez notifié dès qu'un coach en programme un."
   },
   "followUps": {
     "title": "À relancer",
@@ -957,7 +956,7 @@
     "inviteSent": "Invitation envoyée",
     "sendInvite": "Envoyer l'invitation",
     "hubBranding": "Identité visuelle",
-    "hubBrandingHint": "Couleur principale de l'app pour ton club",
+    "hubBrandingHint": "Couleur principale de l'app pour votre club",
     "hubPayments": "Paiements",
     "hubPaymentsHint": "Encaissez les inscriptions tournoi via Stripe",
     "payments": {
@@ -996,7 +995,7 @@
       "saved": "Couleur du club mise à jour",
       "saveError": "Impossible de sauvegarder",
       "title": "Identité visuelle",
-      "subtitle": "Choisis la couleur principale de l'app. Elle s'applique partout, y compris la page de connexion.",
+      "subtitle": "Choisissez la couleur principale de l'app. Elle s'applique partout, y compris la page de connexion.",
       "previewTitle": "Aperçu",
       "previewPrimary": "Bouton principal",
       "previewSecondary": "Secondaire"
@@ -1371,7 +1370,7 @@
     },
     "adminUsers": {
       "title": "Utilisateurs — Clubero",
-      "description": "Gère les membres et les rôles de ton club."
+      "description": "Gérez les membres et les rôles de votre club."
     },
     "tournaments": {
       "title": "Tournois — Clubero",
@@ -1648,19 +1647,19 @@
     "unfollow": "Ne plus suivre",
     "followers_one": "{{count}} abonné",
     "followers_other": "{{count}} abonnés",
-    "loginRequired": "Connecte-toi pour suivre ce profil",
+    "loginRequired": "Connectez-vous pour suivre ce profil",
     "error": "Erreur, réessaie"
   },
   "following": {
     "title": "Mes abonnements",
-    "menuSubtitle": "Joueurs, coachs et clubs que tu suis",
-    "summary": "Tu suis {{p}} joueur(s), {{c}} coach(s), {{cl}} club(s)",
+    "menuSubtitle": "Joueurs, coachs et clubs que vous suivez",
+    "summary": "Vous suivez {{p}} joueur(s), {{c}} coach(s), {{cl}} club(s)",
     "players": "Joueurs",
     "coaches": "Coachs",
     "clubs": "Clubs",
-    "emptyPlayers": "Tu ne suis aucun joueur.",
-    "emptyCoaches": "Tu ne suis aucun coach.",
-    "emptyClubs": "Tu ne suis aucun club.",
+    "emptyPlayers": "Vous ne suivez aucun joueur.",
+    "emptyCoaches": "Vous ne suivez aucun coach.",
+    "emptyClubs": "Vous ne suivez aucun club.",
     "discoverPlayers": "Découvrir des joueurs"
   },
   "widget": {
