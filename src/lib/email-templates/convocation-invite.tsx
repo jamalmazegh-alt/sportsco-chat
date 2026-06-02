@@ -225,7 +225,7 @@ const ConvocationInviteEmail = ({
   lineup,
   locale,
 }: Props) => {
-  const l: Locale = locale === "fr" ? "fr" : "en";
+  const l: Locale = pickLocale(locale);
   const t = T[l];
   return (
 
