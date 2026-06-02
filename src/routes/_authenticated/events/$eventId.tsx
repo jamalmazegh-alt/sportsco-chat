@@ -6,7 +6,14 @@ import { domToPng } from "modern-screenshot";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 
-const emailLocale = (): "fr" | "en" => ((i18n.language ?? "en").toLowerCase().startsWith("fr") ? "fr" : "en");
+const SUPPORTED_LOCALES = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
+const pickEmailLocale = (...candidates: Array<string | null | undefined>): string => {
+  for (const c of candidates) {
+    const v = (c ?? "").toLowerCase().slice(0, 2);
+    if (SUPPORTED_LOCALES.has(v)) return v;
+  }
+  return "fr";
+};
 import { fmt } from "@/lib/date-locale";
 import {
   MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle,
