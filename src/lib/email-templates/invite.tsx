@@ -93,7 +93,7 @@ export const InviteEmail = ({
   inviterName,
 }: Props) => {
   const l: Locale = pickLocale(locale)
-  const c = COPY[l]
+  const c = COPY[l === 'fr' ? 'fr' : 'en']
   const club = clubName?.trim() || undefined
   const intro = buildIntro(l, club, inviteRole, playerName?.trim() || undefined)
   const body = inviterName?.trim() ? (
