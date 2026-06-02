@@ -59,7 +59,9 @@ export const premiumButton: React.CSSProperties = {
   boxShadow: '0 4px 12px rgba(63, 138, 31, 0.28)',
 }
 
-const FOOTER_COPY = {
+const FOOTER_COPY: Record<Locale, {
+  tagline: string; contact: string; visit: string; sentBy: string; via: string; help: string
+}> = {
   fr: {
     tagline: 'La plateforme qui simplifie la vie des clubs sportifs.',
     contact: 'Nous contacter',
@@ -76,7 +78,57 @@ const FOOTER_COPY = {
     via: 'via Clubero',
     help: 'Need help?',
   },
-} as const
+  es: {
+    tagline: 'La plataforma que simplifica la vida de los clubes deportivos.',
+    contact: 'Contáctanos',
+    visit: 'clubero.app',
+    sentBy: 'Enviado por',
+    via: 'vía Clubero',
+    help: '¿Necesitas ayuda?',
+  },
+  de: {
+    tagline: 'Die Plattform, die das Vereinsleben einfacher macht.',
+    contact: 'Kontakt',
+    visit: 'clubero.app',
+    sentBy: 'Gesendet von',
+    via: 'über Clubero',
+    help: 'Brauchen Sie Hilfe?',
+  },
+  it: {
+    tagline: 'La piattaforma che semplifica la vita dei club sportivi.',
+    contact: 'Contattaci',
+    visit: 'clubero.app',
+    sentBy: 'Inviato da',
+    via: 'tramite Clubero',
+    help: 'Hai bisogno di aiuto?',
+  },
+  nl: {
+    tagline: 'Het platform dat het leven van sportclubs makkelijker maakt.',
+    contact: 'Contacteer ons',
+    visit: 'clubero.app',
+    sentBy: 'Verzonden door',
+    via: 'via Clubero',
+    help: 'Hulp nodig?',
+  },
+  pt: {
+    tagline: 'A plataforma que simplifica a vida dos clubes desportivos.',
+    contact: 'Contactar',
+    visit: 'clubero.app',
+    sentBy: 'Enviado por',
+    via: 'via Clubero',
+    help: 'Precisa de ajuda?',
+  },
+}
+
+const BUTTON_HINT: Record<Locale, { broken: string; open: string }> = {
+  fr: { broken: 'Le bouton ne fonctionne pas ?', open: 'Ouvrir le lien' },
+  en: { broken: 'Button not working?', open: 'Open the link' },
+  es: { broken: '¿El botón no funciona?', open: 'Abrir el enlace' },
+  de: { broken: 'Funktioniert der Button nicht?', open: 'Link öffnen' },
+  it: { broken: 'Il pulsante non funziona?', open: 'Apri il link' },
+  nl: { broken: 'Werkt de knop niet?', open: 'Open de link' },
+  pt: { broken: 'O botão não funciona?', open: 'Abrir o link' },
+}
 
 /* =================================================================
  * BrandedEmail — utilisé par les emails AUTH (signup, invite, etc.)
