@@ -519,7 +519,7 @@
     "parentRequiredForMinor": "Para um jogador menor, é necessário adicionar um encarregado de educação.",
     "noParents": "Nenhum encarregado de educação associado ainda.",
     "childAccessTitle": "Permitir que o meu filho aceda à plataforma",
-    "childAccessHint": "Por padrão, as crianças não recebem uma conta nem notificações. Ative esta opção se você (como encarregado de educação) quiser dar acesso à plataforma ao seu filho.",
+    "childAccessHint": "Por predefinição, as crianças não recebem uma conta nem notificações. Ativa esta opção se (como encarregado de educação) quiseres dar acesso à plataforma ao teu filho.",
     "minorParentNotice": "Este jogador é menor — um encarregado de educação é necessário e receberá o convite. A criança não receberá uma conta por padrão.",
     "autoInviteSent": "Convite enviado automaticamente.",
     "autoInviteParentSent": "Convite enviado ao encarregado de educação.",
