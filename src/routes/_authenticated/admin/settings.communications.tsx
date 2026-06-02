@@ -51,7 +51,7 @@ function CommunicationsSettings() {
       const { data, error } = await supabase
         .from("clubs")
         .select(
-          "id, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled",
+          "id, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, default_language",
         )
         .eq("id", activeClubId!)
         .single();
