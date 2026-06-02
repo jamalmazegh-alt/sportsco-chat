@@ -26,7 +26,18 @@ type Form = {
   event_chat_enabled: boolean;
   event_chat_players_enabled: boolean;
   event_chat_parents_enabled: boolean;
+  default_language: string;
 };
+
+const LANGS = [
+  { value: "fr", label: "Français", flag: "🇫🇷" },
+  { value: "en", label: "English", flag: "🇬🇧" },
+  { value: "de", label: "Deutsch", flag: "🇩🇪" },
+  { value: "es", label: "Español", flag: "🇪🇸" },
+  { value: "pt", label: "Português", flag: "🇵🇹" },
+  { value: "it", label: "Italiano", flag: "🇮🇹" },
+  { value: "nl", label: "Nederlands", flag: "🇳🇱" },
+] as const;
 
 function CommunicationsSettings() {
   const { t } = useTranslation();
