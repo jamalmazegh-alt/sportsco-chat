@@ -1,0 +1,1120 @@
+{
+  "search": {
+    "filterRegion": "Regio",
+    "filterSport": "Sport"
+  },
+  "nav": {
+    "features": "Functies",
+    "players": "Spelers",
+    "tournaments": "Toernooien",
+    "onboarding": "Installatie",
+    "pricing": "Prijzen",
+    "faq": "Veelgestelde vragen",
+    "contact": "Contact",
+    "login": "Aanmelden",
+    "signup": "Club registreren",
+    "demo": "Demo aanvragen"
+  },
+  "footer": {
+    "tagline": "Teamcoördinatie, eenvoudig gemaakt voor sportclubs.",
+    "product": "Product",
+    "company": "Bedrijf",
+    "legal": "Juridisch",
+    "terms": "Gebruiksvoorwaarden",
+    "privacy": "Privacybeleid",
+    "legalNotice": "Colofon",
+    "rights": "© {{year}} Clubero. Alle rechten voorbehouden.",
+    "tagline2": "Ontworpen voor clubs, coaches, ouders en spelers."
+  },
+  "home": {
+    "badge": "Het platform voor amateur sportclubs",
+    "title": "De energie van je Club — eindelijk gecoördineerd.",
+    "subtitle": "Geen verloren oproepen meer in WhatsApp. Echte Teamcoördinatie: Aanwezigheid, herinneringen, communicatie — alles in één app.",
+    "ctaDemo": "Demo aanvragen",
+    "ctaFeatures": "Bekijk functies",
+    "freeTrial": "Gratis proefperiode",
+    "noCard": "Geen creditcard nodig",
+    "hostedEU": "Gegevens gehost in Europa",
+    "statConvoke": "voor uitnodigingen",
+    "statResponse": "antwoordpercentage",
+    "statChannels": "beschikbare kanalen",
+    "featuresTitle": "Alles wat je Club nodig heeft.",
+    "featuresSubtitle": "Niets overbodigs.",
+    "featuresBody": "Oproepen, Aanwezigheid, herinneringen en statistieken — alles gebeurt in Clubero. WhatsApp blijft optioneel beschikbaar voor iedereen die zijn groep niet wil opgeven.",
+    "forEveryone": "Voor de hele Club",
+    "forEveryoneTitle": "Eén app, vier perspectieven.",
+    "ctaTitle": "Klaar om de coördinatie van je Club te verbeteren?",
+    "ctaBody": "Sluit je aan bij de Clubs die chaos inruilen voor duidelijkheid.",
+    "ctaButton": "Demo aanvragen",
+    "ctaPricing": "Bekijk prijzen",
+    "ctaSeason": "Start je seizoen",
+    "heroLive": "Live · 2-1",
+    "heroAttendance": "Aanwezigheid",
+    "heroDate": "Zaterdag · 14:30",
+    "heroMatch": "O13 — vs FC Riverside",
+    "heroBadgeConvocation": "Oproep",
+    "heroStatusPresent": "Aanwezig",
+    "heroStatusMaybe": "Misschien",
+    "heroStatusAbsent": "Afwezig",
+    "heroStatusPending": "In afwachting",
+    "heroResponded": "14 van de 18 hebben geantwoord",
+    "featuresChip": "Gemaakt voor het veld",
+    "feat1Title": "Slimme oproepen",
+    "feat1Body": "Verstuur je oproepen in seconden. Spelers en Ouders antwoorden met één klik.",
+    "feat2Title": "Team management",
+    "feat2Body": "Selectie, Ouder-koppelingen, nummers en posities — alles op één plek.",
+    "feat3Title": "Automatische herinneringen",
+    "feat3Body": "Geen handmatige opvolging meer. Herinneringen worden automatisch verzonden.",
+    "feat4Title": "WhatsApp & e-mail optioneel",
+    "feat4Body": "Clubero is je hoofdkanaal. Voor iedereen die liever WhatsApp of e-mail gebruikt: deel een geformatteerde link met één klik.",
+    "feat5Title": "Kant-en-klare Toernooien",
+    "feat5Body": "Creëer een Toernooi met groepen, knock-outrondes, speelschema en standen. Deel een openbare tv-link voor live resultaten.",
+    "feat6Title": "Resultaten & statistieken per sport",
+    "feat6Body": "Registreer resultaten en statistieken (doelpunten, pogingen, driepunters) passend bij elke sport.",
+    "feat7Title": "Aanwezigheid bijhouden",
+    "feat7Body": "Zie wie er was, wie er ontbrak, en herken de trends van het seizoen.",
+    "feat8Title": "Geïntegreerde AI-assistent",
+    "feat8Body": "Stel je vragen in het Nederlands — de assistent kent je Club, je Teams, je statistieken en je volgende evenementen.",
+    "feat9Title": "Clubleven in realtime",
+    "feat9Body": "Prikbord, vermeldingen, leesbevestigingen, bestanden — het hele Clubleven op één plek.",
+    "feat10Title": "AVG & Veiligheid",
+    "feat10Body": "Op rollen gebaseerde toegang, Ouderlijk toezicht en gegevenshosting in Europa.",
+    "audClubs": "Clubs",
+    "audClubsP1": "Teams en leden centraal beheren",
+    "audClubsP2": "Multi-Team dashboard",
+    "audClubsP3": "Statistieken over het seizoen",
+    "audCoaches": "Coaches",
+    "audCoachesP1": "Oproepen in seconden",
+    "audCoachesP2": "Aanwezigheid in realtime",
+    "audCoachesP3": "Eigen chat voor elk evenement",
+    "audParents": "Ouders",
+    "audParentsP1": "Antwoord met één klik",
+    "audParentsP2": "Kalender altijd bij de hand",
+    "audParentsP3": "Geen stortvloed aan meldingen",
+    "audPlayers": "Spelers",
+    "audPlayersP1": "Zie je volgende wedstrijd",
+    "audPlayersP2": "Bevestig je deelname",
+    "audPlayersP3": "Blijf op de hoogte",
+    "feat11Title": "Speler-ontwikkelingsboekje",
+    "feat11Body": "Elke Speler heeft zijn volledige profiel: Aanwezigheidskaart week na week, statistieken (doelpunten, kaarten, gespeelde wedstrijden), Coach-feedback per evenement en AI-seizoensbalans. Ouders hebben directe toegang.",
+    "feat12Title": "Club prikbord & sociale netwerken",
+    "feat12Body": "Instagram-, Facebook- en X-posts van de Club verschijnen automatisch op het Clubero-prikbord. De leden zien alles op één plek, zonder tussen apps te wisselen.",
+    "feat13Title": "Onboarding in enkele minuten",
+    "feat13Body": "Importeer je Spelers, Ouders en Coaches uit je bestaande Excel-bestand. Als de kolommen niet passen, rangschikt en normaliseert de AI alles automatisch vóór de import.",
+    "feat14Title": "Reglement automatisch gegenereerd",
+    "feat14Body": "Elk Toernooi genereert zijn reglement als PDF met één klik, in het Nederlands of Engels, op basis van de configuratie. Klaar om te delen of af te drukken.",
+    "feat15Title": "Multi-sport native",
+    "feat15Body": "Voetbal, basketbal, rugby, handbal, volleybal — één enkele Club kan meerdere sporten beheren met passende statistieken en formaten per discipline.",
+    "badge2": "Het sportplatform dat Clubs, Spelers en Coaches verbindt",
+    "heroLine1": "Je Club.",
+    "heroLine2": "Je ontwikkeling.",
+    "heroLine3": "Je sportieve netwerk.",
+    "heroSub": "Voetbal, basketbal, rugby, handbal — alles wat je Club en je Spelers nodig hebben, op één plek.",
+    "ctaClub": "Club aanmaken",
+    "ctaPlayer": "Spelerprofiel aanmaken",
+    "ctaCoachHint": "Al Coach?",
+    "ctaCoach": "Coachprofiel aanmaken",
+    "ctaExplore": "Profielen ontdekken",
+    "ctaEcosystem": "Word onderdeel van het Clubero-ecosysteem",
+    "ctaEcosystemSub": "Club, Speler of Coach — start gratis.",
+    "previewTitle": "Clubero in actie zien",
+    "previewMock1Title": "Dashboard Coach",
+    "previewMock1Avail": "Beschikbaarheden",
+    "previewMock1Upcoming": "Aankomende evenementen",
+    "previewMock1Cta": "Uitnodiging aanmaken",
+    "previewMock2Title": "Openbaar Spelerprofiel",
+    "previewMock2Season": "Seizoen 2025-26",
+    "previewMock2Badge": "Regionaal kampioen",
+    "previewMock2Follow": "Volgen",
+    "previewMock3Title": "Club prikbord",
+    "previewMock3Pinned": "Vastgepind",
+    "previewMock3Post": "3-1 overwinning tegen AS Montagne — Gefeliciteerd aan de O13!",
+    "previewMock3Ig": "Instagram verbonden",
+    "promise1Title": "Alles om je seizoen te beheren",
+    "promise1Body": "Oproepen, planning, Aanwezigheid, Toernooien, discipline, communicatie — gebundeld op één plek.",
+    "promise1Cta": "Bekijk functies →",
+    "promise2Title": "Je sportieve weg voor altijd",
+    "promise2Body": "Statistieken, successen, tijdlijn, openbaar profiel — je sportgeschiedenis is van jou, zelfs als je van Club wisselt.",
+    "promise2Cta": "Profiel aanmaken →",
+    "promise3Title": "Een profiel dat je vertegenwoordigt",
+    "promise3Body": "Diploma's, ervaringen, spelfilosofie — je Coach-carrière zichtbaar met één enkele link.",
+    "promise3Cta": "Coachprofiel aanmaken →",
+    "ctaFinalTitle": "Klaar om lid te worden van de community?",
+    "ctaFinalSub": "Gratis proefperiode. Geen creditcard nodig. Gegevens gehost in Europa.",
+    "feat16Title": "Beschikbaarheden & afwezigheden",
+    "feat16Body": "Spelers en Ouders melden hun afwezigheden. De Coach ziet de beschikbare Selectie, nog voordat hij de oproep maakt.",
+    "feat17Title": "Discipline & Schorsingen",
+    "feat17Body": "Beheer Schorsingen, volg uitgezeten wedstrijden en ontvang waarschuwingen bij de oproep.",
+    "allChip": "Alles wat Clubero kan",
+    "allTitle": "Eén platform. Alles wat je Club nodig heeft.",
+    "allSub": "Ontdek elke module in detail — klik op een tegel om te zien hoe het werkt.",
+    "allCta": "Bekijk details",
+    "allCtaAll": "Bekijk alle functies",
+    "tile_tournaments_t": "Toernooien & competities",
+    "tile_tournaments_b": "Van de groepsindeling tot de finale, inclusief ticketing en openbare tv-modus.",
+    "tile_convocations_t": "Oproepen & Aanwezigheid",
+    "tile_convocations_b": "In 12 seconden oproepen, antwoorden volgen, automatisch herinneren.",
+    "tile_wall_t": "Club prikbord",
+    "tile_wall_b": "Aankondigingen, foto's, vastgepinde posts. De levensader van de Club, zonder Facebook.",
+    "tile_whatsapp_t": "WhatsApp optioneel",
+    "tile_whatsapp_b": "Alles blijft in Clubero, en met één klik deel je de geformatteerde oproep op WhatsApp.",
+    "tile_player_t": "Speler-dagboek",
+    "tile_player_b": "Statistieken, Aanwezigheid, Coach-feedback, AI-inzichten — een echt voortgangsboekje.",
+    "tile_coach_t": "Coachprofiel",
+    "tile_coach_b": "Diploma's, spelfilosofie, ervaringen — je openbare visitekaartje.",
+    "tile_network_t": "Sportnetwerk",
+    "tile_network_b": "Ontdek Spelers, Coaches en Clubs bij jou in de buurt. De LinkedIn van de amateursport.",
+    "tile_ai_t": "AI Assistent Coach",
+    "tile_ai_b": "Actievoorstellen, wedstrijdoverzichten, seizoensanalyses — de AI ten dienste van de Coach."
+  },
+  "whatsapp": {
+    "chip": "Flexibele communicatie",
+    "title1": "Alles gebeurt in Clubero.",
+    "title2": "WhatsApp blijft een optie.",
+    "body": "Selecties die verdwijnen in de chat, antwoorden die verloren gaan in meldingen en ouders die informatie missen: Clubero bundelt alles op één overzichtelijke plek. En voor iedereen die liever bij WhatsApp blijft, deelt een knop het opgemaakte bericht met één klik in de groep.",
+    "p1Title": "Alles gebundeld in Clubero",
+    "p1Body": "Selecties, aanwezigheidsbevestigingen, herinneringen, statistieken en chat per evenement — één plek, niets gaat verloren.",
+    "p2Title": "WhatsApp als optie, niet als verplichting",
+    "p2Body": "Een ouder of Speler blijft liever bij WhatsApp? Een knop kopieert het opgemaakte bericht, klaar om te delen. Het overzicht houd je in de app.",
+    "p3Title": "E-mail voor telefoon-schuwe mensen",
+    "p3Body": "Selecties kunnen ook via e-mail worden verstuurd. Zo dek je moeiteloos alle kanalen af.",
+    "p4Title": "Geen API, geen nummer om in te stellen",
+    "p4Body": "Het delen via WhatsApp maakt gebruik van de native functie van de telefoon. Niets te installeren aan de kant van de Club.",
+    "cta": "Bekijk demo",
+    "ctaNote": "Alles in de app — WhatsApp en e-mail blijven optioneel",
+    "mockGroup": "O13 — Seizoen 25/26",
+    "mockMembers": "Coach, 14 Spelers, 9 Ouders",
+    "mockChampionship": "Kampioenschap",
+    "mockHome": "Thuis",
+    "mockConvocation": "Selectie: 13:45 uur",
+    "mockSummoned": "Geselecteerden (12)",
+    "mockOthers": "+ 6 anderen",
+    "mockSentVia": "— verzonden via Clubero",
+    "mockSentIn": "In 12 sec. verzonden via Clubero",
+    "mockTracking": "Aanwezigheid bijgehouden"
+  },
+  "ai": {
+    "chip": "Nieuw · AI-assistent",
+    "titlePre": "Een ",
+    "titleHighlight": "assistent",
+    "titlePost": " die jouw Club kent.",
+    "body": "Stel je vragen in het Nederlands. De assistent leest je gegevens in realtime — opstellingen, Aanwezigheid, Spelerstatistieken, volgende evenementen — en antwoordt je direct.",
+    "p1Title": "Verbonden met jouw gegevens",
+    "p1Body": "“Wie ontbreekt er zaterdag?”, “Wat is mijn Aanwezigheid percentage?”, “Mijn volgende wedstrijd?”",
+    "p2Title": "Aangepast aan jouw rol",
+    "p2Body": "Coach, Ouder, Speler of beheerder — de assistent respecteert wat je mag zien.",
+    "p3Title": "Ook op de website",
+    "p3Body": "De widget rechtsonder beantwoordt 24/7 vragen over het product, prijzen en het demo-proces.",
+    "p4Title": "Gehost in Europa",
+    "p4Body": "Je gesprekken worden niet gebruikt om een model te trainen. AVG-conform.",
+    "cta": "Probeer de assistent",
+    "ctaNote": "Inbegrepen in alle abonnementen · Geen installatie",
+    "mockName": "Assistent Clubero",
+    "mockConnected": "verbonden met jouw Club",
+    "mockQ1": "Wie heeft er voor zaterdag nog niet gereageerd?",
+    "mockA1Pre": "Voor ",
+    "mockA1Mid": " zaterdag 14:30, zijn er nog ",
+    "mockA1Post": " antwoorden nodig:",
+    "mockPending": "In afwachting",
+    "mockAskAgain": "Moet ik ze een herinnering sturen?",
+    "mockYes": "Ja, graag 👍",
+    "mockPlaceholder": "Stel je vraag...",
+    "mockContext": "Contextueel"
+  },
+  "clubWall": {
+    "chip": "Club- & Team-prikbord",
+    "titlePre": "Het hele clubleven, ",
+    "titleHighlight": "op één plek",
+    "titlePost": ".",
+    "body": "Het prikbord van de Club en elk Team bundelt aankondigingen, foto's, vermeldingen en leesbevestigingen. Koppel Instagram, Facebook of X: nieuwe Club-posts verschijnen automatisch op het prikbord, zonder overtypen.",
+    "p1Title": "Club-prikbord + Team-prikbord",
+    "p1Body": "Een openbaar gedeelte voor de Club, een privéfeed per Team — iedereen ziet alleen wat relevant is.",
+    "p2Title": "Instagram, Facebook & X geïntegreerd",
+    "p2Body": "Koppel je accounts één keer. Elke nieuwe Club-post verschijnt op het prikbord, met afbeelding en link.",
+    "p3Title": "@Vermeldingen & leesbevestigingen",
+    "p3Body": "Vermeld een Speler, een Ouder of een heel Team. Je ziet wie het gelezen heeft, zonder navraag te doen.",
+    "p4Title": "Foto's, bestanden & vastgezette posts",
+    "p4Body": "Deel wedstrijd foto's, selectie-PDF's of het reglement. Zet belangrijke berichten bovenaan het prikbord vast.",
+    "cta": "Bekijk prikbord in demo",
+    "ctaNote": "Inbegrepen in alle abonnementen",
+    "mockTitle": "Club-prikbord",
+    "mockSubtitle": "FC Clubero · 14 Teams",
+    "mockPostAdminName": "FC Clubero · officieel",
+    "mockPostAdminTime": "Vandaag · 9:12",
+    "mockPostAdminPinned": "Vastgezet",
+    "mockPostAdminBody": "🏆 Gefeliciteerd aan de O13 met de 4:1 overwinning gisteren! Verzamelen zaterdag voor de groepsfinale.",
+    "mockPostAdminStats": "32 ❤ · 12 gelezen · 3 reacties",
+    "mockPostSocialName": "Instagram · @fcclubero",
+    "mockPostSocialTime": "2 uur geleden",
+    "mockPostSocialBody": "Fotoserie van de O11-toernooidag — een grote dank aan de vrijwillige helpers! 📸",
+    "mockPostSocialTag": "Gesynchroniseerd van Instagram",
+    "mockComposerPh": "Schrijf een bericht aan de Club…",
+    "mockBadgeSynced": "Netwerken gekoppeld"
+  },
+  "playerJournal": {
+    "chip": "Spelerjournaal",
+    "titlePre": "Een ",
+    "titleHighlight": "logboek",
+    "titlePost": " voor elke Speler.",
+    "body": "Elke Speler (en zijn Ouders) heeft toegang tot zijn volledige profiel: Aanwezigheid week na week, statistieken per sport, Coach-feedback na elke wedstrijd en AI-balans aan het einde van het seizoen. Alles is privé en respecteert de rollen.",
+    "p1Title": "Aanwezigheids-heatmap",
+    "p1Body": "Zie in één oogopslag de regelmaat van de Speler, week na week, gedurende het hele seizoen.",
+    "p2Title": "Sport-specifieke statistieken",
+    "p2Body": "Doelpunten, assists, kaarten, pogingen, driepunters, reddingen… de relevante statistieken afhankelijk van de sport van het Team.",
+    "p3Title": "Coach-feedback per evenement",
+    "p3Body": "Beoordeling, sterke punten, ontwikkelingsgebieden en sportspecifieke tags — in seconden vastgelegd na elke wedstrijd of training.",
+    "p4Title": "Iteratieve AI-balans",
+    "p4Body": "Genereer met één klik een seizoensoverzicht, een ontwikkelingsrapport of een gespreksvoorbereiding op basis van Coach-feedback en statistieken. Verfijn daarna in dialoog met de AI.",
+    "cta": "Spelersprofiel bekijken",
+    "ctaNote": "Inclusief Ouder-toegang · Privégegevens",
+    "mockName": "Lucas Martin",
+    "mockMeta": "O13 · #10 · Aanvallende middenvelder",
+    "mockTabStats": "Stats",
+    "mockTabAttendance": "Aanwezigheid",
+    "mockTabFeedback": "Feedback",
+    "mockStatGames": "Wedstrijden",
+    "mockStatGoals": "Doelpunten",
+    "mockStatAssists": "Assists",
+    "mockStatRating": "Gem. beoordeling",
+    "mockAttendanceLabel": "Laatste 12 weken",
+    "mockFeedbackCoach": "Coach Marc · Wedstrijd O13 vs. FC Riverside",
+    "mockFeedbackBody": "Zeer goed speloverzicht, twee assists. Te verbeteren: afwerking met de linkervoet.",
+    "mockFeedbackTagStrong": "Visie",
+    "mockFeedbackTagWork": "Afwerking",
+    "mockAiBadge": "AI-samenvatting",
+    "mockAiBody": "Consistent seizoen, duidelijke vooruitgang in de opbouw van het spel. Aanbeveling: afwerkingsoefeningen met de zwakke voet."
+  },
+  "coachAssist": {
+    "chip": "Voor Coaches",
+    "titlePre": "Een copiloot voor ",
+    "titleHighlight": "jouw week",
+    "titlePost": " als coach.",
+    "body": "Clubero combineert een conversatie-AI-assistent met proactieve inzichten die de Coach herinneren aan zijn taken — te versturen opstellingen, ontbrekende follow-ups, vast te leggen feedback. Niets wordt meer vergeten.",
+    "p1Title": "Proactieve inzichten",
+    "p1Body": "“4 Spelers hebben niet gereageerd”, “Geen feedback vastgelegd voor de wedstrijd van zaterdag”, “Selectie onvolledig voor dinsdag” — weergegeven op de startpagina zodra je de app opent.",
+    "p2Title": "Dagelijkse AI-assistent",
+    "p2Body": "“Maak de O13-opstelling voor zaterdag”, “Wie heeft de laatste 3 trainingen gemist?”, “Stuur een bericht naar de groep” — de assistent doet het werk.",
+    "p3Title": "Taken met één klik",
+    "p3Body": "Elke inzicht biedt de directe actie aan: herinneren, evenement aanmaken, notities vastleggen, herinnering sturen.",
+    "p4Title": "Begeleide onboarding",
+    "p4Body": "Een intelligente checklist leidt je in de eerste week door de instelling van je Team — branding, Selectie, eerste evenement.",
+    "cta": "Bekijk de Coach-sectie",
+    "ctaNote": "Inbegrepen in alle abonnementen",
+    "mockTitle": "Hallo Coach Marc 👋",
+    "mockSubtitle": "Hier is jouw week",
+    "mockInsightsLabel": "Vandaag te doen",
+    "mockTask1": "4 Spelers hebben niet gereageerd voor de wedstrijd van zaterdag",
+    "mockTask1Cta": "Herinneren",
+    "mockTask2": "Coach-feedback vastleggen voor de wedstrijd van 18.05.",
+    "mockTask2Cta": "Vastleggen",
+    "mockTask3": "Selectie onvolledig voor de training van dinsdag",
+    "mockTask3Cta": "Aanvullen",
+    "mockAssistantLabel": "Vraag de assistent",
+    "mockAssistantQ": "Maak de O13-opstelling voor zaterdag 14:30 uur",
+    "mockAssistantA": "✅ Opstelling voor 14 Spelers aangemaakt. Verzonden via melding + e-mail."
+  },
+  "pricing": {
+    "badge": "Prijzen",
+    "title": "Gratis beginnen. Eenvoudig groeien.",
+    "subtitle": "30 dagen proberen zonder verplichtingen. Geen creditcard nodig.",
+    "trialBadge": "30 dagen gratis proberen",
+    "trialTitle": "Probeer Clubero zonder enig risico",
+    "trialBody": "Volledige toegang tot alle functies gedurende 30 dagen. Geen creditcard nodig. Op elk moment opzegbaar.",
+    "trialCta": "Start mijn gratis proefperiode",
+    "planName": "CLUBERO",
+    "planSubtitle": "Alles inclusief, voor alle Clubs.",
+    "priceMonthly": "/ maand",
+    "priceYearly": "/ jaar",
+    "yearlyDiscount": "2 maanden gratis",
+    "monthlyAlt": "of",
+    "ctaStart": "Start gratis proefperiode",
+    "popular": "Meest populair",
+    "enterpriseName": "Enterprise",
+    "enterpriseSubtitle": "Voor grote organisaties.",
+    "enterprisePrice": "Op maat",
+    "enterpriseBody": "Individuele prijsstelling op basis van uw behoeften.",
+    "enterpriseCta": "Neem contact op met het verkoopteam",
+    "footer": "Alle aanbiedingen omvatten EU-hosting, AVG-conformiteit en e-mailondersteuning.",
+    "clubFeatures": [
+      "Onbeperkt aantal Teams",
+      "Onbeperkt aantal Spelers",
+      "Wedstrijdbeheer",
+      "Trainingsplanning",
+      "Aanwezigheid bijhouden",
+      "Clubcommunicatie",
+      "Meldingen",
+      "Statistieken",
+      "Evenementen",
+      "Toernooimodule inbegrepen",
+      "Mobiele toegang / PWA",
+      "Coach- en managerrollen"
+    ],
+    "enterpriseFeatures": [
+      "Multi-Clubs, bonden en districten",
+      "Academies en prestatiecentra",
+      "Competities en sportorganisaties",
+      "SSO en geavanceerde beveiliging",
+      "Toegewijde onboarding",
+      "Aangepaste gegevensexport",
+      "SLA en training"
+    ]
+  },
+  "features": {
+    "metaTitle": "Functies — Clubero",
+    "metaDesc": "Selecties, Aanwezigheid, Communicatie, Statistieken. Ontdek alles wat Clubero te bieden heeft aan Clubs, Coaches, Ouders en Spelers.",
+    "kicker": "Functies",
+    "title": "Eén app voor het hele seizoen.",
+    "subtitle": "Van de eerste selectie tot de seizoensanalyse — Clubero dekt alles wat belangrijk is voor amateur sportclubs.",
+    "screenshotsTitle": "App-voorbeeld.",
+    "screenshotsSubtitle": "Een ervaring die is ontworpen voor elke rol, mobile-first.",
+    "shot1Title": "Coach — Aanwezigheidsregistratie",
+    "shot1Body": "Geconsolideerd overzicht van trainingen en wedstrijden, per Speler en periode.",
+    "shot2Title": "Ouder — Selectie",
+    "shot2Body": "Antwoord met één klik, optionele reden, uniforme familiekalender.",
+    "shot3Title": "Club — Dashboard",
+    "shot3Body": "Meerdere Teams, leden, centrale communicatie.",
+    "shot4Title": "Speler — Startpagina",
+    "shot4Body": "Volgende evenement, aanwezigheidsbevestiging, Team-prikbord.",
+    "sportsTitle": "Ondersteunde sporten in V1",
+    "sportsBody": "Resultaat- en Spelerstatistiekenregistratie afgestemd op de sport van elk Team.",
+    "sportsAskPre": "Geïnteresseerd in een andere sport? ",
+    "sportsAskLink": "Laat het ons weten",
+    "rolesTitle": "Ontworpen voor elke rol binnen de Club.",
+    "rolesBody": "Elke gebruiker krijgt een ervaring die is afgestemd op zijn behoeften.",
+    "ctaDemo": "Vraag een demo aan",
+    "ctaPricing": "Bekijk prijzen",
+    "pillars": [
+      {
+        "t": "Selecties en Evenementen",
+        "b": "Maak wedstrijden, trainingen en Toernooien in seconden aan. De selecties bereiken Spelers en Ouders direct."
+      },
+      {
+        "t": "Team en Selectie",
+        "b": "Beheer Spelers, nummers, posities en Ouder-koppelingen. Alles op één kaart."
+      },
+      {
+        "t": "Herinneringen",
+        "b": "Automatische herinneringen zorgen voor openstaande antwoorden, zodat Coaches dat niet hoeven te doen."
+      },
+      {
+        "t": "Coachfeedback per Speler",
+        "b": "Na elke wedstrijd of training: beoordeling, sterke punten, verbeterpunten, sportspecifieke tags."
+      },
+      {
+        "t": "Iteratieve AI-samenvattingen",
+        "b": "Maak met één klik een seizoensanalyse, een ontwikkelingsrapport of een gespreksvoorbereiding."
+      },
+      {
+        "t": "Geïntegreerde AI-Assistent",
+        "b": "Een assistent die verbonden is met je Clubgegevens. Directe antwoorden, rolbewustzijn, EU-hosting."
+      },
+      {
+        "t": "WhatsApp en e-mail optioneel",
+        "b": "Alles wordt beheerd in Clubero. Voor WhatsApp-fans: deel bericht met één klik."
+      },
+      {
+        "t": "Interne communicatie",
+        "b": "Club-prikbord met @vermeldingen, vastgezette berichten, leesbevestigingen en bijlagen."
+      },
+      {
+        "t": "Aanwezigheidsregistratie",
+        "b": "Markeer Aanwezigheid met één klik. Trends per Speler en Team gedurende het hele seizoen."
+      },
+      {
+        "t": "Kant-en-klare Toernooien",
+        "b": "Maak een Toernooi in minuten: Groepen, Knock-outfases, kalender, live standen. Openbare TV-pagina deelbaar."
+      },
+      {
+        "t": "Resultaten en Statistieken per sport",
+        "b": "Registreer resultaten en Spelerstatistieken afgestemd op de sport van elk Team."
+      },
+      {
+        "t": "Wereldwijde zoekfunctie",
+        "b": "Cmd/Ctrl + K om direct naar Speler, Team of evenement te springen."
+      },
+      {
+        "t": "CSV-exports",
+        "b": "Exporteer selectie of Aanwezigheidslijst met één klik — klaar voor Excel."
+      },
+      {
+        "t": "Prullenbak 7 dagen",
+        "b": "Per ongeluk verwijderd? Herstel berichten, evenementen en Spelers gedurende 7 dagen."
+      },
+      {
+        "t": "Rollen en rechten",
+        "b": "Admin, Coach, Assistent-coach, Manager, Speler, Ouder — elke rol ziet alleen wat relevant is."
+      },
+      {
+        "t": "Speler-notitieboekje",
+        "b": "Elke Speler heeft zijn volledige profiel: Aanwezigheidskaart, Statistieken, Coachfeedback, AI-samenvatting."
+      },
+      {
+        "t": "Club-prikbord en Social Media",
+        "b": "Instagram-, Facebook- en X-posts van de Club verschijnen automatisch op het Clubero-prikbord."
+      },
+      {
+        "t": "Installatie in minuten",
+        "b": "Importeer Spelers, Ouders en Coaches uit je Excel-tabel. AI mapt en normaliseert automatisch."
+      },
+      {
+        "t": "Automatisch gegenereerd officieel reglement",
+        "b": "Elk Toernooi genereert zijn PDF-reglement met één klik vanuit de configuratie."
+      },
+      {
+        "t": "Multi-sport native",
+        "b": "Voetbal, basketbal, rugby, handbal, volleybal — een Club kan meerdere sporten beheren."
+      },
+      {
+        "t": "Spelergeschiedenis",
+        "b": "Seizoenen, prestaties en tijdlijn automatisch: elke wedstrijd, goal en beker verrijkt de geschiedenis."
+      },
+      {
+        "t": "Schorsingen en straffen",
+        "b": "Houd kaarten, Schorsingen en uitgezeten wedstrijden bij. Waarschuwingen voor elke selectie."
+      },
+      {
+        "t": "Openbaar Spelerprofiel",
+        "b": "Deelbare link voor volwassenen: prestaties, seizoenen en tijdlijn openbaar zichtbaar (opt-in)."
+      }
+    ],
+    "audiences": [
+      {
+        "t": "Voor Clubs",
+        "p": [
+          "Multi-Team-dashboard",
+          "Ledenlijst en rolbeheer",
+          "Wereldwijde zoekfunctie (Cmd + K) over de hele Club",
+          "CSV-exports (selectie, Aanwezigheid) klaar voor Excel",
+          "Centraal communicatiekanaal",
+          "AVG-conform, Europese hosting"
+        ]
+      },
+      {
+        "t": "Voor Coaches",
+        "p": [
+          "Uitnodiging in minder dan een minuut klaar",
+          "Aanwezigheidsantwoorden in realtime",
+          "Registratie van Spelerresultaten met sport-specifieke Spelerstatistieken",
+          "Individuele feedback per Speler (beoordeling, sterke punten, ontwikkelingsgebieden, sport-specifieke tags)",
+          "AI-samenvattingen balans / gesprek / ontwikkeling, verfijnbaar in dialoog met de AI",
+          "Evenement-chat met Spelers en Ouders",
+          "@vermeldingen en leesbevestigingen op het prikbord",
+          "Beheer van wisselspelers en toewijzing van nummers"
+        ]
+      },
+      {
+        "t": "Voor Ouders",
+        "p": [
+          "Eén klik om te bevestigen of te weigeren",
+          "Familiekalender met alle evenementen van je kinderen",
+          "Ontvang selecties in de Clubero-app, via e-mail of via WhatsApp — precies zoals je Club het verkiest",
+          "Directe berichten met de Coach",
+          "Autorisatiebeheer voor minderjarigen"
+        ]
+      },
+      {
+        "t": "Voor Spelers",
+        "p": [
+          "Zie je volgende wedstrijd in één oogopslag",
+          "Snelle Aanwezigheidsbevestiging",
+          "Team-chat zonder ruis",
+          "Persoonlijke Aanwezigheidsgeschiedenis",
+          "Profiel, foto en Statistieken"
+        ]
+      }
+    ]
+  },
+  "faq": {
+    "metaTitle": "FAQ — Clubero",
+    "metaDesc": "Antwoorden op veelgestelde vragen over Clubero — prijzen, instellen, AVG, ouderlijk toezicht en meer.",
+    "kicker": "FAQ",
+    "title": "Veelgestelde vragen",
+    "subtitle": "Geen antwoord gevonden? Neem contact met ons op, we helpen je graag.",
+    "ctaContact": "Contact opnemen",
+    "ctaDemo": "Demo aanvragen",
+    "items": [
+      {
+        "q": "Voor wie is Clubero bedoeld?",
+        "a": "Clubero is ontworpen voor amateur sportclubs. Coaches, officials, ouders en Spelers hebben elk een aangepaste ervaring."
+      },
+      {
+        "q": "Welke sporten worden ondersteund?",
+        "a": "In V1 ondersteunt Clubero 8 teamsporten: voetbal, zaalvoetbal, basketbal, rugby, handbal, volleybal, ijshockey en hockey."
+      },
+      {
+        "q": "Is er een gratis aanbod?",
+        "a": "Ja. We bieden een gratis proefperiode van 30 dagen zonder creditcard."
+      },
+      {
+        "q": "Hoe lang duurt het om een Club in te stellen?",
+        "a": "De meeste Clubs zijn binnen een uur operationeel."
+      },
+      {
+        "q": "Hoe gaan jullie om met minderjarigen en ouderlijke toestemming?",
+        "a": "Spelers onder de 18 kunnen worden gekoppeld aan één of meerdere Ouder-accounts. Standaard controleren de Ouders de antwoorden."
+      },
+      {
+        "q": "Waar worden de gegevens opgeslagen?",
+        "a": "Alle Clubgegevens worden gehost op Europese infrastructuur en Clubero voldoet aan de AVG."
+      },
+      {
+        "q": "Kan ik mijn bestaande Selectie importeren?",
+        "a": "Ja. We beheren de CSV-import tijdens het onboardingproces."
+      },
+      {
+        "q": "Werkt Clubero op mobiel?",
+        "a": "Clubero is Mobile-first. Het werkt in elke moderne browser en kan als PWA worden geïnstalleerd."
+      },
+      {
+        "q": "Hoe krijg ik hulp?",
+        "a": "E-mailondersteuning is inbegrepen bij alle abonnementen."
+      }
+    ]
+  },
+  "contact": {
+    "metaTitle": "Contact — Clubero",
+    "metaDesc": "Neem contact op met het Clubero-team: productvragen, demo, partnerschappen of ondersteuning voor je sportclub. We antwoorden binnen 24 uur.",
+    "kicker": "Contact",
+    "title": "Laten we praten.",
+    "subtitlePre": "Vraag, samenwerking of gewoon nieuwsgierig? Schrijf ons — we antwoorden binnen ",
+    "subtitleStrong": "48 werkuren",
+    "subtitlePost": ".",
+    "emailLabel": "E-mail",
+    "whereLabel": "Waar",
+    "whereBody": "Ontworpen voor Europese amateurclubs.",
+    "firstName": "Voornaam",
+    "firstNamePh": "Je voornaam",
+    "lastName": "Achternaam",
+    "lastNamePh": "Je achternaam",
+    "email": "E-mail",
+    "emailPh": "jij@club.nl",
+    "phone": "Telefoon",
+    "phonePh": "+31 6 12 34 56 78",
+    "role": "Je rol",
+    "rolePh": "Kies een rol",
+    "club": "Club",
+    "clubPh": "AS Riverside",
+    "message": "Bericht",
+    "messagePh": "Hoe kunnen we helpen?",
+    "submit": "Verstuur bericht",
+    "submitting": "Verzenden…",
+    "submitted": "Bericht verzonden ✓",
+    "successToast": "Bericht verzonden. We nemen binnen 48 werkuren contact met je op.",
+    "errorToast": "Verzenden mislukt. Probeer het opnieuw of stuur een e-mail naar hello@clubero.app.",
+    "roles": [
+      "Voorzitter",
+      "Bestuurslid",
+      "Coach",
+      "Technisch directeur",
+      "Ouder",
+      "Speler",
+      "Anders"
+    ]
+  },
+  "demo": {
+    "metaTitle": "Demo aanvragen — Clubero",
+    "metaDesc": "Boek een demo van 15 minuten van Clubero. We helpen je met het instellen van je eerste Team.",
+    "kicker": "Demo",
+    "title": "Zie Clubero in actie.",
+    "subtitlePre": "Vertel ons kort iets over je Club — we nemen binnen",
+    "subtitleStrong": " 48 werkuren",
+    "subtitlePost": " contact met je op om een demo te plannen.",
+    "perks": [
+      "Gepersonaliseerde demo van 15 minuten",
+      "We helpen je met het instellen van je eerste Team",
+      "Gratis proefperiode, geen creditcard nodig",
+      "Hulp bij de migratie van je huidige tool"
+    ],
+    "clubName": "Clubnaam",
+    "clubNamePh": "AS Riverside",
+    "firstName": "Voornaam",
+    "firstNamePh": "Je voornaam",
+    "lastName": "Achternaam",
+    "lastNamePh": "Je achternaam",
+    "email": "E-mail",
+    "emailPh": "jij@club.nl",
+    "phone": "Telefoon",
+    "phonePh": "+31 6 12 34 56 78",
+    "role": "Je rol",
+    "rolePh": "Kies een rol",
+    "teams": "Aantal Teams",
+    "teamsPh": "bijv.: 6",
+    "notes": "Iets wat we moeten weten?",
+    "notesPh": "Huidige tool, belangrijkste probleem…",
+    "submit": "Demo aanvragen",
+    "submitting": "Verzenden…",
+    "submitted": "Aanvraag verzonden ✓",
+    "rgpd": "Wij delen je gegevens nooit. AVG-conform.",
+    "successToast": "Aanvraag verzonden. We nemen binnen 48 werkuren contact met je op.",
+    "errorToast": "Verzenden mislukt. Stuur een e-mail naar hello@clubero.app.",
+    "roles": [
+      "Voorzitter",
+      "Bestuurslid",
+      "Coach",
+      "Technisch directeur",
+      "Ouder",
+      "Speler",
+      "Overig"
+    ]
+  },
+  "tournaments": {
+    "home": {
+      "badge": "Nieuw · Toernooimodule",
+      "titlePre": "Organiseer een ",
+      "titleHighlight": "Toernooi",
+      "titlePost": " in enkele minuten.",
+      "subtitle": "Groepen, knock-outschema's, speelschema, velden, real-time standen en online inschrijving — alles inbegrepen. Deel een openbare link of een tv-scherm om de resultaten live in de zaal te volgen.",
+      "feat1Title": "Groepen + automatische knock-outschema's",
+      "feat1Body": "Loting, speelschema over meerdere velden en automatisch berekende kwalificaties.",
+      "feat2Title": "Live Standen",
+      "feat2Body": "Resultaten worden in real-time bijgewerkt. Toeschouwers en Teams volgen alles via hun mobiel.",
+      "feat3Title": "Online inschrijvingen & betalingen",
+      "feat3Body": "Openbare inschrijvingspagina, goedkeuring door de organisator, Team-limiet, Speler-selectie en incasso via Stripe Connect.",
+      "feat4Title": "TV-modus volledig scherm",
+      "feat4Body": "Eigen link om te projecteren op een groot scherm — lopende wedstrijden, volgende wedstrijden en doorlopende Standen.",
+      "feat5Title": "AI-gegenereerd officieel reglement",
+      "feat5Body": "Op basis van je configuratie (formaat, punten, tie-breakers, speelduur) genereert Clubero het complete reglement als PDF in het Nederlands of Engels. Klaar om te ondertekenen, te delen of af te drukken.",
+      "feat6Title": "Staf, Scheidsrechters & Sponsoren",
+      "feat6Body": "Nodig medewerkers en Scheidsrechters uit, beheer de Officials en ontwerp de openbare pagina met je sponsoren en partners.",
+      "ctaStart": "Start Toernooi",
+      "ctaFeatures": "Bekijk alle functies",
+      "mockTournament": "Paastoernooi O13",
+      "mockPhase": "Groepsfase · Groep A",
+      "mockLive": "Live",
+      "mockOngoing": "Lopende wedstrijd · Veld 2",
+      "mockTvAvailable": "TV-modus beschikbaar",
+      "mockTeamsRegistered": "Aangemelde Teams"
+    },
+    "pricing": {
+      "title": "Toernooien",
+      "subtitle": "Voor organisatoren zonder Clubero-Club.",
+      "per": "/ Toernooi",
+      "info": "Betaling per evenement. Geen abonnement, toegang tot de Clubero Toernooien-module voor één Toernooi.",
+      "cta": "Start Toernooi",
+      "feat1": "Onbeperkt aantal Toernooien",
+      "feat2": "Groepsfasen & Knock-outfase",
+      "feat3": "Openbare pagina's & TV-modus",
+      "feat4": "QR-code delen",
+      "feat5": "Externe Teams toegestaan",
+      "feat6": "Real-time Standen"
+    },
+    "start": {
+      "metaTitle": "Start een Toernooi — Clubero",
+      "metaDesc": "Maak je Clubero-account aan en start je Toernooi in enkele minuten. Betaal per evenement, zonder abonnement.",
+      "heading": "Start Toernooi",
+      "subheading": "Meld je aan of maak je account aan in enkele seconden. Geen abonnement nodig — je betaalt per evenement.",
+      "tabSignup": "Account aanmaken",
+      "tabLogin": "Ik heb al een account",
+      "termsPre": "Door verder te gaan, accepteer je onze ",
+      "terms": "Algemene voorwaarden",
+      "termsMid": " en ons ",
+      "privacy": "Privacybeleid",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mail",
+      "password": "Wachtwoord",
+      "passwordHelp": "Min. 8 tekens, 1 hoofdletter, 1 kleine letter, 1 cijfer.",
+      "passwordError": "Het wachtwoord moet 8 tekens bevatten, met hoofdletter, kleine letter en cijfer.",
+      "signupCta": "Account aanmaken en verdergaan",
+      "accountCreated": "Account aangemaakt",
+      "checkEmail": "Controleer je e-mails om je account te bevestigen.",
+      "loginCta": "Aanmelden en verdergaan",
+      "invalidCreds": "E-mail of wachtwoord onjuist",
+      "forgotPassword": "Wachtwoord vergeten?",
+      "expiredTitle": "Bevestigingslink verlopen",
+      "expiredBody": "Je e-mailbevestigingslink is niet meer geldig. Voer je e-mailadres in om een nieuwe link te ontvangen.",
+      "resendCta": "Opnieuw verzenden",
+      "resendSent": "Bevestigings-e-mail opnieuw verzonden. Controleer je inbox."
+    }
+  },
+  "onboarding": {
+    "kicker": "Installatie",
+    "title": "Overstappen naar Clubero — heel eenvoudig.",
+    "subtitle": "Wij helpen je om je Club, je Teams en je gegevens binnen enkele dagen te migreren.",
+    "ctaDemo": "Demo aanvragen",
+    "ctaContact": "Contact opnemen",
+    "reassure1": "Geen creditcard nodig",
+    "reassure2": "Persoonlijke begeleiding",
+    "reassure3": "Gegevens gehost in Europa",
+    "importTitle": "Wat we voor je kunnen importeren.",
+    "importSubtitle": "Breng mee wat je hebt — bestanden, tabellen, lijsten. Wij regelen de rest.",
+    "imports": [
+      {
+        "t": "Teams",
+        "b": "Al je Teams, categorieën en seizoenen."
+      },
+      {
+        "t": "Spelers",
+        "b": "Selectie, nummers, posities, foto's."
+      },
+      {
+        "t": "Ouders",
+        "b": "Contactgegevens van Ouders en koppelingen met hun kinderen."
+      },
+      {
+        "t": "Coaches & staf",
+        "b": "Coaches, managers en rollen."
+      },
+      {
+        "t": "Speelschema's",
+        "b": "Wedstrijd- en trainingsschema's."
+      },
+      {
+        "t": "Bestaande Toernooien",
+        "b": "Aangemelde Teams, groepen en resultaten."
+      },
+      {
+        "t": "Excel-/CSV-bestanden",
+        "b": "Vereenvoudigde import vanuit je tabellen."
+      },
+      {
+        "t": "Foto's & logo's",
+        "b": "Clublogo, Team- en Spelerfoto's."
+      }
+    ],
+    "howTitle": "Zo werkt het.",
+    "howSubtitle": "Een traject in 4 duidelijke en eenvoudige stappen.",
+    "steps": [
+      {
+        "t": "Je stuurt ons je gegevens",
+        "b": "Tabellen, lijsten of exports — in het formaat dat je hebt."
+      },
+      {
+        "t": "Wij bereiden de import voor",
+        "b": "Opschonen, structureren en controleren, samen met jou."
+      },
+      {
+        "t": "Wij richten je Club in",
+        "b": "Teams, rollen, branding en aangepaste instellingen."
+      },
+      {
+        "t": "Je Club is klaar om te starten",
+        "b": "We trainen je Coaches en jullie zijn klaar voor gebruik."
+      }
+    ],
+    "humanTitle": "Je bent niet alleen.",
+    "humanSubtitle": "Wij begeleiden je gedurende de hele installatie.",
+    "humanPoints": [
+      {
+        "t": "Begeleiding bij onboarding",
+        "b": "Een vast contactpersoon tijdens de installatie van je Club."
+      },
+      {
+        "t": "Migratiehulp",
+        "b": "Wij halen je bestaande gegevens op en integreren ze netjes."
+      },
+      {
+        "t": "Ondersteuning bij de installatie",
+        "b": "Instellingen, rollen, branding, e-mailsjablonen — wij regelen alles samen met jou."
+      },
+      {
+        "t": "Responsieve ondersteuning",
+        "b": "Een team dat snel bereikbaar is via e-mail, in het Nederlands."
+      }
+    ],
+    "faqTitle": "Veelgestelde vragen over de installatie",
+    "faq": [
+      {
+        "q": "Moet alles handmatig opnieuw worden aangemaakt?",
+        "a": "Nee. We kunnen een groot deel van je gegevens importeren — Teams, Spelers, Ouders, speelschema's — vanuit je bestaande tabellen of exports."
+      },
+      {
+        "q": "Hoe lang duurt de migratie?",
+        "a": "De meeste Clubs zijn binnen enkele dagen klaar voor gebruik. De duur hangt af van het datavolume en je beschikbaarheid om deze samen met ons te controleren."
+      },
+      {
+        "q": "Is een specifieke IT-tool vereist?",
+        "a": "Nee. Een eenvoudige browser is voldoende. Clubero werkt op computer, tablet en mobiel (PWA iOS / Android)."
+      },
+      {
+        "q": "Wat als onze gegevens in meerdere bestanden staan?",
+        "a": "Geen probleem. Wij consolideren en structureren alles voor je vóór de import."
+      },
+      {
+        "q": "Kunnen we midden in het seizoen starten?",
+        "a": "Ja. We passen de import aan je kalender aan en bewaren desgewenst je wedstrijd- en evenementengeschiedenis."
+      },
+      {
+        "q": "Wat gebeurt er na de installatie?",
+        "a": "Een e-mailondersteuning blijft beschikbaar. We blijven bereikbaar voor aanpassingen, verdere trainingen en nieuwe Teams."
+      }
+    ],
+    "ctaTitle": "Klaar voor de stap?",
+    "ctaBody": "Laten we praten over je Club. We laten je Clubero zien en bereiden samen de migratie voor.",
+    "ctaPrimary": "Demo aanvragen",
+    "ctaSecondary": "Contact opnemen"
+  },
+  "tournamentsPage": {
+    "kicker": "Toernooien",
+    "title": "Moderne, dynamische en openbare Toernooien.",
+    "subtitle": "Organiseer je Toernooien met live scores, openbare standen, mobiele Scheidsrechter-functionaliteit en een community-ervaring.",
+    "ctaPrimary": "Toernooi aanmaken",
+    "ctaSecondary": "Bekijk demo",
+    "heroBadge": "Live · en direct",
+    "heroMatch": "Kwartfinale · Veld 2",
+    "heroTeamA": "AS Riverside",
+    "heroTeamB": "FC Lakeside",
+    "heroStandings": "Stand Groep A",
+    "heroBracket": "Eindschema",
+    "heroTv": "TV-modus",
+    "everythingTitle": "Alles voor je Toernooien, op één plek.",
+    "everythingSubtitle": "Een compleet ecosysteem, ontworpen voor zowel het veld als de schermen.",
+    "ecosystem": [
+      {
+        "t": "Teams",
+        "b": "Inschrijvingen, selecties, contacten."
+      },
+      {
+        "t": "Groepen",
+        "b": "Automatische loting en samenstelling."
+      },
+      {
+        "t": "Wedstrijden",
+        "b": "Planning en real-time volgen."
+      },
+      {
+        "t": "Standen",
+        "b": "Automatisch berekend, in real-time."
+      },
+      {
+        "t": "Speelschema's",
+        "b": "Meerdere velden, meerdere dagen."
+      },
+      {
+        "t": "Scheidsrechters",
+        "b": "Bevestiging van scores op mobiel."
+      },
+      {
+        "t": "Openbare pagina's",
+        "b": "Deelbare link voor iedereen."
+      },
+      {
+        "t": "TV-modus",
+        "b": "Volledig scherm weergave in de hal."
+      },
+      {
+        "t": "Live scores",
+        "b": "Directe updates overal."
+      }
+    ],
+    "liveTitle": "Gemaakt om het Toernooi live te beleven.",
+    "liveSubtitle": "Je Scheidsrechters en organisatoren behouden de controle, zonder het veld te verlaten.",
+    "livePoints": [
+      {
+        "t": "Scores vanaf het veld",
+        "b": "Voer de scores direct in vanaf je telefoon."
+      },
+      {
+        "t": "Scheidsrechter-goedkeuring",
+        "b": "De Scheidsrechters bevestigen de scores live op hun mobiel."
+      },
+      {
+        "t": "Directe updates",
+        "b": "Standen en Toernooi-schema's worden direct bijgewerkt."
+      },
+      {
+        "t": "Veldbeheer",
+        "b": "Wijs je velden toe en herorden ze in seconden."
+      },
+      {
+        "t": "Automatische planning",
+        "b": "Speelschema geoptimaliseerd volgens jouw voorkeuren."
+      },
+      {
+        "t": "Conflicthantering",
+        "b": "Duidelijke, traceerbare geschiedenis van elke beslissing."
+      },
+      {
+        "t": "QR-code toegang",
+        "b": "Een QR-code om te scannen om de openbare pagina te openen."
+      }
+    ],
+    "publicTitle": "Een openbare, gedeelde ervaring.",
+    "publicSubtitle": "Ouders, Spelers en fans volgen het Toernooi live, overal.",
+    "publicPoints": [
+      {
+        "t": "Openbare Standen",
+        "b": "Altijd actueel, bereikbaar via een link."
+      },
+      {
+        "t": "Wedstrijdpagina's",
+        "b": "Opstelling, score, belangrijke gebeurtenissen."
+      },
+      {
+        "t": "Laatste resultaten",
+        "b": "Real-time feed van de afgeronde wedstrijden."
+      },
+      {
+        "t": "Teampagina's",
+        "b": "Speelschema, Stand, Toernooi-verloop."
+      },
+      {
+        "t": "Mobile first",
+        "b": "Ontworpen om vanaf de tribune te bekijken."
+      },
+      {
+        "t": "Eenvoudig delen",
+        "b": "Link, QR-code, netwerken — één klik volstaat."
+      }
+    ],
+    "tvTitle": "TV-modus & centraal scherm.",
+    "tvSubtitle": "Toon het Toernooi op groot formaat, in de hal, in het Clubhuis of langs het veld.",
+    "tvPoints": [
+      "Live Standen op het scherm",
+      "Programma van de volgende wedstrijden",
+      "Lopende wedstrijden, veld voor veld",
+      "Volledig scherm zonder installatie"
+    ],
+    "tvBadge": "Volledig scherm",
+    "tvCurrent": "Lopende wedstrijd",
+    "tvNext": "Binnenkort",
+    "formatsTitle": "Alle Toernooi-formaten.",
+    "formatsSubtitle": "Pas Clubero aan jouw competitie aan, niet andersom.",
+    "formats": [
+      {
+        "t": "Groepsfase",
+        "b": "Met automatische kwalificaties."
+      },
+      {
+        "t": "Knock-outfase",
+        "b": "Toernooi-schema's met 4, 8, 16, 32 Teams."
+      },
+      {
+        "t": "Round Robin",
+        "b": "Alle Teams spelen tegen elkaar."
+      },
+      {
+        "t": "Liga / Kampioenschap",
+        "b": "Over een heel seizoen."
+      },
+      {
+        "t": "Play-offs",
+        "b": "Finalerondes na een regulier seizoen."
+      }
+    ],
+    "formatsExtras": [
+      "Automatische planning",
+      "Veldtoewijzing",
+      "Beheer van kwalificaties"
+    ],
+    "mobileTitle": "Mobile first, direct op het veld.",
+    "mobileSubtitle": "Gemaakt om met één hand te bedienen, tussen twee wedstrijden door.",
+    "mobilePoints": [
+      {
+        "t": "Scheidsrechter-invoer",
+        "b": "Grote knoppen, weinig klikken, snelle validatie."
+      },
+      {
+        "t": "Organisatoren ter plaatse",
+        "b": "Alle belangrijke acties binnen handbereik."
+      },
+      {
+        "t": "Touchscreen-interface",
+        "b": "Ook bij zon goed leesbaar, mobiel geoptimaliseerd."
+      },
+      {
+        "t": "Snelle acties",
+        "b": "Verplaatsen, aanpassen, corrigeren in enkele seconden."
+      },
+      {
+        "t": "Live-updates",
+        "b": "Veld en publiek blijven synchroon."
+      }
+    ],
+    "pricingTitle": "Een eenvoudige prijsstelling.",
+    "pricingSubtitle": "Kies wat bij jouw evenement past.",
+    "pricing": [
+      {
+        "name": "Toernooi",
+        "price": "€ 40",
+        "per": "per Toernooi",
+        "desc": "Organisatie van een eenmalig Toernooi.",
+        "cta": "Toernooi aanmaken"
+      },
+      {
+        "name": "Liga / Kampioenschap",
+        "price": "€ 199",
+        "per": "per seizoen",
+        "desc": "Compleet beheer van een seizoen.",
+        "cta": "Neem contact op"
+      },
+      {
+        "name": "Clubero Club",
+        "price": "€ 49",
+        "per": "/ maand",
+        "desc": "Onbeperkte Toernooien inbegrepen.",
+        "cta": "Bekijk Clubero Club",
+        "highlight": true
+      }
+    ],
+    "pricingNote": "Onbeperkte Toernooien inbegrepen met Clubero Club.",
+    "finalTitle": "Klaar om je Toernooien te moderniseren?",
+    "finalBody": "Start binnen enkele minuten een Toernooi of ervaar Clubero in actie met ons Team.",
+    "finalPrimary": "Toernooi aanmaken",
+    "finalSecondary": "Demo aanvragen",
+    "faqTitle": "Veelgestelde vragen over Toernooien",
+    "faq": [
+      {
+        "q": "Kunnen externe Teams deelnemen?",
+        "a": "Ja. Teams die Clubero niet dagelijks gebruiken, kunnen zich via de openbare pagina aanmelden en worden beheerd als interne Teams."
+      },
+      {
+        "q": "Werkt het met beperkte verbinding op het veld?",
+        "a": "De mobiele Scheidsrechter-interface is lichtgewicht en werkt via 3G/4G. De resultaten synchroniseren zodra de verbinding terug is."
+      },
+      {
+        "q": "Kan het speelschema tijdens het Toernooi worden gewijzigd?",
+        "a": "Absoluut. Je kunt in seconden opnieuw plannen, van veld wisselen of tijden aanpassen. De openbare pagina en de TV-modus worden direct bijgewerkt."
+      },
+      {
+        "q": "Is er een limiet aan het aantal Teams?",
+        "a": "Geen harde limiet. Clubero beheert Toernooien van 4 tot meer dan 100 Teams met automatische planning."
+      },
+      {
+        "q": "Kunnen toeschouwers zonder account volgen?",
+        "a": "Ja. De openbare pagina is voor iedereen toegankelijk via een link of QR-code — geen aanmelding vereist."
+      },
+      {
+        "q": "Hoe werkt de TV-modus?",
+        "a": "Open de eigen TV-link op elk scherm (Smart-TV, beamer, computer). Het toont live Standen, de volgende wedstrijden en de lopende resultaten op volledig scherm — nul installatie."
+      }
+    ]
+  },
+  "players": {
+    "sectionChip": "Voor Spelers",
+    "sectionTitle": "Jouw carrière is van jou",
+    "sectionSub": "Creëer je sportprofiel, zelfs zonder Club.",
+    "p1Title": "Openbaar Spelerprofiel",
+    "p1Body": "Elke Speler kan een openbare pagina aanmaken met zijn statistieken, prestaties en tijdlijn.",
+    "p2Title": "Levenslang Spelerpad",
+    "p2Body": "Clubs, seizoenen, doelpunten, onderscheidingen — je sportgeschiedenis blijft bij jou, zelfs als je van Club wisselt.",
+    "p3Title": "Clubonafhankelijk",
+    "p3Body": "Creëer je profiel zonder uitnodiging. Word lid van een Club wanneer je maar wilt.",
+    "p4Title": "Zichtbaarheid voor Scouts",
+    "p4Body": "Bereid je profiel voor om geleidelijk zichtbaar te worden voor Clubs en amateur-scouts."
+  },
+  "coachProfile": {
+    "sectionChip": "Voor Coaches",
+    "sectionTitle": "Laat je coachingspad zien",
+    "sectionSub": "Een openbaar profiel voor je diploma's, ervaringen en spelvisie.",
+    "p1Title": "Openbaar Coachprofiel",
+    "p1Body": "UEFA-licenties, clubcarrière, spelvisie — alles op één pagina, toegankelijk zonder account.",
+    "p2Title": "Diploma's en certificaten",
+    "p2Body": "UEFA C, B, A, voetbalcoach — toon je kwalificaties en de uitgevende instantie.",
+    "p3Title": "Clubhistorie",
+    "p3Body": "Breng je carrière in kaart, club per club, seizoen per seizoen.",
+    "p4Title": "Open voor nieuwe kansen?",
+    "p4Body": "Geef je beschikbaarheid aan en word zichtbaar voor bestuurders die een Coach zoeken."
+  },
+  "network": {
+    "sectionChip": "Sportnetwerk",
+    "sectionTitle": "Het netwerk van de amateursport",
+    "sectionSub": "Volg Spelers, Coaches en Clubs. Blijf op de hoogte van hun sportnieuws.",
+    "p1Title": "Volg een Speler of Coach",
+    "p1Body": "Abonneer je op een openbaar profiel en volg hun nieuws: nieuwe Club, successen, mijlpalen.",
+    "p2Title": "Openbaar zoeken",
+    "p2Body": "Ontdek stap voor stap de openbare profielen van Spelers en Coaches op Clubero, gefilterd op sport, Club of regio.",
+    "p3Title": "Profielen verrijkt door Clubs",
+    "p3Body": "Profielen kunnen door Clubero-Clubs worden verrijkt en aangevuld — statistieken, successen, seizoenhistorie."
+  }
+}
