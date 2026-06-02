@@ -76,12 +76,20 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       const email = u?.user?.email;
       if (!email) continue;
 
-      const lang = ((p as any).preferred_language ?? "en").toLowerCase();
-      const locale: "fr" | "en" = lang.startsWith("fr") ? "fr" : "en";
+      const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
+      const resolveLocale = (...c: Array<string | null | undefined>) => {
+        for (const x of c) {
+          const v = (x ?? "").toLowerCase().slice(0, 2);
+          if (SUPPORTED.has(v)) return v;
+        }
+        return "fr";
+      };
+      const locale = resolveLocale((p as any).preferred_language, clubDefaultLang);
+      const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
 
       const startsAt = ev.starts_at ? new Date(ev.starts_at) : null;
       const eventDate = startsAt
-        ? startsAt.toLocaleDateString(locale === "fr" ? "fr-FR" : "en-GB", {
+        ? startsAt.toLocaleDateString(bcp, {
             weekday: "long",
             day: "numeric",
             month: "long",
