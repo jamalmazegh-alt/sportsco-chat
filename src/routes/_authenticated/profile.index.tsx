@@ -256,10 +256,15 @@ function ProfilePage() {
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
-          <div role="radiogroup" className="grid grid-cols-2 gap-2">
+          <div role="radiogroup" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {([
               { value: "fr", label: "Français", flag: "🇫🇷" },
               { value: "en", label: "English", flag: "🇬🇧" },
+              { value: "de", label: "Deutsch", flag: "🇩🇪" },
+              { value: "es", label: "Español", flag: "🇪🇸" },
+              { value: "pt", label: "Português", flag: "🇵🇹" },
+              { value: "it", label: "Italiano", flag: "🇮🇹" },
+              { value: "nl", label: "Nederlands", flag: "🇳🇱" },
             ] as const).map((opt) => {
               const current = i18n.language?.slice(0, 2) ?? "fr";
               const active = current === opt.value;
