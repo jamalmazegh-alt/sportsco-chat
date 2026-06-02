@@ -33,7 +33,7 @@
     "metaDesc": "Volg {{name}} live: Teams, speelschema, uitslagen en standen{{locationSuffix}}.",
     "metaDescFallback": "Volg dit toernooi live: Teams, speelschema, uitslagen en standen.",
     "unavailableTitle": "Toernooi niet beschikbaar",
-    "unavailableBody": "Dit toernooi is nog niet gepubliceerd of de link is verlopen.",
+    "unavailableBody": "Dit toernooi is nog niet gepubliceerd of de link is verlopen. Als je de organisator bent, open je toernooi en klik op <1>Publiceren</1>.",
     "backHome": "Terug naar de startpagina",
     "register": "Aanmelden",
     "tvSlideshow": "TV-presentatie",
