@@ -155,17 +155,20 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
             const respondUrl = `${baseUrl}/r/${conv.response_token}`;
 
-            const recipients: { email: string; firstName?: string }[] = [];
+            const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
             if (player.email) {
-              recipients.push({ email: player.email, firstName: player.first_name ?? undefined });
+              recipients.push({ email: player.email, firstName: player.first_name ?? undefined, userId: player.user_id ?? null });
             }
             for (const pp of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
               if (!pp.email) continue;
               const first = (pp.full_name ?? "").split(" ")[0] || undefined;
-              recipients.push({ email: pp.email, firstName: first });
+              recipients.push({ email: pp.email, firstName: first, userId: pp.parent_user_id ?? null });
             }
 
             for (const r of recipients) {
+              const recipientLang = r.userId ? langByUser.get(r.userId) : undefined;
+              const locale = resolveLocale(recipientLang, clubLang);
+              const eventDateLabel = fmtDate(ev.starts_at, locale);
               try {
                 await enqueueTransactionalEmailServer({
                   templateName: "convocation-invite",
@@ -179,7 +182,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     eventDate: eventDateLabel,
                     eventDescription: ev.description ?? undefined,
                     convocationTime: ev.convocation_time
-                      ? frDate(ev.convocation_time)
+                      ? fmtDate(ev.convocation_time, locale)
                       : undefined,
                     eventLocation: ev.location ?? undefined,
                     locationMapsUrl,
@@ -194,7 +197,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     isReminder: true,
                     reminderHoursBefore: milestone,
                     lineup: lineupEmail,
-                    locale: "fr",
+                    locale,
                   },
 
                 });
