@@ -74,11 +74,8 @@ export function MarketingHeader() {
 
         <div className="hidden items-center gap-3 md:flex">
           {/* Language switch */}
-          <div role="radiogroup" className="flex items-center gap-1 rounded-lg border border-border p-1">
-            {([
-              { value: "fr", label: "FR", flag: "🇫🇷" },
-              { value: "en", label: "EN", flag: "🇬🇧" },
-            ] as const).map((opt) => {
+          <div role="radiogroup" className="flex items-center gap-1 rounded-lg border border-border p-1 overflow-x-auto max-w-[260px]">
+            {LANG_OPTS.map((opt) => {
               const active = current === opt.value;
               return (
                 <button
