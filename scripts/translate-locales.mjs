@@ -74,33 +74,55 @@ async function callAI(messages, retries=4) {
 
 async function translateSection(lang, ns, sectionKey, sectionValue) {
   const glossary = SPORTS_GLOSSARY[lang];
+async function translateOne(lang, ns, sectionKey, sectionValue, attempt=0) {
+  const glossary = SPORTS_GLOSSARY[lang];
   const sys = `You are a professional sports-app localizer translating from German (DE) to ${LANG_NAMES[lang]}.
 Audience: amateur sports clubs (football-first), coaches, players, parents, tournament organizers.
 Rules:
 - Translate ALL string VALUES naturally and idiomatically. Do NOT do word-for-word translation.
-- Preserve the EXACT JSON structure: same keys, same nesting, same arrays, same booleans/numbers/null.
+- Preserve the EXACT JSON structure: same keys, same nesting, same arrays, same booleans/numbers/null. Do NOT add, remove, rename, or reorder keys.
 - Preserve ALL placeholders exactly: {{count}}, {{name}}, {count}, %{x}, <0>, </0>, etc. Do not translate placeholder names. Keep their count and order.
 - Preserve plural suffixes (e.g. *_one, *_other, *_zero, *_few, *_many) as KEYS — they are i18next plural keys, do not rename.
-- Keep emojis, punctuation style appropriate for the target language. Use language-correct quotation marks where natural in body text.
-- Keep brand names: Clubero, Stripe, WhatsApp, Google.
+- Keep emojis and brand names: Clubero, Stripe, WhatsApp, Google. Use language-correct quotation marks where natural.
 - Sports terminology must follow this glossary: ${JSON.stringify(glossary)}
-- Output ONLY valid JSON, no commentary. Top-level shape MUST be {"${sectionKey}": <translated value>}.`;
-
+- Output ONLY valid JSON, no commentary, no markdown fences. Top-level shape MUST be {"${sectionKey}": <translated value>}.`;
   const user = `Namespace: ${ns}\nSection key: ${sectionKey}\nTranslate the values of this JSON to ${LANG_NAMES[lang]}:\n\n${JSON.stringify({[sectionKey]: sectionValue})}`;
-
   const raw = await callAI([{role:"system",content:sys},{role:"user",content:user}]);
   let parsed;
-  try { parsed = JSON.parse(raw); } catch { throw new Error(`Bad JSON for ${lang}/${ns}/${sectionKey}: ${raw.slice(0,200)}`); }
+  try { parsed = JSON.parse(raw); } catch { throw new Error("bad-json"); }
   const out = parsed[sectionKey] ?? parsed;
-  if (!structurallyEqual(sectionValue, out)) throw new Error(`Structure mismatch ${lang}/${ns}/${sectionKey}`);
-  // Placeholder check
+  if (!structurallyEqual(sectionValue, out)) throw new Error("structure-mismatch");
   const srcStrs = collectStrings(sectionValue);
   const dstStrs = collectStrings(out);
   for (let i=0;i<srcStrs.length;i++){
     const a=placeholders(srcStrs[i]).join("|"), b=placeholders(dstStrs[i]).join("|");
-    if (a!==b) throw new Error(`Placeholder mismatch ${lang}/${ns}/${sectionKey} string#${i}: [${a}] vs [${b}] — "${dstStrs[i]}"`);
+    if (a!==b) throw new Error(`placeholder-mismatch:${a} vs ${b}`);
   }
   return out;
+}
+
+async function translateSection(lang, ns, sectionKey, sectionValue) {
+  // Try whole-section first; on failure recurse into subkeys.
+  try {
+    return await translateOne(lang, ns, sectionKey, sectionValue);
+  } catch(e) {
+    if (sectionValue && typeof sectionValue === "object" && !Array.isArray(sectionValue)) {
+      const out = {};
+      for (const [k,v] of Object.entries(sectionValue)) {
+        if (typeof v === "string" || Array.isArray(v) || (v && typeof v === "object")) {
+          try {
+            out[k] = await translateOne(lang, ns, k, v);
+          } catch(e2) {
+            // last resort: leave DE value to avoid corrupting parity
+            console.error(`    WARN ${lang}/${ns}/${sectionKey}.${k} fallback to DE (${e2.message})`);
+            out[k] = v;
+          }
+        } else out[k] = v;
+      }
+      return out;
+    }
+    throw e;
+  }
 }
 
 async function processLangNs(lang, ns) {
