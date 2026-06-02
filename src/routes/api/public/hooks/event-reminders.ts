@@ -6,8 +6,17 @@ import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
 
-function frDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
+function resolveLocale(...candidates: Array<string | null | undefined>): string {
+  for (const c of candidates) {
+    const v = (c ?? "").toLowerCase().slice(0, 2);
+    if (SUPPORTED.has(v)) return v;
+  }
+  return "fr";
+}
+function fmtDate(iso: string, locale: string) {
+  const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
+  return new Date(iso).toLocaleDateString(bcp, {
     weekday: "long",
     day: "numeric",
     month: "long",
