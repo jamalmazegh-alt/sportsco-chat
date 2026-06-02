@@ -400,6 +400,7 @@ export type Database = {
           created_at: string
           created_by: string
           default_channels: Json
+          default_language: string
           event_chat_enabled: boolean
           event_chat_parents_enabled: boolean
           event_chat_players_enabled: boolean
@@ -425,6 +426,7 @@ export type Database = {
           created_at?: string
           created_by: string
           default_channels?: Json
+          default_language?: string
           event_chat_enabled?: boolean
           event_chat_parents_enabled?: boolean
           event_chat_players_enabled?: boolean
@@ -450,6 +452,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           default_channels?: Json
+          default_language?: string
           event_chat_enabled?: boolean
           event_chat_parents_enabled?: boolean
           event_chat_players_enabled?: boolean
