@@ -47,7 +47,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
         const { data: events, error } = await supabaseAdmin
           .from("events")
           .select(
-            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before))"
+            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before, default_language))"
           )
           .is("cancelled_at", null)
           .is("deleted_at", null)
