@@ -23,7 +23,7 @@ const ROLE_LABEL: Record<string, { fr: string; en: string }> = {
 }
 
 function buildIntro(
-  l: Locale,
+  rawL: Locale,
   clubName?: string,
   inviteRole?: string,
   playerName?: string,
