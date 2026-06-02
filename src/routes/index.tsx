@@ -9,7 +9,7 @@ import {
   MessageSquareText, BarChart3, CheckCircle2, Trophy, Zap, Activity, Flame, MessageCircle, Sparkles, BrainCircuit, Send,
   BookOpen, Share2, UploadCloud, FileText, Swords,
   Camera, Hash, Heart, Pin, TrendingUp, Star, ClipboardList, Bot, ListChecks,
-  Shield, GraduationCap, Award, UserPlus, Plus,
+  Shield, GraduationCap, Award, UserPlus, Plus, Building2, UserCircle2, Network, Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
@@ -57,13 +57,421 @@ function AppHostRedirect() {
 function Landing() {
   return (
     <MarketingLayout>
-      <Hero />
-      <ProductPreview />
-      <TournamentsSection />
-      <HomeFeatureTiles />
-      <Promises />
-      <CTA />
+      <div className="bg-[#0a0a1a] text-slate-100">
+        <HeroDual />
+        <SocialBento />
+        <DualAudienceSplit />
+        <TournamentsStrip />
+        <FinalCTA />
+      </div>
     </MarketingLayout>
+  );
+}
+
+// ============================================================
+//  NEW MARKETING — Midnight Dual-Lens (clubs ET joueurs)
+// ============================================================
+
+function HeroDual() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="relative overflow-hidden border-b border-[#1e1e5a]/60">
+      {/* glow */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-[#4f46e5]/15 blur-[140px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.08),transparent_60%)]" />
+
+      <div className="relative mx-auto max-w-7xl px-5 pt-20 pb-16 lg:px-8 lg:pt-28 lg:pb-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#4f46e5]/30 bg-[#4f46e5]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-indigo-300">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#4f46e5] opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#4f46e5]" />
+            </span>
+            {t("home.dual.kicker", { defaultValue: "La plateforme sociale du sport amateur" })}
+          </div>
+          <h1
+            style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+            className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl"
+          >
+            {t("home.dual.headline1", { defaultValue: "Pensée pour les" })}{" "}
+            <span className="bg-gradient-to-r from-[#818cf8] to-[#4f46e5] bg-clip-text text-transparent">
+              {t("home.dual.headlineClubs", { defaultValue: "clubs" })}
+            </span>
+            <br />
+            {t("home.dual.headlineAnd", { defaultValue: "ET les" })}{" "}
+            <span className="bg-gradient-to-r from-[#4f46e5] to-[#a5b4fc] bg-clip-text text-transparent">
+              {t("home.dual.headlinePlayers", { defaultValue: "joueurs" })}
+            </span>
+            .
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
+            {t("home.dual.sub", {
+              defaultValue:
+                "Bien plus qu'un outil de gestion. La première plateforme sociale où ton club et ta carrière de joueur vivent au même endroit.",
+            })}
+          </p>
+        </div>
+
+        {/* Dual CTA cards */}
+        <div className="mx-auto mt-14 grid max-w-5xl gap-5 md:grid-cols-2">
+          <Link
+            to="/register"
+            className="group relative overflow-hidden rounded-3xl border border-[#1e1e5a] bg-[#141432] p-7 transition-all hover:-translate-y-1 hover:border-[#4f46e5]/60 hover:shadow-[0_20px_60px_-20px_rgba(79,70,229,0.5)]"
+          >
+            <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[#4f46e5]/10 blur-3xl transition-opacity group-hover:bg-[#4f46e5]/20" />
+            <div className="relative flex items-start justify-between">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 transition-transform group-hover:scale-110">
+                <Building2 className="h-6 w-6 text-indigo-300" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 group-hover:text-indigo-300">
+                {t("home.dual.clubSide", { defaultValue: "Côté club" })}
+              </span>
+            </div>
+            <h3
+              style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+              className="relative mt-6 text-2xl font-bold text-white"
+            >
+              {t("home.dual.clubTitle", { defaultValue: "Anime ta communauté." })}
+            </h3>
+            <p className="relative mt-2 text-sm text-slate-400">
+              {t("home.dual.clubBody", {
+                defaultValue:
+                  "Wall social interne, convocations automatisées, tournois clés en main. Engage tes membres au-delà des matchs.",
+              })}
+            </p>
+            <div className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white">
+              {t("home.dual.clubCta", { defaultValue: "Créer mon club" })}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </div>
+          </Link>
+
+          <Link
+            to="/register/player"
+            className="group relative overflow-hidden rounded-3xl border border-[#4f46e5] bg-gradient-to-br from-[#4f46e5] to-[#3730a3] p-7 text-white transition-all hover:-translate-y-1 hover:shadow-[0_20px_60px_-15px_rgba(79,70,229,0.7)]"
+          >
+            <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+            <div className="relative flex items-start justify-between">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/30 bg-white/15 transition-transform group-hover:scale-110">
+                <UserCircle2 className="h-6 w-6" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+                {t("home.dual.playerSide", { defaultValue: "Côté joueur" })}
+              </span>
+            </div>
+            <h3
+              style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+              className="relative mt-6 text-2xl font-bold"
+            >
+              {t("home.dual.playerTitle", { defaultValue: "Fais vivre ta carrière." })}
+            </h3>
+            <p className="relative mt-2 text-sm text-white/85">
+              {t("home.dual.playerBody", {
+                defaultValue:
+                  "Profil public, stats de saison, journal de progression et réseau de joueurs / coachs. Ton sport, en grand.",
+              })}
+            </p>
+            <div className="relative mt-6 inline-flex items-center gap-2 text-sm font-bold">
+              {t("home.dual.playerCta", { defaultValue: "Créer mon profil joueur" })}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </div>
+          </Link>
+        </div>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
+          <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-[#4f46e5]" />{t("home.dual.trust1", { defaultValue: "Essai gratuit" })}</span>
+          <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-[#4f46e5]" />{t("home.dual.trust2", { defaultValue: "Sans carte bancaire" })}</span>
+          <span className="inline-flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-[#4f46e5]" />{t("home.dual.trust3", { defaultValue: "Données hébergées en Europe" })}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SocialBento() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="relative border-b border-[#1e1e5a]/60 bg-[#08081410] py-20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-indigo-300">
+            {t("home.bento.kicker", { defaultValue: "Ce qui fait la différence" })}
+          </p>
+          <h2
+            style={{ fontFamily: "'Sora', system-ui, sans-serif" }}
+            className="mt-3 text-3xl font-bold text-white sm:text-4xl"
+          >
+            {t("home.bento.title", { defaultValue: "Une plateforme. Deux mondes connectés." })}
+          </h2>
+          <p className="mt-4 text-slate-400">
+            {t("home.bento.sub", {
+              defaultValue:
+                "Là où les autres apps s'arrêtent à la gestion, Clubero relie clubs, joueurs et coachs dans un vrai réseau social du sport amateur.",
+            })}
+          </p>
+        </div>
+
+        <div className="mt-14 grid auto-rows-[200px] grid-cols-1 gap-5 md:grid-cols-4 md:grid-rows-3">
+          {/* XL — Player profile */}
+          <div className="group relative overflow-hidden rounded-[28px] border border-[#1e1e5a] bg-[#141432] p-7 md:col-span-2 md:row-span-2">
+            <span className="absolute right-6 top-6 rounded border border-[#4f46e5]/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-indigo-300">
+              {t("home.dual.playerSide", { defaultValue: "Côté joueur" })}
+            </span>
+            <div className="absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-[#4f46e5]/10 blur-3xl" />
+            <div className="relative">
+              <div className="flex items-center gap-4">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-tr from-[#4f46e5] to-[#a5b4fc] p-0.5">
+                  <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0a0a1a] text-base font-bold text-white">LM</div>
+                </div>
+                <div className="min-w-0">
+                  <p style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="truncate text-lg font-bold text-white">Lucas Martin</p>
+                  <p className="truncate text-xs text-slate-400">{t("home.bento.profileSub", { defaultValue: "Attaquant · FC Clubero" })}</p>
+                </div>
+                <button className="ml-auto rounded-full bg-[#4f46e5] px-3 py-1 text-[11px] font-bold text-white">+ Follow</button>
+              </div>
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {[
+                  { l: t("home.bento.statMatches", { defaultValue: "Matchs" }), v: "42" },
+                  { l: t("home.bento.statGoals", { defaultValue: "Buts" }), v: "18", accent: true },
+                  { l: t("home.bento.statAssists", { defaultValue: "Passes" }), v: "12" },
+                ].map((s) => (
+                  <div key={s.l} className="rounded-2xl border border-[#1e1e5a] bg-[#0a0a1a] p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{s.l}</p>
+                    <p className={`mt-1 text-2xl font-bold ${s.accent ? "text-[#818cf8]" : "text-white"}`}>{s.v}</p>
+                  </div>
+                ))}
+              </div>
+              <h3 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="mt-7 text-xl font-bold text-white">
+                {t("home.bento.profileTitle", { defaultValue: "Un vrai profil joueur public." })}
+              </h3>
+              <p className="mt-2 max-w-md text-sm text-slate-400">
+                {t("home.bento.profileBody", {
+                  defaultValue:
+                    "Stats, carrière, journal, followers. Ton sport amateur a enfin une vitrine — partageable, certifiée par tes clubs.",
+                })}
+              </p>
+            </div>
+          </div>
+
+          {/* L — Club wall */}
+          <div className="group relative overflow-hidden rounded-[28px] border border-[#1e1e5a] bg-[#141432] p-7 md:col-span-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-300">{t("home.dual.clubSide", { defaultValue: "Côté club" })}</span>
+              <div className="flex -space-x-2">
+                <div className="h-6 w-6 rounded-full border-2 border-[#141432] bg-slate-700" />
+                <div className="h-6 w-6 rounded-full border-2 border-[#141432] bg-slate-600" />
+                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#141432] bg-[#4f46e5] text-[9px] font-bold">+12</div>
+              </div>
+            </div>
+            <h3 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="mt-3 text-lg font-bold text-white">
+              {t("home.bento.wallTitle", { defaultValue: "Wall du club" })}
+            </h3>
+            <p className="mt-1 text-sm text-slate-400">
+              {t("home.bento.wallBody", { defaultValue: "Ton propre feed social. Sans Facebook. Sans WhatsApp qui déborde." })}
+            </p>
+            <div className="mt-3 flex items-start gap-3 rounded-xl border border-[#1e1e5a] bg-[#0a0a1a] p-3">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#4f46e5]/20"><Newspaper className="h-3.5 w-3.5 text-[#818cf8]" /></div>
+              <div className="min-w-0">
+                <p className="truncate text-xs text-slate-200">{t("home.bento.wallPost", { defaultValue: "Coach Sarah : « Super séance ce soir, la cohésion est là 💪 »" })}</p>
+                <p className="mt-0.5 text-[10px] text-slate-500">il y a 2h · 8 likes</p>
+              </div>
+            </div>
+          </div>
+
+          {/* L — Social network */}
+          <div className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-[#1e1e5a] bg-[#141432] p-7 md:col-span-2">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-300">{t("home.bento.networkKicker", { defaultValue: "Réseau social" })}</span>
+              <h3 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="mt-2 text-xl font-bold text-white">
+                {t("home.bento.networkTitle", { defaultValue: "Le LinkedIn du sport amateur." })}
+              </h3>
+              <p className="mt-1 text-sm text-slate-400">
+                {t("home.bento.networkBody", { defaultValue: "Suis des coachs, repère des joueurs, découvre les clubs autour de toi." })}
+              </p>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex -space-x-3">
+                <div className="h-10 w-10 rounded-full border-2 border-[#141432] bg-gradient-to-br from-indigo-400 to-indigo-700" />
+                <div className="h-10 w-10 rounded-full border-2 border-[#141432] bg-gradient-to-br from-violet-400 to-violet-700" />
+                <div className="h-10 w-10 rounded-full border-2 border-[#141432] bg-gradient-to-br from-fuchsia-400 to-fuchsia-700" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#141432] bg-[#4f46e5] text-[10px] font-bold text-white">+5k</div>
+              </div>
+              <Network className="h-8 w-8 text-indigo-300/60" />
+            </div>
+          </div>
+
+          {/* M — Convocations */}
+          <BentoSmall icon={<CalendarCheck className="h-5 w-5" />} title={t("home.bento.convocTitle", { defaultValue: "Convocations" })} body={t("home.bento.convocBody", { defaultValue: "Réponse en 12s, relance auto." })} />
+          {/* M — Tournois */}
+          <BentoSmall icon={<Trophy className="h-5 w-5" />} title={t("home.bento.tournTitle", { defaultValue: "Tournois clés en main" })} body={t("home.bento.tournBody", { defaultValue: "Tableaux, scores live, page publique." })} />
+          {/* M — Player journal */}
+          <BentoSmall icon={<BookOpen className="h-5 w-5" />} title={t("home.bento.journalTitle", { defaultValue: "Journal du joueur" })} body={t("home.bento.journalBody", { defaultValue: "Stats, feedback coach, progression IA." })} />
+          {/* M — AI Coach */}
+          <BentoSmall icon={<BrainCircuit className="h-5 w-5" />} title={t("home.bento.aiTitle", { defaultValue: "Coach AI" })} body={t("home.bento.aiBody", { defaultValue: "Suggestions tactiques, résumés de match." })} />
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#1e1e5a] bg-[#141432]/60 px-4 py-2 text-xs text-slate-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+            {t("home.bento.whatsapp", { defaultValue: "WhatsApp en option — pour ceux qui ne peuvent pas s'en passer" })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BentoSmall({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
+  return (
+    <div className="group relative overflow-hidden rounded-[28px] border border-[#1e1e5a] bg-[#141432] p-6 transition-colors hover:border-[#4f46e5]/50">
+      <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#4f46e5]/10 text-[#818cf8]">
+        {icon}
+      </div>
+      <h4 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="text-sm font-bold text-white">{title}</h4>
+      <p className="mt-1 text-xs text-slate-400">{body}</p>
+    </div>
+  );
+}
+
+function DualAudienceSplit() {
+  const { t } = useTranslation("marketing");
+  const club = t("home.split.clubBullets", {
+    returnObjects: true,
+    defaultValue: [
+      "Convocations & présence en 12 secondes",
+      "Wall social interne (l'alternative à votre groupe WhatsApp)",
+      "Tournois, brackets, page publique TV",
+      "Paiements en ligne (Stripe Connect)",
+      "Coach AI pour résumer matchs et compositions",
+    ],
+  }) as string[];
+  const player = t("home.split.playerBullets", {
+    returnObjects: true,
+    defaultValue: [
+      "Profil public partageable (stats, carrière, médias)",
+      "Suivi des compétitions et des saisons",
+      "Journal de progression et feedback coach",
+      "Réseau : suivre des coachs, clubs et joueurs",
+      "Une seule app pour tous tes clubs",
+    ],
+  }) as string[];
+
+  return (
+    <section className="border-b border-[#1e1e5a]/60 py-20 lg:py-24">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <SplitCard
+            side={t("home.dual.clubSide", { defaultValue: "Côté club" })}
+            title={t("home.split.clubTitle", { defaultValue: "Pour les clubs qui veulent fédérer." })}
+            sub={t("home.split.clubSub", { defaultValue: "Tout ce qu'il faut pour gérer ET pour créer du lien." })}
+            bullets={club}
+            ctaLabel={t("home.dual.clubCta", { defaultValue: "Créer mon club" })}
+            to="/register"
+            tone="club"
+          />
+          <SplitCard
+            side={t("home.dual.playerSide", { defaultValue: "Côté joueur" })}
+            title={t("home.split.playerTitle", { defaultValue: "Pour les joueurs qui veulent exister." })}
+            sub={t("home.split.playerSub", { defaultValue: "Ta carrière amateur mérite mieux qu'un compte qui reçoit des convocs." })}
+            bullets={player}
+            ctaLabel={t("home.dual.playerCta", { defaultValue: "Créer mon profil joueur" })}
+            to="/register/player"
+            tone="player"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SplitCard({
+  side, title, sub, bullets, ctaLabel, to, tone,
+}: {
+  side: string; title: string; sub: string; bullets: string[]; ctaLabel: string; to: string; tone: "club" | "player";
+}) {
+  const accent = tone === "club" ? "text-indigo-300" : "text-white";
+  const cardBg = tone === "club"
+    ? "border-[#1e1e5a] bg-[#141432]"
+    : "border-[#4f46e5]/40 bg-gradient-to-br from-[#1e1b4b] to-[#141432]";
+  return (
+    <div className={`relative overflow-hidden rounded-[32px] border p-8 ${cardBg}`}>
+      <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#4f46e5]/10 blur-3xl" />
+      <p className={`text-[10px] font-bold uppercase tracking-widest ${accent}`}>{side}</p>
+      <h3 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="mt-2 text-3xl font-bold text-white">
+        {title}
+      </h3>
+      <p className="mt-3 text-slate-400">{sub}</p>
+      <ul className="relative mt-6 space-y-3">
+        {bullets.map((b) => (
+          <li key={b} className="flex items-start gap-3 text-sm text-slate-200">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#818cf8]" />
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+      <Button asChild className="relative mt-8 h-11 bg-[#4f46e5] px-6 text-white hover:bg-[#4338ca]">
+        <Link to={to}>
+          {ctaLabel} <ArrowRight className="ml-1.5 h-4 w-4" />
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+function TournamentsStrip() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="border-b border-[#1e1e5a]/60 py-16">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="flex flex-col items-start justify-between gap-6 rounded-[32px] border border-[#1e1e5a] bg-gradient-to-br from-[#141432] to-[#0a0a1a] p-8 md:flex-row md:items-center md:p-10">
+          <div className="max-w-xl">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-300">
+              {t("home.tournStrip.kicker", { defaultValue: "Module Tournois" })}
+            </p>
+            <h3 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="mt-2 text-2xl font-bold text-white sm:text-3xl">
+              {t("home.tournStrip.title", { defaultValue: "Lancer un tournoi en quelques minutes." })}
+            </h3>
+            <p className="mt-2 text-sm text-slate-400">
+              {t("home.tournStrip.body", { defaultValue: "Inscriptions en ligne, tableaux, scores live, page publique TV. Avec ou sans club." })}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button asChild className="h-11 bg-amber-400 px-6 text-[#0a0a1a] hover:bg-amber-300">
+              <Link to="/tournaments/start">
+                {t("home.tournStrip.cta", { defaultValue: "Démarrer un tournoi" })} <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="h-11 border-[#1e1e5a] bg-transparent px-6 text-white hover:bg-[#141432]">
+              <Link to="/features">{t("home.tournStrip.more", { defaultValue: "Voir toutes les features" })}</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCTA() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="relative overflow-hidden py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.18),transparent_60%)]" />
+      <div className="relative mx-auto max-w-3xl px-5 text-center lg:px-8">
+        <h2 style={{ fontFamily: "'Sora', system-ui, sans-serif" }} className="text-3xl font-bold text-white sm:text-5xl">
+          {t("home.finalCta.title", { defaultValue: "Prêt à rejoindre la communauté ?" })}
+        </h2>
+        <p className="mt-4 text-slate-400">
+          {t("home.finalCta.sub", { defaultValue: "Essai gratuit. Sans carte bancaire. Données hébergées en Europe." })}
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Button asChild className="h-12 bg-[#4f46e5] px-7 text-white hover:bg-[#4338ca]">
+            <Link to="/register">{t("home.dual.clubCta", { defaultValue: "Créer mon club" })}</Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 border-[#4f46e5]/40 bg-transparent px-7 text-white hover:bg-[#141432]">
+            <Link to="/register/player">{t("home.dual.playerCta", { defaultValue: "Créer mon profil joueur" })}</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }
 
