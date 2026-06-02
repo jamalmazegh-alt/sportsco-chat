@@ -605,7 +605,7 @@
     "byes_one": "{{count}} Freilos",
     "byes_other": "{{count}} Freilose",
     "tabAuto": "Auto",
-    "tabProgressive": "Progressif",
+    "tabProgressive": "Progressiv",
     "tabManual": "Manuel",
     "autoDesc": "Vollständige Zufallsauslosung auf einmal.",
     "launch": "Auslosung starten",
