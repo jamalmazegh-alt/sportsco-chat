@@ -179,9 +179,9 @@ export const BrandedEmail = ({
                   {ctaLabel}
                 </Button>
                 <Text style={ctaHint}>
-                  {locale === 'fr' ? 'Le bouton ne fonctionne pas ?' : 'Button not working?'}{' '}
+                  {BUTTON_HINT[locale].broken}{' '}
                   <Link href={ctaUrl} style={inlineLink}>
-                    {locale === 'fr' ? 'Ouvrir le lien' : 'Open the link'}
+                    {BUTTON_HINT[locale].open}
                   </Link>
                 </Text>
               </Section>
