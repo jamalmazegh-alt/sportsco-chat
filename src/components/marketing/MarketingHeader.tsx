@@ -28,6 +28,16 @@ const LOCALIZED_NAV = {
   ],
 } as const;
 
+const LANG_OPTS = [
+  { value: "fr", label: "FR", flag: "🇫🇷" },
+  { value: "en", label: "EN", flag: "🇬🇧" },
+  { value: "de", label: "DE", flag: "🇩🇪" },
+  { value: "es", label: "ES", flag: "🇪🇸" },
+  { value: "pt", label: "PT", flag: "🇵🇹" },
+  { value: "it", label: "IT", flag: "🇮🇹" },
+  { value: "nl", label: "NL", flag: "🇳🇱" },
+] as const;
+
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
   const { t, i18n } = useTranslation("marketing");
@@ -64,11 +74,8 @@ export function MarketingHeader() {
 
         <div className="hidden items-center gap-3 md:flex">
           {/* Language switch */}
-          <div role="radiogroup" className="flex items-center gap-1 rounded-lg border border-border p-1">
-            {([
-              { value: "fr", label: "FR", flag: "🇫🇷" },
-              { value: "en", label: "EN", flag: "🇬🇧" },
-            ] as const).map((opt) => {
+          <div role="radiogroup" className="flex items-center gap-1 rounded-lg border border-border p-1 overflow-x-auto max-w-[260px]">
+            {LANG_OPTS.map((opt) => {
               const active = current === opt.value;
               return (
                 <button
@@ -131,11 +138,8 @@ export function MarketingHeader() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <div className="mt-3 flex items-center justify-center gap-1 rounded-lg border border-border p-1">
-              {([
-                { value: "fr", label: "FR", flag: "🇫🇷" },
-                { value: "en", label: "EN", flag: "🇬🇧" },
-              ] as const).map((opt) => {
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-1 rounded-lg border border-border p-1">
+              {LANG_OPTS.map((opt) => {
                 const active = current === opt.value;
                 return (
                   <button
