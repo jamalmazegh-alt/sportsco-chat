@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Button, Column, Heading, Row, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale } from "./_layout";
+import type { Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
-
-type Locale = "fr" | "en";
 
 interface LineupPlayer {
   name: string;
