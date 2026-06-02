@@ -86,6 +86,7 @@ function CommunicationsSettings() {
         event_chat_enabled: form.event_chat_enabled,
         event_chat_players_enabled: form.event_chat_players_enabled,
         event_chat_parents_enabled: form.event_chat_parents_enabled,
+        default_language: form.default_language,
       })
       .eq("id", form.id);
     setSaving(false);
