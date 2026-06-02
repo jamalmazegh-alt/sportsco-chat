@@ -19,11 +19,11 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const { convocationId } = data;
     const { userId } = context;
 
-    // Fetch convocation + event + player
+    // Fetch convocation + event + player + team's club default_language
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id)"
+        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,starts_at,team_id,teams:team_id(clubs:club_id(default_language)))"
       )
       .eq("id", convocationId)
       .single();
@@ -33,6 +33,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     if (status !== "absent" && status !== "uncertain") return { sent: 0 };
 
     const ev: any = conv.events;
+    const clubDefaultLang = ev?.teams?.clubs?.default_language as string | null | undefined;
     const player: any = conv.players ?? {};
     const playerName =
       `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
