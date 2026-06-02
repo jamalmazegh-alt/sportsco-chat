@@ -106,15 +106,33 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           const [{ data: players }, { data: parents }] = await Promise.all([
             supabaseAdmin
               .from("players")
-              .select("id, first_name, last_name, email")
+              .select("id, first_name, last_name, email, user_id")
               .in("id", playerIds),
             supabaseAdmin
               .from("player_parents")
-              .select("player_id, email, full_name")
+              .select("player_id, email, full_name, parent_user_id")
               .in("player_id", playerIds),
           ]);
 
-          const eventDateLabel = frDate(ev.starts_at);
+          // Fetch preferred_language for any linked profiles (player or parent)
+          const profileIds = Array.from(new Set([
+            ...((players ?? []).map((p: any) => p.user_id).filter(Boolean)),
+            ...((parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean)),
+          ]));
+          const langByUser = new Map<string, string>();
+          if (profileIds.length > 0) {
+            const { data: profs } = await supabaseAdmin
+              .from("profiles")
+              .select("id, preferred_language")
+              .in("id", profileIds);
+            for (const p of profs ?? []) {
+              if ((p as any).preferred_language) {
+                langByUser.set((p as any).id, (p as any).preferred_language);
+              }
+            }
+          }
+
+          const clubLang = (club as any).default_language as string | null | undefined;
           const baseUrl =
             process.env.SITE_URL ||
             "https://www.clubero.app";
