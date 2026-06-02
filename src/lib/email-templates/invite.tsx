@@ -28,6 +28,7 @@ function buildIntro(
   inviteRole?: string,
   playerName?: string,
 ): string {
+  const l: 'fr' | 'en' = rawL === 'fr' ? 'fr' : 'en'
   const club = clubName?.trim()
   const roleKey = inviteRole?.toLowerCase()
   const roleLabel = roleKey && ROLE_LABEL[roleKey] ? ROLE_LABEL[roleKey][l] : undefined
