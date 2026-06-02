@@ -54,19 +54,21 @@ function structurallyEqual(a,b){
   return a===b;
 }
 
-async function callAI(messages, retries=3) {
+async function callAI(messages, retries=4) {
   for (let i=0;i<retries;i++){
     try {
       const r = await fetch(URL, {
         method:"POST",
         headers:{ "Content-Type":"application/json", Authorization:`Bearer ${API_KEY}` },
-        body: JSON.stringify({ model: MODEL, messages, response_format:{type:"json_object"}, temperature:0.2 }),
+        body: JSON.stringify({ model: MODEL, messages, response_format:{type:"json_object"}, temperature:0.2, max_tokens: 16000 }),
       });
-      if (r.status===429 || r.status>=500) { await new Promise(r=>setTimeout(r, 2000*(i+1))); continue; }
+      if (r.status===429 || r.status>=500) { await new Promise(r=>setTimeout(r, 3000*(i+1))); continue; }
       if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
       const j = await r.json();
-      return j.choices[0].message.content;
-    } catch(e){ if (i===retries-1) throw e; await new Promise(r=>setTimeout(r, 2000*(i+1))); }
+      const content = j.choices?.[0]?.message?.content;
+      if (!content) throw new Error("empty content");
+      return content;
+    } catch(e){ if (i===retries-1) throw e; await new Promise(r=>setTimeout(r, 3000*(i+1))); }
   }
 }
 
