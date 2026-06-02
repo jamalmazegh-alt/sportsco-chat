@@ -1,0 +1,62 @@
+{
+  "fab": "Apoio",
+  "page": {
+    "title": "Os meus pedidos",
+    "subtitle": "Acompanhe os seus pedidos de suporte e relate um novo problema.",
+    "new": "Novo",
+    "empty": "Ainda não existem pedidos.",
+    "report": "Comunicar um problema",
+    "back": "Os meus pedidos"
+  },
+  "form": {
+    "title": "Reportar um problema",
+    "subject": "Assunto",
+    "subject_placeholder": "Descreva o problema em poucas palavras",
+    "category": "Categoria",
+    "description": "Descrição",
+    "description_placeholder": "Por favor, seja o mais preciso possível…",
+    "intent": "O que tentou fazer?",
+    "intent_optional": "(opcional)",
+    "intent_placeholder": "p. ex., criar um evento",
+    "attachments": "Capturas de ecrã",
+    "attachments_hint": "(máx. 5, 5 MB)",
+    "add_file": "Adicionar ficheiro",
+    "cancel": "Cancelar",
+    "send": "Enviar",
+    "sent": "Pedido enviado",
+    "sent_desc": "Entraremos em contacto o mais rapidamente possível. Pode acompanhar o estado em «Os meus pedidos».",
+    "close": "Fechar",
+    "view": "Ver ticket",
+    "file_too_large": "{{name}} excede 5 MB",
+    "error": "Erro"
+  },
+  "thread": {
+    "internal_note": "Nota interna",
+    "staff_label": "Equipa Clubero",
+    "reply_placeholder": "Escrever uma resposta…",
+    "send": "Enviar",
+    "link_unavailable": "Link indisponível"
+  },
+  "status": {
+    "open": "Aberto",
+    "in_progress": "Em progresso",
+    "waiting_user": "A aguardar a sua resposta",
+    "resolved": "Resolvido",
+    "closed": "Fechado"
+  },
+  "priority": {
+    "low": "Baixa",
+    "normal": "Normal",
+    "high": "Alta",
+    "urgent": "Urgente"
+  },
+  "category": {
+    "bug": "Erro",
+    "payment": "Pagamento",
+    "account": "Conta",
+    "team": "Equipas / Jogadores",
+    "event": "Eventos",
+    "feature_request": "Pedido de funcionalidade",
+    "other": "Outro"
+  }
+}
