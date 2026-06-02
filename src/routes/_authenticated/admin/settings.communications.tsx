@@ -26,7 +26,18 @@ type Form = {
   event_chat_enabled: boolean;
   event_chat_players_enabled: boolean;
   event_chat_parents_enabled: boolean;
+  default_language: string;
 };
+
+const LANGS = [
+  { value: "fr", label: "Français", flag: "🇫🇷" },
+  { value: "en", label: "English", flag: "🇬🇧" },
+  { value: "de", label: "Deutsch", flag: "🇩🇪" },
+  { value: "es", label: "Español", flag: "🇪🇸" },
+  { value: "pt", label: "Português", flag: "🇵🇹" },
+  { value: "it", label: "Italiano", flag: "🇮🇹" },
+  { value: "nl", label: "Nederlands", flag: "🇳🇱" },
+] as const;
 
 function CommunicationsSettings() {
   const { t } = useTranslation();
@@ -40,7 +51,7 @@ function CommunicationsSettings() {
       const { data, error } = await supabase
         .from("clubs")
         .select(
-          "id, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled",
+          "id, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, default_language",
         )
         .eq("id", activeClubId!)
         .single();
@@ -75,6 +86,7 @@ function CommunicationsSettings() {
         event_chat_enabled: form.event_chat_enabled,
         event_chat_players_enabled: form.event_chat_players_enabled,
         event_chat_parents_enabled: form.event_chat_parents_enabled,
+        default_language: form.default_language,
       })
       .eq("id", form.id);
     setSaving(false);
@@ -120,6 +132,43 @@ function CommunicationsSettings() {
             />
           </div>
         )}
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <div>
+          <p className="text-sm font-medium">
+            {t("admin.emailLanguage", { defaultValue: "Langue des emails de communication" })}
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {t("admin.emailLanguageHint", {
+              defaultValue:
+                "Langue utilisée pour les emails envoyés par le club aux destinataires qui n'ont pas défini de langue préférée.",
+            })}
+          </p>
+        </div>
+        <div role="radiogroup" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {LANGS.map((opt) => {
+            const active = form.default_language === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setForm({ ...form, default_language: opt.value })}
+                className={
+                  "flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-colors " +
+                  (active
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground")
+                }
+              >
+                <span className="text-base">{opt.flag}</span>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       <Button className="w-full h-11" onClick={save} disabled={saving}>
