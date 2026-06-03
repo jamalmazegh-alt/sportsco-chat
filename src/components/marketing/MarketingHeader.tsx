@@ -160,28 +160,8 @@ export function MarketingHeader() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-1 rounded-lg border border-border p-1">
-              {LANG_OPTS.map((opt) => {
-                const active = current === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => setLang(opt.value)}
-                    className={cn(
-                      "flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                      active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    <span>{opt.flag}</span>
-                    {opt.label}
-                  </button>
-                );
-              })}
+            <div className="mt-3 flex items-center justify-center">
+              <LanguageSwitcher current={current} onChange={setLang} />
             </div>
             <div className="mt-2 flex flex-col gap-2 px-1">
               <Button asChild variant="outline" onClick={() => setOpen(false)}>
