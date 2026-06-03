@@ -310,7 +310,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
           onDone={() => { qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] }); setNeedOpen(false); }}
         />
       )}
-    </div>
+    </>
   );
 }
 
