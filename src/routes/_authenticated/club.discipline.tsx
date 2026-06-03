@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuickSanctionDrawer } from "@/components/quick-sanction-drawer";
+import { ClubAvailabilityWidget } from "@/components/club-availability-widget";
 import { cn } from "@/lib/utils";
 import { fmt } from "@/lib/date-locale";
 
@@ -155,6 +156,8 @@ function DisciplinePage() {
           </div>
         </div>
       </header>
+
+      <ClubAvailabilityWidget clubId={activeClubId} />
 
       <div className="grid gap-2 sm:grid-cols-[1fr_180px_180px]">
         <Select value={teamFilter} onValueChange={setTeamFilter}>
