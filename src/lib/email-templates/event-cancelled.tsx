@@ -63,8 +63,9 @@ const EventCancelledEmail = ({
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
+  const eventDateFmt = formatEmailDateTime(eventDate, l);
   return (
-  <EmailShell preview={`${t.preview(eventTitle, eventDate)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${t.preview(eventTitle, eventDateFmt)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
@@ -77,7 +78,7 @@ const EventCancelledEmail = ({
         <Section style={card}>
           <Text style={cardKicker}>{t.kicker}</Text>
           <Text style={cardTitle}>{eventTitle}</Text>
-          {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
+          {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
           {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
         </Section>
 
