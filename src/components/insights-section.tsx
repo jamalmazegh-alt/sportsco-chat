@@ -72,9 +72,9 @@ const PRIORITY_TONE: Record<
 };
 
 const PRIORITY_LABEL_KEY: Record<InsightRow["priority"], string> = {
-  high: "insights.priorityHigh",
-  medium: "insights.priorityMedium",
-  low: "insights.priorityLow",
+  high: "insights.high",
+  medium: "insights.medium",
+  low: "insights.low",
 };
 
 export function InsightsSection({ clubId }: { clubId: string }) {
