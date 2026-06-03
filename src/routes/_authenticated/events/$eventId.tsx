@@ -186,6 +186,7 @@ function EventDetail() {
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const [sending, setSending] = useState(false);
+  const [confirmSendSuspendedOpen, setConfirmSendSuspendedOpen] = useState(false);
   const [sharingLineup, setSharingLineup] = useState(false);
   const lineupCardRef = useRef<HTMLDivElement | null>(null);
 
