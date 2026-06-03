@@ -882,11 +882,9 @@ function EventDetail() {
             playerName,
             eventTitle: event.title,
             eventType: event.type,
-            eventDate: eventDateLabel,
+            eventDate: event.starts_at,
             eventDescription: (event as any).description ?? undefined,
-            convocationTime: (event as any).convocation_time
-              ? fmt((event as any).convocation_time, "EEEE d MMMM 'à' HH'h'mm")
-              : undefined,
+            convocationTime: (event as any).convocation_time ?? undefined,
             eventLocation: event.location ?? undefined,
             locationMapsUrl,
             meetingPoint: (event as any).meeting_point ?? undefined,
