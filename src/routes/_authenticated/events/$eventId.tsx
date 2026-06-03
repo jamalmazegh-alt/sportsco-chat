@@ -186,6 +186,7 @@ function EventDetail() {
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const [sending, setSending] = useState(false);
+  const [confirmSendSuspendedOpen, setConfirmSendSuspendedOpen] = useState(false);
   const [sharingLineup, setSharingLineup] = useState(false);
   const lineupCardRef = useRef<HTMLDivElement | null>(null);
 
@@ -2301,7 +2302,17 @@ function EventDetail() {
                 <Button variant="outline" onClick={() => setPickerStep("select")} disabled={sending}>
                   {t("common.back")}
                 </Button>
-                <Button onClick={sendConvocations} disabled={sending || selectedIds.size === 0}>
+                <Button
+                  onClick={() => {
+                    const hasSuspended = Array.from(selectedIds).some((pid) => suspensionByPlayer.has(pid));
+                    if (hasSuspended) {
+                      setConfirmSendSuspendedOpen(true);
+                    } else {
+                      sendConvocations();
+                    }
+                  }}
+                  disabled={sending || selectedIds.size === 0}
+                >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   {t("attendance.confirmSend", { defaultValue: "Confirmer l'envoi" })}
                 </Button>
@@ -2709,6 +2720,52 @@ function EventDetail() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {t("attendance.cancelConvocation")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmSendSuspendedOpen} onOpenChange={setConfirmSendSuspendedOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("suspensions.confirmSendTitle", { defaultValue: "Convoquer des joueurs suspendus ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  {(event as any)?.is_official === true && event?.type === "match"
+                    ? t("suspensions.confirmSendOfficial", { defaultValue: "Ce match est officiel. Convoquer un joueur suspendu peut être contraire au règlement." })
+                    : t("suspensions.confirmSendNonOfficial", { defaultValue: "Certains joueurs sélectionnés ont une suspension active. Ce match ne décompte pas leur suspension." })}
+                </p>
+                <ul className="list-disc pl-5 text-sm">
+                  {Array.from(selectedIds)
+                    .map((pid) => {
+                      const s = suspensionByPlayer.get(pid);
+                      if (!s) return null;
+                      const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
+                      const p = tp?.players;
+                      return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), remaining: s.remaining } : null;
+                    })
+                    .filter(Boolean)
+                    .map((s: any) => (
+                      <li key={s.id}>
+                        {s.name} — {t("suspensions.remaining", { defaultValue: "{{count}} match(s) restant(s)", count: s.remaining })}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmSendSuspendedOpen(false);
+                sendConvocations();
+              }}
+            >
+              {t("suspensions.confirmSendAction", { defaultValue: "Convoquer quand même" })}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
