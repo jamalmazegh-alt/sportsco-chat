@@ -97,7 +97,7 @@ export const template = {
   component: EventCancelledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    return T[l].subject(d.eventTitle as string, d.eventDate as string | undefined);
+    return T[l].subject(d.eventTitle as string, formatEmailDateTime(d.eventDate as string | undefined, l));
   },
   displayName: "Event cancelled",
   previewData: {
