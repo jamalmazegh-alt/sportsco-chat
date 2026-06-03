@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QuickSanctionDrawer } from "@/components/quick-sanction-drawer";
+import { ClubAvailabilityWidget } from "@/components/club-availability-widget";
 import { cn } from "@/lib/utils";
 import { fmt } from "@/lib/date-locale";
 
