@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Column, Heading, Row, Section, Text } from "@react-email/components";
-import { EmailShell, pickLocale } from "./_layout";
+import { EmailShell, pickLocale, formatEmailDateTime } from "./_layout";
 import type { Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
