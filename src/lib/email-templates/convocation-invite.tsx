@@ -266,9 +266,9 @@ const ConvocationInviteEmail = ({
             {competitionName ? ` · ${competitionName}` : ""}
           </Text>
           <Text style={cardTitle}>{eventTitle}</Text>
-          {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
-          {convocationTime ? (
-            <Text style={cardMeta}>⏰ {t.meetingTime}: <strong>{convocationTime}</strong></Text>
+          {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
+          {convocationTimeFmt ? (
+            <Text style={cardMeta}>⏰ {t.meetingTime}: <strong>{convocationTimeFmt}</strong></Text>
           ) : null}
           {eventLocation ? (
             <Text style={cardMeta}>
