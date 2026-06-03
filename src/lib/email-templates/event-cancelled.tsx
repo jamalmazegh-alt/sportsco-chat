@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, formatEmailDateTime } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
