@@ -2875,16 +2875,6 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {event.type === "match" && event.carpool_enabled && event.status !== "cancelled" && (
-        <CarpoolSection
-          eventId={eventId}
-          teamId={event.team_id}
-          isCoach={isCoach}
-          convocations={(convocations ?? []) as any}
-          childrenLinks={(childrenLinks ?? []) as string[]}
-        />
-      )}
-
       {isCoach && event.type === "match" && event.status !== "cancelled" && (
         <div className="rounded-2xl border bg-card p-4 flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -2910,6 +2900,16 @@ function EventDetail() {
             {event.carpool_enabled ? (t("carpool.disable" as any) || "Désactiver") : (t("carpool.enable" as any) || "Activer")}
           </Button>
         </div>
+      )}
+
+      {event.type === "match" && event.carpool_enabled && event.status !== "cancelled" && (
+        <CarpoolSection
+          eventId={eventId}
+          teamId={event.team_id}
+          isCoach={isCoach}
+          convocations={(convocations ?? []) as any}
+          childrenLinks={(childrenLinks ?? []) as string[]}
+        />
       )}
 
       <EventChat eventId={eventId} />
