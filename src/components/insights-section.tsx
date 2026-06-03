@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Clock, UserX, Trophy, Shield, X } from "lucide-react";
+import { Clock, UserX, Trophy, Shield, X, Sparkles, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -46,23 +46,35 @@ const TYPE_ICON = {
 
 const PRIORITY_TONE: Record<
   InsightRow["priority"],
-  { iconFg: string; dot: string; hoverBg: string }
+  { iconBg: string; iconFg: string; accent: string; ring: string; label: string }
 > = {
   high: {
+    iconBg: "bg-destructive/10",
     iconFg: "text-destructive",
-    dot: "bg-destructive",
-    hoverBg: "hover:bg-destructive/5",
+    accent: "before:bg-destructive",
+    ring: "ring-destructive/15",
+    label: "text-destructive",
   },
   medium: {
+    iconBg: "bg-pending/10",
     iconFg: "text-pending",
-    dot: "bg-pending",
-    hoverBg: "hover:bg-pending/5",
+    accent: "before:bg-pending",
+    ring: "ring-pending/15",
+    label: "text-pending",
   },
   low: {
+    iconBg: "bg-primary/10",
     iconFg: "text-primary",
-    dot: "bg-primary",
-    hoverBg: "hover:bg-primary/5",
+    accent: "before:bg-primary",
+    ring: "ring-primary/15",
+    label: "text-primary",
   },
+};
+
+const PRIORITY_LABEL_KEY: Record<InsightRow["priority"], string> = {
+  high: "insights.high",
+  medium: "insights.medium",
+  low: "insights.low",
 };
 
 export function InsightsSection({ clubId }: { clubId: string }) {
@@ -141,48 +153,76 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   };
 
   return (
-    <section className="space-y-2">
+    <section className="space-y-2.5">
       <div className="flex items-center justify-between px-0.5">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.14em]">
-          {t("insights.title")}
-        </h2>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.14em]">
+            {t("insights.title")}
+          </h2>
+        </div>
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
           {insights.length}
         </span>
       </div>
-      <div className="space-y-1">
+      <div className="space-y-2">
         {insights.map((ins) => {
           const Icon = TYPE_ICON[ins.insight_type] ?? Clock;
           const msg = locale === "en" ? ins.message_en : ins.message_fr;
           const label = actionLabel(ins.action_type);
           const tone = PRIORITY_TONE[ins.priority];
+          const priorityLabel = t(PRIORITY_LABEL_KEY[ins.priority], {
+            defaultValue: ins.priority,
+          });
           return (
             <div
               key={ins.id}
               className={cn(
-                "group flex items-start gap-2.5 rounded-lg border border-border/60 bg-card px-3 py-2 transition-colors",
-                tone.hoverBg,
+                "group relative overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm transition-all",
+                "hover:shadow-md hover:border-border",
+                "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1",
+                tone.accent,
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0 mt-0.5", tone.iconFg)} />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm leading-snug text-foreground">{msg}</p>
-              </div>
-              <div className="flex items-center gap-1 shrink-0 mt-0.5">
-                {label && (
-                  <button
-                    className="text-xs text-primary hover:underline underline-offset-2 font-medium"
-                    onClick={() => handleAction(ins)}
+              <div className="flex items-start gap-3 pl-4 pr-2.5 py-3">
+                <div
+                  className={cn(
+                    "h-9 w-9 shrink-0 rounded-lg flex items-center justify-center ring-1",
+                    tone.iconBg,
+                    tone.ring,
+                  )}
+                >
+                  <Icon className={cn("h-4 w-4", tone.iconFg)} />
+                </div>
+                <div className="min-w-0 flex-1 pt-0.5">
+                  <p
+                    className={cn(
+                      "text-[10px] font-bold uppercase tracking-wider mb-0.5",
+                      tone.label,
+                    )}
                   >
-                    {label}
-                  </button>
-                )}
+                    {priorityLabel}
+                  </p>
+                  <p className="text-sm leading-snug text-foreground">{msg}</p>
+                  {label && (
+                    <button
+                      onClick={() => handleAction(ins)}
+                      className={cn(
+                        "mt-2 inline-flex items-center gap-0.5 text-xs font-semibold rounded-md px-2 py-1 -ml-2 transition-colors",
+                        "text-primary hover:bg-primary/10",
+                      )}
+                    >
+                      {label}
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
                 <button
                   aria-label={t("insights.dismiss")}
                   onClick={() => setPendingDismiss(ins.id)}
-                  className="p-1 rounded-md text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted hover:text-foreground"
+                  className="shrink-0 p-1.5 rounded-md text-muted-foreground/60 transition-all hover:bg-muted hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
