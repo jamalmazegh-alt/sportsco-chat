@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, formatEmailDateTime } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
@@ -65,8 +65,10 @@ const EventRescheduledEmail = ({
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
+  const previousDateFmt = formatEmailDateTime(previousDate, l);
+  const newDateFmt = formatEmailDateTime(newDate, l) ?? newDate;
   return (
-  <EmailShell preview={`${t.preview(eventTitle, newDate)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${t.preview(eventTitle, newDateFmt)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
@@ -79,10 +81,10 @@ const EventRescheduledEmail = ({
         <Section style={card}>
           <Text style={cardKicker}>{t.kicker}</Text>
           <Text style={cardTitle}>{eventTitle}</Text>
-          {previousDate ? (
-            <Text style={cardMetaOld}>📅 <span style={strike}>{previousDate}</span></Text>
+          {previousDateFmt ? (
+            <Text style={cardMetaOld}>📅 <span style={strike}>{previousDateFmt}</span></Text>
           ) : null}
-          <Text style={cardMetaNew}>✅ {newDate}</Text>
+          <Text style={cardMetaNew}>✅ {newDateFmt}</Text>
           {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
         </Section>
 
@@ -103,7 +105,8 @@ export const template = {
   component: EventRescheduledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    return T[l].subject(d.eventTitle as string, d.newDate as string);
+    const newDateFmt = formatEmailDateTime(d.newDate as string, l) ?? (d.newDate as string);
+    return T[l].subject(d.eventTitle as string, newDateFmt);
   },
   displayName: "Event rescheduled",
   previewData: {

@@ -22,6 +22,35 @@ export const pickLocale = (input?: string | null): Locale => {
   return (SUPPORTED_LOCALES as string[]).includes(v) ? (v as Locale) : 'fr'
 }
 
+/**
+ * Formats a date/time value for email rendering in the recipient's locale.
+ * - If value is an ISO 8601 string, it's reformatted with Intl.DateTimeFormat
+ *   so each recipient sees the date in their own language (no hardcoded
+ *   French "à" or English "at").
+ * - If value is already a pre-formatted string (legacy callers), it's
+ *   returned as-is for backwards compatibility.
+ */
+export const formatEmailDateTime = (
+  value: string | undefined | null,
+  locale?: Locale | string | null,
+): string | undefined => {
+  if (!value) return value ?? undefined
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(value)) return value
+  const l = pickLocale(typeof locale === 'string' ? locale : (locale as string | undefined))
+  const bcp = l === 'en' ? 'en-GB' : `${l}-${l.toUpperCase()}`
+  try {
+    return new Date(value).toLocaleString(bcp, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return value
+  }
+}
+
 const LOGO_URL = 'https://www.clubero.app/clubero-logo.png'
 const SITE_URL = 'https://www.clubero.app'
 const SUPPORT_EMAIL = 'support@clubero.app'

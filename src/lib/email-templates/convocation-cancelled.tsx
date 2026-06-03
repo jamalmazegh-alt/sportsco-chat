@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, formatEmailDateTime } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
@@ -59,8 +59,9 @@ const ConvocationCancelledEmail = ({
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
+  const eventDateFmt = formatEmailDateTime(eventDate, l);
   return (
-  <EmailShell preview={`${t.preview}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${t.preview}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
@@ -72,7 +73,7 @@ const ConvocationCancelledEmail = ({
         <Section style={card}>
           <Text style={cardKicker}>{t.kicker}</Text>
           <Text style={cardTitle}>{eventTitle}</Text>
-          {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
+          {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
           {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
         </Section>
 
@@ -86,7 +87,7 @@ export const template = {
   component: ConvocationCancelledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    return T[l].subject(d.eventTitle as string, d.eventDate as string | undefined);
+    return T[l].subject(d.eventTitle as string, formatEmailDateTime(d.eventDate as string | undefined, l));
   },
   displayName: "Convocation cancelled",
   previewData: {

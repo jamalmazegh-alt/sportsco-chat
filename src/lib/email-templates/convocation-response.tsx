@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, formatEmailDateTime } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 type Locale = "fr" | "en";
@@ -47,6 +47,7 @@ const ConvocationResponseEmail = ({
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
   const statusLabel = t.labels[status];
+  const eventDateFmt = formatEmailDateTime(eventDate, l);
   return (
   <EmailShell preview={`${t.preview(playerName, statusLabel, eventTitle)}`} locale={l}>
         <Heading style={h1}>{t.hello(coachFirstName)}</Heading>
@@ -56,7 +57,7 @@ const ConvocationResponseEmail = ({
             {statusLabel}
           </strong>{" "}
           {t.toCallup} <strong>{eventTitle}</strong>
-          {eventDate ? <> ({eventDate})</> : null}.
+          {eventDateFmt ? <> ({eventDateFmt})</> : null}.
         </Text>
         {reason && (
           <Section style={reasonBox}>

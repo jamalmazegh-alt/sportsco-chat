@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Column, Heading, Row, Section, Text } from "@react-email/components";
-import { EmailShell, pickLocale } from "./_layout";
+import { EmailShell, pickLocale, formatEmailDateTime } from "./_layout";
 import type { Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
@@ -227,9 +227,11 @@ const ConvocationInviteEmail = ({
 }: Props) => {
   const l: Locale = pickLocale(locale);
   const t = T[l];
+  const eventDateFmt = formatEmailDateTime(eventDate, l);
+  const convocationTimeFmt = formatEmailDateTime(convocationTime, l);
   return (
 
-  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>
           {isUpdate
             ? t.headingUpdate
@@ -264,9 +266,9 @@ const ConvocationInviteEmail = ({
             {competitionName ? ` · ${competitionName}` : ""}
           </Text>
           <Text style={cardTitle}>{eventTitle}</Text>
-          {eventDate ? <Text style={cardMeta}>📅 {eventDate}</Text> : null}
-          {convocationTime ? (
-            <Text style={cardMeta}>⏰ {t.meetingTime}: <strong>{convocationTime}</strong></Text>
+          {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
+          {convocationTimeFmt ? (
+            <Text style={cardMeta}>⏰ {t.meetingTime}: <strong>{convocationTimeFmt}</strong></Text>
           ) : null}
           {eventLocation ? (
             <Text style={cardMeta}>
@@ -429,7 +431,8 @@ export const template = {
     const l: Locale = pickLocale((d as any).locale);
     const t = T[l];
     const prefix = d.isUpdate ? t.subjUpdate : d.isReminder ? t.subjReminder : t.subjDefault;
-    return `${prefix}${t.convocation}: ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`;
+    const dateFmt = formatEmailDateTime(d.eventDate, l);
+    return `${prefix}${t.convocation}: ${d.eventTitle}${dateFmt ? ` — ${dateFmt}` : ""}`;
   },
   displayName: "Convocation invite",
   previewData: {
