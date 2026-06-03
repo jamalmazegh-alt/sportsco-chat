@@ -10,6 +10,8 @@ import { PasswordInput } from "@/components/password-input";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
