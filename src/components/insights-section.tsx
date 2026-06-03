@@ -46,23 +46,35 @@ const TYPE_ICON = {
 
 const PRIORITY_TONE: Record<
   InsightRow["priority"],
-  { iconFg: string; dot: string; hoverBg: string }
+  { iconBg: string; iconFg: string; accent: string; ring: string; label: string }
 > = {
   high: {
+    iconBg: "bg-destructive/10",
     iconFg: "text-destructive",
-    dot: "bg-destructive",
-    hoverBg: "hover:bg-destructive/5",
+    accent: "before:bg-destructive",
+    ring: "ring-destructive/15",
+    label: "text-destructive",
   },
   medium: {
+    iconBg: "bg-pending/10",
     iconFg: "text-pending",
-    dot: "bg-pending",
-    hoverBg: "hover:bg-pending/5",
+    accent: "before:bg-pending",
+    ring: "ring-pending/15",
+    label: "text-pending",
   },
   low: {
+    iconBg: "bg-primary/10",
     iconFg: "text-primary",
-    dot: "bg-primary",
-    hoverBg: "hover:bg-primary/5",
+    accent: "before:bg-primary",
+    ring: "ring-primary/15",
+    label: "text-primary",
   },
+};
+
+const PRIORITY_LABEL_KEY: Record<InsightRow["priority"], string> = {
+  high: "insights.priorityHigh",
+  medium: "insights.priorityMedium",
+  low: "insights.priorityLow",
 };
 
 export function InsightsSection({ clubId }: { clubId: string }) {
