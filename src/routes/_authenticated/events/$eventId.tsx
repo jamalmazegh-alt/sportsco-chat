@@ -1152,7 +1152,7 @@ function EventDetail() {
             recipientFirstName,
             playerName,
             eventTitle: event.title,
-            eventDate: eventDateLabel,
+            eventDate: event.starts_at,
             eventLocation: event.location ?? undefined,
             reason,
             teamName,
