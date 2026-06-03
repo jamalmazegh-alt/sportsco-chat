@@ -211,8 +211,6 @@ function HomePage() {
       {/* Insights (admins/coaches) */}
       {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
 
-      {/* Club availability (suspensions + absences unified) */}
-      {isCoach && activeClubId && <ClubAvailabilityWidget clubId={activeClubId} />}
 
 
 
