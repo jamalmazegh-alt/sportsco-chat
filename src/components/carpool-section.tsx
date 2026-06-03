@@ -151,7 +151,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
   const canParticipate = myConvokedChildren.length > 0 || isCoach;
 
   return (
-    <div className="relative px-5 pt-4 space-y-3">
+    <>
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <div className="px-4 py-3 border-b border-border flex items-center gap-2">
           <Car className="h-4 w-4 text-primary" />
