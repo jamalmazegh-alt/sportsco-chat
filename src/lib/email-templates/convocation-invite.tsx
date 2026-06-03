@@ -431,7 +431,8 @@ export const template = {
     const l: Locale = pickLocale((d as any).locale);
     const t = T[l];
     const prefix = d.isUpdate ? t.subjUpdate : d.isReminder ? t.subjReminder : t.subjDefault;
-    return `${prefix}${t.convocation}: ${d.eventTitle}${d.eventDate ? ` — ${d.eventDate}` : ""}`;
+    const dateFmt = formatEmailDateTime(d.eventDate, l);
+    return `${prefix}${t.convocation}: ${d.eventTitle}${dateFmt ? ` — ${dateFmt}` : ""}`;
   },
   displayName: "Convocation invite",
   previewData: {
