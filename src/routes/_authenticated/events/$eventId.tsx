@@ -2302,7 +2302,17 @@ function EventDetail() {
                 <Button variant="outline" onClick={() => setPickerStep("select")} disabled={sending}>
                   {t("common.back")}
                 </Button>
-                <Button onClick={sendConvocations} disabled={sending || selectedIds.size === 0}>
+                <Button
+                  onClick={() => {
+                    const hasSuspended = Array.from(selectedIds).some((pid) => suspensionByPlayer.has(pid));
+                    if (hasSuspended) {
+                      setConfirmSendSuspendedOpen(true);
+                    } else {
+                      sendConvocations();
+                    }
+                  }}
+                  disabled={sending || selectedIds.size === 0}
+                >
                   {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   {t("attendance.confirmSend", { defaultValue: "Confirmer l'envoi" })}
                 </Button>
