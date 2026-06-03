@@ -1,8 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/clubero-logo.png";
 
@@ -37,6 +43,45 @@ const LANG_OPTS = [
   { value: "it", label: "IT", flag: "🇮🇹" },
   { value: "nl", label: "NL", flag: "🇳🇱" },
 ] as const;
+
+function LanguageSwitcher({
+  current,
+  onChange,
+}: {
+  current: string;
+  onChange: (lang: string) => void;
+}) {
+  const active = LANG_OPTS.find((o) => o.value === current) ?? LANG_OPTS[0];
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+        >
+          <span>{active.flag}</span>
+          {active.label}
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[8rem]">
+        {LANG_OPTS.map((opt) => (
+          <DropdownMenuItem
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            className={cn(
+              "cursor-pointer gap-2",
+              current === opt.value && "bg-primary/10 text-primary font-medium"
+            )}
+          >
+            <span>{opt.flag}</span>
+            {opt.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export function MarketingHeader() {
   const [open, setOpen] = useState(false);
@@ -74,30 +119,7 @@ export function MarketingHeader() {
 
         <div className="hidden items-center gap-3 md:flex">
           {/* Language switch */}
-          <div role="radiogroup" className="flex items-center gap-1 rounded-lg border border-border p-1 overflow-x-auto max-w-[260px]">
-            {LANG_OPTS.map((opt) => {
-              const active = current === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  onClick={() => setLang(opt.value)}
-                  className={cn(
-                    "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors",
-                    active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                  title={opt.label}
-                >
-                  <span>{opt.flag}</span>
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
+          <LanguageSwitcher current={current} onChange={setLang} />
 
           <Button asChild variant="ghost" size="sm" className="h-9">
             <Link to="/login">{t("nav.login")}</Link>
@@ -138,28 +160,8 @@ export function MarketingHeader() {
                 {t(`nav.${item.key}`)}
               </Link>
             ))}
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-1 rounded-lg border border-border p-1">
-              {LANG_OPTS.map((opt) => {
-                const active = current === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => setLang(opt.value)}
-                    className={cn(
-                      "flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                      active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    <span>{opt.flag}</span>
-                    {opt.label}
-                  </button>
-                );
-              })}
+            <div className="mt-3 flex items-center justify-center">
+              <LanguageSwitcher current={current} onChange={setLang} />
             </div>
             <div className="mt-2 flex flex-col gap-2 px-1">
               <Button asChild variant="outline" onClick={() => setOpen(false)}>
