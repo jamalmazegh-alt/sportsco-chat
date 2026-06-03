@@ -105,7 +105,8 @@ export const template = {
   component: EventRescheduledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    return T[l].subject(d.eventTitle as string, d.newDate as string);
+    const newDateFmt = formatEmailDateTime(d.newDate as string, l) ?? (d.newDate as string);
+    return T[l].subject(d.eventTitle as string, newDateFmt);
   },
   displayName: "Event rescheduled",
   previewData: {
