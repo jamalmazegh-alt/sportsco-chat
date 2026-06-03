@@ -65,8 +65,10 @@ const EventRescheduledEmail = ({
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
+  const previousDateFmt = formatEmailDateTime(previousDate, l);
+  const newDateFmt = formatEmailDateTime(newDate, l) ?? newDate;
   return (
-  <EmailShell preview={`${t.preview(eventTitle, newDate)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${t.preview(eventTitle, newDateFmt)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
         <Text style={text}>
@@ -79,10 +81,10 @@ const EventRescheduledEmail = ({
         <Section style={card}>
           <Text style={cardKicker}>{t.kicker}</Text>
           <Text style={cardTitle}>{eventTitle}</Text>
-          {previousDate ? (
-            <Text style={cardMetaOld}>📅 <span style={strike}>{previousDate}</span></Text>
+          {previousDateFmt ? (
+            <Text style={cardMetaOld}>📅 <span style={strike}>{previousDateFmt}</span></Text>
           ) : null}
-          <Text style={cardMetaNew}>✅ {newDate}</Text>
+          <Text style={cardMetaNew}>✅ {newDateFmt}</Text>
           {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
         </Section>
 
