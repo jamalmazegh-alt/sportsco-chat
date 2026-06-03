@@ -2725,6 +2725,52 @@ function EventDetail() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={confirmSendSuspendedOpen} onOpenChange={setConfirmSendSuspendedOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("suspensions.confirmSendTitle", { defaultValue: "Convoquer des joueurs suspendus ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  {(event as any)?.is_official === true && event?.type === "match"
+                    ? t("suspensions.confirmSendOfficial", { defaultValue: "Ce match est officiel. Convoquer un joueur suspendu peut être contraire au règlement." })
+                    : t("suspensions.confirmSendNonOfficial", { defaultValue: "Certains joueurs sélectionnés ont une suspension active. Ce match ne décompte pas leur suspension." })}
+                </p>
+                <ul className="list-disc pl-5 text-sm">
+                  {Array.from(selectedIds)
+                    .map((pid) => {
+                      const s = suspensionByPlayer.get(pid);
+                      if (!s) return null;
+                      const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
+                      const p = tp?.players;
+                      return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), remaining: s.remaining } : null;
+                    })
+                    .filter(Boolean)
+                    .map((s: any) => (
+                      <li key={s.id}>
+                        {s.name} — {t("suspensions.remaining", { defaultValue: "{{count}} match(s) restant(s)", count: s.remaining })}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmSendSuspendedOpen(false);
+                sendConvocations();
+              }}
+            >
+              {t("suspensions.confirmSendAction", { defaultValue: "Convoquer quand même" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={!!coachOverrideTarget} onOpenChange={(o) => !o && setCoachOverrideTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
