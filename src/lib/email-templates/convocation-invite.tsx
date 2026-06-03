@@ -227,9 +227,11 @@ const ConvocationInviteEmail = ({
 }: Props) => {
   const l: Locale = pickLocale(locale);
   const t = T[l];
+  const eventDateFmt = formatEmailDateTime(eventDate, l);
+  const convocationTimeFmt = formatEmailDateTime(convocationTime, l);
   return (
 
-  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDate ? ` — ${eventDate}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
+  <EmailShell preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
         <Heading style={h1}>
           {isUpdate
             ? t.headingUpdate
