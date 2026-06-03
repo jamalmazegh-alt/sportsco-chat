@@ -52,21 +52,13 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
-        <div className="mb-4 flex justify-end gap-2 text-xs">
-          {(["fr", "en"] as const).map((lng) => {
-            const active = (i18n.language ?? "en").slice(0, 2) === lng;
-            return (
-              <button
-                key={lng}
-                type="button"
-                onClick={() => i18n.changeLanguage(lng)}
-                className={`uppercase px-2 py-1 rounded-md transition-colors ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                {lng}
-              </button>
-            );
-          })}
+        <div className="mb-4 flex justify-end">
+          <LanguageSwitcher
+            current={(i18n.language ?? "fr").slice(0, 2)}
+            onChange={(lng) => i18n.changeLanguage(lng)}
+          />
         </div>
+
         <a
           href="https://www.clubero.app"
           target="_blank"
