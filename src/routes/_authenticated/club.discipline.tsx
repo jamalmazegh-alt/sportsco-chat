@@ -157,6 +157,8 @@ function DisciplinePage() {
         </div>
       </header>
 
+      <ClubAvailabilityWidget clubId={activeClubId} />
+
       <div className="grid gap-2 sm:grid-cols-[1fr_180px_180px]">
         <Select value={teamFilter} onValueChange={setTeamFilter}>
           <SelectTrigger>
