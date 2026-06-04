@@ -102,10 +102,10 @@ export function getFields(type: ImportType): FieldDef[] {
 export function templateMatchRatio(headers: string[], type: ImportType): number {
   const fields = getFields(type);
   const required = fields.filter((f) => f.required);
-  const norm = headers.map((h) => h.toLowerCase().replace(/\s+/g, "").replace(/[éèê]/g, "e"));
-  const matched = required.filter((f) =>
-    norm.includes(f.key.toLowerCase().replace(/\s+/g, "").replace(/[éèê]/g, "e")),
-  );
+  const norm = (s: string) =>
+    s.toLowerCase().replace(/\s+/g, "").replace(/[éèê]/g, "e").replace(/[^a-z0-9_]/g, "");
+  const normHeaders = headers.map(norm);
+  const matched = required.filter((f) => normHeaders.includes(norm(f.key)));
   return required.length === 0 ? 1 : matched.length / required.length;
 }
 
