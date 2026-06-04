@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
 import { cn } from "@/lib/utils";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
@@ -256,38 +257,12 @@ function ProfilePage() {
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
-          <div role="radiogroup" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {([
-              { value: "fr", label: "Français", flag: "🇫🇷" },
-              { value: "en", label: "English", flag: "🇬🇧" },
-              { value: "de", label: "Deutsch", flag: "🇩🇪" },
-              { value: "es", label: "Español", flag: "🇪🇸" },
-              { value: "pt", label: "Português", flag: "🇵🇹" },
-              { value: "it", label: "Italiano", flag: "🇮🇹" },
-              { value: "nl", label: "Nederlands", flag: "🇳🇱" },
-            ] as const).map((opt) => {
-              const current = i18n.language?.slice(0, 2) ?? "fr";
-              const active = current === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  onClick={() => setLang(opt.value)}
-                  className={cn(
-                    "flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-colors",
-                    active
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-background text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <span className="text-base">{opt.flag}</span>
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
+          <LanguageSwitcher
+            variant="full"
+            align="start"
+            current={i18n.language?.slice(0, 2) ?? "fr"}
+            onChange={(lng: string) => setLang(lng)}
+          />
         </div>
 
         <div className="space-y-1.5">
