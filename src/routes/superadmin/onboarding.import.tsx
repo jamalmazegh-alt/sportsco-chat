@@ -276,7 +276,21 @@ function ImportPage() {
             ))}
           </div>
           {type && (
-            <label className="block border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50">
+            <label
+              className="block border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors data-[drag=true]:bg-primary/10 data-[drag=true]:border-primary"
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.dataset.drag = "true"; }}
+              onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.dataset.drag = "true"; }}
+              onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.dataset.drag = "false"; }}
+              onDrop={(e) => {
+                e.preventDefault(); e.stopPropagation();
+                e.currentTarget.dataset.drag = "false";
+                const f = e.dataTransfer.files?.[0];
+                if (!f) return;
+                if (!/\.(xlsx|xls|csv)$/i.test(f.name)) { toast.error("Format non supporté (xlsx/xls/csv uniquement)"); return; }
+                if (f.size > 5 * 1024 * 1024) { toast.error("Fichier trop volumineux (max 5 Mo)"); return; }
+                onFile(f);
+              }}
+            >
               <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
               <div className="text-sm">Glissez le fichier ou cliquez (xlsx/xls/csv, max 5 Mo)</div>
               <input
