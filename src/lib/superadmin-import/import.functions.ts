@@ -47,8 +47,9 @@ export const listClubsForImport = createServerFn({ method: "POST" })
       .from("clubs")
       .select("id, name, created_at")
       .is("archived_at", null)
+      .eq("is_personal", false)
       .order("name")
-      .limit(20);
+      .limit(500);
     if (data.search) q = q.ilike("name", `%${data.search}%`);
     const { data: clubs, error } = await q;
     if (error) throw new Error(error.message);
