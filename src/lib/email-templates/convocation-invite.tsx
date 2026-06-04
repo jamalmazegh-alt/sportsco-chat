@@ -301,17 +301,17 @@ const ConvocationInviteEmail = ({
         <Section style={{ margin: "0 0 12px" }}>
           <Row>
             <Column style={{ width: "33%", paddingRight: 6 }}>
-              <Button style={btnPresent} href={`${respondUrl}?s=present`}>
+              <Button style={btnPresent} href={`${respondUrl}?s=present&lang=${l}`}>
                 {t.btnPresent}
               </Button>
             </Column>
             <Column style={{ width: "34%", paddingRight: 6 }}>
-              <Button style={btnUncertain} href={`${respondUrl}?s=uncertain`}>
+              <Button style={btnUncertain} href={`${respondUrl}?s=uncertain&lang=${l}`}>
                 {t.btnUncertain}
               </Button>
             </Column>
             <Column style={{ width: "33%" }}>
-              <Button style={btnAbsent} href={`${respondUrl}?s=absent`}>
+              <Button style={btnAbsent} href={`${respondUrl}?s=absent&lang=${l}`}>
                 {t.btnAbsent}
               </Button>
             </Column>

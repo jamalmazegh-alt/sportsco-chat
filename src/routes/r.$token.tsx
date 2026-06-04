@@ -7,9 +7,13 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, HelpCircle, Loader2, ExternalLink, MapPin, Calendar } from "lucide-react";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
+
+const SUPPORTED_LANGS = ["fr", "en", "es", "de", "it", "nl", "pt"] as const;
 
 const searchSchema = z.object({
   s: z.enum(["present", "absent", "uncertain"]).optional(),
+  lang: z.enum(SUPPORTED_LANGS).optional(),
 });
 
 export const Route = createFileRoute("/r/$token")({
@@ -114,6 +118,13 @@ function RespondPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<Status | null>(null);
   const [autoApplied, setAutoApplied] = useState(false);
+
+  // Apply locale from email link (?lang=xx) so the page matches the email language
+  useEffect(() => {
+    if (search.lang && i18n.language !== search.lang) {
+      i18n.changeLanguage(search.lang);
+    }
+  }, [search.lang]);
 
   async function load() {
     setLoading(true);
