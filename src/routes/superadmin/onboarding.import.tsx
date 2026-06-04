@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
@@ -65,10 +65,14 @@ function ImportPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Awaited<ReturnType<typeof runImport>> | null>(null);
 
+  // Load all clubs on mount so the dropdown is populated immediately.
+  useEffect(() => {
+    listClubs({ data: {} }).then(({ clubs }) => setClubs(clubs)).catch(() => {});
+  }, [listClubs]);
+
   const doSearch = useCallback(async (q: string) => {
     setSearch(q);
-    if (q.length < 2) { setClubs([]); return; }
-    const { clubs } = await listClubs({ data: { search: q } });
+    const { clubs } = await listClubs({ data: q ? { search: q } : {} });
     setClubs(clubs);
   }, [listClubs]);
 
@@ -189,8 +193,8 @@ function ImportPage() {
         <div className="space-y-4">
           <h2 className="font-medium">Sélectionner le club</h2>
           <Input placeholder="Rechercher un club..." value={search} onChange={(e) => doSearch(e.target.value)} />
-          {clubs.length > 0 && (
-            <div className="border rounded-md divide-y">
+          {clubs.length > 0 && !club && (
+            <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
               {clubs.map((c) => (
                 <button key={c.id} onClick={() => selectClub(c)} className="block w-full text-left px-3 py-2 hover:bg-muted">
                   {c.name}
