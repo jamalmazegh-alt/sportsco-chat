@@ -193,8 +193,8 @@ function ImportPage() {
         <div className="space-y-4">
           <h2 className="font-medium">Sélectionner le club</h2>
           <Input placeholder="Rechercher un club..." value={search} onChange={(e) => doSearch(e.target.value)} />
-          {clubs.length > 0 && (
-            <div className="border rounded-md divide-y">
+          {clubs.length > 0 && !club && (
+            <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
               {clubs.map((c) => (
                 <button key={c.id} onClick={() => selectClub(c)} className="block w-full text-left px-3 py-2 hover:bg-muted">
                   {c.name}
