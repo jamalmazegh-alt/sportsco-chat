@@ -4652,6 +4652,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_club_role_any: {
+        Args: { _club_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
       has_club_role_text: {
         Args: { _club_id: string; _role: string; _user_id: string }
         Returns: boolean
