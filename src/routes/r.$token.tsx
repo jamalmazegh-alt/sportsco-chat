@@ -119,6 +119,13 @@ function RespondPage() {
   const [submitting, setSubmitting] = useState<Status | null>(null);
   const [autoApplied, setAutoApplied] = useState(false);
 
+  // Apply locale from email link (?lang=xx) so the page matches the email language
+  useEffect(() => {
+    if (search.lang && i18n.language !== search.lang) {
+      i18n.changeLanguage(search.lang);
+    }
+  }, [search.lang]);
+
   async function load() {
     setLoading(true);
     const { data, error: rpcError } = await supabase.rpc("get_convocation_by_token", { _token: token });
