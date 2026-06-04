@@ -34,6 +34,29 @@ const TYPE_LABELS: Record<ImportType, string> = {
   planning: "Planning",
 };
 
+const IMPORT_TYPES = Object.keys(TYPE_LABELS) as ImportType[];
+
+function cleanSheetRows(rows: Array<Record<string, unknown>>) {
+  return rows
+    .map((row) => {
+      const out: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(row)) {
+        if (key === "__rowNum__" || key.trim() === "") continue;
+        out[key] = typeof value === "string" ? value.trim() : value;
+      }
+      return out;
+    })
+    .filter((row) => Object.values(row).some((value) => value != null && String(value).trim() !== ""));
+}
+
+function detectTemplateType(headers: string[], selectedType: ImportType): { type: ImportType; ratio: number } {
+  const matches = IMPORT_TYPES
+    .map((candidate) => ({ type: candidate, ratio: templateMatchRatio(headers, candidate) }))
+    .sort((a, b) => b.ratio - a.ratio);
+  const selected = matches.find((match) => match.type === selectedType) ?? { type: selectedType, ratio: 0 };
+  return selected.ratio >= 0.8 ? selected : matches[0];
+}
+
 function downloadTemplate(type: ImportType) {
   const fields = getFields(type);
   const ws = XLSX.utils.aoa_to_sheet([fields.map((f) => f.key + (f.required ? "*" : ""))]);
@@ -90,19 +113,29 @@ function ImportPage() {
     setLoading(true);
     try {
       const buf = await f.arrayBuffer();
-      const wb = XLSX.read(buf, { type: "array" });
+      const wb = XLSX.read(buf, { type: "array", cellDates: true });
       const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      const rows = cleanSheetRows(
+        XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+          defval: "",
+          raw: false,
+          blankrows: false,
+        }),
+      );
       if (rows.length === 0) throw new Error("Fichier vide");
       const hdrs = Object.keys(rows[0]);
       setHeaders(hdrs);
       setRawRows(rows);
-      const ratio = templateMatchRatio(hdrs, type);
-      const isTemplate = ratio >= 0.8;
+      const detected = detectTemplateType(hdrs, type);
+      const isTemplate = detected.ratio >= 0.8;
+      if (detected.type !== type && isTemplate) {
+        setType(detected.type);
+        toast.info(`Type détecté automatiquement : ${TYPE_LABELS[detected.type]}`);
+      }
       setTemplateDetected(isTemplate);
       setStep(3);
       if (isTemplate) {
-        const res = await tplParse({ data: { type, headers: hdrs, rawRows: rows } });
+        const res = await tplParse({ data: { type: detected.type, headers: hdrs, rawRows: rows } });
         setAnalysis(res);
         setIaUsed(false);
         setStep(4);
