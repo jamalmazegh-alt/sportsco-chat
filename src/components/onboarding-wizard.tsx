@@ -82,13 +82,18 @@ export function OnboardingWizard() {
   useEffect(() => {
     if (!isAdmin || !user?.id || !activeClubId || !counts) return;
     if (typeof window === "undefined") return;
+    const trulyEmpty = counts.teams === 0 && counts.players === 0;
+    // Brand-new club → always show, even if previously dismissed
+    if (trulyEmpty) {
+      localStorage.removeItem(SEEN_KEY(user.id, activeClubId));
+      setOpen(true);
+      return;
+    }
     const seen = localStorage.getItem(SEEN_KEY(user.id, activeClubId));
     if (seen === "1") return;
-    // Only show if club looks brand-new (no teams or no players yet)
     if (counts.teams === 0 || counts.players === 0) {
       setOpen(true);
     } else {
-      // mark as seen to avoid reopening later
       localStorage.setItem(SEEN_KEY(user.id, activeClubId), "1");
     }
   }, [isAdmin, user?.id, activeClubId, counts]);

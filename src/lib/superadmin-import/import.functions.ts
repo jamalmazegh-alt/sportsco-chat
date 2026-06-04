@@ -80,63 +80,27 @@ export const getClubImportStats = createServerFn({ method: "POST" })
 // ============================================================
 // 3) Analyse IA — Gemini Flash via gateway Lovable
 // ============================================================
-const cellSchema = z.object({
-  value: z.string().nullable(),
-  error: z.string().nullable(),
-  auto_corrected: z.boolean(),
-  original: z.string().nullable(),
-});
-
-const aiResultSchema = z.object({
-  mapping: z.record(z.string(), z.string()),
-  rows: z.array(z.record(z.string(), cellSchema)),
-  corrections: z.array(
+// Schéma simple : l'IA ne produit QUE le mapping (en-tête source → clé Clubero).
+// Toute la normalisation/validation est ensuite faite localement par parseTemplate.
+// → bien plus robuste que de demander à Gemini des objets cellules dynamiques.
+const aiMappingSchema = z.object({
+  mapping: z.array(
     z.object({
-      field: z.string(),
-      original: z.string(),
-      corrected: z.string(),
-      count: z.number(),
+      source: z.string().describe("En-tête tel qu'il apparaît dans le fichier source"),
+      field: z.string().describe("Clé Clubero cible, ou 'ignore' si la colonne n'a pas d'équivalent"),
     }),
   ),
-  summary: z.object({
-    total: z.number(),
-    valid: z.number(),
-    to_fix: z.number(),
-  }),
 });
 
-const SYSTEM_PROMPT = `Tu es un assistant d'import de données pour Clubero, plateforme de gestion de clubs sportifs.
+const SYSTEM_PROMPT = `Tu es un assistant d'import pour Clubero (plateforme de clubs sportifs).
+Ta seule tâche : mapper les colonnes du fichier source vers les champs Clubero.
 
-Le fichier vient du club (Excel maison, export fédéral...). Les colonnes peuvent avoir des noms différents, en anglais ou abrégées.
-
-Pour chaque cellule, produis :
-  value          : valeur normalisée (string) ou null si manquante
-  error          : message d'erreur si invalide, null sinon
-  auto_corrected : true si normalisé silencieusement
-  original       : valeur brute avant correction
-
-Normalise silencieusement :
-  Dates   → YYYY-MM-DD
-  Emails  → minuscules, trim
-  Noms    → Titre Case
-  Sports  → "footbal" → "Football"
-  Rôles   → "Coach" → "coach", "Assistant" → "assistant_coach"
-  Jours   → "tuesday" → "Mardi", "mar." → "Mardi"
-  Heures  → "14h30" / "2:30 PM" → "14:30"
-  Domicile/Ext → "home" → "Domicile", "away" → "Extérieur"
-  Genre   → "M" → "Masculin", "F" → "Féminin"
-
-Champs obligatoires selon le type :
-  players  : equipe, sport, categorie, prenom_joueur, nom_joueur, date_naissance
-  coaches  : equipe, sport, categorie, prenom, nom, email, role
-  planning : equipe, type, date_debut, heure_debut, + recurrence_fin si recurrence_jours présent
-
-Si champ obligatoire manquant → value=null, error=null
-Si valeur invalide            → error="message", value=valeur originale
-Si champ optionnel absent     → value=null, error=null
-
-Le mapping doit avoir pour clés les en-têtes source du fichier et pour valeurs les clés Clubero.
-Renvoie un summary cohérent (total = rows.length).`;
+Règles :
+- Pour CHAQUE en-tête source listé, renvoie une entrée { source, field }.
+- field doit être l'une des clés Clubero attendues, ou exactement "ignore" si aucune ne correspond.
+- N'invente pas de clé : utilise uniquement celles fournies dans la liste.
+- Sois tolérant aux abréviations, anglais, accents, casse, espaces.
+- Exemples : "first name" → prenom, "DOB" → date_naissance, "team" → equipe, "category" → categorie, "phone" → telephone.`;
 
 export const analyzeFileWithAI = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -156,62 +120,61 @@ export const analyzeFileWithAI = createServerFn({ method: "POST" })
     if (!apiKey) throw new Error("LOVABLE_API_KEY non configurée");
 
     const fields = getFields(data.type);
-    const fieldList = fields.map((f) => `${f.key} (${f.required ? "obligatoire" : "optionnel"})`).join(", ");
+    const validKeys = new Set(fields.map((f) => f.key));
+    const fieldList = fields
+      .map((f) => `${f.key} (${f.required ? "obligatoire" : "optionnel"})`)
+      .join(", ");
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     const model = gateway("google/gemini-3-flash-preview");
 
-    // Paginate by 100 rows
-    const chunks: Array<typeof data.rawRows> = [];
-    for (let i = 0; i < data.rawRows.length; i += 100) chunks.push(data.rawRows.slice(i, i + 100));
+    // 1) Demande IA : seulement le mapping (petit, fiable)
+    let mapping: Record<string, string> = {};
+    try {
+      const { object } = await generateObject({
+        model,
+        schema: aiMappingSchema,
+        system: SYSTEM_PROMPT,
+        prompt: `Type d'import : ${data.type}
+Clés Clubero valides : ${fieldList}
 
-    const merged: AnalysisResult = {
-      mapping: {},
-      rows: [],
-      corrections: [],
-      summary: { total: 0, valid: 0, to_fix: 0 },
-    };
-    const corrAcc = new Map<string, { field: string; original: string; corrected: string; count: number }>();
+En-têtes source du fichier :
+${JSON.stringify(data.headers)}
 
-    for (const chunk of chunks) {
-      try {
-        const { object } = await generateObject({
-          model,
-          schema: aiResultSchema,
-          system: SYSTEM_PROMPT,
-          prompt: `Type d'import : ${data.type}
-Champs Clubero attendus : ${fieldList}
-En-têtes source : ${JSON.stringify(data.headers)}
-Données (${chunk.length} lignes) :
-${JSON.stringify(chunk)}`,
-          abortSignal: AbortSignal.timeout(30_000),
-        });
-        Object.assign(merged.mapping, object.mapping);
-        merged.rows.push(...object.rows);
-        for (const c of object.corrections) {
-          const k = `${c.field}|${c.original}|${c.corrected}`;
-          const ex = corrAcc.get(k);
-          if (ex) ex.count += c.count;
-          else corrAcc.set(k, { ...c });
+Échantillon des 3 premières lignes (pour aider la désambiguïsation) :
+${JSON.stringify(data.rawRows.slice(0, 3))}
+
+Renvoie le mapping en couvrant TOUS les en-têtes source ci-dessus.`,
+        abortSignal: AbortSignal.timeout(30_000),
+      });
+      for (const m of object.mapping) {
+        if (m.field && m.field !== "ignore" && validKeys.has(m.field)) {
+          mapping[m.source] = m.field;
         }
-      } catch (e) {
-        log.error("AI analysis chunk failed", { error: String(e) });
-        throw new Error("L'analyse IA a échoué. Vérifiez le fichier ou réessayez.");
       }
+    } catch (e) {
+      log.error("AI analysis chunk failed", { error: String(e) });
+      throw new Error(
+        "L'analyse IA n'a pas réussi à mapper les colonnes. Vérifie que le fichier contient des en-têtes lisibles ou utilise le modèle Clubero.",
+      );
     }
 
-    merged.corrections = Array.from(corrAcc.values());
-    // Recompute summary from merged rows using local required-field check
-    const required = fields.filter((f) => f.required).map((f) => f.key);
-    let valid = 0;
-    let to_fix = 0;
-    for (const r of merged.rows) {
-      const ok = required.every((k) => r[k]?.value) && Object.values(r).every((c) => !c.error);
-      if (ok) valid++;
-      else to_fix++;
-    }
-    merged.summary = { total: merged.rows.length, valid, to_fix };
-    return merged;
+    // 2) Renomme les en-têtes du dataset selon le mapping IA, puis applique parseTemplate
+    //    (toute la normalisation/validation locale s'applique).
+    const renamedHeaders = data.headers.map((h) => mapping[h] ?? h);
+    const renamedRows = data.rawRows.map((row) => {
+      const out: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(row)) {
+        const target = mapping[k];
+        if (target) out[target] = v;
+      }
+      return out;
+    });
+
+    const parsed = parseTemplate(data.type, renamedHeaders, renamedRows);
+    // Conserve le mapping IA dans le résultat final pour traçabilité
+    parsed.mapping = mapping;
+    return parsed as AnalysisResult;
   });
 
 // ============================================================
