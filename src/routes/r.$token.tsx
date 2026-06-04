@@ -7,9 +7,13 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, HelpCircle, Loader2, ExternalLink, MapPin, Calendar } from "lucide-react";
 import { fmt } from "@/lib/date-locale";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
+
+const SUPPORTED_LANGS = ["fr", "en", "es", "de", "it", "nl", "pt"] as const;
 
 const searchSchema = z.object({
   s: z.enum(["present", "absent", "uncertain"]).optional(),
+  lang: z.enum(SUPPORTED_LANGS).optional(),
 });
 
 export const Route = createFileRoute("/r/$token")({
