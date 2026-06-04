@@ -17,6 +17,7 @@ import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
 import { cn } from "@/lib/utils";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
