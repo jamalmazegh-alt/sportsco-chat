@@ -261,7 +261,7 @@ function ProfilePage() {
             variant="full"
             align="start"
             current={i18n.language?.slice(0, 2) ?? "fr"}
-            onChange={(lng) => setLang(lng)}
+            onChange={(lng: string) => setLang(lng)}
           />
         </div>
 
