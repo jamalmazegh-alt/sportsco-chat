@@ -65,10 +65,14 @@ function ImportPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Awaited<ReturnType<typeof runImport>> | null>(null);
 
+  // Load all clubs on mount so the dropdown is populated immediately.
+  useEffect(() => {
+    listClubs({ data: {} }).then(({ clubs }) => setClubs(clubs)).catch(() => {});
+  }, [listClubs]);
+
   const doSearch = useCallback(async (q: string) => {
     setSearch(q);
-    if (q.length < 2) { setClubs([]); return; }
-    const { clubs } = await listClubs({ data: { search: q } });
+    const { clubs } = await listClubs({ data: q ? { search: q } : {} });
     setClubs(clubs);
   }, [listClubs]);
 
