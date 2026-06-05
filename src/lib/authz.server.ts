@@ -10,6 +10,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export type ClubRole =
   | "admin"
+  | "dirigeant"
   | "coach"
   | "assistant_coach"
   | "staff"
