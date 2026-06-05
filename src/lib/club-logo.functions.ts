@@ -28,8 +28,17 @@ const LogoPathInput = z.object({
 });
 
 function safeLogoExtension(fileName: string, contentType: string) {
-  const fromName = fileName.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (fromName && ["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"].includes(fromName)) {
+  const fromName = fileName
+    .split(".")
+    .pop()
+    ?.toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  if (
+    fromName &&
+    ["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"].includes(
+      fromName,
+    )
+  ) {
     return fromName === "jpeg" ? "jpg" : fromName;
   }
   if (contentType === "image/png") return "png";
@@ -81,7 +90,9 @@ export const updateClubLogoFromUpload = createServerFn({ method: "POST" })
       allowedRoles: ["admin", "dirigeant"],
     });
 
-    const { data: publicUrl } = supabaseAdmin.storage.from("club-logos").getPublicUrl(data.path);
+    const { data: publicUrl } = supabaseAdmin.storage
+      .from("club-logos")
+      .getPublicUrl(data.path);
     const { error } = await supabaseAdmin
       .from("clubs")
       .update({ logo_url: publicUrl.publicUrl })
