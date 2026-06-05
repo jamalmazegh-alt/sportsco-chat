@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { createSignedClubLogoUpload, updateClubLogoFromUpload } from "@/lib/club-logo.functions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,17 @@ export const Route = createFileRoute("/_authenticated/profile/")({
   }),
 });
 
+function inferImageContentType(file: File) {
+  if (file.type) return file.type;
+  const ext = file.name.split(".").pop()?.toLowerCase();
+  if (ext === "png") return "image/png";
+  if (ext === "webp") return "image/webp";
+  if (ext === "gif") return "image/gif";
+  if (ext === "heic") return "image/heic";
+  if (ext === "heif") return "image/heif";
+  return "image/jpeg";
+}
+
 function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { user, signOut, memberships, activeClubId, setActiveClubId, refreshMemberships } = useAuth();
@@ -39,6 +52,8 @@ function ProfilePage() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();
   const { tournamentOnly } = useTournamentOnlyMode();
+  const createLogoUpload = useServerFn(createSignedClubLogoUpload);
+  const updateClubLogo = useServerFn(updateClubLogoFromUpload);
 
   const club = memberships.find((m) => m.club_id === activeClubId)?.club;
 
@@ -119,25 +134,28 @@ function ProfilePage() {
   async function onUploadClubLogo(file: File) {
     if (!activeClubId) return;
     setUploadingLogo(true);
-    const ext = file.name.split(".").pop() || "png";
-    const path = `${activeClubId}/logo-${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage
-      .from("club-logos")
-      .upload(path, file, { upsert: true, contentType: file.type });
-    if (upErr) {
+    try {
+      const contentType = inferImageContentType(file);
+      const signed = await createLogoUpload({
+        data: {
+          clubId: activeClubId,
+          fileName: file.name,
+          contentType,
+          size: file.size,
+        },
+      });
+      const { error: upErr } = await supabase.storage
+        .from("club-logos")
+        .uploadToSignedUrl(signed.path, signed.token, file, { contentType });
+      if (upErr) throw upErr;
+      await updateClubLogo({ data: { clubId: activeClubId, path: signed.path } });
+      await refreshMemberships();
+      toast.success(t("club.logoUpdated"));
+    } catch (error: any) {
+      toast.error(error?.message ?? t("common.error", { defaultValue: "Erreur" }));
+    } finally {
       setUploadingLogo(false);
-      toast.error(upErr.message);
-      return;
     }
-    const { data: pub } = supabase.storage.from("club-logos").getPublicUrl(path);
-    const { error: updErr } = await supabase
-      .from("clubs")
-      .update({ logo_url: pub.publicUrl })
-      .eq("id", activeClubId);
-    setUploadingLogo(false);
-    if (updErr) { toast.error(updErr.message); return; }
-    await refreshMemberships();
-    toast.success(t("club.logoUpdated"));
   }
 
   return (
