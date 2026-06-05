@@ -5,10 +5,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  createSignedClubLogoUpload,
-  updateClubLogoFromUpload,
-} from "@/lib/club-logo.functions";
+import { createSignedClubLogoUpload, updateClubLogoFromUpload } from "@/lib/club-logo.functions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
