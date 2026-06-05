@@ -5,7 +5,10 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { createSignedClubLogoUpload, updateClubLogoFromUpload } from "@/lib/club-logo.functions";
+import {
+  createSignedClubLogoUpload,
+  updateClubLogoFromUpload,
+} from "@/lib/club-logo.functions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -48,6 +51,7 @@ function ProfilePage() {
   const role = useActiveRole();
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
+  const canManageLogo = isAdmin || roles.includes("dirigeant");
   const navigate = useNavigate();
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const { mode: themeMode, setTheme } = useTheme();
@@ -151,8 +155,9 @@ function ProfilePage() {
       await updateClubLogo({ data: { clubId: activeClubId, path: signed.path } });
       await refreshMemberships();
       toast.success(t("club.logoUpdated"));
-    } catch (error: any) {
-      toast.error(error?.message ?? t("common.error", { defaultValue: "Erreur" }));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : null;
+      toast.error(message ?? t("common.error", { defaultValue: "Erreur" }));
     } finally {
       setUploadingLogo(false);
     }
@@ -248,7 +253,7 @@ function ProfilePage() {
               )}
             </div>
           </div>
-          {isAdmin && (
+          {canManageLogo && (
             <label className="flex items-center justify-center gap-2 w-full h-10 rounded-xl border border-dashed border-primary/40 bg-primary/5 text-sm text-primary font-medium cursor-pointer hover:bg-primary/10 transition-colors">
               {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
               {uploadingLogo
