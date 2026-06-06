@@ -110,7 +110,8 @@ export function useAuthState(): AuthState {
     setMemberships(list);
     const current = activeClubIdRef.current;
     if (list.length > 0 && !list.some((m) => m.club_id === current)) {
-      setActiveClubId(list[0].club_id);
+      const preferred = list.find((m) => m.role === "admin") ?? list[0];
+      setActiveClubId(preferred.club_id);
     }
     if (list.length === 0) setActiveClubId(null);
   }, [setActiveClubId]);

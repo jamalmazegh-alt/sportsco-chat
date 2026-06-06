@@ -27,8 +27,9 @@ export const listClubUsers = createServerFn({ method: "POST" })
       throw new Response("Forbidden", { status: 403 });
     }
 
-    // Fetch all members of the club (role only — legacy DBs may lack roles[])
-    const { data: members, error } = await supabaseAdmin
+    // Use the caller's JWT client (same Supabase project as the browser).
+    // supabaseAdmin may target a different env in local dev and would return [].
+    const { data: members, error } = await supabase
       .from("club_members")
       .select("user_id, role, created_at")
       .eq("club_id", data.club_id);
@@ -37,19 +38,23 @@ export const listClubUsers = createServerFn({ method: "POST" })
     const ids = Array.from(new Set((members ?? []).map((m) => m.user_id)));
     if (ids.length === 0) return { users: [] };
 
-    const { data: profiles } = await supabaseAdmin
+    const { data: profiles } = await supabase
       .from("profiles")
       .select("id, full_name, first_name, last_name, phone, avatar_url")
       .in("id", ids);
     const profById = new Map((profiles ?? []).map((p: any) => [p.id, p]));
 
     const emailById = new Map<string, string | null>();
-    const { data: authRows } = await (supabaseAdmin as any)
-      .schema("auth")
-      .from("users")
-      .select("id, email")
-      .in("id", ids);
-    for (const u of authRows ?? []) emailById.set(u.id, u.email ?? null);
+    try {
+      const { data: authRows } = await (supabaseAdmin as any)
+        .schema("auth")
+        .from("users")
+        .select("id, email")
+        .in("id", ids);
+      for (const u of authRows ?? []) emailById.set(u.id, u.email ?? null);
+    } catch {
+      // Emails optional when service-role client is misconfigured
+    }
 
     const grouped = new Map<
       string,
@@ -101,7 +106,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       throw new Response("Forbidden", { status: 403 });
     }
 
-    const { data: targetMembership } = await supabaseAdmin
+    const { data: targetMembership } = await supabase
       .from("club_members")
       .select("user_id")
       .eq("club_id", data.club_id)
@@ -113,12 +118,12 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
 
     const [{ data: profile }, { data: memberships }, { data: linkedPlayers }, { data: parentLinks }, authUser] =
       await Promise.all([
-        supabaseAdmin
+        supabase
           .from("profiles")
           .select("id, full_name, first_name, last_name, phone, created_at, avatar_url, phone_verified_at")
           .eq("id", data.user_id)
           .maybeSingle(),
-        supabaseAdmin
+        supabase
           .from("club_members")
           .select("club_id, role, created_at, clubs:club_id(name)")
           .eq("user_id", data.user_id),
