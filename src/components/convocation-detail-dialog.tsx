@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
-import { Bell, Mail, MessageSquare, Smartphone, Send, X } from "lucide-react";
+import { Bell, Mail, MessageSquare, Smartphone, Send, X, CheckCircle2, XCircle, HelpCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+
+const STATUS_ACTIONS = [
+  { status: "present", Icon: CheckCircle2, activeCls: "bg-emerald-500 text-white border-emerald-500", idleCls: "text-emerald-600 hover:bg-emerald-50" },
+  { status: "uncertain", Icon: HelpCircle, activeCls: "bg-uncertain text-uncertain-foreground border-uncertain", idleCls: "text-uncertain-foreground hover:bg-uncertain/20" },
+  { status: "absent", Icon: XCircle, activeCls: "bg-absent text-white border-absent", idleCls: "text-absent hover:bg-absent/10" },
+] as const;
 
 type Convocation = {
   id: string;
@@ -25,6 +32,7 @@ type Convocation = {
     jersey_number?: number | null;
     photo_url?: string | null;
     preferred_position?: string | null;
+    user_id?: string | null;
   } | null;
 };
 
@@ -53,16 +61,20 @@ export function ConvocationDetailDialog({
   convocation,
   eventConvocationsSentAt,
   isCoach,
+  currentUserId,
   onRemind,
   onCancel,
+  onChangeStatus,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   convocation: Convocation | null;
   eventConvocationsSentAt?: string | null;
   isCoach: boolean;
+  currentUserId?: string | null;
   onRemind?: (convocationId: string) => void;
   onCancel?: (convocationId: string) => void;
+  onChangeStatus?: (convocationId: string, status: "present" | "uncertain" | "absent") => void;
 }) {
   const { t } = useTranslation();
 
@@ -121,12 +133,39 @@ export function ConvocationDetailDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between rounded-xl border p-3">
-            <span className="text-sm text-muted-foreground">{t("attendance.status")}</span>
-            <AttendancePill status={convocation.status as any} />
-          </div>
+          {isCoach && onChangeStatus ? (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                {t("attendance.status")}
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {STATUS_ACTIONS.map(({ status, Icon, activeCls, idleCls }) => {
+                  const active = convocation.status === status;
+                  return (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => onChangeStatus(convocation.id, status)}
+                      className={cn(
+                        "flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-2 py-3 text-xs font-semibold transition-all",
+                        active ? activeCls : cn("border-border bg-background", idleCls),
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {t(`attendance.${status}`)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between rounded-xl border p-3">
+              <span className="text-sm text-muted-foreground">{t("attendance.status")}</span>
+              <AttendancePill status={convocation.status as any} />
+            </div>
+          )}
 
-          {convocation.comment && (
+          {convocation.comment && (isCoach || (currentUserId && convocation.players?.user_id === currentUserId)) && (
             <div className="rounded-xl border bg-muted/50 p-3">
               <p className="text-xs text-muted-foreground mb-1">{t("attendance.comment")}</p>
               <p className="text-sm italic">"{convocation.comment}"</p>
@@ -179,30 +218,43 @@ export function ConvocationDetailDialog({
           </div>
         </div>
 
-        {isCoach && (
-          <DialogFooter className="gap-2 sm:gap-2">
-            {convocation.status === "pending" && onRemind && (
-              <Button
-                variant="outline"
-                onClick={() => onRemind(convocation.id)}
-                className="gap-2"
-              >
-                <Bell className="h-4 w-4" />
-                {t("attendance.remind")}
-              </Button>
-            )}
-            {onCancel && (
-              <Button
-                variant="outline"
-                onClick={() => onCancel(convocation.id)}
-                className="gap-2 text-destructive hover:text-destructive"
-              >
-                <X className="h-4 w-4" />
-                {t("attendance.cancelConvocation")}
-              </Button>
-            )}
-          </DialogFooter>
-        )}
+        {isCoach && (() => {
+          const lastReminderAt = meta?.reminders?.[0]?.sent_at
+            ? new Date(meta.reminders[0].sent_at).getTime()
+            : 0;
+          const cooldownMs = 30 * 60 * 1000;
+          const remainingMs = lastReminderAt ? cooldownMs - (Date.now() - lastReminderAt) : 0;
+          const inCooldown = remainingMs > 0;
+          const remainingMin = Math.ceil(remainingMs / 60000);
+          return (
+            <DialogFooter className="gap-2 sm:gap-2">
+              {convocation.status === "pending" && onRemind && (
+                <Button
+                  variant="outline"
+                  onClick={() => onRemind(convocation.id)}
+                  disabled={inCooldown}
+                  className="gap-2"
+                  title={inCooldown ? t("attendance.cooldownHint", { defaultValue: "Encore {{m}} min avant de pouvoir relancer", m: remainingMin }) : undefined}
+                >
+                  <Bell className="h-4 w-4" />
+                  {inCooldown
+                    ? t("attendance.remindIn", { defaultValue: "Relancer dans {{m}} min", m: remainingMin })
+                    : t("attendance.remind")}
+                </Button>
+              )}
+              {onCancel && (
+                <Button
+                  variant="outline"
+                  onClick={() => onCancel(convocation.id)}
+                  className="gap-2 text-destructive hover:text-destructive"
+                >
+                  <X className="h-4 w-4" />
+                  {t("attendance.cancelConvocation")}
+                </Button>
+              )}
+            </DialogFooter>
+          );
+        })()}
       </DialogContent>
     </Dialog>
   );

@@ -4,7 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 type Status = Database["public"]["Enums"]["attendance_status"];
 
 const STYLES: Record<Status, string> = {
-  present: "bg-present text-present-foreground",
+  present: "bg-emerald-100 text-emerald-800",
   absent: "bg-absent text-absent-foreground",
   uncertain: "bg-uncertain text-uncertain-foreground",
   pending: "bg-pending text-pending-foreground",

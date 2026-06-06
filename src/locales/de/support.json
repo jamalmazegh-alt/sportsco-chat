@@ -1,0 +1,62 @@
+{
+  "fab": "Support",
+  "page": {
+    "title": "Meine Anfragen",
+    "subtitle": "Verfolge deine Support-Anfragen und melde ein neues Problem.",
+    "new": "Neu",
+    "empty": "Noch keine Anfragen vorhanden.",
+    "report": "Problem melden",
+    "back": "Meine Anfragen"
+  },
+  "form": {
+    "title": "Problem melden",
+    "subject": "Betreff",
+    "subject_placeholder": "Beschreibe das Problem in wenigen Worten",
+    "category": "Kategorie",
+    "description": "Beschreibung",
+    "description_placeholder": "Bitte so präzise wie möglich…",
+    "intent": "Was hast du versucht zu tun?",
+    "intent_optional": "(optional)",
+    "intent_placeholder": "z. B. ein Event erstellen",
+    "attachments": "Screenshots",
+    "attachments_hint": "(max. 5, 5 MB)",
+    "add_file": "Datei hinzufügen",
+    "cancel": "Abbrechen",
+    "send": "Senden",
+    "sent": "Anfrage gesendet",
+    "sent_desc": "Wir melden uns so schnell wie möglich. Du kannst den Stand unter «Meine Anfragen» verfolgen.",
+    "close": "Schließen",
+    "view": "Ticket anzeigen",
+    "file_too_large": "{{name}} überschreitet 5 MB",
+    "error": "Fehler"
+  },
+  "thread": {
+    "internal_note": "Interne Notiz",
+    "staff_label": "Clubero-Team",
+    "reply_placeholder": "Eine Antwort schreiben…",
+    "send": "Senden",
+    "link_unavailable": "Link nicht verfügbar"
+  },
+  "status": {
+    "open": "Offen",
+    "in_progress": "In Bearbeitung",
+    "waiting_user": "Warte auf deine Antwort",
+    "resolved": "Gelöst",
+    "closed": "Geschlossen"
+  },
+  "priority": {
+    "low": "Niedrig",
+    "normal": "Normal",
+    "high": "Hoch",
+    "urgent": "Dringend"
+  },
+  "category": {
+    "bug": "Fehler",
+    "payment": "Zahlung",
+    "account": "Konto",
+    "team": "Teams / Spieler",
+    "event": "Events",
+    "feature_request": "Funktionswunsch",
+    "other": "Sonstiges"
+  }
+}

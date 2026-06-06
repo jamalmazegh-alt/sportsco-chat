@@ -1,0 +1,1199 @@
+{
+  "search": {
+    "filterRegion": "Región",
+    "filterSport": "Deporte"
+  },
+  "nav": {
+    "features": "Funcionalidades",
+    "players": "Jugadores",
+    "tournaments": "Torneos",
+    "onboarding": "Configuración",
+    "pricing": "Precios",
+    "faq": "Preguntas frecuentes",
+    "contact": "Contacto",
+    "login": "Iniciar sesión",
+    "signup": "Registrar club",
+    "demo": "Solicitar demo"
+  },
+  "footer": {
+    "tagline": "Coordinación de equipos, simplificada para clubes deportivos.",
+    "product": "Producto",
+    "company": "Empresa",
+    "legal": "Legal",
+    "terms": "Condiciones de uso",
+    "privacy": "Política de privacidad",
+    "legalNotice": "Aviso legal",
+    "rights": "© {{year}} Clubero. Todos los derechos reservados.",
+    "tagline2": "Diseñado para clubes, entrenadores, padres y jugadores."
+  },
+  "home": {
+    "badge": "La plataforma para clubes deportivos amateur",
+    "title": "La energía de tu club, por fin coordinada.",
+    "subtitle": "Se acabaron las convocatorias perdidas en WhatsApp. Coordinación de equipo real: asistencia, recordatorios, comunicación, todo en una sola aplicación.",
+    "ctaDemo": "Solicitar demo",
+    "ctaFeatures": "Ver funciones",
+    "freeTrial": "Prueba gratuita",
+    "noCard": "Sin tarjeta de crédito",
+    "hostedEU": "Datos alojados en Europa",
+    "statConvoke": "para convocatorias",
+    "statResponse": "Tasa de respuesta",
+    "statChannels": "canales disponibles",
+    "featuresTitle": "Todo lo que tu club necesita.",
+    "featuresSubtitle": "Nada superfluo.",
+    "featuresBody": "Convocatorias, asistencia, recordatorios y estadísticas: todo funciona en Clubero. WhatsApp sigue estando disponible opcionalmente para aquellos que no quieran abandonar su grupo.",
+    "forEveryone": "Para todo el club",
+    "forEveryoneTitle": "Una aplicación, cuatro perspectivas.",
+    "ctaTitle": "¿Listo para mejorar la coordinación de tu club?",
+    "ctaBody": "Únete a los clubes que cambian el caos por la claridad.",
+    "ctaButton": "Solicitar demo",
+    "ctaPricing": "Ver precios",
+    "ctaSeason": "Comienza tu temporada",
+    "heroLive": "Directo · 2-1",
+    "heroAttendance": "Asistencia",
+    "heroDate": "Sábado · 14:30",
+    "heroMatch": "Sub-13 — vs FC Riverside",
+    "heroBadgeConvocation": "Convocatoria",
+    "heroStatusPresent": "Presente",
+    "heroStatusMaybe": "Quizás",
+    "heroStatusAbsent": "Ausente",
+    "heroStatusPending": "Pendiente",
+    "heroResponded": "14 de 18 han respondido",
+    "featuresChip": "Hecho para el campo",
+    "feat1Title": "Convocatorias inteligentes",
+    "feat1Body": "Envía tus convocatorias en segundos. Jugadores y padres responden con un clic.",
+    "feat2Title": "Gestión de equipos",
+    "feat2Body": "Plantilla, vínculos parentales, números y posiciones, todo en un solo lugar.",
+    "feat3Title": "Recordatorios automáticos",
+    "feat3Body": "Se acabó el seguimiento manual. Los recordatorios se envían automáticamente.",
+    "feat4Title": "WhatsApp y email opcionales",
+    "feat4Body": "Clubero es tu canal principal. Para todos los que prefieran usar WhatsApp o correo electrónico: comparte un enlace formateado con un clic.",
+    "feat5Title": "Torneos llave en mano",
+    "feat5Body": "Crea un torneo con grupos, fases eliminatorias, calendario y clasificaciones. Comparte un enlace de TV público para resultados en vivo.",
+    "feat6Title": "Resultados y estadísticas por deporte",
+    "feat6Body": "Registra resultados y estadísticas (goles, ensayos, triples) adaptados a cada deporte.",
+    "feat7Title": "Seguimiento de asistencia",
+    "feat7Body": "Ve quién estuvo, quién faltó y detecta las tendencias de la temporada.",
+    "feat8Title": "Asistente de IA integrado",
+    "feat8Body": "Haz tus preguntas en español: el asistente conoce tu club, tus equipos, tus estadísticas y tus próximos eventos.",
+    "feat9Title": "Vida del club en tiempo real",
+    "feat9Body": "Tablón de anuncios, menciones, confirmaciones de lectura, archivos: toda la vida del club en un solo lugar.",
+    "feat10Title": "RGPD y seguridad",
+    "feat10Body": "Acceso basado en roles, control parental y alojamiento de datos en Europa.",
+    "audClubs": "Clubes",
+    "audClubsP1": "Gestiona equipos y miembros de forma centralizada",
+    "audClubsP2": "Panel de control multi-equipo",
+    "audClubsP3": "Estadísticas de la temporada",
+    "audCoaches": "Entrenadores",
+    "audCoachesP1": "Convocatorias en segundos",
+    "audCoachesP2": "Asistencia en tiempo real",
+    "audCoachesP3": "Chat propio para cada evento",
+    "audParents": "Padres/Madres",
+    "audParentsP1": "Responde con un clic",
+    "audParentsP2": "Calendario siempre a mano",
+    "audParentsP3": "Sin avalancha de notificaciones",
+    "audPlayers": "Jugadores",
+    "audPlayersP1": "Ve tu próximo partido",
+    "audPlayersP2": "Confirma tu participación",
+    "audPlayersP3": "Mantente al día",
+    "feat11Title": "Cuaderno de desarrollo del jugador",
+    "feat11Body": "Cada jugador tiene su perfil completo: tarjeta de asistencia semana a semana, estadísticas (goles, tarjetas, partidos jugados), feedback del entrenador por evento y balance de temporada de IA. Los padres tienen acceso directo.",
+    "feat12Title": "Tablón del club y redes sociales",
+    "feat12Body": "Las publicaciones de Instagram, Facebook y X del club aparecen automáticamente en el tablón de Clubero. Los miembros ven todo en un solo lugar, sin cambiar de aplicación.",
+    "feat13Title": "Incorporación en minutos",
+    "feat13Body": "Importa a tus jugadores, padres y entrenadores desde tu archivo Excel existente. Si las columnas no coinciden, la IA las organiza y normaliza automáticamente antes de la importación.",
+    "feat14Title": "Reglamento generado automáticamente",
+    "feat14Body": "Cada torneo genera su reglamento en PDF con un clic, en español o inglés, basado en su configuración. Listo para compartir o imprimir.",
+    "feat15Title": "Multi-deporte nativo",
+    "feat15Body": "Fútbol, baloncesto, rugby, balonmano, voleibol: un solo club puede gestionar múltiples deportes con estadísticas y formatos adecuados para cada disciplina.",
+    "badge2": "La plataforma deportiva que conecta clubes, jugadores y entrenadores",
+    "heroLine1": "Tu club.",
+    "heroLine2": "Tu desarrollo.",
+    "heroLine3": "Tu red deportiva.",
+    "heroSub": "Fútbol, baloncesto, rugby, balonmano: todo lo que tu club y tus jugadores necesitan, en un solo lugar.",
+    "ctaClub": "Crear club",
+    "ctaPlayer": "Crear perfil de jugador",
+    "ctaCoachHint": "¿Ya eres entrenador?",
+    "ctaCoach": "Crear perfil de entrenador",
+    "ctaExplore": "Descubrir perfiles",
+    "ctaEcosystem": "Forma parte del ecosistema Clubero",
+    "ctaEcosystemSub": "Club, jugador o entrenador: empieza gratis.",
+    "previewTitle": "Ver Clubero en acción",
+    "previewMock1Title": "Panel de entrenador",
+    "previewMock1Avail": "Disponibilidades",
+    "previewMock1Upcoming": "Próximos eventos",
+    "previewMock1Cta": "Crear convocatoria",
+    "previewMock2Title": "Perfil público de jugador",
+    "previewMock2Season": "Temporada 2025-26",
+    "previewMock2Badge": "Campeón regional",
+    "previewMock2Follow": "Seguir",
+    "previewMock3Title": "Tablón del club",
+    "previewMock3Pinned": "Fijado",
+    "previewMock3Post": "Victoria 3-1 contra AS Montagne — ¡Enhorabuena al Sub-13!",
+    "previewMock3Ig": "Instagram conectado",
+    "promise1Title": "Todo para gestionar tu temporada",
+    "promise1Body": "Convocatorias, planificación, asistencia, torneos, disciplina, comunicación: todo en un solo lugar.",
+    "promise1Cta": "Ver funciones →",
+    "promise2Title": "Tu camino deportivo para siempre",
+    "promise2Body": "Estadísticas, logros, línea de tiempo, perfil público: tu historia deportiva te pertenece, incluso si cambias de club.",
+    "promise2Cta": "Crear perfil →",
+    "promise3Title": "Un perfil que te representa",
+    "promise3Body": "Diplomas, experiencias, filosofía de juego: tu trayectoria como entrenador visible con un solo enlace.",
+    "promise3Cta": "Crear perfil de entrenador →",
+    "ctaFinalTitle": "¿Listo para unirte a la comunidad?",
+    "ctaFinalSub": "Prueba gratuita. Sin tarjeta de crédito. Datos alojados en Europa.",
+    "feat16Title": "Disponibilidades y ausencias",
+    "feat16Body": "Jugadores y padres informan de sus ausencias. El entrenador ve la plantilla disponible antes de crear la convocatoria.",
+    "feat17Title": "Disciplina y sanciones",
+    "feat17Body": "Gestiona sanciones, sigue los partidos cumplidos y recibe avisos al convocar.",
+    "allChip": "Todo lo que Clubero puede hacer",
+    "allTitle": "Una plataforma. Todo lo que tu club necesita.",
+    "allSub": "Descubre cada módulo en detalle: haz clic en una tarjeta para ver cómo funciona.",
+    "allCta": "Ver detalles",
+    "allCtaAll": "Ver todas las funciones",
+    "tile_tournaments_t": "Torneos y competiciones",
+    "tile_tournaments_b": "Desde el sorteo de grupos hasta la final, incluyendo la venta de entradas y el modo TV público.",
+    "tile_convocations_t": "Convocatorias y asistencia",
+    "tile_convocations_b": "Convoca en 12 segundos, sigue las respuestas, haz recordatorios automáticos.",
+    "tile_wall_t": "Tablón del club",
+    "tile_wall_b": "Anuncios, fotos, publicaciones fijadas. El hilo de vida del club, sin Facebook.",
+    "tile_whatsapp_t": "WhatsApp opcional",
+    "tile_whatsapp_b": "Todo permanece en Clubero, y un clic comparte la convocatoria formateada en WhatsApp.",
+    "tile_player_t": "Diario del jugador",
+    "tile_player_b": "Estadísticas, asistencia, feedback del entrenador, insights de IA: un verdadero cuaderno de progreso.",
+    "tile_coach_t": "Perfil de entrenador",
+    "tile_coach_b": "Diplomas, filosofía de juego, experiencias: tu tarjeta de presentación pública.",
+    "tile_network_t": "Red deportiva",
+    "tile_network_b": "Descubre jugadores, entrenadores y clubes cerca de ti. El LinkedIn del deporte amateur.",
+    "tile_ai_t": "Asistente de IA para entrenadores",
+    "tile_ai_b": "Sugerencias de acción, resúmenes de partidos, análisis de temporada: la IA al servicio del entrenador.",
+    "hero": {
+      "kicker": "Pensada por y para clubes amateurs",
+      "headline1": "Hemos entendido lo que necesitabas",
+      "headline2": "para ganar tiempo",
+      "headline3": "y volver a centrarte en el deporte.",
+      "sub": "Clubero digitaliza todo lo que te roba tardes enteras: convocatorias, pagos, comunicaciones, estadísticas. Vuelves a ser club, no administración.",
+      "cta": "Probar gratis",
+      "ctaSecondary": "Ver funcionalidades",
+      "trust1": "Prueba gratuita",
+      "trust2": "Sin tarjeta bancaria",
+      "trust3": "Datos alojados en Europa"
+    },
+    "digit": {
+      "kicker": "Lo hemos digitalizado por ti",
+      "title": "Todo lo que te llevaba horas, ahora en unos clics.",
+      "sub": "Cada función nace de una necesidad real planteada por clubes como el tuyo.",
+      "f1Title": "Convocatorias en 12 segundos",
+      "f1Body": "Envía, recuerda, sigue las respuestas. Sin perseguir a cada uno por SMS.",
+      "f2Title": "Pagos en línea",
+      "f2Body": "Cuotas, equipamiento, stages. Stripe integrado, recibos automáticos, recordatorios incluidos.",
+      "f3Title": "Comunicación centralizada",
+      "f3Body": "Muro del club, chat de evento, emails multilingües. Se acabaron los grupos de WhatsApp desbordados.",
+      "f4Title": "Estadísticas y seguimiento de jugadores",
+      "f4Body": "Asistencias, feedback del entrenador, progresión. Una verdadera carrera para tus jugadores.",
+      "f5Title": "Disciplina y sanciones",
+      "f5Body": "Tarjetas, sanciones, lesiones registradas automáticamente por equipo y temporada.",
+      "f6Title": "Alineaciones y actas de partido",
+      "f6Body": "Prepara la alineación, compártela, exporta el acta. El entrenador lo tiene todo en su móvil."
+    },
+    "ai": {
+      "kicker": "Inteligencia artificial integrada",
+      "title": "La IA te respalda a diario.",
+      "sub": "No es un capricho: un asistente que entiende tu club, tus jugadores, tu temporada — y te hace ganar tiempo real.",
+      "b1": "Resume tus partidos y propone la próxima alineación",
+      "b2": "Redacta tus comunicaciones en un clic, en 7 idiomas",
+      "b3": "Detecta automáticamente progresos y alertas de jugadores",
+      "b4": "Asistente integrado: hazle cualquier pregunta sobre tu club",
+      "cta": "Descubrir el asistente",
+      "assistantName": "Asistente Clubero",
+      "online": "En línea",
+      "q1": "¿Quién no ha pagado todavía la cuota?",
+      "a1": "3 jugadores: Lucas M., Sarah B. y Tom D. ¿Lanzo un recordatorio por email?",
+      "q2": "Sí, en francés."
+    },
+    "tourn": {
+      "kicker": "Módulo de torneos — app completa",
+      "title": "Una verdadera app de gestión de torneos, dentro de Clubero.",
+      "sub": "Inscripciones, brackets, marcadores en directo, página pública TV. Todo lo que necesita un organizador, sin software aparte.",
+      "b1": "Inscripciones en línea, pago integrado",
+      "b2": "Cuadros, grupos, brackets, marcadores en vivo",
+      "b3": "Página pública TV para tus espectadores",
+      "b4": "Convocatorias y actas de partido incluidas",
+      "cta": "Iniciar un torneo",
+      "pricing": "Ver tarifas",
+      "included": "Incluido en la suscripción del club",
+      "includedDesc": "Torneos ilimitados, sin coste por evento",
+      "includedBody": "Si tu club tiene una suscripción Clubero, puedes crear todos los torneos que quieras, sin coste extra.",
+      "standalone": "Sin suscripción — por evento",
+      "standaloneDesc": "Paga 40 € por torneo, sin más",
+      "standaloneBody": "¿Organizas un torneo puntual? Activa el módulo para un solo evento, sin compromiso."
+    },
+    "social": {
+      "kicker": "La red social del deporte amateur",
+      "title": "Más allá de la gestión: hemos creado la red de jugadores y entrenadores.",
+      "sub": "Perfiles públicos, seguimiento, comunidad. El deporte amateur merece su propia red — no un feed de Instagram perdido en el ruido.",
+      "c1Title": "Perfil de jugador público",
+      "c1Body": "Estadísticas, carrera, contenido — compartible, certificado por tus clubes.",
+      "c2Title": "Página de entrenador",
+      "c2Body": "Visibilidad, seguimiento, contratación. Los entrenadores dejan de ser invisibles.",
+      "c3Title": "Seguidores y suscripciones",
+      "c3Body": "Sigue a tus clubes favoritos, a tus hijos, a tus amigos. Como una red de verdad.",
+      "cta": "Crear mi perfil de jugador"
+    },
+    "finalCta": {
+      "title": "Recupera tiempo para el deporte.",
+      "sub": "Prueba gratuita. Sin tarjeta bancaria. Datos alojados en Europa.",
+      "club": "Crear mi club",
+      "player": "Crear mi perfil de jugador"
+    }
+  },
+  "whatsapp": {
+    "chip": "Comunicación flexible",
+    "title1": "Todo sucede en Clubero.",
+    "title2": "WhatsApp sigue siendo una opción.",
+    "body": "Convocatorias que se pierden en el chat, respuestas que desaparecen en las notificaciones y padres que se pierden la información: Clubero centraliza todo en un lugar claro y organizado. Y para aquellos que prefieren seguir en WhatsApp, un botón comparte el mensaje formateado en el grupo con un solo clic.",
+    "p1Title": "Todo centralizado en Clubero",
+    "p1Body": "Convocatorias, respuestas de asistencia, recordatorios, estadísticas y chat por evento: un único lugar, nada se pierde.",
+    "p2Title": "WhatsApp como opción, no como obligación",
+    "p2Body": "¿Un padre o jugador prefiere quedarse en WhatsApp? Un botón copia el mensaje formateado, listo para compartir. Tú mantienes el control en la aplicación.",
+    "p3Title": "Correo electrónico para los que no usan el teléfono",
+    "p3Body": "Las convocatorias también se pueden enviar por correo electrónico. Así cubres todos los canales sin esfuerzo.",
+    "p4Title": "Sin API, sin número para configurar",
+    "p4Body": "La función de compartir en WhatsApp utiliza la función nativa del teléfono. Nada que instalar por parte del club.",
+    "cta": "Ver demo",
+    "ctaNote": "Todo en la aplicación — WhatsApp y correo electrónico siguen siendo opcionales",
+    "mockGroup": "Sub-13 — Temporada 25/26",
+    "mockMembers": "Entrenador, 14 Jugadores, 9 Padres",
+    "mockChampionship": "Campeonato",
+    "mockHome": "Casa",
+    "mockConvocation": "Convocatoria: 13:45",
+    "mockSummoned": "Convocados (12)",
+    "mockOthers": "+ 6 más",
+    "mockSentVia": "— enviado a través de Clubero",
+    "mockSentIn": "Enviado en 12 seg. a través de Clubero",
+    "mockTracking": "Asistencia registrada"
+  },
+  "ai": {
+    "chip": "Nuevo · Asistente IA",
+    "titlePre": "Un",
+    "titleHighlight": " asistente",
+    "titlePost": " que conoce tu club.",
+    "body": "Haz tus preguntas en español. El asistente lee tus datos en tiempo real — convocatorias, asistencia, estadísticas de jugadores, próximos eventos — y te responde al instante.",
+    "p1Title": "Conectado a tus datos",
+    "p1Body": "«¿Quién falta el sábado?», «¿Cuál es mi porcentaje de asistencia?», «¿Mi próximo partido?»",
+    "p2Title": "Adaptado a tu rol",
+    "p2Body": "Entrenador, padre/madre, jugador o administrador — el asistente respeta lo que puedes ver.",
+    "p3Title": "También en la web",
+    "p3Body": "El widget de abajo a la derecha responde preguntas sobre el producto, los precios y el proceso de demostración, las 24 horas del día.",
+    "p4Title": "Alojado en Europa",
+    "p4Body": "Tus conversaciones no se utilizan para entrenar un modelo. Cumple con el RGPD.",
+    "cta": "Probar el asistente",
+    "ctaNote": "Incluido en todos los planes · Sin configuración",
+    "mockName": "Asistente Clubero",
+    "mockConnected": "conectado a tu club",
+    "mockQ1": "¿Quién no ha respondido aún para el sábado?",
+    "mockA1Pre": "Para el ",
+    "mockA1Mid": " sábado a las 14:30, aún faltan ",
+    "mockA1Post": " respuestas:",
+    "mockPending": "Pendiente",
+    "mockAskAgain": "¿Quieres que les envíe un recordatorio?",
+    "mockYes": "Sí, adelante 👍",
+    "mockPlaceholder": "Haz tu pregunta...",
+    "mockContext": "Contextual"
+  },
+  "clubWall": {
+    "chip": "Muro del Club y Equipo",
+    "titlePre": "Toda la vida del club, ",
+    "titleHighlight": "en un solo lugar",
+    "titlePost": ".",
+    "body": "El muro del club y de cada equipo agrupa anuncios, fotos, menciones y confirmaciones de lectura. Conecta Instagram, Facebook o X: las nuevas publicaciones del club aparecerán automáticamente en el muro, sin necesidad de escribirlas.",
+    "p1Title": "Muro del club + Muro del equipo",
+    "p1Body": "Un área pública para el club, un feed privado por equipo — cada uno ve solo lo que le concierne.",
+    "p2Title": "Instagram, Facebook y X integrados",
+    "p2Body": "Conecta tus cuentas una sola vez. Cada nueva publicación del club aparecerá en el muro, con imagen y enlace.",
+    "p3Title": "@Menciones y confirmaciones de lectura",
+    "p3Body": "Menciona a un Jugador, un Padre/Madre o un Equipo entero. Verás quién ha leído, sin tener que preguntar.",
+    "p4Title": "Fotos, archivos y publicaciones fijadas",
+    "p4Body": "Comparte fotos de partidos, PDFs de la Convocatoria o el reglamento. Fija mensajes importantes en la parte superior del muro.",
+    "cta": "Ver muro en la demo",
+    "ctaNote": "Incluido en todos los planes",
+    "mockTitle": "Muro del club",
+    "mockSubtitle": "FC Clubero · 14 Equipos",
+    "mockPostAdminName": "FC Clubero · oficial",
+    "mockPostAdminTime": "Hoy · 9:12",
+    "mockPostAdminPinned": "Fijado",
+    "mockPostAdminBody": "🏆 ¡Felicidades a la Sub-13 por la victoria de 4-1 de ayer! Punto de encuentro el sábado para la final de grupo.",
+    "mockPostAdminStats": "32 ❤ · 12 leídos · 3 comentarios",
+    "mockPostSocialName": "Instagram · @fcclubero",
+    "mockPostSocialTime": "Hace 2h",
+    "mockPostSocialBody": "Galería de fotos del día del Torneo Sub-11 — ¡muchas gracias a los voluntarios! 📸",
+    "mockPostSocialTag": "Sincronizado desde Instagram",
+    "mockComposerPh": "Escribe un mensaje para el club…",
+    "mockBadgeSynced": "Redes conectadas"
+  },
+  "playerJournal": {
+    "chip": "Cuaderno del Jugador",
+    "titlePre": "Un ",
+    "titleHighlight": "cuaderno de bitácora",
+    "titlePost": " para cada Jugador.",
+    "body": "Cada Jugador (y sus Padres) tiene acceso a su perfil completo: Asistencia semana a semana, estadísticas por deporte, feedback del Entrenador después de cada partido y un balance de IA al final de la temporada. Todo es privado y respeta los roles.",
+    "p1Title": "Mapa de calor de Asistencia",
+    "p1Body": "Visualiza de un vistazo la regularidad del Jugador, semana a semana, durante toda la temporada.",
+    "p2Title": "Estadísticas específicas por deporte",
+    "p2Body": "Goles, asistencias, tarjetas, ensayos, triples, paradas… las métricas adecuadas según el deporte del Equipo.",
+    "p3Title": "Feedback del Entrenador por evento",
+    "p3Body": "Valoración, puntos fuertes, áreas de mejora y etiquetas específicas del deporte — registradas en segundos después de cada partido o entrenamiento.",
+    "p4Title": "Balance iterativo de IA",
+    "p4Body": "Crea con un clic un balance de temporada, un informe de desarrollo o una preparación de conversación a partir del feedback del Entrenador y las estadísticas. Luego, afina en diálogo con la IA.",
+    "cta": "Ver perfil del Jugador",
+    "ctaNote": "Acceso para Padres incluido · Datos privados",
+    "mockName": "Lucas Martin",
+    "mockMeta": "U13 · #10 · Centrocampista ofensivo",
+    "mockTabStats": "Estadísticas",
+    "mockTabAttendance": "Asistencia",
+    "mockTabFeedback": "Comentarios",
+    "mockStatGames": "Partidos",
+    "mockStatGoals": "Goles",
+    "mockStatAssists": "Asistencias",
+    "mockStatRating": "Nota media",
+    "mockAttendanceLabel": "Últimas 12 semanas",
+    "mockFeedbackCoach": "Entrenador Marc · Partido U13 vs. FC Riverside",
+    "mockFeedbackBody": "Muy buena comprensión del juego, dos asistencias de gol. A mejorar: finalización con el pie izquierdo.",
+    "mockFeedbackTagStrong": "Visión",
+    "mockFeedbackTagWork": "Definición",
+    "mockAiBadge": "Resumen de IA",
+    "mockAiBody": "Temporada constante, progreso significativo en la construcción del juego. Recomendación: ejercicios de finalización con el pie menos hábil."
+  },
+  "coachAssist": {
+    "chip": "Para entrenadores",
+    "titlePre": "Un copiloto para ",
+    "titleHighlight": "tu semana",
+    "titlePost": " como entrenador.",
+    "body": "Clubero combina un asistente de IA conversacional con información proactiva que recuerda al entrenador sus tareas: convocatorias que enviar, seguimientos pendientes, comentarios que registrar. Nada se le escapa.",
+    "p1Title": "Información proactiva",
+    "p1Body": "«4 jugadores no han respondido», «No se han registrado comentarios para el partido del sábado», «Convocatoria incompleta para el martes» — se muestra en la página de inicio en cuanto abres la aplicación.",
+    "p2Title": "Asistente de IA diario",
+    "p2Body": "«Crea la convocatoria sub-13 para el sábado», «¿Quién faltó a los últimos 3 entrenamientos?», «Escribe un mensaje al grupo» — el asistente hace el trabajo.",
+    "p3Title": "Tareas con un clic",
+    "p3Body": "Cada información ofrece la acción directa: hacer seguimiento, crear evento, registrar notas, enviar recordatorio.",
+    "p4Title": "Incorporación guiada",
+    "p4Body": "Una lista de verificación inteligente te guía durante la primera semana en la configuración de tu equipo: marca, convocatoria, primer evento.",
+    "cta": "Ver sección de entrenadores",
+    "ctaNote": "Incluido en todos los planes",
+    "mockTitle": "Hola, entrenador Marc 👋",
+    "mockSubtitle": "Aquí tienes tu semana",
+    "mockInsightsLabel": "Tareas para hoy",
+    "mockTask1": "4 jugadores no han respondido para el partido del sábado",
+    "mockTask1Cta": "Recordar",
+    "mockTask2": "Registrar los comentarios del entrenador para el partido del 18.05.",
+    "mockTask2Cta": "Registrar",
+    "mockTask3": "Convocatoria incompleta para el entrenamiento del martes",
+    "mockTask3Cta": "Completar",
+    "mockAssistantLabel": "Pregunta al asistente",
+    "mockAssistantQ": "Crea la convocatoria sub-13 para el sábado a las 14:30",
+    "mockAssistantA": "✅ Convocatoria creada para 14 jugadores. Enviada por notificación + correo electrónico."
+  },
+  "pricing": {
+    "badge": "Precios",
+    "title": "Empieza gratis. Crece fácilmente.",
+    "subtitle": "Prueba de 30 días sin compromiso. Sin tarjeta de crédito.",
+    "trialBadge": "Prueba gratuita de 30 días",
+    "trialTitle": "Prueba Clubero sin riesgos",
+    "trialBody": "Acceso completo a todas las funciones durante 30 días. Sin tarjeta de crédito. Cancela en cualquier momento.",
+    "trialCta": "Iniciar mi prueba gratuita",
+    "planName": "CLUBERO",
+    "planSubtitle": "Todo incluido, para todos los clubes.",
+    "priceMonthly": "/ mes",
+    "priceYearly": "/ año",
+    "yearlyDiscount": "2 meses gratis",
+    "monthlyAlt": "o",
+    "ctaStart": "Iniciar prueba gratuita",
+    "popular": "Más popular",
+    "enterpriseName": "Empresas",
+    "enterpriseSubtitle": "Para grandes organizaciones.",
+    "enterprisePrice": "Personalizado",
+    "enterpriseBody": "Precios personalizados según tus necesidades.",
+    "enterpriseCta": "Contactar al equipo de ventas",
+    "footer": "Todas las ofertas incluyen alojamiento en la UE, cumplimiento del RGPD y soporte por correo electrónico.",
+    "clubFeatures": [
+      "Equipos ilimitados",
+      "Jugadores ilimitados",
+      "Gestión de partidos",
+      "Planificación de entrenamientos",
+      "Seguimiento de Asistencia",
+      "Comunicación del Club",
+      "Notificaciones",
+      "Estadísticas",
+      "Eventos",
+      "Módulo de Torneo incluido",
+      "Acceso móvil / PWA",
+      "Roles de Entrenador y Gerente"
+    ],
+    "enterpriseFeatures": [
+      "Multiclubes, federaciones y distritos",
+      "Academias y centros de alto rendimiento",
+      "Ligas y organizaciones deportivas",
+      "SSO y seguridad avanzada",
+      "Onboarding dedicado",
+      "Exportación de datos personalizada",
+      "SLA y formación"
+    ]
+  },
+  "features": {
+    "metaTitle": "Funcionalidades — Clubero",
+    "metaDesc": "Convocatorias, asistencia, comunicación, estadísticas. Descubre todo lo que Clubero ofrece a clubes, entrenadores, padres y jugadores.",
+    "kicker": "Funcionalidades",
+    "title": "Una app para toda la temporada.",
+    "subtitle": "Desde la primera convocatoria hasta el balance de la temporada, Clubero cubre todo lo importante para los clubes deportivos aficionados.",
+    "screenshotsTitle": "Vista previa de la app.",
+    "screenshotsSubtitle": "Una experiencia diseñada para cada rol, priorizando el móvil.",
+    "shot1Title": "Entrenador — Seguimiento de asistencia",
+    "shot1Body": "Vista consolidada de entrenamientos y partidos, por jugador y período.",
+    "shot2Title": "Padre/Madre — Convocatoria",
+    "shot2Body": "Respuesta con un clic, motivo opcional, calendario familiar unificado.",
+    "shot3Title": "Club — Panel de control",
+    "shot3Body": "Múltiples equipos, miembros, comunicación centralizada.",
+    "shot4Title": "Jugador — Página de inicio",
+    "shot4Body": "Próximo evento, confirmación de asistencia, tablón del equipo.",
+    "sportsTitle": "Deportes cubiertos en V1",
+    "sportsBody": "Registro de resultados y estadísticas de jugadores adaptado al deporte de cada equipo.",
+    "sportsAskPre": "¿Te interesa otro deporte? ",
+    "sportsAskLink": "Dínoslo",
+    "rolesTitle": "Diseñado para cada rol en el club.",
+    "rolesBody": "Cada usuario recibe una experiencia adaptada a sus necesidades.",
+    "ctaDemo": "Solicitar demo",
+    "ctaPricing": "Ver precios",
+    "pillars": [
+      {
+        "t": "Convocatorias y eventos",
+        "b": "Crea partidos, entrenamientos y torneos en segundos. Las convocatorias llegan a jugadores y padres al instante."
+      },
+      {
+        "t": "Equipo y plantilla",
+        "b": "Gestiona jugadores, números, posiciones y vinculaciones familiares. Todo en una ficha."
+      },
+      {
+        "t": "Recordatorios",
+        "b": "Los recordatorios automáticos se encargan de las respuestas pendientes para que los entrenadores no tengan que hacerlo."
+      },
+      {
+        "t": "Feedback del entrenador por jugador",
+        "b": "Después de cada partido o entrenamiento: valoración, puntos fuertes, áreas de mejora, etiquetas específicas del deporte."
+      },
+      {
+        "t": "Resúmenes iterativos con IA",
+        "b": "Crea un balance de temporada, un informe de desarrollo o una preparación para una conversación con un clic."
+      },
+      {
+        "t": "Asistente de IA integrado",
+        "b": "Un asistente conectado a los datos de tu club. Respuestas instantáneas, respeto de roles, alojamiento en la UE."
+      },
+      {
+        "t": "WhatsApp y correo electrónico opcionales",
+        "b": "Todo se gestiona en Clubero. Para los fans de WhatsApp: comparte el mensaje con un clic."
+      },
+      {
+        "t": "Comunicación interna",
+        "b": "Tablón del club con @menciones, publicaciones fijadas, confirmaciones de lectura y archivos adjuntos."
+      },
+      {
+        "t": "Seguimiento de asistencia",
+        "b": "Marca la asistencia con un clic. Tendencias por jugador y equipo durante toda la temporada."
+      },
+      {
+        "t": "Torneos llave en mano",
+        "b": "Crea un torneo en minutos: grupos, fases eliminatorias, calendario, tablas en vivo. Página pública de TV compartible."
+      },
+      {
+        "t": "Resultados y estadísticas por deporte",
+        "b": "Registra resultados y estadísticas de jugadores adaptados al deporte de cada equipo."
+      },
+      {
+        "t": "Búsqueda global",
+        "b": "Cmd/Ctrl + K para saltar instantáneamente a un jugador, equipo o evento."
+      },
+      {
+        "t": "Exportaciones CSV",
+        "b": "Exporta la plantilla o la lista de asistencia con un clic, listo para Excel."
+      },
+      {
+        "t": "Papelera de reciclaje 7 días",
+        "b": "¿Borrado accidentalmente? Recupera publicaciones, eventos y jugadores durante 7 días."
+      },
+      {
+        "t": "Roles y permisos",
+        "b": "Administrador, Entrenador, Entrenador asistente, Gerente, Jugador, Padre/Madre: cada rol solo ve lo que le concierne."
+      },
+      {
+        "t": "Cuaderno del jugador",
+        "b": "Cada jugador tiene su perfil completo: ficha de asistencia, estadísticas, feedback del entrenador, resumen de IA."
+      },
+      {
+        "t": "Tablón del club y redes sociales",
+        "b": "Las publicaciones de Instagram, Facebook y X del club aparecen automáticamente en el tablón de Clubero."
+      },
+      {
+        "t": "Configuración en minutos",
+        "b": "Importa jugadores, padres y entrenadores desde tu tabla de Excel. La IA mapea y normaliza automáticamente."
+      },
+      {
+        "t": "Reglamento oficial generado automáticamente",
+        "b": "Cada torneo genera su reglamento en PDF con un clic a partir de la configuración."
+      },
+      {
+        "t": "Multi-deporte nativo",
+        "b": "Fútbol, Baloncesto, Rugby, Balonmano, Voleibol: un club puede gestionar varios deportes."
+      },
+      {
+        "t": "Historial del jugador",
+        "b": "Temporadas, logros y línea de tiempo automáticamente: cada partido, gol y trofeo enriquece la historia."
+      },
+      {
+        "t": "Sanciones y suspensiones",
+        "b": "Seguimiento de tarjetas, suspensiones y partidos cumplidos. Advertencias antes de cada convocatoria."
+      },
+      {
+        "t": "Perfil público del jugador",
+        "b": "Enlace compartible para adultos: logros, temporadas y línea de tiempo visibles públicamente (opcional)."
+      }
+    ],
+    "audiences": [
+      {
+        "t": "Para clubes",
+        "p": [
+          "Panel de control multi-equipo",
+          "Directorio de miembros y gestión de roles",
+          "Búsqueda global (Cmd + K) en todo el club",
+          "Exportaciones CSV (plantilla, asistencia) listas para Excel",
+          "Canal de comunicación centralizado",
+          "Cumple con el RGPD, alojamiento europeo"
+        ]
+      },
+      {
+        "t": "Para entrenadores",
+        "p": [
+          "Convocatoria lista en menos de un minuto",
+          "Respuestas de asistencia en tiempo real",
+          "Registro de resultados de partidos con estadísticas de jugadores específicas del deporte",
+          "Feedback individual por jugador (valoración, puntos fuertes, áreas de desarrollo, etiquetas específicas del deporte)",
+          "Resúmenes de IA de balance / conversación / desarrollo, refinables en diálogo con la IA",
+          "Chat de eventos con jugadores y padres",
+          "@Menciones y confirmaciones de lectura en el tablón",
+          "Gestión de suplentes y asignación de números"
+        ]
+      },
+      {
+        "t": "Para padres",
+        "p": [
+          "Un clic para confirmar o rechazar",
+          "Calendario familiar con todos los eventos de tus hijos",
+          "Recibe convocatorias en la app de Clubero, por correo electrónico o por WhatsApp, según prefiera tu club",
+          "Mensajes directos con el entrenador",
+          "Gestión de autorizaciones para menores"
+        ]
+      },
+      {
+        "t": "Para jugadores",
+        "p": [
+          "Ve tu próximo partido de un vistazo",
+          "Confirmación rápida de asistencia",
+          "Chat del equipo sin ruido",
+          "Historial personal de asistencia",
+          "Perfil, foto y estadísticas"
+        ]
+      }
+    ]
+  },
+  "faq": {
+    "metaTitle": "Preguntas frecuentes — Clubero",
+    "metaDesc": "Respuestas a preguntas frecuentes sobre Clubero: precios, configuración, RGPD, control parental y más.",
+    "kicker": "Preguntas frecuentes",
+    "title": "Preguntas frecuentes",
+    "subtitle": "¿No encuentras la respuesta? Contáctanos, estaremos encantados de ayudarte.",
+    "ctaContact": "Contactar",
+    "ctaDemo": "Solicitar demo",
+    "items": [
+      {
+        "q": "¿Para quién es Clubero?",
+        "a": "Clubero está diseñado para clubes deportivos aficionados. Entrenadores, directivos, padres y jugadores tienen una experiencia adaptada a sus necesidades."
+      },
+      {
+        "q": "¿Qué deportes cubre?",
+        "a": "En la V1, Clubero cubre 8 deportes de equipo: fútbol, fútbol sala, baloncesto, rugby, balonmano, voleibol, hockey sobre hielo y hockey sobre césped."
+      },
+      {
+        "q": "¿Hay una oferta gratuita?",
+        "a": "Sí. Ofrecemos una prueba gratuita de 30 días sin necesidad de tarjeta de crédito."
+      },
+      {
+        "q": "¿Cuánto tiempo se tarda en configurar un club?",
+        "a": "La mayoría de los clubes están operativos en menos de una hora."
+      },
+      {
+        "q": "¿Cómo gestionáis a los menores y el consentimiento parental?",
+        "a": "Los jugadores menores de 18 años pueden ser asignados a una o varias cuentas parentales. Por defecto, los padres controlan las respuestas."
+      },
+      {
+        "q": "¿Dónde se almacenan los datos?",
+        "a": "Todos los datos del club se alojan en infraestructura europea y Clubero cumple con el RGPD."
+      },
+      {
+        "q": "¿Puedo importar mi plantilla existente?",
+        "a": "Sí. Gestionamos la importación de CSV durante la incorporación."
+      },
+      {
+        "q": "¿Funciona Clubero en el móvil?",
+        "a": "Clubero es Mobile-first. Funciona en cualquier navegador moderno y se puede instalar como PWA."
+      },
+      {
+        "q": "¿Cómo obtengo ayuda?",
+        "a": "El soporte por correo electrónico está incluido en todos los planes."
+      }
+    ]
+  },
+  "contact": {
+    "metaTitle": "Contacto — Clubero",
+    "metaDesc": "Contacta con el equipo de Clubero: preguntas sobre el producto, demostraciones, colaboraciones o soporte para tu club deportivo. Respondemos en 24 horas.",
+    "kicker": "Contacto",
+    "title": "Hablemos.",
+    "subtitlePre": "¿Preguntas, colaboraciones o simplemente curiosidad? Escríbenos, te responderemos en ",
+    "subtitleStrong": "48 horas laborables",
+    "subtitlePost": ".",
+    "emailLabel": "Correo electrónico",
+    "whereLabel": "Dónde",
+    "whereBody": "Diseñado para clubes deportivos amateur europeos.",
+    "firstName": "Nombre",
+    "firstNamePh": "Tu nombre",
+    "lastName": "Apellido",
+    "lastNamePh": "Tu apellido",
+    "email": "Correo electrónico",
+    "emailPh": "tu@club.es",
+    "phone": "Teléfono",
+    "phonePh": "+34 612 34 56 78",
+    "role": "Tu rol",
+    "rolePh": "Selecciona tu rol",
+    "club": "Club",
+    "clubPh": "CD Ribereño",
+    "message": "Mensaje",
+    "messagePh": "¿En qué podemos ayudarte?",
+    "submit": "Enviar mensaje",
+    "submitting": "Enviando…",
+    "submitted": "Mensaje enviado ✓",
+    "successToast": "Mensaje enviado. Nos pondremos en contacto en 48 horas laborables.",
+    "errorToast": "Error al enviar. Inténtalo de nuevo o escribe a hello@clubero.app.",
+    "roles": [
+      "Presidente/a",
+      "Directivo/a",
+      "Entrenador/a",
+      "Director/a técnico/a",
+      "Padre/Madre",
+      "Jugador/a",
+      "Otro"
+    ]
+  },
+  "demo": {
+    "metaTitle": "Solicitar demo — Clubero",
+    "metaDesc": "Reserva una demo de 15 minutos de Clubero. Configuraremos tu primer equipo contigo.",
+    "kicker": "Demo",
+    "title": "Mira Clubero en acción.",
+    "subtitlePre": "Cuéntanos brevemente sobre tu club — te contactaremos en un plazo de",
+    "subtitleStrong": " 48 horas laborables",
+    "subtitlePost": " para programar una demo.",
+    "perks": [
+      "Demo personalizada de 15 minutos",
+      "Configuraremos tu primer equipo juntos",
+      "Prueba gratuita, sin tarjeta de crédito",
+      "Ayuda con la migración desde tu herramienta actual"
+    ],
+    "clubName": "Nombre del club",
+    "clubNamePh": "AS Riverside",
+    "firstName": "Nombre",
+    "firstNamePh": "Tu nombre",
+    "lastName": "Apellido",
+    "lastNamePh": "Tu apellido",
+    "email": "Correo electrónico",
+    "emailPh": "tu@club.es",
+    "phone": "Teléfono",
+    "phonePh": "+34 612 34 56 78",
+    "role": "Tu rol",
+    "rolePh": "Selecciona un rol",
+    "teams": "Número de equipos",
+    "teamsPh": "ej.: 6",
+    "notes": "¿Hay algo que debamos saber?",
+    "notesPh": "Herramienta actual, problema principal…",
+    "submit": "Solicitar demo",
+    "submitting": "Enviando…",
+    "submitted": "Solicitud enviada ✓",
+    "rgpd": "Nunca compartimos tus datos. Cumplimos con el RGPD.",
+    "successToast": "Solicitud enviada. Te contactaremos en 48 horas laborables.",
+    "errorToast": "Error al enviar. Escribe a hello@clubero.app.",
+    "roles": [
+      "Presidente/a",
+      "Directivo/a",
+      "Entrenador/a",
+      "Director/a técnico/a",
+      "Padre/Madre",
+      "Jugador/a",
+      "Otro"
+    ]
+  },
+  "tournaments": {
+    "home": {
+      "badge": "Nuevo · Módulo de Torneos",
+      "titlePre": "Organiza un ",
+      "titleHighlight": "Torneo",
+      "titlePost": " en minutos.",
+      "subtitle": "Fases de grupos, fases eliminatorias, calendario de partidos, campos, clasificaciones en tiempo real e inscripción en línea, todo incluido. Comparte un enlace público o una pantalla de TV para seguir los resultados en vivo en el pabellón.",
+      "feat1Title": "Fases de grupos + fases eliminatorias automáticas",
+      "feat1Body": "Sorteo, calendario de partidos en múltiples campos y clasificaciones calculadas automáticamente.",
+      "feat2Title": "Clasificaciones en vivo",
+      "feat2Body": "Los resultados se actualizan en tiempo real. Espectadores y equipos siguen todo desde el móvil.",
+      "feat3Title": "Inscripciones y pagos en línea",
+      "feat3Body": "Página de inscripción pública, aprobación por parte del organizador, límite de equipos, plantillas de jugadores y cobro de pagos a través de Stripe Connect.",
+      "feat4Title": "Modo de pantalla completa para TV",
+      "feat4Body": "Enlace propio para proyectar en una pantalla grande: partidos en curso, próximos partidos y clasificaciones rotativas.",
+      "feat5Title": "Reglamento oficial generado por IA",
+      "feat5Body": "A partir de tu configuración (formato, puntos, criterios de desempate, duración del partido), Clubero genera el reglamento completo en PDF en español o inglés. Listo para firmar, compartir o imprimir.",
+      "feat6Title": "Personal, Árbitros y Patrocinadores",
+      "feat6Body": "Invita a personal y árbitros, gestiona a los oficiales y personaliza la página pública con tus patrocinadores y colaboradores.",
+      "ctaStart": "Iniciar Torneo",
+      "ctaFeatures": "Ver todas las funciones",
+      "mockTournament": "Torneo de Pascua Sub-13",
+      "mockPhase": "Fase de grupos · Grupo A",
+      "mockLive": "En vivo",
+      "mockOngoing": "Partido en curso · Campo 2",
+      "mockTvAvailable": "Modo TV disponible",
+      "mockTeamsRegistered": "Equipos inscritos"
+    },
+    "pricing": {
+      "title": "Torneos",
+      "subtitle": "Para organizadores sin un club en Clubero.",
+      "per": "/ Torneo",
+      "info": "Pago por evento. Sin suscripción, acceso al módulo Clubero Torneos para un torneo.",
+      "cta": "Iniciar Torneo",
+      "feat1": "Torneos ilimitados",
+      "feat2": "Fases de grupos y eliminatorias",
+      "feat3": "Páginas públicas y modo TV",
+      "feat4": "Compartir código QR",
+      "feat5": "Equipos externos permitidos",
+      "feat6": "Clasificaciones en tiempo real"
+    },
+    "start": {
+      "metaTitle": "Iniciar un Torneo — Clubero",
+      "metaDesc": "Crea tu cuenta de Clubero y comienza tu torneo en minutos. Paga por evento, sin suscripción.",
+      "heading": "Iniciar Torneo",
+      "subheading": "Regístrate o crea tu cuenta en segundos. No necesitas suscripción, pagas por evento.",
+      "tabSignup": "Crear cuenta",
+      "tabLogin": "Ya tengo una cuenta",
+      "termsPre": "Al continuar, aceptas nuestros ",
+      "terms": "Términos y Condiciones",
+      "termsMid": " y nuestra ",
+      "privacy": "Política de Privacidad",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "passwordHelp": "Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número.",
+      "passwordError": "La contraseña debe contener 8 caracteres, con mayúscula, minúscula y número.",
+      "signupCta": "Crear cuenta y continuar",
+      "accountCreated": "Cuenta creada",
+      "checkEmail": "Revisa tu correo electrónico para confirmar tu cuenta.",
+      "loginCta": "Iniciar sesión y continuar",
+      "invalidCreds": "Correo electrónico o contraseña incorrectos",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "expiredTitle": "Enlace de confirmación caducado",
+      "expiredBody": "Tu enlace de confirmación de correo electrónico ya no es válido. Introduce tu dirección de correo electrónico para recibir un nuevo enlace.",
+      "resendCta": "Reenviar",
+      "resendSent": "Correo electrónico de confirmación reenviado. Revisa tu bandeja de entrada."
+    }
+  },
+  "onboarding": {
+    "kicker": "Configuración",
+    "title": "Cámbiate a Clubero — es muy fácil.",
+    "subtitle": "Te ayudamos a migrar tu club, tus equipos y tus datos en pocos días.",
+    "ctaDemo": "Solicitar demo",
+    "ctaContact": "Contactar",
+    "reassure1": "Sin tarjeta de crédito",
+    "reassure2": "Soporte personalizado",
+    "reassure3": "Datos alojados en Europa",
+    "importTitle": "Lo que podemos importar por ti.",
+    "importSubtitle": "Trae lo que tengas — archivos, hojas de cálculo, listas. Nosotros nos encargamos del resto.",
+    "imports": [
+      {
+        "t": "Equipos",
+        "b": "Todos tus equipos, categorías y temporadas."
+      },
+      {
+        "t": "Jugadores",
+        "b": "Plantillas, números, posiciones, fotos."
+      },
+      {
+        "t": "Padres/Madres",
+        "b": "Contactos de padres/madres y vinculación con sus hijos."
+      },
+      {
+        "t": "Entrenadores y personal",
+        "b": "Entrenadores, mánagers y roles."
+      },
+      {
+        "t": "Calendarios",
+        "b": "Calendarios de partidos y entrenamientos."
+      },
+      {
+        "t": "Torneos existentes",
+        "b": "Equipos inscritos, grupos y resultados."
+      },
+      {
+        "t": "Archivos Excel/CSV",
+        "b": "Importación simplificada desde tus hojas de cálculo."
+      },
+      {
+        "t": "Fotos y logotipos",
+        "b": "Logotipo del club, fotos de equipos y jugadores."
+      }
+    ],
+    "howTitle": "Así funciona.",
+    "howSubtitle": "Un proceso de 4 pasos, sencillo y claro.",
+    "steps": [
+      {
+        "t": "Nos envías tus datos",
+        "b": "Hojas de cálculo, listas o exportaciones — en el formato que tengas."
+      },
+      {
+        "t": "Preparamos la importación",
+        "b": "Limpieza, estructuración y verificación junto contigo."
+      },
+      {
+        "t": "Configuramos tu club",
+        "b": "Equipos, roles, marca y ajustes personalizados."
+      },
+      {
+        "t": "Tu club está listo para empezar",
+        "b": "Capacitamos a tus entrenadores y estaréis listos para usarlo."
+      }
+    ],
+    "humanTitle": "No estás solo.",
+    "humanSubtitle": "Te acompañamos durante toda la configuración.",
+    "humanPoints": [
+      {
+        "t": "Soporte de onboarding",
+        "b": "Un contacto fijo durante la configuración de tu club."
+      },
+      {
+        "t": "Ayuda con la migración",
+        "b": "Recuperamos tus datos existentes y los integramos de forma limpia."
+      },
+      {
+        "t": "Soporte de configuración",
+        "b": "Ajustes, roles, marca, plantillas de correo electrónico — nos encargamos de todo contigo."
+      },
+      {
+        "t": "Soporte reactivo",
+        "b": "Un equipo al que se puede contactar rápidamente por correo electrónico, en español."
+      }
+    ],
+    "faqTitle": "Preguntas frecuentes sobre la configuración",
+    "faq": [
+      {
+        "q": "¿Hay que crear todo manualmente de nuevo?",
+        "a": "No. Podemos importar una gran parte de tus datos — equipos, jugadores, padres/madres, calendarios — desde tus hojas de cálculo o exportaciones existentes."
+      },
+      {
+        "q": "¿Cuánto tiempo dura la migración?",
+        "a": "La mayoría de los clubes están listos en pocos días. La duración depende del volumen de datos y de tu disponibilidad para revisarlos con nosotros."
+      },
+      {
+        "q": "¿Se requiere una herramienta informática específica?",
+        "a": "No. Un navegador simple es suficiente. Clubero funciona en ordenador, tableta y móvil (PWA iOS / Android)."
+      },
+      {
+        "q": "¿Qué pasa si nuestros datos están en varios archivos?",
+        "a": "No hay problema. Consolidamos y estructuramos todo para ti antes de la importación."
+      },
+      {
+        "q": "¿Podemos empezar a mitad de temporada?",
+        "a": "Sí. Adaptamos la importación a tu calendario y, si lo deseas, conservamos tu historial de partidos y eventos."
+      },
+      {
+        "q": "¿Qué ocurre después de la configuración?",
+        "a": "El soporte por correo electrónico sigue estando disponible. Seguimos accesibles para ajustes, más capacitaciones y nuevos equipos."
+      }
+    ],
+    "ctaTitle": "¿Listo para el cambio?",
+    "ctaBody": "Hablemos de tu club. Te mostraremos Clubero y prepararemos la migración juntos.",
+    "ctaPrimary": "Solicitar demo",
+    "ctaSecondary": "Contactar"
+  },
+  "tournamentsPage": {
+    "kicker": "Torneos",
+    "title": "Torneos modernos, dinámicos y públicos.",
+    "subtitle": "Organiza tus torneos con resultados en vivo, clasificaciones públicas, función de árbitro móvil y experiencia comunitaria.",
+    "ctaPrimary": "Crear un torneo",
+    "ctaSecondary": "Ver demo",
+    "heroBadge": "En vivo · en directo",
+    "heroMatch": "Cuartos de final · Campo 2",
+    "heroTeamA": "AS Riverside",
+    "heroTeamB": "FC Lakeside",
+    "heroStandings": "Clasificación Grupo A",
+    "heroBracket": "Cuadro final",
+    "heroTv": "Modo TV",
+    "everythingTitle": "Todo para tus torneos, en un solo lugar.",
+    "everythingSubtitle": "Un ecosistema completo, diseñado tanto para el campo como para las pantallas.",
+    "ecosystem": [
+      {
+        "t": "Equipos",
+        "b": "Inscripciones, plantillas, contactos."
+      },
+      {
+        "t": "Grupos",
+        "b": "Sorteo y composición automáticos."
+      },
+      {
+        "t": "Partidos",
+        "b": "Planificación y seguimiento en tiempo real."
+      },
+      {
+        "t": "Clasificaciones",
+        "b": "Calculadas automáticamente, en tiempo real."
+      },
+      {
+        "t": "Calendarios",
+        "b": "Múltiples campos, múltiples días."
+      },
+      {
+        "t": "Árbitros",
+        "b": "Validación de resultados en el móvil."
+      },
+      {
+        "t": "Páginas públicas",
+        "b": "Enlace compartible para todos."
+      },
+      {
+        "t": "Modo TV",
+        "b": "Visualización en pantalla completa en el pabellón."
+      },
+      {
+        "t": "Resultados en vivo",
+        "b": "Actualizaciones instantáneas en todas partes."
+      }
+    ],
+    "liveTitle": "Hecho para vivir el torneo en directo.",
+    "liveSubtitle": "Tus árbitros y organizadores mantienen el control sin salir del campo.",
+    "livePoints": [
+      {
+        "t": "Resultados desde el campo",
+        "b": "Registra los resultados directamente desde tu teléfono."
+      },
+      {
+        "t": "Validación del árbitro",
+        "b": "Los árbitros validan los resultados en vivo desde el móvil."
+      },
+      {
+        "t": "Actualizaciones instantáneas",
+        "b": "Las clasificaciones y los cuadros se actualizan al instante."
+      },
+      {
+        "t": "Gestión de campos",
+        "b": "Asigna tus campos y reordénalos en segundos."
+      },
+      {
+        "t": "Programación automática",
+        "b": "Calendario optimizado según tus criterios."
+      },
+      {
+        "t": "Gestión de conflictos",
+        "b": "Historial claro y rastreable de cada decisión."
+      },
+      {
+        "t": "Acceso por código QR",
+        "b": "Un código QR para escanear y abrir la página pública."
+      }
+    ],
+    "publicTitle": "Una experiencia pública y compartida.",
+    "publicSubtitle": "Padres, jugadores y aficionados siguen el torneo en vivo, desde cualquier lugar.",
+    "publicPoints": [
+      {
+        "t": "Clasificaciones públicas",
+        "b": "Siempre actualizadas, accesibles a través de un enlace."
+      },
+      {
+        "t": "Páginas de partidos",
+        "b": "Alineación, resultado, eventos importantes."
+      },
+      {
+        "t": "Últimos resultados",
+        "b": "Feed en tiempo real de los encuentros finalizados."
+      },
+      {
+        "t": "Páginas de equipos",
+        "b": "Calendario, clasificación, trayectoria en el torneo."
+      },
+      {
+        "t": "Mobile first",
+        "b": "Diseñado para ser visto desde la grada."
+      },
+      {
+        "t": "Compartir fácilmente",
+        "b": "Enlace, código QR, redes — un clic es suficiente."
+      }
+    ],
+    "tvTitle": "Modo TV y pantalla central.",
+    "tvSubtitle": "Muestra el torneo a lo grande, en el pabellón, en la casa club o en el campo.",
+    "tvPoints": [
+      "Clasificaciones en vivo en pantalla",
+      "Programa de los próximos partidos",
+      "Partidos en curso, campo por campo",
+      "Modo de pantalla completa sin instalación"
+    ],
+    "tvBadge": "Pantalla completa",
+    "tvCurrent": "Partido en curso",
+    "tvNext": "Próximamente",
+    "formatsTitle": "Todos los formatos de torneo.",
+    "formatsSubtitle": "Adapta Clubero a tu competición, no al revés.",
+    "formats": [
+      {
+        "t": "Fase de grupos",
+        "b": "Con clasificaciones automáticas."
+      },
+      {
+        "t": "Sistema de eliminación directa",
+        "b": "Cuadros con 4, 8, 16, 32 equipos."
+      },
+      {
+        "t": "Round Robin",
+        "b": "Todos los equipos se enfrentan entre sí."
+      },
+      {
+        "t": "Liga / Campeonato",
+        "b": "A lo largo de una temporada completa."
+      },
+      {
+        "t": "Playoffs",
+        "b": "Rondas finales después de una temporada regular."
+      }
+    ],
+    "formatsExtras": [
+      "Programación automática",
+      "Asignación de campos",
+      "Gestión de clasificaciones"
+    ],
+    "mobileTitle": "Mobile first, directamente en el campo.",
+    "mobileSubtitle": "Hecho para ser usado con una mano, entre dos partidos.",
+    "mobilePoints": [
+      {
+        "t": "Entrada del árbitro",
+        "b": "Botones grandes, pocos clics, validación rápida."
+      },
+      {
+        "t": "Organizadores en el lugar",
+        "b": "Todas las acciones importantes al alcance del pulgar."
+      },
+      {
+        "t": "Interfaz táctil",
+        "b": "Legible incluso bajo el sol, optimizada para móvil."
+      },
+      {
+        "t": "Acciones rápidas",
+        "b": "Informar, ajustar, corregir en segundos."
+      },
+      {
+        "t": "Actualizaciones en vivo",
+        "b": "El campo y el público se mantienen sincronizados."
+      }
+    ],
+    "pricingTitle": "Una política de precios sencilla.",
+    "pricingSubtitle": "Elige lo que mejor se adapte a tu evento.",
+    "pricing": [
+      {
+        "name": "Torneo",
+        "price": "40 €",
+        "per": "por torneo",
+        "desc": "Organización de un torneo único.",
+        "cta": "Crear un torneo"
+      },
+      {
+        "name": "Liga / Campeonato",
+        "price": "199 €",
+        "per": "por temporada",
+        "desc": "Gestión completa de una temporada.",
+        "cta": "Hablar con nosotros"
+      },
+      {
+        "name": "Clubero Club",
+        "price": "49 €",
+        "per": "/ mes",
+        "desc": "Torneos ilimitados incluidos.",
+        "cta": "Ver Clubero Club",
+        "highlight": true
+      }
+    ],
+    "pricingNote": "Torneos ilimitados incluidos con Clubero Club.",
+    "finalTitle": "¿Listo para modernizar tus torneos?",
+    "finalBody": "Inicia un torneo en minutos o experimenta Clubero en acción con nuestro equipo.",
+    "finalPrimary": "Crear un torneo",
+    "finalSecondary": "Solicitar una demo",
+    "faqTitle": "Preguntas frecuentes sobre torneos",
+    "faq": [
+      {
+        "q": "¿Pueden participar equipos externos?",
+        "a": "Sí. Los equipos que no usan Clubero a diario pueden inscribirse a través de la página pública y se gestionan como equipos internos."
+      },
+      {
+        "q": "¿Funciona con conexión limitada en el campo?",
+        "a": "La interfaz móvil del árbitro es ligera y funciona con 3G/4G. Los resultados se sincronizan tan pronto como la conexión vuelve."
+      },
+      {
+        "q": "¿Se puede cambiar el calendario durante el torneo?",
+        "a": "Absolutamente. Puedes reprogramar, cambiar de campo o ajustar los horarios en segundos. La página pública y el modo TV se actualizan al instante."
+      },
+      {
+        "q": "¿Hay un límite en el número de equipos?",
+        "a": "No hay un límite estricto. Clubero gestiona torneos desde 4 hasta más de 100 equipos con programación automática."
+      },
+      {
+        "q": "¿Pueden los espectadores seguir el torneo sin una cuenta?",
+        "a": "Sí. La página pública es accesible para todos a través de un enlace o código QR — no se requiere registro."
+      },
+      {
+        "q": "¿Cómo funciona el modo TV?",
+        "a": "Abre el enlace de TV dedicado en cualquier pantalla (Smart TV, proyector, ordenador). Muestra clasificaciones en vivo, los próximos partidos y los resultados en curso a pantalla completa — cero instalación."
+      }
+    ]
+  },
+  "players": {
+    "sectionChip": "Para jugadores",
+    "sectionTitle": "Tu carrera te pertenece",
+    "sectionSub": "Crea tu perfil deportivo, incluso sin club.",
+    "p1Title": "Perfil público de jugador",
+    "p1Body": "Cada jugador puede crear una página pública con sus estadísticas, logros y cronología.",
+    "p2Title": "Trayectoria deportiva de por vida",
+    "p2Body": "Clubes, temporadas, goles, premios: tu historia deportiva permanece contigo, incluso si cambias de club.",
+    "p3Title": "Independiente del club",
+    "p3Body": "Crea tu perfil sin invitación. Únete a un club cuando quieras.",
+    "p4Title": "Visibilidad para ojeadores",
+    "p4Body": "Prepara tu perfil para que sea visible gradualmente para clubes y ojeadores aficionados."
+  },
+  "coachProfile": {
+    "sectionChip": "Para Entrenadores",
+    "sectionTitle": "Muestra tu trayectoria como entrenador",
+    "sectionSub": "Un perfil público con tus títulos, experiencia y filosofía de juego.",
+    "p1Title": "Perfil público de entrenador",
+    "p1Body": "Licencias UEFA, trayectoria en clubes, filosofía de juego: todo en una página, accesible sin necesidad de cuenta.",
+    "p2Title": "Títulos y certificados",
+    "p2Body": "UEFA C, B, A, Entrenador de fútbol: muestra tus cualificaciones y la entidad que las expide.",
+    "p3Title": "Historial de clubes",
+    "p3Body": "Registra tu trayectoria, club por club, temporada por temporada.",
+    "p4Title": "¿Abierto a nuevas oportunidades?",
+    "p4Body": "Indica tu disponibilidad y hazte visible para los responsables que buscan un entrenador."
+  },
+  "network": {
+    "sectionChip": "Red deportiva",
+    "sectionTitle": "La red del deporte aficionado",
+    "sectionSub": "Sigue a jugadores, entrenadores y clubes. Mantente al día de sus novedades deportivas.",
+    "p1Title": "Seguir a un jugador o entrenador",
+    "p1Body": "Suscríbete a un perfil público y sigue sus novedades: nuevo club, éxitos, hitos.",
+    "p2Title": "Búsqueda pública",
+    "p2Body": "Descubre progresivamente los perfiles públicos de jugadores y entrenadores en Clubero, filtrados por deporte, club o región.",
+    "p3Title": "Perfiles enriquecidos por clubes",
+    "p3Body": "Los perfiles pueden ser enriquecidos y complementados por los clubes de Clubero: estadísticas, logros, historial de temporadas."
+  }
+}

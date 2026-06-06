@@ -1,102 +1,56 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import i18nInstance from "@/lib/i18n";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Loader2, Settings2 } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Loader2,
+  CreditCard,
+  Send,
+  MessagesSquare,
+  BellRing,
+  Palette,
+  Wallet,
+  ChevronRight,
+  Share2,
+  Receipt,
+  TrendingUp,
+} from "lucide-react";
+import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
-  head: () => ({ meta: [{ title: "Admin settings — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18nInstance.t("meta.admin.title") },
+      { name: "description", content: i18nInstance.t("meta.admin.description") },
+    ],
+  }),
 });
-
-type ChannelKey = "in_app" | "email" | "sms" | "whatsapp" | "push";
-const CHANNELS: ChannelKey[] = ["in_app", "email", "sms", "whatsapp", "push"];
-
-type ClubSettings = {
-  id: string;
-  name: string;
-  convocation_channels: string[];
-  wall_comments_enabled: boolean;
-  event_chat_enabled: boolean;
-  event_chat_players_enabled: boolean;
-  event_chat_parents_enabled: boolean;
-};
 
 function AdminSettingsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
-  const role = useActiveRole();
+  const roles = useMyRoles();
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["club-settings", activeClubId],
+  const { data, isLoading } = useQuery({
+    queryKey: ["club-name", activeClubId],
     enabled: !!activeClubId,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clubs")
-        .select("id, name, convocation_channels, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled")
+        .select("id, name, is_personal")
         .eq("id", activeClubId!)
         .single();
       if (error) throw error;
-      return data as unknown as ClubSettings;
+      return data;
     },
   });
 
-  const [form, setForm] = useState<ClubSettings | null>(null);
-  const [saving, setSaving] = useState(false);
+  if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
-  useEffect(() => {
-    if (data) {
-      setForm({
-        ...data,
-        convocation_channels: Array.isArray(data.convocation_channels)
-          ? data.convocation_channels
-          : ["email", "in_app"],
-      });
-    }
-  }, [data]);
-
-  if (role !== "admin") return <Navigate to="/profile" replace />;
-
-  const toggleChannel = (ch: ChannelKey) => {
-    if (!form) return;
-    const has = form.convocation_channels.includes(ch);
-    setForm({
-      ...form,
-      convocation_channels: has
-        ? form.convocation_channels.filter((c) => c !== ch)
-        : [...form.convocation_channels, ch],
-    });
-  };
-
-  async function save() {
-    if (!form) return;
-    setSaving(true);
-    const { error } = await supabase
-      .from("clubs")
-      .update({
-        convocation_channels: form.convocation_channels,
-        wall_comments_enabled: form.wall_comments_enabled,
-        event_chat_enabled: form.event_chat_enabled,
-        event_chat_players_enabled: form.event_chat_players_enabled,
-        event_chat_parents_enabled: form.event_chat_parents_enabled,
-      })
-      .eq("id", form.id);
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(t("admin.saved"));
-    refetch();
-  }
-
-  if (isLoading || !form) {
+  if (isLoading || !data) {
     return (
       <div className="flex justify-center py-20">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -104,80 +58,112 @@ function AdminSettingsPage() {
     );
   }
 
+  const items: Array<{
+    to: string;
+    icon: typeof CreditCard;
+    title: string;
+    hint: string;
+    tone: string;
+  }> = [
+    {
+      to: "/admin/billing",
+      icon: CreditCard,
+      title: t("admin.hubSubscription"),
+      hint: t("admin.hubSubscriptionHint"),
+      tone: "bg-primary/10 text-primary",
+    },
+    {
+      to: "/admin/settings/payments",
+      icon: Wallet,
+      title: t("admin.hubPayments", { defaultValue: "Paiements" }),
+      hint: t("admin.hubPaymentsHint", {
+        defaultValue: "Encaissez les inscriptions tournoi via Stripe",
+      }),
+      tone: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
+    },
+    {
+      to: "/admin/payments/items",
+      icon: Receipt,
+      title: "Items de paiement",
+      hint: "Licences, cotisations, équipements, déplacements",
+      tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    },
+    {
+      to: "/admin/payments/dashboard",
+      icon: TrendingUp,
+      title: "Tableau de bord financier",
+      hint: "KPIs, taux d'encaissement, exports CSV",
+      tone: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
+    },
+    {
+      to: "/admin/settings/convocations",
+      icon: Send,
+      title: t("admin.hubConvocations"),
+      hint: t("admin.hubConvocationsHint"),
+      tone: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    },
+    {
+      to: "/admin/settings/communications",
+      icon: MessagesSquare,
+      title: t("admin.hubCommunications"),
+      hint: t("admin.hubCommunicationsHint"),
+      tone: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      to: "/admin/settings/social",
+      icon: Share2,
+      title: "Réseaux sociaux",
+      hint: "Affichez vos posts Instagram, Facebook et X sur le mur du club",
+      tone: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+    },
+    {
+      to: "/admin/settings/reminders",
+      icon: BellRing,
+      title: t("admin.hubReminders"),
+      hint: t("admin.hubRemindersHint"),
+      tone: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    },
+    {
+      to: "/admin/settings/branding",
+      icon: Palette,
+      title: t("admin.hubBranding", { defaultValue: "Identité visuelle" }),
+      hint: t("admin.hubBrandingHint", {
+        defaultValue: "Couleur principale de l'app pour ton club",
+      }),
+      tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
+    },
+  ];
+
   return (
-    <div className="px-5 py-4 space-y-5">
-      <header className="flex items-center gap-2">
-        <Settings2 className="h-5 w-5 text-primary" />
-        <h1 className="text-xl font-semibold">{t("admin.title")}</h1>
-      </header>
-      <p className="text-sm text-muted-foreground">{t("admin.subtitle", { club: form.name })}</p>
+    <div className="px-5 py-4 space-y-4">
+      <p className="text-sm text-muted-foreground">
+        {t("admin.subtitle", { club: data.name })}
+      </p>
 
-      <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
-        <div>
-          <Label className="text-base">{t("admin.convocationChannels")}</Label>
-          <p className="text-xs text-muted-foreground mt-0.5">{t("admin.convocationChannelsHint")}</p>
-        </div>
-        <div className="space-y-2">
-          {CHANNELS.map((ch) => (
-            <div key={ch} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
-              <span className="text-sm capitalize">{t(`channels.${ch}`)}</span>
-              <Switch
-                checked={form.convocation_channels.includes(ch)}
-                onCheckedChange={() => toggleChannel(ch)}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
+      {data.is_personal && (
+        <ConvertPersonalClubBanner clubId={data.id} currentName={data.name} />
+      )}
 
-      <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <Label className="text-base">{t("admin.communications")}</Label>
 
-        <Row
-          label={t("admin.wallComments")}
-          hint={t("admin.wallCommentsHint")}
-          checked={form.wall_comments_enabled}
-          onChange={(v) => setForm({ ...form, wall_comments_enabled: v })}
-        />
-        <Row
-          label={t("admin.eventChat")}
-          hint={t("admin.eventChatHint")}
-          checked={form.event_chat_enabled}
-          onChange={(v) => setForm({ ...form, event_chat_enabled: v })}
-        />
-        {form.event_chat_enabled && (
-          <div className="ml-2 pl-3 border-l-2 border-border space-y-3">
-            <Row
-              label={t("admin.eventChatPlayers")}
-              checked={form.event_chat_players_enabled}
-              onChange={(v) => setForm({ ...form, event_chat_players_enabled: v })}
-            />
-            <Row
-              label={t("admin.eventChatParents")}
-              checked={form.event_chat_parents_enabled}
-              onChange={(v) => setForm({ ...form, event_chat_parents_enabled: v })}
-            />
-          </div>
-        )}
-      </section>
-
-      <Button className="w-full h-11" onClick={save} disabled={saving}>
-        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.save")}
-      </Button>
-    </div>
-  );
-}
-
-function Row({
-  label, hint, checked, onChange,
-}: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <div className="min-w-0">
-        <p className="text-sm font-medium">{label}</p>
-        {hint && <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>}
-      </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
+        {items.map((it) => (
+          <li key={it.to}>
+            <Link
+              to={it.to}
+              className="flex items-center gap-3 px-4 py-3.5 hover:bg-muted/40 transition-colors"
+            >
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${it.tone}`}>
+                <it.icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">{it.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">{it.hint}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

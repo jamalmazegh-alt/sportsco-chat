@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/password-input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
@@ -20,8 +21,8 @@ export const Route = createFileRoute("/register")({
   component: RegisterPage,
   head: () => ({
     meta: [
-      { title: "Create account — Clubero" },
-      { name: "description", content: "Create your Clubero account in seconds." },
+      { title: i18n.t("meta.register.title") },
+      { name: "description", content: i18n.t("meta.register.description") },
     ],
   }),
 });
@@ -71,6 +72,8 @@ function RegisterPage() {
         setEmail(row.email);
         setInviteEmailLocked(true);
       }
+      if (row.suggested_first_name) setFirstName(row.suggested_first_name);
+      if (row.suggested_last_name) setLastName(row.suggested_last_name);
       setInviteLoading(false);
     })();
     return () => {
@@ -94,11 +97,11 @@ function RegisterPage() {
     }
     setBusy(true);
     const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/home`,
         data: {
           full_name: fullName,
           first_name: firstName.trim(),
@@ -114,19 +117,26 @@ function RegisterPage() {
       toast.error(error.message);
       return;
     }
-    // If session is immediately available (auto-confirm), redeem invite now
-    if (hasInvite) {
-      const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
-      const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
-      if (rErr) {
-        setBusy(false);
-        toast.error(rErr.message || t("auth.inviteInvalid"));
-        return;
+    // If session is immediately available (auto-confirm), redeem invite + go home.
+    // Otherwise, show "check your email" message and send to login.
+    if (signUpData.session) {
+      if (hasInvite) {
+        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
+        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
+        if (rErr) {
+          setBusy(false);
+          toast.error(rErr.message || t("auth.inviteInvalid"));
+          return;
+        }
       }
+      setBusy(false);
+      toast.success(t("auth.signupSuccess"));
+      navigate({ to: "/home" });
+      return;
     }
     setBusy(false);
-    toast.success(t("auth.signupSuccess"));
-    navigate({ to: "/home" });
+    toast.success(t("auth.checkEmail"), { duration: 8000 });
+    navigate({ to: "/login" });
   }
 
   // When invited, the role is fixed by the invitation — don't let the user change it.
@@ -136,41 +146,23 @@ function RegisterPage() {
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <img src={logo} alt="Clubero" width={144} height={144} className="mx-auto mb-3 h-32 w-32 object-contain drop-shadow-sm" />
+          <img src={logo} alt="Clubero" width={144} height={72} className="mx-auto mb-3 h-16 w-36 object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-2" />
           <h1 className="text-2xl font-semibold">{t("auth.register")}</h1>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           {showRoleSelector ? (
-            <div className="space-y-2">
-              <Label>{t("auth.signupAs")}</Label>
-              <RadioGroup
-                value={signupRole}
-                onValueChange={(v) => setSignupRole(v as SignupRole)}
-                className="grid gap-2"
-              >
-                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <RadioGroupItem value="club_admin" id="r-admin" className="mt-0.5" />
-                  <div className="text-sm">
-                    <div className="font-medium">{t("auth.roleClubAdmin")}</div>
-                    <div className="text-xs text-muted-foreground">{t("auth.roleClubAdminHint")}</div>
-                  </div>
-                </label>
-                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <RadioGroupItem value="player" id="r-player" className="mt-0.5" />
-                  <div className="text-sm">
-                    <div className="font-medium">{t("auth.rolePlayer")}</div>
-                    <div className="text-xs text-muted-foreground">{t("auth.rolePlayerHint")}</div>
-                  </div>
-                </label>
-                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                  <RadioGroupItem value="parent" id="r-parent" className="mt-0.5" />
-                  <div className="text-sm">
-                    <div className="font-medium">{t("auth.roleParent")}</div>
-                    <div className="text-xs text-muted-foreground">{t("auth.roleParentHint")}</div>
-                  </div>
-                </label>
-              </RadioGroup>
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm space-y-2">
+              <div className="font-medium">{t("auth.roleClubAdmin")}</div>
+              <div className="text-xs text-muted-foreground">
+                {t("auth.publicSignupClubAdminOnly") ||
+                  "Cette inscription est destinée aux dirigeants de club. Les joueurs et parents rattachés à un club rejoignent Clubero via une invitation."}
+              </div>
+              <div className="text-xs">
+                <Link to="/register/player" className="font-semibold text-primary hover:underline">
+                  {t("auth.playerSignupLink") || "Vous êtes joueur ? Créez votre profil ici →"}
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">

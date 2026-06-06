@@ -1,62 +1,68 @@
 import * as React from "react";
-import {
-  Body, Button, Container, Head, Heading, Html, Preview, Text,
-} from "@react-email/components";
+import { Button, Heading, Img, Section, Text } from "@react-email/components";
+import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface PlayerInviteProps {
   firstName?: string;
   teamName?: string;
   clubName?: string;
+  clubLogoUrl?: string;
   inviteUrl: string;
+  roleLabel?: string;
 }
 
-const PlayerInviteEmail = ({ firstName, teamName, clubName, inviteUrl }: PlayerInviteProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>
-      {clubName ? `${clubName} invited you to join` : "You've been invited to join Clubero"}
-    </Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>
-          {firstName ? `Welcome, ${firstName}!` : "You've been invited"}
-        </Heading>
-        <Text style={text}>
-          {clubName ? <strong>{clubName}</strong> : "Your club"} has added you
-          {teamName ? <> to <strong>{teamName}</strong></> : null} on Clubero.
-          Accept your invitation to set up your account, view upcoming events
-          and respond to convocations.
-        </Text>
-        <Button style={button} href={inviteUrl}>
-          Accept invitation
-        </Button>
-        <Text style={small}>
-          Or paste this link in your browser:<br />
-          <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
-        </Text>
-        <Text style={footer}>
-          If you weren't expecting this, you can ignore this email.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-);
+const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl, roleLabel }: PlayerInviteProps) => {
+  const club = clubName ?? "Votre club";
+  const isStaff = !!roleLabel && roleLabel.toLowerCase() !== "joueur";
+  const role = roleLabel ?? "joueur";
+  return (
+    <EmailShell
+      preview={`${club} vous invite à rejoindre Clubero en tant que ${role}`}
+      locale="fr"
+      clubName={clubName}
+      clubLogoUrl={clubLogoUrl}
+    >
+          <Heading style={h1}>
+            {firstName ? `Bonjour ${firstName},` : "Bonjour,"}
+          </Heading>
+          <Text style={text}>
+            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>{role}</strong>
+            {isStaff ? null : teamName ? <> au sein de l'équipe <strong>{teamName}</strong></> : null}.
+          </Text>
+          <Text style={text}>
+            {isStaff
+              ? "Acceptez l'invitation pour créer votre compte et accéder à votre espace d'encadrement : gestion des équipes, convocations, suivi des joueurs et événements du club."
+              : "Acceptez l'invitation pour créer votre compte, consulter vos prochains événements et répondre à vos convocations."}
+          </Text>
+          <Button style={button} href={inviteUrl}>
+            Accepter l'invitation
+          </Button>
+          <Text style={small}>
+            Ou copiez ce lien dans votre navigateur :<br />
+            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
+          </Text>
+          </EmailShell>
+  );
+};
 
 export const template = {
   component: PlayerInviteEmail,
-  subject: (data) => data.clubName ? `${data.clubName} invited you on Clubero` : "Your Clubero invitation",
+  subject: (data) => {
+    const club = data.clubName ?? "Votre club";
+    const role = data.roleLabel ?? "joueur";
+    return `${club} vous invite sur Clubero en tant que ${role}`;
+  },
   displayName: "Player invitation",
   previewData: {
     firstName: "Alex",
     teamName: "U13 A",
     clubName: "AS Clubero",
+    clubLogoUrl: "https://www.clubero.app/clubero-logo.png",
     inviteUrl: "https://clubero.app/register?invite=sample-token",
   },
 } satisfies TemplateEntry;
 
-const main = { backgroundColor: "#ffffff", fontFamily: "Arial, sans-serif" };
-const container = { padding: "24px 28px", maxWidth: "560px" };
 const h1 = { fontSize: "22px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 24px" };
 const button = {
@@ -69,4 +75,4 @@ const button = {
   display: "inline-block",
 };
 const small = { fontSize: "12px", color: "#64748b", margin: "20px 0 0", lineHeight: "1.5" };
-const footer = { fontSize: "12px", color: "#94a3b8", margin: "24px 0 0" };
+

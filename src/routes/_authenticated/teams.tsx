@@ -1,21 +1,31 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
-import { Plus, Users, ChevronRight, Loader2 } from "lucide-react";
+import { Plus, Users, ChevronRight, Loader2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/empty-state";
+import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
+
+
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/teams")({
   component: TeamsRoute,
-  head: () => ({ meta: [{ title: "Teams — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.teams.title") },
+      { name: "description", content: i18n.t("meta.teams.description") },
+    ],
+  }),
 });
 
 function TeamsRoute() {
@@ -28,7 +38,8 @@ function TeamsPage() {
   const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const role = useActiveRole();
-  const isAdmin = role === "admin";
+  const roles = useMyRoles();
+  const isAdmin = roles.includes("admin");
   const qc = useQueryClient();
 
   const { data: teams, isLoading } = useQuery({
@@ -39,6 +50,7 @@ function TeamsPage() {
         .from("teams")
         .select("id, name, season, sport, age_group, championship, competitions, image_url")
         .eq("club_id", activeClubId!)
+        .is("deleted_at", null)
         .order("name");
       if (!ts) return [];
       const { data: tm } = await supabase
@@ -55,6 +67,14 @@ function TeamsPage() {
       return ts.map((tm) => ({ ...tm, count: counts[tm.id] ?? 0 }));
     },
   });
+
+  // Auto-redirect non-admin users with exactly 1 team straight to its detail page.
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!isAdmin && teams && teams.length === 1) {
+      navigate({ to: "/teams/$teamId", params: { teamId: teams[0].id }, replace: true });
+    }
+  }, [isAdmin, teams, navigate]);
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -102,68 +122,67 @@ function TeamsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t("teams.title")}</h1>
         {isAdmin && (
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
+          <ResponsiveFormDialog
+            open={open}
+            onOpenChange={setOpen}
+            trigger={
               <Button size="sm" className="h-9">
                 <Plus className="h-4 w-4" />
                 {t("teams.create")}
               </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-3xl">
-              <SheetHeader>
-                <SheetTitle>{t("teams.create")}</SheetTitle>
-              </SheetHeader>
-              <form onSubmit={onCreate} className="space-y-4 mt-4 pb-6">
-                <div className="space-y-1.5">
-                  <Label>{t("teams.name")}</Label>
-                  <Input required value={name} onChange={(e) => setName(e.target.value)} />
+            }
+            title={t("teams.create")}
+          >
+            <form onSubmit={onCreate} className="space-y-4 mt-4 pb-6">
+              <div className="space-y-1.5">
+                <Label>{t("teams.name")}</Label>
+                <Input required value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.sport")}</Label>
+                <SportSelect value={sport} onValueChange={setSport} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("teams.ageGroup")}</Label>
+                <Input
+                  value={ageGroup}
+                  onChange={(e) => setAgeGroup(e.target.value)}
+                  placeholder="U13"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>
+                  {t("teams.championship")}{" "}
+                  <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
+                </Label>
+                <Input
+                  value={championship}
+                  onChange={(e) => setChampionship(e.target.value)}
+                  placeholder="District D2"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t("teams.competitions")}</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["friendly", "championship", "cup"] as const).map((key) => (
+                    <label
+                      key={key}
+                      className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm"
+                    >
+                      <Checkbox
+                        checked={competitions.includes(key)}
+                        onCheckedChange={(checked) => toggleCompetition(key, checked === true)}
+                      />
+                      {t(`events.competitionTypes.${key}`)}
+                    </label>
+                  ))}
                 </div>
-                <div className="space-y-1.5">
-                  <Label>{t("teams.sport")}</Label>
-                  <SportSelect value={sport} onValueChange={setSport} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>{t("teams.ageGroup")}</Label>
-                  <Input
-                    value={ageGroup}
-                    onChange={(e) => setAgeGroup(e.target.value)}
-                    placeholder="U13"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>
-                    {t("teams.championship")}{" "}
-                    <span className="text-xs text-muted-foreground">({t("common.optional")})</span>
-                  </Label>
-                  <Input
-                    value={championship}
-                    onChange={(e) => setChampionship(e.target.value)}
-                    placeholder="District D2"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("teams.competitions")}</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["friendly", "championship", "cup"] as const).map((key) => (
-                      <label
-                        key={key}
-                        className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm"
-                      >
-                        <Checkbox
-                          checked={competitions.includes(key)}
-                          onCheckedChange={(checked) => toggleCompetition(key, checked === true)}
-                        />
-                        {t(`events.competitionTypes.${key}`)}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <Button type="submit" className="w-full h-11" disabled={busy}>
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
-                </Button>
-              </form>
-            </SheetContent>
-          </Sheet>
+              </div>
+              <Button type="submit" className="w-full h-11" disabled={busy}>
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.create")}
+              </Button>
+            </form>
+          </ResponsiveFormDialog>
         )}
       </div>
 
@@ -174,38 +193,83 @@ function TeamsPage() {
           ))}
         </div>
       ) : !teams || teams.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-          <Users className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">{t("teams.noTeams")}</p>
-        </div>
+        <EmptyState
+          icon={<Users className="h-6 w-6" />}
+          title={t("teams.noTeams")}
+          description={
+            isAdmin
+              ? t("teams.emptyHintAdmin")
+              : t("teams.emptyHintMember")
+          }
+          action={
+            isAdmin ? (
+              <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" />
+                {t("teams.create")}
+              </Button>
+            ) : null
+          }
+        />
       ) : (
-        <ul className="space-y-2">
-          {teams.map((tm) => (
-            <li key={tm.id}>
-              <Link
-                to="/teams/$teamId"
-                params={{ teamId: tm.id }}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
-              >
-                <div className="h-14 w-14 rounded-xl bg-muted shrink-0 overflow-hidden flex items-center justify-center">
-                  {tm.image_url ? (
-                    <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium truncate">{tm.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
-                    {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-2">
+            {teams.map((tm) => (
+              <li key={tm.id}>
+                <Link
+                  to="/teams/$teamId"
+                  params={{ teamId: tm.id }}
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
+                >
+                  <div className="h-14 w-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
+                    {tm.image_url ? (
+                      <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className={`h-full w-full flex items-center justify-center text-sm font-bold tracking-tight ${avatarGradient(tm.id)}`}>
+                        {initialsFrom(tm.name)}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{tm.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {[tm.age_group, tm.championship, tm.sport].filter(Boolean).join(" · ")}
+                      {tm.count > 0 && ` · ${tm.count} ${t("teams.members")}`}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                </Link>
+              </li>
+            ))}
+
+            {isAdmin && teams.length < 3 && (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  className="group w-full flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/30 px-4 py-5 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 active:scale-[0.99] transition-all"
+                >
+                  <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+                  {t("teams.create")}
+                </button>
+              </li>
+            )}
+          </ul>
+
+          <Link
+            to="/stats"
+            className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4 active:scale-[0.99] transition-transform hover:bg-accent/40"
+          >
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <BarChart3 className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{t("nav.viewStats", { defaultValue: "Voir les statistiques" })}</p>
+              <p className="text-xs text-muted-foreground">{t("nav.stats")}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+          </Link>
+        </>
       )}
     </div>
   );

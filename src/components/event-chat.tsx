@@ -19,6 +19,8 @@ type Msg = {
   author?: { full_name: string | null; avatar_url: string | null } | null;
 };
 
+const PAGE_SIZE = 30;
+
 export function EventChat({ eventId }: { eventId: string }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -28,9 +30,22 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [sending, setSending] = useState(false);
   const [open, setOpen] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Check club setting + load messages
+  async function attachAuthors(msgs: Msg[]): Promise<Msg[]> {
+    const ids = Array.from(new Set(msgs.map((m) => m.author_user_id).filter(Boolean)));
+    if (ids.length === 0) return msgs;
+    const { data: profs } = await supabase
+      .from("profiles")
+      .select("id, full_name, avatar_url")
+      .in("id", ids);
+    const map = new Map((profs ?? []).map((p) => [p.id, p]));
+    return msgs.map((m) => ({ ...m, author: map.get(m.author_user_id) ?? m.author ?? null }));
+  }
+
+  // Check club setting + load most recent page
   useEffect(() => {
     let active = true;
     (async () => {
@@ -39,7 +54,6 @@ export function EventChat({ eventId }: { eventId: string }) {
         .select("team_id, teams:team_id(club_id, clubs:club_id(event_chat_enabled))")
         .eq("id", eventId)
         .single();
-      // fallback: try to read setting; if select with embed not allowed, just allow
       const ec = (ev as { teams?: { clubs?: { event_chat_enabled?: boolean } } } | null)?.teams?.clubs?.event_chat_enabled;
       if (!active) return;
       setEnabled(ec === undefined ? true : !!ec);
@@ -47,22 +61,39 @@ export function EventChat({ eventId }: { eventId: string }) {
         .from("event_messages")
         .select("id, event_id, author_user_id, body, created_at, attachments")
         .eq("event_id", eventId)
-        .order("created_at", { ascending: true });
-      const msgs = (data ?? []) as Msg[];
-      const ids = Array.from(new Set(msgs.map((m) => m.author_user_id)));
-      if (ids.length > 0) {
-        const { data: profs } = await supabase
-          .from("profiles")
-          .select("id, full_name, avatar_url")
-          .in("id", ids);
-        const map = new Map((profs ?? []).map((p) => [p.id, p]));
-        msgs.forEach((m) => { m.author = map.get(m.author_user_id) ?? null; });
-      }
+        .order("created_at", { ascending: false })
+        .limit(PAGE_SIZE + 1);
+      const rows = (data ?? []) as Msg[];
+      const more = rows.length > PAGE_SIZE;
+      const page = more ? rows.slice(0, PAGE_SIZE) : rows;
+      const ordered = page.reverse();
+      const withAuthors = await attachAuthors(ordered);
       if (!active) return;
-      setMessages(msgs);
+      setMessages(withAuthors);
+      setHasMore(more);
     })();
     return () => { active = false; };
   }, [eventId]);
+
+  async function loadMore() {
+    if (loadingMore || messages.length === 0) return;
+    setLoadingMore(true);
+    const oldest = messages[0].created_at;
+    const { data } = await supabase
+      .from("event_messages")
+      .select("id, event_id, author_user_id, body, created_at, attachments")
+      .eq("event_id", eventId)
+      .lt("created_at", oldest)
+      .order("created_at", { ascending: false })
+      .limit(PAGE_SIZE + 1);
+    const rows = (data ?? []) as Msg[];
+    const more = rows.length > PAGE_SIZE;
+    const page = more ? rows.slice(0, PAGE_SIZE) : rows;
+    const withAuthors = await attachAuthors(page.reverse());
+    setMessages((prev) => [...withAuthors, ...prev]);
+    setHasMore(more);
+    setLoadingMore(false);
+  }
 
   // Realtime
   useEffect(() => {
@@ -71,9 +102,17 @@ export function EventChat({ eventId }: { eventId: string }) {
       .channel(`event_messages:${eventId}`)
       .on("postgres_changes",
         { event: "INSERT", schema: "public", table: "event_messages", filter: `event_id=eq.${eventId}` },
-        (payload) => {
+        async (payload) => {
+          const incoming = payload.new as Msg;
+          // Fetch author profile so the name doesn't appear as "—"
+          const { data: prof } = await supabase
+            .from("profiles")
+            .select("id, full_name, avatar_url")
+            .eq("id", incoming.author_user_id)
+            .maybeSingle();
+          const withAuthor = { ...incoming, author: prof ?? null };
           setMessages((prev) =>
-            prev.some((m) => m.id === (payload.new as Msg).id) ? prev : [...prev, payload.new as Msg]
+            prev.some((m) => m.id === incoming.id) ? prev : [...prev, withAuthor]
           );
         })
       .subscribe();
@@ -128,6 +167,18 @@ export function EventChat({ eventId }: { eventId: string }) {
       {open && (
         <>
           <div className="max-h-80 overflow-y-auto px-3 py-3 space-y-2 border-t border-border">
+            {hasMore && (
+              <div className="flex justify-center pb-1">
+                <button
+                  type="button"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="text-[11px] font-medium text-primary hover:underline disabled:opacity-50"
+                >
+                  {loadingMore ? t("common.loading", { defaultValue: "Loading…" }) : t("chat.loadMore", { defaultValue: "Load earlier messages" })}
+                </button>
+              </div>
+            )}
             {messages.length === 0 && (
               <p className="text-xs text-muted-foreground text-center py-6">{t("chat.empty")}</p>
             )}

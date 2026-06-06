@@ -18,7 +18,45 @@ export interface TemplateEntry {
  *   // then add to TEMPLATES: 'welcome': welcomeTemplate
  */
 import { template as playerInviteTemplate } from './player-invite'
+import { template as convocationResponseTemplate } from './convocation-response'
+import { template as convocationInviteTemplate } from './convocation-invite'
+import { template as convocationCancelledTemplate } from './convocation-cancelled'
+import { template as subscriptionAdminNotificationTemplate } from './subscription-admin-notification'
+import { template as eventCancelledTemplate } from './event-cancelled'
+import { template as eventRescheduledTemplate } from './event-rescheduled'
+import { template as trialReminderTemplate } from './trial-reminder'
+import { template as inboundInquiryTemplate } from './inbound-inquiry'
+import { template as inquiryConfirmationTemplate } from './inquiry-confirmation'
+import { template as supportTicketCreatedTemplate } from './support-ticket-created'
+import { template as supportTicketReplyTemplate } from './support-ticket-reply'
+import { template as tournamentPassPurchasedTemplate } from './tournament-pass-purchased'
+import { template as tournamentInviteTemplate } from './tournament-invite'
+import { template as tournamentMemberAddedTemplate } from './tournament-member-added'
+import { template as tournamentPaymentRequestTemplate } from './tournament-payment-request'
+import { template as tournamentProgrammePublishedTemplate } from './tournament-programme-published'
+import { template as tournamentRosterLinkTemplate } from './tournament-roster-link'
+import { template as paymentReceiptTemplate } from './payment-receipt'
+import { template as paymentReminderTemplate } from './payment-reminder'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
+  'inquiry-confirmation': inquiryConfirmationTemplate,
   'player-invite': playerInviteTemplate,
+  'convocation-response': convocationResponseTemplate,
+  'convocation-invite': convocationInviteTemplate,
+  'convocation-cancelled': convocationCancelledTemplate,
+  'subscription-admin-notification': subscriptionAdminNotificationTemplate,
+  'event-cancelled': eventCancelledTemplate,
+  'event-rescheduled': eventRescheduledTemplate,
+  'trial-reminder': trialReminderTemplate,
+  'inbound-inquiry': inboundInquiryTemplate,
+  'support-ticket-created': supportTicketCreatedTemplate,
+  'support-ticket-reply': supportTicketReplyTemplate,
+  'tournament-pass-purchased': tournamentPassPurchasedTemplate,
+  'tournament-invite': tournamentInviteTemplate,
+  'tournament-member-added': tournamentMemberAddedTemplate,
+  'tournament-payment-request': tournamentPaymentRequestTemplate,
+  'tournament-programme-published': tournamentProgrammePublishedTemplate,
+  'tournament-roster-link': tournamentRosterLinkTemplate,
+  'payment-receipt': paymentReceiptTemplate,
+  'payment-reminder': paymentReminderTemplate,
 }

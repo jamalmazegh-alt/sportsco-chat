@@ -1,11 +1,39 @@
-import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Navigate, useRouterState } from "@tanstack/react-router";
 import { requireAuthBeforeLoad } from "@/lib/route-guards";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { useClubSubscriptionActive } from "@/lib/use-club-subscription";
+
+// Routes accessible to tournament-only users (no club). Everything else
+// under /_authenticated is redirected to /tournaments.
+const TOURNAMENT_ONLY_ALLOWED = [
+  "/tournaments",
+  "/profile",
+  "/admin",
+  "/support",
+  "/assistant",
+];
+// When a club has no active subscription, only these prefixes remain
+// accessible (so the admin can subscribe; everyone can still see profile).
+const CLUB_LOCKED_ALLOWED = [
+  "/admin",
+  "/profile",
+  "/support",
+];
+function isPathAllowed(pathname: string, list: string[]): boolean {
+  return list.some((p) => pathname === p || pathname.startsWith(p + "/"));
+}
+import { AssistantFab } from "@/components/assistant-fab";
+import { SupportFab } from "@/components/support-fab";
 import { ConsentGate } from "@/components/consent-gate";
+import { GlobalSearch } from "@/components/global-search";
+import { TrialBanner } from "@/components/trial-banner";
+import { OnboardingWizard } from "@/components/onboarding-wizard";
+import { ClubSelector } from "@/components/club-selector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,10 +47,14 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthLayout() {
-  const { session, loading, memberships, refreshMemberships, user } = useAuth();
+  const { session, loading, memberships, refreshMemberships, user, activeClubId } = useAuth();
   const { t } = useTranslation();
   const [clubName, setClubName] = useState("");
   const [busy, setBusy] = useState(false);
+  const { tournamentOnly } = useTournamentOnlyMode();
+  const { isActive: clubSubActive, isLoading: subLoading } =
+    useClubSubscriptionActive(activeClubId);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (loading) {
     return (
@@ -33,7 +65,44 @@ function AuthLayout() {
   }
   if (!session) return <Navigate to="/login" replace />;
 
+  const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
+  const isTournamentOrganizer = signupRole === "tournament_organizer";
+
+  // Guard: tournament-only accounts can only reach tournament + profile pages.
+  if (tournamentOnly && !isPathAllowed(pathname, TOURNAMENT_ONLY_ALLOWED)) {
+    return <Navigate to="/tournaments" replace />;
+  }
+
+  // Guard: clubs without an active subscription only see Admin + Profile.
+  if (
+    !tournamentOnly &&
+    activeClubId &&
+    !subLoading &&
+    !clubSubActive &&
+    !isPathAllowed(pathname, CLUB_LOCKED_ALLOWED)
+  ) {
+    return <Navigate to="/admin/billing" replace />;
+  }
+
+
+
   if (memberships.length === 0) {
+    // Tournament organizers don't need a club — render the route with just
+    // the bottom nav, no club onboarding screen, consent gate, or wizard.
+    if (isTournamentOrganizer) {
+      return (
+        <div className="min-h-screen bg-background pb-24">
+          <div className="mx-auto max-w-xl">
+            <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+              <Outlet />
+            </div>
+          </div>
+          <SupportFab />
+          <AssistantFab />
+          <BottomNav />
+        </div>
+      );
+    }
     return <NoMembershipScreen
       clubName={clubName}
       setClubName={setClubName}
@@ -47,14 +116,28 @@ function AuthLayout() {
 
   return (
     <ConsentGate>
+
       <div className="min-h-screen bg-background pb-24">
         <div className="mx-auto max-w-xl">
-          <div className="flex items-center justify-center gap-2 pt-3 pb-1">
-            <img src={logo} alt="Clubero" width={28} height={28} className="h-7 w-7 object-contain" />
-            <span className="text-sm font-semibold tracking-tight text-foreground/80">Clubero</span>
+          <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
+            <div className="relative flex items-center justify-center px-3 py-3">
+              <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                <ClubSelector />
+              </div>
+              <img src={logo} alt="Clubero" className="h-10 w-auto object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-1.5 dark:py-0.5" />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <GlobalSearch />
+              </div>
+            </div>
+            <TrialBanner />
           </div>
-          <Outlet />
+          <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+            <Outlet />
+          </div>
         </div>
+        <OnboardingWizard />
+        <SupportFab />
+        <AssistantFab />
         <BottomNav />
       </div>
     </ConsentGate>
@@ -86,7 +169,7 @@ function NoMembershipScreen({
       .single();
     if (error || !club) {
       setBusy(false);
-      toast.error(error?.message ?? "Could not create club");
+      toast.error(error?.message ?? t("errors.clubCreateFailed"));
       return;
     }
     const { error: mErr } = await supabase

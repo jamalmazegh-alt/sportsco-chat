@@ -66,6 +66,35 @@ export function TimePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-2">
+        <div className="mb-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9:]*"
+            placeholder="HH:MM"
+            defaultValue={value}
+            key={value}
+            onChange={(e) => {
+              let v = e.target.value.replace(/[^0-9]/g, "").slice(0, 4);
+              if (v.length >= 3) v = `${v.slice(0, 2)}:${v.slice(2)}`;
+              e.target.value = v;
+              const m = v.match(/^(\d{1,2}):(\d{2})$/);
+              if (m) {
+                const hh = Math.min(23, parseInt(m[1], 10));
+                const mm = Math.min(59, parseInt(m[2], 10));
+                onChange(`${pad(hh)}:${pad(mm)}`);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                setOpen(false);
+              }
+            }}
+            className="w-full h-9 rounded-md border border-input bg-background px-2 text-center text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-ring"
+            autoFocus
+          />
+        </div>
         <div className="flex gap-1">
           <ScrollArea className="h-56 w-16 rounded-md border">
             <div ref={hCol} className="p-1 space-y-0.5">

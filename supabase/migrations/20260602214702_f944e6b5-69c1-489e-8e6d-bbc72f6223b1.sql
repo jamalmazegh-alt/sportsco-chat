@@ -1,0 +1,2 @@
+ALTER TABLE public.clubs ADD COLUMN IF NOT EXISTS default_language text NOT NULL DEFAULT 'fr';
+ALTER TABLE public.clubs ADD CONSTRAINT clubs_default_language_check CHECK (default_language IN ('fr','en','de','es','it','nl','pt'));

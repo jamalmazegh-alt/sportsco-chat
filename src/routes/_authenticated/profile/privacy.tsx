@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -31,13 +32,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Download, Trash2, ShieldCheck, Loader2 } from "lucide-react";
+import { Download, Trash2, ShieldCheck, Loader2, ChevronRight } from "lucide-react";
+import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { LegalDialog } from "@/components/legal-dialog";
 
 export const Route = createFileRoute("/_authenticated/profile/privacy")({
   component: PrivacyPage,
-  head: () => ({ meta: [{ title: "Privacy & data — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.privacy.title", { ns: "common" }) },
+      { name: "description", content: i18n.t("meta.privacy.description", { ns: "common" }) },
+    ],
+  }),
 });
 
 function PrivacyPage() {
@@ -88,6 +96,9 @@ function PrivacyPage() {
 
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [legalKind, setLegalKind] = useState<
+    null | "terms" | "privacy" | "data_processing" | "media" | "notifications" | "legal_notice" | "parental_consent"
+  >(null);
 
   async function toggleConsent(kind: string, version_id: string, currentlyGranted: boolean) {
     setBusy(true);
@@ -143,10 +154,9 @@ function PrivacyPage() {
   return (
     <div className="px-4 pb-10 pt-2 space-y-6">
       <div className="flex items-center gap-2">
-        <Link to="/profile" className="-ml-2 inline-flex items-center text-sm text-muted-foreground">
-          <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-        </Link>
+        <BackLink to="/profile" />
       </div>
+
 
       <header className="space-y-1">
         <div className="flex items-center gap-2">
@@ -159,25 +169,52 @@ function PrivacyPage() {
       {/* Consents */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h2 className="text-sm font-semibold">{t("privacy.yourConsents")}</h2>
+        <p className="text-xs text-muted-foreground">
+          {t("privacy.consentsHint", { defaultValue: "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte." })}
+        </p>
         <div className="space-y-2">
-          {status?.items.map((i) => (
-            <div key={i.kind} className="flex items-start justify-between gap-3 rounded-lg border border-border p-3">
-              <div className="text-sm">
-                <div className="font-medium">
-                  {i.title}
-                  {i.required && (
-                    <span className="ml-2 text-xs text-destructive">{t("privacy.required")}</span>
-                  )}
+          {status?.items.map((i) => {
+            const legalKindFor = (
+              ["terms", "privacy", "data_processing", "media", "notifications"] as const
+            ).includes(i.kind as any)
+              ? (i.kind as any)
+              : null;
+            return (
+              <div
+                key={i.kind}
+                className="rounded-lg border border-border p-3 space-y-2"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
+                      <span className="truncate">{i.title}</span>
+                      {i.required && (
+                        <span className="text-[10px] uppercase tracking-wide text-destructive font-semibold">
+                          {t("privacy.required")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">v{i.version}</p>
+                  </div>
+                  <Switch
+                    checked={i.granted}
+                    disabled={busy || (i.required && i.granted)}
+                    onCheckedChange={() => toggleConsent(i.kind, i.version_id, i.granted)}
+                  />
                 </div>
-                <p className="text-xs text-muted-foreground">v{i.version}</p>
+                {legalKindFor && (
+                  <button
+                    type="button"
+                    onClick={() => setLegalKind(legalKindFor)}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                  >
+                    {t("privacy.readDocument", { defaultValue: "Lire le document" })}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
-              <Switch
-                checked={i.granted}
-                disabled={busy || (i.required && i.granted)}
-                onCheckedChange={() => toggleConsent(i.kind, i.version_id, i.granted)}
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -216,6 +253,9 @@ function PrivacyPage() {
           </div>
         </section>
       )}
+
+      {/* Legal docs section removed — each consent above opens its document. */}
+
 
       {/* GDPR rights */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
@@ -302,6 +342,12 @@ function PrivacyPage() {
           ))}
         </div>
       </section>
+
+      <LegalDialog
+        open={!!legalKind}
+        onOpenChange={(o) => !o && setLegalKind(null)}
+        kind={legalKind}
+      />
     </div>
   );
 }

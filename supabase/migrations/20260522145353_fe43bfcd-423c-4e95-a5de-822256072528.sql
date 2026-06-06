@@ -1,0 +1,1 @@
+ALTER TABLE public.tournament_matches ADD COLUMN IF NOT EXISTS sets jsonb;

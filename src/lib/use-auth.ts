@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import i18n from "@/lib/i18n";
@@ -28,6 +28,7 @@ export type AppRole = "admin" | "coach" | "parent" | "player";
 export interface ClubMembership {
   club_id: string;
   role: AppRole;
+  roles: string[];
   club: { id: string; name: string; logo_url: string | null };
 }
 
@@ -42,15 +43,30 @@ export interface AuthState {
   signOut: () => Promise<void>;
 }
 
-const ACTIVE_CLUB_KEY = "squadly:active_club_id";
+const ACTIVE_CLUB_KEY = "clubero:active_club_id";
+const LEGACY_ACTIVE_CLUB_KEY = "squadly:active_club_id";
+
+function readActiveClubKey(): string | null {
+  if (typeof window === "undefined") return null;
+  const current = localStorage.getItem(ACTIVE_CLUB_KEY);
+  if (current) return current;
+  // Migrate one-shot from the old "squadly:" key (pre-rebrand).
+  const legacy = localStorage.getItem(LEGACY_ACTIVE_CLUB_KEY);
+  if (legacy) {
+    localStorage.setItem(ACTIVE_CLUB_KEY, legacy);
+    localStorage.removeItem(LEGACY_ACTIVE_CLUB_KEY);
+    return legacy;
+  }
+  return null;
+}
 
 export function useAuthState(): AuthState {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [memberships, setMemberships] = useState<ClubMembership[]>([]);
-  const [activeClubId, setActiveClubIdState] = useState<string | null>(() =>
-    typeof window !== "undefined" ? localStorage.getItem(ACTIVE_CLUB_KEY) : null
-  );
+  const [activeClubId, setActiveClubIdState] = useState<string | null>(readActiveClubKey);
+  const activeClubIdRef = useRef(activeClubId);
+  activeClubIdRef.current = activeClubId;
 
   const setActiveClubId = useCallback((id: string | null) => {
     setActiveClubIdState(id);
@@ -66,7 +82,6 @@ export function useAuthState(): AuthState {
       setMemberships([]);
       return;
     }
-    // Sync preferred language from profile
     supabase
       .from("profiles")
       .select("preferred_language")
@@ -80,7 +95,7 @@ export function useAuthState(): AuthState {
       });
     const { data, error } = await supabase
       .from("club_members")
-      .select("club_id, role, clubs:club_id(id, name, logo_url)")
+      .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
       .eq("user_id", userData.user.id);
     if (error) {
       console.error(error);
@@ -89,14 +104,16 @@ export function useAuthState(): AuthState {
     const list: ClubMembership[] = (data ?? []).map((row: any) => ({
       club_id: row.club_id,
       role: row.role,
+      roles: row.roles ?? [row.role],
       club: row.clubs,
     }));
     setMemberships(list);
-    if (list.length > 0 && !list.some((m) => m.club_id === activeClubId)) {
+    const current = activeClubIdRef.current;
+    if (list.length > 0 && !list.some((m) => m.club_id === current)) {
       setActiveClubId(list[0].club_id);
     }
     if (list.length === 0) setActiveClubId(null);
-  }, [activeClubId, setActiveClubId]);
+  }, [setActiveClubId]);
 
   useEffect(() => {
     // Set up listener BEFORE getSession
@@ -113,9 +130,11 @@ export function useAuthState(): AuthState {
       }
     });
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
-      if (data.session) refreshMemberships();
+      if (data.session) {
+        await refreshMemberships();
+      }
       setLoading(false);
     });
 

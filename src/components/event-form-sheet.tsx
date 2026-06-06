@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,10 @@ import { TimePicker } from "@/components/ui/time-picker";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
+import { useNavigate } from "@tanstack/react-router";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -85,6 +88,7 @@ export type EventFormValues = {
   ends_at: string | null;
   convocation_time: string | null;
   attachments?: Attachment[] | null;
+  is_official?: boolean | null;
 };
 
 type Team = { id: string; name: string };
@@ -310,7 +314,7 @@ function AddressField({
     }
     const handle = window.setTimeout(() => {
       service.getPlacePredictions(
-        { input: value, types: ["geocode"], sessionToken: sessionTokenRef.current ?? undefined },
+        { input: value, sessionToken: sessionTokenRef.current ?? undefined },
         (items) => {
           setSuggestions(
             (items ?? [])
@@ -412,6 +416,9 @@ export function EventFormSheet({
     initial?.is_home === false ? "away" : "home",
   );
   const [meetingPoint, setMeetingPoint] = useState(initial?.meeting_point ?? "");
+  const [isOfficial, setIsOfficial] = useState<boolean>(
+    initial?.is_official ?? ((initial?.type as EventType) === "match"),
+  );
   const [attachments, setAttachments] = useState<Attachment[]>((initial?.attachments as Attachment[] | undefined) ?? []);
 
   const startsInit = splitDateTime(initial?.starts_at);
@@ -425,7 +432,11 @@ export function EventFormSheet({
   const [convocDate, setConvocDate] = useState<Date | undefined>(convocInit.date);
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
+  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
+  const [sendNow, setSendNow] = useState<boolean>(false);
+
   const [busy, setBusy] = useState(false);
+  const navigate = useNavigate();
   const selectedTeam = teams.find((tm) => tm.id === teamId);
   const availableCompetitionTypes = useMemo(() => competitionOptions(selectedTeam), [selectedTeam]);
 
@@ -443,6 +454,7 @@ export function EventFormSheet({
     setCompetitionName(initial?.competition_name ?? "");
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
+    setIsOfficial(initial?.is_official ?? ((initial?.type as EventType) === "match"));
     setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
@@ -453,6 +465,8 @@ export function EventFormSheet({
     setEndTime(e.time);
     setConvocDate(c.date);
     setConvocTime(c.time);
+    setRepeatWeeks(1);
+    setSendNow(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
@@ -518,9 +532,73 @@ export function EventFormSheet({
       ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
       convocation_time: eventConvocationTime,
       attachments: attachments as unknown as never,
+      is_official: type === "match" ? true : type === "tournament" ? isOfficial : false,
     };
 
     if (mode === "create") {
+      const shouldRepeat = type === "training" && repeatWeeks > 1;
+      if (shouldRepeat) {
+        const rows = [] as typeof payload[];
+        for (let i = 0; i < repeatWeeks; i++) {
+          const offsetMs = i * 7 * 24 * 60 * 60 * 1000;
+          const shifted = {
+            ...payload,
+            starts_at: new Date(new Date(payload.starts_at).getTime() + offsetMs).toISOString(),
+            ends_at: payload.ends_at
+              ? new Date(new Date(payload.ends_at).getTime() + offsetMs).toISOString()
+              : null,
+            convocation_time: payload.convocation_time
+              ? new Date(new Date(payload.convocation_time).getTime() + offsetMs).toISOString()
+              : null,
+          };
+          rows.push(shifted);
+        }
+        // Duplicate check: skip rows that already exist (same team + type + starts_at)
+        const { data: existing } = await supabase
+          .from("events")
+          .select("starts_at")
+          .eq("team_id", teamId)
+          .eq("type", type)
+          .in("starts_at", rows.map((r) => r.starts_at))
+          .is("deleted_at", null);
+        const existingSet = new Set((existing ?? []).map((e) => new Date(e.starts_at).toISOString()));
+        const toInsert = rows.filter((r) => !existingSet.has(r.starts_at));
+        if (toInsert.length === 0) {
+          setBusy(false);
+          toast.error(t("events.duplicateExists"));
+          return;
+        }
+        const { data, error } = await supabase
+          .from("events")
+          .insert(toInsert.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })))
+          .select("id");
+        setBusy(false);
+        if (error || !data || data.length === 0) {
+          toast.error(error?.message ?? "Failed");
+          return;
+        }
+        if (existingSet.size > 0) {
+          toast.info(t("events.someDuplicatesSkipped", { count: existingSet.size }));
+        }
+        toast.success(t("events.repeatCreated", { count: data.length }));
+        onOpenChange(false);
+        onSaved(data[0].id);
+        return;
+      }
+      // Duplicate check for single create
+      const { data: dupes } = await supabase
+        .from("events")
+        .select("id")
+        .eq("team_id", teamId)
+        .eq("type", type)
+        .eq("starts_at", payload.starts_at)
+        .is("deleted_at", null)
+        .limit(1);
+      if (dupes && dupes.length > 0) {
+        setBusy(false);
+        toast.error(t("events.duplicateExists"));
+        return;
+      }
       const { data, error } = await supabase
         .from("events")
         .insert({ ...payload, status: "published", created_by: userId, convocations_sent: false })
@@ -534,6 +612,9 @@ export function EventFormSheet({
       toast.success(t("events.publish"));
       onOpenChange(false);
       onSaved(data.id);
+      if (sendNow && type !== "other" && type !== "meeting") {
+        navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
+      }
     } else {
       const { error } = await supabase.from("events").update(payload).eq("id", initial!.id!);
       setBusy(false);
@@ -548,13 +629,13 @@ export function EventFormSheet({
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-      <SheetContent side="bottom" className="h-[92vh] rounded-t-3xl overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{mode === "create" ? t("events.create") : t("common.edit")}</SheetTitle>
-        </SheetHeader>
-        <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-8">
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      trigger={trigger}
+      title={mode === "create" ? t("events.create") : t("common.edit")}
+    >
+      <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-8">
           <div className="space-y-1.5">
             <Label>{t("events.selectTeam")}</Label>
             <Select value={teamId} onValueChange={setTeamId} required>
@@ -586,6 +667,14 @@ export function EventFormSheet({
               </SelectContent>
             </Select>
           </div>
+
+          {type === "tournament" && (
+            <div className="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2.5">
+              <Label className="text-sm font-normal">{t("events.isOfficial")}</Label>
+              <Switch checked={isOfficial} onCheckedChange={setIsOfficial} />
+            </div>
+          )}
+
 
           {type !== "match" && (
             <div className="space-y-1.5">
@@ -648,14 +737,14 @@ export function EventFormSheet({
                 </div>
               </div>
               {isHome === "away" && (
-                <div className="space-y-1.5">
-                  <Label>{t("events.meetingPoint")}</Label>
-                  <Input
-                    value={meetingPoint ?? ""}
-                    onChange={(e) => setMeetingPoint(e.target.value)}
-                    placeholder={t("events.meetingPointHint")}
-                  />
-                </div>
+                <AddressField
+                  label={t("events.meetingPoint")}
+                  value={meetingPoint ?? ""}
+                  onValueChange={setMeetingPoint}
+                  onPlaceUrl={() => undefined}
+                  placeholder={t("events.meetingPointHint")}
+                  helper={t("events.locationGoogleHelper")}
+                />
               )}
             </>
           )}
@@ -705,6 +794,27 @@ export function EventFormSheet({
                 />
                 <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
               </div>
+              {mode === "create" && (
+                <div className="space-y-1.5">
+                  <Label>{t("events.repeat")}</Label>
+                  <Select value={String(repeatWeeks)} onValueChange={(v) => setRepeatWeeks(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">{t("events.repeatNone")}</SelectItem>
+                      {[2, 4, 6, 8, 10, 12, 16, 20].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {t("events.repeatWeeks", { count: n })}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {repeatWeeks > 1 && (
+                    <p className="text-[11px] text-muted-foreground">{t("events.repeatHint")}</p>
+                  )}
+                </div>
+              )}
             </>
           ) : (
             <>
@@ -744,6 +854,24 @@ export function EventFormSheet({
             <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
           </div>
 
+          {mode === "create" && type !== "other" && type !== "meeting" && (
+            <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
+              <Checkbox
+                checked={sendNow}
+                onCheckedChange={(v) => setSendNow(v === true)}
+                className="mt-0.5"
+              />
+              <div className="space-y-0.5">
+                <div className="text-sm font-medium">
+                  {t("events.openConvocationAfterCreate")}
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {t("events.openConvocationAfterCreateHint")}
+                </div>
+              </div>
+            </label>
+          )}
+
           <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -753,8 +881,7 @@ export function EventFormSheet({
               t("common.save")
             )}
           </Button>
-        </form>
-      </SheetContent>
-    </Sheet>
+      </form>
+    </ResponsiveFormDialog>
   );
 }

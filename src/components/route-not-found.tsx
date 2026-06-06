@@ -1,6 +1,7 @@
 import { Navigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { NotFoundPage } from "@/components/not-found-page";
 
 export function RouteNotFound() {
   const { session, loading } = useAuth();
@@ -17,9 +18,5 @@ export function RouteNotFound() {
     return <Navigate to="/login" replace />;
   }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-5">
-      <p className="text-sm text-muted-foreground">Page not found.</p>
-    </div>
-  );
+  return <NotFoundPage />;
 }

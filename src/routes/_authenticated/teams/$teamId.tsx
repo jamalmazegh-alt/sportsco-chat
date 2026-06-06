@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,14 +16,26 @@ import {
 } from "@/components/ui/sheet";
 import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
+import { PositionCombobox } from "@/components/position-combobox";
 import { sendTransactionalEmail } from "@/lib/email/send";
-import { ChevronLeft, ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare } from "lucide-react";
+import { ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
+import { BackLink } from "@/components/back-link";
+import { toCsv, downloadCsv } from "@/lib/csv";
+import { SwipeableRow } from "@/components/swipeable-row";
+import { TeamAttendanceStats } from "@/components/team-attendance-stats";
+import { UnavailableBadge } from "@/components/unavailable-badge";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/teams/$teamId")({
   component: TeamDetail,
-  head: () => ({ meta: [{ title: "Team — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.team.title") },
+      { name: "description", content: i18n.t("meta.team.description") },
+    ],
+  }),
 });
 
 type RespondBy = "player" | "parent" | "both";
@@ -33,7 +45,8 @@ function TeamDetail() {
   const { t } = useTranslation();
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   
 
@@ -54,13 +67,65 @@ function TeamDetail() {
     queryFn: async () => {
       const { data: tm } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, preferred_position, photo_url, user_id, email, phone)")
+        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, license_number, preferred_position, photo_url, user_id, email, phone)")
         .eq("team_id", teamId)
         .eq("role", "player");
+      const seen = new Set<string>();
       return (tm ?? [])
         .map((r: any) => r.players)
-        .filter(Boolean)
+        .filter((p: any) => {
+          if (!p || seen.has(p.id)) return false;
+          seen.add(p.id);
+          return true;
+        })
         .sort((a: any, b: any) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
+    },
+  });
+
+  // Active suspensions for players in this team, used to display unavailability badge.
+  const { data: activeSuspensionsByPlayer } = useQuery({
+    queryKey: ["team-active-suspensions", teamId],
+    enabled: !!players && players.length > 0,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Map<string, { remaining: number; reason: string }>();
+      const { data } = await supabase
+        .from("player_suspensions")
+        .select("player_id, matches_to_serve, matches_served, suspension_reason, status")
+        .in("player_id", ids)
+        .eq("team_id", teamId)
+        .eq("status", "active");
+      const map = new Map<string, { remaining: number; reason: string }>();
+      for (const row of (data ?? []) as any[]) {
+        const remaining = Math.max(0, (row.matches_to_serve ?? 0) - (row.matches_served ?? 0));
+        if (remaining <= 0) continue;
+        const prev = map.get(row.player_id);
+        if (!prev || remaining > prev.remaining) {
+          map.set(row.player_id, { remaining, reason: row.suspension_reason });
+        }
+      }
+      return map;
+    },
+  });
+
+  // Track which players already have a pending (unaccepted) invite.
+  const { data: pendingInvitePlayerIds } = useQuery({
+    queryKey: ["team-pending-invites", teamId, activeClubId],
+    enabled: !!activeClubId && !!players && players.length > 0 && isCoach,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Set<string>();
+      const { data } = await supabase
+        .from("member_invites")
+        .select("player_id, parent_for_player_id, used_at")
+        .eq("club_id", activeClubId!)
+        .is("used_at", null);
+      const set = new Set<string>();
+      (data ?? []).forEach((r: any) => {
+        const pid = r.player_id ?? r.parent_for_player_id;
+        if (pid && ids.includes(pid)) set.add(pid);
+      });
+      return set;
     },
   });
 
@@ -83,6 +148,7 @@ function TeamDetail() {
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
+  const [license, setLicense] = useState("");
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -110,6 +176,8 @@ function TeamDetail() {
   const [editCompetitions, setEditCompetitions] = useState(["friendly", "championship", "cup"]);
   const [editSeason, setEditSeason] = useState("");
   const [editSport, setEditSport] = useState("");
+  const [editWhatsappUrl, setEditWhatsappUrl] = useState("");
+  const [editCommMode, setEditCommMode] = useState<"app" | "whatsapp" | "hybrid">("app");
   const [editBusy, setEditBusy] = useState(false);
 
   function openEdit() {
@@ -119,6 +187,8 @@ function TeamDetail() {
     setEditCompetitions((team as any)?.competitions ?? ["friendly", "championship", "cup"]);
     setEditSeason(team?.season ?? "");
     setEditSport(team?.sport ?? "");
+    setEditWhatsappUrl((team as any)?.whatsapp_group_url ?? "");
+    setEditCommMode(((team as any)?.communication_mode as any) ?? "app");
     setEditOpen(true);
   }
 
@@ -138,7 +208,9 @@ function TeamDetail() {
         competitions: editCompetitions,
         season: editSeason || null,
         sport: editSport || null,
-      })
+        whatsapp_group_url: editWhatsappUrl.trim() || null,
+        communication_mode: editCommMode,
+      } as any)
       .eq("id", teamId);
     setEditBusy(false);
     if (error) { toast.error(error.message); return; }
@@ -149,13 +221,22 @@ function TeamDetail() {
   }
 
   function reset() {
-    setFirst(""); setLast(""); setJersey(""); setPosition("");
+    setFirst(""); setLast(""); setJersey(""); setLicense(""); setPosition("");
     setPhone(""); setEmail(""); setBirthDate("");
     setParentFirst(""); setParentLast(""); setParentPhone(""); setParentEmail("");
     setRespondBy("both"); setPhotoFile(null);
   }
 
   async function uploadPhoto(playerId: string, file: File): Promise<string | null> {
+    // Limite côté client : refuse > 5 Mo (le bucket impose aussi la limite côté serveur)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("players.photoTooLarge", { defaultValue: "Photo trop lourde (max 5 Mo)." }));
+      return null;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }));
+      return null;
+    }
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${activeClubId}/${playerId}.${ext}`;
     const { error: upErr } = await supabase.storage
@@ -199,11 +280,30 @@ function TeamDetail() {
 
     if (targets.length === 0) return { sent: 0, failed: 0, skipped: 1 };
 
-    const { data: clubRow } = await supabase.from("clubs").select("name").eq("id", activeClubId).maybeSingle();
+    // Déduplication : si l'email est déjà associé à un compte Clubero existant,
+    // on saute l'invitation (et on tag comme "skipped" pour informer l'utilisateur).
+    const filtered: InviteTarget[] = [];
+    let skippedExisting = 0;
+    for (const target of targets) {
+      if (target.email) {
+        const { data: exists } = await supabase.rpc("email_exists", { _email: target.email });
+        if (exists === true) {
+          skippedExisting += 1;
+          continue;
+        }
+      }
+      filtered.push(target);
+    }
+    if (filtered.length === 0) {
+      return { sent: 0, failed: 0, skipped: skippedExisting || 1 };
+    }
+
+    const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", activeClubId).maybeSingle();
     const clubLabel = clubRow?.name ?? "Clubero";
+    const clubLogoUrl = clubRow?.logo_url ?? undefined;
 
     let sent = 0; let failed = 0;
-    for (const target of targets) {
+    for (const target of filtered) {
       const token = `${crypto.randomUUID()}-${crypto.randomUUID()}`.replace(/-/g, "");
       const { error: invErr } = await supabase.from("member_invites").insert({
         club_id: activeClubId,
@@ -225,7 +325,8 @@ function TeamDetail() {
             templateName: "player-invite",
             recipientEmail: target.email,
             idempotencyKey: `member-invite-${token}`,
-            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, inviteUrl },
+            fromName: `${clubLabel} via Clubero`,
+            templateData: { firstName: target.firstName, teamName: team?.name, clubName: clubLabel, clubLogoUrl, inviteUrl },
           });
           dispatched = true;
         } catch { /* fallthrough to sms */ }
@@ -244,6 +345,20 @@ function TeamDetail() {
     else if (r.failed && !r.sent) toast.error(t("players.inviteFailed"));
     else if (r.failed) toast.warning(t("players.invitePartial", { sent: r.sent, failed: r.failed }));
     else toast.success(t("players.inviteSent"));
+    qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
+  }
+
+  async function removeFromTeam(playerId: string, fullName: string) {
+    if (!confirm(t("players.removeConfirm", { defaultValue: `Retirer ${fullName} de l'équipe ?`, name: fullName }))) return;
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("player_id", playerId);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("players.removed"));
+    qc.invalidateQueries({ queryKey: ["team-players", teamId] });
+    qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
   }
 
   async function inviteSelected() {
@@ -260,6 +375,7 @@ function TeamDetail() {
     if (totalSent === 0 && totalFailed === 0) toast.warning(t("players.inviteNoContact"));
     else if (totalFailed) toast.warning(t("players.inviteBulkResult", { sent: totalSent, failed: totalFailed, skipped: totalSkipped }));
     else toast.success(t("players.inviteBulkSent", { count: totalSent }));
+    qc.invalidateQueries({ queryKey: ["team-pending-invites", teamId] });
   }
 
   async function onAdd(e: FormEvent) {
@@ -285,6 +401,7 @@ function TeamDetail() {
         first_name: first,
         last_name: last,
         jersey_number: jersey ? Number(jersey) : null,
+        license_number: license.trim() || null,
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
@@ -347,9 +464,8 @@ function TeamDetail() {
 
   return (
     <div className="px-5 pt-6 pb-6 space-y-5">
-      <Link to="/teams" className="inline-flex items-center text-sm text-muted-foreground gap-1">
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/teams" />
+
 
       <div className="flex items-start gap-4">
         <TeamImage
@@ -414,6 +530,32 @@ function TeamDetail() {
                 <Label>{t("teams.season")}</Label>
                 <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
               </div>
+              <div className="space-y-1.5 pt-2 border-t border-border/60">
+                <Label>{t("teams.whatsappGroupLink")}</Label>
+                <Input
+                  type="url"
+                  placeholder="https://chat.whatsapp.com/..."
+                  value={editWhatsappUrl}
+                  onChange={(e) => setEditWhatsappUrl(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {t("teams.whatsappGroupHint")}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>{t("teams.communicationMode")}</Label>
+                <Select value={editCommMode} onValueChange={(v) => setEditCommMode(v as any)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="app">{t("teams.commMode.app")}</SelectItem>
+                    <SelectItem value="hybrid">{t("teams.commMode.hybrid")}</SelectItem>
+                    <SelectItem value="whatsapp">{t("teams.commMode.whatsapp")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {t("teams.commModeHint")}
+                </p>
+              </div>
               <Button type="submit" className="w-full h-11" disabled={editBusy}>
                 {editBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
               </Button>
@@ -421,6 +563,10 @@ function TeamDetail() {
           </SheetContent>
         </Sheet>
       )}
+
+      {isCoach && <CollapsibleTeamStats teamId={teamId} />}
+
+      <TeamCoaches teamId={teamId} clubId={(team as any)?.club_id} isAdmin={roles.includes("admin")} />
 
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -440,6 +586,41 @@ function TeamDetail() {
               </>
             ) : (
               <>
+                {isCoach && (players ?? []).length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9"
+                    onClick={() => {
+                      const csv = toCsv(
+                        (players ?? []).map((p: any) => ({
+                          last_name: p.last_name ?? "",
+                          first_name: p.first_name ?? "",
+                          jersey_number: p.jersey_number ?? "",
+                          license_number: p.license_number ?? "",
+                          position: p.preferred_position ?? "",
+                          email: p.email ?? "",
+                          phone: p.phone ?? "",
+                          account: p.user_id ? "active" : "inactive",
+                        })),
+                        [
+                          { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
+                          { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                          { key: "jersey_number", header: "#" },
+                          { key: "license_number", header: t("players.licenseNumber", { defaultValue: "License #" }) },
+                          { key: "position", header: t("players.position", { defaultValue: "Position" }) },
+                          { key: "email", header: "Email" },
+                          { key: "phone", header: t("players.phone", { defaultValue: "Phone" }) },
+                          { key: "account", header: t("players.account", { defaultValue: "Account" }) },
+                        ],
+                      );
+                      downloadCsv(`${team?.name ?? "team"}-players`, csv);
+                    }}
+                    aria-label={t("common.exportCsv", { defaultValue: "Export CSV" })}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                )}
                 {(players ?? []).some((p: any) => !p.user_id && (p.email || p.phone)) && (
                   <Button size="sm" variant="outline" className="h-9" onClick={() => setSelectMode(true)}>
                     <CheckSquare className="h-4 w-4" />
@@ -497,8 +678,18 @@ function TeamDetail() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>{t("players.preferredPosition")}</Label>
-                    <Input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="GK / DF / MF / FW" />
+                    <PositionCombobox
+                      value={position}
+                      onChange={setPosition}
+                      sport={team?.sport ?? null}
+                      placeholder="GK / DF / MF / FW"
+                    />
                   </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{t("players.licenseNumber")}</Label>
+                  <Input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="FFF-2025-12345" />
                 </div>
 
                 <div className="space-y-1.5">
@@ -597,8 +788,11 @@ function TeamDetail() {
         <ul className="space-y-2">
           {players.map((p: any) => {
             const canInvite = !p.user_id && (p.email || p.phone);
+            const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
+            const linked = !!p.user_id;
             const checked = selectedIds.has(p.id);
             const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const susp = activeSuspensionsByPlayer?.get(p.id);
             const inner = (
               <>
                 <div className="relative h-12 w-12 shrink-0 rounded-full bg-muted overflow-hidden">
@@ -609,12 +803,18 @@ function TeamDetail() {
                       {(p.first_name?.[0] ?? "") + (p.last_name?.[0] ?? "")}
                     </div>
                   )}
-                  <span
-                    className={cn(
-                      "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
-                      p.user_id ? "bg-present" : "bg-muted-foreground/40",
-                    )}
-                  />
+                  {isCoach && (
+                    <span
+                      className={cn(
+                        "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card",
+                        linked
+                          ? "bg-emerald-500"
+                          : hasPendingInvite
+                            ? "bg-amber-400"
+                            : "bg-muted-foreground/40",
+                      )}
+                    />
+                  )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">
@@ -623,8 +823,37 @@ function TeamDetail() {
                       <span className="text-muted-foreground font-normal"> · #{p.jersey_number}</span>
                     ) : null}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {p.preferred_position ?? (p.user_id ? t("players.accountActive") : t("players.accountInactive"))}
+                  {susp && (
+                    <div className="mt-1">
+                      <UnavailableBadge
+                        reason="suspension"
+                        detail={t("discipline.matchesLeft", { count: susp.remaining })}
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs mt-0.5 truncate">
+                    {linked ? (
+                      <span className="text-muted-foreground">
+                        {p.preferred_position ?? (isCoach ? t("players.accountActive") : "")}
+                      </span>
+                    ) : isCoach ? (
+                      hasPendingInvite ? (
+                        <span className="inline-flex items-center gap-1 text-amber-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          {t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
+                        </span>
+                      ) : canInvite ? (
+                        <span className="text-muted-foreground">
+                          {t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {p.preferred_position ?? t("players.accountInactive")}
+                        </span>
+                      )
+                    ) : (
+                      <span className="text-muted-foreground">{p.preferred_position ?? ""}</span>
+                    )}
                   </p>
                 </div>
               </>
@@ -641,26 +870,48 @@ function TeamDetail() {
                     <Checkbox checked={checked} disabled={!canInvite} className="shrink-0" />
                     {inner}
                   </button>
-                ) : (
-                  <div className={rowClass}>
-                    <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
-                      {inner}
-                    </Link>
-                    {isCoach && canInvite && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-8 w-8 shrink-0"
-                        title={t("players.invite")}
-                        disabled={inviting}
-                        onClick={() => inviteOne(p.id)}
-                      >
-                        <Send className="h-4 w-4 text-primary" />
-                      </Button>
-                    )}
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-                  </div>
-                )}
+                ) : (() => {
+                  const rowContent = (
+                    <div className={rowClass}>
+                      <Link to="/players/$playerId" params={{ playerId: p.id }} className="contents">
+                        {inner}
+                      </Link>
+                      {isCoach && canInvite && (
+                        <Button
+                          size="sm"
+                          variant={hasPendingInvite ? "outline" : "default"}
+                          className="h-8 px-3 shrink-0 text-xs"
+                          title={hasPendingInvite ? t("players.resendAction") : t("players.inviteSentAction")}
+                          disabled={inviting}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); inviteOne(p.id); }}
+                        >
+                          <Send className="h-3.5 w-3.5" />
+                          {hasPendingInvite
+                            ? t("players.resendAction", { defaultValue: "Renvoyer" })
+                            : t("players.inviteSentAction", { defaultValue: "Inviter" })}
+                        </Button>
+                      )}
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </div>
+                  );
+                  if (!isCoach) return rowContent;
+                  const actions = [
+                    ...(canInvite
+                      ? [{
+                          label: t("players.invite"),
+                          icon: <Send className="h-4 w-4" />,
+                          onClick: () => inviteOne(p.id),
+                        }]
+                      : []),
+                    {
+                      label: t("common.remove", { defaultValue: "Retirer" }),
+                      icon: <Trash2 className="h-4 w-4" />,
+                      variant: "destructive" as const,
+                      onClick: () => removeFromTeam(p.id, `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim()),
+                    },
+                  ];
+                  return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
+                })()}
               </li>
             );
           })}
@@ -676,6 +927,14 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
 
   async function onPick(file: File) {
     if (!team?.club_id) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("teams.imageTooLarge", { defaultValue: "Image trop lourde (max 5 Mo)." }));
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("teams.imageInvalidType", { defaultValue: "Format de fichier non supporté." }));
+      return;
+    }
     setBusy(true);
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${team.club_id}/${team.id}-${Date.now()}.${ext}`;
@@ -708,6 +967,244 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
       {inner}
       <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); }} />
     </label>
+  );
+}
+
+function CollapsibleTeamStats({ teamId }: { teamId: string }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/40"
+      >
+        <span>{t("stats.showAttendance", { defaultValue: "Voir les statistiques de présence" })}</span>
+        <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />
+      </button>
+      {open && <div className="px-3 pb-3"><TeamAttendanceStats teamId={teamId} /></div>}
+    </div>
+  );
+}
+
+function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: string; isAdmin: boolean }) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [busyUid, setBusyUid] = useState<string | null>(null);
+
+  const { data: coaches } = useQuery({
+    queryKey: ["team-coaches", teamId, clubId],
+    queryFn: async () => {
+      const { data: tm } = await supabase
+        .from("team_members")
+        .select("user_id, role")
+        .eq("team_id", teamId)
+        .in("role", ["coach", "admin"]);
+      const ids = Array.from(new Set((tm ?? []).map((m: any) => m.user_id).filter(Boolean)));
+      if (ids.length === 0) return [] as any[];
+      const [{ data: profs }, { data: cm }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, full_name, first_name, last_name, avatar_url")
+          .in("id", ids),
+        clubId
+          ? supabase
+              .from("club_members")
+              .select("user_id, role")
+              .eq("club_id", clubId)
+              .in("user_id", ids)
+              .in("role", ["admin", "coach"])
+          : Promise.resolve({ data: [] as any[] }),
+      ]);
+      const byId = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      const clubRolesByUser = new Map<string, Set<string>>();
+      for (const m of (cm ?? []) as any[]) {
+        if (!m.user_id) continue;
+        if (!clubRolesByUser.has(m.user_id)) clubRolesByUser.set(m.user_id, new Set());
+        clubRolesByUser.get(m.user_id)!.add(m.role);
+      }
+      return (tm ?? [])
+        .filter((m: any) => m.user_id && byId.has(m.user_id))
+        .map((m: any) => ({
+          ...byId.get(m.user_id),
+          role: m.role,
+          clubRoles: Array.from(clubRolesByUser.get(m.user_id) ?? []),
+        }));
+    },
+  });
+
+  // Club staff available to attach (admins + coaches not already on this team)
+  const { data: availableStaff } = useQuery({
+    queryKey: ["club-staff-available", clubId, teamId, coaches?.length ?? 0],
+    enabled: isAdmin && !!clubId && pickerOpen,
+    queryFn: async () => {
+      const { data: cm } = await supabase
+        .from("club_members")
+        .select("user_id, role")
+        .eq("club_id", clubId!)
+        .in("role", ["coach", "admin"]);
+      const taken = new Set((coaches ?? []).map((c: any) => c.id));
+      const rolesByUser = new Map<string, Set<string>>();
+      for (const m of cm ?? []) {
+        if (!m.user_id || taken.has(m.user_id)) continue;
+        if (!rolesByUser.has(m.user_id)) rolesByUser.set(m.user_id, new Set());
+        rolesByUser.get(m.user_id)!.add(m.role);
+      }
+      const ids = Array.from(rolesByUser.keys());
+      if (ids.length === 0) return [] as any[];
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, full_name, first_name, last_name, avatar_url")
+        .in("id", ids);
+      return (profs ?? []).map((p: any) => ({
+        ...p,
+        roles: Array.from(rolesByUser.get(p.id) ?? []),
+      }));
+    },
+  });
+
+
+  async function attach(uid: string) {
+    setBusyUid(uid);
+    const { error } = await supabase
+      .from("team_members")
+      .insert({ team_id: teamId, user_id: uid, role: "coach" });
+    setBusyUid(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("teams.coachAttached", { defaultValue: "Coach attaché" }));
+    qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
+  }
+
+  async function detach(uid: string) {
+    if (!confirm(t("teams.coachDetachConfirm"))) return;
+    setBusyUid(uid);
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("user_id", uid)
+      .in("role", ["coach", "admin"]);
+    setBusyUid(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("teams.coachDetached", { defaultValue: "Coach retiré" }));
+    qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
+  }
+
+  const hasCoaches = (coaches ?? []).length > 0;
+  if (!hasCoaches && !isAdmin) return null;
+
+  return (
+    <section className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4">
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
+            <UserCircle2 className="h-4 w-4" />
+          </span>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+            {(coaches?.length ?? 0) > 1
+              ? t("teams.coaches", { defaultValue: "Coaches" })
+              : t("teams.coach", { defaultValue: "Coach" })}
+          </h2>
+        </div>
+        {isAdmin && (
+          <Sheet open={pickerOpen} onOpenChange={setPickerOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" variant="outline" className="h-7 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10">
+                <Plus className="h-3.5 w-3.5" />
+                {t("teams.attachCoach", { defaultValue: "Attacher" })}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-3xl">
+              <SheetHeader>
+                <SheetTitle>{t("teams.attachCoachTitle", { defaultValue: "Attacher un coach" })}</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 pb-6 space-y-2">
+                {(availableStaff ?? []).length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">
+                    {t("teams.noAvailableCoach", { defaultValue: "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs." })}
+                  </p>
+                ) : (
+                  (availableStaff ?? []).map((s: any) => {
+                    const name = s.full_name ?? [s.first_name, s.last_name].filter(Boolean).join(" ") ?? "—";
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        disabled={busyUid === s.id}
+                        onClick={async () => { await attach(s.id); setPickerOpen(false); }}
+                        className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/40 transition disabled:opacity-50"
+                      >
+                        <div className="h-9 w-9 rounded-full bg-muted overflow-hidden flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                          {s.avatar_url ? (
+                            <img src={s.avatar_url} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            (name?.[0] ?? "?").toUpperCase()
+                          )}
+                        </div>
+                        <span className="text-sm font-medium flex-1 text-left truncate">{name}</span>
+                        {(s.roles ?? []).includes("admin") && (
+                          <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary mr-1">
+                            {t("roles.admin", { defaultValue: "Admin" })}
+                          </span>
+                        )}
+
+                        {busyUid === s.id && <Loader2 className="h-4 w-4 animate-spin" />}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+      </div>
+      {hasCoaches ? (
+        <ul className="flex flex-wrap gap-2">
+          {(coaches ?? []).map((c: any) => {
+            const name = c.full_name
+              ?? [c.first_name, c.last_name].filter(Boolean).join(" ")
+              ?? "—";
+            return (
+              <li
+                key={c.id}
+                className="flex items-center gap-2 rounded-full bg-card border border-amber-500/30 pl-1 pr-2 py-1"
+              >
+                <div className="h-7 w-7 rounded-full bg-muted overflow-hidden flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
+                  {c.avatar_url ? (
+                    <img src={c.avatar_url} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    (name?.[0] ?? "?").toUpperCase()
+                  )}
+                </div>
+                <span className="text-sm font-medium truncate max-w-[140px]">{name}</span>
+                {(c.role === "admin" || (c.clubRoles ?? []).includes("admin")) && (
+                  <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
+                    {t("roles.admin")}
+                  </span>
+                )}
+                {isAdmin && c.role !== "admin" && (
+                  <button
+                    type="button"
+                    onClick={() => detach(c.id)}
+                    disabled={busyUid === c.id}
+                    className="ml-1 h-5 w-5 inline-flex items-center justify-center rounded-full hover:bg-destructive/15 text-muted-foreground hover:text-destructive disabled:opacity-50"
+                    aria-label={t("teams.coachDetach", { defaultValue: "Retirer" })}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          {t("teams.noCoachYet", { defaultValue: "Aucun coach attaché. Cliquez sur Attacher pour en ajouter." })}
+        </p>
+      )}
+    </section>
   );
 }
 

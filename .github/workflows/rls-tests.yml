@@ -1,0 +1,63 @@
+name: RLS Security Tests
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # Chaque nuit à 3h UTC
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Raison du lancement manuel (optionnel)"
+        required: false
+        default: "Test RLS à la demande"
+
+concurrency:
+  group: rls-tests
+  cancel-in-progress: false
+
+jobs:
+  rls-tests:
+    name: RLS Security Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Log trigger reason
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "🖐️ Lancement manuel — ${{ inputs.reason }}"
+          else
+            echo "🌙 Lancement automatique (cron nocturne)"
+          fi
+
+      - name: Run RLS tests
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: bun run test:rls
+
+      - name: Notify on failure (cron only)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 RLS Tests Failed — ${new Date().toISOString().slice(0,10)}`,
+              body: `Les tests RLS ont échoué lors du run nocturne.\n\n**Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nVérifier les régressions de sécurité avant le prochain déploiement.`,
+              labels: ["security", "bug", "automated"]
+            });

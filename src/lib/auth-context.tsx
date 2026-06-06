@@ -18,16 +18,36 @@ export function useActiveRole(): "admin" | "coach" | "parent" | "player" | null 
   const { memberships, activeClubId } = useAuth();
   const m = memberships.find((x) => x.club_id === activeClubId);
   if (!m) return null;
-  // priority: admin > coach > parent > player (highest privilege wins for UI default)
-  const all = memberships
-    .filter((x) => x.club_id === activeClubId)
-    .map((x) => x.role);
+  const all = new Set<string>(m.roles ?? [m.role]);
   const order: Array<"admin" | "coach" | "parent" | "player"> = [
     "admin",
     "coach",
     "parent",
     "player",
   ];
-  for (const r of order) if (all.includes(r)) return r;
+  for (const r of order) if (all.has(r)) return r;
   return m.role;
+}
+
+/** Full roles array for the active club (multi-role aware). */
+export function useMyRoles(): string[] {
+  const { memberships, activeClubId } = useAuth();
+  const m = memberships.find((x) => x.club_id === activeClubId);
+  return m?.roles ?? (m ? [m.role] : []);
+}
+
+/** Convenience: check whether the active membership has a given role. */
+export function useHasRole(role: string): boolean {
+  return useMyRoles().includes(role);
+}
+
+/** Convenience: is the user an admin of the active club? */
+export function useIsAdmin(): boolean {
+  return useMyRoles().includes("admin");
+}
+
+/** Convenience: is the user any kind of coach (head or assistant) or admin? */
+export function useIsCoach(): boolean {
+  const roles = useMyRoles();
+  return roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
 }

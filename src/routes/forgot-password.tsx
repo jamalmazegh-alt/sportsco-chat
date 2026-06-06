@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +16,8 @@ export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,
   head: () => ({
     meta: [
-      { title: "Forgot password — Clubero" },
-      { name: "description", content: "Reset your Clubero password." },
+      { title: i18n.t("meta.forgot.title") },
+      { name: "description", content: i18n.t("meta.forgot.description") },
     ],
   }),
 });

@@ -9,36 +9,133 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperadminRouteImport } from './routes/superadmin'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PlayersRouteImport } from './routes/players'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DnsCheckRouteImport } from './routes/dns-check'
+import { Route as DemoRouteImport } from './routes/demo'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
+import { Route as TournamentsStartRouteImport } from './routes/tournaments.start'
+import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
+import { Route as TournamentSlugRouteImport } from './routes/tournament.$slug'
+import { Route as TournamentInviteTokenRouteImport } from './routes/tournament-invite.$token'
+import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as SuperadminUsersRouteImport } from './routes/superadmin/users'
+import { Route as SuperadminSupportRouteImport } from './routes/superadmin/support'
+import { Route as SuperadminSettingsRouteImport } from './routes/superadmin/settings'
+import { Route as SuperadminLogsRouteImport } from './routes/superadmin/logs'
+import { Route as SuperadminBillingRouteImport } from './routes/superadmin/billing'
+import { Route as RegisterPlayerRouteImport } from './routes/register_.player'
+import { Route as RTokenRouteImport } from './routes/r.$token'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
 import { Route as LegalKindRouteImport } from './routes/legal.$kind'
+import { Route as FrTournoisRouteImport } from './routes/fr.tournois'
+import { Route as FrOnboardingClubRouteImport } from './routes/fr.onboarding-club'
+import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
+import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CoachSlugRouteImport } from './routes/coach.$slug'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedTournamentsRouteImport } from './routes/_authenticated/tournaments'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
+import { Route as AuthenticatedStatsRouteImport } from './routes/_authenticated/stats'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedFollowingRouteImport } from './routes/_authenticated/following'
+import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authenticated/follow-ups'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as SuperadminSupportTicketsIndexRouteImport } from './routes/superadmin/support-tickets.index'
+import { Route as SuperadminClubsIndexRouteImport } from './routes/superadmin/clubs.index'
+import { Route as AuthenticatedSupportIndexRouteImport } from './routes/_authenticated/support.index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as TournamentSlugTvRouteImport } from './routes/tournament.$slug_.tv'
+import { Route as TournamentSlugRegisterRouteImport } from './routes/tournament.$slug_.register'
+import { Route as TSlugTvRouteImport } from './routes/t.$slug.tv'
+import { Route as TSlugRegisterRouteImport } from './routes/t.$slug.register'
+import { Route as SuperadminUsersUserIdRouteImport } from './routes/superadmin/users.$userId'
+import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/superadmin/support-tickets.$ticketId'
+import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
+import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicTournamentRosterRouteImport } from './routes/api/public/tournament-roster'
+import { Route as ApiPublicTournamentRegistrationRouteImport } from './routes/api/public/tournament-registration'
+import { Route as ApiPublicTournamentPaymentLinkRouteImport } from './routes/api/public/tournament-payment-link'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
+import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
+import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
+import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './routes/_authenticated/tournaments.new-from-pass'
+import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
+import { Route as AuthenticatedSupportTicketIdRouteImport } from './routes/_authenticated/support.$ticketId'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile/privacy'
+import { Route as AuthenticatedProfilePasswordRouteImport } from './routes/_authenticated/profile/password'
 import { Route as AuthenticatedPlayersPlayerIdRouteImport } from './routes/_authenticated/players/$playerId'
+import { Route as AuthenticatedPaymentsReceiptsRouteImport } from './routes/_authenticated/payments.receipts'
+import { Route as AuthenticatedPaymentsFamilyRouteImport } from './routes/_authenticated/payments.family'
 import { Route as AuthenticatedEventsEventIdRouteImport } from './routes/_authenticated/events/$eventId'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedClubDisciplineRouteImport } from './routes/_authenticated/club.discipline'
+import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin/billing'
+import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users.index'
+import { Route as TournamentSlugRosterTokenRouteImport } from './routes/tournament.$slug_.roster.$token'
+import { Route as TournamentSlugRegisterSuccessRouteImport } from './routes/tournament.$slug_.register.success'
+import { Route as TSlugPayRegistrationIdRouteImport } from './routes/t.$slug.pay.$registrationId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicSocialSyncRouteImport } from './routes/api/public/social/sync'
+import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public/social/callback'
+import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
+import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api/public/hooks/payment-reminders'
+import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
+import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
+import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
+import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
+import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
+import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
+import { Route as AuthenticatedPlayersPlayerIdAvailabilityRouteImport } from './routes/_authenticated/players/$playerId/availability'
+import { Route as AuthenticatedPlayersPlayerIdAchievementsRouteImport } from './routes/_authenticated/players/$playerId/achievements'
+import { Route as AuthenticatedEventsEventIdLineupRouteImport } from './routes/_authenticated/events/$eventId/lineup'
+import { Route as AuthenticatedEventsEventIdFeedbackRouteImport } from './routes/_authenticated/events/$eventId/feedback'
 import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_authenticated/admin/users.$userId'
+import { Route as AuthenticatedAdminSettingsSocialRouteImport } from './routes/_authenticated/admin/settings.social'
+import { Route as AuthenticatedAdminSettingsRemindersRouteImport } from './routes/_authenticated/admin/settings.reminders'
+import { Route as AuthenticatedAdminSettingsPaymentsRouteImport } from './routes/_authenticated/admin/settings.payments'
+import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
+import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './routes/_authenticated/admin/settings.communications'
+import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
+import { Route as AuthenticatedAdminPaymentsItemsRouteImport } from './routes/_authenticated/admin/payments.items'
+import { Route as AuthenticatedAdminPaymentsDashboardRouteImport } from './routes/_authenticated/admin/payments.dashboard'
+import { Route as ApiPublicTournamentIdRegulationsRouteImport } from './routes/api/public/tournament.$id.regulations'
 
+const SuperadminRoute = SuperadminRouteImport.update({
+  id: '/superadmin',
+  path: '/superadmin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -47,6 +144,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayersRoute = PlayersRouteImport.update({
+  id: '/players',
+  path: '/players',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -59,9 +166,29 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DnsCheckRoute = DnsCheckRouteImport.update({
   id: '/dns-check',
   path: '/dns-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -73,9 +200,104 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperadminIndexRoute = SuperadminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const TournamentsStartRoute = TournamentsStartRouteImport.update({
+  id: '/tournaments/start',
+  path: '/tournaments/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentsPassSuccessRoute = TournamentsPassSuccessRouteImport.update({
+  id: '/tournaments/pass-success',
+  path: '/tournaments/pass-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentSlugRoute = TournamentSlugRouteImport.update({
+  id: '/tournament/$slug',
+  path: '/tournament/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentInviteTokenRoute = TournamentInviteTokenRouteImport.update({
+  id: '/tournament-invite/$token',
+  path: '/tournament-invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TSlugRoute = TSlugRouteImport.update({
+  id: '/t/$slug',
+  path: '/t/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuperadminUsersRoute = SuperadminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminSupportRoute = SuperadminSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminSettingsRoute = SuperadminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminLogsRoute = SuperadminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const SuperadminBillingRoute = SuperadminBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const RegisterPlayerRoute = RegisterPlayerRouteImport.update({
+  id: '/register_/player',
+  path: '/register/player',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RTokenRoute = RTokenRouteImport.update({
+  id: '/r/$token',
+  path: '/r/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/legal/cookies',
+  path: '/legal/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalKindRoute = LegalKindRouteImport.update({
   id: '/legal/$kind',
   path: '/legal/$kind',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrTournoisRoute = FrTournoisRouteImport.update({
+  id: '/fr/tournois',
+  path: '/fr/tournois',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrOnboardingClubRoute = FrOnboardingClubRouteImport.update({
+  id: '/fr/onboarding-club',
+  path: '/fr/onboarding-club',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnTournamentsRoute = EnTournamentsRouteImport.update({
+  id: '/en/tournaments',
+  path: '/en/tournaments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnClubOnboardingRoute = EnClubOnboardingRouteImport.update({
+  id: '/en/club-onboarding',
+  path: '/en/club-onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
@@ -83,14 +305,45 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoachSlugRoute = CoachSlugRouteImport.update({
+  id: '/coach/$slug',
+  path: '/coach/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTournamentsRoute =
+  AuthenticatedTournamentsRouteImport.update({
+    id: '/tournaments',
+    path: '/tournaments',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTeamsRoute = AuthenticatedTeamsRouteImport.update({
   id: '/teams',
   path: '/teams',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedStatsRoute = AuthenticatedStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPaymentsRoute = AuthenticatedPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
@@ -103,9 +356,24 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFollowingRoute = AuthenticatedFollowingRouteImport.update({
+  id: '/following',
+  path: '/following',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFollowUpsRoute = AuthenticatedFollowUpsRouteImport.update({
+  id: '/follow-ups',
+  path: '/follow-ups',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -113,6 +381,23 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const SuperadminSupportTicketsIndexRoute =
+  SuperadminSupportTicketsIndexRouteImport.update({
+    id: '/support-tickets/',
+    path: '/support-tickets/',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
+const SuperadminClubsIndexRoute = SuperadminClubsIndexRouteImport.update({
+  id: '/clubs/',
+  path: '/clubs/',
+  getParentRoute: () => SuperadminRoute,
+} as any)
+const AuthenticatedSupportIndexRoute =
+  AuthenticatedSupportIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSupportRoute,
+  } as any)
 const AuthenticatedProfileIndexRoute =
   AuthenticatedProfileIndexRouteImport.update({
     id: '/',
@@ -124,21 +409,120 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const TournamentSlugTvRoute = TournamentSlugTvRouteImport.update({
+  id: '/tournament/$slug_/tv',
+  path: '/tournament/$slug/tv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TournamentSlugRegisterRoute = TournamentSlugRegisterRouteImport.update({
+  id: '/tournament/$slug_/register',
+  path: '/tournament/$slug/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TSlugTvRoute = TSlugTvRouteImport.update({
+  id: '/tv',
+  path: '/tv',
+  getParentRoute: () => TSlugRoute,
+} as any)
+const TSlugRegisterRoute = TSlugRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => TSlugRoute,
+} as any)
+const SuperadminUsersUserIdRoute = SuperadminUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => SuperadminUsersRoute,
+} as any)
+const SuperadminSupportTicketsTicketIdRoute =
+  SuperadminSupportTicketsTicketIdRouteImport.update({
+    id: '/support-tickets/$ticketId',
+    path: '/support-tickets/$ticketId',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
+const SuperadminOnboardingImportRoute =
+  SuperadminOnboardingImportRouteImport.update({
+    id: '/onboarding/import',
+    path: '/onboarding/import',
+    getParentRoute: () => SuperadminRoute,
+  } as any)
+const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
+  id: '/clubs/$clubId',
+  path: '/clubs/$clubId',
+  getParentRoute: () => SuperadminRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTournamentRosterRoute =
+  ApiPublicTournamentRosterRouteImport.update({
+    id: '/api/public/tournament-roster',
+    path: '/api/public/tournament-roster',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTournamentRegistrationRoute =
+  ApiPublicTournamentRegistrationRouteImport.update({
+    id: '/api/public/tournament-registration',
+    path: '/api/public/tournament-registration',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTournamentPaymentLinkRoute =
+  ApiPublicTournamentPaymentLinkRouteImport.update({
+    id: '/api/public/tournament-payment-link',
+    path: '/api/public/tournament-payment-link',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicMarketingChatRoute = ApiPublicMarketingChatRouteImport.update({
+  id: '/api/public/marketing-chat',
+  path: '/api/public/marketing-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicInquiryRoute = ApiPublicInquiryRouteImport.update({
+  id: '/api/public/inquiry',
+  path: '/api/public/inquiry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedTournamentsNewFromPassRoute =
+  AuthenticatedTournamentsNewFromPassRouteImport.update({
+    id: '/new-from-pass',
+    path: '/new-from-pass',
+    getParentRoute: () => AuthenticatedTournamentsRoute,
+  } as any)
+const AuthenticatedTournamentsTournamentIdRoute =
+  AuthenticatedTournamentsTournamentIdRouteImport.update({
+    id: '/$tournamentId',
+    path: '/$tournamentId',
+    getParentRoute: () => AuthenticatedTournamentsRoute,
+  } as any)
 const AuthenticatedTeamsTeamIdRoute =
   AuthenticatedTeamsTeamIdRouteImport.update({
     id: '/$teamId',
     path: '/$teamId',
     getParentRoute: () => AuthenticatedTeamsRoute,
   } as any)
+const AuthenticatedSupportTicketIdRoute =
+  AuthenticatedSupportTicketIdRouteImport.update({
+    id: '/$ticketId',
+    path: '/$ticketId',
+    getParentRoute: () => AuthenticatedSupportRoute,
+  } as any)
 const AuthenticatedProfilePrivacyRoute =
   AuthenticatedProfilePrivacyRouteImport.update({
     id: '/privacy',
     path: '/privacy',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedProfilePasswordRoute =
+  AuthenticatedProfilePasswordRouteImport.update({
+    id: '/password',
+    path: '/password',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
 const AuthenticatedPlayersPlayerIdRoute =
@@ -147,16 +531,58 @@ const AuthenticatedPlayersPlayerIdRoute =
     path: '/players/$playerId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedPaymentsReceiptsRoute =
+  AuthenticatedPaymentsReceiptsRouteImport.update({
+    id: '/receipts',
+    path: '/receipts',
+    getParentRoute: () => AuthenticatedPaymentsRoute,
+  } as any)
+const AuthenticatedPaymentsFamilyRoute =
+  AuthenticatedPaymentsFamilyRouteImport.update({
+    id: '/family',
+    path: '/family',
+    getParentRoute: () => AuthenticatedPaymentsRoute,
+  } as any)
 const AuthenticatedEventsEventIdRoute =
   AuthenticatedEventsEventIdRouteImport.update({
     id: '/$eventId',
     path: '/$eventId',
     getParentRoute: () => AuthenticatedEventsRoute,
   } as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthenticatedAdminRoute,
+const AuthenticatedClubDisciplineRoute =
+  AuthenticatedClubDisciplineRouteImport.update({
+    id: '/club/discipline',
+    path: '/club/discipline',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminBillingRoute =
+  AuthenticatedAdminBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminUsersIndexRoute =
+  AuthenticatedAdminUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const TournamentSlugRosterTokenRoute =
+  TournamentSlugRosterTokenRouteImport.update({
+    id: '/tournament/$slug_/roster/$token',
+    path: '/tournament/$slug/roster/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TournamentSlugRegisterSuccessRoute =
+  TournamentSlugRegisterSuccessRouteImport.update({
+    id: '/success',
+    path: '/success',
+    getParentRoute: () => TournamentSlugRegisterRoute,
+  } as any)
+const TSlugPayRegistrationIdRoute = TSlugPayRegistrationIdRouteImport.update({
+  id: '/pay/$registrationId',
+  path: '/pay/$registrationId',
+  getParentRoute: () => TSlugRoute,
 } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
@@ -186,215 +612,923 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSocialSyncRoute = ApiPublicSocialSyncRouteImport.update({
+  id: '/api/public/social/sync',
+  path: '/api/public/social/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSocialCallbackRoute = ApiPublicSocialCallbackRouteImport.update({
+  id: '/api/public/social/callback',
+  path: '/api/public/social/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksTrialRemindersRoute =
+  ApiPublicHooksTrialRemindersRouteImport.update({
+    id: '/api/public/hooks/trial-reminders',
+    path: '/api/public/hooks/trial-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksPaymentRemindersRoute =
+  ApiPublicHooksPaymentRemindersRouteImport.update({
+    id: '/api/public/hooks/payment-reminders',
+    path: '/api/public/hooks/payment-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksEventRemindersRoute =
+  ApiPublicHooksEventRemindersRouteImport.update({
+    id: '/api/public/hooks/event-reminders',
+    path: '/api/public/hooks/event-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDataRetentionRoute =
+  ApiPublicHooksDataRetentionRouteImport.update({
+    id: '/api/public/hooks/data-retention',
+    path: '/api/public/hooks/data-retention',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksCoachInsightsRoute =
+  ApiPublicHooksCoachInsightsRouteImport.update({
+    id: '/api/public/hooks/coach-insights',
+    path: '/api/public/hooks/coach-insights',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedPlayersPlayerIdTimelineRoute =
+  AuthenticatedPlayersPlayerIdTimelineRouteImport.update({
+    id: '/timeline',
+    path: '/timeline',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdSeasonsRoute =
+  AuthenticatedPlayersPlayerIdSeasonsRouteImport.update({
+    id: '/seasons',
+    path: '/seasons',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdFeedbackRoute =
+  AuthenticatedPlayersPlayerIdFeedbackRouteImport.update({
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdAvailabilityRoute =
+  AuthenticatedPlayersPlayerIdAvailabilityRouteImport.update({
+    id: '/availability',
+    path: '/availability',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedPlayersPlayerIdAchievementsRoute =
+  AuthenticatedPlayersPlayerIdAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
+    getParentRoute: () => AuthenticatedPlayersPlayerIdRoute,
+  } as any)
+const AuthenticatedEventsEventIdLineupRoute =
+  AuthenticatedEventsEventIdLineupRouteImport.update({
+    id: '/lineup',
+    path: '/lineup',
+    getParentRoute: () => AuthenticatedEventsEventIdRoute,
+  } as any)
+const AuthenticatedEventsEventIdFeedbackRoute =
+  AuthenticatedEventsEventIdFeedbackRouteImport.update({
+    id: '/feedback',
+    path: '/feedback',
+    getParentRoute: () => AuthenticatedEventsEventIdRoute,
+  } as any)
 const AuthenticatedAdminUsersUserIdRoute =
   AuthenticatedAdminUsersUserIdRouteImport.update({
-    id: '/$userId',
-    path: '/$userId',
-    getParentRoute: () => AuthenticatedAdminUsersRoute,
+    id: '/users/$userId',
+    path: '/users/$userId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsSocialRoute =
+  AuthenticatedAdminSettingsSocialRouteImport.update({
+    id: '/settings/social',
+    path: '/settings/social',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRemindersRoute =
+  AuthenticatedAdminSettingsRemindersRouteImport.update({
+    id: '/settings/reminders',
+    path: '/settings/reminders',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsPaymentsRoute =
+  AuthenticatedAdminSettingsPaymentsRouteImport.update({
+    id: '/settings/payments',
+    path: '/settings/payments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsConvocationsRoute =
+  AuthenticatedAdminSettingsConvocationsRouteImport.update({
+    id: '/settings/convocations',
+    path: '/settings/convocations',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsCommunicationsRoute =
+  AuthenticatedAdminSettingsCommunicationsRouteImport.update({
+    id: '/settings/communications',
+    path: '/settings/communications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsBrandingRoute =
+  AuthenticatedAdminSettingsBrandingRouteImport.update({
+    id: '/settings/branding',
+    path: '/settings/branding',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPaymentsItemsRoute =
+  AuthenticatedAdminPaymentsItemsRouteImport.update({
+    id: '/payments/items',
+    path: '/payments/items',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPaymentsDashboardRoute =
+  AuthenticatedAdminPaymentsDashboardRouteImport.update({
+    id: '/payments/dashboard',
+    path: '/payments/dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const ApiPublicTournamentIdRegulationsRoute =
+  ApiPublicTournamentIdRegulationsRouteImport.update({
+    id: '/api/public/tournament/$id/regulations',
+    path: '/api/public/tournament/$id/regulations',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/players': typeof PlayersRoute
+  '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/superadmin': typeof SuperadminRouteWithChildren
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/assistant': typeof AuthenticatedAssistantRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
+  '/follow-ups': typeof AuthenticatedFollowUpsRoute
+  '/following': typeof AuthenticatedFollowingRoute
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
+  '/stats': typeof AuthenticatedStatsRoute
+  '/support': typeof AuthenticatedSupportRouteWithChildren
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
+  '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
+  '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
-  '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
-  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/p/$slug': typeof PSlugRoute
+  '/r/$token': typeof RTokenRoute
+  '/register/player': typeof RegisterPlayerRoute
+  '/superadmin/billing': typeof SuperadminBillingRoute
+  '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/settings': typeof SuperadminSettingsRoute
+  '/superadmin/support': typeof SuperadminSupportRoute
+  '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament-invite/$token': typeof TournamentInviteTokenRoute
+  '/tournament/$slug': typeof TournamentSlugRoute
+  '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
+  '/tournaments/start': typeof TournamentsStartRoute
+  '/superadmin/': typeof SuperadminIndexRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/club/discipline': typeof AuthenticatedClubDisciplineRoute
+  '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
+  '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
+  '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
+  '/api/public/inquiry': typeof ApiPublicInquiryRoute
+  '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
+  '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
+  '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
+  '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
+  '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/register': typeof TSlugRegisterRoute
+  '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRouteWithChildren
+  '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
+  '/support/': typeof AuthenticatedSupportIndexRoute
+  '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
+  '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
+  '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
+  '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
+  '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
+  '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
+  '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
+  '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
+  '/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
+  '/players/$playerId/availability': typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
+  '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
+  '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
+  '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
+  '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
+  '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
+  '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
+  '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/players': typeof PlayersRoute
+  '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/assistant': typeof AuthenticatedAssistantRoute
   '/events': typeof AuthenticatedEventsRouteWithChildren
+  '/follow-ups': typeof AuthenticatedFollowUpsRoute
+  '/following': typeof AuthenticatedFollowingRoute
   '/home': typeof AuthenticatedHomeRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/payments': typeof AuthenticatedPaymentsRouteWithChildren
+  '/stats': typeof AuthenticatedStatsRoute
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
+  '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
+  '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
-  '/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
-  '/events/$eventId': typeof AuthenticatedEventsEventIdRoute
-  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/p/$slug': typeof PSlugRoute
+  '/r/$token': typeof RTokenRoute
+  '/register/player': typeof RegisterPlayerRoute
+  '/superadmin/billing': typeof SuperadminBillingRoute
+  '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/settings': typeof SuperadminSettingsRoute
+  '/superadmin/support': typeof SuperadminSupportRoute
+  '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament-invite/$token': typeof TournamentInviteTokenRoute
+  '/tournament/$slug': typeof TournamentSlugRoute
+  '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
+  '/tournaments/start': typeof TournamentsStartRoute
+  '/superadmin': typeof SuperadminIndexRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/club/discipline': typeof AuthenticatedClubDisciplineRoute
+  '/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/payments/family': typeof AuthenticatedPaymentsFamilyRoute
+  '/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
+  '/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
+  '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
+  '/api/public/inquiry': typeof ApiPublicInquiryRoute
+  '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
+  '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
+  '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
+  '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
+  '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/register': typeof TSlugRegisterRoute
+  '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug/register': typeof TournamentSlugRegisterRouteWithChildren
+  '/tournament/$slug/tv': typeof TournamentSlugTvRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
+  '/support': typeof AuthenticatedSupportIndexRoute
+  '/superadmin/clubs': typeof SuperadminClubsIndexRoute
+  '/superadmin/support-tickets': typeof SuperadminSupportTicketsIndexRoute
+  '/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
+  '/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
+  '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
+  '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
+  '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
+  '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
+  '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
+  '/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
+  '/players/$playerId/availability': typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
+  '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
+  '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
+  '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
+  '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
+  '/tournament/$slug/register/success': typeof TournamentSlugRegisterSuccessRoute
+  '/tournament/$slug/roster/$token': typeof TournamentSlugRosterTokenRoute
+  '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
+  '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/demo': typeof DemoRoute
   '/dns-check': typeof DnsCheckRoute
+  '/faq': typeof FaqRoute
+  '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/players': typeof PlayersRoute
+  '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/superadmin': typeof SuperadminRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/events': typeof AuthenticatedEventsRouteWithChildren
+  '/_authenticated/follow-ups': typeof AuthenticatedFollowUpsRoute
+  '/_authenticated/following': typeof AuthenticatedFollowingRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/payments': typeof AuthenticatedPaymentsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
+  '/_authenticated/stats': typeof AuthenticatedStatsRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRouteWithChildren
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
+  '/_authenticated/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
+  '/api/chat': typeof ApiChatRoute
+  '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/en/club-onboarding': typeof EnClubOnboardingRoute
+  '/en/tournaments': typeof EnTournamentsRoute
+  '/fr/onboarding-club': typeof FrOnboardingClubRoute
+  '/fr/tournois': typeof FrTournoisRoute
   '/legal/$kind': typeof LegalKindRoute
-  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRouteWithChildren
-  '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRoute
-  '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/p/$slug': typeof PSlugRoute
+  '/r/$token': typeof RTokenRoute
+  '/register_/player': typeof RegisterPlayerRoute
+  '/superadmin/billing': typeof SuperadminBillingRoute
+  '/superadmin/logs': typeof SuperadminLogsRoute
+  '/superadmin/settings': typeof SuperadminSettingsRoute
+  '/superadmin/support': typeof SuperadminSupportRoute
+  '/superadmin/users': typeof SuperadminUsersRouteWithChildren
+  '/t/$slug': typeof TSlugRouteWithChildren
+  '/tournament-invite/$token': typeof TournamentInviteTokenRoute
+  '/tournament/$slug': typeof TournamentSlugRoute
+  '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
+  '/tournaments/start': typeof TournamentsStartRoute
+  '/superadmin/': typeof SuperadminIndexRoute
+  '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
+  '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
+  '/_authenticated/events/$eventId': typeof AuthenticatedEventsEventIdRouteWithChildren
+  '/_authenticated/payments/family': typeof AuthenticatedPaymentsFamilyRoute
+  '/_authenticated/payments/receipts': typeof AuthenticatedPaymentsReceiptsRoute
+  '/_authenticated/players/$playerId': typeof AuthenticatedPlayersPlayerIdRouteWithChildren
+  '/_authenticated/profile/password': typeof AuthenticatedProfilePasswordRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
+  '/_authenticated/support/$ticketId': typeof AuthenticatedSupportTicketIdRoute
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
+  '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
+  '/_authenticated/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
+  '/api/public/inquiry': typeof ApiPublicInquiryRoute
+  '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
+  '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
+  '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
+  '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
+  '/superadmin/support-tickets/$ticketId': typeof SuperadminSupportTicketsTicketIdRoute
+  '/superadmin/users/$userId': typeof SuperadminUsersUserIdRoute
+  '/t/$slug/register': typeof TSlugRegisterRoute
+  '/t/$slug/tv': typeof TSlugTvRoute
+  '/tournament/$slug_/register': typeof TournamentSlugRegisterRouteWithChildren
+  '/tournament/$slug_/tv': typeof TournamentSlugTvRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
+  '/_authenticated/support/': typeof AuthenticatedSupportIndexRoute
+  '/superadmin/clubs/': typeof SuperadminClubsIndexRoute
+  '/superadmin/support-tickets/': typeof SuperadminSupportTicketsIndexRoute
+  '/_authenticated/admin/payments/dashboard': typeof AuthenticatedAdminPaymentsDashboardRoute
+  '/_authenticated/admin/payments/items': typeof AuthenticatedAdminPaymentsItemsRoute
+  '/_authenticated/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
+  '/_authenticated/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
+  '/_authenticated/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
+  '/_authenticated/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
+  '/_authenticated/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
+  '/_authenticated/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
   '/_authenticated/admin/users/$userId': typeof AuthenticatedAdminUsersUserIdRoute
+  '/_authenticated/events/$eventId/feedback': typeof AuthenticatedEventsEventIdFeedbackRoute
+  '/_authenticated/events/$eventId/lineup': typeof AuthenticatedEventsEventIdLineupRoute
+  '/_authenticated/players/$playerId/achievements': typeof AuthenticatedPlayersPlayerIdAchievementsRoute
+  '/_authenticated/players/$playerId/availability': typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  '/_authenticated/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
+  '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
+  '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
+  '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
+  '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
+  '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
+  '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/t/$slug/pay/$registrationId': typeof TSlugPayRegistrationIdRoute
+  '/tournament/$slug_/register/success': typeof TournamentSlugRegisterSuccessRoute
+  '/tournament/$slug_/roster/$token': typeof TournamentSlugRosterTokenRoute
+  '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/api/public/tournament/$id/regulations': typeof ApiPublicTournamentIdRegulationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/contact'
+    | '/demo'
     | '/dns-check'
+    | '/faq'
+    | '/features'
     | '/forgot-password'
     | '/login'
+    | '/players'
+    | '/pricing'
     | '/register'
     | '/reset-password'
+    | '/sitemap.xml'
+    | '/superadmin'
     | '/admin'
+    | '/assistant'
     | '/events'
+    | '/follow-ups'
+    | '/following'
     | '/home'
     | '/inbox'
+    | '/payments'
     | '/profile'
+    | '/stats'
+    | '/support'
     | '/teams'
+    | '/tournaments'
+    | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
+    | '/en/club-onboarding'
+    | '/en/tournaments'
+    | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
-    | '/admin/users'
+    | '/legal/cookies'
+    | '/p/$slug'
+    | '/r/$token'
+    | '/register/player'
+    | '/superadmin/billing'
+    | '/superadmin/logs'
+    | '/superadmin/settings'
+    | '/superadmin/support'
+    | '/superadmin/users'
+    | '/t/$slug'
+    | '/tournament-invite/$token'
+    | '/tournament/$slug'
+    | '/tournaments/pass-success'
+    | '/tournaments/start'
+    | '/superadmin/'
+    | '/admin/billing'
+    | '/club/discipline'
     | '/events/$eventId'
+    | '/payments/family'
+    | '/payments/receipts'
     | '/players/$playerId'
+    | '/profile/password'
     | '/profile/privacy'
+    | '/support/$ticketId'
     | '/teams/$teamId'
+    | '/tournaments/$tournamentId'
+    | '/tournaments/new-from-pass'
+    | '/api/public/inquiry'
+    | '/api/public/marketing-chat'
+    | '/api/public/stripe-webhook'
+    | '/api/public/tournament-payment-link'
+    | '/api/public/tournament-registration'
+    | '/api/public/tournament-roster'
     | '/lovable/email/suppression'
+    | '/superadmin/clubs/$clubId'
+    | '/superadmin/onboarding/import'
+    | '/superadmin/support-tickets/$ticketId'
+    | '/superadmin/users/$userId'
+    | '/t/$slug/register'
+    | '/t/$slug/tv'
+    | '/tournament/$slug/register'
+    | '/tournament/$slug/tv'
     | '/admin/'
     | '/profile/'
+    | '/support/'
+    | '/superadmin/clubs/'
+    | '/superadmin/support-tickets/'
+    | '/admin/payments/dashboard'
+    | '/admin/payments/items'
+    | '/admin/settings/branding'
+    | '/admin/settings/communications'
+    | '/admin/settings/convocations'
+    | '/admin/settings/payments'
+    | '/admin/settings/reminders'
+    | '/admin/settings/social'
     | '/admin/users/$userId'
+    | '/events/$eventId/feedback'
+    | '/events/$eventId/lineup'
+    | '/players/$playerId/achievements'
+    | '/players/$playerId/availability'
+    | '/players/$playerId/feedback'
+    | '/players/$playerId/seasons'
+    | '/players/$playerId/timeline'
+    | '/api/public/hooks/coach-insights'
+    | '/api/public/hooks/data-retention'
+    | '/api/public/hooks/event-reminders'
+    | '/api/public/hooks/payment-reminders'
+    | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
+    | '/tournament/$slug/register/success'
+    | '/tournament/$slug/roster/$token'
+    | '/admin/users/'
+    | '/api/public/tournament/$id/regulations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/contact'
+    | '/demo'
     | '/dns-check'
+    | '/faq'
+    | '/features'
     | '/forgot-password'
     | '/login'
+    | '/players'
+    | '/pricing'
     | '/register'
     | '/reset-password'
+    | '/sitemap.xml'
+    | '/assistant'
     | '/events'
+    | '/follow-ups'
+    | '/following'
     | '/home'
     | '/inbox'
+    | '/payments'
+    | '/stats'
     | '/teams'
+    | '/tournaments'
+    | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
+    | '/en/club-onboarding'
+    | '/en/tournaments'
+    | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
-    | '/admin/users'
+    | '/legal/cookies'
+    | '/p/$slug'
+    | '/r/$token'
+    | '/register/player'
+    | '/superadmin/billing'
+    | '/superadmin/logs'
+    | '/superadmin/settings'
+    | '/superadmin/support'
+    | '/superadmin/users'
+    | '/t/$slug'
+    | '/tournament-invite/$token'
+    | '/tournament/$slug'
+    | '/tournaments/pass-success'
+    | '/tournaments/start'
+    | '/superadmin'
+    | '/admin/billing'
+    | '/club/discipline'
     | '/events/$eventId'
+    | '/payments/family'
+    | '/payments/receipts'
     | '/players/$playerId'
+    | '/profile/password'
     | '/profile/privacy'
+    | '/support/$ticketId'
     | '/teams/$teamId'
+    | '/tournaments/$tournamentId'
+    | '/tournaments/new-from-pass'
+    | '/api/public/inquiry'
+    | '/api/public/marketing-chat'
+    | '/api/public/stripe-webhook'
+    | '/api/public/tournament-payment-link'
+    | '/api/public/tournament-registration'
+    | '/api/public/tournament-roster'
     | '/lovable/email/suppression'
+    | '/superadmin/clubs/$clubId'
+    | '/superadmin/onboarding/import'
+    | '/superadmin/support-tickets/$ticketId'
+    | '/superadmin/users/$userId'
+    | '/t/$slug/register'
+    | '/t/$slug/tv'
+    | '/tournament/$slug/register'
+    | '/tournament/$slug/tv'
     | '/admin'
     | '/profile'
+    | '/support'
+    | '/superadmin/clubs'
+    | '/superadmin/support-tickets'
+    | '/admin/payments/dashboard'
+    | '/admin/payments/items'
+    | '/admin/settings/branding'
+    | '/admin/settings/communications'
+    | '/admin/settings/convocations'
+    | '/admin/settings/payments'
+    | '/admin/settings/reminders'
+    | '/admin/settings/social'
     | '/admin/users/$userId'
+    | '/events/$eventId/feedback'
+    | '/events/$eventId/lineup'
+    | '/players/$playerId/achievements'
+    | '/players/$playerId/availability'
+    | '/players/$playerId/feedback'
+    | '/players/$playerId/seasons'
+    | '/players/$playerId/timeline'
+    | '/api/public/hooks/coach-insights'
+    | '/api/public/hooks/data-retention'
+    | '/api/public/hooks/event-reminders'
+    | '/api/public/hooks/payment-reminders'
+    | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
+    | '/tournament/$slug/register/success'
+    | '/tournament/$slug/roster/$token'
+    | '/admin/users'
+    | '/api/public/tournament/$id/regulations'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/contact'
+    | '/demo'
     | '/dns-check'
+    | '/faq'
+    | '/features'
     | '/forgot-password'
     | '/login'
+    | '/players'
+    | '/pricing'
     | '/register'
     | '/reset-password'
+    | '/sitemap.xml'
+    | '/superadmin'
     | '/_authenticated/admin'
+    | '/_authenticated/assistant'
     | '/_authenticated/events'
+    | '/_authenticated/follow-ups'
+    | '/_authenticated/following'
     | '/_authenticated/home'
     | '/_authenticated/inbox'
+    | '/_authenticated/payments'
     | '/_authenticated/profile'
+    | '/_authenticated/stats'
+    | '/_authenticated/support'
     | '/_authenticated/teams'
+    | '/_authenticated/tournaments'
+    | '/api/chat'
+    | '/coach/$slug'
     | '/email/unsubscribe'
+    | '/en/club-onboarding'
+    | '/en/tournaments'
+    | '/fr/onboarding-club'
+    | '/fr/tournois'
     | '/legal/$kind'
-    | '/_authenticated/admin/users'
+    | '/legal/cookies'
+    | '/p/$slug'
+    | '/r/$token'
+    | '/register_/player'
+    | '/superadmin/billing'
+    | '/superadmin/logs'
+    | '/superadmin/settings'
+    | '/superadmin/support'
+    | '/superadmin/users'
+    | '/t/$slug'
+    | '/tournament-invite/$token'
+    | '/tournament/$slug'
+    | '/tournaments/pass-success'
+    | '/tournaments/start'
+    | '/superadmin/'
+    | '/_authenticated/admin/billing'
+    | '/_authenticated/club/discipline'
     | '/_authenticated/events/$eventId'
+    | '/_authenticated/payments/family'
+    | '/_authenticated/payments/receipts'
     | '/_authenticated/players/$playerId'
+    | '/_authenticated/profile/password'
     | '/_authenticated/profile/privacy'
+    | '/_authenticated/support/$ticketId'
     | '/_authenticated/teams/$teamId'
+    | '/_authenticated/tournaments/$tournamentId'
+    | '/_authenticated/tournaments/new-from-pass'
+    | '/api/public/inquiry'
+    | '/api/public/marketing-chat'
+    | '/api/public/stripe-webhook'
+    | '/api/public/tournament-payment-link'
+    | '/api/public/tournament-registration'
+    | '/api/public/tournament-roster'
     | '/lovable/email/suppression'
+    | '/superadmin/clubs/$clubId'
+    | '/superadmin/onboarding/import'
+    | '/superadmin/support-tickets/$ticketId'
+    | '/superadmin/users/$userId'
+    | '/t/$slug/register'
+    | '/t/$slug/tv'
+    | '/tournament/$slug_/register'
+    | '/tournament/$slug_/tv'
     | '/_authenticated/admin/'
     | '/_authenticated/profile/'
+    | '/_authenticated/support/'
+    | '/superadmin/clubs/'
+    | '/superadmin/support-tickets/'
+    | '/_authenticated/admin/payments/dashboard'
+    | '/_authenticated/admin/payments/items'
+    | '/_authenticated/admin/settings/branding'
+    | '/_authenticated/admin/settings/communications'
+    | '/_authenticated/admin/settings/convocations'
+    | '/_authenticated/admin/settings/payments'
+    | '/_authenticated/admin/settings/reminders'
+    | '/_authenticated/admin/settings/social'
     | '/_authenticated/admin/users/$userId'
+    | '/_authenticated/events/$eventId/feedback'
+    | '/_authenticated/events/$eventId/lineup'
+    | '/_authenticated/players/$playerId/achievements'
+    | '/_authenticated/players/$playerId/availability'
+    | '/_authenticated/players/$playerId/feedback'
+    | '/_authenticated/players/$playerId/seasons'
+    | '/_authenticated/players/$playerId/timeline'
+    | '/api/public/hooks/coach-insights'
+    | '/api/public/hooks/data-retention'
+    | '/api/public/hooks/event-reminders'
+    | '/api/public/hooks/payment-reminders'
+    | '/api/public/hooks/trial-reminders'
+    | '/api/public/social/callback'
+    | '/api/public/social/sync'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/t/$slug/pay/$registrationId'
+    | '/tournament/$slug_/register/success'
+    | '/tournament/$slug_/roster/$token'
+    | '/_authenticated/admin/users/'
+    | '/api/public/tournament/$id/regulations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  DemoRoute: typeof DemoRoute
   DnsCheckRoute: typeof DnsCheckRoute
+  FaqRoute: typeof FaqRoute
+  FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  PlayersRoute: typeof PlayersRoute
+  PricingRoute: typeof PricingRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SuperadminRoute: typeof SuperadminRouteWithChildren
+  ApiChatRoute: typeof ApiChatRoute
+  CoachSlugRoute: typeof CoachSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  EnClubOnboardingRoute: typeof EnClubOnboardingRoute
+  EnTournamentsRoute: typeof EnTournamentsRoute
+  FrOnboardingClubRoute: typeof FrOnboardingClubRoute
+  FrTournoisRoute: typeof FrTournoisRoute
   LegalKindRoute: typeof LegalKindRoute
+  LegalCookiesRoute: typeof LegalCookiesRoute
+  PSlugRoute: typeof PSlugRoute
+  RTokenRoute: typeof RTokenRoute
+  RegisterPlayerRoute: typeof RegisterPlayerRoute
+  TSlugRoute: typeof TSlugRouteWithChildren
+  TournamentInviteTokenRoute: typeof TournamentInviteTokenRoute
+  TournamentSlugRoute: typeof TournamentSlugRoute
+  TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
+  TournamentsStartRoute: typeof TournamentsStartRoute
+  ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
+  ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicTournamentPaymentLinkRoute: typeof ApiPublicTournamentPaymentLinkRoute
+  ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
+  ApiPublicTournamentRosterRoute: typeof ApiPublicTournamentRosterRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
+  TournamentSlugTvRoute: typeof TournamentSlugTvRoute
+  ApiPublicHooksCoachInsightsRoute: typeof ApiPublicHooksCoachInsightsRoute
+  ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
+  ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
+  ApiPublicHooksPaymentRemindersRoute: typeof ApiPublicHooksPaymentRemindersRoute
+  ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
+  ApiPublicSocialCallbackRoute: typeof ApiPublicSocialCallbackRoute
+  ApiPublicSocialSyncRoute: typeof ApiPublicSocialSyncRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+  TournamentSlugRosterTokenRoute: typeof TournamentSlugRosterTokenRoute
+  ApiPublicTournamentIdRegulationsRoute: typeof ApiPublicTournamentIdRegulationsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/superadmin': {
+      id: '/superadmin'
+      path: '/superadmin'
+      fullPath: '/superadmin'
+      preLoaderRoute: typeof SuperadminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -407,6 +1541,20 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/players': {
+      id: '/players'
+      path: '/players'
+      fullPath: '/players'
+      preLoaderRoute: typeof PlayersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -423,11 +1571,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dns-check': {
       id: '/dns-check'
       path: '/dns-check'
       fullPath: '/dns-check'
       preLoaderRoute: typeof DnsCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -444,11 +1620,144 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/superadmin/': {
+      id: '/superadmin/'
+      path: '/'
+      fullPath: '/superadmin/'
+      preLoaderRoute: typeof SuperadminIndexRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/tournaments/start': {
+      id: '/tournaments/start'
+      path: '/tournaments/start'
+      fullPath: '/tournaments/start'
+      preLoaderRoute: typeof TournamentsStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournaments/pass-success': {
+      id: '/tournaments/pass-success'
+      path: '/tournaments/pass-success'
+      fullPath: '/tournaments/pass-success'
+      preLoaderRoute: typeof TournamentsPassSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament/$slug': {
+      id: '/tournament/$slug'
+      path: '/tournament/$slug'
+      fullPath: '/tournament/$slug'
+      preLoaderRoute: typeof TournamentSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament-invite/$token': {
+      id: '/tournament-invite/$token'
+      path: '/tournament-invite/$token'
+      fullPath: '/tournament-invite/$token'
+      preLoaderRoute: typeof TournamentInviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/t/$slug': {
+      id: '/t/$slug'
+      path: '/t/$slug'
+      fullPath: '/t/$slug'
+      preLoaderRoute: typeof TSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/superadmin/users': {
+      id: '/superadmin/users'
+      path: '/users'
+      fullPath: '/superadmin/users'
+      preLoaderRoute: typeof SuperadminUsersRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/support': {
+      id: '/superadmin/support'
+      path: '/support'
+      fullPath: '/superadmin/support'
+      preLoaderRoute: typeof SuperadminSupportRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/settings': {
+      id: '/superadmin/settings'
+      path: '/settings'
+      fullPath: '/superadmin/settings'
+      preLoaderRoute: typeof SuperadminSettingsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/logs': {
+      id: '/superadmin/logs'
+      path: '/logs'
+      fullPath: '/superadmin/logs'
+      preLoaderRoute: typeof SuperadminLogsRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/billing': {
+      id: '/superadmin/billing'
+      path: '/billing'
+      fullPath: '/superadmin/billing'
+      preLoaderRoute: typeof SuperadminBillingRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/register_/player': {
+      id: '/register_/player'
+      path: '/register/player'
+      fullPath: '/register/player'
+      preLoaderRoute: typeof RegisterPlayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/$token': {
+      id: '/r/$token'
+      path: '/r/$token'
+      fullPath: '/r/$token'
+      preLoaderRoute: typeof RTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/legal/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/$kind': {
       id: '/legal/$kind'
       path: '/legal/$kind'
       fullPath: '/legal/$kind'
       preLoaderRoute: typeof LegalKindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/tournois': {
+      id: '/fr/tournois'
+      path: '/fr/tournois'
+      fullPath: '/fr/tournois'
+      preLoaderRoute: typeof FrTournoisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr/onboarding-club': {
+      id: '/fr/onboarding-club'
+      path: '/fr/onboarding-club'
+      fullPath: '/fr/onboarding-club'
+      preLoaderRoute: typeof FrOnboardingClubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/tournaments': {
+      id: '/en/tournaments'
+      path: '/en/tournaments'
+      fullPath: '/en/tournaments'
+      preLoaderRoute: typeof EnTournamentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/club-onboarding': {
+      id: '/en/club-onboarding'
+      path: '/en/club-onboarding'
+      fullPath: '/en/club-onboarding'
+      preLoaderRoute: typeof EnClubOnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
@@ -458,6 +1767,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/coach/$slug': {
+      id: '/coach/$slug'
+      path: '/coach/$slug'
+      fullPath: '/coach/$slug'
+      preLoaderRoute: typeof CoachSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tournaments': {
+      id: '/_authenticated/tournaments'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof AuthenticatedTournamentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/teams': {
       id: '/_authenticated/teams'
       path: '/teams'
@@ -465,11 +1795,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/stats': {
+      id: '/_authenticated/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof AuthenticatedStatsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/payments': {
+      id: '/_authenticated/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof AuthenticatedPaymentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/inbox': {
@@ -486,11 +1837,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/following': {
+      id: '/_authenticated/following'
+      path: '/following'
+      fullPath: '/following'
+      preLoaderRoute: typeof AuthenticatedFollowingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/follow-ups': {
+      id: '/_authenticated/follow-ups'
+      path: '/follow-ups'
+      fullPath: '/follow-ups'
+      preLoaderRoute: typeof AuthenticatedFollowUpsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/events': {
       id: '/_authenticated/events'
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/assistant': {
+      id: '/_authenticated/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AuthenticatedAssistantRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -499,6 +1871,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/superadmin/support-tickets/': {
+      id: '/superadmin/support-tickets/'
+      path: '/support-tickets'
+      fullPath: '/superadmin/support-tickets/'
+      preLoaderRoute: typeof SuperadminSupportTicketsIndexRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/clubs/': {
+      id: '/superadmin/clubs/'
+      path: '/clubs'
+      fullPath: '/superadmin/clubs/'
+      preLoaderRoute: typeof SuperadminClubsIndexRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/_authenticated/support/': {
+      id: '/_authenticated/support/'
+      path: '/'
+      fullPath: '/support/'
+      preLoaderRoute: typeof AuthenticatedSupportIndexRouteImport
+      parentRoute: typeof AuthenticatedSupportRoute
     }
     '/_authenticated/profile/': {
       id: '/_authenticated/profile/'
@@ -514,12 +1907,124 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/tournament/$slug_/tv': {
+      id: '/tournament/$slug_/tv'
+      path: '/tournament/$slug/tv'
+      fullPath: '/tournament/$slug/tv'
+      preLoaderRoute: typeof TournamentSlugTvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament/$slug_/register': {
+      id: '/tournament/$slug_/register'
+      path: '/tournament/$slug/register'
+      fullPath: '/tournament/$slug/register'
+      preLoaderRoute: typeof TournamentSlugRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/t/$slug/tv': {
+      id: '/t/$slug/tv'
+      path: '/tv'
+      fullPath: '/t/$slug/tv'
+      preLoaderRoute: typeof TSlugTvRouteImport
+      parentRoute: typeof TSlugRoute
+    }
+    '/t/$slug/register': {
+      id: '/t/$slug/register'
+      path: '/register'
+      fullPath: '/t/$slug/register'
+      preLoaderRoute: typeof TSlugRegisterRouteImport
+      parentRoute: typeof TSlugRoute
+    }
+    '/superadmin/users/$userId': {
+      id: '/superadmin/users/$userId'
+      path: '/$userId'
+      fullPath: '/superadmin/users/$userId'
+      preLoaderRoute: typeof SuperadminUsersUserIdRouteImport
+      parentRoute: typeof SuperadminUsersRoute
+    }
+    '/superadmin/support-tickets/$ticketId': {
+      id: '/superadmin/support-tickets/$ticketId'
+      path: '/support-tickets/$ticketId'
+      fullPath: '/superadmin/support-tickets/$ticketId'
+      preLoaderRoute: typeof SuperadminSupportTicketsTicketIdRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/onboarding/import': {
+      id: '/superadmin/onboarding/import'
+      path: '/onboarding/import'
+      fullPath: '/superadmin/onboarding/import'
+      preLoaderRoute: typeof SuperadminOnboardingImportRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
+    '/superadmin/clubs/$clubId': {
+      id: '/superadmin/clubs/$clubId'
+      path: '/clubs/$clubId'
+      fullPath: '/superadmin/clubs/$clubId'
+      preLoaderRoute: typeof SuperadminClubsClubIdRouteImport
+      parentRoute: typeof SuperadminRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tournament-roster': {
+      id: '/api/public/tournament-roster'
+      path: '/api/public/tournament-roster'
+      fullPath: '/api/public/tournament-roster'
+      preLoaderRoute: typeof ApiPublicTournamentRosterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tournament-registration': {
+      id: '/api/public/tournament-registration'
+      path: '/api/public/tournament-registration'
+      fullPath: '/api/public/tournament-registration'
+      preLoaderRoute: typeof ApiPublicTournamentRegistrationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tournament-payment-link': {
+      id: '/api/public/tournament-payment-link'
+      path: '/api/public/tournament-payment-link'
+      fullPath: '/api/public/tournament-payment-link'
+      preLoaderRoute: typeof ApiPublicTournamentPaymentLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/marketing-chat': {
+      id: '/api/public/marketing-chat'
+      path: '/api/public/marketing-chat'
+      fullPath: '/api/public/marketing-chat'
+      preLoaderRoute: typeof ApiPublicMarketingChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/inquiry': {
+      id: '/api/public/inquiry'
+      path: '/api/public/inquiry'
+      fullPath: '/api/public/inquiry'
+      preLoaderRoute: typeof ApiPublicInquiryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tournaments/new-from-pass': {
+      id: '/_authenticated/tournaments/new-from-pass'
+      path: '/new-from-pass'
+      fullPath: '/tournaments/new-from-pass'
+      preLoaderRoute: typeof AuthenticatedTournamentsNewFromPassRouteImport
+      parentRoute: typeof AuthenticatedTournamentsRoute
+    }
+    '/_authenticated/tournaments/$tournamentId': {
+      id: '/_authenticated/tournaments/$tournamentId'
+      path: '/$tournamentId'
+      fullPath: '/tournaments/$tournamentId'
+      preLoaderRoute: typeof AuthenticatedTournamentsTournamentIdRouteImport
+      parentRoute: typeof AuthenticatedTournamentsRoute
     }
     '/_authenticated/teams/$teamId': {
       id: '/_authenticated/teams/$teamId'
@@ -528,11 +2033,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamsTeamIdRouteImport
       parentRoute: typeof AuthenticatedTeamsRoute
     }
+    '/_authenticated/support/$ticketId': {
+      id: '/_authenticated/support/$ticketId'
+      path: '/$ticketId'
+      fullPath: '/support/$ticketId'
+      preLoaderRoute: typeof AuthenticatedSupportTicketIdRouteImport
+      parentRoute: typeof AuthenticatedSupportRoute
+    }
     '/_authenticated/profile/privacy': {
       id: '/_authenticated/profile/privacy'
       path: '/privacy'
       fullPath: '/profile/privacy'
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/profile/password': {
+      id: '/_authenticated/profile/password'
+      path: '/password'
+      fullPath: '/profile/password'
+      preLoaderRoute: typeof AuthenticatedProfilePasswordRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
     '/_authenticated/players/$playerId': {
@@ -542,6 +2061,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlayersPlayerIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/payments/receipts': {
+      id: '/_authenticated/payments/receipts'
+      path: '/receipts'
+      fullPath: '/payments/receipts'
+      preLoaderRoute: typeof AuthenticatedPaymentsReceiptsRouteImport
+      parentRoute: typeof AuthenticatedPaymentsRoute
+    }
+    '/_authenticated/payments/family': {
+      id: '/_authenticated/payments/family'
+      path: '/family'
+      fullPath: '/payments/family'
+      preLoaderRoute: typeof AuthenticatedPaymentsFamilyRouteImport
+      parentRoute: typeof AuthenticatedPaymentsRoute
+    }
     '/_authenticated/events/$eventId': {
       id: '/_authenticated/events/$eventId'
       path: '/$eventId'
@@ -549,12 +2082,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsEventIdRouteImport
       parentRoute: typeof AuthenticatedEventsRoute
     }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+    '/_authenticated/club/discipline': {
+      id: '/_authenticated/club/discipline'
+      path: '/club/discipline'
+      fullPath: '/club/discipline'
+      preLoaderRoute: typeof AuthenticatedClubDisciplineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/billing': {
+      id: '/_authenticated/admin/billing'
+      path: '/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users/': {
+      id: '/_authenticated/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/tournament/$slug_/roster/$token': {
+      id: '/tournament/$slug_/roster/$token'
+      path: '/tournament/$slug/roster/$token'
+      fullPath: '/tournament/$slug/roster/$token'
+      preLoaderRoute: typeof TournamentSlugRosterTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tournament/$slug_/register/success': {
+      id: '/tournament/$slug_/register/success'
+      path: '/success'
+      fullPath: '/tournament/$slug/register/success'
+      preLoaderRoute: typeof TournamentSlugRegisterSuccessRouteImport
+      parentRoute: typeof TournamentSlugRegisterRoute
+    }
+    '/t/$slug/pay/$registrationId': {
+      id: '/t/$slug/pay/$registrationId'
+      path: '/pay/$registrationId'
+      fullPath: '/t/$slug/pay/$registrationId'
+      preLoaderRoute: typeof TSlugPayRegistrationIdRouteImport
+      parentRoute: typeof TSlugRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -591,66 +2159,287 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/social/sync': {
+      id: '/api/public/social/sync'
+      path: '/api/public/social/sync'
+      fullPath: '/api/public/social/sync'
+      preLoaderRoute: typeof ApiPublicSocialSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/social/callback': {
+      id: '/api/public/social/callback'
+      path: '/api/public/social/callback'
+      fullPath: '/api/public/social/callback'
+      preLoaderRoute: typeof ApiPublicSocialCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/trial-reminders': {
+      id: '/api/public/hooks/trial-reminders'
+      path: '/api/public/hooks/trial-reminders'
+      fullPath: '/api/public/hooks/trial-reminders'
+      preLoaderRoute: typeof ApiPublicHooksTrialRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/payment-reminders': {
+      id: '/api/public/hooks/payment-reminders'
+      path: '/api/public/hooks/payment-reminders'
+      fullPath: '/api/public/hooks/payment-reminders'
+      preLoaderRoute: typeof ApiPublicHooksPaymentRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/event-reminders': {
+      id: '/api/public/hooks/event-reminders'
+      path: '/api/public/hooks/event-reminders'
+      fullPath: '/api/public/hooks/event-reminders'
+      preLoaderRoute: typeof ApiPublicHooksEventRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/data-retention': {
+      id: '/api/public/hooks/data-retention'
+      path: '/api/public/hooks/data-retention'
+      fullPath: '/api/public/hooks/data-retention'
+      preLoaderRoute: typeof ApiPublicHooksDataRetentionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/coach-insights': {
+      id: '/api/public/hooks/coach-insights'
+      path: '/api/public/hooks/coach-insights'
+      fullPath: '/api/public/hooks/coach-insights'
+      preLoaderRoute: typeof ApiPublicHooksCoachInsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/players/$playerId/timeline': {
+      id: '/_authenticated/players/$playerId/timeline'
+      path: '/timeline'
+      fullPath: '/players/$playerId/timeline'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdTimelineRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/players/$playerId/seasons': {
+      id: '/_authenticated/players/$playerId/seasons'
+      path: '/seasons'
+      fullPath: '/players/$playerId/seasons'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdSeasonsRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/players/$playerId/feedback': {
+      id: '/_authenticated/players/$playerId/feedback'
+      path: '/feedback'
+      fullPath: '/players/$playerId/feedback'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/players/$playerId/availability': {
+      id: '/_authenticated/players/$playerId/availability'
+      path: '/availability'
+      fullPath: '/players/$playerId/availability'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdAvailabilityRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/players/$playerId/achievements': {
+      id: '/_authenticated/players/$playerId/achievements'
+      path: '/achievements'
+      fullPath: '/players/$playerId/achievements'
+      preLoaderRoute: typeof AuthenticatedPlayersPlayerIdAchievementsRouteImport
+      parentRoute: typeof AuthenticatedPlayersPlayerIdRoute
+    }
+    '/_authenticated/events/$eventId/lineup': {
+      id: '/_authenticated/events/$eventId/lineup'
+      path: '/lineup'
+      fullPath: '/events/$eventId/lineup'
+      preLoaderRoute: typeof AuthenticatedEventsEventIdLineupRouteImport
+      parentRoute: typeof AuthenticatedEventsEventIdRoute
+    }
+    '/_authenticated/events/$eventId/feedback': {
+      id: '/_authenticated/events/$eventId/feedback'
+      path: '/feedback'
+      fullPath: '/events/$eventId/feedback'
+      preLoaderRoute: typeof AuthenticatedEventsEventIdFeedbackRouteImport
+      parentRoute: typeof AuthenticatedEventsEventIdRoute
+    }
     '/_authenticated/admin/users/$userId': {
       id: '/_authenticated/admin/users/$userId'
-      path: '/$userId'
+      path: '/users/$userId'
       fullPath: '/admin/users/$userId'
       preLoaderRoute: typeof AuthenticatedAdminUsersUserIdRouteImport
-      parentRoute: typeof AuthenticatedAdminUsersRoute
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings/social': {
+      id: '/_authenticated/admin/settings/social'
+      path: '/settings/social'
+      fullPath: '/admin/settings/social'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsSocialRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings/reminders': {
+      id: '/_authenticated/admin/settings/reminders'
+      path: '/settings/reminders'
+      fullPath: '/admin/settings/reminders'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRemindersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings/payments': {
+      id: '/_authenticated/admin/settings/payments'
+      path: '/settings/payments'
+      fullPath: '/admin/settings/payments'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsPaymentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings/convocations': {
+      id: '/_authenticated/admin/settings/convocations'
+      path: '/settings/convocations'
+      fullPath: '/admin/settings/convocations'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsConvocationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings/communications': {
+      id: '/_authenticated/admin/settings/communications'
+      path: '/settings/communications'
+      fullPath: '/admin/settings/communications'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsCommunicationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings/branding': {
+      id: '/_authenticated/admin/settings/branding'
+      path: '/settings/branding'
+      fullPath: '/admin/settings/branding'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsBrandingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/payments/items': {
+      id: '/_authenticated/admin/payments/items'
+      path: '/payments/items'
+      fullPath: '/admin/payments/items'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsItemsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/payments/dashboard': {
+      id: '/_authenticated/admin/payments/dashboard'
+      path: '/payments/dashboard'
+      fullPath: '/admin/payments/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/tournament/$id/regulations': {
+      id: '/api/public/tournament/$id/regulations'
+      path: '/api/public/tournament/$id/regulations'
+      fullPath: '/api/public/tournament/$id/regulations'
+      preLoaderRoute: typeof ApiPublicTournamentIdRegulationsRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AuthenticatedAdminUsersRouteChildren {
-  AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
-}
-
-const AuthenticatedAdminUsersRouteChildren: AuthenticatedAdminUsersRouteChildren =
-  {
-    AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
-  }
-
-const AuthenticatedAdminUsersRouteWithChildren =
-  AuthenticatedAdminUsersRoute._addFileChildren(
-    AuthenticatedAdminUsersRouteChildren,
-  )
-
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRouteWithChildren
+  AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminPaymentsDashboardRoute: typeof AuthenticatedAdminPaymentsDashboardRoute
+  AuthenticatedAdminPaymentsItemsRoute: typeof AuthenticatedAdminPaymentsItemsRoute
+  AuthenticatedAdminSettingsBrandingRoute: typeof AuthenticatedAdminSettingsBrandingRoute
+  AuthenticatedAdminSettingsCommunicationsRoute: typeof AuthenticatedAdminSettingsCommunicationsRoute
+  AuthenticatedAdminSettingsConvocationsRoute: typeof AuthenticatedAdminSettingsConvocationsRoute
+  AuthenticatedAdminSettingsPaymentsRoute: typeof AuthenticatedAdminSettingsPaymentsRoute
+  AuthenticatedAdminSettingsRemindersRoute: typeof AuthenticatedAdminSettingsRemindersRoute
+  AuthenticatedAdminSettingsSocialRoute: typeof AuthenticatedAdminSettingsSocialRoute
+  AuthenticatedAdminUsersUserIdRoute: typeof AuthenticatedAdminUsersUserIdRoute
+  AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRouteWithChildren,
+  AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminPaymentsDashboardRoute:
+    AuthenticatedAdminPaymentsDashboardRoute,
+  AuthenticatedAdminPaymentsItemsRoute: AuthenticatedAdminPaymentsItemsRoute,
+  AuthenticatedAdminSettingsBrandingRoute:
+    AuthenticatedAdminSettingsBrandingRoute,
+  AuthenticatedAdminSettingsCommunicationsRoute:
+    AuthenticatedAdminSettingsCommunicationsRoute,
+  AuthenticatedAdminSettingsConvocationsRoute:
+    AuthenticatedAdminSettingsConvocationsRoute,
+  AuthenticatedAdminSettingsPaymentsRoute:
+    AuthenticatedAdminSettingsPaymentsRoute,
+  AuthenticatedAdminSettingsRemindersRoute:
+    AuthenticatedAdminSettingsRemindersRoute,
+  AuthenticatedAdminSettingsSocialRoute: AuthenticatedAdminSettingsSocialRoute,
+  AuthenticatedAdminUsersUserIdRoute: AuthenticatedAdminUsersUserIdRoute,
+  AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedEventsEventIdRouteChildren {
+  AuthenticatedEventsEventIdFeedbackRoute: typeof AuthenticatedEventsEventIdFeedbackRoute
+  AuthenticatedEventsEventIdLineupRoute: typeof AuthenticatedEventsEventIdLineupRoute
+}
+
+const AuthenticatedEventsEventIdRouteChildren: AuthenticatedEventsEventIdRouteChildren =
+  {
+    AuthenticatedEventsEventIdFeedbackRoute:
+      AuthenticatedEventsEventIdFeedbackRoute,
+    AuthenticatedEventsEventIdLineupRoute:
+      AuthenticatedEventsEventIdLineupRoute,
+  }
+
+const AuthenticatedEventsEventIdRouteWithChildren =
+  AuthenticatedEventsEventIdRoute._addFileChildren(
+    AuthenticatedEventsEventIdRouteChildren,
+  )
+
 interface AuthenticatedEventsRouteChildren {
-  AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRoute
+  AuthenticatedEventsEventIdRoute: typeof AuthenticatedEventsEventIdRouteWithChildren
 }
 
 const AuthenticatedEventsRouteChildren: AuthenticatedEventsRouteChildren = {
-  AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRoute,
+  AuthenticatedEventsEventIdRoute: AuthenticatedEventsEventIdRouteWithChildren,
 }
 
 const AuthenticatedEventsRouteWithChildren =
   AuthenticatedEventsRoute._addFileChildren(AuthenticatedEventsRouteChildren)
 
+interface AuthenticatedPaymentsRouteChildren {
+  AuthenticatedPaymentsFamilyRoute: typeof AuthenticatedPaymentsFamilyRoute
+  AuthenticatedPaymentsReceiptsRoute: typeof AuthenticatedPaymentsReceiptsRoute
+}
+
+const AuthenticatedPaymentsRouteChildren: AuthenticatedPaymentsRouteChildren = {
+  AuthenticatedPaymentsFamilyRoute: AuthenticatedPaymentsFamilyRoute,
+  AuthenticatedPaymentsReceiptsRoute: AuthenticatedPaymentsReceiptsRoute,
+}
+
+const AuthenticatedPaymentsRouteWithChildren =
+  AuthenticatedPaymentsRoute._addFileChildren(
+    AuthenticatedPaymentsRouteChildren,
+  )
+
 interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfilePasswordRoute: typeof AuthenticatedProfilePasswordRoute
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfilePasswordRoute: AuthenticatedProfilePasswordRoute,
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
 }
 
 const AuthenticatedProfileRouteWithChildren =
   AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
+
+interface AuthenticatedSupportRouteChildren {
+  AuthenticatedSupportTicketIdRoute: typeof AuthenticatedSupportTicketIdRoute
+  AuthenticatedSupportIndexRoute: typeof AuthenticatedSupportIndexRoute
+}
+
+const AuthenticatedSupportRouteChildren: AuthenticatedSupportRouteChildren = {
+  AuthenticatedSupportTicketIdRoute: AuthenticatedSupportTicketIdRoute,
+  AuthenticatedSupportIndexRoute: AuthenticatedSupportIndexRoute,
+}
+
+const AuthenticatedSupportRouteWithChildren =
+  AuthenticatedSupportRoute._addFileChildren(AuthenticatedSupportRouteChildren)
 
 interface AuthenticatedTeamsRouteChildren {
   AuthenticatedTeamsTeamIdRoute: typeof AuthenticatedTeamsTeamIdRoute
@@ -663,46 +2452,220 @@ const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
 const AuthenticatedTeamsRouteWithChildren =
   AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
 
+interface AuthenticatedTournamentsRouteChildren {
+  AuthenticatedTournamentsTournamentIdRoute: typeof AuthenticatedTournamentsTournamentIdRoute
+  AuthenticatedTournamentsNewFromPassRoute: typeof AuthenticatedTournamentsNewFromPassRoute
+}
+
+const AuthenticatedTournamentsRouteChildren: AuthenticatedTournamentsRouteChildren =
+  {
+    AuthenticatedTournamentsTournamentIdRoute:
+      AuthenticatedTournamentsTournamentIdRoute,
+    AuthenticatedTournamentsNewFromPassRoute:
+      AuthenticatedTournamentsNewFromPassRoute,
+  }
+
+const AuthenticatedTournamentsRouteWithChildren =
+  AuthenticatedTournamentsRoute._addFileChildren(
+    AuthenticatedTournamentsRouteChildren,
+  )
+
+interface AuthenticatedPlayersPlayerIdRouteChildren {
+  AuthenticatedPlayersPlayerIdAchievementsRoute: typeof AuthenticatedPlayersPlayerIdAchievementsRoute
+  AuthenticatedPlayersPlayerIdAvailabilityRoute: typeof AuthenticatedPlayersPlayerIdAvailabilityRoute
+  AuthenticatedPlayersPlayerIdFeedbackRoute: typeof AuthenticatedPlayersPlayerIdFeedbackRoute
+  AuthenticatedPlayersPlayerIdSeasonsRoute: typeof AuthenticatedPlayersPlayerIdSeasonsRoute
+  AuthenticatedPlayersPlayerIdTimelineRoute: typeof AuthenticatedPlayersPlayerIdTimelineRoute
+}
+
+const AuthenticatedPlayersPlayerIdRouteChildren: AuthenticatedPlayersPlayerIdRouteChildren =
+  {
+    AuthenticatedPlayersPlayerIdAchievementsRoute:
+      AuthenticatedPlayersPlayerIdAchievementsRoute,
+    AuthenticatedPlayersPlayerIdAvailabilityRoute:
+      AuthenticatedPlayersPlayerIdAvailabilityRoute,
+    AuthenticatedPlayersPlayerIdFeedbackRoute:
+      AuthenticatedPlayersPlayerIdFeedbackRoute,
+    AuthenticatedPlayersPlayerIdSeasonsRoute:
+      AuthenticatedPlayersPlayerIdSeasonsRoute,
+    AuthenticatedPlayersPlayerIdTimelineRoute:
+      AuthenticatedPlayersPlayerIdTimelineRoute,
+  }
+
+const AuthenticatedPlayersPlayerIdRouteWithChildren =
+  AuthenticatedPlayersPlayerIdRoute._addFileChildren(
+    AuthenticatedPlayersPlayerIdRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRouteWithChildren
+  AuthenticatedFollowUpsRoute: typeof AuthenticatedFollowUpsRoute
+  AuthenticatedFollowingRoute: typeof AuthenticatedFollowingRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedPaymentsRoute: typeof AuthenticatedPaymentsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
+  AuthenticatedStatsRoute: typeof AuthenticatedStatsRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRouteWithChildren
   AuthenticatedTeamsRoute: typeof AuthenticatedTeamsRouteWithChildren
-  AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRoute
+  AuthenticatedTournamentsRoute: typeof AuthenticatedTournamentsRouteWithChildren
+  AuthenticatedClubDisciplineRoute: typeof AuthenticatedClubDisciplineRoute
+  AuthenticatedPlayersPlayerIdRoute: typeof AuthenticatedPlayersPlayerIdRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRouteWithChildren,
+  AuthenticatedFollowUpsRoute: AuthenticatedFollowUpsRoute,
+  AuthenticatedFollowingRoute: AuthenticatedFollowingRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedPaymentsRoute: AuthenticatedPaymentsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
+  AuthenticatedStatsRoute: AuthenticatedStatsRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRouteWithChildren,
   AuthenticatedTeamsRoute: AuthenticatedTeamsRouteWithChildren,
-  AuthenticatedPlayersPlayerIdRoute: AuthenticatedPlayersPlayerIdRoute,
+  AuthenticatedTournamentsRoute: AuthenticatedTournamentsRouteWithChildren,
+  AuthenticatedClubDisciplineRoute: AuthenticatedClubDisciplineRoute,
+  AuthenticatedPlayersPlayerIdRoute:
+    AuthenticatedPlayersPlayerIdRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface SuperadminUsersRouteChildren {
+  SuperadminUsersUserIdRoute: typeof SuperadminUsersUserIdRoute
+}
+
+const SuperadminUsersRouteChildren: SuperadminUsersRouteChildren = {
+  SuperadminUsersUserIdRoute: SuperadminUsersUserIdRoute,
+}
+
+const SuperadminUsersRouteWithChildren = SuperadminUsersRoute._addFileChildren(
+  SuperadminUsersRouteChildren,
+)
+
+interface SuperadminRouteChildren {
+  SuperadminBillingRoute: typeof SuperadminBillingRoute
+  SuperadminLogsRoute: typeof SuperadminLogsRoute
+  SuperadminSettingsRoute: typeof SuperadminSettingsRoute
+  SuperadminSupportRoute: typeof SuperadminSupportRoute
+  SuperadminUsersRoute: typeof SuperadminUsersRouteWithChildren
+  SuperadminIndexRoute: typeof SuperadminIndexRoute
+  SuperadminClubsClubIdRoute: typeof SuperadminClubsClubIdRoute
+  SuperadminOnboardingImportRoute: typeof SuperadminOnboardingImportRoute
+  SuperadminSupportTicketsTicketIdRoute: typeof SuperadminSupportTicketsTicketIdRoute
+  SuperadminClubsIndexRoute: typeof SuperadminClubsIndexRoute
+  SuperadminSupportTicketsIndexRoute: typeof SuperadminSupportTicketsIndexRoute
+}
+
+const SuperadminRouteChildren: SuperadminRouteChildren = {
+  SuperadminBillingRoute: SuperadminBillingRoute,
+  SuperadminLogsRoute: SuperadminLogsRoute,
+  SuperadminSettingsRoute: SuperadminSettingsRoute,
+  SuperadminSupportRoute: SuperadminSupportRoute,
+  SuperadminUsersRoute: SuperadminUsersRouteWithChildren,
+  SuperadminIndexRoute: SuperadminIndexRoute,
+  SuperadminClubsClubIdRoute: SuperadminClubsClubIdRoute,
+  SuperadminOnboardingImportRoute: SuperadminOnboardingImportRoute,
+  SuperadminSupportTicketsTicketIdRoute: SuperadminSupportTicketsTicketIdRoute,
+  SuperadminClubsIndexRoute: SuperadminClubsIndexRoute,
+  SuperadminSupportTicketsIndexRoute: SuperadminSupportTicketsIndexRoute,
+}
+
+const SuperadminRouteWithChildren = SuperadminRoute._addFileChildren(
+  SuperadminRouteChildren,
+)
+
+interface TSlugRouteChildren {
+  TSlugRegisterRoute: typeof TSlugRegisterRoute
+  TSlugTvRoute: typeof TSlugTvRoute
+  TSlugPayRegistrationIdRoute: typeof TSlugPayRegistrationIdRoute
+}
+
+const TSlugRouteChildren: TSlugRouteChildren = {
+  TSlugRegisterRoute: TSlugRegisterRoute,
+  TSlugTvRoute: TSlugTvRoute,
+  TSlugPayRegistrationIdRoute: TSlugPayRegistrationIdRoute,
+}
+
+const TSlugRouteWithChildren = TSlugRoute._addFileChildren(TSlugRouteChildren)
+
+interface TournamentSlugRegisterRouteChildren {
+  TournamentSlugRegisterSuccessRoute: typeof TournamentSlugRegisterSuccessRoute
+}
+
+const TournamentSlugRegisterRouteChildren: TournamentSlugRegisterRouteChildren =
+  {
+    TournamentSlugRegisterSuccessRoute: TournamentSlugRegisterSuccessRoute,
+  }
+
+const TournamentSlugRegisterRouteWithChildren =
+  TournamentSlugRegisterRoute._addFileChildren(
+    TournamentSlugRegisterRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  ContactRoute: ContactRoute,
+  DemoRoute: DemoRoute,
   DnsCheckRoute: DnsCheckRoute,
+  FaqRoute: FaqRoute,
+  FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  PlayersRoute: PlayersRoute,
+  PricingRoute: PricingRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SuperadminRoute: SuperadminRouteWithChildren,
+  ApiChatRoute: ApiChatRoute,
+  CoachSlugRoute: CoachSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  EnClubOnboardingRoute: EnClubOnboardingRoute,
+  EnTournamentsRoute: EnTournamentsRoute,
+  FrOnboardingClubRoute: FrOnboardingClubRoute,
+  FrTournoisRoute: FrTournoisRoute,
   LegalKindRoute: LegalKindRoute,
+  LegalCookiesRoute: LegalCookiesRoute,
+  PSlugRoute: PSlugRoute,
+  RTokenRoute: RTokenRoute,
+  RegisterPlayerRoute: RegisterPlayerRoute,
+  TSlugRoute: TSlugRouteWithChildren,
+  TournamentInviteTokenRoute: TournamentInviteTokenRoute,
+  TournamentSlugRoute: TournamentSlugRoute,
+  TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
+  TournamentsStartRoute: TournamentsStartRoute,
+  ApiPublicInquiryRoute: ApiPublicInquiryRoute,
+  ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicTournamentPaymentLinkRoute: ApiPublicTournamentPaymentLinkRoute,
+  ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
+  ApiPublicTournamentRosterRoute: ApiPublicTournamentRosterRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,
+  TournamentSlugTvRoute: TournamentSlugTvRoute,
+  ApiPublicHooksCoachInsightsRoute: ApiPublicHooksCoachInsightsRoute,
+  ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
+  ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
+  ApiPublicHooksPaymentRemindersRoute: ApiPublicHooksPaymentRemindersRoute,
+  ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
+  ApiPublicSocialCallbackRoute: ApiPublicSocialCallbackRoute,
+  ApiPublicSocialSyncRoute: ApiPublicSocialSyncRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  TournamentSlugRosterTokenRoute: TournamentSlugRosterTokenRoute,
+  ApiPublicTournamentIdRegulationsRoute: ApiPublicTournamentIdRegulationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

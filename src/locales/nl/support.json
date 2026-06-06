@@ -1,0 +1,62 @@
+{
+  "fab": "Support",
+  "page": {
+    "title": "Mijn aanvragen",
+    "subtitle": "Volg je supportaanvragen en meld een nieuw probleem.",
+    "new": "Nieuw",
+    "empty": "Nog geen aanvragen.",
+    "report": "Probleem melden",
+    "back": "Mijn aanvragen"
+  },
+  "form": {
+    "title": "Probleem melden",
+    "subject": "Onderwerp",
+    "subject_placeholder": "Beschrijf het probleem in enkele woorden",
+    "category": "Categorie",
+    "description": "Beschrijving",
+    "description_placeholder": "Wees zo precies mogelijk…",
+    "intent": "Wat probeerde je te doen?",
+    "intent_optional": "(optioneel)",
+    "intent_placeholder": "bijv. een evenement aanmaken",
+    "attachments": "Schermafbeeldingen",
+    "attachments_hint": "(max. 5, 5 MB)",
+    "add_file": "Bestand toevoegen",
+    "cancel": "Annuleren",
+    "send": "Verzenden",
+    "sent": "Aanvraag verzonden",
+    "sent_desc": "We nemen zo snel mogelijk contact met je op. Je kunt de status volgen onder 'Mijn aanvragen'.",
+    "close": "Sluiten",
+    "view": "Ticket bekijken",
+    "file_too_large": "{{name}} overschrijdt 5 MB",
+    "error": "Fout"
+  },
+  "thread": {
+    "internal_note": "Interne notitie",
+    "staff_label": "Clubero-team",
+    "reply_placeholder": "Een antwoord schrijven…",
+    "send": "Verzenden",
+    "link_unavailable": "Link niet beschikbaar"
+  },
+  "status": {
+    "open": "Open",
+    "in_progress": "Bezig",
+    "waiting_user": "Wacht op uw antwoord",
+    "resolved": "Opgelost",
+    "closed": "Gesloten"
+  },
+  "priority": {
+    "low": "Laag",
+    "normal": "Normaal",
+    "high": "Hoog",
+    "urgent": "Dringend"
+  },
+  "category": {
+    "bug": "Bug",
+    "payment": "Betaling",
+    "account": "Account",
+    "team": "Teams / Spelers",
+    "event": "Evenementen",
+    "feature_request": "Functieverzoek",
+    "other": "Overig"
+  }
+}

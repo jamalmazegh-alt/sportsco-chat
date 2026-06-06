@@ -1,0 +1,1 @@
+ALTER TABLE public.event_lineups DROP COLUMN IF EXISTS include_in_convocation;

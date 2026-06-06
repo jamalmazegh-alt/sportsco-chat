@@ -1,8 +1,13 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
+import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
+import { AttendanceHeatmap } from "@/components/attendance-heatmap";
+import { PlayerSuspensions } from "@/components/player-suspensions";
+import { PublicProfileCard } from "@/components/public-profile-card";
+import { PlayerDetailSkeleton } from "@/components/skeletons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useAuth, useActiveRole } from "@/lib/auth-context";
+import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,14 +18,24 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send } from "lucide-react";
+import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User, Trophy, CalendarDays, History, Globe, Copy, Palmtree } from "lucide-react";
+import { BackLink } from "@/components/back-link";
+import { PositionCombobox } from "@/components/position-combobox";
+import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
+
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId")({
   component: PlayerProfile,
-  head: () => ({ meta: [{ title: "Player — Clubero" }] }),
+  head: () => ({
+    meta: [
+      { title: i18n.t("meta.player.title") },
+      { name: "description", content: i18n.t("meta.player.description") },
+    ],
+  }),
 });
 
 function isMinorFromBirthDate(birth: string | null | undefined): boolean {
@@ -76,46 +91,71 @@ function PlayerProfile() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const role = useActiveRole();
-  const isCoach = role === "admin" || role === "coach";
+  const roles = useMyRoles();
+  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isFeedback = pathname === `/players/${playerId}/feedback`;
+  const isAchievements = pathname === `/players/${playerId}/achievements`;
+  const isSeasons = pathname === `/players/${playerId}/seasons`;
+  const isTimeline = pathname === `/players/${playerId}/timeline`;
+  const isAvailability = pathname === `/players/${playerId}/availability`;
+  const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   async function onDeletePlayer() {
     if (!player) return;
     setDeleting(true);
-    // Cascade-clean dependents we manage from the client. RLS allows admin/coach.
-    await supabase.from("player_parents").delete().eq("player_id", player.id);
-    await supabase.from("team_members").delete().eq("player_id", player.id);
-    await supabase.from("convocations").delete().eq("player_id", player.id);
-    const { error } = await supabase.from("players").delete().eq("id", player.id);
+    const { error } = await supabase.rpc("soft_delete_entity", { _kind: "player", _id: player.id });
     setDeleting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(t("players.deleted"));
+    toast(t("players.deleted"), {
+      action: {
+        label: t("common.undo", { defaultValue: "Undo" }),
+        onClick: async () => {
+          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "player", _id: player.id });
+          if (e2) toast.error(e2.message);
+          else qc.invalidateQueries({ queryKey: ["team-players"] });
+        },
+      },
+    });
     qc.invalidateQueries({ queryKey: ["team-players"] });
     navigate({ to: "/teams" });
   }
 
   async function resendParentInvite(pp: { id: string; full_name: string | null; email: string | null; phone: string | null; parent_user_id: string | null }) {
     if (!player || !user) return;
+    if (!player.club_id) { toast.warning(t("players.inviteNoContact")); return; }
+    const clubId = player.club_id;
     if (pp.parent_user_id) { toast.info(t("players.alreadyLinked")); return; }
     if (!pp.email && !pp.phone) { toast.warning(t("players.inviteNoContact")); return; }
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
-      club_id: player.club_id, created_by: user.id, token,
+      club_id: clubId, created_by: user.id, token,
       parent_for_player_id: player.id, role: "parent",
       email: pp.email ?? null, phone: pp.phone ?? null,
     });
+
     if (invErr) { toast.error(invErr.message); return; }
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     if (pp.email) {
       try {
+        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+
         await sendTransactionalEmail({
           templateName: "player-invite",
           recipientEmail: pp.email,
           idempotencyKey: `member-invite-${token}`,
-          templateData: { firstName: (pp.full_name ?? "").split(" ")[0] || undefined, clubName: undefined, inviteUrl },
+          templateData: {
+            firstName: (pp.full_name ?? "").split(" ")[0] || undefined,
+            clubName: clubRow?.name ?? undefined,
+            clubLogoUrl: clubRow?.logo_url ?? undefined,
+            inviteUrl,
+            roleLabel: "parent",
+          },
+
         });
         toast.success(t("players.inviteSent"));
       } catch (e: any) {
@@ -132,7 +172,7 @@ function PlayerProfile() {
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, jersey_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access")
+        .select("id, first_name, last_name, jersey_number, license_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status, public_profile_enabled, public_slug")
         .eq("id", playerId)
         .single();
       return data;
@@ -174,9 +214,27 @@ function PlayerProfile() {
     },
   });
 
+  // Used for sport-aware position suggestions. Falls back to free text when
+  // the player isn't on any team yet.
+  const { data: playerSport } = useQuery({
+    queryKey: ["player-primary-sport", playerId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("team_members")
+        .select("teams:team_id(sport)")
+        .eq("player_id", playerId)
+        .limit(5);
+      const sports = (data ?? [])
+        .map((r: any) => r?.teams?.sport)
+        .filter(Boolean) as string[];
+      return sports[0] ?? null;
+    },
+  });
+
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
+  const [license, setLicense] = useState("");
   const [position, setPosition] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -190,6 +248,7 @@ function PlayerProfile() {
     setFirst(player.first_name ?? "");
     setLast(player.last_name ?? "");
     setJersey(player.jersey_number?.toString() ?? "");
+    setLicense((player as any).license_number ?? "");
     setPosition(player.preferred_position ?? "");
     setPhone(player.phone ?? "");
     setEmail(player.email ?? "");
@@ -199,6 +258,43 @@ function PlayerProfile() {
 
   const minor = isMinorFromBirthDate(player?.birth_date);
   const isParentOfThisPlayer = !!parents?.some((p) => p.parent_user_id === user?.id);
+  const isSelf = !!player?.user_id && player.user_id === user?.id;
+  const canSeePrivate = isCoach || isSelf || isParentOfThisPlayer;
+
+  async function sendChildOnboardingInvite(targetEmail: string) {
+    if (!player || !user) return;
+    if (!player.club_id) { toast.warning(t("players.inviteNoContact")); return; }
+    const clubId = player.club_id;
+    const token = crypto.randomUUID().replace(/-/g, "");
+    const { error: invErr } = await supabase.from("member_invites").insert({
+      club_id: clubId,
+      created_by: user.id,
+      player_id: player.id,
+      role: "player",
+      token,
+      email: targetEmail,
+    });
+    if (invErr) { toast.error(invErr.message); return; }
+    const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
+    try {
+      const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+
+      await sendTransactionalEmail({
+        templateName: "player-invite",
+        recipientEmail: targetEmail,
+        idempotencyKey: `member-invite-${token}`,
+        templateData: {
+          firstName: player.first_name || undefined,
+          clubName: clubRow?.name ?? undefined,
+          clubLogoUrl: clubRow?.logo_url ?? undefined,
+          inviteUrl,
+        },
+      });
+      toast.success(t("players.inviteSent", { defaultValue: "Invitation envoyée" }));
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  }
 
   async function onSave(e: FormEvent) {
     e.preventDefault();
@@ -207,6 +303,27 @@ function PlayerProfile() {
 
     let photo_url = player.photo_url;
     if (photoFile) {
+      // RGPD: parental consent required for photos of minors
+      if (minor && player.media_consent_status !== "granted") {
+        setBusy(false);
+        toast.error(
+          t("players.photoBlockedMinor", {
+            defaultValue: "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
+          })
+        );
+        return;
+      }
+      // Limite côté client : refuse > 5 Mo (le bucket impose aussi la limite côté serveur)
+      if (photoFile.size > 5 * 1024 * 1024) {
+        setBusy(false);
+        toast.error(t("players.photoTooLarge", { defaultValue: "Photo trop lourde (max 5 Mo)." }));
+        return;
+      }
+      if (!photoFile.type.startsWith("image/")) {
+        setBusy(false);
+        toast.error(t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }));
+        return;
+      }
       const ext = photoFile.name.split(".").pop() || "jpg";
       const path = `${player.club_id}/${player.id}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -218,12 +335,17 @@ function PlayerProfile() {
       }
     }
 
+    const prevEmail = (player.email ?? "").toLowerCase().trim();
+    const newEmail = (email ?? "").toLowerCase().trim();
+    const emailChanged = newEmail && newEmail !== prevEmail;
+
     const { error } = await supabase
       .from("players")
       .update({
         first_name: first,
         last_name: last,
         jersey_number: jersey ? Number(jersey) : null,
+        license_number: license.trim() || null,
         preferred_position: position || null,
         phone: phone || null,
         email: email || null,
@@ -240,10 +362,25 @@ function PlayerProfile() {
     qc.invalidateQueries({ queryKey: ["player", playerId] });
     qc.invalidateQueries({ queryKey: ["team-players"] });
     toast.success(t("common.saved"));
+
+    // If child access is already enabled and the email was added/changed, (re)send onboarding email
+    if (player.child_platform_access && !player.user_id && emailChanged) {
+      await sendChildOnboardingInvite(newEmail);
+    }
   }
 
   async function toggleChildAccess(value: boolean) {
     if (!player) return;
+    if (value) {
+      const target = (email || player.email || "").trim();
+      if (!target) {
+        toast.error(t("players.childAccessNeedsEmail"));
+        return;
+      }
+      if (player.user_id) {
+        // Already linked — just flip flag
+      }
+    }
     const { error } = await supabase
       .from("players")
       .update({ child_platform_access: value })
@@ -254,6 +391,11 @@ function PlayerProfile() {
     }
     refetchPlayer();
     toast.success(t("common.saved"));
+
+    if (value && !player.user_id) {
+      const target = (email || player.email || "").trim();
+      if (target) await sendChildOnboardingInvite(target);
+    }
   }
 
   // ---- Parent form (collapsed) ----
@@ -299,47 +441,47 @@ function PlayerProfile() {
   }
 
   if (!player) {
-    return (
-      <div className="flex justify-center pt-20">
-        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-      </div>
-    );
+    return <PlayerDetailSkeleton />;
   }
 
   return (
     <div className="px-5 pt-6 pb-10 space-y-5">
-      <Link to="/teams" className="inline-flex items-center text-sm text-muted-foreground gap-1">
-        <ChevronLeft className="h-4 w-4" /> {t("common.back")}
-      </Link>
+      <BackLink to="/teams" />
+
 
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">
-        <div className="relative h-16 w-16 rounded-full bg-muted overflow-hidden shrink-0">
+        <div className="relative h-16 w-16 rounded-full overflow-hidden shrink-0 shadow-sm">
           {player.photo_url ? (
             <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="h-full w-full flex items-center justify-center text-base font-semibold text-muted-foreground">
-              {(player.first_name?.[0] ?? "") + (player.last_name?.[0] ?? "")}
+            <div className={`h-full w-full flex items-center justify-center text-lg font-bold ${avatarGradient(player.id)}`}>
+              {initialsFrom(player.first_name, player.last_name)}
             </div>
           )}
-          <span
-            className={cn(
-              "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
-              player.user_id ? "bg-present" : "bg-muted-foreground/40"
-            )}
-          />
+
+          {(isCoach || isSelf || isParentOfThisPlayer) && (
+            <span
+              className={cn(
+                "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
+                player.user_id ? "bg-present" : "bg-muted-foreground/40"
+              )}
+            />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold truncate">
             {player.first_name} {player.last_name}
           </h1>
           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <span className={cn(
-              "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
-              player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-            )}>
-              {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
-            </span>
+            {(isCoach || isSelf || isParentOfThisPlayer) && (
+              <span className={cn(
+                "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
+                player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
+              )}>
+                {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
+              </span>
+            )}
             {minor && (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-accent text-accent-foreground">
                 {t("players.minor")}
@@ -354,11 +496,107 @@ function PlayerProfile() {
         )}
       </div>
 
+      {/* Tabs */}
+      {(isCoach || isSelf || isParentOfThisPlayer) && (
+        <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1 overflow-x-auto">
+          {isCoach && (
+          <>
+          <Link
+            to="/players/$playerId"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              !isSubRoute
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <User className="h-3.5 w-3.5" />
+            {t("players.tabProfile", { defaultValue: "Profil" })}
+          </Link>
+          <Link
+            to="/players/$playerId/seasons"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isSeasons ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <CalendarDays className="h-3.5 w-3.5" />
+            {t("journey.tab.season", { defaultValue: "Saison" })}
+          </Link>
+          <Link
+            to="/players/$playerId/achievements"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isAchievements ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Trophy className="h-3.5 w-3.5" />
+            {t("journey.tab.achievements", { defaultValue: "Palmarès" })}
+          </Link>
+          <Link
+            to="/players/$playerId/timeline"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isTimeline ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <History className="h-3.5 w-3.5" />
+            {t("journey.tab.timeline", { defaultValue: "Timeline" })}
+          </Link>
+          <Link
+            to="/players/$playerId/feedback"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isFeedback
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <ClipboardList className="h-3.5 w-3.5" />
+            {t("players.tabFeedback", { defaultValue: "Retours coach" })}
+          </Link>
+          </>
+          )}
+          <Link
+            to="/players/$playerId/availability"
+            params={{ playerId }}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+              isAvailability
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Palmtree className="h-3.5 w-3.5" />
+            {t("availability.title", { defaultValue: "Disponibilités" })}
+          </Link>
+        </div>
+      )}
+
+
+      {isSubRoute ? (
+        <Outlet />
+      ) : (
+      <>
+      {(isCoach || isSelf || isParentOfThisPlayer) && !minor && (
+        <PublicProfileCard
+          playerId={player.id}
+          enabled={!!(player as { public_profile_enabled?: boolean }).public_profile_enabled}
+          slug={(player as { public_slug?: string | null }).public_slug ?? null}
+          onChanged={() => qc.invalidateQueries({ queryKey: ["player", playerId] })}
+        />
+      )}
       <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {t("players.details")}
         </h2>
 
+        {canSeePrivate && (
         <div className="space-y-1.5">
           <Label>{t("players.photo")}</Label>
           <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
@@ -378,7 +616,14 @@ function PlayerProfile() {
               disabled={!isCoach}
             />
           </label>
+          {minor && player.media_consent_status !== "granted" && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              {t("players.photoConsentRequired")}
+              <b>{player.media_consent_status}</b>
+            </p>
+          )}
         </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
@@ -397,35 +642,48 @@ function PlayerProfile() {
           </div>
           <div className="space-y-1.5">
             <Label>{t("players.preferredPosition")}</Label>
-            <Input value={position} onChange={(e) => setPosition(e.target.value)} disabled={!isCoach} />
+            <PositionCombobox
+              value={position}
+              onChange={setPosition}
+              sport={playerSport ?? null}
+              disabled={!isCoach}
+            />
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>{t("players.birthDate")}</Label>
-          <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={!isCoach} />
+          <Label>{t("players.licenseNumber")}</Label>
+          <Input value={license} onChange={(e) => setLicense(e.target.value)} disabled={!isCoach} placeholder="FFF-2025-12345" />
         </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.phone")}</Label>
-          {isCoach ? (
-            <PhoneInput value={phone} onChange={setPhone} />
-          ) : (
-            <Input value={phone} disabled />
-          )}
-        </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.email")}</Label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isCoach} />
-        </div>
-        <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
-          <span className="text-sm">{t("players.canRespond")} ({t("players.respondPlayer")})</span>
-          <input
-            type="checkbox"
-            className="h-5 w-5 accent-primary"
-            checked={canRespond}
-            onChange={(e) => setCanRespond(e.target.checked)}
-            disabled={!isCoach}
-          />
-        </div>
+        {canSeePrivate && (
+          <>
+            <div className="space-y-1.5">
+              <Label>{t("players.birthDate")}</Label>
+              <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={!isCoach} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("players.phone")}</Label>
+              {isCoach ? (
+                <PhoneInput value={phone} onChange={setPhone} />
+              ) : (
+                <Input value={phone} disabled />
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("players.email")}</Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isCoach} />
+            </div>
+            <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
+              <span className="text-sm">{t("players.canRespond")} ({t("players.respondPlayer")})</span>
+              <input
+                type="checkbox"
+                className="h-5 w-5 accent-primary"
+                checked={canRespond}
+                onChange={(e) => setCanRespond(e.target.checked)}
+                disabled={!isCoach}
+              />
+            </div>
+          </>
+        )}
 
         {isCoach && (
           <Button type="submit" className="w-full h-11" disabled={busy}>
@@ -433,6 +691,12 @@ function PlayerProfile() {
           </Button>
         )}
       </form>
+
+      {isCoach && player.club_id && (
+        <PlayerSuspensions playerId={player.id} clubId={player.club_id} />
+      )}
+      {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
+      {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
 
       {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
       {minor && (isParentOfThisPlayer || isCoach) && (
@@ -452,7 +716,8 @@ function PlayerProfile() {
         </div>
       )}
 
-      {/* PARENTS — separate card */}
+      {/* PARENTS — separate card (private) */}
+      {canSeePrivate && (
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -563,6 +828,9 @@ function PlayerProfile() {
           </form>
         )}
       </div>
+      )}
+      </>
+      )}
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
