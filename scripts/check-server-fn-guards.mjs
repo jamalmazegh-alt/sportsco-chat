@@ -47,6 +47,10 @@ const ALLOWLIST = new Set([
   "src/lib/payment-family.functions.ts",
   // Public read of legal documents — no per-tenant scoping.
   "src/lib/legal.functions.ts",
+  // validateInviteToken is public by design — validates invite tokens for
+  // unauthenticated pre-registration users. Query scoped to token value,
+  // no cross-tenant risk.
+  "src/lib/invite.functions.ts",
 ]);
 
 
