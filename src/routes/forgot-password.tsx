@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 import { Loader2, MailCheck } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
 
@@ -44,26 +43,15 @@ function ForgotPasswordPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      // 1. Validate the email exists for this account
-      const { data: exists, error: rpcErr } = await supabase.rpc("email_exists", {
-        _email: email.trim(),
-      });
-      if (rpcErr) throw rpcErr;
-      if (!exists) {
-        toast.error(t("auth.emailNotFound"));
-        return;
-      }
-      // 2. Send the reset link
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      // Always attempt reset; never reveal whether the email exists.
+      await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-      if (error) {
-        toast.error(t("auth.resetError"));
-        return;
-      }
-      setSent(true);
+    } catch {
+      // Swallow — same UX whether the address exists or sending failed.
     } finally {
       setBusy(false);
+      setSent(true);
     }
   }
 
@@ -83,9 +71,7 @@ function ForgotPasswordPage() {
             </div>
             <div className="space-y-1">
               <h2 className="text-base font-semibold">{t("auth.resetSentTitle")}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t("auth.resetSentTo")} <span className="font-medium text-foreground break-all">{email}</span>
-              </p>
+              <p className="text-sm text-muted-foreground">{t("auth.resetSent")}</p>
               <p className="text-xs text-muted-foreground pt-2">{t("auth.resetSentHint")}</p>
             </div>
             <div className="flex flex-col gap-2 pt-2">

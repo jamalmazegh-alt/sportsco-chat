@@ -27,10 +27,10 @@ export const listClubUsers = createServerFn({ method: "POST" })
       throw new Response("Forbidden", { status: 403 });
     }
 
-    // Fetch all members of the club
+    // Fetch all members of the club (role only — legacy DBs may lack roles[])
     const { data: members, error } = await supabaseAdmin
       .from("club_members")
-      .select("user_id, role, roles, created_at")
+      .select("user_id, role, created_at")
       .eq("club_id", data.club_id);
     if (error) throw error;
 
@@ -56,10 +56,7 @@ export const listClubUsers = createServerFn({ method: "POST" })
       { user_id: string; roles: string[]; profile: any; email: string | null }
     >();
     for (const m of members ?? []) {
-      const rolesArr: string[] =
-        Array.isArray((m as any).roles) && (m as any).roles.length > 0
-          ? (m as any).roles
-          : [m.role];
+      const rolesArr: string[] = m.role ? [m.role] : [];
       const g =
         grouped.get(m.user_id) ?? {
           user_id: m.user_id,
@@ -123,7 +120,7 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
           .maybeSingle(),
         supabaseAdmin
           .from("club_members")
-          .select("club_id, role, roles, created_at, clubs:club_id(name)")
+          .select("club_id, role, created_at, clubs:club_id(name)")
           .eq("user_id", data.user_id),
         supabaseAdmin
           .from("players")
@@ -144,7 +141,10 @@ export const getClubUserDetail = createServerFn({ method: "POST" })
       profile,
       email: u?.email ?? null,
       last_sign_in_at: u?.last_sign_in_at ?? null,
-      memberships: memberships ?? [],
+      memberships: (memberships ?? []).map((m: { role?: string }) => ({
+        ...m,
+        roles: m.role ? [m.role] : [],
+      })),
       linkedPlayers: linkedPlayers ?? [],
       parentLinks: parentLinks ?? [],
       is_disabled: isDisabled,

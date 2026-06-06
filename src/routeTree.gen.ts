@@ -15,6 +15,8 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PlayersRouteImport } from './routes/players'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
@@ -46,6 +48,7 @@ import { Route as EnTournamentsRouteImport } from './routes/en.tournaments'
 import { Route as EnClubOnboardingRouteImport } from './routes/en.club-onboarding'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CoachSlugRouteImport } from './routes/coach.$slug'
+import { Route as ClubCreateRouteImport } from './routes/club.create'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedTournamentsRouteImport } from './routes/_authenticated/tournaments'
 import { Route as AuthenticatedTeamsRouteImport } from './routes/_authenticated/teams'
@@ -154,6 +157,16 @@ const PricingRoute = PricingRouteImport.update({
 const PlayersRoute = PlayersRouteImport.update({
   id: '/players',
   path: '/players',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -308,6 +321,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
 const CoachSlugRoute = CoachSlugRouteImport.update({
   id: '/coach/$slug',
   path: '/coach/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClubCreateRoute = ClubCreateRouteImport.update({
+  id: '/club/create',
+  path: '/club/create',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -764,6 +782,8 @@ export interface FileRoutesByFullPath {
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
@@ -784,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/club/create': typeof ClubCreateRoute
   '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
@@ -881,6 +902,8 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
@@ -897,6 +920,7 @@ export interface FileRoutesByTo {
   '/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/club/create': typeof ClubCreateRoute
   '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
@@ -996,6 +1020,8 @@ export interface FileRoutesById {
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
   '/players': typeof PlayersRoute
   '/pricing': typeof PricingRoute
   '/register': typeof RegisterRoute
@@ -1016,6 +1042,7 @@ export interface FileRoutesById {
   '/_authenticated/teams': typeof AuthenticatedTeamsRouteWithChildren
   '/_authenticated/tournaments': typeof AuthenticatedTournamentsRouteWithChildren
   '/api/chat': typeof ApiChatRoute
+  '/club/create': typeof ClubCreateRoute
   '/coach/$slug': typeof CoachSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/en/club-onboarding': typeof EnClubOnboardingRoute
@@ -1115,6 +1142,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/forgot-password'
     | '/login'
+    | '/notifications'
+    | '/onboarding'
     | '/players'
     | '/pricing'
     | '/register'
@@ -1135,6 +1164,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/tournaments'
     | '/api/chat'
+    | '/club/create'
     | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
@@ -1232,6 +1262,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/forgot-password'
     | '/login'
+    | '/notifications'
+    | '/onboarding'
     | '/players'
     | '/pricing'
     | '/register'
@@ -1248,6 +1280,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/tournaments'
     | '/api/chat'
+    | '/club/create'
     | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
@@ -1346,6 +1379,8 @@ export interface FileRouteTypes {
     | '/features'
     | '/forgot-password'
     | '/login'
+    | '/notifications'
+    | '/onboarding'
     | '/players'
     | '/pricing'
     | '/register'
@@ -1366,6 +1401,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams'
     | '/_authenticated/tournaments'
     | '/api/chat'
+    | '/club/create'
     | '/coach/$slug'
     | '/email/unsubscribe'
     | '/en/club-onboarding'
@@ -1465,6 +1501,8 @@ export interface RootRouteChildren {
   FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  NotificationsRoute: typeof NotificationsRoute
+  OnboardingRoute: typeof OnboardingRoute
   PlayersRoute: typeof PlayersRoute
   PricingRoute: typeof PricingRoute
   RegisterRoute: typeof RegisterRoute
@@ -1472,6 +1510,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuperadminRoute: typeof SuperadminRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
+  ClubCreateRoute: typeof ClubCreateRoute
   CoachSlugRoute: typeof CoachSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EnClubOnboardingRoute: typeof EnClubOnboardingRoute
@@ -1555,6 +1594,20 @@ declare module '@tanstack/react-router' {
       path: '/players'
       fullPath: '/players'
       preLoaderRoute: typeof PlayersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -1772,6 +1825,13 @@ declare module '@tanstack/react-router' {
       path: '/coach/$slug'
       fullPath: '/coach/$slug'
       preLoaderRoute: typeof CoachSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/club/create': {
+      id: '/club/create'
+      path: '/club/create'
+      fullPath: '/club/create'
+      preLoaderRoute: typeof ClubCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -2620,6 +2680,8 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  NotificationsRoute: NotificationsRoute,
+  OnboardingRoute: OnboardingRoute,
   PlayersRoute: PlayersRoute,
   PricingRoute: PricingRoute,
   RegisterRoute: RegisterRoute,
@@ -2627,6 +2689,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuperadminRoute: SuperadminRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
+  ClubCreateRoute: ClubCreateRoute,
   CoachSlugRoute: CoachSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EnClubOnboardingRoute: EnClubOnboardingRoute,

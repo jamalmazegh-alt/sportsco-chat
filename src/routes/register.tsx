@@ -1,15 +1,17 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import { validateInviteToken, type InviteValidationResult } from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/password-input";
 
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import logo from "@/assets/clubero-logo.png";
 
 type SignupRole = "club_admin" | "player" | "parent";
@@ -46,40 +48,46 @@ function RegisterPage() {
   const [inviteKind, setInviteKind] = useState<string | null>(null);
   const [inviteEmailLocked, setInviteEmailLocked] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(hasInvite);
+  const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
   const [busy, setBusy] = useState(false);
+  const validateInvite = useServerFn(validateInviteToken);
 
   useEffect(() => {
     if (!hasInvite) return;
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase.rpc("get_member_invite_info", {
-        _token: inviteToken,
-      });
-      if (cancelled) return;
-      const row = Array.isArray(data) ? data[0] : null;
-      if (error || !row) {
-        // Likely a club_invites token — keep player as default role
-        setInviteKind("club");
-        setInviteLoading(false);
-        return;
+      try {
+        const result = await validateInvite({ data: { token: inviteToken } });
+        if (cancelled) return;
+        setInviteValidation(result);
+        if (!result.valid) return;
+
+        if (result.source === "club") {
+          setInviteKind("club");
+          if (result.role === "club_admin") setSignupRole("club_admin");
+          else if (result.role === "parent") setSignupRole("parent");
+          else setSignupRole("player");
+        } else {
+          setInviteKind(result.kind);
+          if (result.kind === "parent") setSignupRole("parent");
+          else if (result.kind === "player") setSignupRole("player");
+          if (result.email) {
+            setEmail(result.email);
+            setInviteEmailLocked(true);
+          }
+          if (result.suggestedFirstName) setFirstName(result.suggestedFirstName);
+          if (result.suggestedLastName) setLastName(result.suggestedLastName);
+        }
+      } catch {
+        if (!cancelled) setInviteValidation({ valid: false, reason: "invalid" });
+      } finally {
+        if (!cancelled) setInviteLoading(false);
       }
-      if (row.expired) toast.error(t("auth.inviteExpired") || "This invitation has expired.");
-      if (row.used) toast.error(t("auth.inviteUsed") || "This invitation has already been used.");
-      setInviteKind(row.kind);
-      if (row.kind === "parent") setSignupRole("parent");
-      else if (row.kind === "player") setSignupRole("player");
-      if (row.email) {
-        setEmail(row.email);
-        setInviteEmailLocked(true);
-      }
-      if (row.suggested_first_name) setFirstName(row.suggested_first_name);
-      if (row.suggested_last_name) setLastName(row.suggested_last_name);
-      setInviteLoading(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [hasInvite, inviteToken, t]);
+  }, [hasInvite, inviteToken, validateInvite]);
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   const passwordValid = passwordRegex.test(password);
@@ -141,6 +149,44 @@ function RegisterPage() {
 
   // When invited, the role is fixed by the invitation — don't let the user change it.
   const showRoleSelector = !hasInvite;
+
+  if (hasInvite && inviteLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (hasInvite && inviteValidation && !inviteValidation.valid) {
+    const message =
+      inviteValidation.reason === "expired"
+        ? t("auth.inviteExpired") || "This invitation has expired."
+        : inviteValidation.reason === "used"
+          ? t("auth.inviteUsed") || "This invitation has already been used."
+          : t("auth.inviteInvalid");
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
+        <div className="w-full max-w-sm text-center space-y-4">
+          <img
+            src={logo}
+            alt="Clubero"
+            width={144}
+            height={72}
+            className="mx-auto h-16 w-36 object-contain drop-shadow-sm dark:bg-white dark:rounded-md dark:px-2"
+          />
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-3">
+            <AlertCircle className="mx-auto h-10 w-10 text-destructive" />
+            <h1 className="text-xl font-semibold">{t("auth.inviteInvalid")}</h1>
+            <p className="text-sm text-muted-foreground">{message}</p>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/login">{t("auth.login")}</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">
