@@ -31,10 +31,50 @@ function isMinorFromBirthDate(birth: string | null | undefined): boolean {
   return age < 18;
 }
 
+type PlayerParentRow = {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  email: string | null;
+  parent_user_id: string | null;
+  can_respond: boolean;
+  parent_profile?: {
+    first_name: string | null;
+    last_name: string | null;
+    full_name: string | null;
+  } | null;
+};
+
+function parentDisplayName(pp: PlayerParentRow): string | null {
+  const manual = pp.full_name?.trim();
+  if (manual) return manual;
+
+  const prof = pp.parent_profile;
+  if (prof) {
+    const fromParts = [prof.first_name, prof.last_name]
+      .map((s) => s?.trim())
+      .filter(Boolean)
+      .join(" ");
+    if (fromParts) return fromParts;
+    const fromFull = prof.full_name?.trim();
+    if (fromFull) return fromFull;
+  }
+
+  if (pp.email?.trim()) return pp.email.trim();
+  if (pp.phone?.trim()) return pp.phone.trim();
+  return null;
+}
+
+function parentContactLine(pp: PlayerParentRow, displayName: string | null): string {
+  const parts = [pp.phone?.trim(), pp.email?.trim()].filter(Boolean) as string[];
+  const unique = [...new Set(parts)].filter((p) => p !== displayName);
+  return unique.join(" · ");
+}
+
 function PlayerProfile() {
   const { playerId } = Route.useParams();
   const { t } = useTranslation();
-  const { user, activeClubId } = useAuth();
+  const { user } = useAuth();
   const role = useActiveRole();
   const isCoach = role === "admin" || role === "coach";
   const qc = useQueryClient();
@@ -102,11 +142,35 @@ function PlayerProfile() {
   const { data: parents, refetch: refetchParents } = useQuery({
     queryKey: ["player-parents", playerId],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("player_parents")
         .select("id, full_name, phone, email, parent_user_id, can_respond")
         .eq("player_id", playerId);
-      return data ?? [];
+      if (error) throw error;
+
+      const rows = data ?? [];
+      const userIds = [
+        ...new Set(rows.map((r) => r.parent_user_id).filter(Boolean)),
+      ] as string[];
+
+      const profileMap = new Map<
+        string,
+        { first_name: string | null; last_name: string | null; full_name: string | null }
+      >();
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, full_name")
+          .in("id", userIds);
+        for (const p of profiles ?? []) profileMap.set(p.id, p);
+      }
+
+      return rows.map((row) => ({
+        ...row,
+        parent_profile: row.parent_user_id
+          ? profileMap.get(row.parent_user_id) ?? null
+          : null,
+      })) satisfies PlayerParentRow[];
     },
   });
 
@@ -411,8 +475,10 @@ function PlayerProfile() {
         )}
 
         <ul className="space-y-2">
-          {(parents ?? []).map((pp: any) => {
+          {(parents ?? []).map((pp) => {
             const linked = !!pp.parent_user_id;
+            const displayName = parentDisplayName(pp);
+            const contactLine = parentContactLine(pp, displayName);
             return (
               <li key={pp.id} className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
                 <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
@@ -420,7 +486,9 @@ function PlayerProfile() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium truncate text-sm">{pp.full_name ?? pp.email ?? pp.phone ?? "—"}</p>
+                    <p className="font-medium truncate text-sm">
+                      {displayName ?? t("players.linkedParentNoDetails")}
+                    </p>
                     <span className={cn(
                       "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
                       linked ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
@@ -429,8 +497,12 @@ function PlayerProfile() {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground truncate mt-0.5">
-                    {[pp.phone, pp.email].filter(Boolean).join(" · ") || "—"}
-                    {pp.can_respond ? ` · ${t("players.canRespond")}` : ""}
+                    {[
+                      contactLine,
+                      pp.can_respond ? t("players.canRespond") : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "—"}
                   </p>
                 </div>
                 {isCoach && !linked && (pp.email || pp.phone) && (
@@ -491,8 +563,6 @@ function PlayerProfile() {
           </form>
         )}
       </div>
-
-      <span className="sr-only">{activeClubId}</span>
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>

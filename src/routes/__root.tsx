@@ -6,6 +6,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { RouteNotFound } from "@/components/route-not-found";
 import { AuthProvider } from "@/lib/auth-context";
 import "@/lib/i18n";
 
@@ -56,6 +57,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   }),
   shellComponent: RootShell,
   component: RootComponent,
+  notFoundComponent: RouteNotFound,
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {

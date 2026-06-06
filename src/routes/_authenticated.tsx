@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
+import { requireAuthBeforeLoad } from "@/lib/route-guards";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 import logo from "@/assets/clubero-logo.png";
 
 export const Route = createFileRoute("/_authenticated")({
+  beforeLoad: requireAuthBeforeLoad,
   component: AuthLayout,
 });
 
