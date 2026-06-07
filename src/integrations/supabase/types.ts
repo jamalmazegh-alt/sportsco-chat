@@ -4145,6 +4145,7 @@ export type Database = {
           daily_end_time: string
           daily_start_time: string
           description: string | null
+          double_round_robin: boolean
           ends_on: string | null
           field_streams: Json
           fields: Json
@@ -4184,6 +4185,7 @@ export type Database = {
           daily_end_time?: string
           daily_start_time?: string
           description?: string | null
+          double_round_robin?: boolean
           ends_on?: string | null
           field_streams?: Json
           fields?: Json
@@ -4223,6 +4225,7 @@ export type Database = {
           daily_end_time?: string
           daily_start_time?: string
           description?: string | null
+          double_round_robin?: boolean
           ends_on?: string | null
           field_streams?: Json
           fields?: Json
