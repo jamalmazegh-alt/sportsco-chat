@@ -45,7 +45,8 @@
       "matches": "Jogos",
       "standings": "Classificação",
       "bracket": "Fase a eliminar",
-      "streams": "Streams"
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "Ao vivo",
@@ -1057,7 +1058,8 @@
     "templates": {
       "champions": "Campeões / Europa",
       "cup_plate": "Taça / Prato",
-      "medals": "Ouro / Prata / Bronze"
+      "medals": "Ouro / Prata / Bronze",
+      "consolation": "Principal / Consolação"
     },
     "dist": {
       "twoFlights": "2 Flights (topo + resto)",
@@ -1074,6 +1076,14 @@
       "customize": "Personalizar",
       "back": "Voltar",
       "save": "Guardar Flights"
+    },
+    "preset": {
+      "consolation": "Predefinição Consolação (1 clique)",
+      "consolationDesc": "Cria 2 flights: Principal (vencedores de grupo) e Consolação (perdedores). Pronto a guardar."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
     }
   }
 }

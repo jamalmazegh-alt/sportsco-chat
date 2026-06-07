@@ -45,7 +45,8 @@
       "matches": "Matches",
       "standings": "Standings",
       "bracket": "Bracket",
-      "streams": "Streams"
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "Live",
@@ -1057,7 +1058,8 @@
     "templates": {
       "champions": "Champions / Europa",
       "cup_plate": "Cup / Plate",
-      "medals": "Gold / Silver / Bronze"
+      "medals": "Gold / Silver / Bronze",
+      "consolation": "Main / Consolation"
     },
     "dist": {
       "twoFlights": "2 Flights (top + rest)",
@@ -1074,6 +1076,14 @@
       "customize": "Customize",
       "back": "Back",
       "save": "Save Flights"
+    },
+    "preset": {
+      "consolation": "Consolation preset (1-click)",
+      "consolationDesc": "Creates 2 flights: Main (group winners) and Consolation (losers). Ready to save."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
     }
   }
 }

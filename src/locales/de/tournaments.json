@@ -45,7 +45,8 @@
       "matches": "Spiele",
       "standings": "Tabelle",
       "bracket": "K.O.-Runde",
-      "streams": "Streams"
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "Live",
@@ -1057,7 +1058,8 @@
     "templates": {
       "champions": "Champions / Europa",
       "cup_plate": "Pokal / Platte",
-      "medals": "Gold / Silber / Bronze"
+      "medals": "Gold / Silber / Bronze",
+      "consolation": "Haupt / Trostrunde"
     },
     "dist": {
       "twoFlights": "2 Flights (Top + Rest)",
@@ -1074,6 +1076,14 @@
       "customize": "Anpassen",
       "back": "Zurück",
       "save": "Flights speichern"
+    },
+    "preset": {
+      "consolation": "Trostrunden-Voreinstellung (1 Klick)",
+      "consolationDesc": "Erstellt 2 Flights: Haupt (Gruppensieger) und Trostrunde (Verlierer). Speicherbereit."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
     }
   }
 }
