@@ -44,7 +44,8 @@
       "teams": "Equipas",
       "matches": "Jogos",
       "standings": "Classificação",
-      "bracket": "Fase a eliminar"
+      "bracket": "Fase a eliminar",
+      "streams": "Streams"
     },
     "sections": {
       "live": "Ao vivo",
@@ -98,7 +99,12 @@
       "foul": "Falta"
     },
     "sponsorsTitleDefault": "Com o apoio dos nossos parceiros",
-    "downloadRules": "Descarregar Regulamento (PDF)"
+    "downloadRules": "Descarregar Regulamento (PDF)",
+    "streams": {
+      "hint": "Escolha um campo para acompanhar a transmissão ao vivo.",
+      "unsupported": "Plataforma não reconhecida. Abra o link num novo separador.",
+      "openExternal": "Abrir stream"
+    }
   },
   "register": {
     "metaTitle": "Inscrição — Torneio {{slug}} · Clubero",
