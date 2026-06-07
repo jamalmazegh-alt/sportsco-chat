@@ -131,6 +131,16 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     { v: "knockout", label: t("wizard.formatKnockout"), desc: t("wizard.formatKnockoutDesc") },
     { v: "mixed", label: t("wizard.formatMixed"), desc: t("wizard.formatMixedDesc") },
     {
+      v: "flighted_finals",
+      label: t("wizard.formatFlightedFinals"),
+      desc: t("wizard.formatFlightedFinalsDesc"),
+    },
+    {
+      v: "consolation",
+      label: t("wizard.formatConsolation"),
+      desc: t("wizard.formatConsolationDesc"),
+    },
+    {
       v: "round_robin_home_away",
       label: t("wizard.formatRoundRobinHomeAway"),
       desc: t("wizard.formatRoundRobinHomeAwayDesc"),
