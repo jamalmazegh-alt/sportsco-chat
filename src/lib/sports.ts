@@ -12,3 +12,11 @@ export const COLLECTIVE_SPORTS = [
 ] as const;
 
 export type SportKey = (typeof TOP_SPORTS)[number] | (typeof COLLECTIVE_SPORTS)[number];
+
+/** Sports où un match ne peut pas se terminer sur un score d'égalité. */
+export const SPORTS_WITHOUT_DRAW: readonly SportKey[] = ["volleyball"];
+
+export function sportAllowsDraw(sport: string | null | undefined): boolean {
+  if (!sport) return true;
+  return !SPORTS_WITHOUT_DRAW.includes(sport as SportKey);
+}

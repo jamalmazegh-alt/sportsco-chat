@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { sportAllowsDraw } from "@/lib/sports";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 
 // ── Constantes mise en page (A4 portrait, marges en pt — 1mm ≈ 2.83465pt) ──
@@ -327,11 +328,14 @@ export async function buildRegulationsPdf(
 
   // Article 2
   drawArticle(ctx, 2, [I18N[lang].a2Intro]);
-  drawBullets(ctx, [
+  const pointBullets = [
     `${I18N[lang].a2Win} : ${I18N[lang].a2Points(t.points_win)}`,
-    `${I18N[lang].a2Draw} : ${I18N[lang].a2Points(t.points_draw)}`,
     `${I18N[lang].a2Loss} : ${I18N[lang].a2Points(t.points_loss)}`,
-  ]);
+  ];
+  if (sportAllowsDraw(t.sport)) {
+    pointBullets.splice(1, 0, `${I18N[lang].a2Draw} : ${I18N[lang].a2Points(t.points_draw)}`);
+  }
+  drawBullets(ctx, pointBullets);
   drawParagraph(ctx, I18N[lang].a2Outro);
 
   // Article 3 — tiebreakers

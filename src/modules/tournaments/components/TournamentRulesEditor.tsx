@@ -50,6 +50,7 @@ import {
   type ScoringMode,
   type ScoringRules,
 } from "../lib/formats";
+import { sportAllowsDraw } from "@/lib/sports";
 import {
   updateTournamentRules,
   generateRulesPdf,
@@ -80,10 +81,15 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     setRules({ ...rules, scoring: next });
   const updateFn = useServerFn(updateTournamentRules);
   const qc = useQueryClient();
+  const allowsDraw = sportAllowsDraw(sport);
 
   const save = useMutation({
-    mutationFn: () =>
-      updateFn({ data: { tournament_id: tournamentId, rules: rules as any } }),
+    mutationFn: () => {
+      const payload = allowsDraw
+        ? rules
+        : { ...rules, points: { ...rules.points, draw: 0 } };
+      return updateFn({ data: { tournament_id: tournamentId, rules: payload as any } });
+    },
     onSuccess: () => {
       toast.success(t("rules.savedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
@@ -148,19 +154,21 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         <CardHeader>
           <CardTitle className="text-base">{t("rules.pointsTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-3 gap-3">
+        <CardContent className={`grid gap-3 ${allowsDraw ? "grid-cols-3" : "grid-cols-2"}`}>
           <NumberField
             label={t("rules.win")}
             value={rules.points.win}
             onChange={(v) => setRules({ ...rules, points: { ...rules.points, win: v } })}
           />
-          <NumberField
-            label={t("rules.draw")}
-            value={rules.points.draw}
-            onChange={(v) =>
-              setRules({ ...rules, points: { ...rules.points, draw: v } })
-            }
-          />
+          {allowsDraw && (
+            <NumberField
+              label={t("rules.draw")}
+              value={rules.points.draw}
+              onChange={(v) =>
+                setRules({ ...rules, points: { ...rules.points, draw: v } })
+              }
+            />
+          )}
           <NumberField
             label={t("rules.loss")}
             value={rules.points.loss}

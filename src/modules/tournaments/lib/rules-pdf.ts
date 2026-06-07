@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import { sportAllowsDraw } from "@/lib/sports";
 import { ALL_TIEBREAKERS, type TournamentRules } from "./rules";
 
 interface TournamentInfo {
@@ -140,11 +141,14 @@ export async function buildRulesPdf(
 
   // Points
   section(ctx, t.points);
-  drawKeyValues(ctx, [
+  const pointRows: Array<[string, string]> = [
     [t.win, `${rules.points.win} pts`],
-    [t.draw, `${rules.points.draw} pts`],
     [t.loss, `${rules.points.loss} pts`],
-  ]);
+  ];
+  if (sportAllowsDraw(tournament.sport)) {
+    pointRows.splice(1, 0, [t.draw, `${rules.points.draw} pts`]);
+  }
+  drawKeyValues(ctx, pointRows);
   ctx.y -= 10;
 
   // Tie-breakers

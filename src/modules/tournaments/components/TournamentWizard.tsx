@@ -100,8 +100,9 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     create.mutate();
   }
 
+  const datesValid = !!startsOn && (!endsOn || endsOn >= startsOn);
   const canNext0 = name.trim().length >= 2 && sport;
-  const canNext1 = !!startsOn;
+  const canNext1 = datesValid;
   const canNext2 = !!format && numTeams >= 2;
 
   const formatOptions: { v: Format; label: string; desc: string }[] = [
@@ -187,6 +188,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 <Label>{t("wizard.end")}</Label>
                 <Input
                   type="date"
+                  min={startsOn || undefined}
                   value={endsOn}
                   onChange={(e) => setEndsOn(e.target.value)}
                 />

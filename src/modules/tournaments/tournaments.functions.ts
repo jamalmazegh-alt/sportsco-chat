@@ -5,7 +5,7 @@ import { slugify, uniqueTournamentSlug } from "./lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
 import { computeStandings, type Tiebreaker, type MatchEventInput } from "./lib/standings";
 import { generateKnockoutBracket } from "./lib/bracket";
-import { mergeRules, DEFAULT_RULES } from "./lib/rules";
+import { mergeRules, DEFAULT_RULES, defaultRulesForSport } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { assertTournamentMutable } from "@/lib/tournament-guards.server";
@@ -18,18 +18,23 @@ import { assertTournamentMutable } from "@/lib/tournament-guards.server";
 const tournamentFormat = z.enum(["group", "knockout", "mixed"]);
 const tournamentStatus = z.enum(["draft", "published", "in_progress", "completed", "cancelled"]);
 
-const createSchema = z.object({
-  club_id: z.string().uuid(),
-  name: z.string().min(2).max(120),
-  sport: z.string().min(1).max(40),
-  category: z.string().max(80).optional().nullable(),
-  starts_on: z.string(), // ISO date
-  ends_on: z.string().optional().nullable(),
-  format: tournamentFormat,
-  num_teams: z.number().int().min(2).max(64),
-  location: z.string().max(200).optional().nullable(),
-  cover_image_url: z.string().url().optional().nullable(),
-});
+const createSchema = z
+  .object({
+    club_id: z.string().uuid(),
+    name: z.string().min(2).max(120),
+    sport: z.string().min(1).max(40),
+    category: z.string().max(80).optional().nullable(),
+    starts_on: z.string(), // ISO date
+    ends_on: z.string().optional().nullable(),
+    format: tournamentFormat,
+    num_teams: z.number().int().min(2).max(64),
+    location: z.string().max(200).optional().nullable(),
+    cover_image_url: z.string().url().optional().nullable(),
+  })
+  .refine((d) => !d.ends_on || d.ends_on >= d.starts_on, {
+    message: "End date must be on or after start date",
+    path: ["ends_on"],
+  });
 
 // ---------- Helpers
 
@@ -93,6 +98,7 @@ export const createTournament = createServerFn({ method: "POST" })
 
 
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
+    const initialRules = defaultRulesForSport(data.sport);
     const { data: row, error } = await supabase
       .from("tournaments")
       .insert({
@@ -109,6 +115,11 @@ export const createTournament = createServerFn({ method: "POST" })
         cover_image_url: data.cover_image_url ?? null,
         created_by: userId,
         status: "draft",
+        settings: initialRules as any,
+        points_win: initialRules.points.win,
+        points_draw: initialRules.points.draw,
+        points_loss: initialRules.points.loss,
+        tiebreakers: initialRules.tiebreakers,
       })
       .select("*")
       .single();
