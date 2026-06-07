@@ -297,10 +297,26 @@ function EventDetail() {
     queryKey: ["teams-min", event?.team_id],
     enabled: !!event,
     queryFn: async () => {
+      // Fetch the current team first to know its club
+      const { data: current } = await supabase
+        .from("teams")
+        .select("id, club_id")
+        .eq("id", event!.team_id)
+        .maybeSingle();
+      if (!current?.club_id) {
+        const { data } = await supabase
+          .from("teams")
+          .select("id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
+          .eq("id", event!.team_id);
+        return data ?? [];
+      }
+      // Fetch all teams of the same club so the coach can reassign the event
       const { data } = await supabase
         .from("teams")
         .select("id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
-        .eq("id", event!.team_id);
+        .eq("club_id", current.club_id)
+        .is("deleted_at", null)
+        .order("name");
       return data ?? [];
     },
   });
