@@ -140,7 +140,7 @@ export type PointsPreset = "standard" | "hockey_ot" | "custom";
 
 export const POINTS_PRESETS: { key: PointsPreset; label: string; value: PointsConfig | null }[] = [
   { key: "standard", label: "Standard (3/1/0)", value: STANDARD_FOOTBALL_POINTS },
-  { key: "hockey_ot", label: "Hockey (2-1-0 OT)", value: HOCKEY_OT_POINTS }, },
+  { key: "hockey_ot", label: "Hockey (2-1-0 OT)", value: HOCKEY_OT_POINTS },
   { key: "custom", label: "Personnalisé", value: null },
 ];
 
