@@ -19,7 +19,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!t) return null;
 
-    const [gRes, teamRes, mRes, eRes, dRes] = await Promise.all([
+    const [gRes, teamRes, mRes, eRes, dRes, fRes] = await Promise.all([
       supabaseAdmin
         .from("tournament_groups")
         .select("id, name, sort_order, qualifiers_count")
@@ -32,7 +32,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       supabaseAdmin
         .from("tournament_matches")
         .select(
-          "id, group_id, round, bracket_position, match_number, team_a_id, team_b_id, team_a_source, team_b_source, scheduled_at, field, status, score_a, score_b, penalty_score_a, penalty_score_b, overtime_score_a, overtime_score_b, sets, winner_team_id, details",
+          "id, group_id, round, bracket_position, match_number, team_a_id, team_b_id, team_a_source, team_b_source, scheduled_at, field, status, score_a, score_b, penalty_score_a, penalty_score_b, overtime_score_a, overtime_score_b, sets, winner_team_id, details, flight_id, placement_kind",
         )
         .eq("tournament_id", t.id)
         .order("scheduled_at", { nullsFirst: false }),
@@ -48,6 +48,11 @@ export const getPublicTournament = createServerFn({ method: "POST" })
         .eq("kind", "rules")
         .order("generated_at", { ascending: false })
         .limit(1),
+      supabaseAdmin
+        .from("tournament_flights")
+        .select("id, sort_order, name, short_name, color, enable_third_place")
+        .eq("tournament_id", t.id)
+        .order("sort_order"),
     ]);
 
     return {
@@ -57,6 +62,7 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       matches: mRes.data ?? [],
       events: eRes.data ?? [],
       rulesDocument: dRes.data?.[0] ?? null,
+      flights: fRes.data ?? [],
     };
   });
 

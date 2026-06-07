@@ -3444,6 +3444,59 @@ export type Database = {
           },
         ]
       }
+      tournament_flights: {
+        Row: {
+          color: string | null
+          created_at: string
+          enable_fifth_place: boolean
+          enable_seventh_place: boolean
+          enable_third_place: boolean
+          id: string
+          name: string
+          qualification_rules: Json
+          short_name: string | null
+          sort_order: number
+          tournament_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          enable_fifth_place?: boolean
+          enable_seventh_place?: boolean
+          enable_third_place?: boolean
+          id?: string
+          name: string
+          qualification_rules?: Json
+          short_name?: string | null
+          sort_order: number
+          tournament_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          enable_fifth_place?: boolean
+          enable_seventh_place?: boolean
+          enable_third_place?: boolean
+          id?: string
+          name?: string
+          qualification_rules?: Json
+          short_name?: string | null
+          sort_order?: number
+          tournament_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_flights_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_groups: {
         Row: {
           created_at: string
@@ -3547,6 +3600,7 @@ export type Database = {
           dispute_flag: boolean
           duration_min: number | null
           field: string | null
+          flight_id: string | null
           group_id: string | null
           id: string
           match_number: number | null
@@ -3555,6 +3609,7 @@ export type Database = {
           overtime_score_b: number | null
           penalty_score_a: number | null
           penalty_score_b: number | null
+          placement_kind: string | null
           referee_name: string | null
           referee_user_id: string | null
           round: Database["public"]["Enums"]["tournament_match_round"]
@@ -3582,6 +3637,7 @@ export type Database = {
           dispute_flag?: boolean
           duration_min?: number | null
           field?: string | null
+          flight_id?: string | null
           group_id?: string | null
           id?: string
           match_number?: number | null
@@ -3590,6 +3646,7 @@ export type Database = {
           overtime_score_b?: number | null
           penalty_score_a?: number | null
           penalty_score_b?: number | null
+          placement_kind?: string | null
           referee_name?: string | null
           referee_user_id?: string | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
@@ -3617,6 +3674,7 @@ export type Database = {
           dispute_flag?: boolean
           duration_min?: number | null
           field?: string | null
+          flight_id?: string | null
           group_id?: string | null
           id?: string
           match_number?: number | null
@@ -3625,6 +3683,7 @@ export type Database = {
           overtime_score_b?: number | null
           penalty_score_a?: number | null
           penalty_score_b?: number | null
+          placement_kind?: string | null
           referee_name?: string | null
           referee_user_id?: string | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
@@ -3644,6 +3703,13 @@ export type Database = {
           winner_team_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tournament_matches_flight_id_fkey"
+            columns: ["flight_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_flights"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tournament_matches_group_id_fkey"
             columns: ["group_id"]
@@ -4154,6 +4220,7 @@ export type Database = {
           location: string | null
           match_duration_min: number
           max_teams: number | null
+          min_rest_minutes: number
           name: string
           num_teams: number
           payment_mode: string
@@ -4194,6 +4261,7 @@ export type Database = {
           location?: string | null
           match_duration_min?: number
           max_teams?: number | null
+          min_rest_minutes?: number
           name: string
           num_teams?: number
           payment_mode?: string
@@ -4234,6 +4302,7 @@ export type Database = {
           location?: string | null
           match_duration_min?: number
           max_teams?: number | null
+          min_rest_minutes?: number
           name?: string
           num_teams?: number
           payment_mode?: string

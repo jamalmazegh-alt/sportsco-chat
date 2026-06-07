@@ -921,7 +921,8 @@
     "tvLive": "Live / TV",
     "tvLiveTitle": "Diashow TV / Live",
     "tvLiveHint": "Open het schermvullende scherm om wedstrijden en standen live te bekijken.",
-    "openTv": "Live-scherm openen"
+    "openTv": "Live-scherm openen",
+    "flights": "Flights"
   },
   "staff": {
     "organizers": "Organisatieteam",
@@ -1038,5 +1039,41 @@
     "rules": "Reglement",
     "finalStandings": "Eindstand",
     "allResults": "Alle resultaten"
+  },
+  "flights": {
+    "title": "Flights / finalefasen",
+    "intro": "Meerdere trofeeën per toernooi: Champions/Europa, Beker/Plaat, Goud/Zilver/Brons of aangepast.",
+    "reconfigure": "Opnieuw configureren",
+    "generate": "Brackets genereren",
+    "waitGroups": "Voltooi alle groepswedstrijden om de brackets te genereren.",
+    "noGroups": "Maak eerst de groepsfase. Flights worden daarna gegenereerd.",
+    "savedToast": "Flights opgeslagen",
+    "generatedToast": "{{n}} wedstrijden aangemaakt",
+    "rulesCount": "regels",
+    "thirdPlace": "3e plaats",
+    "fifthPlace": "5e plaats",
+    "seventhPlace": "7e plaats",
+    "draftRulesSummary": "{{n}} kwalificatieregel(s) ingesteld",
+    "templates": {
+      "champions": "Champions / Europa",
+      "cup_plate": "Beker / Plaat",
+      "medals": "Goud / Zilver / Brons"
+    },
+    "dist": {
+      "twoFlights": "2 Flights (top + rest)",
+      "twoFlightsBalanced": "2 gebalanceerde Flights",
+      "threeFlights": "3 Flights (elite + 2 niveaus)",
+      "threeEqual": "3 gelijke Flights",
+      "fourFlights": "4 Flights"
+    },
+    "wizard": {
+      "template": "Naamsjabloon",
+      "distribution": "Verdeling ({{n}} teams)",
+      "notEnough": "Minimaal 4 teams vereist.",
+      "clean": "Schone brackets",
+      "customize": "Aanpassen",
+      "back": "Terug",
+      "save": "Flights opslaan"
+    }
   }
 }
