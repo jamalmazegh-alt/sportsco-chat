@@ -93,6 +93,7 @@ type Sub =
   | "staff"
   | "draw"
   | "schedule"
+  | "flights"
   | "matches"
   | "standings"
   | "bracket"
