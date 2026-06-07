@@ -22,6 +22,8 @@ const tournamentFormat = z.enum([
   "double_elimination",
   "swiss",
   "round_robin_home_away",
+  "flighted_finals",
+  "consolation",
 ]);
 const tournamentStatus = z.enum(["draft", "published", "in_progress", "completed", "cancelled"]);
 

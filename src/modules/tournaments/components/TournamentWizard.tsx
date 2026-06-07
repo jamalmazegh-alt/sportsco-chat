@@ -22,7 +22,9 @@ type Format =
   | "mixed"
   | "double_elimination"
   | "swiss"
-  | "round_robin_home_away";
+  | "round_robin_home_away"
+  | "flighted_finals"
+  | "consolation";
 
 interface Props {
   clubId: string;
@@ -35,6 +37,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [sport, setSport] = useState("football");
+  const [customSportName, setCustomSportName] = useState("");
   const [category, setCategory] = useState("");
   const [startsOn, setStartsOn] = useState("");
   const [endsOn, setEndsOn] = useState("");
@@ -57,6 +60,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           club_id: clubId,
           name: name.trim(),
           sport,
+          custom_sport_name: sport === "custom" ? customSportName.trim() || null : null,
           category: category || null,
           starts_on: startsOn,
           ends_on: endsOn || null,
@@ -93,6 +97,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   function reset() {
     setStep(0);
     setName("");
+    setCustomSportName("");
     setCategory("");
     setStartsOn("");
     setEndsOn("");
@@ -111,7 +116,10 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   }
 
   const datesValid = !!startsOn && (!endsOn || endsOn >= startsOn);
-  const canNext0 = name.trim().length >= 2 && sport;
+  const canNext0 =
+    name.trim().length >= 2 &&
+    !!sport &&
+    (sport !== "custom" || customSportName.trim().length >= 2);
   const canNext1 = datesValid;
   const canNext2 =
     !!format &&
@@ -122,6 +130,16 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     { v: "group", label: t("wizard.formatGroup"), desc: t("wizard.formatGroupDesc") },
     { v: "knockout", label: t("wizard.formatKnockout"), desc: t("wizard.formatKnockoutDesc") },
     { v: "mixed", label: t("wizard.formatMixed"), desc: t("wizard.formatMixedDesc") },
+    {
+      v: "flighted_finals",
+      label: t("wizard.formatFlightedFinals"),
+      desc: t("wizard.formatFlightedFinalsDesc"),
+    },
+    {
+      v: "consolation",
+      label: t("wizard.formatConsolation"),
+      desc: t("wizard.formatConsolationDesc"),
+    },
     {
       v: "round_robin_home_away",
       label: t("wizard.formatRoundRobinHomeAway"),
@@ -164,7 +182,12 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>{t("wizard.sport")}</Label>
-              <SportSelect value={sport} onValueChange={setSport} />
+              <SportSelect
+                value={sport}
+                onValueChange={setSport}
+                customName={customSportName}
+                onCustomNameChange={setCustomSportName}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>{t("wizard.categoryOptional")}</Label>

@@ -523,7 +523,11 @@
     "formatSwiss": "Sistema svizzero",
     "formatSwissDesc": "Accoppiamenti per classifica a ogni turno, numero di turni fisso",
     "swissRounds": "Numero di turni",
-    "swissRoundsHint": "Consigliato: ceil(log₂(squadre)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5."
+    "swissRoundsHint": "Consigliato: ceil(log₂(squadre)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Finali a Flights",
+    "formatFlightedFinalsDesc": "Gironi seguiti da più tabelloni finali paralleli (Champions, Europa…)",
+    "formatConsolation": "Consolazione",
+    "formatConsolationDesc": "Tabellone principale + tabellone consolazione per le squadre eliminate presto"
   },
   "groups": {
     "drawTitle": "Sorteggio",

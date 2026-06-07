@@ -523,7 +523,11 @@
     "formatSwiss": "Swiss System",
     "formatSwissDesc": "Pairings by standings each round, fixed number of rounds",
     "swissRounds": "Number of rounds",
-    "swissRoundsHint": "Recommended: ceil(log₂(teams)) — 8 teams ≈ 3, 16 ≈ 4, 32 ≈ 5."
+    "swissRoundsHint": "Recommended: ceil(log₂(teams)) — 8 teams ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Flighted Finals",
+    "formatFlightedFinalsDesc": "Group stage followed by multiple parallel finals brackets (Champions, Europa…)",
+    "formatConsolation": "Consolation",
+    "formatConsolationDesc": "Main bracket + consolation bracket for early-eliminated teams"
   },
   "groups": {
     "drawTitle": "Draw",

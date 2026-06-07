@@ -523,7 +523,11 @@
     "formatSwiss": "Sistema suíço",
     "formatSwissDesc": "Emparelhamentos por classificação em cada ronda, número de rondas fixo",
     "swissRounds": "Número de rondas",
-    "swissRoundsHint": "Recomendado: teto(log₂(equipas)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5."
+    "swissRoundsHint": "Recomendado: teto(log₂(equipas)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Finais por Flights",
+    "formatFlightedFinalsDesc": "Fase de grupos seguida de várias chaves finais paralelas (Champions, Europa…)",
+    "formatConsolation": "Consolação",
+    "formatConsolationDesc": "Chave principal + chave de consolação para as equipas eliminadas cedo"
   },
   "groups": {
     "drawTitle": "Sorteio",

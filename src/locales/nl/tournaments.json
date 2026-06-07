@@ -523,7 +523,11 @@
     "formatSwiss": "Zwitsers systeem",
     "formatSwissDesc": "Paringen op stand per ronde, vast aantal ronden",
     "swissRounds": "Aantal ronden",
-    "swissRoundsHint": "Aanbevolen: ceil(log₂(teams)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5."
+    "swissRoundsHint": "Aanbevolen: ceil(log₂(teams)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Flighted finales",
+    "formatFlightedFinalsDesc": "Poulefase gevolgd door meerdere parallelle finaletabellen (Champions, Europa…)",
+    "formatConsolation": "Consolatie",
+    "formatConsolationDesc": "Hoofdtabel + consolatietabel voor vroeg uitgeschakelde teams"
   },
   "groups": {
     "drawTitle": "Loting",
