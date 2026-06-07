@@ -40,6 +40,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [endsOn, setEndsOn] = useState("");
   const [location, setLocation] = useState("");
   const [format, setFormat] = useState<Format>("mixed");
+  const [swissRounds, setSwissRounds] = useState<number>(5);
   const [numTeams, setNumTeams] = useState(8);
   const [numTeamsRaw, setNumTeamsRaw] = useState("8");
   const [logo, setLogo] = useState<Attachment[]>([]);
