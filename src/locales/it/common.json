@@ -555,6 +555,7 @@
     "title": "Eventi",
     "create": "Nuovo evento",
     "name": "Nome evento",
+    "nameRequired": "Il nome dell'evento è obbligatorio",
     "type": "Tipo",
     "types": {
       "training": "Allenamento",

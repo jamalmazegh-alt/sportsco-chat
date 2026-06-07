@@ -483,10 +483,16 @@ export function EventFormSheet({
     });
   }, [open]);
 
+  const titleMissing = type !== "match" && !title.trim();
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!teamId) {
       toast.error(t("events.selectTeam"));
+      return;
+    }
+    if (titleMissing) {
+      toast.error(t("events.nameRequired"));
       return;
     }
     const startsIso = combineDateTime(startDate, startTime);
@@ -497,13 +503,11 @@ export function EventFormSheet({
     setBusy(true);
 
     const finalTitle =
-      type === "training"
-        ? title.trim() || t("events.types.training")
-        : type === "match"
-          ? opponent
-            ? `vs ${opponent}`
-            : t("events.types.match")
-          : title.trim();
+      type === "match"
+        ? opponent
+          ? `vs ${opponent}`
+          : t("events.types.match")
+        : title.trim();
 
     const finalLocationUrl = locationUrl?.trim()
       ? locationUrl.trim()
@@ -683,7 +687,7 @@ export function EventFormSheet({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={type === "training" ? t("events.types.training") : ""}
-                required={type !== "training"}
+                required
               />
             </div>
           )}
@@ -872,7 +876,7 @@ export function EventFormSheet({
             </label>
           )}
 
-          <Button type="submit" className="w-full h-11" disabled={busy || !teamId}>
+          <Button type="submit" className="w-full h-11" disabled={busy || !teamId || titleMissing}>
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : mode === "create" ? (
