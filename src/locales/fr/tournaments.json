@@ -921,7 +921,8 @@
     "tvLive": "Live / TV",
     "tvLiveTitle": "Diaporama TV / Live",
     "tvLiveHint": "Ouvrez l'écran plein-écran pour afficher matchs et classements en direct.",
-    "openTv": "Ouvrir l'écran live"
+    "openTv": "Ouvrir l'écran live",
+    "flights": "Flights"
   },
   "staff": {
     "organizers": "Équipe d'organisation",
@@ -1038,5 +1039,41 @@
     "rules": "Règlement",
     "finalStandings": "Classement final",
     "allResults": "Tous les résultats"
+  },
+  "flights": {
+    "title": "Flights / phases finales",
+    "intro": "Plusieurs trophées par tournoi : Champions/Europa, Coupe/Plaque, Or/Argent/Bronze, ou custom.",
+    "reconfigure": "Reconfigurer",
+    "generate": "Générer les brackets",
+    "waitGroups": "Termine tous les matchs de poules pour générer les brackets.",
+    "noGroups": "Crée d'abord la phase de poules. Les Flights se génèrent après.",
+    "savedToast": "Flights enregistrés",
+    "generatedToast": "{{n}} matchs créés",
+    "rulesCount": "règles",
+    "thirdPlace": "3e place",
+    "fifthPlace": "5e place",
+    "seventhPlace": "7e place",
+    "draftRulesSummary": "{{n}} règle(s) de qualification configurée(s)",
+    "templates": {
+      "champions": "Champions / Europa",
+      "cup_plate": "Coupe / Plaque",
+      "medals": "Or / Argent / Bronze"
+    },
+    "dist": {
+      "twoFlights": "2 Flights (top + reste)",
+      "twoFlightsBalanced": "2 Flights équilibrés",
+      "threeFlights": "3 Flights (élite + 2 niveaux)",
+      "threeEqual": "3 Flights égaux",
+      "fourFlights": "4 Flights"
+    },
+    "wizard": {
+      "template": "Template de noms",
+      "distribution": "Répartition ({{n}} équipes)",
+      "notEnough": "Au moins 4 équipes requises.",
+      "clean": "Brackets nets",
+      "customize": "Personnaliser",
+      "back": "Retour",
+      "save": "Enregistrer les Flights"
+    }
   }
 }
