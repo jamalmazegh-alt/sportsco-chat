@@ -1,0 +1,1 @@
+ALTER TABLE public.tournaments ADD COLUMN IF NOT EXISTS double_round_robin boolean NOT NULL DEFAULT false;

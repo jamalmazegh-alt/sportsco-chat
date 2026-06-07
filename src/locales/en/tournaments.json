@@ -508,7 +508,15 @@
     "next": "Next",
     "create": "Create tournament",
     "createdToast": "Tournament created",
-    "errorToast": "Error"
+    "errorToast": "Error",
+    "formatRoundRobinHomeAway": "Home & Away Round-Robin",
+    "formatRoundRobinHomeAwayDesc": "Each team plays every other team twice (home + away)",
+    "formatDoubleElimination": "Double Elimination",
+    "formatDoubleEliminationDesc": "Winners + losers brackets; eliminated after 2 losses",
+    "formatSwiss": "Swiss System",
+    "formatSwissDesc": "Pairings by standings each round, fixed number of rounds",
+    "swissRounds": "Number of rounds",
+    "swissRoundsHint": "Recommended: ceil(log₂(teams)) — 8 teams ≈ 3, 16 ≈ 4, 32 ≈ 5."
   },
   "groups": {
     "drawTitle": "Draw",

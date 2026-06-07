@@ -16,7 +16,13 @@ import { toast } from "sonner";
 import { createTournament, updateTournament } from "../tournaments.functions";
 
 
-type Format = "group" | "knockout" | "mixed";
+type Format =
+  | "group"
+  | "knockout"
+  | "mixed"
+  | "double_elimination"
+  | "swiss"
+  | "round_robin_home_away";
 
 interface Props {
   clubId: string;
@@ -34,6 +40,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [endsOn, setEndsOn] = useState("");
   const [location, setLocation] = useState("");
   const [format, setFormat] = useState<Format>("mixed");
+  const [swissRounds, setSwissRounds] = useState<number>(5);
   const [numTeams, setNumTeams] = useState(8);
   const [numTeamsRaw, setNumTeamsRaw] = useState("8");
   const [logo, setLogo] = useState<Attachment[]>([]);
@@ -55,6 +62,8 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           ends_on: endsOn || null,
           format,
           num_teams: numTeams,
+          swiss_rounds: format === "swiss" ? swissRounds : null,
+          double_round_robin: format === "round_robin_home_away",
           location: location || null,
         },
       });
@@ -89,6 +98,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     setEndsOn("");
     setLocation("");
     setFormat("mixed");
+    setSwissRounds(5);
     setNumTeams(8);
     setNumTeamsRaw("8");
     setLogo([]);
@@ -103,12 +113,26 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const datesValid = !!startsOn && (!endsOn || endsOn >= startsOn);
   const canNext0 = name.trim().length >= 2 && sport;
   const canNext1 = datesValid;
-  const canNext2 = !!format && numTeams >= 2;
+  const canNext2 =
+    !!format &&
+    numTeams >= 2 &&
+    (format !== "swiss" || (swissRounds >= 1 && swissRounds <= 20));
 
   const formatOptions: { v: Format; label: string; desc: string }[] = [
     { v: "group", label: t("wizard.formatGroup"), desc: t("wizard.formatGroupDesc") },
     { v: "knockout", label: t("wizard.formatKnockout"), desc: t("wizard.formatKnockoutDesc") },
     { v: "mixed", label: t("wizard.formatMixed"), desc: t("wizard.formatMixedDesc") },
+    {
+      v: "round_robin_home_away",
+      label: t("wizard.formatRoundRobinHomeAway"),
+      desc: t("wizard.formatRoundRobinHomeAwayDesc"),
+    },
+    {
+      v: "double_elimination",
+      label: t("wizard.formatDoubleElimination"),
+      desc: t("wizard.formatDoubleEliminationDesc"),
+    },
+    { v: "swiss", label: t("wizard.formatSwiss"), desc: t("wizard.formatSwissDesc") },
   ];
 
   return (
@@ -257,6 +281,24 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 }}
               />
             </div>
+            {format === "swiss" && (
+              <div className="space-y-1.5">
+                <Label>{t("wizard.swissRounds")}</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={swissRounds}
+                  onChange={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    if (!isNaN(n)) setSwissRounds(Math.max(1, Math.min(20, n)));
+                  }}
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  {t("wizard.swissRoundsHint")}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
