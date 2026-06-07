@@ -434,6 +434,9 @@ function PublicTournamentPage() {
           {tab === "bracket" && (
             <BracketView matches={matches as any} teams={teams as any} />
           )}
+          {tab === "flights" && (
+            <FlightsPublicView flights={flights as any} matches={matches as any} teams={teams as any} />
+          )}
           {tab === "streams" && <FieldStreams streams={fieldStreamEntries} />}
         </div>
 
