@@ -1,108 +1,97 @@
-## Contexte
+# Plan — Features QA manquantes
 
-Le code existant couvre déjà une bonne partie du périmètre :
-
-- **Ranking / tie-breakers** : `src/modules/tournaments/lib/standings.ts` implémente déjà points / GD / GF / head-to-head (points/GD/GF) / fair-play / draw-lot, avec ordre configurable par tournoi (`tiebreakers: Tiebreaker[]`). Pas besoin de schéma DB — l'ordre est déjà persisté dans `tournaments.settings`. → il manque surtout **les tests** et la valeur par défaut alignée avec la spec.
-- **Freeze tournoi** : pas de garde-fou unifié. Les server fns laissent supprimer équipes / changer format même après démarrage. → ajout d'un helper `assertTournamentMutable` + tests cross-tenant via les guards `assertClubRole` déjà testés.
-- **Paiement atomicité** : flux Stripe → `tournament_registrations`. Aujourd'hui le webhook met juste `payment_status='paid_online'` mais ne crée pas la team (sauf en auto-approval avant paiement). Pas de self-heal. Pas de statut explicite `paid_pending_team`. Montant déjà recalculé serveur (✅), mais pas d'idempotency stricte sur eventId.
-
-Je découpe en 3 lots livrables séparément.
+Quatre lots indépendants. Je propose de les livrer **dans cet ordre** (priorités QA) avec une migration DB unique par lot quand nécessaire.
 
 ---
 
-## Lot 1 — Ranking tie-breakers (tests + défaut aligné spec)
+## Lot 1 — Formats de tournoi (priorité haute)
 
-**Changements code (minimes)**
-- `src/modules/tournaments/lib/standings.ts` : ajuster `DEFAULT_TIEBREAKERS` pour matcher exactement l'ordre demandé :
-  `points → goal_diff → goals_for → head_to_head_points → head_to_head_gd → head_to_head_gf → fair_play → draw_lot`.
-  (actuellement : points → h2h_points → h2h_gd → goal_diff → goals_for ; on inverse pour mettre GD/GF avant H2H comme spec.)
+Trois nouveaux formats à ajouter à côté de `groups + knockout` / `round_robin` / `knockout` existants.
 
-**Tests (`src/tests/unit/standings-tiebreakers.test.ts`)**
-- Tied points, séparés par GD
-- Tied GD, séparés par GF
-- Tied stats générales, séparés par H2H points
-- Tied H2H, séparés par fair-play
-- Tied total → résolu par `draw_lot` déterministe (salt stable)
-- Ordre custom : tournoi qui met `fair_play` avant `goal_diff` produit un classement différent
+### 1.1 Double élimination
+- Nouveau format `double_elimination`.
+- Génération : bracket **winner** classique + bracket **loser** alimenté par les perdants de chaque tour du winner bracket. Grande finale entre champion winner et champion loser (avec règle "reset" optionnelle V1 = pas de reset).
+- Nouveau fichier `src/modules/tournaments/lib/double-elim.ts` (fonction pure, testée).
+- Persistance : on réutilise `knockout_matches` + un champ `bracket_side: 'winner' | 'loser' | 'grand_final'` (jsonb metadata ou colonne).
+- UI : composant `DoubleEliminationBracket` (2 colonnes : Winner / Loser, grande finale en bas).
 
----
+### 1.2 Championnat aller-retour
+- Option `doubleRoundRobin: boolean` sur les règles (ou format `round_robin_home_away`).
+- Étend `generateRoundRobin()` : 2e passe avec home/away inversés et `round` continu (n-1 + n-1).
+- Aucune migration : on génère juste 2× plus de matchs.
 
-## Lot 2 — Tournament freeze + cross-tenant
+### 1.3 Système suisse
+- Nouveau format `swiss`.
+- Paramètres : `rounds` (fixe, défini à la création), pas de groupes.
+- Algorithme : ronde 1 = appariement par seed (haut vs bas) ; rondes suivantes = tri par points puis appariement haut/bas en évitant les rematchs.
+- Nouveau fichier `src/modules/tournaments/lib/swiss.ts` + tests.
+- UI : bouton "Générer la ronde suivante" (manuel, car dépend des résultats validés).
 
-**Nouveau helper** : `src/lib/tournament-guards.server.ts`
-- `assertTournamentMutable(tournamentId, { allow: 'structure' | 'scores' | 'logistics' })`
-  - lit `tournaments.status` via supabaseAdmin
-  - `structure` (delete team, change format, change groups, change ranking rules, delete matches) → throw 409 si status ∈ `in_progress | completed`
-  - `scores` / `logistics` → toujours autorisés
-- `assertCanSubmitMatchScore({ userId, matchId, role: 'referee' | 'organizer' })`
-  - referee : doit être assigné au match (table `tournament_matches.referee_user_id` ou équivalent)
-  - organizer : doit être admin/tournament_manager du club du tournoi (→ délègue à `assertClubRole`)
-  - match `locked=true` → referee refusé, organizer OK avec `correction_reason` non vide
-- `assertCanLockMatch(...)` : organizer only
-
-**Câblage minimal côté server fns** (pas de réécriture massive) :
-- ajouter `assertTournamentMutable` dans : `deleteTournamentTeam`, `updateTournamentFormat`, `updateGroupComposition`, `updateRankingRules`, `regenerateMatches`/`deleteMatch` (identifier les fns exactes dans `tournaments.functions.ts`).
-- ajouter `assertCanSubmitMatchScore` dans `submitMatchScore` / `updateMatchScore` / `lockMatchResult`.
-
-**Tests (`src/tests/unit/tournament-guards.test.ts`)** (même pattern que `authz.test.ts`, mocks via `vi.hoisted`)
-- `assertTournamentMutable` : draft → autorisé ; in_progress + structure → 409 ; in_progress + scores → autorisé
-- Locked match : referee re-edit → 403 ; organizer sans reason → 400 ; organizer + reason → OK + audit log
-- Cross-tenant :
-  - organizer club A + tournoi club B → 403
-  - referee match A + score match B → 403
-  - staff tournoi A + edit tournoi B → 403
-  - user public (pas de userId) → 401/403
+### 1.4 Migration
+```sql
+ALTER TYPE tournament_format ADD VALUE 'double_elimination';
+ALTER TYPE tournament_format ADD VALUE 'swiss';
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS double_round_robin boolean DEFAULT false;
+ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS swiss_rounds integer;
+ALTER TABLE knockout_matches ADD COLUMN IF NOT EXISTS bracket_side text;
+```
 
 ---
 
-## Lot 3 — Payment atomicity
+## Lot 2 — Sports
 
-**Migration DB** (`tournament_registrations`)
-- Nouvelle colonne `registration_state text` (enum-like check) avec valeurs :
-  `pending_payment | paid_pending_team | confirmed | failed | cancelled`
-  (on garde `payment_status` legacy pour rétrocompat ; `registration_state` devient la source de vérité).
-- Index unique partiel : `(tournament_id, tournament_team_id)` où `tournament_team_id is not null` (évite la double-team).
-- Table `stripe_webhook_events (event_id text primary key, processed_at timestamptz)` pour idempotency stricte au niveau webhook (si pas déjà existante).
+### 2.1 Tennis & Padel
+- Ajout `tennis` et `padel` dans `src/lib/sports.ts` (catégorie nouvelle "racket").
+- `sport-config.ts` : scoreUnit `sets`, `cardsEnabled: false`, `setScoresEnabled: true`.
+- `formats.ts` : profil scoring `mode: 'sets'`, bestOf 3, pointsToWin 6, tieBreak 7, winBy 2.
+- `defaultRulesForSport()` : pas de nul (ajout dans `SPORTS_WITHOUT_DRAW`), format par défaut = `knockout`, roster `playersPerTeam` = 1 (tennis) / 2 (padel).
 
-**Code**
-- `src/routes/api/public/stripe-webhook.ts` :
-  - en tout début de handler, `INSERT … ON CONFLICT DO NOTHING` dans `stripe_webhook_events`. Si conflict → 200 immédiat.
-- `src/modules/tournaments/tournament-payments.server.ts` :
-  - `handleTournamentCheckoutCompleted` :
-    1. transition `registration_state → paid_pending_team` (idempotent)
-    2. appelle `ensureRegistrationTeam(registrationId)` :
-       - SELECT `tournament_team_id` ; si non null → no-op (idempotent)
-       - sinon INSERT team + UPDATE registration en une transaction RPC (`create_team_for_registration` SECURITY DEFINER, returns team_id, exception-safe sur unique violation → retourne team existante)
-    3. transition `→ confirmed`
-  - `buildCheckoutForRegistration` : déjà OK (montant serveur), on ajoute une assertion explicite que `metadata.tournament_id` côté checkout est ignoré et toujours re-résolu depuis la registration côté webhook.
-- **Self-heal** : route `/api/public/hooks/payment-self-heal.ts` (cron-friendly) qui repère `registration_state='paid_pending_team'` depuis > 5 min et rejoue `ensureRegistrationTeam`.
-- `checkout.session.expired` / `payment_intent.payment_failed` → `registration_state='failed'`.
-- `checkout.session.async_payment_failed` + cancel URL hit → `cancelled`.
-
-**Tests (`src/tests/unit/tournament-payment-atomicity.test.ts`)**
-- Webhook livré 2× même eventId → 1 seule team créée
-- `paid_pending_team` puis team-creation échoue puis retry → exactement 1 team
-- Client POSTant un amount custom → ignoré (montant relu depuis `tournaments.registration_fee`)
-- Client POSTant `tournament_id` d'un autre club → registration créée sur le bon tournoi (slug-driven, déjà OK) + assertion explicite
-- `payment_intent.payment_failed` → `failed`, pas de team
-- Cancel → `cancelled`, pas de team
+### 2.2 Sport personnalisé
+- Option `custom` dans la sélection de sport, accompagnée d'un input texte `customSportName`.
+- Colonne `tournaments.custom_sport_name text` (déjà sport=text donc on stocke `custom:<name>` ou ajout colonne dédiée — je propose colonne dédiée pour clarté).
+- `getSportConfig('custom')` → fallback générique (points, pas de cartons, pas de sets).
+- Affichage : si `sport='custom'`, on affiche `customSportName` partout au lieu de la clé.
 
 ---
 
-## Section technique (pour les développeurs)
+## Lot 3 — Streaming par terrain
 
-- **Stack** : TanStack Start + Supabase. Guards = pures fonctions serveur testables avec mocks `vi.hoisted` (déjà en place dans `authz.test.ts`).
-- **Tests** : Vitest (déjà câblé via `unit-tests.yml` après le fix `bun run test`).
-- **Idempotency Stripe** : table `stripe_webhook_events` est la barrière #1. La transition d'état dans `tournament_registrations` est la barrière #2 (les UPDATE sont conditionnés sur l'état attendu : `WHERE registration_state IN ('pending_payment','paid_pending_team')`).
-- **RLS** : `tournament_registrations` reste write-only via supabaseAdmin côté server (déjà le cas).
-- **Pas d'edge function** : tout reste dans server routes TanStack.
+État actuel : un seul lien `stream_url` au niveau tournoi.
+
+Cible : un lien par **terrain** (`fields` / `venues`). Le viewer choisit le terrain.
+
+- Migration : `ALTER TABLE tournament_fields ADD COLUMN stream_url text;` (table existe déjà pour les terrains/poules).
+- UI admin : dans la config des terrains, input "URL de stream" par ligne.
+- UI public (`t.$slug.tv.tsx`) : sélecteur de terrain, embed dynamique selon le terrain choisi. Fallback sur `stream_url` global si terrain sans lien.
+
+---
+
+## Lot 4 — Préset points Hockey
+
+- Ajout d'un préset nommé "Hockey (OT)" dans la config des points :
+  `{ win: 2, draw: 0, loss: 0, otWin: 2, otLoss: 1 }`.
+- Extension de `PointsConfig` : champs optionnels `otWin?: number` et `otLoss?: number`.
+- `computeStandings` : si match marqué `decided_in: 'overtime' | 'shootout'`, applique `otWin` au vainqueur et `otLoss` au perdant à la place de `win`/`loss`.
+- Migration : ajout colonne `matches.decided_in text` (NULL = temps réglementaire).
+- UI règles : nouvelle section "Préset" avec boutons rapides (Standard, Hockey OT, Personnalisé).
+
+---
+
+## Section technique (détails impl)
+
+- **Tests** : Vitest pour les 3 nouveaux algorithmes (double-elim, suisse, round-robin aller-retour), couvrant 4/8/16 équipes et cas impair.
+- **Types Supabase** : régénérés automatiquement après chaque migration.
+- **i18n** : nouvelles clés `tournaments.formats.*` (FR/EN/ES/DE/IT/NL/PT) — copie FR puis script de traduction existant.
+- **Rétro-compat** : tous les tournois existants conservent leur format ; les nouvelles colonnes sont nullable / défaut sûr.
+- **Hors scope V1** : reset de grande finale (double-elim), tie-break avancé (suisse Buchholz score), multi-stream simultané (le viewer choisit 1 terrain à la fois).
 
 ---
 
 ## Ordre d'exécution proposé
 
-1. **Lot 1** (1 fichier code + 1 fichier test) — risque ~nul, valide la base.
-2. **Lot 2** (1 helper + ~5 call-sites + 1 fichier test) — risque modéré, mais aucune migration DB.
-3. **Lot 3** (1 migration + helpers webhook + 1 route self-heal + 1 fichier test) — risque le plus élevé, fait en dernier pour bénéficier des guards du Lot 2.
+1. Lot 4 (Hockey OT) — petit, isolé, valide la mécanique points
+2. Lot 2 (Tennis/Padel/custom) — étend sport-config
+3. Lot 3 (streams par terrain) — UI + 1 colonne
+4. Lot 1 (formats tournoi) — le plus gros, livré en 3 PR internes (round-robin a/r, suisse, double-élim)
 
-Chaque lot est mergeable indépendamment. Confirme si tu veux que je démarre par le Lot 1, ou les 3 d'affilée.
+Confirmes-tu l'ordre et le scope, ou tu veux que je commence par un lot particulier ?
