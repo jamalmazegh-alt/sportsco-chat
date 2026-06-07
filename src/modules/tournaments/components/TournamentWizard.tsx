@@ -16,7 +16,13 @@ import { toast } from "sonner";
 import { createTournament, updateTournament } from "../tournaments.functions";
 
 
-type Format = "group" | "knockout" | "mixed";
+type Format =
+  | "group"
+  | "knockout"
+  | "mixed"
+  | "double_elimination"
+  | "swiss"
+  | "round_robin_home_away";
 
 interface Props {
   clubId: string;
