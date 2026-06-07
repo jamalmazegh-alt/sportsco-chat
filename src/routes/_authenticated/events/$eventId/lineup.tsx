@@ -123,16 +123,19 @@ function LineupPage() {
 
   // Active suspensions for warning badges in the available roster
   const { data: suspensions } = useQuery({
-    queryKey: ["lineup-suspensions", ctx?.event?.team_id],
-    enabled: !!ctx?.event?.team_id,
+    queryKey: ["lineup-suspensions", ctx?.event?.team_id, (roster ?? []).length],
+    enabled: !!ctx?.event?.team_id && (roster?.length ?? 0) > 0,
     queryFn: async () => {
+      const ids = (roster ?? []).map((p) => p.id);
+      if (ids.length === 0) return [];
       const { data, error } = await supabase
         .from("player_suspensions")
         .select("player_id, matches_to_serve, matches_served")
+        .in("player_id", ids)
         .eq("team_id", ctx!.event.team_id as string)
         .eq("status", "active");
       if (error) throw error;
-      return (data ?? []).filter((s: any) => s.matches_served < s.matches_to_serve);
+      return (data ?? []).filter((s: any) => (s.matches_to_serve ?? 0) - (s.matches_served ?? 0) > 0);
     },
   });
   const suspensionMap = useMemo(() => {
