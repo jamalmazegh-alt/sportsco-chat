@@ -60,6 +60,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           club_id: clubId,
           name: name.trim(),
           sport,
+          custom_sport_name: sport === "custom" ? customSportName.trim() || null : null,
           category: category || null,
           starts_on: startsOn,
           ends_on: endsOn || null,
