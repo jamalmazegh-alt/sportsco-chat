@@ -90,6 +90,8 @@ function AvailabilityPage() {
     toast.success(t("availability.cancelled", { defaultValue: "Absence annulée" }));
     qc.invalidateQueries({ queryKey: ["player-availabilities", playerId] });
     qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
+    qc.invalidateQueries({ queryKey: ["event-absences"] });
+    qc.invalidateQueries({ queryKey: ["team-active-absences"] });
   }
 
   const activeAbsences = rows.filter((r) => r.status === "active");
