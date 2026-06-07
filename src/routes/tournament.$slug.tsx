@@ -167,12 +167,18 @@ function PublicTournamentPage() {
     (opens === null || now >= opens) &&
     (closes === null || now <= closes);
 
+  const fieldStreams = ((tournament as any).field_streams ?? {}) as Record<string, string>;
+  const fieldStreamEntries = Object.entries(fieldStreams).filter(([, url]) => !!url?.trim());
+
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "overview", label: t("public.tabs.overview"), icon: CalendarDays },
     { id: "teams", label: t("public.tabs.teams"), icon: Users },
     { id: "matches", label: t("public.tabs.matches"), icon: Calendar },
     { id: "standings", label: t("public.tabs.standings"), icon: ListOrdered },
     { id: "bracket", label: t("public.tabs.bracket"), icon: GitBranch },
+    ...(fieldStreamEntries.length > 0
+      ? [{ id: "streams" as Tab, label: t("public.tabs.streams"), icon: Tv }]
+      : []),
   ];
 
   const accent = rules.branding.primaryColor;
