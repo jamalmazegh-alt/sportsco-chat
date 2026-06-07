@@ -104,7 +104,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
     return () => { supabase.removeChannel(channel); };
   }, [eventId, qc]);
 
-  // Players convoked (present/uncertain/pending) — denominator
+  // Players convoked (present/uncertain/pending) — denominator for coach coverage
   const convokedPlayers = useMemo(
     () => convocations.filter((c) => c.status !== "absent"),
     [convocations],
@@ -138,17 +138,43 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
   const myBookingCarpool = myBooking ? carpools.find((c) => c.id === myBooking.carpool_id) : null;
   const myNeed = needs.find((n) => n.parent_user_id === user?.id);
 
-  // My children convoked (present/uncertain)
+  // My children on this event (any status) — parents booking seats
+  const myChildConvocations = useMemo(
+    () => convocations.filter((c) => childrenLinks.includes(c.player_id)),
+    [convocations, childrenLinks],
+  );
+
+  // Own convocation on this event (any status) — players booking for themselves
+  const myOwnConvocations = useMemo(
+    () => convocations.filter((c) => c.players?.user_id === user?.id),
+    [convocations, user?.id],
+  );
+
+  /** Players the current user may book seats for (attendance status ignored). */
+  const bookableConvocations = useMemo(() => {
+    if (isCoach) return convokedPlayers;
+    const seen = new Set<string>();
+    const out: Convocation[] = [];
+    for (const c of [...myChildConvocations, ...myOwnConvocations]) {
+      if (!seen.has(c.player_id)) {
+        seen.add(c.player_id);
+        out.push(c);
+      }
+    }
+    return out;
+  }, [isCoach, convokedPlayers, myChildConvocations, myOwnConvocations]);
+
+  // Legacy alias — "I need a ride" still targets convoked (non-absent) children only
   const myConvokedChildren = useMemo(
-    () => convokedPlayers.filter((c) => childrenLinks.includes(c.player_id)),
-    [convokedPlayers, childrenLinks],
+    () => myChildConvocations.filter((c) => c.status !== "absent"),
+    [myChildConvocations],
   );
 
   const [offerOpen, setOfferOpen] = useState(false);
   const [reserveCarpool, setReserveCarpool] = useState<Carpool | null>(null);
   const [needOpen, setNeedOpen] = useState(false);
 
-  const canParticipate = myConvokedChildren.length > 0 || isCoach;
+  const canParticipate = isCoach || bookableConvocations.length > 0;
 
   return (
     <>
@@ -272,7 +298,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
                 {isCoach ? t("carpool.offerSeats") : t("carpool.iCanDrive")}
               </Button>
             )}
-            {!isCoach && !myBooking && !myCarpool && myConvokedChildren.length > 0 && !myNeed && (
+            {!isCoach && !myBooking && !myCarpool && bookableConvocations.length > 0 && !myNeed && (
               <Button size="sm" variant="outline" onClick={() => setNeedOpen(true)}>
                 <HandHelping className="h-3.5 w-3.5" />
                 {t("carpool.iNeedRide")}
@@ -297,7 +323,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
       {reserveCarpool && (
         <ReserveDialog
           carpool={reserveCarpool}
-          selectablePlayers={isCoach ? convokedPlayers : myConvokedChildren}
+          selectablePlayers={bookableConvocations}
           onClose={() => setReserveCarpool(null)}
           onDone={() => { qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] }); setReserveCarpool(null); }}
         />
@@ -305,7 +331,7 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
       {needOpen && (
         <NeedDialog
           eventId={eventId}
-          myConvokedChildren={myConvokedChildren}
+          myConvokedChildren={bookableConvocations}
           onClose={() => setNeedOpen(false)}
           onDone={() => { qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] }); setNeedOpen(false); }}
         />

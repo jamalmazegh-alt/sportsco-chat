@@ -20,6 +20,7 @@ import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournament
 import { HomeQuickCards } from "@/components/home-quick-cards";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
+import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -227,6 +228,8 @@ function HomePage() {
 
       {/* KPIs strip (admins/coaches) */}
       {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
+
+      {isCoach && activeClubId && <UpcomingAbsencesWidget clubId={activeClubId} />}
 
       {/* Quick actions */}
       {isCoach && (

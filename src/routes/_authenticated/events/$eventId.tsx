@@ -68,6 +68,12 @@ const ATTENDANCE_ACTIONS: Array<{
   { status: "pending", Icon: CircleDot, className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground" },
 ];
 
+/** Event types that support the carpool section (coach toggle + member offers). */
+const CARPOOL_EVENT_TYPES = new Set(["match", "training"]);
+function eventSupportsCarpool(type: string) {
+  return CARPOOL_EVENT_TYPES.has(type);
+}
+
 const CONVOC_SNAPSHOT_FIELDS = [
   "title",
   "description",
@@ -1551,8 +1557,12 @@ function EventDetail() {
     return <EventDetailSkeleton />;
   }
 
+  const responsesReadOnly =
+    !!event.responses_locked ||
+    event.status === "cancelled" ||
+    new Date((event.ends_at ?? event.starts_at) as string).getTime() <= Date.now();
   const hasPendingForMe =
-    !event.responses_locked &&
+    !responsesReadOnly &&
     visibleMyConvocs.some((c: any) => c.status === "pending");
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
@@ -2518,8 +2528,14 @@ function EventDetail() {
                         t("attendance.respondPrompt")
                       )}
                     </p>
-                    {event.responses_locked ? (
-                      <p className="text-xs text-muted-foreground">{t("attendance.responsesLocked")}</p>
+                    {responsesReadOnly ? (
+                      <p className="text-xs text-muted-foreground">
+                        {event.responses_locked
+                          ? t("attendance.responsesLocked")
+                          : t("attendance.responsesClosedPast", {
+                              defaultValue: "Les réponses ne sont plus modifiables pour cet événement passé.",
+                            })}
+                      </p>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">
                         {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
@@ -2921,7 +2937,7 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {isCoach && event.type === "match" && event.status !== "cancelled" && (
+      {isCoach && eventSupportsCarpool(event.type) && event.status !== "cancelled" && (
         <div className="rounded-2xl border bg-card p-4 flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold">{t("carpool.toggleTitle" as any) || "Covoiturage"}</p>
@@ -2948,7 +2964,7 @@ function EventDetail() {
         </div>
       )}
 
-      {event.type === "match" && event.carpool_enabled && event.status !== "cancelled" && (
+      {eventSupportsCarpool(event.type) && event.carpool_enabled && event.status !== "cancelled" && (
         <CarpoolSection
           eventId={eventId}
           teamId={event.team_id}

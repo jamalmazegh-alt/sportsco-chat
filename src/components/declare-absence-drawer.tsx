@@ -277,6 +277,9 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
       qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
       qc.invalidateQueries({ queryKey: ["event-availabilities"] });
+      qc.invalidateQueries({ queryKey: ["event-absences"] });
+      qc.invalidateQueries({ queryKey: ["team-active-absences"] });
+      qc.invalidateQueries({ queryKey: ["lineup-absences"] });
       onCreated?.();
       onOpenChange(false);
     } catch (e: any) {

@@ -23,7 +23,8 @@ import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
-import { UnavailableBadge } from "@/components/unavailable-badge";
+import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
+import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
@@ -103,6 +104,30 @@ function TeamDetail() {
         if (!prev || remaining > prev.remaining) {
           map.set(row.player_id, { remaining, reason: row.suspension_reason });
         }
+      }
+      return map;
+    },
+  });
+
+  // Active absences (player_availabilities) overlapping today — badge in roster.
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const { data: activeAbsencesByPlayer } = useQuery({
+    queryKey: ["team-active-absences", teamId, todayStr],
+    enabled: !!players && players.length > 0,
+    queryFn: async () => {
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length === 0) return new Map<string, UnavailableReason>();
+      const { data, error } = await supabase
+        .from("player_availabilities")
+        .select("player_id, reason")
+        .in("player_id", ids)
+        .eq("status", "active")
+        .lte("start_date", todayStr)
+        .gte("end_date", todayStr);
+      if (error) throw error;
+      const map = new Map<string, UnavailableReason>();
+      for (const row of (data ?? []) as { player_id: string; reason: string }[]) {
+        map.set(row.player_id, row.reason as UnavailableReason);
       }
       return map;
     },
@@ -566,6 +591,10 @@ function TeamDetail() {
 
       {isCoach && <CollapsibleTeamStats teamId={teamId} />}
 
+      {isCoach && team?.club_id && (
+        <UpcomingAbsencesWidget clubId={team.club_id} />
+      )}
+
       <TeamCoaches teamId={teamId} clubId={(team as any)?.club_id} isAdmin={roles.includes("admin")} />
 
       <div className="flex items-center justify-between gap-2">
@@ -793,6 +822,7 @@ function TeamDetail() {
             const checked = selectedIds.has(p.id);
             const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
             const susp = activeSuspensionsByPlayer?.get(p.id);
+            const absenceReason = activeAbsencesByPlayer?.get(p.id);
             const inner = (
               <>
                 <div className="relative h-12 w-12 shrink-0 rounded-full bg-muted overflow-hidden">
@@ -829,6 +859,11 @@ function TeamDetail() {
                         reason="suspension"
                         detail={t("discipline.matchesLeft", { count: susp.remaining })}
                       />
+                    </div>
+                  )}
+                  {!susp && absenceReason && (
+                    <div className="mt-1">
+                      <UnavailableBadge reason={absenceReason} />
                     </div>
                   )}
                   <p className="text-xs mt-0.5 truncate">
