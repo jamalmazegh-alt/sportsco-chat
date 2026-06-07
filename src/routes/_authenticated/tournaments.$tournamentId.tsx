@@ -50,6 +50,7 @@ import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflo
 import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
 import { ClipboardList, UserCog, CreditCard, Dices, CalendarClock } from "lucide-react";
+import { FlightsManager } from "@/modules/tournaments/components/FlightsManager";
 
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
