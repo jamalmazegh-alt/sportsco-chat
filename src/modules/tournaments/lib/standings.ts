@@ -208,16 +208,19 @@ export function computeStandings(
     a.goalsAgainst += sb;
     b.goalsFor += sb;
     b.goalsAgainst += sa;
+    const inOT = m.decidedIn === "overtime" || m.decidedIn === "shootout";
+    const winPts = inOT && points.otWin != null ? points.otWin : points.win;
+    const lossPts = inOT && points.otLoss != null ? points.otLoss : points.loss;
     if (sa > sb) {
       a.won++;
       b.lost++;
-      a.points += points.win;
-      b.points += points.loss;
+      a.points += winPts;
+      b.points += lossPts;
     } else if (sa < sb) {
       b.won++;
       a.lost++;
-      b.points += points.win;
-      a.points += points.loss;
+      b.points += winPts;
+      a.points += lossPts;
     } else {
       a.drawn++;
       b.drawn++;
