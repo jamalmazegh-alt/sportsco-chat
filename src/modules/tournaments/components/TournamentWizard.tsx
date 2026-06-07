@@ -116,7 +116,10 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   }
 
   const datesValid = !!startsOn && (!endsOn || endsOn >= startsOn);
-  const canNext0 = name.trim().length >= 2 && sport;
+  const canNext0 =
+    name.trim().length >= 2 &&
+    !!sport &&
+    (sport !== "custom" || customSportName.trim().length >= 2);
   const canNext1 = datesValid;
   const canNext2 =
     !!format &&
