@@ -214,7 +214,7 @@ export const getTournament = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const [tRes, gRes, teamRes, mRes, canRes] = await Promise.all([
+    const [tRes, gRes, teamRes, mRes, fRes, canRes] = await Promise.all([
       supabase.from("tournaments").select("*").eq("id", data.tournament_id).maybeSingle(),
       supabase
         .from("tournament_groups")
@@ -231,6 +231,11 @@ export const getTournament = createServerFn({ method: "POST" })
         .select("*")
         .eq("tournament_id", data.tournament_id)
         .order("scheduled_at", { nullsFirst: false }),
+      supabase
+        .from("tournament_flights")
+        .select("*")
+        .eq("tournament_id", data.tournament_id)
+        .order("sort_order"),
       supabase.rpc("can_manage_tournament", {
         _user_id: userId,
         _tournament_id: data.tournament_id,
