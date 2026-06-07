@@ -428,7 +428,9 @@ function PublicTournamentPage() {
           {tab === "bracket" && (
             <BracketView matches={matches as any} teams={teams as any} />
           )}
+          {tab === "streams" && <FieldStreams streams={fieldStreamEntries} />}
         </div>
+
 
         {(data as any).rulesDocument?.file_url && (
           <div className="pb-2">
