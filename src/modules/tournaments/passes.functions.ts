@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { slugify, uniqueTournamentSlug } from "./lib/slug";
+import { defaultRulesForSport } from "./lib/rules";
 
 
 function getOrigin(): string {
@@ -250,6 +251,10 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
         num_teams: z.number().int().min(2).max(64),
         location: z.string().max(200).optional().nullable(),
       })
+      .refine((d) => !d.ends_on || d.ends_on >= d.starts_on, {
+        message: "End date must be on or after start date",
+        path: ["ends_on"],
+      })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -293,6 +298,7 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
       personalClubId = null;
     }
 
+    const initialRules = defaultRulesForSport(data.sport);
     const { data: tournament, error: tErr } = await supabaseAdmin
       .from("tournaments")
       .insert({
@@ -308,6 +314,11 @@ export const createTournamentFromPass = createServerFn({ method: "POST" })
         location: data.location ?? null,
         created_by: userId,
         status: "draft",
+        settings: initialRules as any,
+        points_win: initialRules.points.win,
+        points_draw: initialRules.points.draw,
+        points_loss: initialRules.points.loss,
+        tiebreakers: initialRules.tiebreakers,
       })
       .select("*")
       .single();

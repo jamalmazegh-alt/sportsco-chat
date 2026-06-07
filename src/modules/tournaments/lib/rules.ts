@@ -9,7 +9,8 @@ import {
   DEFAULT_FAIR_PLAY,
 } from "./standings";
 import type { ScoringRules } from "./formats";
-import { DEFAULT_SETS_RULES } from "./formats";
+import { DEFAULT_SETS_RULES, defaultScoringForSport } from "./formats";
+import { sportAllowsDraw } from "@/lib/sports";
 
 export type TournamentLanguage = "fr" | "en";
 
@@ -118,6 +119,23 @@ export const DEFAULT_RULES: TournamentRules = {
   language: "fr",
   branding: {},
 };
+
+/** Règles par défaut adaptées au sport (ex. volley : pas de nul, scoring en sets). */
+export function defaultRulesForSport(sport: string | null | undefined): TournamentRules {
+  const base = { ...DEFAULT_RULES };
+  if (!sportAllowsDraw(sport)) {
+    base.points = { ...base.points, draw: 0 };
+  }
+  if (sport) {
+    base.scoring = defaultScoringForSport(sport);
+    if (sport === "volleyball") {
+      base.overtime = { enabled: false };
+      base.penaltyShootout = { enabled: false };
+      base.roster = { playersPerTeam: 6, maxSubstitutes: 6 };
+    }
+  }
+  return base;
+}
 
 export const ALL_TIEBREAKERS: { key: Tiebreaker; labelFr: string; labelEn: string }[] = [
   { key: "points", labelFr: "Points", labelEn: "Points" },
