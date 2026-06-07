@@ -22,6 +22,17 @@ const rolesSchema = z
   .array(z.enum(CLUB_ROLES))
   .min(1, "At least one role required");
 
+/** Non-staff roles kept on club_members.roles when staff roles are edited. */
+const NON_STAFF_CLUB_ROLES = new Set(["player", "parent", "dirigeant"]);
+
+function mergeStaffWithNonStaffRoles(
+  staffRoles: ClubRole[],
+  existingRoles: string[] | null | undefined,
+): string[] {
+  const preserved = (existingRoles ?? []).filter((r) => NON_STAFF_CLUB_ROLES.has(r));
+  return Array.from(new Set([...staffRoles, ...preserved]));
+}
+
 // ============================================================
 // Helpers
 // ============================================================
@@ -156,9 +167,11 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
       }
     }
 
+    const mergedRoles = mergeStaffWithNonStaffRoles(data.roles, oldRoles);
+
     const { error: upErr } = await supabaseAdmin
       .from("club_members")
-      .update({ roles: data.roles })
+      .update({ roles: mergedRoles })
       .eq("club_id", data.club_id)
       .eq("user_id", data.user_id);
     if (upErr) throw new Response(upErr.message, { status: 500 });
@@ -170,11 +183,11 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
       scope: "club",
       scopeId: data.club_id,
       oldRoles,
-      newRoles: data.roles,
+      newRoles: mergedRoles,
       action: "update_roles",
     });
 
-    return { ok: true, roles: data.roles };
+    return { ok: true, roles: mergedRoles };
   });
 
 // ============================================================
