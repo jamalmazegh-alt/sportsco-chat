@@ -79,6 +79,14 @@ const PROFILES: Record<string, ScoringRules> = {
     sets: DEFAULT_SETS_RULES,
     periods: { count: 4, durationMin: 15 },
   },
+  tennis: {
+    mode: "sets",
+    sets: { bestOf: 3, pointsToWin: 6, tieBreakPoints: 7, winBy: 2 },
+  },
+  padel: {
+    mode: "sets",
+    sets: { bestOf: 3, pointsToWin: 6, tieBreakPoints: 7, winBy: 2 },
+  },
 };
 
 export function defaultScoringForSport(sport: string | null | undefined): ScoringRules {

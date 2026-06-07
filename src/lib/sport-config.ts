@@ -92,6 +92,33 @@ const CONFIGS: Record<string, SportConfig> = {
     minuteEnabled: true,
     defaultStatKind: "goal",
   },
+  tennis: {
+    scoreUnit: "sets",
+    statKinds: ["point"],
+    assistsEnabled: false,
+    cardsEnabled: false,
+    setScoresEnabled: true,
+    minuteEnabled: false,
+    defaultStatKind: "point",
+  },
+  padel: {
+    scoreUnit: "sets",
+    statKinds: ["point"],
+    assistsEnabled: false,
+    cardsEnabled: false,
+    setScoresEnabled: true,
+    minuteEnabled: false,
+    defaultStatKind: "point",
+  },
+  custom: {
+    scoreUnit: "points",
+    statKinds: [],
+    assistsEnabled: false,
+    cardsEnabled: false,
+    setScoresEnabled: false,
+    minuteEnabled: false,
+    defaultStatKind: "point",
+  },
 };
 
 const FALLBACK: SportConfig = {
