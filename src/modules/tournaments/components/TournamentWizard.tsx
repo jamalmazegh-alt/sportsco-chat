@@ -62,6 +62,8 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
           ends_on: endsOn || null,
           format,
           num_teams: numTeams,
+          swiss_rounds: format === "swiss" ? swissRounds : null,
+          double_round_robin: format === "round_robin_home_away",
           location: location || null,
         },
       });
