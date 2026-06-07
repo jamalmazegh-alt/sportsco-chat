@@ -97,6 +97,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   function reset() {
     setStep(0);
     setName("");
+    setCustomSportName("");
     setCategory("");
     setStartsOn("");
     setEndsOn("");
