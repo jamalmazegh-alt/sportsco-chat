@@ -74,7 +74,7 @@ export const Route = createFileRoute("/tournament/$slug")({
   },
 });
 
-type Tab = "overview" | "teams" | "matches" | "standings" | "bracket";
+type Tab = "overview" | "teams" | "matches" | "standings" | "bracket" | "streams";
 
 function PublicTournamentPage() {
   const { slug } = Route.useParams();
