@@ -52,7 +52,26 @@ export const updateTournamentPaymentSettings = createServerFn({ method: "POST" }
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertCanManage(supabase, userId, data.tournament_id);
+    const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+
+    if (data.registration_fee < 0) {
+      throw new Response("registration_fee must be >= 0", { status: 400 });
+    }
+
+    const needsStripe =
+      data.registration_fee > 0 ||
+      data.payment_mode === "online" ||
+      data.payment_mode === "both";
+    if (needsStripe && tournament.club_id) {
+      const { data: club } = await supabaseAdmin
+        .from("clubs")
+        .select("stripe_account_id")
+        .eq("id", tournament.club_id)
+        .maybeSingle();
+      if (!club?.stripe_account_id) {
+        throw new Response("stripe_account_required", { status: 400 });
+      }
+    }
 
     const { error } = await supabaseAdmin
       .from("tournaments")

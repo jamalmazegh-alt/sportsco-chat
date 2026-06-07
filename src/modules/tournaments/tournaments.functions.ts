@@ -247,17 +247,19 @@ export const getTournament = createServerFn({ method: "POST" })
     if (tRes.error) throw tRes.error;
     if (!tRes.data) throw new Response("Not found", { status: 404 });
     let club_stripe_charges_enabled = false;
+    let club_stripe_account_id: string | null = null;
     if (tRes.data.club_id) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: club } = await supabaseAdmin
         .from("clubs")
-        .select("stripe_charges_enabled")
+        .select("stripe_charges_enabled, stripe_account_id")
         .eq("id", tRes.data.club_id)
         .maybeSingle();
       club_stripe_charges_enabled = Boolean(club?.stripe_charges_enabled);
+      club_stripe_account_id = club?.stripe_account_id ?? null;
     }
     return {
-      tournament: { ...tRes.data, club_stripe_charges_enabled },
+      tournament: { ...tRes.data, club_stripe_charges_enabled, club_stripe_account_id },
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],

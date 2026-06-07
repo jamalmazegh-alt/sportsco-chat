@@ -27,6 +27,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperadminIndexRouteImport } from './routes/superadmin/index'
+import { Route as WebhooksStripeRouteImport } from './routes/webhooks/stripe'
 import { Route as TournamentsStartRouteImport } from './routes/tournaments.start'
 import { Route as TournamentsPassSuccessRouteImport } from './routes/tournaments.pass-success'
 import { Route as TournamentSlugRouteImport } from './routes/tournament.$slug'
@@ -217,6 +218,11 @@ const SuperadminIndexRoute = SuperadminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SuperadminRoute,
+} as any)
+const WebhooksStripeRoute = WebhooksStripeRouteImport.update({
+  id: '/webhooks/stripe',
+  path: '/webhooks/stripe',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TournamentsStartRoute = TournamentsStartRouteImport.update({
   id: '/tournaments/start',
@@ -826,6 +832,7 @@ export interface FileRoutesByFullPath {
   '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
+  '/webhooks/stripe': typeof WebhooksStripeRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
@@ -942,6 +949,7 @@ export interface FileRoutesByTo {
   '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
+  '/webhooks/stripe': typeof WebhooksStripeRoute
   '/superadmin': typeof SuperadminIndexRoute
   '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/club/discipline': typeof AuthenticatedClubDisciplineRoute
@@ -1064,6 +1072,7 @@ export interface FileRoutesById {
   '/tournament/$slug': typeof TournamentSlugRoute
   '/tournaments/pass-success': typeof TournamentsPassSuccessRoute
   '/tournaments/start': typeof TournamentsStartRoute
+  '/webhooks/stripe': typeof WebhooksStripeRoute
   '/superadmin/': typeof SuperadminIndexRoute
   '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/club/discipline': typeof AuthenticatedClubDisciplineRoute
@@ -1186,6 +1195,7 @@ export interface FileRouteTypes {
     | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
+    | '/webhooks/stripe'
     | '/superadmin/'
     | '/admin/billing'
     | '/club/discipline'
@@ -1302,6 +1312,7 @@ export interface FileRouteTypes {
     | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
+    | '/webhooks/stripe'
     | '/superadmin'
     | '/admin/billing'
     | '/club/discipline'
@@ -1423,6 +1434,7 @@ export interface FileRouteTypes {
     | '/tournament/$slug'
     | '/tournaments/pass-success'
     | '/tournaments/start'
+    | '/webhooks/stripe'
     | '/superadmin/'
     | '/_authenticated/admin/billing'
     | '/_authenticated/club/discipline'
@@ -1527,6 +1539,7 @@ export interface RootRouteChildren {
   TournamentSlugRoute: typeof TournamentSlugRoute
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
+  WebhooksStripeRoute: typeof WebhooksStripeRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -1679,6 +1692,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/superadmin/'
       preLoaderRoute: typeof SuperadminIndexRouteImport
       parentRoute: typeof SuperadminRoute
+    }
+    '/webhooks/stripe': {
+      id: '/webhooks/stripe'
+      path: '/webhooks/stripe'
+      fullPath: '/webhooks/stripe'
+      preLoaderRoute: typeof WebhooksStripeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/tournaments/start': {
       id: '/tournaments/start'
@@ -2706,6 +2726,7 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentSlugRoute: TournamentSlugRoute,
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,
+  WebhooksStripeRoute: WebhooksStripeRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,

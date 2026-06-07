@@ -418,6 +418,7 @@ function TournamentDetailPage() {
           <PaymentSettingsPanel
             tournamentId={tournament.id}
             clubId={(tournament as any).club_id ?? null}
+            stripeAccountId={(tournament as any).club_stripe_account_id ?? null}
             initial={{
               registration_fee: (tournament as any).registration_fee ?? 0,
               registration_currency: (tournament as any).registration_currency ?? "eur",
