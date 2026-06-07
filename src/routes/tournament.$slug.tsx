@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
+import { FlightsPublicView } from "@/modules/tournaments/components/FlightsPublicView";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
 import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
