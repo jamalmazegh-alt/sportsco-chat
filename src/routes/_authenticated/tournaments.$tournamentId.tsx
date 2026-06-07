@@ -175,11 +175,12 @@ function TournamentDetailPage() {
   const isLoading = q.isLoading;
   const hasData = !!q.data;
 
-  const { tournament, groups, teams, matches } = (q.data ?? {
+  const { tournament, groups, teams, matches, flights } = (q.data ?? {
     tournament: null as any,
     groups: [] as any[],
     teams: [] as any[],
     matches: [] as any[],
+    flights: [] as any[],
   });
   const canManage =
     (q.data as any)?.canManage === true ||
