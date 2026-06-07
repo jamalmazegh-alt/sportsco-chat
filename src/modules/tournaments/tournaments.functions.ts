@@ -5,6 +5,7 @@ import { slugify, uniqueTournamentSlug } from "./lib/slug";
 import { distributeIntoGroups, generateRoundRobin } from "./lib/scheduling";
 import { computeStandings, type Tiebreaker, type MatchEventInput } from "./lib/standings";
 import { generateKnockoutBracket } from "./lib/bracket";
+import { generateDoubleEliminationBracket } from "./lib/double-elim";
 import { mergeRules, DEFAULT_RULES, defaultRulesForSport } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
@@ -714,7 +715,59 @@ export const getGroupStandings = createServerFn({ method: "POST" })
   });
 
 
-// ---------- Knockout generation from group qualifiers
+// ---------- Knockout / double-elimination generation
+
+const DOUBLE_ELIM_TEAM_COUNTS = [4, 8, 16] as const;
+
+function assertDoubleElimTeamCount(n: number): void {
+  if (!(DOUBLE_ELIM_TEAM_COUNTS as readonly number[]).includes(n)) {
+    throw new Response(
+      `Double élimination : ${n} équipes non supportées (tailles acceptées : 4, 8 ou 16)`,
+      { status: 400 },
+    );
+  }
+}
+
+async function nextKnockoutMatchNumber(supabase: any, tournamentId: string): Promise<number> {
+  const { data: maxRow } = await supabase
+    .from("tournament_matches")
+    .select("match_number")
+    .eq("tournament_id", tournamentId)
+    .eq("round", "group")
+    .order("match_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return ((maxRow?.match_number as number | null) ?? 0) + 1;
+}
+
+function buildKnockoutMatchRows(
+  tournamentId: string,
+  startNumber: number,
+  bracket: Array<{
+    round: string;
+    bracketPosition: number;
+    teamASource: unknown;
+    teamBSource: unknown;
+    side?: string;
+  }>,
+) {
+  return bracket.map((m, idx) => ({
+    tournament_id: tournamentId,
+    round: m.round,
+    bracket_position: m.bracketPosition,
+    match_number: startNumber + idx,
+    bracket_side: m.side ?? null,
+    team_a_id: m.teamASource && typeof m.teamASource === "object" && "teamId" in m.teamASource
+      ? (m.teamASource as { teamId: string }).teamId
+      : null,
+    team_b_id: m.teamBSource && typeof m.teamBSource === "object" && "teamId" in m.teamBSource
+      ? (m.teamBSource as { teamId: string }).teamId
+      : null,
+    team_a_source: m.teamASource as any,
+    team_b_source: m.teamBSource as any,
+    status: "scheduled" as const,
+  }));
+}
 
 export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -733,7 +786,7 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
 
     const { data: t } = await supabase
       .from("tournaments")
-      .select("settings, points_win, points_draw, points_loss, tiebreakers")
+      .select("format, settings, points_win, points_draw, points_loss, tiebreakers")
       .eq("id", data.tournament_id)
       .single();
     const rules = mergeRules(t?.settings ?? {});
@@ -807,42 +860,27 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
       throw new Response("Pas assez de qualifiés", { status: 400 });
     }
 
+    const isDoubleElim = t?.format === "double_elimination";
+    if (isDoubleElim) {
+      assertDoubleElimTeamCount(qualifiers.length);
+    }
 
-    const bracket = generateKnockoutBracket(qualifiers, { thirdPlace: data.third_place });
+    const bracket = isDoubleElim
+      ? generateDoubleEliminationBracket(qualifiers)
+      : generateKnockoutBracket(qualifiers, { thirdPlace: data.third_place });
 
-    // Wipe existing non-group matches
     await supabase
       .from("tournament_matches")
       .delete()
       .eq("tournament_id", data.tournament_id)
       .neq("round", "group");
 
-    // Compute starting match number after existing group matches
-    const { data: maxRow } = await supabase
-      .from("tournament_matches")
-      .select("match_number")
-      .eq("tournament_id", data.tournament_id)
-      .eq("round", "group")
-      .order("match_number", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    const startNumber = ((maxRow?.match_number as number | null) ?? 0) + 1;
-
-    // Insert bracket matches (sources stored as jsonb)
-    const rows = bracket.map((m, idx) => ({
-      tournament_id: data.tournament_id,
-      round: m.round,
-      bracket_position: m.bracketPosition,
-      match_number: startNumber + idx,
-
-      team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
-      team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
-      team_a_source: m.teamASource as any,
-      team_b_source: m.teamBSource as any,
-      status: "scheduled" as const,
-    }));
-    const { error } = await supabase.from("tournament_matches").insert(rows as any);
-    if (error) throw new Response(error.message, { status: 400 });
+    const startNumber = await nextKnockoutMatchNumber(supabase, data.tournament_id);
+    const rows = buildKnockoutMatchRows(data.tournament_id, startNumber, bracket);
+    if (rows.length) {
+      const { error } = await supabase.from("tournament_matches").insert(rows as any);
+      if (error) throw new Response(error.message, { status: 400 });
+    }
 
     return { matches_created: rows.length };
   });
@@ -1809,6 +1847,16 @@ const drawKnockoutSchema = z.object({
   third_place: z.boolean().default(false),
 });
 
+/** Tirage verrouillé une fois le programme publié aux équipes. */
+function isDrawPublished(tournament: {
+  published_programme_at?: string | null;
+  status?: string;
+}): boolean {
+  if (tournament.published_programme_at) return true;
+  const status = tournament.status ?? "";
+  return status === "in_progress" || status === "completed" || status === "cancelled";
+}
+
 export const applyTeamDraw = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -1817,6 +1865,15 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { count: groupsCount, error: groupsCountErr } = await supabase
+      .from("tournament_groups")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (groupsCountErr) throw groupsCountErr;
+    if ((groupsCount ?? 0) > 0 && isDrawPublished(tournament)) {
+      throw new Response("Draw already published", { status: 409 });
+    }
 
     const { data: teams, error: teamsErr } = await supabase
       .from("tournament_teams")
@@ -1922,39 +1979,24 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
         throw new Response("Équipe inconnue dans le tirage", { status: 400 });
       }
     }
-    const bracket = generateKnockoutBracket(data.bracket_order, {
-      thirdPlace: data.third_place,
-    });
 
-    // Wipe existing non-group matches
+    const isDoubleElim = tournament.format === "double_elimination";
+    if (isDoubleElim) {
+      assertDoubleElimTeamCount(data.bracket_order.length);
+    }
+
+    const bracket = isDoubleElim
+      ? generateDoubleEliminationBracket(data.bracket_order)
+      : generateKnockoutBracket(data.bracket_order, { thirdPlace: data.third_place });
+
     await supabase
       .from("tournament_matches")
       .delete()
       .eq("tournament_id", data.tournament_id)
       .neq("round", "group");
 
-    const { data: maxRow2 } = await supabase
-      .from("tournament_matches")
-      .select("match_number")
-      .eq("tournament_id", data.tournament_id)
-      .eq("round", "group")
-      .order("match_number", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    const startNumber2 = ((maxRow2?.match_number as number | null) ?? 0) + 1;
-
-    const rows = bracket.map((m, idx) => ({
-      tournament_id: data.tournament_id,
-      round: m.round,
-      bracket_position: m.bracketPosition,
-      match_number: startNumber2 + idx,
-
-      team_a_id: m.teamASource && "teamId" in m.teamASource ? m.teamASource.teamId : null,
-      team_b_id: m.teamBSource && "teamId" in m.teamBSource ? m.teamBSource.teamId : null,
-      team_a_source: m.teamASource as any,
-      team_b_source: m.teamBSource as any,
-      status: "scheduled" as const,
-    }));
+    const startNumber = await nextKnockoutMatchNumber(supabase, data.tournament_id);
+    const rows = buildKnockoutMatchRows(data.tournament_id, startNumber, bracket);
     if (rows.length) {
       const { error } = await supabase.from("tournament_matches").insert(rows as any);
       if (error) throw new Response(error.message, { status: 400 });
