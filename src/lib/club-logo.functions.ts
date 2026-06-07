@@ -13,14 +13,24 @@ const ALLOWED_LOGO_MIME_TYPES = new Set([
   "image/heif",
 ]);
 
-const MAX_LOGO_SIZE = 5 * 1024 * 1024;
+export const MAX_LOGO_SIZE = 5 * 1024 * 1024;
+const LOGO_TOO_LARGE_MSG = "Fichier trop volumineux (max 5 MB)";
+const LOGO_FORMAT_UNSUPPORTED_MSG = "Format de logo non supporté";
 
 const LogoUploadInput = z.object({
   clubId: z.string().uuid(),
   fileName: z.string().min(1).max(255),
   contentType: z.string().min(1).max(100),
-  size: z.number().int().min(1).max(MAX_LOGO_SIZE),
+  size: z.number().int().min(1),
 });
+
+function parseLogoUploadInput(input: unknown) {
+  const data = LogoUploadInput.parse(input);
+  if (data.size > MAX_LOGO_SIZE) {
+    throw new Error(LOGO_TOO_LARGE_MSG);
+  }
+  return data;
+}
 
 const LogoPathInput = z.object({
   clubId: z.string().uuid(),
@@ -46,10 +56,13 @@ function safeLogoExtension(fileName: string, contentType: string) {
 
 export const createSignedClubLogoUpload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => LogoUploadInput.parse(input))
+  .inputValidator((input) => parseLogoUploadInput(input))
   .handler(async ({ data, context }) => {
+    if (data.size > MAX_LOGO_SIZE) {
+      throw new Error(LOGO_TOO_LARGE_MSG);
+    }
     if (!ALLOWED_LOGO_MIME_TYPES.has(data.contentType)) {
-      throw new Error("Format de logo non supporté");
+      throw new Error(LOGO_FORMAT_UNSUPPORTED_MSG);
     }
 
     await assertClubRole({

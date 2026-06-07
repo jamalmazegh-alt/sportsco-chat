@@ -63,6 +63,9 @@ const INCOMPATIBLE_ROLES: Record<string, string[]> = {
   staff: ["assistant_coach"],
 };
 
+/** Excluded from setClubMemberRoles payload (staff roles only). */
+const NON_STAFF_ROLES = new Set(["player", "parent"]);
+
 interface Props {
   userId: string | null;
   open: boolean;
@@ -171,15 +174,15 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
     const nextStaff = checked
       ? Array.from(new Set([...currentRoles, role]))
       : currentRoles.filter((r) => r !== role);
-    const next = [...nextStaff, ...nonStaffRoles];
-    if (next.length === 0) {
+    const rolesForUpdate = nextStaff.filter((r) => !NON_STAFF_ROLES.has(r));
+    if (rolesForUpdate.length === 0) {
       toast.error(t("permissions.atLeastOneRole", { defaultValue: "Au moins un rôle est requis" }));
       return;
     }
     setActing("roles");
     try {
       await callSetRoles({
-        data: { club_id: activeClubId, user_id: userId, roles: next as any },
+        data: { club_id: activeClubId, user_id: userId, roles: rolesForUpdate },
       });
       toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });

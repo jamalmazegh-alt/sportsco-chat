@@ -5,7 +5,11 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { createSignedClubLogoUpload, updateClubLogoFromUpload } from "@/lib/club-logo.functions";
+import {
+  createSignedClubLogoUpload,
+  MAX_LOGO_SIZE,
+  updateClubLogoFromUpload,
+} from "@/lib/club-logo.functions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -134,6 +138,12 @@ function ProfilePage() {
 
   async function onUploadClubLogo(file: File) {
     if (!activeClubId) return;
+    if (file.size > MAX_LOGO_SIZE) {
+      toast.error(
+        t("club.logoTooLarge", { defaultValue: "Fichier trop volumineux (max 5 MB)" }),
+      );
+      return;
+    }
     setUploadingLogo(true);
     try {
       const contentType = inferImageContentType(file);
