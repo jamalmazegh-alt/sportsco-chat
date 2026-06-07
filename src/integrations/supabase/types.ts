@@ -5004,6 +5004,8 @@ export type Database = {
         | "double_elimination"
         | "swiss"
         | "round_robin_home_away"
+        | "flighted_finals"
+        | "consolation"
       tournament_match_round:
         | "group"
         | "r32"
@@ -5274,6 +5276,8 @@ export const Constants = {
         "double_elimination",
         "swiss",
         "round_robin_home_away",
+        "flighted_finals",
+        "consolation",
       ],
       tournament_match_round: [
         "group",
