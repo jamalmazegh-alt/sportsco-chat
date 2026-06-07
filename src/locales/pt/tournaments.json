@@ -508,7 +508,15 @@
     "next": "Seguinte",
     "create": "Criar torneio",
     "createdToast": "Torneio criado",
-    "errorToast": "Erro"
+    "errorToast": "Erro",
+    "formatRoundRobinHomeAway": "Campeonato ida e volta",
+    "formatRoundRobinHomeAwayDesc": "Cada equipa joga duas vezes contra cada outra (casa + fora)",
+    "formatDoubleElimination": "Dupla eliminação",
+    "formatDoubleEliminationDesc": "Chave de vencedores + perdedores; eliminada após 2 derrotas",
+    "formatSwiss": "Sistema suíço",
+    "formatSwissDesc": "Emparelhamentos por classificação em cada ronda, número de rondas fixo",
+    "swissRounds": "Número de rondas",
+    "swissRoundsHint": "Recomendado: teto(log₂(equipas)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5."
   },
   "groups": {
     "drawTitle": "Sorteio",

@@ -508,7 +508,15 @@
     "next": "Volgende",
     "create": "Toernooi aanmaken",
     "createdToast": "Toernooi aangemaakt",
-    "errorToast": "Fout"
+    "errorToast": "Fout",
+    "formatRoundRobinHomeAway": "Heen- en terugcompetitie",
+    "formatRoundRobinHomeAwayDesc": "Elk team speelt twee keer tegen elk ander team (thuis + uit)",
+    "formatDoubleElimination": "Dubbele eliminatie",
+    "formatDoubleEliminationDesc": "Winnaars- + verliezersschema; uitgeschakeld na 2 nederlagen",
+    "formatSwiss": "Zwitsers systeem",
+    "formatSwissDesc": "Paringen op stand per ronde, vast aantal ronden",
+    "swissRounds": "Aantal ronden",
+    "swissRoundsHint": "Aanbevolen: ceil(log₂(teams)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5."
   },
   "groups": {
     "drawTitle": "Loting",
