@@ -490,6 +490,25 @@ function TournamentDetailPage() {
             settings={(tournament as any).settings}
           />
         )}
+        {section === "manage" && canManage && sub === "flights" && (
+          <FlightsManager
+            tournamentId={tournament.id}
+            numTeams={(teams as any[]).length}
+            numGroups={(groups as any[]).length}
+            flights={(flights as any[]) ?? []}
+            hasGroups={(groups as any[]).length > 0}
+            groupMatchesCompleted={
+              (matches as any[]).filter(
+                (m: any) => m.round === "group",
+              ).length > 0 &&
+              (matches as any[])
+                .filter((m: any) => m.round === "group")
+                .every((m: any) => m.status === "completed")
+            }
+          />
+        )}
+
+
 
 
         {/* Play section */}
