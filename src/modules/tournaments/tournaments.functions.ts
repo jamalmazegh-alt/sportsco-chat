@@ -1784,6 +1784,16 @@ const drawKnockoutSchema = z.object({
   third_place: z.boolean().default(false),
 });
 
+/** Tirage verrouillé une fois le programme publié aux équipes. */
+function isDrawPublished(tournament: {
+  published_programme_at?: string | null;
+  status?: string;
+}): boolean {
+  if (tournament.published_programme_at) return true;
+  const status = tournament.status ?? "";
+  return status === "in_progress" || status === "completed" || status === "cancelled";
+}
+
 export const applyTeamDraw = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -1792,6 +1802,15 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
+
+    const { count: groupsCount, error: groupsCountErr } = await supabase
+      .from("tournament_groups")
+      .select("id", { count: "exact", head: true })
+      .eq("tournament_id", data.tournament_id);
+    if (groupsCountErr) throw groupsCountErr;
+    if ((groupsCount ?? 0) > 0 && isDrawPublished(tournament)) {
+      throw new Response("Draw already published", { status: 409 });
+    }
 
     const { data: teams, error: teamsErr } = await supabase
       .from("tournament_teams")
