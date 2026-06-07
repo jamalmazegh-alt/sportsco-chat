@@ -22,7 +22,9 @@ type Format =
   | "mixed"
   | "double_elimination"
   | "swiss"
-  | "round_robin_home_away";
+  | "round_robin_home_away"
+  | "flighted_finals"
+  | "consolation";
 
 interface Props {
   clubId: string;
