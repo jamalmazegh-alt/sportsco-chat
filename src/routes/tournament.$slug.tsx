@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { PublicStandings } from "@/modules/tournaments/components/PublicStandings";
+import { FlightsPublicView } from "@/modules/tournaments/components/FlightsPublicView";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
 import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
@@ -74,7 +75,7 @@ export const Route = createFileRoute("/tournament/$slug")({
   },
 });
 
-type Tab = "overview" | "teams" | "matches" | "standings" | "bracket" | "streams";
+type Tab = "overview" | "teams" | "matches" | "standings" | "bracket" | "flights" | "streams";
 
 function PublicTournamentPage() {
   const { slug } = Route.useParams();
@@ -170,12 +171,17 @@ function PublicTournamentPage() {
   const fieldStreams = ((tournament as any).field_streams ?? {}) as Record<string, string>;
   const fieldStreamEntries = Object.entries(fieldStreams).filter(([, url]) => !!url?.trim());
 
+  const flights = ((q.data as any).flights ?? []) as any[];
+
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "overview", label: t("public.tabs.overview"), icon: CalendarDays },
     { id: "teams", label: t("public.tabs.teams"), icon: Users },
     { id: "matches", label: t("public.tabs.matches"), icon: Calendar },
     { id: "standings", label: t("public.tabs.standings"), icon: ListOrdered },
     { id: "bracket", label: t("public.tabs.bracket"), icon: GitBranch },
+    ...(flights.length > 0
+      ? [{ id: "flights" as Tab, label: t("public.tabs.flights", { defaultValue: "Flights" }), icon: Trophy }]
+      : []),
     ...(fieldStreamEntries.length > 0
       ? [{ id: "streams" as Tab, label: t("public.tabs.streams"), icon: Tv }]
       : []),
@@ -427,6 +433,9 @@ function PublicTournamentPage() {
           )}
           {tab === "bracket" && (
             <BracketView matches={matches as any} teams={teams as any} />
+          )}
+          {tab === "flights" && (
+            <FlightsPublicView flights={flights as any} matches={matches as any} teams={teams as any} />
           )}
           {tab === "streams" && <FieldStreams streams={fieldStreamEntries} />}
         </div>
