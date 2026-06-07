@@ -44,7 +44,9 @@
       "teams": "Equipos",
       "matches": "Partidos",
       "standings": "Clasificación",
-      "bracket": "Fase eliminatoria"
+      "bracket": "Fase eliminatoria",
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "En vivo",
@@ -98,7 +100,12 @@
       "foul": "Falta"
     },
     "sponsorsTitleDefault": "Con el apoyo de nuestros patrocinadores",
-    "downloadRules": "Descargar reglamento (PDF)"
+    "downloadRules": "Descargar reglamento (PDF)",
+    "streams": {
+      "hint": "Elige una cancha para ver la transmisión en vivo.",
+      "unsupported": "Plataforma no reconocida. Abre el enlace en una nueva pestaña.",
+      "openExternal": "Abrir stream"
+    }
   },
   "register": {
     "metaTitle": "Registro — Torneo {{slug}} · Clubero",
@@ -508,7 +515,19 @@
     "next": "Siguiente",
     "create": "Crear Torneo",
     "createdToast": "Torneo creado",
-    "errorToast": "Error"
+    "errorToast": "Error",
+    "formatRoundRobinHomeAway": "Liga ida y vuelta",
+    "formatRoundRobinHomeAwayDesc": "Cada equipo juega dos veces contra los demás (local + visitante)",
+    "formatDoubleElimination": "Doble eliminación",
+    "formatDoubleEliminationDesc": "Cuadro de ganadores + perdedores; eliminado tras 2 derrotas",
+    "formatSwiss": "Sistema suizo",
+    "formatSwissDesc": "Emparejamientos por clasificación en cada ronda, número de rondas fijo",
+    "swissRounds": "Número de rondas",
+    "swissRoundsHint": "Recomendado: techo(log₂(equipos)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Finales por Flights",
+    "formatFlightedFinalsDesc": "Fase de grupos seguida de varios cuadros finales paralelos (Champions, Europa…)",
+    "formatConsolation": "Consolación",
+    "formatConsolationDesc": "Cuadro principal + cuadro de consolación para los eliminados pronto"
   },
   "groups": {
     "drawTitle": "Sorteo",
@@ -907,7 +926,8 @@
     "tvLive": "En vivo / TV",
     "tvLiveTitle": "Presentación TV / En vivo",
     "tvLiveHint": "Abre la pantalla completa para ver partidos y clasificaciones en vivo.",
-    "openTv": "Abrir pantalla en vivo"
+    "openTv": "Abrir pantalla en vivo",
+    "flights": "Flights"
   },
   "staff": {
     "organizers": "Equipo organizador",
@@ -1024,5 +1044,50 @@
     "rules": "Reglamento",
     "finalStandings": "Clasificación final",
     "allResults": "Todos los resultados"
+  },
+  "flights": {
+    "title": "Flights / fases finales",
+    "intro": "Varios trofeos por torneo: Campeones/Europa, Copa/Plato, Oro/Plata/Bronce o personalizado.",
+    "reconfigure": "Reconfigurar",
+    "generate": "Generar brackets",
+    "waitGroups": "Completa todos los partidos de grupos para generar los brackets.",
+    "noGroups": "Crea primero la fase de grupos. Los Flights se generan después.",
+    "savedToast": "Flights guardados",
+    "generatedToast": "{{n}} partidos creados",
+    "rulesCount": "reglas",
+    "thirdPlace": "3.er puesto",
+    "fifthPlace": "5.º puesto",
+    "seventhPlace": "7.º puesto",
+    "draftRulesSummary": "{{n}} regla(s) de clasificación configurada(s)",
+    "templates": {
+      "champions": "Campeones / Europa",
+      "cup_plate": "Copa / Plato",
+      "medals": "Oro / Plata / Bronce",
+      "consolation": "Principal / Consolación"
+    },
+    "dist": {
+      "twoFlights": "2 Flights (top + resto)",
+      "twoFlightsBalanced": "2 Flights equilibrados",
+      "threeFlights": "3 Flights (élite + 2 niveles)",
+      "threeEqual": "3 Flights iguales",
+      "fourFlights": "4 Flights"
+    },
+    "wizard": {
+      "template": "Plantilla de nombres",
+      "distribution": "Distribución ({{n}} equipos)",
+      "notEnough": "Se requieren al menos 4 equipos.",
+      "clean": "Brackets limpios",
+      "customize": "Personalizar",
+      "back": "Atrás",
+      "save": "Guardar Flights"
+    },
+    "preset": {
+      "consolation": "Preajuste Consolación (1 clic)",
+      "consolationDesc": "Crea 2 flights: Principal (ganadores de grupo) y Consolación (perdedores). Listo para guardar."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
+    }
   }
 }

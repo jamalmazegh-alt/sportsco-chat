@@ -15,7 +15,16 @@ import { assertTournamentMutable } from "@/lib/tournament-guards.server";
 
 // ---------- Schemas
 
-const tournamentFormat = z.enum(["group", "knockout", "mixed"]);
+const tournamentFormat = z.enum([
+  "group",
+  "knockout",
+  "mixed",
+  "double_elimination",
+  "swiss",
+  "round_robin_home_away",
+  "flighted_finals",
+  "consolation",
+]);
 const tournamentStatus = z.enum(["draft", "published", "in_progress", "completed", "cancelled"]);
 
 const createSchema = z
@@ -23,17 +32,24 @@ const createSchema = z
     club_id: z.string().uuid(),
     name: z.string().min(2).max(120),
     sport: z.string().min(1).max(40),
+    custom_sport_name: z.string().max(80).optional().nullable(),
     category: z.string().max(80).optional().nullable(),
     starts_on: z.string(), // ISO date
     ends_on: z.string().optional().nullable(),
     format: tournamentFormat,
     num_teams: z.number().int().min(2).max(64),
+    swiss_rounds: z.number().int().min(1).max(20).optional().nullable(),
+    double_round_robin: z.boolean().optional().nullable(),
     location: z.string().max(200).optional().nullable(),
     cover_image_url: z.string().url().optional().nullable(),
   })
   .refine((d) => !d.ends_on || d.ends_on >= d.starts_on, {
     message: "End date must be on or after start date",
     path: ["ends_on"],
+  })
+  .refine((d) => d.format !== "swiss" || (!!d.swiss_rounds && d.swiss_rounds >= 1), {
+    message: "Swiss format requires a number of rounds",
+    path: ["swiss_rounds"],
   });
 
 // ---------- Helpers
@@ -106,11 +122,14 @@ export const createTournament = createServerFn({ method: "POST" })
         name: data.name,
         slug,
         sport: data.sport,
+        custom_sport_name: data.custom_sport_name ?? null,
         category: data.category ?? null,
         starts_on: data.starts_on,
         ends_on: data.ends_on ?? null,
         format: data.format,
         num_teams: data.num_teams,
+        swiss_rounds: data.swiss_rounds ?? null,
+        double_round_robin: data.double_round_robin ?? false,
         location: data.location ?? null,
         cover_image_url: data.cover_image_url ?? null,
         created_by: userId,
@@ -197,7 +216,7 @@ export const getTournament = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const [tRes, gRes, teamRes, mRes, canRes] = await Promise.all([
+    const [tRes, gRes, teamRes, mRes, fRes, canRes] = await Promise.all([
       supabase.from("tournaments").select("*").eq("id", data.tournament_id).maybeSingle(),
       supabase
         .from("tournament_groups")
@@ -214,6 +233,11 @@ export const getTournament = createServerFn({ method: "POST" })
         .select("*")
         .eq("tournament_id", data.tournament_id)
         .order("scheduled_at", { nullsFirst: false }),
+      supabase
+        .from("tournament_flights")
+        .select("*")
+        .eq("tournament_id", data.tournament_id)
+        .order("sort_order"),
       supabase.rpc("can_manage_tournament", {
         _user_id: userId,
         _tournament_id: data.tournament_id,
@@ -236,6 +260,7 @@ export const getTournament = createServerFn({ method: "POST" })
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],
+      flights: fRes.data ?? [],
       canManage: Boolean(canRes.data),
     };
   });

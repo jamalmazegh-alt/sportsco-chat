@@ -44,7 +44,9 @@
       "teams": "Teams",
       "matches": "Matches",
       "standings": "Standings",
-      "bracket": "Bracket"
+      "bracket": "Bracket",
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "Live",
@@ -98,7 +100,12 @@
       "foul": "Foul"
     },
     "sponsorsTitleDefault": "With the support of our partners",
-    "downloadRules": "Download rules (PDF)"
+    "downloadRules": "Download rules (PDF)",
+    "streams": {
+      "hint": "Pick a venue to watch the live broadcast.",
+      "unsupported": "Platform not recognized. Open the link in a new tab.",
+      "openExternal": "Open stream"
+    }
   },
   "register": {
     "metaTitle": "Register — Tournament {{slug}} · Clubero",
@@ -508,7 +515,19 @@
     "next": "Next",
     "create": "Create tournament",
     "createdToast": "Tournament created",
-    "errorToast": "Error"
+    "errorToast": "Error",
+    "formatRoundRobinHomeAway": "Home & Away Round-Robin",
+    "formatRoundRobinHomeAwayDesc": "Each team plays every other team twice (home + away)",
+    "formatDoubleElimination": "Double Elimination",
+    "formatDoubleEliminationDesc": "Winners + losers brackets; eliminated after 2 losses",
+    "formatSwiss": "Swiss System",
+    "formatSwissDesc": "Pairings by standings each round, fixed number of rounds",
+    "swissRounds": "Number of rounds",
+    "swissRoundsHint": "Recommended: ceil(log₂(teams)) — 8 teams ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Flighted Finals",
+    "formatFlightedFinalsDesc": "Group stage followed by multiple parallel finals brackets (Champions, Europa…)",
+    "formatConsolation": "Consolation",
+    "formatConsolationDesc": "Main bracket + consolation bracket for early-eliminated teams"
   },
   "groups": {
     "drawTitle": "Draw",
@@ -907,7 +926,8 @@
     "tvLive": "Live / TV",
     "tvLiveTitle": "TV slideshow / Live",
     "tvLiveHint": "Open the fullscreen view to display matches and standings live.",
-    "openTv": "Open live screen"
+    "openTv": "Open live screen",
+    "flights": "Flights"
   },
   "staff": {
     "organizers": "Organizing team",
@@ -1024,5 +1044,50 @@
     "rules": "Rules",
     "finalStandings": "Final standings",
     "allResults": "All results"
+  },
+  "flights": {
+    "title": "Flights / final stages",
+    "intro": "Multiple trophies per tournament: Champions/Europa, Cup/Plate, Gold/Silver/Bronze, or custom.",
+    "reconfigure": "Reconfigure",
+    "generate": "Generate brackets",
+    "waitGroups": "Complete all group matches to generate brackets.",
+    "noGroups": "Create the group stage first. Flights are generated after.",
+    "savedToast": "Flights saved",
+    "generatedToast": "{{n}} matches created",
+    "rulesCount": "rules",
+    "thirdPlace": "3rd place",
+    "fifthPlace": "5th place",
+    "seventhPlace": "7th place",
+    "draftRulesSummary": "{{n}} qualification rule(s) configured",
+    "templates": {
+      "champions": "Champions / Europa",
+      "cup_plate": "Cup / Plate",
+      "medals": "Gold / Silver / Bronze",
+      "consolation": "Main / Consolation"
+    },
+    "dist": {
+      "twoFlights": "2 Flights (top + rest)",
+      "twoFlightsBalanced": "2 balanced Flights",
+      "threeFlights": "3 Flights (elite + 2 tiers)",
+      "threeEqual": "3 equal Flights",
+      "fourFlights": "4 Flights"
+    },
+    "wizard": {
+      "template": "Name template",
+      "distribution": "Distribution ({{n}} teams)",
+      "notEnough": "At least 4 teams required.",
+      "clean": "Clean brackets",
+      "customize": "Customize",
+      "back": "Back",
+      "save": "Save Flights"
+    },
+    "preset": {
+      "consolation": "Consolation preset (1-click)",
+      "consolationDesc": "Creates 2 flights: Main (group winners) and Consolation (losers). Ready to save."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
+    }
   }
 }

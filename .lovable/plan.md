@@ -1,108 +1,168 @@
-## Contexte
+# Plan — Flights & finales multiples
 
-Le code existant couvre déjà une bonne partie du périmètre :
+Objectif : un **moteur Flight générique** qui couvre Champions/Europa/Conference, Coupe/Plaque/Bowl/Shield, Or/Argent/Bronze, ou n'importe quelle config custom. Jamais hardcodé.
 
-- **Ranking / tie-breakers** : `src/modules/tournaments/lib/standings.ts` implémente déjà points / GD / GF / head-to-head (points/GD/GF) / fair-play / draw-lot, avec ordre configurable par tournoi (`tiebreakers: Tiebreaker[]`). Pas besoin de schéma DB — l'ordre est déjà persisté dans `tournaments.settings`. → il manque surtout **les tests** et la valeur par défaut alignée avec la spec.
-- **Freeze tournoi** : pas de garde-fou unifié. Les server fns laissent supprimer équipes / changer format même après démarrage. → ajout d'un helper `assertTournamentMutable` + tests cross-tenant via les guards `assertClubRole` déjà testés.
-- **Paiement atomicité** : flux Stripe → `tournament_registrations`. Aujourd'hui le webhook met juste `payment_status='paid_online'` mais ne crée pas la team (sauf en auto-approval avant paiement). Pas de self-heal. Pas de statut explicite `paid_pending_team`. Montant déjà recalculé serveur (✅), mais pas d'idempotency stricte sur eventId.
+État actuel (déjà livré) :
+- `double_elimination`, `swiss`, `round_robin_home_away` (formats + algos + tests)
+- Préset Hockey OT (`otWin`/`otLoss` dans PointsConfig, colonne `decided_in`)
+- `field_streams` (jsonb) + UI admin + onglet public Streams par terrain
+- Tennis/Padel/Custom + i18n complet
 
-Je découpe en 3 lots livrables séparément.
-
----
-
-## Lot 1 — Ranking tie-breakers (tests + défaut aligné spec)
-
-**Changements code (minimes)**
-- `src/modules/tournaments/lib/standings.ts` : ajuster `DEFAULT_TIEBREAKERS` pour matcher exactement l'ordre demandé :
-  `points → goal_diff → goals_for → head_to_head_points → head_to_head_gd → head_to_head_gf → fair_play → draw_lot`.
-  (actuellement : points → h2h_points → h2h_gd → goal_diff → goals_for ; on inverse pour mettre GD/GF avant H2H comme spec.)
-
-**Tests (`src/tests/unit/standings-tiebreakers.test.ts`)**
-- Tied points, séparés par GD
-- Tied GD, séparés par GF
-- Tied stats générales, séparés par H2H points
-- Tied H2H, séparés par fair-play
-- Tied total → résolu par `draw_lot` déterministe (salt stable)
-- Ordre custom : tournoi qui met `fair_play` avant `goal_diff` produit un classement différent
+Reste à faire ↓
 
 ---
 
-## Lot 2 — Tournament freeze + cross-tenant
+## Lot A — Moteur Flight (PRIORITÉ 1)
 
-**Nouveau helper** : `src/lib/tournament-guards.server.ts`
-- `assertTournamentMutable(tournamentId, { allow: 'structure' | 'scores' | 'logistics' })`
-  - lit `tournaments.status` via supabaseAdmin
-  - `structure` (delete team, change format, change groups, change ranking rules, delete matches) → throw 409 si status ∈ `in_progress | completed`
-  - `scores` / `logistics` → toujours autorisés
-- `assertCanSubmitMatchScore({ userId, matchId, role: 'referee' | 'organizer' })`
-  - referee : doit être assigné au match (table `tournament_matches.referee_user_id` ou équivalent)
-  - organizer : doit être admin/tournament_manager du club du tournoi (→ délègue à `assertClubRole`)
-  - match `locked=true` → referee refusé, organizer OK avec `correction_reason` non vide
-- `assertCanLockMatch(...)` : organizer only
+### A1. Schéma DB
 
-**Câblage minimal côté server fns** (pas de réécriture massive) :
-- ajouter `assertTournamentMutable` dans : `deleteTournamentTeam`, `updateTournamentFormat`, `updateGroupComposition`, `updateRankingRules`, `regenerateMatches`/`deleteMatch` (identifier les fns exactes dans `tournaments.functions.ts`).
-- ajouter `assertCanSubmitMatchScore` dans `submitMatchScore` / `updateMatchScore` / `lockMatchResult`.
+Une seule nouvelle table `tournament_flights`. Le bracket réutilise `tournament_matches` (déjà flexible) avec une colonne `flight_id`.
 
-**Tests (`src/tests/unit/tournament-guards.test.ts`)** (même pattern que `authz.test.ts`, mocks via `vi.hoisted`)
-- `assertTournamentMutable` : draft → autorisé ; in_progress + structure → 409 ; in_progress + scores → autorisé
-- Locked match : referee re-edit → 403 ; organizer sans reason → 400 ; organizer + reason → OK + audit log
-- Cross-tenant :
-  - organizer club A + tournoi club B → 403
-  - referee match A + score match B → 403
-  - staff tournoi A + edit tournoi B → 403
-  - user public (pas de userId) → 401/403
+```sql
+CREATE TABLE public.tournament_flights (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tournament_id uuid NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE,
+  sort_order int NOT NULL,                 -- A=0 (meilleur), B=1, ...
+  name text NOT NULL,                      -- "Champions", "Coupe", "Or"…
+  short_name text,                         -- "A", "B", optionnel
+  color text,                              -- accent visuel (or/argent/bronze)
+  qualification_rules jsonb NOT NULL,      -- voir A2
+  enable_third_place boolean DEFAULT true,
+  enable_fifth_place boolean DEFAULT false,
+  enable_seventh_place boolean DEFAULT false,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE tournament_matches ADD COLUMN flight_id uuid REFERENCES tournament_flights(id) ON DELETE SET NULL;
+ALTER TABLE tournament_matches ADD COLUMN placement_kind text;  -- 'final'|'third_place'|'fifth_place'|'seventh_place'|'semi'|'quarter'|'round_of_16'
+```
+GRANT + RLS hérités via `can_manage_tournament` / lecture publique si tournoi publié.
+
+### A2. `qualification_rules` (jsonb)
+
+Une règle = une source d'équipes. Cumulables.
+```ts
+type QualRule =
+  | { kind: "group_position"; positions: number[] }          // ex: [1] pour tous les 1ers
+  | { kind: "group_position_in"; group_id: string; positions: number[] }
+  | { kind: "best_n_remaining"; n: number; among: "all" | "position"; position?: number }  // wild cards
+  | { kind: "manual"; team_ids: string[] };
+```
+Le générateur applique les règles dans l'ordre, ignore les doublons, s'arrête quand le quota du Flight est atteint.
+
+### A3. Générateur — équilibrage automatique
+
+`proposeFlightDistributions(numTeams, opts)` → renvoie 2-3 options pré-faites (pure function, testée Vitest) :
+- équilibrer en N flights de tailles puissances de 2 quand possible
+- sinon, propose un flight "irrégulier" (5 ou 6 équipes avec un mini round-robin court ou bye)
+
+Exemples couverts : 12 (3p4 → 4/8), 16 (4p4 → 4/4/8), 24 (4p6 → 8/8/8), 13 (4/4/5 ou 4/3/3/3).
+
+L'UI admin affiche les options sous forme de cartes, l'organisateur clique → la config se matérialise dans `tournament_flights` + `qualification_rules` pré-remplis.
+
+### A4. Génération du bracket par Flight
+
+Réutilise `generateKnockoutBracket()` existant avec `flight_id` propagé + flag `placement_kind`. Pour chaque Flight :
+- semis (si ≥4), finale, et selon flags : 3e/5e/7e place (perdants des semis/quarts s'enchaînent dans les matchs de classement)
+- bracket vide tant que les équipes ne sont pas qualifiées ; rempli quand l'admin clique "Générer les Flights" (après clôture des poules)
+
+### A5. Qualification manuelle / réajustement
+
+Action UI "Déplacer cette équipe vers Flight X" → `moveTeamToFlight(tournament_id, team_id, flight_id)` server fn :
+- supprime l'équipe des matchs non-joués du Flight d'origine
+- l'ajoute dans le Flight cible (à la position vacante ou en remplacement d'une équipe forfait)
+- recalcule le bracket si nécessaire
+
+Garde-fou : interdit si des matchs du Flight ont déjà commencé (status ≠ scheduled).
+
+### A6. Classement final global
+
+`computeOverallStandings(tournament)` agrège :
+```
+Flight A (sort_order=0) : 1=vainqueur, 2=finaliste, 3/4 selon match 3e place
+Flight B (sort_order=1) : reprend à la place 1+offset (où offset = somme tailles flights précédents)
+…
+```
+Affiché sur la page publique en fin de tournoi + onglet "Palmarès".
+
+### A7. UI
+
+- **Admin** : nouvel onglet "Flights" dans la page tournoi (à côté de Poules/Matchs).
+  - Vide tant que les poules ne sont pas créées
+  - Bouton "Configurer les Flights" → wizard : choix template (Champions League / Coupe-Plaque / Médailles / Custom) → choix distribution → édition libre des noms/couleurs/règles → "Générer"
+  - Une fois généré : liste des Flights avec leurs brackets miniatures + bouton "Déplacer équipe"
+- **Public** : nouvel onglet "Flights" (ou intégré au Bracket existant si 1 seul flight).
+  - 1 carte par Flight avec son bracket, son champion en haut, médailles si tournoi terminé
+
+### A8. Templates noms (i18n)
+
+Trois templates pré-traduits dans `src/modules/tournaments/lib/flight-templates.ts` (FR/EN/DE/ES/IT/NL/PT) :
+- `champions` : Champions / Europa / Conference
+- `cup_plate` : Coupe / Plaque / Bowl / Shield
+- `medals` : Or / Argent / Bronze
+
+Plus option `custom` (saisie libre).
 
 ---
 
-## Lot 3 — Payment atomicity
+## Lot B — Consolante simple (PRIORITÉ 2)
 
-**Migration DB** (`tournament_registrations`)
-- Nouvelle colonne `registration_state text` (enum-like check) avec valeurs :
-  `pending_payment | paid_pending_team | confirmed | failed | cancelled`
-  (on garde `payment_status` legacy pour rétrocompat ; `registration_state` devient la source de vérité).
-- Index unique partiel : `(tournament_id, tournament_team_id)` où `tournament_team_id is not null` (évite la double-team).
-- Table `stripe_webhook_events (event_id text primary key, processed_at timestamptz)` pour idempotency stricte au niveau webhook (si pas déjà existante).
+Cas particulier du moteur Flight :
+- 2 Flights uniquement
+- Flight A = qualifiés (top N) avec bracket principal
+- Flight B = non-qualifiés ("Consolante" / "Plaque" / nom libre)
 
-**Code**
-- `src/routes/api/public/stripe-webhook.ts` :
-  - en tout début de handler, `INSERT … ON CONFLICT DO NOTHING` dans `stripe_webhook_events`. Si conflict → 200 immédiat.
-- `src/modules/tournaments/tournament-payments.server.ts` :
-  - `handleTournamentCheckoutCompleted` :
-    1. transition `registration_state → paid_pending_team` (idempotent)
-    2. appelle `ensureRegistrationTeam(registrationId)` :
-       - SELECT `tournament_team_id` ; si non null → no-op (idempotent)
-       - sinon INSERT team + UPDATE registration en une transaction RPC (`create_team_for_registration` SECURITY DEFINER, returns team_id, exception-safe sur unique violation → retourne team existante)
-    3. transition `→ confirmed`
-  - `buildCheckoutForRegistration` : déjà OK (montant serveur), on ajoute une assertion explicite que `metadata.tournament_id` côté checkout est ignoré et toujours re-résolu depuis la registration côté webhook.
-- **Self-heal** : route `/api/public/hooks/payment-self-heal.ts` (cron-friendly) qui repère `registration_state='paid_pending_team'` depuis > 5 min et rejoue `ensureRegistrationTeam`.
-- `checkout.session.expired` / `payment_intent.payment_failed` → `registration_state='failed'`.
-- `checkout.session.async_payment_failed` + cancel URL hit → `cancelled`.
-
-**Tests (`src/tests/unit/tournament-payment-atomicity.test.ts`)**
-- Webhook livré 2× même eventId → 1 seule team créée
-- `paid_pending_team` puis team-creation échoue puis retry → exactement 1 team
-- Client POSTant un amount custom → ignoré (montant relu depuis `tournaments.registration_fee`)
-- Client POSTant `tournament_id` d'un autre club → registration créée sur le bon tournoi (slug-driven, déjà OK) + assertion explicite
-- `payment_intent.payment_failed` → `failed`, pas de team
-- Cancel → `cancelled`, pas de team
+Bouton wizard dédié "Format Coupe + Consolante" qui pré-remplit cette config en 1 clic. Aucun code spécifique — juste un preset du moteur Flight.
 
 ---
 
-## Section technique (pour les développeurs)
+## Lot C — Planning intelligent (transverse, requis pour Flights)
 
-- **Stack** : TanStack Start + Supabase. Guards = pures fonctions serveur testables avec mocks `vi.hoisted` (déjà en place dans `authz.test.ts`).
-- **Tests** : Vitest (déjà câblé via `unit-tests.yml` après le fix `bun run test`).
-- **Idempotency Stripe** : table `stripe_webhook_events` est la barrière #1. La transition d'état dans `tournament_registrations` est la barrière #2 (les UPDATE sont conditionnés sur l'état attendu : `WHERE registration_state IN ('pending_payment','paid_pending_team')`).
-- **RLS** : `tournament_registrations` reste write-only via supabaseAdmin côté server (déjà le cas).
-- **Pas d'edge function** : tout reste dans server routes TanStack.
+Ce qui manque aujourd'hui pour rendre Flights utilisable :
+
+- `scheduleMatchesAcrossFlights(matches, fields[], opts)` : assigne `scheduled_at` + `field` à tous les matchs encore vides, sans conflit
+- Contraintes :
+  - 1 match à la fois par terrain
+  - 1 match à la fois par équipe
+  - **Temps de repos minimum** entre 2 matchs d'une même équipe (nouvelle option `min_rest_minutes` sur `tournaments`)
+  - Durée match + buffer (déjà existants)
+- Vue planning globale : grille terrains × créneaux, déjà partiellement en place dans `FieldsManager` — étendre pour afficher tous les flights mixés avec un filtre.
+
+Algo : greedy avec backtracking limité ; suffisant pour ≤200 matchs.
+
+---
+
+## Lot D — Reste petit
+
+Déjà OK : streams par terrain, hockey OT, double-élim algo, swiss algo, round-robin a/r.
+
+Manque côté UI :
+- Vue **DoubleEliminationBracket** (Winner / Loser / Grand Final côte à côte) — composant React
+- Bouton **"Générer la ronde suivante"** pour Swiss (admin)
+- Préset "Hockey OT" déjà ajouté à `TournamentRulesEditor` — vérifier qu'il apparaît bien dans la UI rules à côté de Football/Volleyball
+
+---
+
+## Section technique
+
+- **Tests Vitest** :
+  - `proposeFlightDistributions` : 12, 13, 16, 24, 32 équipes
+  - `qualifyTeamsToFlight` : application des règles (positions, wild cards, manuel, doublons)
+  - `computeOverallStandings` : 3 flights × 3 tailles
+  - Planning : pas de conflit terrain/équipe, respect repos
+- **Migrations** : 1 seule migration pour le lot A (table + colonnes + grants + RLS via `can_manage_tournament` + lecture publique sur tournois publiés). 1 migration pour `min_rest_minutes`.
+- **Régression** : tournois existants (`format` ∈ knockout/group/mixed) ignorent complètement les Flights. Les Flights ne s'activent que si l'admin clique "Configurer les Flights" après les poules.
+- **i18n** : ~30 nouvelles clés dans `tournaments.json` × 7 langues (templates + UI Flights + Planning).
 
 ---
 
 ## Ordre d'exécution proposé
 
-1. **Lot 1** (1 fichier code + 1 fichier test) — risque ~nul, valide la base.
-2. **Lot 2** (1 helper + ~5 call-sites + 1 fichier test) — risque modéré, mais aucune migration DB.
-3. **Lot 3** (1 migration + helpers webhook + 1 route self-heal + 1 fichier test) — risque le plus élevé, fait en dernier pour bénéficier des guards du Lot 2.
+1. **Lot A (Flights)** — le morceau central
+   - A1 migration → A2 types + générateur testé → A3 distributions → A4 bracket par flight → A7 UI admin/public → A6 palmarès → A5 manual moves → A8 templates i18n
+2. **Lot B (Consolante)** — preset au-dessus du Lot A
+3. **Lot C (Planning intelligent)** — débloque l'usage réel des Flights
+4. **Lot D (UI manquantes)** — DoubleEliminationBracket + bouton ronde suisse
 
-Chaque lot est mergeable indépendamment. Confirme si tu veux que je démarre par le Lot 1, ou les 3 d'affilée.
+Estimation : Lot A = gros morceau (~3 PR internes), Lot B = trivial après A, Lot C = moyen, Lot D = petit.
+
+Tu valides ce découpage et on attaque par **Lot A1 (migration)** ?

@@ -44,7 +44,9 @@
       "teams": "Teams",
       "matches": "Wedstrijden",
       "standings": "Stand",
-      "bracket": "K.O.-fase"
+      "bracket": "K.O.-fase",
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "Live",
@@ -98,7 +100,12 @@
       "foul": "Overtreding"
     },
     "sponsorsTitleDefault": "Met steun van onze partners",
-    "downloadRules": "Reglement downloaden (PDF)"
+    "downloadRules": "Reglement downloaden (PDF)",
+    "streams": {
+      "hint": "Kies een veld om de live-uitzending te bekijken.",
+      "unsupported": "Platform niet herkend. Open de link in een nieuw tabblad.",
+      "openExternal": "Stream openen"
+    }
   },
   "register": {
     "metaTitle": "Aanmelden — Toernooi {{slug}} · Clubero",
@@ -508,7 +515,19 @@
     "next": "Volgende",
     "create": "Toernooi aanmaken",
     "createdToast": "Toernooi aangemaakt",
-    "errorToast": "Fout"
+    "errorToast": "Fout",
+    "formatRoundRobinHomeAway": "Heen- en terugcompetitie",
+    "formatRoundRobinHomeAwayDesc": "Elk team speelt twee keer tegen elk ander team (thuis + uit)",
+    "formatDoubleElimination": "Dubbele eliminatie",
+    "formatDoubleEliminationDesc": "Winnaars- + verliezersschema; uitgeschakeld na 2 nederlagen",
+    "formatSwiss": "Zwitsers systeem",
+    "formatSwissDesc": "Paringen op stand per ronde, vast aantal ronden",
+    "swissRounds": "Aantal ronden",
+    "swissRoundsHint": "Aanbevolen: ceil(log₂(teams)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Flighted finales",
+    "formatFlightedFinalsDesc": "Poulefase gevolgd door meerdere parallelle finaletabellen (Champions, Europa…)",
+    "formatConsolation": "Consolatie",
+    "formatConsolationDesc": "Hoofdtabel + consolatietabel voor vroeg uitgeschakelde teams"
   },
   "groups": {
     "drawTitle": "Loting",
@@ -907,7 +926,8 @@
     "tvLive": "Live / TV",
     "tvLiveTitle": "Diashow TV / Live",
     "tvLiveHint": "Open het schermvullende scherm om wedstrijden en standen live te bekijken.",
-    "openTv": "Live-scherm openen"
+    "openTv": "Live-scherm openen",
+    "flights": "Flights"
   },
   "staff": {
     "organizers": "Organisatieteam",
@@ -1024,5 +1044,50 @@
     "rules": "Reglement",
     "finalStandings": "Eindstand",
     "allResults": "Alle resultaten"
+  },
+  "flights": {
+    "title": "Flights / finalefasen",
+    "intro": "Meerdere trofeeën per toernooi: Champions/Europa, Beker/Plaat, Goud/Zilver/Brons of aangepast.",
+    "reconfigure": "Opnieuw configureren",
+    "generate": "Brackets genereren",
+    "waitGroups": "Voltooi alle groepswedstrijden om de brackets te genereren.",
+    "noGroups": "Maak eerst de groepsfase. Flights worden daarna gegenereerd.",
+    "savedToast": "Flights opgeslagen",
+    "generatedToast": "{{n}} wedstrijden aangemaakt",
+    "rulesCount": "regels",
+    "thirdPlace": "3e plaats",
+    "fifthPlace": "5e plaats",
+    "seventhPlace": "7e plaats",
+    "draftRulesSummary": "{{n}} kwalificatieregel(s) ingesteld",
+    "templates": {
+      "champions": "Champions / Europa",
+      "cup_plate": "Beker / Plaat",
+      "medals": "Goud / Zilver / Brons",
+      "consolation": "Hoofd / Troostronde"
+    },
+    "dist": {
+      "twoFlights": "2 Flights (top + rest)",
+      "twoFlightsBalanced": "2 gebalanceerde Flights",
+      "threeFlights": "3 Flights (elite + 2 niveaus)",
+      "threeEqual": "3 gelijke Flights",
+      "fourFlights": "4 Flights"
+    },
+    "wizard": {
+      "template": "Naamsjabloon",
+      "distribution": "Verdeling ({{n}} teams)",
+      "notEnough": "Minimaal 4 teams vereist.",
+      "clean": "Schone brackets",
+      "customize": "Aanpassen",
+      "back": "Terug",
+      "save": "Flights opslaan"
+    },
+    "preset": {
+      "consolation": "Troostronde-voorinstelling (1 klik)",
+      "consolationDesc": "Maakt 2 flights: Hoofd (groepswinnaars) en Troostronde (verliezers). Klaar om op te slaan."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
+    }
   }
 }

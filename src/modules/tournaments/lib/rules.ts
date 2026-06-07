@@ -120,6 +120,30 @@ export const DEFAULT_RULES: TournamentRules = {
   branding: {},
 };
 
+/** Préset Hockey (OT) : V=2, défaite en prolongation/TAB=1, défaite=0. */
+export const HOCKEY_OT_POINTS: PointsConfig = {
+  win: 2,
+  draw: 0,
+  loss: 0,
+  otWin: 2,
+  otLoss: 1,
+};
+
+/** Préset "standard football" (3/1/0). */
+export const STANDARD_FOOTBALL_POINTS: PointsConfig = {
+  win: 3,
+  draw: 1,
+  loss: 0,
+};
+
+export type PointsPreset = "standard" | "hockey_ot" | "custom";
+
+export const POINTS_PRESETS: { key: PointsPreset; label: string; value: PointsConfig | null }[] = [
+  { key: "standard", label: "Standard (3/1/0)", value: STANDARD_FOOTBALL_POINTS },
+  { key: "hockey_ot", label: "Hockey (2-1-0 OT)", value: HOCKEY_OT_POINTS },
+  { key: "custom", label: "Personnalisé", value: null },
+];
+
 /** Règles par défaut adaptées au sport (ex. volley : pas de nul, scoring en sets). */
 export function defaultRulesForSport(sport: string | null | undefined): TournamentRules {
   const base = { ...DEFAULT_RULES };
@@ -132,6 +156,19 @@ export function defaultRulesForSport(sport: string | null | undefined): Tourname
       base.overtime = { enabled: false };
       base.penaltyShootout = { enabled: false };
       base.roster = { playersPerTeam: 6, maxSubstitutes: 6 };
+    }
+    if (sport === "tennis") {
+      base.overtime = { enabled: false };
+      base.penaltyShootout = { enabled: false };
+      base.roster = { playersPerTeam: 1, maxSubstitutes: 0 };
+    }
+    if (sport === "padel") {
+      base.overtime = { enabled: false };
+      base.penaltyShootout = { enabled: false };
+      base.roster = { playersPerTeam: 2, maxSubstitutes: 0 };
+    }
+    if (sport === "ice_hockey" || sport === "field_hockey") {
+      base.points = { ...HOCKEY_OT_POINTS };
     }
   }
   return base;

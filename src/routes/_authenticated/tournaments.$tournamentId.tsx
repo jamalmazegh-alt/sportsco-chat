@@ -50,6 +50,7 @@ import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflo
 import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { PaymentSettingsPanel } from "@/modules/tournaments/components/PaymentSettingsPanel";
 import { ClipboardList, UserCog, CreditCard, Dices, CalendarClock } from "lucide-react";
+import { FlightsManager } from "@/modules/tournaments/components/FlightsManager";
 
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
@@ -92,6 +93,7 @@ type Sub =
   | "staff"
   | "draw"
   | "schedule"
+  | "flights"
   | "matches"
   | "standings"
   | "bracket"
@@ -173,11 +175,12 @@ function TournamentDetailPage() {
   const isLoading = q.isLoading;
   const hasData = !!q.data;
 
-  const { tournament, groups, teams, matches } = (q.data ?? {
+  const { tournament, groups, teams, matches, flights } = (q.data ?? {
     tournament: null as any,
     groups: [] as any[],
     teams: [] as any[],
     matches: [] as any[],
+    flights: [] as any[],
   });
   const canManage =
     (q.data as any)?.canManage === true ||
@@ -211,6 +214,7 @@ function TournamentDetailPage() {
         { id: "staff", icon: UserCog, label: t("sections.staffAndOfficials", { defaultValue: "Staff & arbitres" }) },
         { id: "draw", icon: Dices, label: t("sections.draw", { defaultValue: "Tirage au sort" }) },
         { id: "schedule", icon: CalendarClock, label: t("sections.groupsSchedule", { defaultValue: "Groupes & calendrier" }) },
+        { id: "flights", icon: Trophy, label: t("sections.flights", { defaultValue: "Flights" }) },
       ]
     : [{ id: "teams", icon: Users, label: t("tabs.teams") }];
   const configureSubs: { id: Sub; icon: any; label: string }[] = canManage
@@ -486,6 +490,25 @@ function TournamentDetailPage() {
             settings={(tournament as any).settings}
           />
         )}
+        {section === "manage" && canManage && sub === "flights" && (
+          <FlightsManager
+            tournamentId={tournament.id}
+            numTeams={(teams as any[]).length}
+            numGroups={(groups as any[]).length}
+            flights={(flights as any[]) ?? []}
+            hasGroups={(groups as any[]).length > 0}
+            groupMatchesCompleted={
+              (matches as any[]).filter(
+                (m: any) => m.round === "group",
+              ).length > 0 &&
+              (matches as any[])
+                .filter((m: any) => m.round === "group")
+                .every((m: any) => m.status === "completed")
+            }
+          />
+        )}
+
+
 
 
         {/* Play section */}

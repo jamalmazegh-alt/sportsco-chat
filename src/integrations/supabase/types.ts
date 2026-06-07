@@ -3444,6 +3444,59 @@ export type Database = {
           },
         ]
       }
+      tournament_flights: {
+        Row: {
+          color: string | null
+          created_at: string
+          enable_fifth_place: boolean
+          enable_seventh_place: boolean
+          enable_third_place: boolean
+          id: string
+          name: string
+          qualification_rules: Json
+          short_name: string | null
+          sort_order: number
+          tournament_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          enable_fifth_place?: boolean
+          enable_seventh_place?: boolean
+          enable_third_place?: boolean
+          id?: string
+          name: string
+          qualification_rules?: Json
+          short_name?: string | null
+          sort_order: number
+          tournament_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          enable_fifth_place?: boolean
+          enable_seventh_place?: boolean
+          enable_third_place?: boolean
+          id?: string
+          name?: string
+          qualification_rules?: Json
+          short_name?: string | null
+          sort_order?: number
+          tournament_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_flights_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_groups: {
         Row: {
           created_at: string
@@ -3540,11 +3593,14 @@ export type Database = {
       tournament_matches: {
         Row: {
           bracket_position: number | null
+          bracket_side: string | null
           created_at: string
+          decided_in: string | null
           details: Json
           dispute_flag: boolean
           duration_min: number | null
           field: string | null
+          flight_id: string | null
           group_id: string | null
           id: string
           match_number: number | null
@@ -3553,6 +3609,7 @@ export type Database = {
           overtime_score_b: number | null
           penalty_score_a: number | null
           penalty_score_b: number | null
+          placement_kind: string | null
           referee_name: string | null
           referee_user_id: string | null
           round: Database["public"]["Enums"]["tournament_match_round"]
@@ -3573,11 +3630,14 @@ export type Database = {
         }
         Insert: {
           bracket_position?: number | null
+          bracket_side?: string | null
           created_at?: string
+          decided_in?: string | null
           details?: Json
           dispute_flag?: boolean
           duration_min?: number | null
           field?: string | null
+          flight_id?: string | null
           group_id?: string | null
           id?: string
           match_number?: number | null
@@ -3586,6 +3646,7 @@ export type Database = {
           overtime_score_b?: number | null
           penalty_score_a?: number | null
           penalty_score_b?: number | null
+          placement_kind?: string | null
           referee_name?: string | null
           referee_user_id?: string | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
@@ -3606,11 +3667,14 @@ export type Database = {
         }
         Update: {
           bracket_position?: number | null
+          bracket_side?: string | null
           created_at?: string
+          decided_in?: string | null
           details?: Json
           dispute_flag?: boolean
           duration_min?: number | null
           field?: string | null
+          flight_id?: string | null
           group_id?: string | null
           id?: string
           match_number?: number | null
@@ -3619,6 +3683,7 @@ export type Database = {
           overtime_score_b?: number | null
           penalty_score_a?: number | null
           penalty_score_b?: number | null
+          placement_kind?: string | null
           referee_name?: string | null
           referee_user_id?: string | null
           round?: Database["public"]["Enums"]["tournament_match_round"]
@@ -3638,6 +3703,13 @@ export type Database = {
           winner_team_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tournament_matches_flight_id_fkey"
+            columns: ["flight_id"]
+            isOneToOne: false
+            referencedRelation: "tournament_flights"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tournament_matches_group_id_fkey"
             columns: ["group_id"]
@@ -4135,16 +4207,20 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           created_by: string
+          custom_sport_name: string | null
           daily_end_time: string
           daily_start_time: string
           description: string | null
+          double_round_robin: boolean
           ends_on: string | null
+          field_streams: Json
           fields: Json
           format: Database["public"]["Enums"]["tournament_format"]
           id: string
           location: string | null
           match_duration_min: number
           max_teams: number | null
+          min_rest_minutes: number
           name: string
           num_teams: number
           payment_mode: string
@@ -4160,6 +4236,7 @@ export type Database = {
           sport: string | null
           starts_on: string
           status: Database["public"]["Enums"]["tournament_status"]
+          swiss_rounds: number | null
           tiebreakers: Json
           updated_at: string
         }
@@ -4171,16 +4248,20 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by: string
+          custom_sport_name?: string | null
           daily_end_time?: string
           daily_start_time?: string
           description?: string | null
+          double_round_robin?: boolean
           ends_on?: string | null
+          field_streams?: Json
           fields?: Json
           format?: Database["public"]["Enums"]["tournament_format"]
           id?: string
           location?: string | null
           match_duration_min?: number
           max_teams?: number | null
+          min_rest_minutes?: number
           name: string
           num_teams?: number
           payment_mode?: string
@@ -4196,6 +4277,7 @@ export type Database = {
           sport?: string | null
           starts_on: string
           status?: Database["public"]["Enums"]["tournament_status"]
+          swiss_rounds?: number | null
           tiebreakers?: Json
           updated_at?: string
         }
@@ -4207,16 +4289,20 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
+          custom_sport_name?: string | null
           daily_end_time?: string
           daily_start_time?: string
           description?: string | null
+          double_round_robin?: boolean
           ends_on?: string | null
+          field_streams?: Json
           fields?: Json
           format?: Database["public"]["Enums"]["tournament_format"]
           id?: string
           location?: string | null
           match_duration_min?: number
           max_teams?: number | null
+          min_rest_minutes?: number
           name?: string
           num_teams?: number
           payment_mode?: string
@@ -4232,6 +4318,7 @@ export type Database = {
           sport?: string | null
           starts_on?: string
           status?: Database["public"]["Enums"]["tournament_status"]
+          swiss_rounds?: number | null
           tiebreakers?: Json
           updated_at?: string
         }
@@ -4470,10 +4557,6 @@ export type Database = {
         Returns: boolean
       }
       can_author_player_feedback: {
-        Args: { _player_id: string; _user_id: string }
-        Returns: boolean
-      }
-      can_view_player_availability: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
@@ -4914,7 +4997,15 @@ export type Database = {
         | "second_yellow"
         | "penalty"
         | "foul"
-      tournament_format: "group" | "knockout" | "mixed"
+      tournament_format:
+        | "group"
+        | "knockout"
+        | "mixed"
+        | "double_elimination"
+        | "swiss"
+        | "round_robin_home_away"
+        | "flighted_finals"
+        | "consolation"
       tournament_match_round:
         | "group"
         | "r32"
@@ -5178,7 +5269,16 @@ export const Constants = {
         "penalty",
         "foul",
       ],
-      tournament_format: ["group", "knockout", "mixed"],
+      tournament_format: [
+        "group",
+        "knockout",
+        "mixed",
+        "double_elimination",
+        "swiss",
+        "round_robin_home_away",
+        "flighted_finals",
+        "consolation",
+      ],
       tournament_match_round: [
         "group",
         "r32",
