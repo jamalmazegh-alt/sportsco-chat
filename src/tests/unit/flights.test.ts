@@ -107,8 +107,7 @@ describe("qualifyTeamsToFlight", () => {
       [{ kind: "best_n_remaining", n: 3 }],
       99,
     );
-    expect(picks.slice(0, 3)).toEqual(["a2", "b2", "c2"]);
-    expect(picks.length).toBeGreaterThanOrEqual(3);
+    expect(picks).toEqual(["a2", "b2", "c2"]);
   });
 
   it("manual rule respects explicit list", () => {
