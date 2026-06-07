@@ -265,6 +265,24 @@ export function FlightsManager({
       {/* Wizard */}
       {showWizard && (
         <div className="rounded-xl border bg-card p-4 space-y-4">
+          {/* Preset 1-clic Consolante */}
+          <button
+            type="button"
+            onClick={applyConsolationPreset}
+            className="w-full text-left rounded-lg border border-primary/30 bg-primary/5 p-3 hover:bg-primary/10 transition-colors"
+          >
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <Wand2 className="h-4 w-4 text-primary" />
+              {t("flights.preset.consolation", { defaultValue: "Préset Consolante (1 clic)" })}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("flights.preset.consolationDesc", {
+                defaultValue:
+                  "Crée 2 flights : Principal (vainqueurs de poule) et Consolante (perdants). Configuration prête à enregistrer.",
+              })}
+            </p>
+          </button>
+
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
               {t("flights.wizard.template", { defaultValue: "Template de noms" })}
@@ -289,7 +307,9 @@ export function FlightsManager({
                           ? "Champions / Europa"
                           : tpl.id === "cup_plate"
                             ? "Coupe / Plaque"
-                            : "Or / Argent / Bronze",
+                            : tpl.id === "medals"
+                              ? "Or / Argent / Bronze"
+                              : "Principal / Consolante",
                     })}
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
@@ -299,6 +319,7 @@ export function FlightsManager({
               ))}
             </div>
           </div>
+
 
           {drafts.length === 0 && (
             <div>
