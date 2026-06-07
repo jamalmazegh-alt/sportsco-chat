@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
@@ -40,6 +40,7 @@ function fmt(d: string) {
 
 function AvailabilityPage() {
   const { playerId } = Route.useParams();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
   const roles = useMyRoles();
@@ -47,8 +48,37 @@ function AvailabilityPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
+  const { data: canView, isLoading: accessLoading } = useQuery({
+    queryKey: ["player-availability-access", playerId, user?.id],
+    enabled: !!user && !!playerId,
+    queryFn: async () => {
+      const uid = user!.id;
+      const { data: player } = await supabase
+        .from("players")
+        .select("user_id")
+        .eq("id", playerId)
+        .maybeSingle();
+      if (player?.user_id === uid) return true;
+
+      const { data: viaRpc, error: rpcErr } = await supabase.rpc("can_view_player_availability", {
+        _user_id: uid,
+        _player_id: playerId,
+      });
+      if (!rpcErr && viaRpc) return true;
+
+      // Fallback until migration is deployed: same rules as RLS / can_view_player_availability.
+      const [{ data: parentOk }, { data: coachOk }, { data: adminOk }] = await Promise.all([
+        supabase.rpc("is_parent_of_player", { _user_id: uid, _player_id: playerId }),
+        supabase.rpc("is_player_team_coach", { _user_id: uid, _player_id: playerId }),
+        supabase.rpc("is_player_club_admin", { _user_id: uid, _player_id: playerId }),
+      ]);
+      return !!(parentOk || coachOk || adminOk);
+    },
+  });
+
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["player-availabilities", playerId],
+    enabled: !!canView,
     queryFn: async (): Promise<Row[]> => {
       const today = new Date().toISOString().slice(0, 10);
       const { data, error } = await supabase
@@ -67,6 +97,7 @@ function AvailabilityPage() {
 
   const { data: suspensions = [] } = useQuery({
     queryKey: ["player-active-suspensions", playerId],
+    enabled: !!canView,
     queryFn: async (): Promise<Susp[]> => {
       const { data } = await supabase
         .from("player_suspensions")
@@ -98,6 +129,24 @@ function AvailabilityPage() {
   const activeSusp = suspensions.filter(
     (s) => s.matches_to_serve - s.matches_served > 0,
   );
+
+  useEffect(() => {
+    if (!accessLoading && canView === false) {
+      navigate({ to: "/home", replace: true });
+    }
+  }, [accessLoading, canView, navigate]);
+
+  if (accessLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!canView) {
+    return <Navigate to="/home" replace />;
+  }
 
   return (
     <div className="space-y-4">

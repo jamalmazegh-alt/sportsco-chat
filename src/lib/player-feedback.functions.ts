@@ -106,8 +106,25 @@ const FeedbackInput = z.object({
   sharedSummary: z.string().trim().max(2000).nullish(),
 });
 
+async function assertStaffCanViewPlayerFeedback(
+  supabase: { rpc: (fn: string, args: Record<string, string>) => Promise<{ data: unknown }> },
+  userId: string,
+  playerId: string,
+) {
+  const { data: adminOk } = await supabase.rpc("is_player_club_admin", {
+    _user_id: userId,
+    _player_id: playerId,
+  });
+  if (adminOk) return;
+  const { data: coachOk } = await supabase.rpc("can_author_player_feedback", {
+    _user_id: userId,
+    _player_id: playerId,
+  });
+  if (!coachOk) throw new Response("Forbidden", { status: 403 });
+}
+
 // ------------------------------------------------------------------
-// List feedbacks for a player (RLS already filters by visibility).
+// List feedbacks for a player (staff-only; RLS also filters by visibility).
 // ------------------------------------------------------------------
 export const listPlayerFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -115,7 +132,8 @@ export const listPlayerFeedback = createServerFn({ method: "POST" })
     z.object({ playerId: z.string().uuid() }).parse(input)
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    await assertStaffCanViewPlayerFeedback(supabase, userId, data.playerId);
     const { data: rows, error } = await supabase
       .from("player_feedback" as any)
       .select(
@@ -319,7 +337,8 @@ export const listPlayerReviews = createServerFn({ method: "POST" })
     z.object({ playerId: z.string().uuid() }).parse(input)
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    await assertStaffCanViewPlayerFeedback(supabase, userId, data.playerId);
     const { data: rows, error } = await supabase
       .from("player_reviews" as any)
       .select("id, kind, period_start, period_end, content, visibility, model, created_at, author_user_id")

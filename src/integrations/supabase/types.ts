@@ -4473,6 +4473,10 @@ export type Database = {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_player_availability: {
+        Args: { _player_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_edit_player_journey: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
