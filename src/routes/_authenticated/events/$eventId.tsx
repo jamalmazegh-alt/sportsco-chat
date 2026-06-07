@@ -1504,17 +1504,63 @@ function EventDetail() {
     );
   }, [convocations]);
 
+  const visibleMyConvocs = useMemo(
+    () => [...myConvocs, ...myChildConvocs],
+    [myConvocs, myChildConvocs],
+  );
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || !event) return;
+    const payload = {
+      userId: user?.id ?? null,
+      eventId,
+      role,
+      roles,
+      isCoach,
+      isActiveCoach,
+      convocationsSent: event.convocations_sent,
+      convocationsCount: convocations?.length ?? 0,
+      myConvocsLength: myConvocs.length,
+      myChildConvocsLength: myChildConvocs.length,
+      visibleMyConvocsLength: visibleMyConvocs.length,
+      childrenLinks: childrenLinks ?? null,
+      myConvocPlayerIds: myConvocs.map((c: { player_id?: string }) => c.player_id),
+      myChildConvocPlayerIds: myChildConvocs.map((c: { player_id?: string }) => c.player_id),
+      linkedPlayerUserIds: (convocations ?? []).map(
+        (c: { players?: { user_id?: string | null } | null }) => c.players?.user_id ?? null,
+      ),
+    };
+    console.info("[EventDetail:conv-debug]", payload);
+    (window as Window & { __CONV_DEBUG?: typeof payload }).__CONV_DEBUG = payload;
+  }, [
+    user?.id,
+    eventId,
+    role,
+    roles,
+    isCoach,
+    isActiveCoach,
+    event,
+    convocations,
+    myConvocs,
+    myChildConvocs,
+    visibleMyConvocs,
+    childrenLinks,
+  ]);
+
   if (!event) {
     return <EventDetailSkeleton />;
   }
 
-  const visibleMyConvocs = [...myConvocs, ...myChildConvocs];
   const hasPendingForMe =
     !event.responses_locked &&
     visibleMyConvocs.some((c: any) => c.status === "pending");
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
   const showFeedbackButton = isPastMatch && isCoach;
+  // Joueur/parent : masquer la carte si aucune convocation personnelle (évite section vide).
+  const showConvocationSection = isCoach
+    ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
+    : visibleMyConvocs.length > 0;
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
@@ -2340,7 +2386,7 @@ function EventDetail() {
       )}
 
       {/* === Unified Convocation card === */}
-      {(event.convocations_sent || (isCoach && event.status !== "cancelled") || visibleMyConvocs.length > 0) && (
+      {showConvocationSection && (
         <section id="my-response" className="rounded-2xl border border-border bg-card overflow-hidden scroll-mt-20">
           {/* Header */}
           <header className="flex items-start justify-between gap-3 px-4 py-3 border-b border-border">
