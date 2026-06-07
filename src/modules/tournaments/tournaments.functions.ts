@@ -258,6 +258,7 @@ export const getTournament = createServerFn({ method: "POST" })
       groups: gRes.data ?? [],
       teams: teamRes.data ?? [],
       matches: mRes.data ?? [],
+      flights: fRes.data ?? [],
       canManage: Boolean(canRes.data),
     };
   });
