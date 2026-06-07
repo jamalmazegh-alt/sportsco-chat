@@ -98,6 +98,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
     setEndsOn("");
     setLocation("");
     setFormat("mixed");
+    setSwissRounds(5);
     setNumTeams(8);
     setNumTeamsRaw("8");
     setLogo([]);
@@ -112,12 +113,26 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const datesValid = !!startsOn && (!endsOn || endsOn >= startsOn);
   const canNext0 = name.trim().length >= 2 && sport;
   const canNext1 = datesValid;
-  const canNext2 = !!format && numTeams >= 2;
+  const canNext2 =
+    !!format &&
+    numTeams >= 2 &&
+    (format !== "swiss" || (swissRounds >= 1 && swissRounds <= 20));
 
   const formatOptions: { v: Format; label: string; desc: string }[] = [
     { v: "group", label: t("wizard.formatGroup"), desc: t("wizard.formatGroupDesc") },
     { v: "knockout", label: t("wizard.formatKnockout"), desc: t("wizard.formatKnockoutDesc") },
     { v: "mixed", label: t("wizard.formatMixed"), desc: t("wizard.formatMixedDesc") },
+    {
+      v: "round_robin_home_away",
+      label: t("wizard.formatRoundRobinHomeAway"),
+      desc: t("wizard.formatRoundRobinHomeAwayDesc"),
+    },
+    {
+      v: "double_elimination",
+      label: t("wizard.formatDoubleElimination"),
+      desc: t("wizard.formatDoubleEliminationDesc"),
+    },
+    { v: "swiss", label: t("wizard.formatSwiss"), desc: t("wizard.formatSwissDesc") },
   ];
 
   return (
