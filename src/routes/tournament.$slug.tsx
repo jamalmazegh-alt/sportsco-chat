@@ -1132,3 +1132,109 @@ function PublishedRegistrationView({
 }
 
 
+
+function streamEmbedUrl(raw: string): string | null {
+  const url = raw.trim();
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    const h = u.hostname.replace(/^www\./, "");
+    // YouTube
+    if (h === "youtu.be") {
+      const id = u.pathname.slice(1);
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    if (h.endsWith("youtube.com")) {
+      if (u.pathname === "/watch") {
+        const id = u.searchParams.get("v");
+        return id ? `https://www.youtube.com/embed/${id}` : null;
+      }
+      if (u.pathname.startsWith("/live/")) {
+        return `https://www.youtube.com/embed/${u.pathname.slice(6)}`;
+      }
+      if (u.pathname.startsWith("/embed/")) return url;
+    }
+    // Twitch
+    if (h === "twitch.tv" || h.endsWith(".twitch.tv")) {
+      const parent = typeof window !== "undefined" ? window.location.hostname : "clubero.app";
+      const parts = u.pathname.split("/").filter(Boolean);
+      if (parts[0] === "videos" && parts[1]) {
+        return `https://player.twitch.tv/?video=${parts[1]}&parent=${parent}`;
+      }
+      if (parts[0]) {
+        return `https://player.twitch.tv/?channel=${parts[0]}&parent=${parent}`;
+      }
+    }
+    // Vimeo
+    if (h.endsWith("vimeo.com")) {
+      const id = u.pathname.split("/").filter(Boolean).pop();
+      if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}`;
+    }
+    // Facebook
+    if (h.endsWith("facebook.com") || h === "fb.watch") {
+      return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function FieldStreams({ streams }: { streams: [string, string][] }) {
+  const { t } = useTranslation("tournaments");
+  const [active, setActive] = useState(streams[0]?.[0] ?? "");
+  const current = streams.find(([f]) => f === active) ?? streams[0];
+  if (!current) return null;
+  const [field, url] = current;
+  const embed = streamEmbedUrl(url);
+
+  return (
+    <div className="space-y-4">
+      {streams.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {streams.map(([f]) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setActive(f)}
+              className={cn(
+                "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
+                f === field
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-foreground border-border hover:bg-muted",
+              )}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="aspect-video w-full rounded-xl overflow-hidden border border-border bg-black">
+        {embed ? (
+          <iframe
+            key={embed}
+            src={embed}
+            title={`${t("public.tabs.streams")} – ${field}`}
+            className="h-full w-full"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+          />
+        ) : (
+          <div className="h-full w-full flex flex-col items-center justify-center gap-3 text-muted-foreground p-6 text-center">
+            <Tv className="h-8 w-8" />
+            <p className="text-sm">{t("public.streams.unsupported")}</p>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium underline"
+            >
+              {t("public.streams.openExternal")}
+            </a>
+          </div>
+        )}
+      </div>
+      <p className="text-xs text-muted-foreground">{t("public.streams.hint")}</p>
+    </div>
+  );
+}
