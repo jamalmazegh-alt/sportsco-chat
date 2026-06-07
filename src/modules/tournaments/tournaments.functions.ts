@@ -15,7 +15,14 @@ import { assertTournamentMutable } from "@/lib/tournament-guards.server";
 
 // ---------- Schemas
 
-const tournamentFormat = z.enum(["group", "knockout", "mixed"]);
+const tournamentFormat = z.enum([
+  "group",
+  "knockout",
+  "mixed",
+  "double_elimination",
+  "swiss",
+  "round_robin_home_away",
+]);
 const tournamentStatus = z.enum(["draft", "published", "in_progress", "completed", "cancelled"]);
 
 const createSchema = z
@@ -23,17 +30,24 @@ const createSchema = z
     club_id: z.string().uuid(),
     name: z.string().min(2).max(120),
     sport: z.string().min(1).max(40),
+    custom_sport_name: z.string().max(80).optional().nullable(),
     category: z.string().max(80).optional().nullable(),
     starts_on: z.string(), // ISO date
     ends_on: z.string().optional().nullable(),
     format: tournamentFormat,
     num_teams: z.number().int().min(2).max(64),
+    swiss_rounds: z.number().int().min(1).max(20).optional().nullable(),
+    double_round_robin: z.boolean().optional().nullable(),
     location: z.string().max(200).optional().nullable(),
     cover_image_url: z.string().url().optional().nullable(),
   })
   .refine((d) => !d.ends_on || d.ends_on >= d.starts_on, {
     message: "End date must be on or after start date",
     path: ["ends_on"],
+  })
+  .refine((d) => d.format !== "swiss" || (!!d.swiss_rounds && d.swiss_rounds >= 1), {
+    message: "Swiss format requires a number of rounds",
+    path: ["swiss_rounds"],
   });
 
 // ---------- Helpers
