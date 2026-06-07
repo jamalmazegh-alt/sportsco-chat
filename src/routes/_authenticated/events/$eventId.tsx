@@ -353,27 +353,35 @@ function EventDetail() {
     },
   });
 
-  // Active suspensions for players in this team (for convocation warnings)
+  // Active suspensions for roster players (convocation picker warnings — same pattern as event-absences)
   const { data: activeSuspensions } = useQuery({
-    queryKey: ["active-suspensions", event?.team_id],
-    enabled: !!event?.team_id,
+    queryKey: ["active-suspensions", event?.team_id, (teamPlayers ?? []).length],
+    enabled: !!event?.team_id && (teamPlayers?.length ?? 0) > 0,
     queryFn: async () => {
+      const playerIds = (teamPlayers ?? []).map((tp: any) => tp.player_id);
+      if (playerIds.length === 0) return [];
       const { data, error } = await supabase
         .from("player_suspensions")
         .select("player_id, matches_to_serve, matches_served, suspension_reason")
+        .in("player_id", playerIds)
         .eq("team_id", event!.team_id)
         .eq("status", "active");
       if (error) throw error;
-      return (data ?? []).filter((s: any) => s.matches_served < s.matches_to_serve);
+      return (data ?? []).filter((s: any) => {
+        const remaining = (s.matches_to_serve ?? 0) - (s.matches_served ?? 0);
+        return remaining > 0;
+      });
     },
   });
   const suspensionByPlayer = useMemo(() => {
     const m = new Map<string, { remaining: number; reason: string }>();
     (activeSuspensions ?? []).forEach((s: any) => {
-      m.set(s.player_id, {
-        remaining: s.matches_to_serve - s.matches_served,
-        reason: s.suspension_reason,
-      });
+      const remaining = Math.max(0, (s.matches_to_serve ?? 0) - (s.matches_served ?? 0));
+      if (remaining <= 0) return;
+      const prev = m.get(s.player_id);
+      if (!prev || remaining > prev.remaining) {
+        m.set(s.player_id, { remaining, reason: s.suspension_reason });
+      }
     });
     return m;
   }, [activeSuspensions]);
@@ -2128,6 +2136,42 @@ function EventDetail() {
           </DialogHeader>
           {teamPlayers && pickerStep === "select" && (
             <>
+              {(() => {
+                const suspendedInRoster = teamPlayers
+                  .map((tp: any) => {
+                    const s = suspensionByPlayer.get(tp.player_id);
+                    if (!s) return null;
+                    const p = tp.players;
+                    return {
+                      id: tp.player_id,
+                      name: `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim(),
+                      remaining: s.remaining,
+                    };
+                  })
+                  .filter(Boolean) as Array<{ id: string; name: string; remaining: number }>;
+                if (suspendedInRoster.length === 0) return null;
+                return (
+                  <div className="rounded-xl border border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200 p-3 text-xs space-y-1 mb-2">
+                    <p className="font-semibold flex items-center gap-1.5">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      {t("suspensions.warningInPicker", {
+                        defaultValue: "Joueur(s) suspendu(s) dans l'effectif",
+                      })}
+                    </p>
+                    <ul className="list-disc pl-5">
+                      {suspendedInRoster.map((s) => (
+                        <li key={s.id}>
+                          {s.name} —{" "}
+                          {t("suspensions.remaining", {
+                            defaultValue: "{{count}} match(s) restant(s)",
+                            count: s.remaining,
+                          })}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
               <div className="flex items-center justify-between border-b pb-2">
                 <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                   <Checkbox
