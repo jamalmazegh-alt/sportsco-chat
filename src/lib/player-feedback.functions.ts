@@ -107,7 +107,8 @@ const FeedbackInput = z.object({
 });
 
 async function assertStaffCanViewPlayerFeedback(
-  supabase: { rpc: (fn: string, args: Record<string, string>) => Promise<{ data: unknown }> },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
   userId: string,
   playerId: string,
 ) {
