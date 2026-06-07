@@ -44,7 +44,8 @@
       "teams": "Équipes",
       "matches": "Matchs",
       "standings": "Classement",
-      "bracket": "Phase finale"
+      "bracket": "Phase finale",
+      "streams": "Streams"
     },
     "sections": {
       "live": "En direct",
@@ -98,7 +99,12 @@
       "foul": "Faute"
     },
     "sponsorsTitleDefault": "Avec le soutien de nos partenaires",
-    "downloadRules": "Télécharger le règlement (PDF)"
+    "downloadRules": "Télécharger le règlement (PDF)",
+    "streams": {
+      "hint": "Sélectionnez un terrain pour suivre la diffusion en direct.",
+      "unsupported": "Plateforme non reconnue. Ouvrez le lien dans un nouvel onglet.",
+      "openExternal": "Ouvrir le stream"
+    }
   },
   "register": {
     "metaTitle": "Inscription — Tournoi {{slug}} · Clubero",

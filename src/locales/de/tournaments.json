@@ -44,7 +44,8 @@
       "teams": "Teams",
       "matches": "Spiele",
       "standings": "Tabelle",
-      "bracket": "K.O.-Runde"
+      "bracket": "K.O.-Runde",
+      "streams": "Streams"
     },
     "sections": {
       "live": "Live",
@@ -98,7 +99,12 @@
       "foul": "Foul"
     },
     "sponsorsTitleDefault": "Mit Unterstützung unserer Partner",
-    "downloadRules": "Regelwerk herunterladen (PDF)"
+    "downloadRules": "Regelwerk herunterladen (PDF)",
+    "streams": {
+      "hint": "Wähle einen Platz, um den Livestream zu sehen.",
+      "unsupported": "Plattform nicht erkannt. Öffne den Link in einem neuen Tab.",
+      "openExternal": "Stream öffnen"
+    }
   },
   "register": {
     "metaTitle": "Anmeldung — Turnier {{slug}} · Clubero",

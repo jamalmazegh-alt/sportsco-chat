@@ -44,7 +44,8 @@
       "teams": "Teams",
       "matches": "Wedstrijden",
       "standings": "Stand",
-      "bracket": "K.O.-fase"
+      "bracket": "K.O.-fase",
+      "streams": "Streams"
     },
     "sections": {
       "live": "Live",
@@ -98,7 +99,12 @@
       "foul": "Overtreding"
     },
     "sponsorsTitleDefault": "Met steun van onze partners",
-    "downloadRules": "Reglement downloaden (PDF)"
+    "downloadRules": "Reglement downloaden (PDF)",
+    "streams": {
+      "hint": "Kies een veld om de live-uitzending te bekijken.",
+      "unsupported": "Platform niet herkend. Open de link in een nieuw tabblad.",
+      "openExternal": "Stream openen"
+    }
   },
   "register": {
     "metaTitle": "Aanmelden — Toernooi {{slug}} · Clubero",

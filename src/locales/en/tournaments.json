@@ -44,7 +44,8 @@
       "teams": "Teams",
       "matches": "Matches",
       "standings": "Standings",
-      "bracket": "Bracket"
+      "bracket": "Bracket",
+      "streams": "Streams"
     },
     "sections": {
       "live": "Live",
@@ -98,7 +99,12 @@
       "foul": "Foul"
     },
     "sponsorsTitleDefault": "With the support of our partners",
-    "downloadRules": "Download rules (PDF)"
+    "downloadRules": "Download rules (PDF)",
+    "streams": {
+      "hint": "Pick a venue to watch the live broadcast.",
+      "unsupported": "Platform not recognized. Open the link in a new tab.",
+      "openExternal": "Open stream"
+    }
   },
   "register": {
     "metaTitle": "Register — Tournament {{slug}} · Clubero",
