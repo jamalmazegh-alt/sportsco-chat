@@ -45,7 +45,8 @@
       "matches": "Matchs",
       "standings": "Classement",
       "bracket": "Phase finale",
-      "streams": "Streams"
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "En direct",
@@ -1057,7 +1058,8 @@
     "templates": {
       "champions": "Champions / Europa",
       "cup_plate": "Coupe / Plaque",
-      "medals": "Or / Argent / Bronze"
+      "medals": "Or / Argent / Bronze",
+      "consolation": "Principal / Consolante"
     },
     "dist": {
       "twoFlights": "2 Flights (top + reste)",
@@ -1074,6 +1076,14 @@
       "customize": "Personnaliser",
       "back": "Retour",
       "save": "Enregistrer les Flights"
+    },
+    "preset": {
+      "consolation": "Préset Consolante (1 clic)",
+      "consolationDesc": "Crée 2 flights : Principal (vainqueurs de poule) et Consolante (perdants). Configuration prête à enregistrer."
+    },
+    "public": {
+      "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
+      "noMatches": "Matches will be generated after group stage."
     }
   }
 }

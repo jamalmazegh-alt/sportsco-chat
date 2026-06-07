@@ -121,6 +121,41 @@ export function FlightsManager({
     setDrafts(newDrafts);
   };
 
+  /** Preset Consolante 1-clic : 2 flights (Principal / Consolante).
+   *  Flight A = K premières positions de chaque poule, Flight B = le reste. */
+  const applyConsolationPreset = () => {
+    const tpl = FLIGHT_TEMPLATES.find((x) => x.id === "consolation")!;
+    setTemplate("consolation");
+    const tpg = teamsPerGroup || Math.max(2, Math.floor(numTeams / Math.max(1, numGroups)));
+    const k = Math.max(1, Math.floor(tpg / 2));
+    const mainPositions = Array.from({ length: k }, (_, i) => i + 1);
+    const consoPositions = Array.from({ length: Math.max(0, tpg - k) }, (_, i) => i + k + 1);
+    const newDrafts: DraftFlight[] = [
+      {
+        name: tpl.names[0][lang] ?? tpl.names[0].en,
+        short_name: tpl.names[0].short,
+        color: tpl.names[0].color ?? "",
+        qualification_rules: [{ kind: "group_position", positions: mainPositions }],
+        enable_third_place: true,
+        enable_fifth_place: false,
+        enable_seventh_place: false,
+      },
+      {
+        name: tpl.names[1][lang] ?? tpl.names[1].en,
+        short_name: tpl.names[1].short,
+        color: tpl.names[1].color ?? "",
+        qualification_rules:
+          consoPositions.length > 0
+            ? [{ kind: "group_position", positions: consoPositions }]
+            : [{ kind: "best_n_remaining", n: Math.max(2, numTeams - k * Math.max(1, numGroups)) }],
+        enable_third_place: false,
+        enable_fifth_place: false,
+        enable_seventh_place: false,
+      },
+    ];
+    setDrafts(newDrafts);
+  };
+
   const save = useMutation({
     mutationFn: () =>
       saveFn({
@@ -230,6 +265,24 @@ export function FlightsManager({
       {/* Wizard */}
       {showWizard && (
         <div className="rounded-xl border bg-card p-4 space-y-4">
+          {/* Preset 1-clic Consolante */}
+          <button
+            type="button"
+            onClick={applyConsolationPreset}
+            className="w-full text-left rounded-lg border border-primary/30 bg-primary/5 p-3 hover:bg-primary/10 transition-colors"
+          >
+            <div className="flex items-center gap-2 font-medium text-sm">
+              <Wand2 className="h-4 w-4 text-primary" />
+              {t("flights.preset.consolation", { defaultValue: "Préset Consolante (1 clic)" })}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("flights.preset.consolationDesc", {
+                defaultValue:
+                  "Crée 2 flights : Principal (vainqueurs de poule) et Consolante (perdants). Configuration prête à enregistrer.",
+              })}
+            </p>
+          </button>
+
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
               {t("flights.wizard.template", { defaultValue: "Template de noms" })}
@@ -254,7 +307,9 @@ export function FlightsManager({
                           ? "Champions / Europa"
                           : tpl.id === "cup_plate"
                             ? "Coupe / Plaque"
-                            : "Or / Argent / Bronze",
+                            : tpl.id === "medals"
+                              ? "Or / Argent / Bronze"
+                              : "Principal / Consolante",
                     })}
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
@@ -264,6 +319,7 @@ export function FlightsManager({
               ))}
             </div>
           </div>
+
 
           {drafts.length === 0 && (
             <div>

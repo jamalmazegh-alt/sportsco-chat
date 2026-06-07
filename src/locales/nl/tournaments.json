@@ -45,7 +45,8 @@
       "matches": "Wedstrijden",
       "standings": "Stand",
       "bracket": "K.O.-fase",
-      "streams": "Streams"
+      "streams": "Streams",
+      "flights": "Flights"
     },
     "sections": {
       "live": "Live",
@@ -1057,7 +1058,8 @@
     "templates": {
       "champions": "Champions / Europa",
       "cup_plate": "Beker / Plaat",
-      "medals": "Goud / Zilver / Brons"
+      "medals": "Goud / Zilver / Brons",
+      "consolation": "Hoofd / Troostronde"
     },
     "dist": {
       "twoFlights": "2 Flights (top + rest)",
@@ -1074,6 +1076,14 @@
       "customize": "Aanpassen",
       "back": "Terug",
       "save": "Flights opslaan"
+    },
+    "preset": {
+      "consolation": "Troostronde-voorinstelling (1 klik)",
+      "consolationDesc": "Maakt 2 flights: Hoofd (groepswinnaars) en Troostronde (verliezers). Klaar om op te slaan."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
     }
   }
 }

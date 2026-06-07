@@ -5,7 +5,7 @@
  * supportées par l'app. L'organisateur peut ensuite renommer librement.
  */
 
-export type FlightTemplateId = "champions" | "cup_plate" | "medals" | "custom";
+export type FlightTemplateId = "champions" | "cup_plate" | "medals" | "consolation" | "custom";
 
 export type Lang = "fr" | "en" | "de" | "es" | "it" | "nl" | "pt";
 
@@ -56,6 +56,14 @@ export const FLIGHT_TEMPLATES: FlightTemplate[] = [
       { short: "A", fr: "Or", en: "Gold", de: "Gold", es: "Oro", it: "Oro", nl: "Goud", pt: "Ouro", color: "#FFD700" },
       { short: "B", fr: "Argent", en: "Silver", de: "Silber", es: "Plata", it: "Argento", nl: "Zilver", pt: "Prata", color: "#C0C0C0" },
       { short: "C", fr: "Bronze", en: "Bronze", de: "Bronze", es: "Bronce", it: "Bronzo", nl: "Brons", pt: "Bronze", color: "#CD7F32" },
+    ],
+  },
+  {
+    id: "consolation",
+    labelKey: "flights.templates.consolation",
+    names: [
+      { short: "A", fr: "Principal", en: "Main", de: "Haupt", es: "Principal", it: "Principale", nl: "Hoofd", pt: "Principal", color: "#FFD700" },
+      { short: "B", fr: "Consolante", en: "Consolation", de: "Trostrunde", es: "Consolación", it: "Consolazione", nl: "Troostronde", pt: "Consolação", color: "#9CA3AF" },
     ],
   },
 ];

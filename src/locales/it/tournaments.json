@@ -45,7 +45,8 @@
       "matches": "Partite",
       "standings": "Classifica",
       "bracket": "Fase a eliminazione diretta",
-      "streams": "Streaming"
+      "streams": "Streaming",
+      "flights": "Flights"
     },
     "sections": {
       "live": "In diretta",
@@ -1057,7 +1058,8 @@
     "templates": {
       "champions": "Champions / Europa",
       "cup_plate": "Coppa / Piatto",
-      "medals": "Oro / Argento / Bronzo"
+      "medals": "Oro / Argento / Bronzo",
+      "consolation": "Principale / Consolazione"
     },
     "dist": {
       "twoFlights": "2 Flights (top + resto)",
@@ -1074,6 +1076,14 @@
       "customize": "Personalizza",
       "back": "Indietro",
       "save": "Salva Flights"
+    },
+    "preset": {
+      "consolation": "Preset Consolazione (1 clic)",
+      "consolationDesc": "Crea 2 flights: Principale (vincitori dei gironi) e Consolazione (perdenti). Pronto da salvare."
+    },
+    "public": {
+      "empty": "No flights configured yet.",
+      "noMatches": "Matches will be generated after group stage."
     }
   }
 }
