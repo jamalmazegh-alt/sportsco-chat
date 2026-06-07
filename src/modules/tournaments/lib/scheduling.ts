@@ -49,6 +49,24 @@ export function generateRoundRobin(teamIds: string[]): Pairing[] {
 }
 
 /**
+ * Round-robin aller-retour : chaque équipe joue 2 fois contre chaque autre
+ * (1 fois à domicile, 1 fois à l'extérieur). Les rondes de la 2e passe
+ * continuent la numérotation et inversent home/away.
+ */
+export function generateDoubleRoundRobin(teamIds: string[]): Pairing[] {
+  const first = generateRoundRobin(teamIds);
+  if (first.length === 0) return first;
+  const maxRound = Math.max(...first.map((p) => p.round));
+  const second: Pairing[] = first.map((p) => ({
+    teamAId: p.teamBId,
+    teamBId: p.teamAId,
+    round: p.round + maxRound,
+  }));
+  return [...first, ...second];
+}
+
+
+/**
  * Distribue des équipes (avec seeds optionnels) dans N groupes équilibrés
  * via "snake draft" pour répartir les têtes de série.
  */

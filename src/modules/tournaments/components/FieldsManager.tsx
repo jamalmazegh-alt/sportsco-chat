@@ -10,6 +10,7 @@ import {
   Clock,
   Loader2,
   GripVertical,
+  Radio,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,8 @@ interface Props {
   dailyEndTime: string;
   matches: Match[];
   teams: Team[];
+  /** Map terrain → URL de streaming (un lien par terrain). */
+  fieldStreams?: Record<string, string> | null;
 }
 
 const UNASSIGNED = "__unassigned__";
@@ -56,12 +59,16 @@ export function FieldsManager({
   dailyEndTime,
   matches,
   teams,
+  fieldStreams,
 }: Props) {
   const { t, i18n } = useTranslation("tournaments");
   const initial = (fields && fields.length > 0 ? fields : [t("common.field") + " 1"]).map(
     (f) => String(f),
   );
   const [localFields, setLocalFields] = useState<string[]>(initial);
+  const [streams, setStreams] = useState<Record<string, string>>(
+    () => ({ ...(fieldStreams ?? {}) }),
+  );
   const [startTime, setStartTime] = useState<string>(
     (dailyStartTime ?? "09:00:00").slice(0, 5),
   );
@@ -75,17 +82,25 @@ export function FieldsManager({
   const qc = useQueryClient();
 
   const saveSettings = useMutation({
-    mutationFn: () =>
-      updateFn({
+    mutationFn: () => {
+      // Ne conserver que les streams des terrains encore présents
+      const cleanedStreams: Record<string, string> = {};
+      for (const f of localFields) {
+        const v = (streams[f] ?? "").trim();
+        if (v) cleanedStreams[f] = v;
+      }
+      return updateFn({
         data: {
           tournament_id: tournamentId,
           patch: {
             fields: localFields,
             daily_start_time: startTime.length === 5 ? `${startTime}:00` : startTime,
             daily_end_time: endTime.length === 5 ? `${endTime}:00` : endTime,
-          },
+            field_streams: cleanedStreams,
+          } as any,
         },
-      }),
+      });
+    },
     onSuccess: () => {
       toast.success(t("fields.savedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
@@ -187,33 +202,48 @@ export function FieldsManager({
 
         <div className="space-y-2">
           {localFields.map((f, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className="flex flex-col">
-                <button
+            <div key={i} className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col">
+                  <button
+                    type="button"
+                    onClick={() => moveField(i, -1)}
+                    className="text-muted-foreground hover:text-foreground disabled:opacity-30"
+                    disabled={i === 0}
+                    aria-label={t("fields.moveUp")}
+                  >
+                    <GripVertical className="h-3 w-3 rotate-90" />
+                  </button>
+                </div>
+                <Input
+                  value={f}
+                  onChange={(e) => renameField(i, e.target.value)}
+                  maxLength={60}
+                  className="flex-1"
+                />
+                <Button
                   type="button"
-                  onClick={() => moveField(i, -1)}
-                  className="text-muted-foreground hover:text-foreground disabled:opacity-30"
-                  disabled={i === 0}
-                  aria-label={t("fields.moveUp")}
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => removeField(i)}
+                  aria-label={t("fields.remove")}
                 >
-                  <GripVertical className="h-3 w-3 rotate-90" />
-                </button>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </div>
-              <Input
-                value={f}
-                onChange={(e) => renameField(i, e.target.value)}
-                maxLength={60}
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() => removeField(i)}
-                aria-label={t("fields.remove")}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
+              <div className="flex items-center gap-2 pl-6">
+                <Radio className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <Input
+                  value={streams[f] ?? ""}
+                  onChange={(e) => setStreams({ ...streams, [f]: e.target.value })}
+                  placeholder={t("fields.streamUrlPlaceholder", {
+                    defaultValue: "URL de streaming (YouTube, Twitch…)",
+                  })}
+                  maxLength={500}
+                  className="flex-1 h-8 text-xs"
+                  type="url"
+                />
+              </div>
             </div>
           ))}
           {localFields.length === 0 && (

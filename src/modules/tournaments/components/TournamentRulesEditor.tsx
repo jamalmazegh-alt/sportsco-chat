@@ -40,6 +40,7 @@ import {
   ALL_TIEBREAKERS,
   DEFAULT_RULES,
   mergeRules,
+  POINTS_PRESETS,
   type TournamentRules,
 } from "../lib/rules";
 import type { Sponsor } from "../lib/rules";
@@ -154,28 +155,65 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         <CardHeader>
           <CardTitle className="text-base">{t("rules.pointsTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className={`grid gap-3 ${allowsDraw ? "grid-cols-3" : "grid-cols-2"}`}>
-          <NumberField
-            label={t("rules.win")}
-            value={rules.points.win}
-            onChange={(v) => setRules({ ...rules, points: { ...rules.points, win: v } })}
-          />
-          {allowsDraw && (
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-1.5">
+            {POINTS_PRESETS.map((p) => (
+              <Button
+                key={p.key}
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  if (p.value)
+                    setRules({ ...rules, points: { ...p.value } });
+                }}
+                disabled={!p.value}
+              >
+                {p.label}
+              </Button>
+            ))}
+          </div>
+          <div className={`grid gap-3 ${allowsDraw ? "grid-cols-3" : "grid-cols-2"}`}>
             <NumberField
-              label={t("rules.draw")}
-              value={rules.points.draw}
+              label={t("rules.win")}
+              value={rules.points.win}
+              onChange={(v) => setRules({ ...rules, points: { ...rules.points, win: v } })}
+            />
+            {allowsDraw && (
+              <NumberField
+                label={t("rules.draw")}
+                value={rules.points.draw}
+                onChange={(v) =>
+                  setRules({ ...rules, points: { ...rules.points, draw: v } })
+                }
+              />
+            )}
+            <NumberField
+              label={t("rules.loss")}
+              value={rules.points.loss}
               onChange={(v) =>
-                setRules({ ...rules, points: { ...rules.points, draw: v } })
+                setRules({ ...rules, points: { ...rules.points, loss: v } })
               }
             />
+          </div>
+          {(rules.points.otWin != null || rules.points.otLoss != null) && (
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+              <NumberField
+                label={t("rules.otWin", { defaultValue: "Victoire en prolongation" })}
+                value={rules.points.otWin ?? rules.points.win}
+                onChange={(v) =>
+                  setRules({ ...rules, points: { ...rules.points, otWin: v } })
+                }
+              />
+              <NumberField
+                label={t("rules.otLoss", { defaultValue: "Défaite en prolongation" })}
+                value={rules.points.otLoss ?? rules.points.loss}
+                onChange={(v) =>
+                  setRules({ ...rules, points: { ...rules.points, otLoss: v } })
+                }
+              />
+            </div>
           )}
-          <NumberField
-            label={t("rules.loss")}
-            value={rules.points.loss}
-            onChange={(v) =>
-              setRules({ ...rules, points: { ...rules.points, loss: v } })
-            }
-          />
         </CardContent>
       </Card>
 

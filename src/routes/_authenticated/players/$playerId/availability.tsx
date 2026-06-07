@@ -60,7 +60,7 @@ function AvailabilityPage() {
         .maybeSingle();
       if (player?.user_id === uid) return true;
 
-      const { data: viaRpc, error: rpcErr } = await supabase.rpc("can_view_player_availability", {
+      const { data: viaRpc, error: rpcErr } = await (supabase.rpc as any)("can_view_player_availability", {
         _user_id: uid,
         _player_id: playerId,
       });
