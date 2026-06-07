@@ -523,7 +523,11 @@
     "formatSwiss": "Schweizer System",
     "formatSwissDesc": "Paarungen nach Tabellenstand pro Runde, feste Rundenanzahl",
     "swissRounds": "Anzahl Runden",
-    "swissRoundsHint": "Empfohlen: aufgerundet log₂(Teams) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5."
+    "swissRoundsHint": "Empfohlen: aufgerundet log₂(Teams) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
+    "formatFlightedFinals": "Flighted Finals",
+    "formatFlightedFinalsDesc": "Gruppenphase gefolgt von mehreren parallelen Finalturnieren (Champions, Europa…)",
+    "formatConsolation": "Trostrunde",
+    "formatConsolationDesc": "Hauptturnier + Trostrunde für früh ausgeschiedene Teams"
   },
   "groups": {
     "drawTitle": "Auslosung",
