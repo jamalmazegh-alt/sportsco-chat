@@ -27,7 +27,10 @@ export interface MatchInput {
   status: string;
   penaltyA?: number | null;
   penaltyB?: number | null;
+  /** Hockey & co. : différencie victoire en temps réglementaire vs prolongation. */
+  decidedIn?: "regulation" | "overtime" | "shootout" | null;
 }
+
 
 export interface ForfeitConfig {
   winnerScore: number;
@@ -100,7 +103,12 @@ export interface PointsConfig {
   draw: number;
   loss: number;
   bonusWin?: number;
+  /** Préset Hockey OT : points attribués au vainqueur en prolongation / TAB. */
+  otWin?: number;
+  /** Préset Hockey OT : points attribués au perdant en prolongation / TAB. */
+  otLoss?: number;
 }
+
 
 export interface FairPlayConfig {
   enabled: boolean;
