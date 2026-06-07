@@ -5,7 +5,7 @@
  * supportées par l'app. L'organisateur peut ensuite renommer librement.
  */
 
-export type FlightTemplateId = "champions" | "cup_plate" | "medals" | "custom";
+export type FlightTemplateId = "champions" | "cup_plate" | "medals" | "consolation" | "custom";
 
 export type Lang = "fr" | "en" | "de" | "es" | "it" | "nl" | "pt";
 
