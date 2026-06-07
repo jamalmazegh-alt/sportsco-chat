@@ -3540,7 +3540,9 @@ export type Database = {
       tournament_matches: {
         Row: {
           bracket_position: number | null
+          bracket_side: string | null
           created_at: string
+          decided_in: string | null
           details: Json
           dispute_flag: boolean
           duration_min: number | null
@@ -3573,7 +3575,9 @@ export type Database = {
         }
         Insert: {
           bracket_position?: number | null
+          bracket_side?: string | null
           created_at?: string
+          decided_in?: string | null
           details?: Json
           dispute_flag?: boolean
           duration_min?: number | null
@@ -3606,7 +3610,9 @@ export type Database = {
         }
         Update: {
           bracket_position?: number | null
+          bracket_side?: string | null
           created_at?: string
+          decided_in?: string | null
           details?: Json
           dispute_flag?: boolean
           duration_min?: number | null
@@ -4135,10 +4141,12 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           created_by: string
+          custom_sport_name: string | null
           daily_end_time: string
           daily_start_time: string
           description: string | null
           ends_on: string | null
+          field_streams: Json
           fields: Json
           format: Database["public"]["Enums"]["tournament_format"]
           id: string
@@ -4160,6 +4168,7 @@ export type Database = {
           sport: string | null
           starts_on: string
           status: Database["public"]["Enums"]["tournament_status"]
+          swiss_rounds: number | null
           tiebreakers: Json
           updated_at: string
         }
@@ -4171,10 +4180,12 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by: string
+          custom_sport_name?: string | null
           daily_end_time?: string
           daily_start_time?: string
           description?: string | null
           ends_on?: string | null
+          field_streams?: Json
           fields?: Json
           format?: Database["public"]["Enums"]["tournament_format"]
           id?: string
@@ -4196,6 +4207,7 @@ export type Database = {
           sport?: string | null
           starts_on: string
           status?: Database["public"]["Enums"]["tournament_status"]
+          swiss_rounds?: number | null
           tiebreakers?: Json
           updated_at?: string
         }
@@ -4207,10 +4219,12 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by?: string
+          custom_sport_name?: string | null
           daily_end_time?: string
           daily_start_time?: string
           description?: string | null
           ends_on?: string | null
+          field_streams?: Json
           fields?: Json
           format?: Database["public"]["Enums"]["tournament_format"]
           id?: string
@@ -4232,6 +4246,7 @@ export type Database = {
           sport?: string | null
           starts_on?: string
           status?: Database["public"]["Enums"]["tournament_status"]
+          swiss_rounds?: number | null
           tiebreakers?: Json
           updated_at?: string
         }
@@ -4910,7 +4925,13 @@ export type Database = {
         | "second_yellow"
         | "penalty"
         | "foul"
-      tournament_format: "group" | "knockout" | "mixed"
+      tournament_format:
+        | "group"
+        | "knockout"
+        | "mixed"
+        | "double_elimination"
+        | "swiss"
+        | "round_robin_home_away"
       tournament_match_round:
         | "group"
         | "r32"
@@ -5174,7 +5195,14 @@ export const Constants = {
         "penalty",
         "foul",
       ],
-      tournament_format: ["group", "knockout", "mixed"],
+      tournament_format: [
+        "group",
+        "knockout",
+        "mixed",
+        "double_elimination",
+        "swiss",
+        "round_robin_home_away",
+      ],
       tournament_match_round: [
         "group",
         "r32",
