@@ -121,6 +121,41 @@ export function FlightsManager({
     setDrafts(newDrafts);
   };
 
+  /** Preset Consolante 1-clic : 2 flights (Principal / Consolante).
+   *  Flight A = K premières positions de chaque poule, Flight B = le reste. */
+  const applyConsolationPreset = () => {
+    const tpl = FLIGHT_TEMPLATES.find((x) => x.id === "consolation")!;
+    setTemplate("consolation");
+    const tpg = teamsPerGroup || Math.max(2, Math.floor(numTeams / Math.max(1, numGroups)));
+    const k = Math.max(1, Math.floor(tpg / 2));
+    const mainPositions = Array.from({ length: k }, (_, i) => i + 1);
+    const consoPositions = Array.from({ length: Math.max(0, tpg - k) }, (_, i) => i + k + 1);
+    const newDrafts: DraftFlight[] = [
+      {
+        name: tpl.names[0][lang] ?? tpl.names[0].en,
+        short_name: tpl.names[0].short,
+        color: tpl.names[0].color ?? "",
+        qualification_rules: [{ kind: "group_position", positions: mainPositions }],
+        enable_third_place: true,
+        enable_fifth_place: false,
+        enable_seventh_place: false,
+      },
+      {
+        name: tpl.names[1][lang] ?? tpl.names[1].en,
+        short_name: tpl.names[1].short,
+        color: tpl.names[1].color ?? "",
+        qualification_rules:
+          consoPositions.length > 0
+            ? [{ kind: "group_position", positions: consoPositions }]
+            : [{ kind: "best_n_remaining", n: Math.max(2, numTeams - k * Math.max(1, numGroups)) }],
+        enable_third_place: false,
+        enable_fifth_place: false,
+        enable_seventh_place: false,
+      },
+    ];
+    setDrafts(newDrafts);
+  };
+
   const save = useMutation({
     mutationFn: () =>
       saveFn({
