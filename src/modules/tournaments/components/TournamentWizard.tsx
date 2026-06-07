@@ -37,6 +37,7 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [sport, setSport] = useState("football");
+  const [customSportName, setCustomSportName] = useState("");
   const [category, setCategory] = useState("");
   const [startsOn, setStartsOn] = useState("");
   const [endsOn, setEndsOn] = useState("");
