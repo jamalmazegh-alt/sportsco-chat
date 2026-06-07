@@ -281,6 +281,24 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
                 }}
               />
             </div>
+            {format === "swiss" && (
+              <div className="space-y-1.5">
+                <Label>{t("wizard.swissRounds")}</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={swissRounds}
+                  onChange={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    if (!isNaN(n)) setSwissRounds(Math.max(1, Math.min(20, n)));
+                  }}
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  {t("wizard.swissRoundsHint")}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
