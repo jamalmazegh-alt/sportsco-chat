@@ -239,11 +239,13 @@ export function qualifyTeamsToFlight(
       case "best_n_remaining": {
         // V1 : on prend les premiers non-encore-pris par position (2e, 3e...)
         // dans l'ordre des poules. Une version avancée comparerait les pts.
+        const startCount = picked.length;
         outer: for (let pos = 1; pos <= 32; pos++) {
           for (const g of standings) {
             const id = g.ordered_team_ids[pos - 1];
             if (id && !seen.has(id)) {
               add(id);
+              if (picked.length - startCount >= rule.n) break outer;
               if (picked.length >= quota) break outer;
             }
           }
