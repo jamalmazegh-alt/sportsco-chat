@@ -182,7 +182,12 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>{t("wizard.sport")}</Label>
-              <SportSelect value={sport} onValueChange={setSport} />
+              <SportSelect
+                value={sport}
+                onValueChange={setSport}
+                customName={customSportName}
+                onCustomNameChange={setCustomSportName}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>{t("wizard.categoryOptional")}</Label>
