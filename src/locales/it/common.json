@@ -907,6 +907,18 @@
     "tabNotifications": "Notifiche",
     "noNotifications": "Niente di nuovo. Tutto a posto."
   },
+  "notificationsCenter": {
+    "title": "Notifiche",
+    "subtitle": "Tutti i promemoria, le menzioni e gli avvisi del tuo Club.",
+    "unreadBadge_one": "{{count}} non letta",
+    "unreadBadge_other": "{{count}} non lette",
+    "markAllRead": "Segna tutto come letto",
+    "markRead": "Segna come letto",
+    "unread": "Non letta",
+    "emptyTitle": "Nessuna notifica",
+    "emptyDescription": "Convocazioni, menzioni, pagamenti e messaggi importanti appariranno qui.",
+    "loadError": "Impossibile caricare le notifiche in questo momento."
+  },
   "profile": {
     "title": "Profilo",
     "preferredLanguage": "Lingua preferita",
@@ -1480,6 +1492,10 @@
     "inbox": {
       "title": "Bacheca — Clubero",
       "description": "Notizie e messaggi del tuo Club."
+    },
+    "notifications": {
+      "title": "Notifiche — Clubero",
+      "description": "Tutti i tuoi avvisi e notifiche Clubero."
     },
     "followUps": {
       "title": "Follow-up — Clubero",

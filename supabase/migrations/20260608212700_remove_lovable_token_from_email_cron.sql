@@ -8,9 +8,13 @@ BEGIN
   LIMIT 1;
 
   IF v_jobid IS NULL THEN
+    RAISE NOTICE 'process-email-queue cron job not found; skipping Lovable token cleanup';
     RETURN;
   END IF;
 
+  -- Never append Lovable project tokens to cron-triggered HTTP URLs.
+  -- Authentication for the queue processor stays in the Authorization header
+  -- and is sourced from Supabase Vault.
   PERFORM cron.alter_job(
     job_id := v_jobid,
     command := $cron$

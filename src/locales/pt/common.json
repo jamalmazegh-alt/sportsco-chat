@@ -907,6 +907,18 @@
     "tabNotifications": "Notificações",
     "noNotifications": "Nada de novo. Tudo em ordem."
   },
+  "notificationsCenter": {
+    "title": "Notificações",
+    "subtitle": "Todos os lembretes, menções e alertas do seu Clube.",
+    "unreadBadge_one": "{{count}} não lida",
+    "unreadBadge_other": "{{count}} não lidas",
+    "markAllRead": "Marcar tudo como lido",
+    "markRead": "Marcar como lida",
+    "unread": "Não lida",
+    "emptyTitle": "Nenhuma notificação",
+    "emptyDescription": "Convocatórias, menções, pagamentos e mensagens importantes aparecerão aqui.",
+    "loadError": "Não foi possível carregar as suas notificações agora."
+  },
   "profile": {
     "title": "Perfil",
     "preferredLanguage": "Idioma preferido",
@@ -1480,6 +1492,10 @@
     "inbox": {
       "title": "Mural — Clubero",
       "description": "Notícias e mensagens do seu Clube."
+    },
+    "notifications": {
+      "title": "Notificações — Clubero",
+      "description": "Todos os seus alertas e notificações Clubero."
     },
     "followUps": {
       "title": "Acompanhamentos — Clubero",

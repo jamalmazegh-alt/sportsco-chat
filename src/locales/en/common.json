@@ -907,6 +907,18 @@
     "tabNotifications": "Notifications",
     "noNotifications": "Nothing new. You're all set."
   },
+  "notificationsCenter": {
+    "title": "Notifications",
+    "subtitle": "All reminders, mentions and alerts from your club.",
+    "unreadBadge_one": "{{count}} unread",
+    "unreadBadge_other": "{{count}} unread",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "unread": "Unread",
+    "emptyTitle": "No notifications",
+    "emptyDescription": "Call-ups, mentions, payments and important messages will appear here.",
+    "loadError": "Could not load your notifications right now."
+  },
   "profile": {
     "title": "Profile",
     "preferredLanguage": "Preferred language",
@@ -1480,6 +1492,10 @@
     "inbox": {
       "title": "Wall — Clubero",
       "description": "News feed and messages from your club."
+    },
+    "notifications": {
+      "title": "Notifications — Clubero",
+      "description": "All your Clubero alerts and notifications."
     },
     "followUps": {
       "title": "Follow-ups — Clubero",
