@@ -166,7 +166,14 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     return (count ?? 0) > 0;
   }
 
-  async function notifyCoaches(playerName: string, startStr: string, endStr: string, reasonLabel: string, events: ImpactedEvent[]) {
+  async function notifyCoaches(
+    playerName: string,
+    startStr: string,
+    endStr: string,
+    reasonLabel: string,
+    events: ImpactedEvent[],
+    declaredByName: string | null,
+  ) {
     // Find teams of the player, then coaches/assistants
     const { data: tm } = await supabase
       .from("team_members")
@@ -191,6 +198,12 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       reason: reasonLabel,
       defaultValue: `${playerName} sera absent(e) du ${startStr} au ${endStr}. Motif : ${reasonLabel}`,
     });
+    if (declaredByName) {
+      body += " — " + t("notification.declaredBy", {
+        name: declaredByName,
+        defaultValue: `déclaré par ${declaredByName}`,
+      });
+    }
     if (events.length > 0) {
       const labelFor = (type: string) => {
         switch (type) {
@@ -220,6 +233,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       })),
     );
   }
+
 
 
   async function onSubmit() {
