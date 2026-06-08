@@ -17,6 +17,7 @@ import {
   Inbox,
 } from "lucide-react";
 import { formatMoney, StatusBadge } from "@/lib/superadmin/ui";
+import { PrivacyRequestsSection } from "@/components/superadmin/privacy-requests-section";
 
 export const Route = createFileRoute("/superadmin/")({
   component: SuperAdminDashboard,
@@ -186,6 +187,10 @@ function SuperAdminDashboard() {
           </div>
         )}
       </section>
+
+      <PrivacyRequestsSection />
+
+
 
       {(stats?.generated_at || finance?.generated_at) && (
         <div className="text-xs text-muted-foreground">
