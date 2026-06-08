@@ -18,6 +18,8 @@ import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
@@ -1028,6 +1030,7 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
   const qc = useQueryClient();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [busyUid, setBusyUid] = useState<string | null>(null);
+  const notifyCoachAssignedFn = useServerFn(notifyCoachAssigned);
 
   const { data: coaches } = useQuery({
     queryKey: ["team-coaches", teamId, clubId],
@@ -1110,6 +1113,11 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
     if (error) { toast.error(error.message); return; }
     toast.success(t("teams.coachAttached", { defaultValue: "Coach attaché" }));
     qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
+
+    // Fire-and-forget email notification (in-app notification handled by DB trigger).
+    notifyCoachAssignedFn({
+      data: { teamId, coachUserId: uid, origin: window.location.origin },
+    }).catch(() => { /* non-blocking */ });
   }
 
   async function detach(uid: string) {

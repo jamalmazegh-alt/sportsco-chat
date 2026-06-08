@@ -174,7 +174,7 @@
   },
   "auth": {
     "playerSignupLink": "Are you a player? Create your profile here →",
-    "publicSignupClubAdminOnly": "This signup is for club managers. Players and parents attached to a club join Clubero via an invitation.",
+    "publicSignupClubAdminOnly": "Public signup is reserved for club managers. Players and parents only join Clubero through an invitation sent by their club.",
     "login": "Log in",
     "register": "Create account",
     "email": "Email",
@@ -197,7 +197,6 @@
     "rolePlayerHint": "Join your club with an invitation link.",
     "roleParent": "Parent",
     "roleParentHint": "Respond to call-ups for your child.",
-    "publicSignupClubAdminOnly": "Public signup is reserved for club managers. Players and parents only join Clubero through an invitation sent by their club.",
     "invitedAsHint": "You were invited — your role is set automatically.",
     "inviteCode": "Invitation code",
     "inviteHint": "Ask your club admin for an invitation link or code.",
@@ -1676,6 +1675,12 @@
       "more": "+ {{n}} more",
       "viewSuspensions": "View suspensions",
       "viewAbsences": "View absences"
+    }
+  },
+  "notifications": {
+    "coachAssigned": {
+      "title": "You have been added to a team",
+      "body": "You are now coach of {{teamName}} at {{clubName}}."
     }
   }
 }
