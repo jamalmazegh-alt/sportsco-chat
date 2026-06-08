@@ -590,6 +590,7 @@
     "minor": "Menor de edad",
     "parentRequiredForMinor": "Para un jugador menor de edad, se debe añadir un padre/madre.",
     "noParents": "Aún no hay ningún padre/madre vinculado.",
+    "linkedParentNoDetails": "Padre/Madre (cuenta vinculada)",
     "childAccessTitle": "Permitir a mi hijo/a acceder a la plataforma",
     "childAccessHint": "Por defecto, los niños no reciben cuenta ni notificaciones. Activa esta opción si tú (como padre/madre) quieres darle acceso a la plataforma a tu hijo/a.",
     "minorParentNotice": "Este jugador es menor de edad — se requiere un padre/madre y recibirá la invitación. El niño/a no recibirá una cuenta por defecto.",

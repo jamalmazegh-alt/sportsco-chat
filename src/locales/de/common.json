@@ -590,6 +590,7 @@
     "minor": "Minderjährig",
     "parentRequiredForMinor": "Für einen minderjährigen Spieler muss ein Elternteil hinzugefügt werden.",
     "noParents": "Noch kein Elternteil verknüpft.",
+    "linkedParentNoDetails": "Elternteil (verknüpftes Konto)",
     "childAccessTitle": "Meinem Kind Zugang zur Plattform erlauben",
     "childAccessHint": "Standardmäßig erhalten Kinder weder Konto noch Benachrichtigungen. Aktiviere diese Option, wenn du (als Elternteil) deinem Kind Zugang zur Plattform geben möchtest.",
     "minorParentNotice": "Dieser Spieler ist minderjährig — ein Elternteil ist erforderlich und erhält die Einladung. Das Kind erhält standardmäßig kein Konto.",

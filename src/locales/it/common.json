@@ -590,6 +590,7 @@
     "minor": "Minorenne",
     "parentRequiredForMinor": "Per un Giocatore minorenne, è necessario aggiungere un Genitore.",
     "noParents": "Nessun Genitore ancora collegato.",
+    "linkedParentNoDetails": "Genitore (account collegato)",
     "childAccessTitle": "Consenti a mio figlio l'accesso alla piattaforma",
     "childAccessHint": "Per impostazione predefinita, i bambini non ricevono un account o notifiche. Attiva questa opzione se tu (come Genitore) desideri dare a tuo figlio l'accesso alla piattaforma.",
     "minorParentNotice": "Questo Giocatore è minorenne — è richiesto un Genitore che riceverà l'invito. Il bambino non riceverà un account per impostazione predefinita.",

@@ -590,6 +590,7 @@
     "minor": "Minderjarig",
     "parentRequiredForMinor": "Voor een minderjarige Speler moet een Ouder worden toegevoegd.",
     "noParents": "Nog geen Ouder gekoppeld.",
+    "linkedParentNoDetails": "Ouder (gekoppeld account)",
     "childAccessTitle": "Mijn kind toegang geven tot het platform",
     "childAccessHint": "Standaard ontvangen kinderen geen account of meldingen. Schakel deze optie in als je (als Ouder) je kind toegang wilt geven tot het platform.",
     "minorParentNotice": "Deze Speler is minderjarig — een Ouder is vereist en ontvangt de uitnodiging. Het kind ontvangt standaard geen account.",
