@@ -17,6 +17,8 @@ type TournamentState = "empty" | "planned" | "live" | "done";
 
 export function HomeQuickCards({ clubId, teams }: Props) {
   const { t } = useTranslation();
+  const roles = useMyRoles();
+  const canCreateTournament = roles.includes("admin") || roles.includes("tournament_manager");
   const fn = useServerFn(listMyTournaments);
   const { data, isLoading } = useQuery({
     queryKey: ["home-tournaments", clubId],
