@@ -154,10 +154,12 @@ function AvailabilityPage() {
       <BackLink />
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-lg font-semibold">{t("availability.title", { defaultValue: "Disponibilités" })}</h1>
-        <Button size="sm" onClick={() => setOpen(true)}>
-          <Plus className="h-4 w-4" />
-          {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-        </Button>
+        {canDeclare && (
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+        )}
       </div>
 
       {/* Consolidated view */}

@@ -321,12 +321,14 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
             {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
           </span>
         </Button>
-        <Button size="sm" variant="default" onClick={() => setAbsenceOpen(true)}>
-          <Plus className="h-4 w-4" />
-          <span className="truncate">
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-          </span>
-        </Button>
+        {canDeclare && (
+          <Button size="sm" variant="default" onClick={() => setAbsenceOpen(true)}>
+            <Plus className="h-4 w-4" />
+            <span className="truncate">
+              {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            </span>
+          </Button>
+        )}
       </div>
 
       <QuickSanctionDrawer
@@ -334,7 +336,7 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
         onOpenChange={setSanctionOpen}
         clubId={clubId}
       />
-      <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />
+      {canDeclare && <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />}
     </section>
   );
 }
