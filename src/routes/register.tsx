@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { validateInviteToken, type InviteValidationResult } from "@/lib/invite.functions";
+import { validateInviteToken, confirmInvitedUserEmail, type InviteValidationResult } from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
