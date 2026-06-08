@@ -2764,14 +2764,19 @@ function EventDetail() {
                       : c.status === "uncertain" ? "ring-2 ring-uncertain/40"
                       : "ring-1 ring-border";
                     return (
-                    <li key={c.id} className="relative flex flex-col gap-2 px-3 py-2.5 border-b border-border last:border-b-0 sm:flex-row sm:items-center sm:justify-between hover:bg-muted/30 transition-colors">
+                    <li key={c.id} className={cn(
+                      "relative border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors",
+                      isCoach
+                        ? "flex flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
+                        : "flex flex-row items-center justify-between gap-2 px-3 py-2"
+                    )}>
                       <span className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full", accent)} />
                       <div className="flex items-center gap-2.5 min-w-0 flex-1 pl-1.5">
-                        <div className={cn("h-8 w-8 shrink-0 rounded-full bg-muted overflow-hidden", ringCls)}>
+                        <div className={cn("shrink-0 rounded-full bg-muted overflow-hidden", isCoach ? "h-8 w-8" : "h-7 w-7", ringCls)}>
                           {c.players?.photo_url ? (
                             <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
                           ) : (
-                            <div className="h-full w-full flex items-center justify-center text-[11px] font-semibold text-muted-foreground">
+                            <div className="h-full w-full flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
                               {(c.players?.first_name?.[0] ?? "") + (c.players?.last_name?.[0] ?? "")}
                             </div>
                           )}
@@ -2788,7 +2793,8 @@ function EventDetail() {
                           )}
                         </div>
                       </div>
-                      <div className="flex w-full items-center gap-1 shrink-0 sm:w-auto">
+                      <div className={cn("flex items-center gap-1 shrink-0", isCoach ? "w-full sm:w-auto" : "w-auto")}>
+
                         {isCoach ? (
                           <>
                             <div className="grid flex-1 grid-cols-3 gap-1 rounded-xl border bg-background/80 p-1 sm:flex sm:flex-none sm:rounded-full sm:gap-0.5 sm:p-0.5">
