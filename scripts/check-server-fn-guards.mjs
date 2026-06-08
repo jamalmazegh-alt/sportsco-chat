@@ -51,6 +51,10 @@ const ALLOWLIST = new Set([
   // unauthenticated pre-registration users. Query scoped to token value,
   // no cross-tenant risk.
   "src/lib/invite.functions.ts",
+  // coach-notify is a server-side event handler triggered by team membership
+  // changes, not a user-facing server function. No cross-tenant risk: queries
+  // are scoped to the affected coach and team.
+  "src/lib/coach-notify.functions.ts",
 ]);
 
 
