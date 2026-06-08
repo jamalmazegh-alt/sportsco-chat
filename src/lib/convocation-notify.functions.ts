@@ -142,6 +142,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               eventDate,
               status,
               reason: conv.comment ?? null,
+              declaredByName,
               eventUrl: `${baseUrl}/events/${ev.id}`,
               locale,
             },
