@@ -18,8 +18,8 @@ const USER_TABLES: Array<{ table: string; column: string }> = [
   { table: "follows", column: "follower_id" },
   { table: "coach_profiles", column: "user_id" },
   { table: "coach_diplomas", column: "user_id" },
-  { table: "player_parents", column: "user_id" },
-  { table: "player_guardians", column: "guardian_user_id" },
+  { table: "player_parents", column: "parent_user_id" },
+  { table: "player_guardians", column: "user_id" },
   { table: "event_messages", column: "sender_user_id" },
   { table: "wall_posts", column: "author_id" },
   { table: "wall_comments", column: "author_id" },
@@ -60,7 +60,7 @@ async function buildExportBundle(userId: string): Promise<{ bytes: Uint8Array; f
   const { data: parentLinks } = await supabaseAdmin
     .from("player_parents")
     .select("player_id")
-    .eq("user_id", userId);
+    .eq("parent_user_id", userId);
   const childIds = (parentLinks ?? []).map((r: any) => r.player_id);
   if (childIds.length) {
     const { data: children } = await supabaseAdmin
@@ -95,12 +95,21 @@ async function buildExportBundle(userId: string): Promise<{ bytes: Uint8Array; f
   }
 
   // Payment obligations and transactions
-  const [obls, txs] = await Promise.all([
-    supabaseAdmin.from("payment_obligations").select("*").eq("user_id", userId),
-    supabaseAdmin.from("payment_transactions").select("*").eq("user_id", userId),
-  ]);
-  bundle.payment_obligations = obls.data ?? [];
-  bundle.payment_transactions = txs.data ?? [];
+  const { data: oblsData } = await supabaseAdmin
+    .from("payment_obligations")
+    .select("*")
+    .eq("payer_user_id", userId);
+  bundle.payment_obligations = oblsData ?? [];
+  const oblIds = (oblsData ?? []).map((o: any) => o.id);
+  if (oblIds.length) {
+    const { data: txs } = await supabaseAdmin
+      .from("payment_transactions")
+      .select("*")
+      .in("obligation_id", oblIds);
+    bundle.payment_transactions = txs ?? [];
+  } else {
+    bundle.payment_transactions = [];
+  }
 
   const json = JSON.stringify(bundle, null, 2);
   const bytes = new TextEncoder().encode(json);
