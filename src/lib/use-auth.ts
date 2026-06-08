@@ -95,7 +95,7 @@ export function useAuthState(): AuthState {
       });
     const { data, error } = await supabase
       .from("club_members")
-      .select("club_id, role, clubs:club_id(id, name, logo_url)")
+      .select("club_id, role, roles, clubs:club_id(id, name, logo_url)")
       .eq("user_id", userData.user.id);
     if (error) {
       console.error(error);
