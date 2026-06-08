@@ -1030,6 +1030,7 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
   const qc = useQueryClient();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [busyUid, setBusyUid] = useState<string | null>(null);
+  const notifyCoachAssignedFn = useServerFn(notifyCoachAssigned);
 
   const { data: coaches } = useQuery({
     queryKey: ["team-coaches", teamId, clubId],
