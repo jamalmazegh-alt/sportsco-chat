@@ -63,3 +63,64 @@ export const validateInviteToken = createServerFn({ method: "POST" })
 
     return { valid: false, reason: "invalid" };
   });
+
+/**
+ * Public: confirm an invited user's email right after signup.
+ *
+ * Receiving + clicking the invite link is proof of email ownership, so we
+ * flip `email_confirmed_at` only when the token matches a still-valid invite
+ * for that exact email.
+ */
+export const confirmInvitedUserEmail = createServerFn({ method: "POST" })
+  .inputValidator((input: { token: string; email: string }) =>
+    z
+      .object({ token: z.string().min(1), email: z.string().email() })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const token = data.token.trim();
+    const email = data.email.trim().toLowerCase();
+
+    const { data: memberRows } = await supabaseAdmin.rpc(
+      "get_member_invite_info",
+      { _token: token },
+    );
+    const member = Array.isArray(memberRows) ? memberRows[0] : null;
+    let ok = false;
+    if (member && !member.used && !member.expired) {
+      if (!member.email || member.email.toLowerCase() === email) ok = true;
+    }
+    if (!ok) {
+      const { data: clubInvite } = await supabaseAdmin
+        .from("club_invites")
+        .select("expires_at, max_uses, uses_count")
+        .eq("token", token)
+        .maybeSingle();
+      if (clubInvite) {
+        const expired =
+          !!clubInvite.expires_at &&
+          new Date(clubInvite.expires_at).getTime() < Date.now();
+        const exhausted =
+          clubInvite.max_uses != null &&
+          clubInvite.uses_count >= clubInvite.max_uses;
+        ok = !expired && !exhausted;
+      }
+    }
+    if (!ok) throw new Response("Invalid invite", { status: 400 });
+
+    const { data: userList, error: listErr } =
+      await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    if (listErr) throw new Response(listErr.message, { status: 500 });
+    const user = userList.users.find(
+      (u) => (u.email ?? "").toLowerCase() === email,
+    );
+    if (!user) throw new Response("User not found", { status: 404 });
+    if (!user.email_confirmed_at) {
+      const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(
+        user.id,
+        { email_confirm: true },
+      );
+      if (updErr) throw new Response(updErr.message, { status: 500 });
+    }
+    return { ok: true };
+  });
