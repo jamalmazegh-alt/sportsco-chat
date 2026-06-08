@@ -119,6 +119,105 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
+        // 1.5 Hardening — allowlist + per-user rate limit + recipient scope check.
+        // Templates a regular signed-in user (coach/parent/player) is allowed to trigger
+        // from the front-end. Admin / system-only templates (suppression notifications,
+        // payment receipts, support tickets, subscription admin notifications, etc.)
+        // MUST NOT be callable from a user JWT — they are sent server-side via
+        // enqueueTransactionalEmailServer.
+        const ALLOWED_USER_TEMPLATES = new Set<string>([
+          'player-invite',
+          'convocation-invite',
+          'convocation-cancelled',
+          'convocation-response',
+          'event-cancelled',
+          'event-rescheduled',
+          'tournament-invite',
+          'tournament-member-added',
+          'absence-declared',
+        ])
+
+        if (!ALLOWED_USER_TEMPLATES.has(templateName)) {
+          console.warn('Blocked non-allowlisted template from user call', {
+            templateName,
+            user_id: user.id,
+          })
+          return Response.json(
+            { error: 'Template not allowed for direct user calls' },
+            { status: 403 }
+          )
+        }
+
+        // Per-user rate limit: 10 sends / minute / user. Reuses public_rate_limits
+        // (best-effort, fail-open on DB error).
+        try {
+          const minuteBucket = new Date()
+          minuteBucket.setSeconds(0, 0)
+          const windowStart = minuteBucket.toISOString()
+          const rlRoute = 'email-transactional-send'
+          const RATE_LIMIT_PER_MINUTE = 10
+
+          await supabase
+            .from('public_rate_limits')
+            .upsert(
+              { ip: user.id, route: rlRoute, window_start: windowStart, count: 0 },
+              { onConflict: 'ip,route,window_start', ignoreDuplicates: true }
+            )
+          const { data: rlRow } = await supabase
+            .from('public_rate_limits')
+            .select('count')
+            .eq('ip', user.id)
+            .eq('route', rlRoute)
+            .eq('window_start', windowStart)
+            .maybeSingle()
+          const current = rlRow?.count ?? 0
+          if (current >= RATE_LIMIT_PER_MINUTE) {
+            return Response.json(
+              { error: 'Rate limit exceeded (10 emails/minute)' },
+              { status: 429, headers: { 'Retry-After': '60' } }
+            )
+          }
+          await supabase
+            .from('public_rate_limits')
+            .update({ count: current + 1 })
+            .eq('ip', user.id)
+            .eq('route', rlRoute)
+            .eq('window_start', windowStart)
+        } catch (err) {
+          console.warn('Email rate-limit check failed — allowing request', {
+            err: err instanceof Error ? err.message : String(err),
+          })
+        }
+
+        // Recipient scope check — recipient must be reachable from one of the
+        // caller's clubs or tournaments (member, player, parent, pending invite,
+        // collaborator, registration), or be the caller's own email.
+        const { data: scopeOk, error: scopeErr } = await supabase.rpc(
+          'user_can_email_recipient',
+          { _user_id: user.id, _email: effectiveRecipient }
+        )
+        if (scopeErr) {
+          console.error('Scope check RPC failed — refusing to send', {
+            error: scopeErr,
+            recipient_redacted: redactEmail(effectiveRecipient),
+          })
+          return Response.json(
+            { error: 'Failed to verify recipient scope' },
+            { status: 500 }
+          )
+        }
+        if (!scopeOk) {
+          console.warn('Recipient outside caller scope — blocked', {
+            user_id: user.id,
+            templateName,
+            recipient_redacted: redactEmail(effectiveRecipient),
+          })
+          return Response.json(
+            { error: 'Recipient not in your club or tournament scope' },
+            { status: 403 }
+          )
+        }
+
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
           .from('suppressed_emails')
