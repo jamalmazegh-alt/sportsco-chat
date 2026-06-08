@@ -1394,6 +1394,17 @@ function EventDetail() {
       return;
     }
     const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
+    const lineupPublishedAt = (lineupData as any)?.published_at as string | undefined;
+    const lastSentAt = (event as any)?.convocation_last_sent_at as string | undefined;
+    const lineupChangedNow = !!lineupPublishedAt && (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
+    if (lineupChangedNow) {
+      changes.push({
+        field: "lineup",
+        label: t("events.fields.lineup" as any, { defaultValue: "Lineup" }),
+        previous: t("events.resend.lineupNotIncluded" as any, { defaultValue: "Not included" }),
+        current: t("events.resend.lineupPublished" as any, { defaultValue: "Published" }),
+      });
+    }
     setResendSubmitting(true);
     try {
       const playerIds = convocations.map((c: any) => c.player_id);
