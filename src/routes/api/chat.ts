@@ -446,6 +446,13 @@ export const Route = createFileRoute("/api/chat")({
               description: z.string().max(1000).optional(),
             }),
             execute: async ({ teamName, title, type, startsAt, endsAt, convocationTime, location, meetingPoint, opponent, isHome, description }) => {
+              // Guard: a match draft requires the opponent — refuse and tell the agent to ask.
+              if (type === "match" && (!opponent || !opponent.trim())) {
+                return {
+                  created: false,
+                  note: "Pour un match, le nom de l'équipe adverse (opponent) est obligatoire. Demande-le à l'utilisateur avant de réessayer.",
+                };
+              }
               // Resolve teams the user can manage (team coach/admin OR club admin/dirigeant)
               const managedTeamIds = await getManagedTeamIds();
               let coached: Array<{ id: string; name: string }> = [];
