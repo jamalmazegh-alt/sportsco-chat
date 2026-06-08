@@ -4899,6 +4899,10 @@ export type Database = {
           visibility: Database["public"]["Enums"]["feedback_visibility"]
         }[]
       }
+      user_can_email_recipient: {
+        Args: { _email: string; _user_id: string }
+        Returns: boolean
+      }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
     }
     Enums: {
