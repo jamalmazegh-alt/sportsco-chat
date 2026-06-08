@@ -114,12 +114,14 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             <p className="text-[11px] text-muted-foreground mt-1">
               {t("nav.tournaments")}
             </p>
-            <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
-              <Plus className="h-3 w-3" />
-              {t("dashboard.tournamentsCard.createCta", {
-                defaultValue: "Créer un tournoi",
-              })}
-            </p>
+            {canCreateTournament && (
+              <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
+                <Plus className="h-3 w-3" />
+                {t("dashboard.tournamentsCard.createCta", {
+                  defaultValue: "Créer un tournoi",
+                })}
+              </p>
+            )}
           </>
         ) : (
           <>
