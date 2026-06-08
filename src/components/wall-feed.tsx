@@ -178,7 +178,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if (error) { toast.error(error.message); return; }
     const mentioned = parseMentions(body);
     if (mentioned.length && data?.id) {
-      await notifyMentioned(mentioned, `/wall#${data.id}`, body.trim());
+      await notifyMentioned(mentioned, `/inbox#${data.id}`, body.trim());
     }
     if (data?.id) {
       const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
@@ -197,7 +197,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
             type: "wall_post",
             title: t("wall.newPostTitle", { defaultValue: "{{name}} a publié sur le mur", name: authorName }),
             body: snippet.slice(0, 140),
-            link: `/wall#${data.id}`,
+            link: `/inbox#${data.id}`,
           })),
         );
       }
@@ -473,7 +473,7 @@ function CommentBlock({ post, currentUserId, role, clubId }: { post: Post; curre
           type: "wall_mention",
           title: t("wall.mentionTitle", { defaultValue: "{{name}} vous a mentionné", name: authorName }),
           body: text.trim().slice(0, 140),
-          link: `/wall#${post.id}`,
+          link: `/inbox#${post.id}`,
         })),
       );
     }

@@ -51,7 +51,8 @@ LLM cost abuse.
 
 Cron-triggered. Sends D-1 reminders for upcoming events.
 
-- **Auth**: `Authorization: Bearer ${CRON_SECRET}`
+- **Auth**: `x-event-reminders-secret: ${EVENT_REMINDERS_SECRET}` (legacy
+  fallback during migration: `x-cron-secret: ${DATA_RETENTION_SECRET}`)
 - **Schedule**: every 15 min via Supabase pg_cron
 - **Response**: `200 {sent:n}`
 
@@ -59,9 +60,28 @@ Cron-triggered. Sends D-1 reminders for upcoming events.
 
 Cron-triggered. Notifies admins when trial is ending in 3 / 1 / 0 days.
 
-- **Auth**: `Authorization: Bearer ${CRON_SECRET}`
+- **Auth**: `x-trial-reminders-secret: ${TRIAL_REMINDERS_SECRET}` (legacy
+  fallback during migration: `x-cron-secret: ${DATA_RETENTION_SECRET}`)
 - **Schedule**: daily at 09:00 UTC
 - **Response**: `200 {sent:n}`
+
+## `POST /api/public/hooks/payment-reminders`
+
+Cron-triggered. Sends member payment reminders based on club settings.
+
+- **Auth**: `x-payment-reminders-secret: ${PAYMENT_REMINDERS_SECRET}` (legacy
+  fallback during migration: `x-cron-secret: ${DATA_RETENTION_SECRET}`)
+- **Schedule**: daily at 09:00 UTC
+- **Response**: `200 {processed:n, sent:n}`
+
+## `POST /api/public/hooks/coach-insights`
+
+Cron-triggered. Detects coach/admin insights for active clubs.
+
+- **Auth**: `x-coach-insights-secret: ${COACH_INSIGHTS_SECRET}` (legacy
+  fallback during migration: `x-cron-secret: ${DATA_RETENTION_SECRET}`)
+- **Schedule**: deployment-specific
+- **Response**: `200 {ok:true, ...}`
 
 ## `POST /api/public/hooks/data-retention`
 
@@ -69,9 +89,18 @@ Cron-triggered. Purges data per `docs/privacy/retention.md`:
 soft-delete inactive accounts > 36 mo, hard-delete archived clubs > 12 mo,
 trim `email_send_log` > 90 days, trim `audit_logs` > 24 mo.
 
-- **Auth**: `Authorization: Bearer ${DATA_RETENTION_SECRET}`
+- **Auth**: `x-retention-secret: ${DATA_RETENTION_SECRET}`
 - **Schedule**: daily at 03:00 UTC
 - **Response**: `200 {purged: {...}}`
+
+## `POST /api/public/social/sync`
+
+Cron-triggered. Syncs active social connections.
+
+- **Auth**: `x-social-sync-secret: ${SOCIAL_SYNC_SECRET}` (legacy fallback
+  during migration: `x-cron-secret: ${DATA_RETENTION_SECRET}`)
+- **Schedule**: hourly
+- **Response**: `200 {ok:true, ...}`
 
 ---
 

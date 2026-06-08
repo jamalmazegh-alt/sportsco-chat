@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 const MILESTONES = [7, 3, 1, 0] as const;
 
@@ -21,16 +22,15 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Shared cron secret — required to prevent public abuse (mass email trigger).
-        const secret = process.env.DATA_RETENTION_SECRET;
-        if (!secret) {
-          return new Response("Not configured", { status: 503 });
-        }
-        const provided =
-          request.headers.get("x-cron-secret") ||
-          request.headers.get("x-retention-secret");
-        if (provided !== secret) {
-          return new Response("Forbidden", { status: 403 });
+        const auth = verifyCronSecret(request, {
+          primaryEnv: "TRIAL_REMINDERS_SECRET",
+          legacyEnv: "DATA_RETENTION_SECRET",
+          headerNames: ["x-trial-reminders-secret", "x-cron-secret"],
+        });
+        if (!auth.ok) {
+          return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {
+            status: auth.status,
+          });
         }
         // Find trialing subs whose trial_end is within the next 8 days OR just expired (last 24h)
         const horizon = new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString();

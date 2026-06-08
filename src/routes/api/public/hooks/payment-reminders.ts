@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 /**
  * Daily payment reminders cron.
- * Auth: bypassed via /api/public/* prefix; protected by x-cron-secret
- * header checked against DATA_RETENTION_SECRET.
+ * Auth: bypassed via /api/public/* prefix; protected by
+ * PAYMENT_REMINDERS_SECRET (legacy fallback: DATA_RETENTION_SECRET).
  *
  * Logic:
  *   - For each club with payment_reminders_enabled:
@@ -98,13 +99,16 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Shared cron secret — required to prevent public abuse (mass-email trigger).
-        const secret = process.env.DATA_RETENTION_SECRET;
-        if (!secret) return new Response("Not configured", { status: 503 });
-        const provided =
-          request.headers.get("x-cron-secret") ||
-          request.headers.get("x-retention-secret");
-        if (provided !== secret) return new Response("Forbidden", { status: 403 });
+        const auth = verifyCronSecret(request, {
+          primaryEnv: "PAYMENT_REMINDERS_SECRET",
+          legacyEnv: "DATA_RETENTION_SECRET",
+          headerNames: ["x-payment-reminders-secret", "x-cron-secret"],
+        });
+        if (!auth.ok) {
+          return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {
+            status: auth.status,
+          });
+        }
 
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);

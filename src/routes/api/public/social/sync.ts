@@ -2,16 +2,22 @@
 // Protected by shared secret header `x-cron-secret`.
 import { createFileRoute } from "@tanstack/react-router";
 import { syncAll } from "@/lib/social/sync.server";
+import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 export const Route = createFileRoute("/api/public/social/sync")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env.SOCIAL_SYNC_SECRET ?? process.env.DATA_RETENTION_SECRET;
-        if (!secret) return new Response("Not configured", { status: 503 });
-        const provided =
-          request.headers.get("x-cron-secret") ?? request.headers.get("x-social-sync-secret");
-        if (provided !== secret) return new Response("Forbidden", { status: 403 });
+        const auth = verifyCronSecret(request, {
+          primaryEnv: "SOCIAL_SYNC_SECRET",
+          legacyEnv: "DATA_RETENTION_SECRET",
+          headerNames: ["x-social-sync-secret", "x-cron-secret"],
+        });
+        if (!auth.ok) {
+          return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {
+            status: auth.status,
+          });
+        }
         try {
           const result = await syncAll();
           return Response.json(result);
