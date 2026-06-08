@@ -16,8 +16,13 @@ export type Database = {
     Tables: {
       account_deletion_requests: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          error: string | null
+          hard_delete: boolean
           id: string
           processed_at: string | null
+          processed_by: string | null
           reason: string | null
           requested_at: string
           scheduled_for: string
@@ -25,8 +30,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          error?: string | null
+          hard_delete?: boolean
           id?: string
           processed_at?: string | null
+          processed_by?: string | null
           reason?: string | null
           requested_at?: string
           scheduled_for?: string
@@ -34,8 +44,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          error?: string | null
+          hard_delete?: boolean
           id?: string
           processed_at?: string | null
+          processed_by?: string | null
           reason?: string | null
           requested_at?: string
           scheduled_for?: string
@@ -777,8 +792,10 @@ export type Database = {
         Row: {
           completed_at: string | null
           error: string | null
+          file_path: string | null
           file_url: string | null
           id: string
+          processed_by: string | null
           requested_at: string
           status: Database["public"]["Enums"]["privacy_request_status"]
           user_id: string
@@ -786,8 +803,10 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           error?: string | null
+          file_path?: string | null
           file_url?: string | null
           id?: string
+          processed_by?: string | null
           requested_at?: string
           status?: Database["public"]["Enums"]["privacy_request_status"]
           user_id: string
@@ -795,8 +814,10 @@ export type Database = {
         Update: {
           completed_at?: string | null
           error?: string | null
+          file_path?: string | null
           file_url?: string | null
           id?: string
+          processed_by?: string | null
           requested_at?: string
           status?: Database["public"]["Enums"]["privacy_request_status"]
           user_id?: string
@@ -4831,6 +4852,7 @@ export type Database = {
       }
       next_receipt_number: { Args: { _club_id: string }; Returns: number }
       player_is_minor: { Args: { _player_id: string }; Returns: boolean }
+      privacy_anonymize_user: { Args: { _user_id: string }; Returns: undefined }
       purge_soft_deleted: { Args: never; Returns: undefined }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -4898,6 +4920,10 @@ export type Database = {
           period_start: string
           visibility: Database["public"]["Enums"]["feedback_visibility"]
         }[]
+      }
+      user_can_email_recipient: {
+        Args: { _email: string; _user_id: string }
+        Returns: boolean
       }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }
     }
