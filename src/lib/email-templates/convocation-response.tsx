@@ -12,6 +12,7 @@ interface Props {
   eventDate?: string;
   status: "absent" | "uncertain";
   reason?: string;
+  declaredByName?: string;
   eventUrl: string;
   locale?: Locale;
 }
@@ -25,6 +26,7 @@ const T = {
     answered: "a répondu",
     toCallup: "à la convocation pour",
     reason: "Motif",
+    declaredBy: (n: string) => `Déclaré par ${n}.`,
     seeEvent: "Voir l'événement",
     foot: "Vous recevez cet e-mail en tant que coach de l'équipe sur Clubero.",
   },
@@ -36,13 +38,14 @@ const T = {
     answered: "replied",
     toCallup: "to the call-up for",
     reason: "Reason",
+    declaredBy: (n: string) => `Declared by ${n}.`,
     seeEvent: "View event",
     foot: "You receive this email as a team coach on Clubero.",
   },
 } as const;
 
 const ConvocationResponseEmail = ({
-  coachFirstName, playerName, eventTitle, eventDate, status, reason, eventUrl, locale,
+  coachFirstName, playerName, eventTitle, eventDate, status, reason, declaredByName, eventUrl, locale,
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
@@ -59,6 +62,9 @@ const ConvocationResponseEmail = ({
           {t.toCallup} <strong>{eventTitle}</strong>
           {eventDateFmt ? <> ({eventDateFmt})</> : null}.
         </Text>
+        {declaredByName && (
+          <Text style={subtle}>{t.declaredBy(declaredByName)}</Text>
+        )}
         {reason && (
           <Section style={reasonBox}>
             <Text style={reasonLabel}>{t.reason}</Text>
@@ -69,6 +75,7 @@ const ConvocationResponseEmail = ({
         </EmailShell>
   );
 };
+
 
 export const template = {
   component: ConvocationResponseEmail,
