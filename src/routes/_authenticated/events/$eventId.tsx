@@ -480,7 +480,7 @@ function EventDetail() {
         const p = byId.get(id);
         return { name: name(p), jersey: p?.jersey_number ?? null };
       });
-      return { formation: l.formation, _starting: starting, _bench: bench };
+      return { formation: l.formation, published_at: l.published_at, _starting: starting, _bench: bench };
     },
   });
 
