@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { validateInviteToken, type InviteValidationResult } from "@/lib/invite.functions";
+import { validateInviteToken, confirmInvitedUserEmail, type InviteValidationResult } from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,7 @@ function RegisterPage() {
   const [inviteValidation, setInviteValidation] = useState<InviteValidationResult | null>(null);
   const [busy, setBusy] = useState(false);
   const validateInvite = useServerFn(validateInviteToken);
+  const confirmInvitedEmail = useServerFn(confirmInvitedUserEmail);
 
   useEffect(() => {
     if (!hasInvite) return;
@@ -141,6 +142,33 @@ function RegisterPage() {
       toast.success(t("auth.signupSuccess"));
       navigate({ to: "/home" });
       return;
+    }
+    // No session: email confirmation is required. For invited users the
+    // invite link is proof of email ownership, so auto-confirm and sign them in.
+    if (hasInvite) {
+      try {
+        await confirmInvitedEmail({ data: { token: inviteToken, email } });
+        const { error: signInErr } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInErr) throw signInErr;
+        const rpcName = inviteKind === "club" ? "redeem_club_invite" : "redeem_member_invite";
+        const { error: rErr } = await supabase.rpc(rpcName, { _token: inviteToken });
+        if (rErr) {
+          setBusy(false);
+          toast.error(rErr.message || t("auth.inviteInvalid"));
+          return;
+        }
+        setBusy(false);
+        toast.success(t("auth.signupSuccess"));
+        navigate({ to: "/home" });
+        return;
+      } catch (err: any) {
+        setBusy(false);
+        toast.error(err?.message || t("auth.inviteInvalid"));
+        return;
+      }
     }
     setBusy(false);
     toast.success(t("auth.checkEmail"), { duration: 8000 });
