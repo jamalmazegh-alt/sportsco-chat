@@ -554,18 +554,36 @@ function EventDetail() {
       new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
     );
 
+    // If caller is a parent (not the player themselves), attribute the response.
+    let declaredByName: string | null = null;
+    if (user && conv?.players?.user_id && conv.players.user_id !== user.id) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("first_name, full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      declaredByName =
+        (prof as any)?.first_name ||
+        (((prof as any)?.full_name ?? "").split(" ")[0] || null);
+    }
+
     if (coachIds.length > 0) {
       // In-app notifications
+      const baseBody = reason ? `${event.title} — "${reason}"` : event.title;
+      const body = declaredByName
+        ? `${baseBody} — ${t("notification.declaredBy", { name: declaredByName, defaultValue: `déclaré par ${declaredByName}` })}`
+        : baseBody;
       await supabase.from("notifications").insert(
         coachIds.map((uid) => ({
           user_id: uid,
           type: "convocation_response",
           title: `${playerName} : ${t(`attendance.${status}`)}`,
-          body: reason ? `${event.title} — "${reason}"` : event.title,
+          body,
           link: `/events/${event.id}`,
         }))
       );
     }
+
 
     // Email notifications via server function (looks up coach emails server-side)
     try {
@@ -872,13 +890,20 @@ function EventDetail() {
         // ignore
       }
 
-      // Full squad list (names of all newly convoked players)
-      const squadList = toInsert
+      // Full squad list (names of ALL convoked players for this event:
+      // already-existing convocations + newly inserted)
+      const existingNames = (convocations ?? [])
+        .map((c: any) =>
+          `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim(),
+        )
+        .filter(Boolean);
+      const newNames = toInsert
         .map((pid) => {
           const p = (playersInfo ?? []).find((pp: any) => pp.id === pid) as any;
           return p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() : "";
         })
         .filter(Boolean);
+      const squadList = Array.from(new Set([...existingNames, ...newNames]));
 
       // Composition (si publiée)
       const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined);
@@ -934,26 +959,37 @@ function EventDetail() {
 
 
       const sends: Promise<unknown>[] = [];
+      // Dedupe by lowercased email — a parent and child sometimes share an inbox.
+      const sentToEmails = new Set<string>();
+      const enqueue = (
+        email: string | undefined | null,
+        token: string,
+        firstName: string | undefined,
+        playerName: string,
+        idemSuffix: string,
+      ) => {
+        if (!email) return;
+        const key = email.trim().toLowerCase();
+        if (!key || sentToEmails.has(key)) return;
+        sentToEmails.add(key);
+        sends.push(
+          sendOne(token, email, firstName, playerName, idemSuffix).catch(() => undefined),
+        );
+      };
       for (const conv of insertedConvs ?? []) {
         const player = (playersInfo ?? []).find((p: any) => p.id === conv.player_id) as any;
         if (!player) continue;
         const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
         // Player email
-        if (player.email) {
-          sends.push(
-            sendOne(conv.response_token!, player.email, player.first_name ?? undefined, playerName, `p-${conv.id}`).catch(() => undefined),
-          );
-        }
+        enqueue(player.email, conv.response_token!, player.first_name ?? undefined, playerName, `p-${conv.id}`);
         // Parent emails
         for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
-          if (!parent.email) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-          sends.push(
-            sendOne(conv.response_token!, parent.email, parentFirst, playerName, `parent-${parent.player_id}-${conv.id}`).catch(() => undefined),
-          );
+          enqueue(parent.email, conv.response_token!, parentFirst, playerName, `parent-${parent.player_id}-${conv.id}`);
         }
       }
       await Promise.allSettled(sends);
+
     } catch {
       // best-effort: in-app notif already sent
     }

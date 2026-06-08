@@ -47,6 +47,30 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       throw new Error("Forbidden");
     }
 
+    // Detect if caller is the player themselves vs. a parent/guardian.
+    // If parent → fetch declarer's first name to attribute in the email.
+    let declaredByName: string | null = null;
+    try {
+      const { data: playerRow } = await supabaseAdmin
+        .from("players")
+        .select("user_id")
+        .eq("id", conv.player_id)
+        .maybeSingle();
+      const isSelf = (playerRow as any)?.user_id === userId;
+      if (!isSelf) {
+        const { data: declarer } = await supabaseAdmin
+          .from("profiles")
+          .select("first_name, full_name")
+          .eq("id", userId)
+          .maybeSingle();
+        declaredByName =
+          (declarer as any)?.first_name ||
+          (((declarer as any)?.full_name ?? "").split(" ")[0] || null);
+      }
+    } catch {
+      // best-effort
+    }
+
     // Find coaches/admins of the team
     const { data: coaches } = await supabaseAdmin
       .from("team_members")
@@ -58,6 +82,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
       new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
     );
     if (coachIds.length === 0) return { sent: 0 };
+
 
     // Fetch coach profiles + emails (auth.users via admin)
     const { data: profs } = await supabaseAdmin
@@ -117,6 +142,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
               eventDate,
               status,
               reason: conv.comment ?? null,
+              declaredByName,
               eventUrl: `${baseUrl}/events/${ev.id}`,
               locale,
             },

@@ -166,7 +166,14 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     return (count ?? 0) > 0;
   }
 
-  async function notifyCoaches(playerName: string, startStr: string, endStr: string, reasonLabel: string, events: ImpactedEvent[]) {
+  async function notifyCoaches(
+    playerName: string,
+    startStr: string,
+    endStr: string,
+    reasonLabel: string,
+    events: ImpactedEvent[],
+    declaredByName: string | null,
+  ) {
     // Find teams of the player, then coaches/assistants
     const { data: tm } = await supabase
       .from("team_members")
@@ -191,6 +198,12 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       reason: reasonLabel,
       defaultValue: `${playerName} sera absent(e) du ${startStr} au ${endStr}. Motif : ${reasonLabel}`,
     });
+    if (declaredByName) {
+      body += " — " + t("notification.declaredBy", {
+        name: declaredByName,
+        defaultValue: `déclaré par ${declaredByName}`,
+      });
+    }
     if (events.length > 0) {
       const labelFor = (type: string) => {
         switch (type) {
@@ -222,6 +235,7 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
   }
 
 
+
   async function onSubmit() {
     if (!playerId) {
       toast.error(t("availability.errors.missingPlayer", { defaultValue: "Sélectionnez un joueur." }));
@@ -247,31 +261,51 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
           setBusy(true);
         }
       }
-      const { error } = await supabase.from("player_availabilities").insert({
-        player_id: playerId,
-        created_by_user_id: user!.id,
-        start_date: startDate,
-        end_date: endDate,
-        reason,
-        comment: comment.trim() || null,
-      });
+      const { data: inserted, error } = await supabase
+        .from("player_availabilities")
+        .insert({
+          player_id: playerId,
+          created_by_user_id: user!.id,
+          start_date: startDate,
+          end_date: endDate,
+          reason,
+          comment: comment.trim() || null,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
 
-      // Notify coaches (best-effort)
+      // Notify coaches (best-effort): in-app + email (server fn handles per-coach locale)
       try {
-        const playerRes = await supabase
-          .from("players")
-          .select("first_name, last_name")
-          .eq("id", playerId)
-          .maybeSingle();
+        const [playerRes, declarerRes] = await Promise.all([
+          supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
+          supabase.from("profiles").select("first_name, full_name").eq("id", user!.id).maybeSingle(),
+        ]);
         const p = playerRes.data;
         const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
+        const declaredByName =
+          (declarerRes.data as any)?.first_name ||
+          (((declarerRes.data as any)?.full_name ?? "").split(" ")[0] || null);
+        // Only attribute if declarer is NOT the player themselves
+        const isSelf = !!p && (await supabase
+          .from("players")
+          .select("user_id")
+          .eq("id", playerId)
+          .maybeSingle()).data?.user_id === user!.id;
+        const attribution = isSelf ? null : declaredByName;
         const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
         const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel, impactedEvents);
+        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel, impactedEvents, attribution);
+
+        // Email coaches via server fn (per-coach language, excludes caller)
+        if (inserted?.id) {
+          const { notifyCoachesOfAbsence } = await import("@/lib/absence-notify.functions");
+          notifyCoachesOfAbsence({ data: { availabilityId: inserted.id } }).catch(() => undefined);
+        }
       } catch {
         /* ignore notify errors */
       }
+
 
       toast.success(t("availability.saved", { defaultValue: "Absence enregistrée" }));
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
