@@ -1626,10 +1626,11 @@ function EventDetail() {
   const isPastMatch =
     event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
   const showFeedbackButton = isPastMatch && isCoach;
-  // Joueur/parent : masquer la carte si aucune convocation personnelle (évite section vide).
+  // Joueur/parent : afficher la liste des convoqués dès que l'événement est publié/envoyé,
+  // même si l'utilisateur n'a pas de réponse personnelle à donner.
   const showConvocationSection = isCoach
     ? event.convocations_sent || event.status !== "cancelled" || visibleMyConvocs.length > 0
-    : visibleMyConvocs.length > 0;
+    : visibleMyConvocs.length > 0 || (event.convocations_sent && (convocations?.length ?? 0) > 0);
 
   return (
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
