@@ -39,6 +39,8 @@ import { template as paymentReceiptTemplate } from './payment-receipt'
 import { template as paymentReminderTemplate } from './payment-reminder'
 import { template as coachAssignedTemplate } from './coach-assigned'
 import { template as absenceDeclaredTemplate } from './absence-declared'
+import { template as dataExportReadyTemplate } from './data-export-ready'
+import { template as accountDeletedTemplate } from './account-deleted'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-confirmation': inquiryConfirmationTemplate,
@@ -63,4 +65,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'payment-reminder': paymentReminderTemplate,
   'coach-assigned': coachAssignedTemplate,
   'absence-declared': absenceDeclaredTemplate,
+  'data-export-ready': dataExportReadyTemplate,
+  'account-deleted': accountDeletedTemplate,
 }
