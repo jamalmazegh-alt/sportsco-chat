@@ -99,6 +99,7 @@ export const template = {
 
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 20px" };
+const subtle = { fontSize: "13px", color: "#64748b", margin: "0 0 16px" };
 const reasonBox = { backgroundColor: "#f1f5f9", borderRadius: "10px", padding: "12px 16px", margin: "0 0 20px" };
 const reasonLabel = { fontSize: "11px", textTransform: "uppercase" as const, color: "#64748b", margin: "0 0 4px", fontWeight: "bold" as const };
 const reasonText = { fontSize: "14px", color: "#0f172a", fontStyle: "italic" as const, margin: 0 };
