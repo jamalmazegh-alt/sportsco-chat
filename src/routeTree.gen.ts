@@ -108,6 +108,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicSocialSyncRouteImport } from './routes/api/public/social/sync'
 import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public/social/callback'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
+import { Route as ApiPublicHooksPrivacyWorkerRouteImport } from './routes/api/public/hooks/privacy-worker'
 import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api/public/hooks/payment-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
@@ -652,6 +653,12 @@ const ApiPublicHooksTrialRemindersRoute =
     path: '/api/public/hooks/trial-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPrivacyWorkerRoute =
+  ApiPublicHooksPrivacyWorkerRouteImport.update({
+    id: '/api/public/hooks/privacy-worker',
+    path: '/api/public/hooks/privacy-worker',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPaymentRemindersRoute =
   ApiPublicHooksPaymentRemindersRouteImport.update({
     id: '/api/public/hooks/payment-reminders',
@@ -886,6 +893,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
+  '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
   '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
@@ -1003,6 +1011,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
+  '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
   '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
@@ -1126,6 +1135,7 @@ export interface FileRoutesById {
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
+  '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
   '/api/public/social/sync': typeof ApiPublicSocialSyncRoute
@@ -1249,6 +1259,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
+    | '/api/public/hooks/privacy-worker'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/social/callback'
     | '/api/public/social/sync'
@@ -1366,6 +1377,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
+    | '/api/public/hooks/privacy-worker'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/social/callback'
     | '/api/public/social/sync'
@@ -1488,6 +1500,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
+    | '/api/public/hooks/privacy-worker'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/social/callback'
     | '/api/public/social/sync'
@@ -1553,6 +1566,7 @@ export interface RootRouteChildren {
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksPaymentRemindersRoute: typeof ApiPublicHooksPaymentRemindersRoute
+  ApiPublicHooksPrivacyWorkerRoute: typeof ApiPublicHooksPrivacyWorkerRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicSocialCallbackRoute: typeof ApiPublicSocialCallbackRoute
   ApiPublicSocialSyncRoute: typeof ApiPublicSocialSyncRoute
@@ -2260,6 +2274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTrialRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/privacy-worker': {
+      id: '/api/public/hooks/privacy-worker'
+      path: '/api/public/hooks/privacy-worker'
+      fullPath: '/api/public/hooks/privacy-worker'
+      preLoaderRoute: typeof ApiPublicHooksPrivacyWorkerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/payment-reminders': {
       id: '/api/public/hooks/payment-reminders'
       path: '/api/public/hooks/payment-reminders'
@@ -2740,6 +2761,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksPaymentRemindersRoute: ApiPublicHooksPaymentRemindersRoute,
+  ApiPublicHooksPrivacyWorkerRoute: ApiPublicHooksPrivacyWorkerRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicSocialCallbackRoute: ApiPublicSocialCallbackRoute,
   ApiPublicSocialSyncRoute: ApiPublicSocialSyncRoute,
