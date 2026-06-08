@@ -907,6 +907,18 @@
     "tabNotifications": "Meldingen",
     "noNotifications": "Niets nieuws. Alles in orde."
   },
+  "notificationsCenter": {
+    "title": "Meldingen",
+    "subtitle": "Alle herinneringen, vermeldingen en waarschuwingen van je Club.",
+    "unreadBadge_one": "{{count}} ongelezen",
+    "unreadBadge_other": "{{count}} ongelezen",
+    "markAllRead": "Alles als gelezen markeren",
+    "markRead": "Als gelezen markeren",
+    "unread": "Ongelezen",
+    "emptyTitle": "Geen meldingen",
+    "emptyDescription": "Oproepen, vermeldingen, betalingen en belangrijke berichten verschijnen hier.",
+    "loadError": "Je meldingen kunnen nu niet worden geladen."
+  },
   "profile": {
     "title": "Profiel",
     "preferredLanguage": "Voorkeurstaal",
@@ -1480,6 +1492,10 @@
     "inbox": {
       "title": "Muur — Clubero",
       "description": "Nieuws en berichten van je Club."
+    },
+    "notifications": {
+      "title": "Meldingen — Clubero",
+      "description": "Al je Clubero-waarschuwingen en meldingen."
     },
     "followUps": {
       "title": "Opvolging — Clubero",
