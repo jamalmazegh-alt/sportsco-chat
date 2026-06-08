@@ -18,6 +18,8 @@ import { PhoneInput } from "@/components/phone-input";
 import { SportSelect } from "@/components/sport-select";
 import { PositionCombobox } from "@/components/position-combobox";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { notifyCoachAssigned } from "@/lib/coach-notify.functions";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, Plus, UserCircle2, Loader2, Camera, Pencil, Send, X, CheckSquare, Trash2, Download } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
@@ -1111,42 +1113,10 @@ function TeamCoaches({ teamId, clubId, isAdmin }: { teamId: string; clubId?: str
     toast.success(t("teams.coachAttached", { defaultValue: "Coach attaché" }));
     qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
 
-    // Send email notification to the newly attached coach (non-blocking).
-    // The in-app notification is handled by a DB trigger.
-    (async () => {
-      try {
-        const [{ data: prof }, { data: team }] = await Promise.all([
-          supabase.from("profiles").select("id, first_name, preferred_language").eq("id", uid).maybeSingle(),
-          supabase.from("teams").select("id, name, club_id").eq("id", teamId).maybeSingle(),
-        ]);
-        const { data: authUser } = await supabase.auth.admin?.getUserById?.(uid).catch?.(() => ({ data: null })) ?? { data: null };
-        // Fallback: read recipient email via club_members invite_email or auth metadata isn't reachable from client.
-        // Use a server-stored email column on club_members.
-        const { data: cm } = team?.club_id
-          ? await supabase.from("club_members").select("user_id, invite_email").eq("club_id", team.club_id).eq("user_id", uid).maybeSingle()
-          : { data: null } as any;
-        const recipient = (authUser as any)?.user?.email ?? cm?.invite_email ?? null;
-        if (!recipient || !team) return;
-        const { data: club } = team.club_id
-          ? await supabase.from("clubs").select("name").eq("id", team.club_id).maybeSingle()
-          : { data: null } as any;
-        const locale = (prof?.preferred_language ?? "fr").slice(0, 2).toLowerCase();
-        await sendTransactionalEmail({
-          templateName: "coach-assigned",
-          recipientEmail: recipient,
-          idempotencyKey: `coach-assigned-${teamId}-${uid}`,
-          templateData: {
-            displayName: prof?.first_name ?? undefined,
-            teamName: team.name,
-            clubName: club?.name ?? "",
-            teamUrl: `${window.location.origin}/teams/${teamId}`,
-            locale,
-          },
-        });
-      } catch {
-        /* non-blocking */
-      }
-    })();
+    // Fire-and-forget email notification (in-app notification handled by DB trigger).
+    notifyCoachAssignedFn({
+      data: { teamId, coachUserId: uid, origin: window.location.origin },
+    }).catch(() => { /* non-blocking */ });
   }
 
   async function detach(uid: string) {
