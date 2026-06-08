@@ -38,6 +38,7 @@ import { template as tournamentRosterLinkTemplate } from './tournament-roster-li
 import { template as paymentReceiptTemplate } from './payment-receipt'
 import { template as paymentReminderTemplate } from './payment-reminder'
 import { template as coachAssignedTemplate } from './coach-assigned'
+import { template as absenceDeclaredTemplate } from './absence-declared'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-confirmation': inquiryConfirmationTemplate,
