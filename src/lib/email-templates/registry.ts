@@ -62,4 +62,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'payment-receipt': paymentReceiptTemplate,
   'payment-reminder': paymentReminderTemplate,
   'coach-assigned': coachAssignedTemplate,
+  'absence-declared': absenceDeclaredTemplate,
 }
