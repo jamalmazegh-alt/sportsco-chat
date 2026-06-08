@@ -498,6 +498,25 @@ function PlayerProfile() {
         )}
       </div>
 
+      {/* Quick action: declare absence for self/child */}
+      {!isCoach && (isSelf || isParentOfThisPlayer) && (
+        <>
+          <Button
+            variant="outline"
+            className="w-full h-11"
+            onClick={() => setAbsenceOpen(true)}
+          >
+            <Palmtree className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+          <DeclareAbsenceDrawer
+            open={absenceOpen}
+            onOpenChange={setAbsenceOpen}
+            playerId={player.id}
+          />
+        </>
+      )}
+
       {/* Tabs */}
       {(isCoach || isSelf || isParentOfThisPlayer) && (
         <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1 overflow-x-auto">
