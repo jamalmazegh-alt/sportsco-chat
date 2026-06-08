@@ -655,7 +655,9 @@
       "notifResent": "Convocation renvoyée",
       "success": "Convocation renvoyée à {{count}} joueur(s)",
       "error": "Erreur lors du renvoi",
-      "updatesBadge": "{{count}} màj"
+      "updatesBadge": "{{count}} màj",
+      "lineupNotIncluded": "Non incluse",
+      "lineupPublished": "Publiée"
     },
     "fields": {
       "title": "Titre",
@@ -666,7 +668,8 @@
       "location": "Lieu",
       "meeting_point": "Point de RDV",
       "competition_name": "Compétition",
-      "type": "Type"
+      "type": "Type",
+      "lineup": "Compo"
     },
     "pastBadge": "Passé",
     "calendarHint": "Touche un jour avec une pastille pour voir les événements.",

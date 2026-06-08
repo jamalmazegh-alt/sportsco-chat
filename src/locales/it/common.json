@@ -654,7 +654,9 @@
       "notifResent": "Convocazione inviata di nuovo",
       "success": "Convocazione inviata di nuovo a {{count}} Giocatori",
       "error": "Errore durante il nuovo invio",
-      "updatesBadge": "{{count}} mod."
+      "updatesBadge": "{{count}} mod.",
+      "lineupNotIncluded": "Non inclusa",
+      "lineupPublished": "Pubblicata"
     },
     "fields": {
       "title": "Titolo",
@@ -665,7 +667,8 @@
       "location": "Luogo",
       "meeting_point": "Punto di ritrovo",
       "competition_name": "Competizione",
-      "type": "Tipo"
+      "type": "Tipo",
+      "lineup": "Formazione"
     },
     "pastBadge": "Passato",
     "calendarHint": "Tocca un giorno con un punto per vedere gli eventi.",

@@ -655,7 +655,9 @@
       "notifResent": "Call-up resent",
       "success": "Call-up resent to {{count}} player(s)",
       "error": "Error while resending",
-      "updatesBadge": "{{count}} update(s)"
+      "updatesBadge": "{{count}} update(s)",
+      "lineupNotIncluded": "Not included",
+      "lineupPublished": "Published"
     },
     "fields": {
       "title": "Title",
@@ -666,7 +668,8 @@
       "location": "Location",
       "meeting_point": "Meeting point",
       "competition_name": "Competition",
-      "type": "Type"
+      "type": "Type",
+      "lineup": "Lineup"
     },
     "pastBadge": "Past",
     "calendarHint": "Tap a day with a dot to see events.",

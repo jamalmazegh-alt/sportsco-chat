@@ -654,7 +654,9 @@
       "notifResent": "Convocatória reenviada",
       "success": "Convocatória reenviada a {{count}} Jogadores",
       "error": "Erro ao reenviar",
-      "updatesBadge": "{{count}} alt."
+      "updatesBadge": "{{count}} alt.",
+      "lineupNotIncluded": "Não incluída",
+      "lineupPublished": "Publicada"
     },
     "fields": {
       "title": "Título",
@@ -665,7 +667,8 @@
       "location": "Local",
       "meeting_point": "Ponto de Encontro",
       "competition_name": "Competição",
-      "type": "Tipo"
+      "type": "Tipo",
+      "lineup": "Escalação"
     },
     "pastBadge": "Passado",
     "calendarHint": "Toque num dia com um ponto para ver os Eventos.",

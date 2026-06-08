@@ -654,7 +654,9 @@
       "notifResent": "Aufgebot erneut gesendet",
       "success": "Aufgebot erneut gesendet an {{count}} Spieler",
       "error": "Fehler beim erneuten Senden",
-      "updatesBadge": "{{count}} Änd."
+      "updatesBadge": "{{count}} Änd.",
+      "lineupNotIncluded": "Nicht enthalten",
+      "lineupPublished": "Veröffentlicht"
     },
     "fields": {
       "title": "Titre",
@@ -665,7 +667,8 @@
       "location": "Ort",
       "meeting_point": "Point de RDV",
       "competition_name": "Wettbewerb",
-      "type": "Type"
+      "type": "Type",
+      "lineup": "Aufstellung"
     },
     "pastBadge": "Vergangen",
     "calendarHint": "Tippe auf einen Tag mit Punkt, um die Events zu sehen.",
