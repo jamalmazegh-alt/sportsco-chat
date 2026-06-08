@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useMyRoles } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
@@ -16,6 +17,8 @@ type TournamentState = "empty" | "planned" | "live" | "done";
 
 export function HomeQuickCards({ clubId, teams }: Props) {
   const { t } = useTranslation();
+  const roles = useMyRoles();
+  const canCreateTournament = roles.includes("admin") || roles.includes("tournament_manager");
   const fn = useServerFn(listMyTournaments);
   const { data, isLoading } = useQuery({
     queryKey: ["home-tournaments", clubId],
@@ -111,12 +114,14 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             <p className="text-[11px] text-muted-foreground mt-1">
               {t("nav.tournaments")}
             </p>
-            <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
-              <Plus className="h-3 w-3" />
-              {t("dashboard.tournamentsCard.createCta", {
-                defaultValue: "Créer un tournoi",
-              })}
-            </p>
+            {canCreateTournament && (
+              <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
+                <Plus className="h-3 w-3" />
+                {t("dashboard.tournamentsCard.createCta", {
+                  defaultValue: "Créer un tournoi",
+                })}
+              </p>
+            )}
           </>
         ) : (
           <>
