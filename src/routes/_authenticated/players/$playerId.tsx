@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, User, Trophy, CalendarDays, History, Globe, Copy, Palmtree } from "lucide-react";
 import { BackLink } from "@/components/back-link";
+import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 
@@ -104,6 +105,7 @@ function PlayerProfile() {
   const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [absenceOpen, setAbsenceOpen] = useState(false);
 
   async function onDeletePlayer() {
     if (!player) return;
@@ -495,6 +497,25 @@ function PlayerProfile() {
           </Button>
         )}
       </div>
+
+      {/* Quick action: declare absence for self/child */}
+      {!isCoach && (isSelf || isParentOfThisPlayer) && (
+        <>
+          <Button
+            variant="outline"
+            className="w-full h-11"
+            onClick={() => setAbsenceOpen(true)}
+          >
+            <Palmtree className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+          <DeclareAbsenceDrawer
+            open={absenceOpen}
+            onOpenChange={setAbsenceOpen}
+            playerId={player.id}
+          />
+        </>
+      )}
 
       {/* Tabs */}
       {(isCoach || isSelf || isParentOfThisPlayer) && (
