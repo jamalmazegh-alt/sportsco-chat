@@ -249,7 +249,7 @@ function AvailabilityPage() {
         )}
       </section>
 
-      <DeclareAbsenceDrawer open={open} onOpenChange={setOpen} playerId={playerId} />
+      {canDeclare && <DeclareAbsenceDrawer open={open} onOpenChange={setOpen} playerId={playerId} />}
     </div>
   );
 }
