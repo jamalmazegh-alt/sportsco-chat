@@ -554,18 +554,36 @@ function EventDetail() {
       new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
     );
 
+    // If caller is a parent (not the player themselves), attribute the response.
+    let declaredByName: string | null = null;
+    if (user && conv?.players?.user_id && conv.players.user_id !== user.id) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("first_name, full_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      declaredByName =
+        (prof as any)?.first_name ||
+        (((prof as any)?.full_name ?? "").split(" ")[0] || null);
+    }
+
     if (coachIds.length > 0) {
       // In-app notifications
+      const baseBody = reason ? `${event.title} — "${reason}"` : event.title;
+      const body = declaredByName
+        ? `${baseBody} — ${t("notification.declaredBy", { name: declaredByName, defaultValue: `déclaré par ${declaredByName}` })}`
+        : baseBody;
       await supabase.from("notifications").insert(
         coachIds.map((uid) => ({
           user_id: uid,
           type: "convocation_response",
           title: `${playerName} : ${t(`attendance.${status}`)}`,
-          body: reason ? `${event.title} — "${reason}"` : event.title,
+          body,
           link: `/events/${event.id}`,
         }))
       );
     }
+
 
     // Email notifications via server function (looks up coach emails server-side)
     try {
