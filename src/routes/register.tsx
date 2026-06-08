@@ -314,7 +314,11 @@ function RegisterPage() {
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {t("auth.hasAccount")}{" "}
-          <Link to="/login" className="font-semibold text-primary hover:underline">
+          <Link
+            to="/login"
+            search={hasInvite ? { invite: inviteToken } : {}}
+            className="font-semibold text-primary hover:underline"
+          >
             {t("auth.login")}
           </Link>
         </p>
