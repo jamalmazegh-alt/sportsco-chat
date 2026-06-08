@@ -404,6 +404,78 @@
       "noData": "—"
     }
   },
+  "payments": {
+    "title": "Mis pagos",
+    "subtitle": "Cuotas, licencias y otros importes a pagar a tu Club.",
+    "familyView": "Vista familia",
+    "simpleView": "Vista simple",
+    "receipts": "Mis recibos",
+    "receiptsShort": "Recibos",
+    "receiptsSubtitle": "Historial de todos tus pagos y recibos PDF.",
+    "success": "Pago registrado. ¡Gracias!",
+    "cancelled": "Pago cancelado.",
+    "emptyTitle": "No hay pagos pendientes",
+    "emptyHint": "Todos tus pagos están al día.",
+    "defaultItem": "Pago",
+    "dueDate": "vence el {{date}}",
+    "alreadyPaid": "ya pagado {{amount}}",
+    "payAmount": "Pagar {{amount}}",
+    "partial": "Pago parcial",
+    "onlineUnavailable": "El pago en línea aún no está activado para este Club. Contacta con el Club para pagar.",
+    "onlineUnavailableShort": "Pago en línea no disponible — contacta con el Club.",
+    "amountLabel": "Importe ({{currency}})",
+    "remainingAfter": "Restante después de este pago: {{amount}}",
+    "invalidAmount": "Importe no válido",
+    "payHelloAsso": "Pagar en HelloAsso {{amount}}",
+    "helloAssoMissing": "Contacta con el Club para obtener el enlace de pago HelloAsso.",
+    "helloAssoExternal": "Pago tratado fuera de Clubero — el Club actualizará el estado tras la recepción.",
+    "noReceipts": "Aún no hay recibos",
+    "viewPending": "Ver mis pagos pendientes",
+    "receiptNumber": "N.º {{number}}",
+    "homeCard": {
+      "title_one": "{{count}} pago pendiente",
+      "title_other": "{{count}} pagos pendientes",
+      "subtitle": "{{amount}} pendiente — toca para pagar."
+    },
+    "tabs": {
+      "open": "Por pagar",
+      "paid": "Pagados",
+      "other": "Otros",
+      "all": "Todo"
+    },
+    "status": {
+      "pending": "Por pagar",
+      "partiallyPaid": "Parcialmente pagado",
+      "paid": "Pagado",
+      "exempted": "Exento",
+      "cancelled": "Cancelado"
+    },
+    "method": {
+      "stripe": "Tarjeta",
+      "helloasso": "HelloAsso",
+      "cash": "Efectivo",
+      "cheque": "Cheque",
+      "bank_transfer": "Transferencia",
+      "manual": "Manual"
+    },
+    "family": {
+      "title": "Portal familia",
+      "subtitle": "Todas las obligaciones financieras de tu hogar, por Jugador.",
+      "remaining": "Resta por pagar",
+      "paid": "Ya pagado",
+      "totalDue": "Total debido",
+      "emptyCategory": "No hay pagos en esta categoría.",
+      "remainingBadge": "Resta {{amount}}",
+      "paidAmount": "pagado {{amount}}",
+      "exemptedReason": "Exento — {{reason}}",
+      "cancelledReason": "Cancelado — {{reason}}",
+      "transactions_one": "Pago ({{count}})",
+      "transactions_other": "Pagos ({{count}})",
+      "recordedByClub": "(registrado por el Club)",
+      "refunded": "(reemb. {{amount}})",
+      "noRecordedPayment": "Aún no hay ningún pago registrado."
+    }
+  },
   "teams": {
     "title": "Equipos",
     "create": "Nuevo equipo",
@@ -518,6 +590,7 @@
     "minor": "Menor de edad",
     "parentRequiredForMinor": "Para un jugador menor de edad, se debe añadir un padre/madre.",
     "noParents": "Aún no hay ningún padre/madre vinculado.",
+    "linkedParentNoDetails": "Padre/Madre (cuenta vinculada)",
     "childAccessTitle": "Permitir a mi hijo/a acceder a la plataforma",
     "childAccessHint": "Por defecto, los niños no reciben cuenta ni notificaciones. Activa esta opción si tú (como padre/madre) quieres darle acceso a la plataforma a tu hijo/a.",
     "minorParentNotice": "Este jugador es menor de edad — se requiere un padre/madre y recibirá la invitación. El niño/a no recibirá una cuenta por defecto.",
@@ -1115,6 +1188,18 @@
     "confirmCancelBody": "Tu acceso permanecerá activo hasta el {{date}}. No se realizarán nuevos cargos. Puedes reactivar en cualquier momento.",
     "confirmCancelFallbackDate": "final del período actual",
     "confirmCancelAction": "Cancelar",
+    "memberLocked": {
+      "eyebrow": "Suscripción caducada",
+      "title": "El Club debe reactivar su suscripción",
+      "body": "El acceso completo a {{club}} está suspendido temporalmente. Un administrador del Club debe regularizar la suscripción para reabrir eventos, Equipos y mensajes.",
+      "fallbackClub": "tu Club",
+      "whatYouCanDo": "Qué puedes hacer",
+      "profileHint": "Tu perfil sigue disponible.",
+      "adminHint": "Contacta con un administrador del Club para reactivar la suscripción.",
+      "supportHint": "El soporte de Clubero puede ayudarte si no sabes a quién contactar.",
+      "profileCta": "Ir al perfil",
+      "supportCta": "Contactar soporte"
+    },
     "features": {
       "teams": "Equipos ilimitados",
       "players": "Jugadores ilimitados",
@@ -1423,6 +1508,11 @@
     "adminPayments": {
       "title": "Pagos — Clubero",
       "description": "Activa la recaudación de cuotas de Torneo para tu Club."
+    },
+    "payments": {
+      "title": "Mis pagos — Clubero",
+      "family": "Portal familia — Clubero",
+      "receipts": "Mis recibos — Clubero"
     },
     "adminCommunications": {
       "title": "Comunicaciones — Clubero",

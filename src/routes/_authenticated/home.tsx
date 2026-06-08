@@ -1,10 +1,11 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3 } from "lucide-react";
+import { Calendar, MapPin, ChevronRight, Plus, Users, BarChart3, CreditCard } from "lucide-react";
 import { isToday, isTomorrow } from "date-fns";
 import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
@@ -18,6 +19,7 @@ import { HomeSkeleton } from "@/components/skeletons";
 import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
+import { listMyObligations } from "@/lib/payment-checkout.functions";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
@@ -41,6 +43,15 @@ function formatWhen(d: Date) {
   return `${label} · ${fmt(d, "HH:mm")}`;
 }
 
+function formatPaymentAmount(cents: number, currency: string | null | undefined, locale: string) {
+  const code = (currency || "eur").toUpperCase();
+  try {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: code }).format(cents / 100);
+  } catch {
+    return `${(cents / 100).toFixed(2)} ${code}`;
+  }
+}
+
 function HomePage() {
   const { t, i18n } = useTranslation();
   const { user, activeClubId, memberships } = useAuth();
@@ -50,6 +61,7 @@ function HomePage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
   const { tournamentOnly, isLoading: tOnlyLoading } = useTournamentOnlyMode();
+  const listMyObligationsFn = useServerFn(listMyObligations);
   if (!tOnlyLoading && tournamentOnly) return <Navigate to="/tournaments" replace />;
 
   const { data: teams, isLoading: teamsLoading } = useQuery({
@@ -171,6 +183,13 @@ function HomePage() {
     },
   });
 
+  const { data: paymentData } = useQuery({
+    queryKey: ["my-obligations-home", user?.id, activeClubId],
+    enabled: !!user && !!activeClubId,
+    staleTime: 60_000,
+    queryFn: () => listMyObligationsFn({ data: {} }),
+  });
+
   const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const isAdmin = roles.includes("admin");
 
@@ -182,6 +201,19 @@ function HomePage() {
       (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
     );
   }, [upcoming, myConvocs]);
+
+  const paymentSummary = useMemo(() => {
+    const obligations = paymentData?.obligations ?? [];
+    if (obligations.length === 0) return null;
+    const totalCents = obligations.reduce((sum: number, obligation: any) => {
+      return sum + Math.max(0, (obligation.amount_due_cents ?? 0) - (obligation.amount_paid_cents ?? 0));
+    }, 0);
+    const currency = obligations[0]?.currency ?? "eur";
+    return {
+      count: obligations.length,
+      totalLabel: formatPaymentAmount(totalCents, currency, i18n.language),
+    };
+  }, [i18n.language, paymentData?.obligations]);
 
   // Show skeleton on first paint while the primary queries hydrate.
   if (activeClubId && teamsLoading) {
@@ -217,6 +249,33 @@ function HomePage() {
           </h1>
         </div>
       </header>
+
+      {paymentSummary && (
+        <Link
+          to="/payments"
+          className="group flex items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-left shadow-sm transition-colors hover:bg-amber-500/15"
+        >
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+              <CreditCard className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">
+                {t("payments.homeCard.title", { count: paymentSummary.count })}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {t("payments.homeCard.subtitle", { amount: paymentSummary.totalLabel })}
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white">
+              {paymentSummary.count}
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          </div>
+        </Link>
+      )}
 
       {/* Insights (admins/coaches) */}
       {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}

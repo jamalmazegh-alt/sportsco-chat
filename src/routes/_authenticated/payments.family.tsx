@@ -42,9 +42,7 @@ export const Route = createFileRoute("/_authenticated/payments/family")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("meta.payments.family", {
-          defaultValue: "Portail famille",
-        }),
+        title: i18nInstance.t("meta.payments.family"),
       },
       { name: "robots", content: "noindex" },
     ],
@@ -107,41 +105,46 @@ type Group = {
 
 const STATUS_META: Record<
   string,
-  { label: string; className: string; icon: typeof CheckCircle2 }
+  { labelKey: string; className: string; icon: typeof CheckCircle2 }
 > = {
   pending: {
-    label: "À payer",
+    labelKey: "payments.status.pending",
     className: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
     icon: AlertCircle,
   },
   partially_paid: {
-    label: "Partiellement payé",
+    labelKey: "payments.status.partiallyPaid",
     className: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
     icon: AlertCircle,
   },
   paid: {
-    label: "Payé",
+    labelKey: "payments.status.paid",
     className: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     icon: CheckCircle2,
   },
   exempted: {
-    label: "Exempté",
+    labelKey: "payments.status.exempted",
     className: "bg-muted text-muted-foreground",
     icon: ShieldOff,
   },
   cancelled: {
-    label: "Annulé",
+    labelKey: "payments.status.cancelled",
     className: "bg-muted text-muted-foreground",
     icon: Ban,
   },
 };
 
-function fmt(cents: number, currency: string | null) {
-  return `${(cents / 100).toFixed(2)} ${(currency || "eur").toUpperCase()}`;
+function fmt(cents: number, currency: string | null, locale: string) {
+  const code = (currency || "eur").toUpperCase();
+  try {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: code }).format(cents / 100);
+  } catch {
+    return `${(cents / 100).toFixed(2)} ${code}`;
+  }
 }
 
 function FamilyPortalPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const listFn = useServerFn(listFamilyPayments);
   const q = useQuery({
     queryKey: ["family-payments"],
@@ -187,35 +190,35 @@ function FamilyPortalPage() {
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <h1 className="text-2xl font-semibold flex items-center gap-2">
             <Users className="h-6 w-6 text-primary" />
-            Portail famille
+            {t("payments.family.title")}
           </h1>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link to="/payments">Vue simple</Link>
+              <Link to="/payments">{t("payments.simpleView")}</Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to="/payments/receipts">Reçus</Link>
+              <Link to="/payments/receipts">{t("payments.receiptsShort")}</Link>
             </Button>
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
-          Toutes les obligations financières de votre foyer, par joueur.
+          {t("payments.family.subtitle")}
         </p>
       </header>
 
       {/* Family-wide summary */}
       <section className="grid grid-cols-3 gap-3">
-        <SummaryCard label="Reste à payer" value={fmt(familyTotals.remaining, "eur")} accent />
-        <SummaryCard label="Déjà payé" value={fmt(familyTotals.paid, "eur")} />
-        <SummaryCard label="Total dû" value={fmt(familyTotals.due, "eur")} muted />
+        <SummaryCard label={t("payments.family.remaining")} value={fmt(familyTotals.remaining, "eur", i18n.language)} accent />
+        <SummaryCard label={t("payments.family.paid")} value={fmt(familyTotals.paid, "eur", i18n.language)} />
+        <SummaryCard label={t("payments.family.totalDue")} value={fmt(familyTotals.due, "eur", i18n.language)} muted />
       </section>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
         <TabsList className="w-full">
-          <TabsTrigger value="open" className="flex-1">À payer</TabsTrigger>
-          <TabsTrigger value="paid" className="flex-1">Payés</TabsTrigger>
-          <TabsTrigger value="other" className="flex-1">Autres</TabsTrigger>
-          <TabsTrigger value="all" className="flex-1">Tout</TabsTrigger>
+          <TabsTrigger value="open" className="flex-1">{t("payments.tabs.open")}</TabsTrigger>
+          <TabsTrigger value="paid" className="flex-1">{t("payments.tabs.paid")}</TabsTrigger>
+          <TabsTrigger value="other" className="flex-1">{t("payments.tabs.other")}</TabsTrigger>
+          <TabsTrigger value="all" className="flex-1">{t("payments.tabs.all")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={tab} className="space-y-5 mt-4">
@@ -226,11 +229,11 @@ function FamilyPortalPage() {
           )}
           {!q.isLoading && filteredGroups.length === 0 && (
             <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-              <p className="text-sm font-medium">Aucun paiement dans cette catégorie.</p>
+              <p className="text-sm font-medium">{t("payments.family.emptyCategory")}</p>
             </div>
           )}
           {filteredGroups.map((g) => (
-            <PlayerGroup key={g.key} group={g} />
+            <PlayerGroup key={g.key} group={g} locale={i18n.language} />
           ))}
         </TabsContent>
       </Tabs>
@@ -267,27 +270,31 @@ function SummaryCard({
   );
 }
 
-function PlayerGroup({ group }: { group: Group }) {
+function PlayerGroup({ group, locale }: { group: Group; locale: string }) {
+  const { t } = useTranslation();
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between gap-2 px-1">
         <h2 className="text-sm font-semibold">{group.label}</h2>
         {group.totals.remaining_cents > 0 && (
           <Badge variant="outline" className="text-[10px]">
-            Reste {fmt(group.totals.remaining_cents, "eur")}
+            {t("payments.family.remainingBadge", {
+              amount: fmt(group.totals.remaining_cents, "eur", locale),
+            })}
           </Badge>
         )}
       </div>
       <Accordion type="multiple" className="space-y-2">
         {group.obligations.map((o) => (
-          <ObligationCard key={o.id} obligation={o} />
+          <ObligationCard key={o.id} obligation={o} locale={locale} />
         ))}
       </Accordion>
     </section>
   );
 }
 
-function ObligationCard({ obligation }: { obligation: Obligation }) {
+function ObligationCard({ obligation, locale }: { obligation: Obligation; locale: string }) {
+  const { t } = useTranslation();
   const checkoutFn = useServerFn(createObligationCheckout);
   const receiptFn = useServerFn(getReceiptDownloadUrl);
 
@@ -338,12 +345,12 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
         <div className="flex-1 flex flex-wrap items-center gap-3 text-left">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold truncate">
-              {obligation.items?.title ?? "Paiement"}
+              {obligation.items?.title ?? t("payments.defaultItem")}
             </p>
             <p className="text-[11px] text-muted-foreground truncate">
               {obligation.clubs?.name}
               {obligation.items?.due_date
-                ? ` · échéance ${obligation.items.due_date}`
+                ? ` · ${t("payments.dueDate", { date: obligation.items.due_date })}`
                 : ""}
             </p>
           </div>
@@ -351,16 +358,18 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
             className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded inline-flex items-center gap-1 ${meta.className}`}
           >
             <Icon className="h-3 w-3" />
-            {meta.label}
+            {t(meta.labelKey)}
           </span>
           <div className="text-right">
             <p className="text-sm font-bold">
-              {fmt(obligation.amount_due_cents, currency)}
+              {fmt(obligation.amount_due_cents, currency, locale)}
             </p>
             {obligation.amount_paid_cents > 0 &&
               obligation.status !== "exempted" && (
                 <p className="text-[10px] text-muted-foreground">
-                  payé {fmt(obligation.amount_paid_cents, currency)}
+                  {t("payments.family.paidAmount", {
+                    amount: fmt(obligation.amount_paid_cents, currency, locale),
+                  })}
                 </p>
               )}
           </div>
@@ -370,12 +379,12 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
         {/* Reason for closed states */}
         {obligation.status === "exempted" && obligation.exempted_reason && (
           <p className="text-xs text-muted-foreground italic">
-            Exempté — {obligation.exempted_reason}
+            {t("payments.family.exemptedReason", { reason: obligation.exempted_reason })}
           </p>
         )}
         {obligation.status === "cancelled" && obligation.cancelled_reason && (
           <p className="text-xs text-muted-foreground italic">
-            Annulé — {obligation.cancelled_reason}
+            {t("payments.family.cancelledReason", { reason: obligation.cancelled_reason })}
           </p>
         )}
 
@@ -391,7 +400,7 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
             ) : (
               <CreditCard className="h-4 w-4" />
             )}
-            Payer {fmt(remaining, currency)}
+            {t("payments.payAmount", { amount: fmt(remaining, currency, locale) })}
           </Button>
         )}
         {(obligation.status === "pending" ||
@@ -399,7 +408,7 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
           !isHelloAsso &&
           !stripeReady && (
             <p className="text-xs text-muted-foreground">
-              Paiement en ligne indisponible — contactez le club.
+              {t("payments.onlineUnavailableShort")}
             </p>
           )}
 
@@ -410,16 +419,16 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
               <Button size="sm" variant="outline" asChild>
                 <a href={helloAssoUrl} target="_blank" rel="noopener noreferrer">
                   <CreditCard className="h-4 w-4" />
-                  Payer sur HelloAsso {fmt(remaining, currency)}
+                  {t("payments.payHelloAsso", { amount: fmt(remaining, currency, locale) })}
                 </a>
               </Button>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Contactez le club pour le lien de paiement HelloAsso.
+                {t("payments.helloAssoMissing")}
               </p>
             )}
             <p className="text-[11px] text-muted-foreground italic">
-              Paiement traité hors de Clubero — le statut sera mis à jour par le club après réception.
+              {t("payments.helloAssoExternal")}
             </p>
           </div>
         )}
@@ -428,51 +437,44 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
         {obligation.transactions.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Paiements ({obligation.transactions.length})
+              {t("payments.family.transactions", { count: obligation.transactions.length })}
             </p>
             <ul className="space-y-1">
-              {obligation.transactions.map((t) => {
-                const refunded = t.refunded_amount_cents ?? 0;
-                const methodLabel =
-                  t.method === "helloasso"
-                    ? "HelloAsso"
-                    : t.method === "stripe"
-                      ? "Carte bancaire"
-                      : t.method === "cash"
-                        ? "Espèces"
-                        : t.method === "cheque"
-                          ? "Chèque"
-                          : t.method === "bank_transfer"
-                            ? "Virement"
-                            : t.method;
+              {obligation.transactions.map((tx) => {
+                const refunded = tx.refunded_amount_cents ?? 0;
+                const methodLabel = t(`payments.method.${tx.method}`, {
+                  defaultValue: tx.method,
+                });
                 const isExternal =
-                  t.method === "helloasso" ||
-                  t.method === "cash" ||
-                  t.method === "cheque" ||
-                  t.method === "bank_transfer";
+                  tx.method === "helloasso" ||
+                  tx.method === "cash" ||
+                  tx.method === "cheque" ||
+                  tx.method === "bank_transfer";
                 return (
                   <li
-                    key={t.id}
+                    key={tx.id}
                     className="flex items-center justify-between text-xs rounded border border-border/60 px-2.5 py-1.5"
                   >
                     <span>
-                      {new Date(t.paid_at ?? t.created_at).toLocaleDateString(
-                        "fr-FR",
+                      {new Date(tx.paid_at ?? tx.created_at).toLocaleDateString(
+                        locale,
                       )}{" "}
                       · {methodLabel}
                       {isExternal && (
                         <span className="ml-1 text-muted-foreground">
-                          (enregistré par le club)
+                          {t("payments.family.recordedByClub")}
                         </span>
                       )}
                       {refunded > 0 && (
                         <span className="ml-1 text-amber-600 dark:text-amber-400">
-                          (remb. {fmt(refunded, t.currency)})
+                          {t("payments.family.refunded", {
+                            amount: fmt(refunded, tx.currency, locale),
+                          })}
                         </span>
                       )}
                     </span>
                     <span className="font-medium">
-                      {fmt(t.amount_gross_cents, t.currency)}
+                      {fmt(tx.amount_gross_cents, tx.currency, locale)}
                     </span>
                   </li>
                 );
@@ -486,7 +488,7 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
         {obligation.receipts.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Reçus
+              {t("payments.receiptsShort")}
             </p>
             <ul className="space-y-1">
               {obligation.receipts.map((r) => (
@@ -496,8 +498,8 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
                 >
                   <span className="flex items-center gap-1.5">
                     <ReceiptIcon className="h-3.5 w-3.5" />
-                    N° {r.receipt_number} ·{" "}
-                    {new Date(r.issued_at).toLocaleDateString("fr-FR")}
+                    {t("payments.receiptNumber", { number: r.receipt_number })} ·{" "}
+                    {new Date(r.issued_at).toLocaleDateString(locale)}
                   </span>
                   <Button
                     size="sm"
@@ -522,7 +524,7 @@ function ObligationCard({ obligation }: { obligation: Obligation }) {
           obligation.receipts.length === 0 &&
           obligation.status === "pending" && (
             <p className="text-xs text-muted-foreground">
-              Aucun paiement enregistré pour le moment.
+              {t("payments.family.noRecordedPayment")}
             </p>
           )}
       </AccordionContent>

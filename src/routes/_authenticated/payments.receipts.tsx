@@ -17,9 +17,7 @@ export const Route = createFileRoute("/_authenticated/payments/receipts")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("meta.payments.receipts", {
-          defaultValue: "Mes reçus",
-        }),
+        title: i18nInstance.t("meta.payments.receipts"),
       },
       { name: "robots", content: "noindex" },
     ],
@@ -37,8 +35,17 @@ type Receipt = {
   issued_at: string;
 };
 
+function formatAmount(cents: number, currency: string | null | undefined, locale: string) {
+  const code = (currency || "eur").toUpperCase();
+  try {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: code }).format(cents / 100);
+  } catch {
+    return `${(cents / 100).toFixed(2)} ${code}`;
+  }
+}
+
 function MyReceiptsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const listFn = useServerFn(listMyReceipts);
   const dlFn = useServerFn(getReceiptDownloadUrl);
 
@@ -52,7 +59,7 @@ function MyReceiptsPage() {
       const { url } = await dlFn({ data: { receiptId: id } });
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erreur");
+      toast.error(e instanceof Error ? e.message : t("common.error"));
     }
   }
 
@@ -64,10 +71,10 @@ function MyReceiptsPage() {
       <header className="space-y-1">
         <h1 className="text-2xl font-semibold flex items-center gap-2">
           <Receipt className="h-6 w-6 text-primary" />
-          Mes reçus
+          {t("payments.receipts")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Historique de tous vos paiements et reçus PDF.
+          {t("payments.receiptsSubtitle")}
         </p>
       </header>
 
@@ -79,10 +86,10 @@ function MyReceiptsPage() {
 
       {q.data && receipts.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-          <p className="text-sm font-medium">Aucun reçu pour le moment</p>
+          <p className="text-sm font-medium">{t("payments.noReceipts")}</p>
           <p className="text-xs text-muted-foreground mt-1">
             <Link to="/payments" className="underline">
-              Voir mes paiements en attente
+              {t("payments.viewPending")}
             </Link>
           </p>
         </div>
@@ -96,18 +103,19 @@ function MyReceiptsPage() {
           >
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate">
-                {r.item_title ?? "Paiement"}
+                {r.item_title ?? t("payments.defaultItem")}
               </p>
               <p className="text-xs text-muted-foreground">
-                N° {String(r.receipt_number).padStart(6, "0")} ·{" "}
-                {new Date(r.issued_at).toLocaleDateString("fr-FR")}
+                {t("payments.receiptNumber", {
+                  number: String(r.receipt_number).padStart(6, "0"),
+                })}{" "}
+                · {new Date(r.issued_at).toLocaleDateString(i18n.language)}
                 {r.player_name ? ` · ${r.player_name}` : ""}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-sm font-bold">
-                {(r.amount_gross_cents / 100).toFixed(2)}{" "}
-                {(r.currency || "eur").toUpperCase()}
+                {formatAmount(r.amount_gross_cents, r.currency, i18n.language)}
               </span>
               <Button size="sm" variant="outline" onClick={() => download(r.id)}>
                 <Download className="h-4 w-4" />

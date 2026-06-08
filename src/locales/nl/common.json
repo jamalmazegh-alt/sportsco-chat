@@ -404,6 +404,78 @@
       "noData": "—"
     }
   },
+  "payments": {
+    "title": "Mijn betalingen",
+    "subtitle": "Lidgelden, licenties en andere bedragen die aan je Club verschuldigd zijn.",
+    "familyView": "Gezinsweergave",
+    "simpleView": "Eenvoudige weergave",
+    "receipts": "Mijn ontvangstbewijzen",
+    "receiptsShort": "Bewijzen",
+    "receiptsSubtitle": "Geschiedenis van al je betalingen en PDF-bewijzen.",
+    "success": "Betaling geregistreerd. Bedankt!",
+    "cancelled": "Betaling geannuleerd.",
+    "emptyTitle": "Geen openstaande betalingen",
+    "emptyHint": "Al je betalingen zijn up-to-date.",
+    "defaultItem": "Betaling",
+    "dueDate": "vervalt op {{date}}",
+    "alreadyPaid": "al betaald {{amount}}",
+    "payAmount": "{{amount}} betalen",
+    "partial": "Deelbetaling",
+    "onlineUnavailable": "Online betaling is nog niet geactiveerd voor deze Club. Neem contact op met de Club om te betalen.",
+    "onlineUnavailableShort": "Online betaling niet beschikbaar — neem contact op met de Club.",
+    "amountLabel": "Bedrag ({{currency}})",
+    "remainingAfter": "Resterend na deze betaling: {{amount}}",
+    "invalidAmount": "Ongeldig bedrag",
+    "payHelloAsso": "Betalen via HelloAsso {{amount}}",
+    "helloAssoMissing": "Neem contact op met de Club voor de HelloAsso-betaallink.",
+    "helloAssoExternal": "Betaling wordt buiten Clubero verwerkt — de Club werkt de status bij na ontvangst.",
+    "noReceipts": "Nog geen ontvangstbewijzen",
+    "viewPending": "Mijn openstaande betalingen bekijken",
+    "receiptNumber": "Nr. {{number}}",
+    "homeCard": {
+      "title_one": "{{count}} openstaande betaling",
+      "title_other": "{{count}} openstaande betalingen",
+      "subtitle": "{{amount}} openstaand — tik om te betalen."
+    },
+    "tabs": {
+      "open": "Te betalen",
+      "paid": "Betaald",
+      "other": "Overig",
+      "all": "Alles"
+    },
+    "status": {
+      "pending": "Te betalen",
+      "partiallyPaid": "Gedeeltelijk betaald",
+      "paid": "Betaald",
+      "exempted": "Vrijgesteld",
+      "cancelled": "Geannuleerd"
+    },
+    "method": {
+      "stripe": "Kaart",
+      "helloasso": "HelloAsso",
+      "cash": "Contant",
+      "cheque": "Cheque",
+      "bank_transfer": "Overschrijving",
+      "manual": "Handmatig"
+    },
+    "family": {
+      "title": "Gezinsportaal",
+      "subtitle": "Alle financiële verplichtingen van je gezin, per Speler.",
+      "remaining": "Nog te betalen",
+      "paid": "Al betaald",
+      "totalDue": "Totaal verschuldigd",
+      "emptyCategory": "Geen betaling in deze categorie.",
+      "remainingBadge": "Nog {{amount}}",
+      "paidAmount": "betaald {{amount}}",
+      "exemptedReason": "Vrijgesteld — {{reason}}",
+      "cancelledReason": "Geannuleerd — {{reason}}",
+      "transactions_one": "Betaling ({{count}})",
+      "transactions_other": "Betalingen ({{count}})",
+      "recordedByClub": "(geregistreerd door de Club)",
+      "refunded": "(terugbet. {{amount}})",
+      "noRecordedPayment": "Nog geen betaling geregistreerd."
+    }
+  },
   "teams": {
     "title": "Teams",
     "create": "Nieuw Team",
@@ -518,6 +590,7 @@
     "minor": "Minderjarig",
     "parentRequiredForMinor": "Voor een minderjarige Speler moet een Ouder worden toegevoegd.",
     "noParents": "Nog geen Ouder gekoppeld.",
+    "linkedParentNoDetails": "Ouder (gekoppeld account)",
     "childAccessTitle": "Mijn kind toegang geven tot het platform",
     "childAccessHint": "Standaard ontvangen kinderen geen account of meldingen. Schakel deze optie in als je (als Ouder) je kind toegang wilt geven tot het platform.",
     "minorParentNotice": "Deze Speler is minderjarig — een Ouder is vereist en ontvangt de uitnodiging. Het kind ontvangt standaard geen account.",
@@ -1115,6 +1188,18 @@
     "confirmCancelBody": "Je toegang blijft actief tot {{date}}. Geen nieuwe afschrijvingen. Je kunt op elk moment opnieuw activeren.",
     "confirmCancelFallbackDate": "einde van de huidige periode",
     "confirmCancelAction": "Opzeggen",
+    "memberLocked": {
+      "eyebrow": "Abonnement verlopen",
+      "title": "De Club moet het abonnement opnieuw activeren",
+      "body": "Volledige toegang tot {{club}} is tijdelijk opgeschort. Een Clubbeheerder moet het abonnement bijwerken om evenementen, Teams en berichten opnieuw te openen.",
+      "fallbackClub": "je Club",
+      "whatYouCanDo": "Wat je kunt doen",
+      "profileHint": "Je profiel blijft beschikbaar.",
+      "adminHint": "Neem contact op met een Clubbeheerder om het abonnement opnieuw te activeren.",
+      "supportHint": "Clubero-support kan helpen als je niet weet wie je moet contacteren.",
+      "profileCta": "Naar profiel",
+      "supportCta": "Support contacteren"
+    },
     "features": {
       "teams": "Onbeperkt aantal Teams",
       "players": "Onbeperkt aantal Spelers",
@@ -1423,6 +1508,11 @@
     "adminPayments": {
       "title": "Betalingen — Clubero",
       "description": "Activeer het innen van Toernooikosten voor je Club."
+    },
+    "payments": {
+      "title": "Mijn betalingen — Clubero",
+      "family": "Gezinsportaal — Clubero",
+      "receipts": "Mijn ontvangstbewijzen — Clubero"
     },
     "adminCommunications": {
       "title": "Communicatie — Clubero",
