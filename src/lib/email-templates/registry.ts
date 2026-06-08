@@ -37,6 +37,7 @@ import { template as tournamentProgrammePublishedTemplate } from './tournament-p
 import { template as tournamentRosterLinkTemplate } from './tournament-roster-link'
 import { template as paymentReceiptTemplate } from './payment-receipt'
 import { template as paymentReminderTemplate } from './payment-reminder'
+import { template as coachAssignedTemplate } from './coach-assigned'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-confirmation': inquiryConfirmationTemplate,
@@ -59,4 +60,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'tournament-roster-link': tournamentRosterLinkTemplate,
   'payment-receipt': paymentReceiptTemplate,
   'payment-reminder': paymentReminderTemplate,
+  'coach-assigned': coachAssignedTemplate,
 }
