@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -173,6 +173,15 @@ function HomePage() {
 
   const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const isAdmin = roles.includes("admin");
+
+  const playerHomeEvents = useMemo(() => {
+    const byId = new Map<string, any>();
+    for (const e of (upcoming ?? []) as any[]) byId.set(e.id, e);
+    for (const e of (myConvocs ?? []) as any[]) byId.set(e.id, e);
+    return Array.from(byId.values()).sort(
+      (a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
+    );
+  }, [upcoming, myConvocs]);
 
   // Show skeleton on first paint while the primary queries hydrate.
   if (activeClubId && teamsLoading) {
@@ -374,14 +383,14 @@ function HomePage() {
               {t("dashboard.viewAll")}
             </Link>
           </div>
-          {!myConvocs || myConvocs.length === 0 ? (
+          {playerHomeEvents.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
               <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
             </div>
           ) : (
             <ul className="space-y-2">
-              {myConvocs.map((e: any, idx: number) => {
+              {playerHomeEvents.map((e: any, idx: number) => {
                 const actionRequired = e.convocation?.status === "pending";
                 const isFirst = idx === 0 && !actionRequired;
                 return (
