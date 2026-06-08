@@ -1,17 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { detectInsightsForAllActiveClubs } from "@/lib/insights.server";
+import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 export const Route = createFileRoute("/api/public/hooks/coach-insights")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Shared cron secret — required to prevent public abuse (AI token spend).
-        const secret = process.env.DATA_RETENTION_SECRET;
-        if (!secret) return new Response("Not configured", { status: 503 });
-        const provided =
-          request.headers.get("x-cron-secret") ||
-          request.headers.get("x-retention-secret");
-        if (provided !== secret) return new Response("Forbidden", { status: 403 });
+        const auth = verifyCronSecret(request, {
+          primaryEnv: "COACH_INSIGHTS_SECRET",
+          legacyEnv: "DATA_RETENTION_SECRET",
+          headerNames: ["x-coach-insights-secret", "x-cron-secret"],
+        });
+        if (!auth.ok) {
+          return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {
+            status: auth.status,
+          });
+        }
 
         try {
           const res = await detectInsightsForAllActiveClubs();

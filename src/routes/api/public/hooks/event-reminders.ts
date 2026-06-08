@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
+import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
@@ -29,16 +30,15 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Shared cron secret — required to prevent public abuse (mass email trigger).
-        const secret = process.env.DATA_RETENTION_SECRET;
-        if (!secret) {
-          return new Response("Not configured", { status: 503 });
-        }
-        const provided =
-          request.headers.get("x-cron-secret") ||
-          request.headers.get("x-retention-secret");
-        if (provided !== secret) {
-          return new Response("Forbidden", { status: 403 });
+        const auth = verifyCronSecret(request, {
+          primaryEnv: "EVENT_REMINDERS_SECRET",
+          legacyEnv: "DATA_RETENTION_SECRET",
+          headerNames: ["x-event-reminders-secret", "x-cron-secret"],
+        });
+        if (!auth.ok) {
+          return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {
+            status: auth.status,
+          });
         }
         const now = Date.now();
         const horizon = new Date(now + 72 * 60 * 60 * 1000).toISOString();
