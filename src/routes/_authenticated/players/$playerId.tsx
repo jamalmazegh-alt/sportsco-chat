@@ -650,10 +650,12 @@ function PlayerProfile() {
             />
           </div>
         </div>
-        <div className="space-y-1.5">
-          <Label>{t("players.licenseNumber")}</Label>
-          <Input value={license} onChange={(e) => setLicense(e.target.value)} disabled={!isCoach} placeholder="FFF-2025-12345" />
-        </div>
+        {canSeePrivate && (
+          <div className="space-y-1.5">
+            <Label>{t("players.licenseNumber")}</Label>
+            <Input value={license} onChange={(e) => setLicense(e.target.value)} disabled={!isCoach} placeholder="FFF-2025-12345" />
+          </div>
+        )}
         {canSeePrivate && (
           <>
             <div className="space-y-1.5">
