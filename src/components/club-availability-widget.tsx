@@ -13,6 +13,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { QuickSanctionDrawer } from "@/components/quick-sanction-drawer";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
