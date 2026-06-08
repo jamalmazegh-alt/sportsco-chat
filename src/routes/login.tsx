@@ -14,6 +14,9 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    invite: typeof search.invite === "string" ? search.invite : undefined,
+  }),
   component: LoginPage,
   head: () => ({
     meta: [
@@ -25,6 +28,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const { t } = useTranslation();
+  const search = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -37,6 +41,17 @@ function LoginPage() {
       setBusy(false);
       toast.error(t("auth.loginError"));
       return;
+    }
+    if (search.invite) {
+      const { error: memberErr } = await supabase.rpc("redeem_member_invite", { _token: search.invite });
+      if (memberErr) {
+        const { error: clubErr } = await supabase.rpc("redeem_club_invite", { _token: search.invite });
+        if (clubErr) {
+          setBusy(false);
+          toast.error(memberErr.message || clubErr.message || t("auth.inviteInvalid"));
+          return;
+        }
+      }
     }
     // Force a full reload so AuthProvider rehydrates the session cleanly,
     // avoiding a race where /home renders before onAuthStateChange fires.
