@@ -64,6 +64,8 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
   const { t } = useTranslation();
   const [sanctionOpen, setSanctionOpen] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
+  const roles = useMyRoles();
+  const canDeclare = roles.includes("player") || roles.includes("parent");
 
   const today = new Date().toISOString().slice(0, 10);
   const in14days = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);

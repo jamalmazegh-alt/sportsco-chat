@@ -45,6 +45,7 @@ function AvailabilityPage() {
   const { user } = useAuth();
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
+  const canDeclare = roles.includes("player") || roles.includes("parent");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
