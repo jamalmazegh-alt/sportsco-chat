@@ -1675,5 +1675,11 @@
       "viewSuspensions": "Ver sanciones",
       "viewAbsences": "Ver ausencias"
     }
+  },
+  "notifications": {
+    "coachAssigned": {
+      "title": "Has sido añadido a un equipo",
+      "body": "Ahora eres entrenador de {{teamName}} en {{clubName}}."
+    }
   }
 }

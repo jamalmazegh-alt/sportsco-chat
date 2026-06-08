@@ -1675,5 +1675,11 @@
       "viewSuspensions": "Schorsingen bekijken",
       "viewAbsences": "Afwezigheden bekijken"
     }
+  },
+  "notifications": {
+    "coachAssigned": {
+      "title": "Je bent toegevoegd aan een team",
+      "body": "Je bent nu coach van {{teamName}} bij {{clubName}}."
+    }
   }
 }
