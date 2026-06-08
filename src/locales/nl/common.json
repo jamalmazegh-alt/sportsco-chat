@@ -654,7 +654,9 @@
       "notifResent": "Uitnodiging opnieuw verstuurd",
       "success": "Uitnodiging opnieuw verstuurd naar {{count}} Spelers",
       "error": "Fout bij opnieuw versturen",
-      "updatesBadge": "{{count}} wijz."
+      "updatesBadge": "{{count}} wijz.",
+      "lineupNotIncluded": "Niet inbegrepen",
+      "lineupPublished": "Gepubliceerd"
     },
     "fields": {
       "title": "Titel",
@@ -665,7 +667,8 @@
       "location": "Locatie",
       "meeting_point": "Verzamelpunt",
       "competition_name": "Competitie",
-      "type": "Type"
+      "type": "Type",
+      "lineup": "Opstelling"
     },
     "pastBadge": "Verleden",
     "calendarHint": "Tik op een dag met een stip om de evenementen te zien.",
