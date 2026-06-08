@@ -480,7 +480,7 @@ function EventDetail() {
         const p = byId.get(id);
         return { name: name(p), jersey: p?.jersey_number ?? null };
       });
-      return { formation: l.formation, _starting: starting, _bench: bench };
+      return { formation: l.formation, published_at: l.published_at, _starting: starting, _bench: bench };
     },
   });
 
@@ -1394,6 +1394,17 @@ function EventDetail() {
       return;
     }
     const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
+    const lineupPublishedAt = (lineupData as any)?.published_at as string | undefined;
+    const lastSentAt = (event as any)?.convocation_last_sent_at as string | undefined;
+    const lineupChangedNow = !!lineupPublishedAt && (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
+    if (lineupChangedNow) {
+      changes.push({
+        field: "lineup",
+        label: t("events.fields.lineup" as any, { defaultValue: "Lineup" }),
+        previous: t("events.resend.lineupNotIncluded" as any, { defaultValue: "Not included" }),
+        current: t("events.resend.lineupPublished" as any, { defaultValue: "Published" }),
+      });
+    }
     setResendSubmitting(true);
     try {
       const playerIds = convocations.map((c: any) => c.player_id);
@@ -1514,8 +1525,22 @@ function EventDetail() {
   }
 
   const convocChanges = useMemo(
-    () => diffSnapshot((event as any)?.convocation_sent_snapshot, event, t),
-    [event, t],
+    () => {
+      const base = diffSnapshot((event as any)?.convocation_sent_snapshot, event, t);
+      const lineupPublishedAt = (lineupData as any)?.published_at as string | undefined;
+      const lastSentAt = (event as any)?.convocation_last_sent_at as string | undefined;
+      const lineupChanged = !!lineupPublishedAt && (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
+      if (lineupChanged) {
+        base.push({
+          field: "lineup",
+          label: t("events.fields.lineup" as any, { defaultValue: "Lineup" }),
+          previous: t("events.resend.lineupNotIncluded" as any, { defaultValue: "Not included" }),
+          current: t("events.resend.lineupPublished" as any, { defaultValue: "Published" }),
+        });
+      }
+      return base;
+    },
+    [event, lineupData, t],
   );
 
   const counts = useMemo(() => {
