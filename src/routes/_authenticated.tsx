@@ -1,6 +1,6 @@
-import { createFileRoute, Outlet, Navigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Navigate, useRouterState, Link } from "@tanstack/react-router";
 import { requireAuthBeforeLoad } from "@/lib/route-guards";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,7 +37,7 @@ import { ClubSelector } from "@/components/club-selector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle, CreditCard, Loader2, MessageCircle, UserCircle } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/clubero-logo.png";
 
@@ -55,6 +55,9 @@ function AuthLayout() {
   const { isActive: clubSubActive, isLoading: subLoading } =
     useClubSubscriptionActive(activeClubId);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const activeMembership = memberships.find((m) => m.club_id === activeClubId);
+  const activeRoles = activeMembership?.roles ?? (activeMembership ? [activeMembership.role] : []);
+  const isAdmin = activeRoles.includes("admin");
 
   if (loading) {
     return (
@@ -81,6 +84,13 @@ function AuthLayout() {
     !clubSubActive &&
     !isPathAllowed(pathname, CLUB_LOCKED_ALLOWED)
   ) {
+    if (!isAdmin) {
+      return (
+        <LockedClubShell>
+          <ClubSubscriptionExpiredScreen clubName={activeMembership?.club?.name} />
+        </LockedClubShell>
+      );
+    }
     return <Navigate to="/admin/billing" replace />;
   }
 
@@ -141,6 +151,86 @@ function AuthLayout() {
         <BottomNav />
       </div>
     </ConsentGate>
+  );
+}
+
+function LockedClubShell({ children }: { children: ReactNode }) {
+  return (
+    <ConsentGate>
+      <div className="min-h-screen bg-background pb-24">
+        <div className="mx-auto max-w-xl">{children}</div>
+        <SupportFab />
+        <AssistantFab />
+        <BottomNav />
+      </div>
+    </ConsentGate>
+  );
+}
+
+function ClubSubscriptionExpiredScreen({ clubName }: { clubName?: string }) {
+  const { t } = useTranslation();
+  return (
+    <main className="px-5 py-8">
+      <div className="overflow-hidden rounded-3xl border border-amber-500/30 bg-card shadow-sm">
+        <div className="bg-amber-500/10 px-5 py-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-300">
+                {t("billing.memberLocked.eyebrow")}
+              </p>
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+                {t("billing.memberLocked.title")}
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t("billing.memberLocked.body", {
+                  club: clubName ?? t("billing.memberLocked.fallbackClub"),
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 px-5 py-5">
+          <div className="rounded-2xl border border-border bg-muted/30 p-4">
+            <h2 className="text-sm font-semibold">
+              {t("billing.memberLocked.whatYouCanDo")}
+            </h2>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2">
+                <UserCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{t("billing.memberLocked.profileHint")}</span>
+              </li>
+              <li className="flex gap-2">
+                <CreditCard className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{t("billing.memberLocked.adminHint")}</span>
+              </li>
+              <li className="flex gap-2">
+                <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{t("billing.memberLocked.supportHint")}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button asChild>
+              <Link to="/profile">
+                <UserCircle className="h-4 w-4" />
+                {t("billing.memberLocked.profileCta")}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/support">
+                <MessageCircle className="h-4 w-4" />
+                {t("billing.memberLocked.supportCta")}
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
 

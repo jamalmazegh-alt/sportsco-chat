@@ -404,6 +404,78 @@
       "noData": "—"
     }
   },
+  "payments": {
+    "title": "Os meus pagamentos",
+    "subtitle": "Quotas, licenças e outros valores a pagar ao seu Clube.",
+    "familyView": "Vista família",
+    "simpleView": "Vista simples",
+    "receipts": "Os meus recibos",
+    "receiptsShort": "Recibos",
+    "receiptsSubtitle": "Histórico de todos os pagamentos e recibos PDF.",
+    "success": "Pagamento registado. Obrigado!",
+    "cancelled": "Pagamento cancelado.",
+    "emptyTitle": "Nenhum pagamento pendente",
+    "emptyHint": "Todos os seus pagamentos estão em dia.",
+    "defaultItem": "Pagamento",
+    "dueDate": "vence em {{date}}",
+    "alreadyPaid": "já pago {{amount}}",
+    "payAmount": "Pagar {{amount}}",
+    "partial": "Pagamento parcial",
+    "onlineUnavailable": "O pagamento online ainda não está ativo para este Clube. Contacte o Clube para pagar.",
+    "onlineUnavailableShort": "Pagamento online indisponível — contacte o Clube.",
+    "amountLabel": "Valor ({{currency}})",
+    "remainingAfter": "Restante após este pagamento: {{amount}}",
+    "invalidAmount": "Valor inválido",
+    "payHelloAsso": "Pagar no HelloAsso {{amount}}",
+    "helloAssoMissing": "Contacte o Clube para obter o link de pagamento HelloAsso.",
+    "helloAssoExternal": "Pagamento processado fora do Clubero — o Clube atualizará o estado após a receção.",
+    "noReceipts": "Ainda não há recibos",
+    "viewPending": "Ver os meus pagamentos pendentes",
+    "receiptNumber": "N.º {{number}}",
+    "homeCard": {
+      "title_one": "{{count}} pagamento pendente",
+      "title_other": "{{count}} pagamentos pendentes",
+      "subtitle": "{{amount}} pendente — toque para pagar."
+    },
+    "tabs": {
+      "open": "A pagar",
+      "paid": "Pagos",
+      "other": "Outros",
+      "all": "Tudo"
+    },
+    "status": {
+      "pending": "A pagar",
+      "partiallyPaid": "Parcialmente pago",
+      "paid": "Pago",
+      "exempted": "Isento",
+      "cancelled": "Cancelado"
+    },
+    "method": {
+      "stripe": "Cartão",
+      "helloasso": "HelloAsso",
+      "cash": "Dinheiro",
+      "cheque": "Cheque",
+      "bank_transfer": "Transferência",
+      "manual": "Manual"
+    },
+    "family": {
+      "title": "Portal família",
+      "subtitle": "Todas as obrigações financeiras do seu agregado, por Jogador.",
+      "remaining": "Resta pagar",
+      "paid": "Já pago",
+      "totalDue": "Total devido",
+      "emptyCategory": "Nenhum pagamento nesta categoria.",
+      "remainingBadge": "Resta {{amount}}",
+      "paidAmount": "pago {{amount}}",
+      "exemptedReason": "Isento — {{reason}}",
+      "cancelledReason": "Cancelado — {{reason}}",
+      "transactions_one": "Pagamento ({{count}})",
+      "transactions_other": "Pagamentos ({{count}})",
+      "recordedByClub": "(registado pelo Clube)",
+      "refunded": "(reemb. {{amount}})",
+      "noRecordedPayment": "Ainda não há nenhum pagamento registado."
+    }
+  },
   "teams": {
     "title": "Equipas",
     "create": "Nova Equipa",
@@ -1115,6 +1187,18 @@
     "confirmCancelBody": "O teu acesso permanecerá ativo até {{date}}. Não serão efetuadas novas cobranças. Podes reativar a qualquer momento.",
     "confirmCancelFallbackDate": "fim do período atual",
     "confirmCancelAction": "Cancelar",
+    "memberLocked": {
+      "eyebrow": "Subscrição expirada",
+      "title": "O Clube precisa de reativar a subscrição",
+      "body": "O acesso completo a {{club}} está temporariamente suspenso. Um administrador do Clube deve regularizar a subscrição para reabrir eventos, Equipas e mensagens.",
+      "fallbackClub": "o seu Clube",
+      "whatYouCanDo": "O que pode fazer",
+      "profileHint": "O seu perfil continua disponível.",
+      "adminHint": "Contacte um administrador do Clube para reativar a subscrição.",
+      "supportHint": "O suporte Clubero pode ajudar se não souber quem contactar.",
+      "profileCta": "Ir para o perfil",
+      "supportCta": "Contactar suporte"
+    },
     "features": {
       "teams": "Equipas ilimitadas",
       "players": "Jogadores ilimitados",
@@ -1423,6 +1507,11 @@
     "adminPayments": {
       "title": "Pagamentos — Clubero",
       "description": "Ative a cobrança de taxas de Torneio para o seu Clube."
+    },
+    "payments": {
+      "title": "Os meus pagamentos — Clubero",
+      "family": "Portal família — Clubero",
+      "receipts": "Os meus recibos — Clubero"
     },
     "adminCommunications": {
       "title": "Comunicações — Clubero",

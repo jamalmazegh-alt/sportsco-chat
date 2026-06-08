@@ -404,6 +404,78 @@
       "noData": "—"
     }
   },
+  "payments": {
+    "title": "My payments",
+    "subtitle": "Membership fees, licenses and other amounts due to your club.",
+    "familyView": "Family view",
+    "simpleView": "Simple view",
+    "receipts": "My receipts",
+    "receiptsShort": "Receipts",
+    "receiptsSubtitle": "History of all your payments and PDF receipts.",
+    "success": "Payment recorded. Thank you!",
+    "cancelled": "Payment cancelled.",
+    "emptyTitle": "No pending payments",
+    "emptyHint": "All your payments are up to date.",
+    "defaultItem": "Payment",
+    "dueDate": "due {{date}}",
+    "alreadyPaid": "already paid {{amount}}",
+    "payAmount": "Pay {{amount}}",
+    "partial": "Partial payment",
+    "onlineUnavailable": "Online payment is not enabled for this club yet. Contact the club to pay.",
+    "onlineUnavailableShort": "Online payment unavailable — contact the club.",
+    "amountLabel": "Amount ({{currency}})",
+    "remainingAfter": "Remaining after this payment: {{amount}}",
+    "invalidAmount": "Invalid amount",
+    "payHelloAsso": "Pay on HelloAsso {{amount}}",
+    "helloAssoMissing": "Contact the club for the HelloAsso payment link.",
+    "helloAssoExternal": "Payment is processed outside Clubero — the club will update the status after receipt.",
+    "noReceipts": "No receipts yet",
+    "viewPending": "View my pending payments",
+    "receiptNumber": "No. {{number}}",
+    "homeCard": {
+      "title_one": "{{count}} payment due",
+      "title_other": "{{count}} payments due",
+      "subtitle": "{{amount}} pending — tap to pay."
+    },
+    "tabs": {
+      "open": "To pay",
+      "paid": "Paid",
+      "other": "Other",
+      "all": "All"
+    },
+    "status": {
+      "pending": "To pay",
+      "partiallyPaid": "Partially paid",
+      "paid": "Paid",
+      "exempted": "Exempted",
+      "cancelled": "Cancelled"
+    },
+    "method": {
+      "stripe": "Card",
+      "helloasso": "HelloAsso",
+      "cash": "Cash",
+      "cheque": "Cheque",
+      "bank_transfer": "Bank transfer",
+      "manual": "Manual"
+    },
+    "family": {
+      "title": "Family portal",
+      "subtitle": "All financial obligations for your household, grouped by player.",
+      "remaining": "Remaining",
+      "paid": "Already paid",
+      "totalDue": "Total due",
+      "emptyCategory": "No payment in this category.",
+      "remainingBadge": "{{amount}} left",
+      "paidAmount": "paid {{amount}}",
+      "exemptedReason": "Exempted — {{reason}}",
+      "cancelledReason": "Cancelled — {{reason}}",
+      "transactions_one": "Payment ({{count}})",
+      "transactions_other": "Payments ({{count}})",
+      "recordedByClub": "(recorded by the club)",
+      "refunded": "(refund {{amount}})",
+      "noRecordedPayment": "No payment recorded yet."
+    }
+  },
   "teams": {
     "title": "Teams",
     "create": "New team",
@@ -1116,6 +1188,18 @@
     "confirmCancelBody": "Your access stays active until {{date}}. No further charges will be made. You can reactivate any time before then.",
     "confirmCancelFallbackDate": "the end of the current period",
     "confirmCancelAction": "Cancel subscription",
+    "memberLocked": {
+      "eyebrow": "Subscription expired",
+      "title": "The club needs to reactivate its subscription",
+      "body": "Full access to {{club}} is temporarily suspended. A club admin must update the subscription to reopen events, teams and messages.",
+      "fallbackClub": "your club",
+      "whatYouCanDo": "What you can do",
+      "profileHint": "Your profile remains available.",
+      "adminHint": "Contact a club admin so they can restart the subscription.",
+      "supportHint": "Clubero support can help if you do not know who to contact.",
+      "profileCta": "Go to profile",
+      "supportCta": "Contact support"
+    },
     "features": {
       "teams": "Unlimited teams",
       "players": "Unlimited players",
@@ -1424,6 +1508,11 @@
     "adminPayments": {
       "title": "Payments — Clubero",
       "description": "Enable tournament registration payments for your club."
+    },
+    "payments": {
+      "title": "My payments — Clubero",
+      "family": "Family portal — Clubero",
+      "receipts": "My receipts — Clubero"
     },
     "adminCommunications": {
       "title": "Communications — Clubero",

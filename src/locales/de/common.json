@@ -404,6 +404,78 @@
       "noData": "—"
     }
   },
+  "payments": {
+    "title": "Meine Zahlungen",
+    "subtitle": "Mitgliedsbeiträge, Lizenzen und andere Beträge, die an deinen Verein zu zahlen sind.",
+    "familyView": "Familienansicht",
+    "simpleView": "Einfache Ansicht",
+    "receipts": "Meine Belege",
+    "receiptsShort": "Belege",
+    "receiptsSubtitle": "Historie aller Zahlungen und PDF-Belege.",
+    "success": "Zahlung erfasst. Danke!",
+    "cancelled": "Zahlung abgebrochen.",
+    "emptyTitle": "Keine offenen Zahlungen",
+    "emptyHint": "Alle Zahlungen sind auf dem neuesten Stand.",
+    "defaultItem": "Zahlung",
+    "dueDate": "fällig am {{date}}",
+    "alreadyPaid": "bereits gezahlt {{amount}}",
+    "payAmount": "{{amount}} bezahlen",
+    "partial": "Teilzahlung",
+    "onlineUnavailable": "Online-Zahlung ist für diesen Verein noch nicht aktiviert. Kontaktiere den Verein, um zu zahlen.",
+    "onlineUnavailableShort": "Online-Zahlung nicht verfügbar — kontaktiere den Verein.",
+    "amountLabel": "Betrag ({{currency}})",
+    "remainingAfter": "Verbleibend nach dieser Zahlung: {{amount}}",
+    "invalidAmount": "Ungültiger Betrag",
+    "payHelloAsso": "Über HelloAsso bezahlen {{amount}}",
+    "helloAssoMissing": "Kontaktiere den Verein für den HelloAsso-Zahlungslink.",
+    "helloAssoExternal": "Zahlung wird außerhalb von Clubero abgewickelt — der Verein aktualisiert den Status nach Eingang.",
+    "noReceipts": "Noch keine Belege",
+    "viewPending": "Meine offenen Zahlungen ansehen",
+    "receiptNumber": "Nr. {{number}}",
+    "homeCard": {
+      "title_one": "{{count}} offene Zahlung",
+      "title_other": "{{count}} offene Zahlungen",
+      "subtitle": "{{amount}} offen — zum Bezahlen tippen."
+    },
+    "tabs": {
+      "open": "Offen",
+      "paid": "Bezahlt",
+      "other": "Andere",
+      "all": "Alle"
+    },
+    "status": {
+      "pending": "Offen",
+      "partiallyPaid": "Teilweise bezahlt",
+      "paid": "Bezahlt",
+      "exempted": "Befreit",
+      "cancelled": "Storniert"
+    },
+    "method": {
+      "stripe": "Karte",
+      "helloasso": "HelloAsso",
+      "cash": "Bar",
+      "cheque": "Scheck",
+      "bank_transfer": "Überweisung",
+      "manual": "Manuell"
+    },
+    "family": {
+      "title": "Familienportal",
+      "subtitle": "Alle finanziellen Verpflichtungen deines Haushalts, nach Spieler gruppiert.",
+      "remaining": "Noch zu zahlen",
+      "paid": "Bereits bezahlt",
+      "totalDue": "Gesamt fällig",
+      "emptyCategory": "Keine Zahlung in dieser Kategorie.",
+      "remainingBadge": "Noch {{amount}}",
+      "paidAmount": "bezahlt {{amount}}",
+      "exemptedReason": "Befreit — {{reason}}",
+      "cancelledReason": "Storniert — {{reason}}",
+      "transactions_one": "Zahlung ({{count}})",
+      "transactions_other": "Zahlungen ({{count}})",
+      "recordedByClub": "(vom Verein erfasst)",
+      "refunded": "(erst. {{amount}})",
+      "noRecordedPayment": "Noch keine Zahlung erfasst."
+    }
+  },
   "teams": {
     "title": "Teams",
     "create": "Neues Team",
@@ -1115,6 +1187,18 @@
     "confirmCancelBody": "Dein Zugang bleibt bis {{date}} aktiv. Keine neuen Abbuchungen. Du kannst jederzeit reaktivieren.",
     "confirmCancelFallbackDate": "Ende des aktuellen Zeitraums",
     "confirmCancelAction": "Kündigen",
+    "memberLocked": {
+      "eyebrow": "Abonnement abgelaufen",
+      "title": "Der Verein muss sein Abonnement reaktivieren",
+      "body": "Der vollständige Zugriff auf {{club}} ist vorübergehend gesperrt. Ein Vereinsadmin muss das Abonnement aktualisieren, um Events, Teams und Nachrichten wieder zu öffnen.",
+      "fallbackClub": "dein Verein",
+      "whatYouCanDo": "Was du tun kannst",
+      "profileHint": "Dein Profil bleibt verfügbar.",
+      "adminHint": "Kontaktiere einen Vereinsadmin, damit das Abonnement reaktiviert wird.",
+      "supportHint": "Der Clubero-Support kann helfen, wenn du nicht weißt, wen du kontaktieren sollst.",
+      "profileCta": "Zum Profil",
+      "supportCta": "Support kontaktieren"
+    },
     "features": {
       "teams": "Unbegrenzte Teams",
       "players": "Unbegrenzte Spieler",
@@ -1423,6 +1507,11 @@
     "adminPayments": {
       "title": "Zahlungen — Clubero",
       "description": "Aktiviere die Einziehung von Turniergebühren für deinen Verein."
+    },
+    "payments": {
+      "title": "Meine Zahlungen — Clubero",
+      "family": "Familienportal — Clubero",
+      "receipts": "Meine Belege — Clubero"
     },
     "adminCommunications": {
       "title": "Communications — Clubero",

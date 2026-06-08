@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/payments")({
   }),
   head: () => ({
     meta: [
-      { title: i18nInstance.t("meta.payments.title", { defaultValue: "Mes paiements" }) },
+      { title: i18nInstance.t("meta.payments.title") },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -61,8 +61,17 @@ type Obligation = {
   players: { id: string; first_name: string | null; last_name: string | null } | null;
 };
 
+function formatAmount(cents: number, currency: string | null | undefined, locale: string) {
+  const code = (currency || "eur").toUpperCase();
+  try {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: code }).format(cents / 100);
+  } catch {
+    return `${(cents / 100).toFixed(2)} ${code}`;
+  }
+}
+
 function MyPaymentsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const listFn = useServerFn(listMyObligations);
 
   const q = useQuery({
@@ -80,29 +89,29 @@ function MyPaymentsPage() {
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <h1 className="text-2xl font-semibold flex items-center gap-2">
             <Wallet className="h-6 w-6 text-primary" />
-            Mes paiements
+            {t("payments.title")}
           </h1>
           <Button variant="outline" size="sm" asChild>
-            <Link to="/payments/family">Vue famille</Link>
+            <Link to="/payments/family">{t("payments.familyView")}</Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to="/payments/receipts">Mes reçus</Link>
+            <Link to="/payments/receipts">{t("payments.receipts")}</Link>
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          Cotisations, licences et autres frais à régler à votre club.
+          {t("payments.subtitle")}
         </p>
       </header>
 
       {search?.success && (
         <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4" />
-          Paiement enregistré. Merci !
+          {t("payments.success")}
         </div>
       )}
       {search?.cancelled && (
         <div className="rounded-md border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
-          Paiement annulé.
+          {t("payments.cancelled")}
         </div>
       )}
 
@@ -114,16 +123,16 @@ function MyPaymentsPage() {
 
       {q.data && q.data.obligations.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-          <p className="text-sm font-medium">Aucun paiement en attente</p>
+          <p className="text-sm font-medium">{t("payments.emptyTitle")}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Tous vos règlements sont à jour.
+            {t("payments.emptyHint")}
           </p>
         </div>
       )}
 
       <ul className="space-y-3">
         {(q.data?.obligations as Obligation[] | undefined)?.map((o) => (
-          <ObligationRow key={o.id} obligation={o} />
+          <ObligationRow key={o.id} obligation={o} locale={i18n.language} />
         ))}
       </ul>
     </div>
@@ -132,9 +141,12 @@ function MyPaymentsPage() {
 
 function ObligationRow({
   obligation,
+  locale,
 }: {
   obligation: Obligation;
+  locale: string;
 }) {
+  const { t } = useTranslation();
   const checkoutFn = useServerFn(createObligationCheckout);
   const [partialOpen, setPartialOpen] = useState(false);
   const [amount, setAmount] = useState("");
@@ -170,11 +182,11 @@ function ObligationRow({
         <div className="min-w-0 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-semibold">
-              {obligation.items?.title ?? "Paiement"}
+              {obligation.items?.title ?? t("payments.defaultItem")}
             </p>
             {obligation.status === "partially_paid" && (
               <Badge variant="outline" className="text-[10px]">
-                Partiellement réglé
+                {t("payments.status.partiallyPaid")}
               </Badge>
             )}
           </div>
@@ -182,18 +194,19 @@ function ObligationRow({
             {obligation.clubs?.name}
             {playerName ? ` · ${playerName}` : ""}
             {obligation.items?.due_date
-              ? ` · échéance ${obligation.items.due_date}`
+              ? ` · ${t("payments.dueDate", { date: obligation.items.due_date })}`
               : ""}
           </p>
         </div>
         <div className="text-right">
           <p className="text-lg font-bold">
-            {(remaining / 100).toFixed(2)} {currency}
+            {formatAmount(remaining, currency, locale)}
           </p>
           {obligation.amount_paid_cents > 0 && (
             <p className="text-[11px] text-muted-foreground">
-              déjà payé {(obligation.amount_paid_cents / 100).toFixed(2)}{" "}
-              {currency}
+              {t("payments.alreadyPaid", {
+                amount: formatAmount(obligation.amount_paid_cents, currency, locale),
+              })}
             </p>
           )}
         </div>
@@ -212,7 +225,7 @@ function ObligationRow({
               ) : (
                 <CreditCard className="h-4 w-4" />
               )}
-              Payer {(remaining / 100).toFixed(2)} {currency}
+              {t("payments.payAmount", { amount: formatAmount(remaining, currency, locale) })}
             </Button>
             {allowPartial && remaining > 100 && (
               <Button
@@ -223,14 +236,13 @@ function ObligationRow({
                   setPartialOpen(true);
                 }}
               >
-                Paiement partiel
+                {t("payments.partial")}
               </Button>
             )}
           </>
         ) : (
           <p className="text-xs text-muted-foreground">
-            Le paiement en ligne n'est pas encore activé pour ce club.
-            Contactez-le pour régler.
+            {t("payments.onlineUnavailable")}
           </p>
         )}
       </div>
@@ -238,10 +250,12 @@ function ObligationRow({
       <Dialog open={partialOpen} onOpenChange={setPartialOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Paiement partiel</DialogTitle>
+            <DialogTitle>{t("payments.partial")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <Label className="text-xs">Montant ({currency})</Label>
+            <Label className="text-xs">
+              {t("payments.amountLabel", { currency })}
+            </Label>
             <Input
               type="number"
               min="1"
@@ -251,23 +265,24 @@ function ObligationRow({
               onChange={(e) => setAmount(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Restant après ce paiement :{" "}
-              {(
-                (remaining - Math.round(parseFloat(amount || "0") * 100)) /
-                100
-              ).toFixed(2)}{" "}
-              {currency}
+              {t("payments.remainingAfter", {
+                amount: formatAmount(
+                  remaining - Math.round(parseFloat(amount || "0") * 100),
+                  currency,
+                  locale,
+                ),
+              })}
             </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setPartialOpen(false)}>
-              Annuler
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={() => {
                 const cents = Math.round(parseFloat(amount || "0") * 100);
                 if (cents <= 0 || cents > remaining) {
-                  toast.error("Montant invalide");
+                  toast.error(t("payments.invalidAmount"));
                   return;
                 }
                 setPartialOpen(false);
@@ -275,7 +290,7 @@ function ObligationRow({
               }}
               disabled={checkout.isPending}
             >
-              Continuer
+              {t("common.continue")}
             </Button>
           </DialogFooter>
         </DialogContent>
