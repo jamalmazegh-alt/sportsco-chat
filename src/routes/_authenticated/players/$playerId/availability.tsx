@@ -45,6 +45,7 @@ function AvailabilityPage() {
   const { user } = useAuth();
   const roles = useMyRoles();
   const isAdmin = roles.includes("admin");
+  const canDeclare = roles.includes("player") || roles.includes("parent");
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
@@ -153,10 +154,12 @@ function AvailabilityPage() {
       <BackLink />
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-lg font-semibold">{t("availability.title", { defaultValue: "Disponibilités" })}</h1>
-        <Button size="sm" onClick={() => setOpen(true)}>
-          <Plus className="h-4 w-4" />
-          {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-        </Button>
+        {canDeclare && (
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+        )}
       </div>
 
       {/* Consolidated view */}
@@ -246,7 +249,7 @@ function AvailabilityPage() {
         )}
       </section>
 
-      <DeclareAbsenceDrawer open={open} onOpenChange={setOpen} playerId={playerId} />
+      {canDeclare && <DeclareAbsenceDrawer open={open} onOpenChange={setOpen} playerId={playerId} />}
     </div>
   );
 }

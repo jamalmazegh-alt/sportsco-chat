@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Palmtree, Plus, CheckCircle2, ChevronRight, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
@@ -33,6 +34,8 @@ function formatRange(start: string, end: string) {
 export function UpcomingAbsencesWidget({ clubId, className }: Props) {
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const roles = useMyRoles();
+  const canDeclare = roles.includes("player") || roles.includes("parent");
 
   const today = new Date().toISOString().slice(0, 10);
   const in14days = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
@@ -98,14 +101,16 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
                 : t("availability.noneUpcoming", { defaultValue: "Aucune absence à venir" })}
           </h2>
         </div>
-        <button
-          type="button"
-          onClick={() => setDrawerOpen(true)}
-          className="text-xs text-primary font-medium inline-flex items-center gap-0.5"
-        >
-          {t("availability.declare", { defaultValue: "Déclarer" })}
-          <ChevronRight className="h-3 w-3" />
-        </button>
+        {canDeclare && (
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            className="text-xs text-primary font-medium inline-flex items-center gap-0.5"
+          >
+            {t("availability.declare", { defaultValue: "Déclarer" })}
+            <ChevronRight className="h-3 w-3" />
+          </button>
+        )}
       </div>
 
       {reducedSquad && (
@@ -146,14 +151,16 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
         </ul>
       )}
 
-      <div className="mt-3 flex items-center gap-2">
-        <Button size="sm" variant="outline" className="flex-1" onClick={() => setDrawerOpen(true)}>
-          <Plus className="h-4 w-4" />
-          {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-        </Button>
-      </div>
+      {canDeclare && (
+        <div className="mt-3 flex items-center gap-2">
+          <Button size="sm" variant="outline" className="flex-1" onClick={() => setDrawerOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </Button>
+        </div>
+      )}
 
-      <DeclareAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
+      {canDeclare && <DeclareAbsenceDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />}
     </section>
   );
 }

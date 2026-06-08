@@ -13,6 +13,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { QuickSanctionDrawer } from "@/components/quick-sanction-drawer";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
@@ -63,6 +64,8 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
   const { t } = useTranslation();
   const [sanctionOpen, setSanctionOpen] = useState(false);
   const [absenceOpen, setAbsenceOpen] = useState(false);
+  const roles = useMyRoles();
+  const canDeclare = roles.includes("player") || roles.includes("parent");
 
   const today = new Date().toISOString().slice(0, 10);
   const in14days = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
@@ -318,12 +321,14 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
             {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
           </span>
         </Button>
-        <Button size="sm" variant="default" onClick={() => setAbsenceOpen(true)}>
-          <Plus className="h-4 w-4" />
-          <span className="truncate">
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-          </span>
-        </Button>
+        {canDeclare && (
+          <Button size="sm" variant="default" onClick={() => setAbsenceOpen(true)}>
+            <Plus className="h-4 w-4" />
+            <span className="truncate">
+              {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            </span>
+          </Button>
+        )}
       </div>
 
       <QuickSanctionDrawer
@@ -331,7 +336,7 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
         onOpenChange={setSanctionOpen}
         clubId={clubId}
       />
-      <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />
+      {canDeclare && <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />}
     </section>
   );
 }
