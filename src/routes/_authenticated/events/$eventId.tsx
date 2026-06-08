@@ -960,10 +960,16 @@ function EventDetail() {
 
     // Save snapshot of values just sent so we can diff later for "resend with changes"
     const snapshot = buildConvocSnapshot(event);
+    const shouldPublish = event.status === "draft";
     if (!event.convocations_sent) {
       const { error: sentError } = await supabase
         .from("events")
-        .update({ convocations_sent: true, convocation_sent_snapshot: snapshot, convocation_last_sent_at: new Date().toISOString() })
+        .update({
+          convocations_sent: true,
+          convocation_sent_snapshot: snapshot,
+          convocation_last_sent_at: new Date().toISOString(),
+          ...(shouldPublish ? { status: "published" } : {}),
+        })
         .eq("id", event.id);
       if (sentError) {
         setSending(false);
@@ -973,7 +979,11 @@ function EventDetail() {
     } else {
       await supabase
         .from("events")
-        .update({ convocation_sent_snapshot: snapshot, convocation_last_sent_at: new Date().toISOString() })
+        .update({
+          convocation_sent_snapshot: snapshot,
+          convocation_last_sent_at: new Date().toISOString(),
+          ...(shouldPublish ? { status: "published" } : {}),
+        })
         .eq("id", event.id);
     }
 
