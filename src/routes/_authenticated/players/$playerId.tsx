@@ -105,6 +105,7 @@ function PlayerProfile() {
   const isSubRoute = isFeedback || isAchievements || isSeasons || isTimeline || isAvailability;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [absenceOpen, setAbsenceOpen] = useState(false);
 
   async function onDeletePlayer() {
     if (!player) return;
