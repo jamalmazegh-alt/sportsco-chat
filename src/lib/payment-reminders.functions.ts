@@ -119,7 +119,7 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
       .eq("id", data.paymentItemId)
       .maybeSingle();
     if (error || !item) throw new Error(error?.message ?? "Item not found");
-    await assertFinancialAdmin(context.userId, item.club_id);
+    await assertAdminOrFinancialAdmin(context.userId, item.club_id);
 
     const { data: obligations } = await supabaseAdmin
       .from("payment_obligations")
