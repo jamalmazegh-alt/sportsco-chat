@@ -221,7 +221,7 @@ function PaymentItemsPage() {
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
           <p className="text-sm font-medium">Aucune saison configurée</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Créez une saison avant d'ajouter des postes de paiement.
+            Créez une saison avant d'ajouter des collectes de fonds.
           </p>
           <Button asChild size="sm" className="mt-3">
             <Link
