@@ -445,7 +445,7 @@ function CreateItemDialog({
       });
     },
     onSuccess: () => {
-      toast.success("Poste créé — les membres concernés vont recevoir un email");
+      toast.success("Collecte créée — les membres concernés vont recevoir un email");
       setOpen(false);
       // reset
       setTitle("");
