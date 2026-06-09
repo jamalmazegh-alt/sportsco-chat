@@ -339,7 +339,7 @@ export const reassignPaymentItem = createServerFn({ method: "POST" })
       .eq("id", data.itemId)
       .eq("club_id", data.clubId)
       .maybeSingle();
-    if (!item) throw new Error("Item not found");
+    if (!item) throw new Error("Poste de paiement introuvable");
 
     // Remove assignments + pending obligations (keep paid/partial untouched)
     await supabaseAdmin
