@@ -453,3 +453,124 @@ async function applyTarget(
       ignoreDuplicates: true,
     });
 }
+
+/* --------------------------- notifications --------------------------- */
+
+function frDate(iso: string | null | undefined): string | undefined {
+  if (!iso) return undefined;
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function fmtMoney(cents: number, currency: string): string {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(cents / 100);
+}
+
+/**
+ * Envoie une notification email initiale aux payeurs / parents / joueurs
+ * de chaque obligation d'un poste de paiement nouvellement ouvert.
+ *
+ * - Idempotent : la clé d'idempotence inclut l'id de l'obligation et l'email
+ *   destinataire — relancer la création (ex. re-tentative) ne renverra pas
+ *   plusieurs fois le même email au même destinataire.
+ * - Non bloquant : un échec d'envoi est loggé mais ne fait pas remonter
+ *   d'erreur à l'admin (qui voit "Poste créé" malgré tout).
+ */
+async function notifyMembersOfNewPaymentItem(
+  clubId: string,
+  itemId: string,
+): Promise<void> {
+  const { data: item } = await supabaseAdmin
+    .from("payment_items")
+    .select(
+      "id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name)",
+    )
+    .eq("id", itemId)
+    .maybeSingle();
+  if (!item) return;
+
+  const { data: obligations } = await supabaseAdmin
+    .from("payment_obligations")
+    .select("id, player_id, payer_user_id, amount_due_cents, currency")
+    .eq("payment_item_id", itemId)
+    .eq("club_id", clubId)
+    .eq("status", "pending");
+
+  if (!obligations || obligations.length === 0) return;
+
+  const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
+  const clubName = (item as any).clubs?.name ?? "Clubero";
+  const dueLabel = frDate(item.due_date);
+  const offsetDays = item.due_date
+    ? Math.round(
+        (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) /
+          86_400_000,
+      )
+    : 0;
+
+  for (const o of obligations) {
+    const recipients = new Set<string>();
+
+    // Payeur (tuteur principal) — récupère l'email via auth.admin.
+    if (o.payer_user_id) {
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(
+        o.payer_user_id,
+      );
+      if (u?.user?.email) recipients.add(u.user.email.toLowerCase());
+    }
+
+    // Email du joueur lui-même + des parents.
+    let playerName: string | null = null;
+    if (o.player_id) {
+      const { data: p } = await supabaseAdmin
+        .from("players")
+        .select("first_name, last_name, email")
+        .eq("id", o.player_id)
+        .maybeSingle();
+      if (p) {
+        playerName = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || null;
+        if (p.email) recipients.add(p.email.toLowerCase());
+      }
+      const { data: parents } = await supabaseAdmin
+        .from("player_parents")
+        .select("email")
+        .eq("player_id", o.player_id);
+      for (const pp of parents ?? []) {
+        if (pp.email) recipients.add(pp.email.toLowerCase());
+      }
+    }
+
+    for (const email of recipients) {
+      try {
+        await enqueueTransactionalEmailServer({
+          templateName: "payment-reminder",
+          recipientEmail: email,
+          idempotencyKey: `pay-init:${o.id}:${email}`,
+          templateData: {
+            kind: "initial",
+            clubName,
+            playerName,
+            itemTitle: item.title,
+            amountLabel: fmtMoney(o.amount_due_cents, item.currency),
+            remainingLabel: null,
+            dueDateLabel: dueLabel,
+            offsetDays,
+            payUrl: `${baseUrl}/payments`,
+          },
+        });
+      } catch (e) {
+        console.error("[payment-items] enqueue initial notification failed", {
+          obligationId: o.id,
+          email,
+          error: String(e),
+        });
+      }
+    }
+  }
+}
