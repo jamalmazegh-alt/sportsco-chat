@@ -222,16 +222,16 @@ function PaymentsDashboardPage() {
           {/* Export buttons */}
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleExportTx}>
-              <Download className="h-4 w-4 mr-2" /> Export transactions CSV
+              <Download className="h-4 w-4 mr-2" /> Exporter les transactions (CSV)
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportItems}>
-              <Download className="h-4 w-4 mr-2" /> Export items CSV
+              <Download className="h-4 w-4 mr-2" /> Exporter par poste (CSV)
             </Button>
           </div>
 
           <Tabs defaultValue="items" className="w-full">
             <TabsList>
-              <TabsTrigger value="items">Par item</TabsTrigger>
+              <TabsTrigger value="items">Par poste</TabsTrigger>
               <TabsTrigger value="methods">Par méthode</TabsTrigger>
               <TabsTrigger value="monthly">Par mois</TabsTrigger>
               <TabsTrigger value="tx">Transactions</TabsTrigger>
@@ -239,7 +239,7 @@ function PaymentsDashboardPage() {
 
             <TabsContent value="items" className="space-y-2 mt-4">
               {data.itemRollup.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun item.</p>
+                <p className="text-sm text-muted-foreground">Aucun poste de paiement.</p>
               ) : (
                 data.itemRollup.map((it) => (
                   <Card key={it.id}>
