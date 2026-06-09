@@ -724,7 +724,8 @@ export const listObligationsForItem = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertFinAdmin(context.supabase, context.userId, data.clubId);
+    // Lecture seule — accessible aux admins club ET aux admins financiers.
+    await assertAdminOrFinAdmin(context.supabase, context.userId, data.clubId);
 
     const { data: obls } = await supabaseAdmin
       .from("payment_obligations")
