@@ -161,7 +161,7 @@ export const getPaymentItem = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!item) throw new Error("Item not found");
+    if (!item) throw new Error("Poste de paiement introuvable");
 
     const { data: assignments } = await context.supabase
       .from("payment_assignments")
