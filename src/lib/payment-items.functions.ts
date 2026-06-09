@@ -304,7 +304,7 @@ export const deletePaymentItem = createServerFn({ method: "POST" })
       );
     if ((count ?? 0) > 0) {
       throw new Error(
-        "Cannot delete: payments already collected. Cancel instead.",
+        "Suppression impossible : des paiements ont déjà été encaissés. Annulez le poste plutôt que de le supprimer.",
       );
     }
     const { error } = await supabaseAdmin
