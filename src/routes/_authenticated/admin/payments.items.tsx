@@ -242,7 +242,7 @@ function PaymentItemsPage() {
 
       {itemsQ.data && itemsQ.data.items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Aucun item de paiement pour cette saison.
+          Aucun poste de paiement pour cette saison.
         </div>
       )}
 
