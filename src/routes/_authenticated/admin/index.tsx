@@ -84,8 +84,8 @@ function AdminSettingsPage() {
     {
       to: "/admin/payments/items",
       icon: Receipt,
-      title: "Items de paiement",
-      hint: "Licences, cotisations, équipements, déplacements",
+      title: "Postes de paiement",
+      hint: "Cotisations, licences, équipements, déplacements",
       tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
     },
     {
