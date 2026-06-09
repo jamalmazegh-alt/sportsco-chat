@@ -20,7 +20,6 @@ type Format =
   | "group"
   | "knockout"
   | "mixed"
-  | "double_elimination"
   | "swiss"
   | "round_robin_home_away"
   | "flighted_finals"
@@ -144,11 +143,6 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
       v: "round_robin_home_away",
       label: t("wizard.formatRoundRobinHomeAway"),
       desc: t("wizard.formatRoundRobinHomeAwayDesc"),
-    },
-    {
-      v: "double_elimination",
-      label: t("wizard.formatDoubleElimination"),
-      desc: t("wizard.formatDoubleEliminationDesc"),
     },
     { v: "swiss", label: t("wizard.formatSwiss"), desc: t("wizard.formatSwissDesc") },
   ];
