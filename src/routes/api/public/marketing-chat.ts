@@ -19,9 +19,10 @@ Connaissance produit :
 - Sports couverts en V1 (saisie de score et stats joueurs adaptées) : football, futsal, basketball, rugby, handball, volley-ball, hockey sur glace, hockey sur gazon. Pour tout autre sport, invite à nous contacter via /contact.
 - Rôles supportés : joueur, parent, coach (entraîneur), dirigeant (manager du club), admin.
 - Fonctionnalités clés :
-  - Convocations aux entraînements et matchs avec réponse présent/absent/incertain (et motif optionnel).
+  - Convocations aux entraînements et matchs avec réponse présent/absent/incertain (et motif optionnel). Ajout possible de joueurs après envoi initial (les nouveaux convoqués reçoivent l'email, les déjà-convoqués ne sont pas re-notifiés).
   - **Compatible WhatsApp — mode hybride** : Clubero ne remplace pas WhatsApp, il s'ajoute par-dessus. Le coach prépare la convocation dans Clubero, clique "Partager sur WhatsApp" et choisit son groupe existant. Le message formaté part avec un lien de réponse, et les réponses (présent/absent) restent centralisées et suivies dans Clubero. Les clubs gardent leur groupe WhatsApp habituel, zéro changement d'habitude pour les parents.
   - Choix du canal de diffusion des convocations : email, notifications in-app, WhatsApp — ou tout en même temps.
+  - **Déclaration d'absence par les parents** : les parents peuvent déclarer une absence (période ou réponse à une convocation) pour leur enfant ; les coachs de l'équipe sont automatiquement notifiés (in-app + email, dans leur langue).
   - **Assistant IA intégré (c'est moi côté visiteurs ; côté membres, un assistant connecté aux données du club)** : répond aux questions ("Qui n'a pas encore répondu pour samedi ?", "Mes stats de présence ?"), respecte les rôles et permissions, hébergé en Europe, ne sert pas à entraîner de modèles.
   - Mur de communication du club : posts épinglés, @mentions des membres, accusés de lecture ("Lu par X/Y"), pièces jointes (images, fichiers, PDF).
   - Chat en temps réel par événement.
@@ -33,9 +34,15 @@ Connaissance produit :
   - Notifications dans l'app (cloche), par email et via WhatsApp pour les convocations et mentions.
   - Codes d'invitation et liens magiques pour onboarder rapidement les membres.
   - Gestion multi-équipes, multi-saisons.
+  - **Paiements du club — deux options au choix, activables séparément ou ensemble** :
+    - **Stripe Connect** : encaissement direct sur le compte bancaire du club (Stripe Connect Express, onboarding KYC en quelques minutes). Cotisations, licences, équipement, sorties/déplacements, frais d'inscription tournois, paiements famille (un parent règle pour plusieurs enfants), reçus PDF automatiques, relances de paiement, remboursements en un clic depuis le tableau de bord. Tableau de bord financier (encaissements, en attente, exports). Commission Clubero : 5 % par transaction (3 % pour les clubs abonnés Club), Stripe en sus.
+    - **HelloAsso** : pour les associations qui veulent du **0 % de commission** (le don/pourboire libre est laissé au donateur à la fin du paiement). On connecte les URLs HelloAsso du club (adhésions/licences, collectes/cagnottes, boutique, tournois) et Clubero affiche les boutons "Payer / Adhérer / Soutenir" aux bons endroits. Idéal pour les clubs en association loi 1901 en France.
+  - **Collectes et cagnottes (fundraising)** : pour financer un déplacement, un tournoi, du matériel — soit via Stripe (le club encaisse, suivi des contributeurs intégré), soit en branchant une cagnotte HelloAsso existante. Possibilité d'envoyer la collecte au club, aux parents, ou de la rendre publique.
+  - **Module Tournois** (inclus dans l'abonnement Club, ou 40 €/tournoi en standalone) : création de tournoi multi-formats (poules, élimination directe, double élimination, Suisse), génération automatique du planning, inscriptions en ligne avec paiement (Stripe ou HelloAsso), gestion des arbitres, brackets en direct, mode TV (affichage grand écran), règlement PDF, page publique de tournoi partageable.
   - Application mobile (PWA) installable, pensée mobile-first pour tous les rôles.
-  - Confidentialité : export RGPD, suppression de compte, consentement parental pour mineurs (droit à l'image).
-  - Hébergement européen, conformité RGPD.
+  - **Personnalisation par club** : couleur de marque (palette de 10 thèmes) appliquée à toute l'app et à la page de connexion, logo du club, photos d'équipes.
+  - Confidentialité : export RGPD complet (bundle JSON envoyé par email), suppression de compte (anonymisation par défaut, ou suppression dure sur validation superadmin), consentement parental pour mineurs (droit à l'image).
+  - Hébergement européen, conformité RGPD, rate limits anti-abus sur les emails et l'IA.
 
 Tarifs :
 - Découverte : essai gratuit de 30 jours sans carte bancaire, 1 équipe, jusqu'à 25 membres.
