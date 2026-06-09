@@ -1,8 +1,54 @@
+/**
+ * ============================================================================
+ * Postes de paiement (campagnes de cotisations / licences / déplacements…)
+ * ============================================================================
+ *
+ * Comportement attendu de la feature « Postes de paiement » :
+ *
+ * 1. CRÉATION
+ *    - Réservé aux rôles `admin` ou `financial_admin` du club.
+ *    - L'admin crée un poste (titre, type, montant, échéance, fournisseur)
+ *      et choisit une cible : tout le club / des équipes / des joueurs précis.
+ *    - À la création (statut `open`), le serveur :
+ *        a. matérialise les `payment_obligations` (1 par joueur ciblé) avec
+ *           le payeur (tuteur principal sinon n'importe quel tuteur) ;
+ *        b. envoie un email « Nouveau paiement à régler » via la queue
+ *           transactionnelle au payeur et aux parents/joueur — avec un lien
+ *           vers /payments. L'envoi est idempotent par (poste × email).
+ *
+ * 2. CÔTÉ MEMBRE (/payments)
+ *    - Le joueur (ou son parent payeur) voit la liste de ses obligations en
+ *      attente / partielles / payées, et règle en ligne (Stripe) ou voit que
+ *      le club encaisse hors ligne (espèces / chèque / virement / HelloAsso).
+ *
+ * 3. CÔTÉ ADMIN — page /admin/payments/items
+ *    - Liste des postes de la saison, statut, montant.
+ *    - Bouton « Suivi » → ouvre le dialog par joueur : qui a payé combien,
+ *      encaissement manuel, remboursement, exonération, annulation.
+ *    - Bouton « Relancer » → envoie immédiatement un email de rappel à
+ *      tous les payeurs non soldés (déduplication par jour calendaire).
+ *
+ * 4. CÔTÉ ADMIN — page /admin/payments/dashboard
+ *    - Vue agrégée : KPIs (encaissé / net / dû / taux), répartition par
+ *      poste / méthode / mois, liste des transactions, exports CSV.
+ *
+ * 5. RÔLES & PERMISSIONS
+ *    - `admin`         : crée/édite/supprime un poste, voit le suivi,
+ *                        envoie des rappels, voit le dashboard.
+ *    - `financial_admin`: idem + opérations financières (encaissement
+ *                         manuel, exonération, annulation, remboursement).
+ *    - Le rôle `admin` ne PEUT PAS exécuter les opérations purement
+ *      financières (record manual / refund) sans le rôle financial_admin —
+ *      voir `payment-checkout.functions.ts`.
+ * ============================================================================
+ */
+
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const ITEM_TYPES = [
   "membership",
