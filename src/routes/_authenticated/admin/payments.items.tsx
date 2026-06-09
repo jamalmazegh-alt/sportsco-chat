@@ -58,7 +58,7 @@ export const Route = createFileRoute("/_authenticated/admin/payments/items")({
   validateSearch: z.object({ season: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: i18nInstance.t("meta.adminPayments.title") + " — Postes" },
+      { title: i18nInstance.t("meta.adminPayments.title") + " — Collectes" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -139,7 +139,7 @@ function PaymentItemsPage() {
     mutationFn: (itemId: string) =>
       deleteFn({ data: { clubId: activeClubId, itemId } }),
     onSuccess: () => {
-      toast.success("Poste supprimé");
+      toast.success("Collecte supprimée");
       qc.invalidateQueries({ queryKey: ["payment-items"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -172,13 +172,13 @@ function PaymentItemsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold flex items-center gap-2">
             <Receipt className="h-6 w-6 text-primary" />
-            Postes de paiement
+            Collectes de fonds
           </h1>
           <p className="text-sm text-muted-foreground">
             Cotisations, licences, équipements, déplacements… affectés à tout
             le club, à des équipes ou à des joueurs précis. Un email est
-            envoyé automatiquement aux membres concernés à l'ouverture du
-            poste.
+            envoyé automatiquement aux membres concernés à l'ouverture de la
+            collecte.
           </p>
         </div>
         <div className="flex items-end gap-2">
@@ -221,7 +221,7 @@ function PaymentItemsPage() {
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
           <p className="text-sm font-medium">Aucune saison configurée</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Créez une saison avant d'ajouter des postes de paiement.
+            Créez une saison avant d'ajouter des collectes de fonds.
           </p>
           <Button asChild size="sm" className="mt-3">
             <Link
@@ -242,7 +242,7 @@ function PaymentItemsPage() {
 
       {itemsQ.data && itemsQ.data.items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Aucun poste de paiement pour cette saison.
+          Aucune collecte de fonds pour cette saison.
         </div>
       )}
 
@@ -445,7 +445,7 @@ function CreateItemDialog({
       });
     },
     onSuccess: () => {
-      toast.success("Poste créé — les membres concernés vont recevoir un email");
+      toast.success("Collecte créée — les membres concernés vont recevoir un email");
       setOpen(false);
       // reset
       setTitle("");
@@ -470,12 +470,12 @@ function CreateItemDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="h-4 w-4" /> Nouveau poste
+          <Plus className="h-4 w-4" /> Nouvelle collecte
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer un poste de paiement</DialogTitle>
+          <DialogTitle>Créer une collecte de fonds</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">

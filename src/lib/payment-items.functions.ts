@@ -91,7 +91,7 @@ async function assertFinAdmin(
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Seuls les admins du club ou les admins financiers peuvent gérer les postes de paiement");
+  throw new Error("Seuls les admins du club ou les admins financiers peuvent gérer les collectes de fonds");
 }
 
 const ItemInput = z.object({
@@ -161,7 +161,7 @@ export const getPaymentItem = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!item) throw new Error("Poste de paiement introuvable");
+    if (!item) throw new Error("Collecte de fonds introuvable");
 
     const { data: assignments } = await context.supabase
       .from("payment_assignments")
@@ -339,7 +339,7 @@ export const reassignPaymentItem = createServerFn({ method: "POST" })
       .eq("id", data.itemId)
       .eq("club_id", data.clubId)
       .maybeSingle();
-    if (!item) throw new Error("Poste de paiement introuvable");
+    if (!item) throw new Error("Collecte de fonds introuvable");
 
     // Remove assignments + pending obligations (keep paid/partial untouched)
     await supabaseAdmin
