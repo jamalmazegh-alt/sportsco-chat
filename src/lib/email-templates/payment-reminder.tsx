@@ -67,6 +67,9 @@ const Row = ({ k, v }: { k: string; v: string }) => (
 export const template = {
   component: PaymentReminderEmail,
   subject: (d: Record<string, any>) => {
+    if (d.kind === "initial") {
+      return `Nouveau paiement — ${d.itemTitle ?? "Paiement"} (${d.clubName ?? "Clubero"})`;
+    }
     const overdue = (d.offsetDays ?? 0) > 0;
     return `${overdue ? "Paiement en retard" : "Rappel"} — ${d.itemTitle ?? "Paiement"} (${d.clubName ?? "Clubero"})`;
   },
