@@ -132,9 +132,16 @@ export function CollectPaymentDialog({
           </div>
         )}
 
+        {q.isError && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+            Impossible de charger le suivi : {(q.error as Error)?.message ?? "erreur inconnue"}
+          </div>
+        )}
+
         {q.data && q.data.obligations.length === 0 && (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            Aucune obligation pour cet item.
+            Aucun joueur n'a encore d'obligation pour ce poste. Vérifiez que
+            la cible (club / équipes / joueurs) contient bien des joueurs.
           </p>
         )}
 

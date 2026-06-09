@@ -27,7 +27,32 @@ async function assertFinancialAdmin(userId: string, clubId: string) {
     _club_id: clubId,
     _role: "financial_admin",
   });
-  if (data !== true) throw new Error("Forbidden");
+  if (data !== true) throw new Error("Accès refusé");
+}
+
+/**
+ * Lecture / notification : autorise admin du club OU financial_admin.
+ * Utilisé pour envoyer des rappels — pas de mouvement d'argent, juste un
+ * email. Le rôle admin doit pouvoir relancer ses membres.
+ */
+async function assertAdminOrFinancialAdmin(userId: string, clubId: string) {
+  const { data: memberRow } = await supabaseAdmin
+    .from("club_members")
+    .select("roles, role")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const isAdmin =
+    !!memberRow &&
+    ((memberRow.roles ?? []).includes("admin") || memberRow.role === "admin");
+  if (isAdmin) return;
+  const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
+    _user_id: userId,
+    _club_id: clubId,
+    _role: "financial_admin",
+  });
+  if (isFin === true) return;
+  throw new Error("Accès refusé");
 }
 
 async function paidCents(obligationId: string): Promise<number> {
@@ -94,7 +119,7 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
       .eq("id", data.paymentItemId)
       .maybeSingle();
     if (error || !item) throw new Error(error?.message ?? "Item not found");
-    await assertFinancialAdmin(context.userId, item.club_id);
+    await assertAdminOrFinancialAdmin(context.userId, item.club_id);
 
     const { data: obligations } = await supabaseAdmin
       .from("payment_obligations")

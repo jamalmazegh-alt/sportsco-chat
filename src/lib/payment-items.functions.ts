@@ -1,8 +1,54 @@
+/**
+ * ============================================================================
+ * Postes de paiement (campagnes de cotisations / licences / déplacements…)
+ * ============================================================================
+ *
+ * Comportement attendu de la feature « Postes de paiement » :
+ *
+ * 1. CRÉATION
+ *    - Réservé aux rôles `admin` ou `financial_admin` du club.
+ *    - L'admin crée un poste (titre, type, montant, échéance, fournisseur)
+ *      et choisit une cible : tout le club / des équipes / des joueurs précis.
+ *    - À la création (statut `open`), le serveur :
+ *        a. matérialise les `payment_obligations` (1 par joueur ciblé) avec
+ *           le payeur (tuteur principal sinon n'importe quel tuteur) ;
+ *        b. envoie un email « Nouveau paiement à régler » via la queue
+ *           transactionnelle au payeur et aux parents/joueur — avec un lien
+ *           vers /payments. L'envoi est idempotent par (poste × email).
+ *
+ * 2. CÔTÉ MEMBRE (/payments)
+ *    - Le joueur (ou son parent payeur) voit la liste de ses obligations en
+ *      attente / partielles / payées, et règle en ligne (Stripe) ou voit que
+ *      le club encaisse hors ligne (espèces / chèque / virement / HelloAsso).
+ *
+ * 3. CÔTÉ ADMIN — page /admin/payments/items
+ *    - Liste des postes de la saison, statut, montant.
+ *    - Bouton « Suivi » → ouvre le dialog par joueur : qui a payé combien,
+ *      encaissement manuel, remboursement, exonération, annulation.
+ *    - Bouton « Relancer » → envoie immédiatement un email de rappel à
+ *      tous les payeurs non soldés (déduplication par jour calendaire).
+ *
+ * 4. CÔTÉ ADMIN — page /admin/payments/dashboard
+ *    - Vue agrégée : KPIs (encaissé / net / dû / taux), répartition par
+ *      poste / méthode / mois, liste des transactions, exports CSV.
+ *
+ * 5. RÔLES & PERMISSIONS
+ *    - `admin`         : crée/édite/supprime un poste, voit le suivi,
+ *                        envoie des rappels, voit le dashboard.
+ *    - `financial_admin`: idem + opérations financières (encaissement
+ *                         manuel, exonération, annulation, remboursement).
+ *    - Le rôle `admin` ne PEUT PAS exécuter les opérations purement
+ *      financières (record manual / refund) sans le rôle financial_admin —
+ *      voir `payment-checkout.functions.ts`.
+ * ============================================================================
+ */
+
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
 const ITEM_TYPES = [
   "membership",
@@ -45,7 +91,7 @@ async function assertFinAdmin(
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only club admins or financial admins can manage payment items");
+  throw new Error("Seuls les admins du club ou les admins financiers peuvent gérer les postes de paiement");
 }
 
 const ItemInput = z.object({
@@ -115,7 +161,7 @@ export const getPaymentItem = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!item) throw new Error("Item not found");
+    if (!item) throw new Error("Poste de paiement introuvable");
 
     const { data: assignments } = await context.supabase
       .from("payment_assignments")
@@ -159,7 +205,7 @@ export const createPaymentItem = createServerFn({ method: "POST" })
       .eq("id", data.item.season_id)
       .eq("club_id", data.clubId)
       .maybeSingle();
-    if (!season) throw new Error("Invalid season for this club");
+    if (!season) throw new Error("Saison invalide pour ce club");
 
     // Insert item
     const { data: created, error } = await supabaseAdmin
@@ -184,6 +230,21 @@ export const createPaymentItem = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     await applyTarget(data.clubId, created.id, data.target, data.item);
+
+    // Notification initiale aux payeurs / parents / joueurs ciblés. On ne
+    // notifie que les postes ouverts (les brouillons restent silencieux).
+    // L'envoi est non bloquant — un échec d'email ne doit pas faire échouer
+    // la création du poste côté admin.
+    if (data.item.status === "open") {
+      try {
+        await notifyMembersOfNewPaymentItem(data.clubId, created.id);
+      } catch (e) {
+        console.error("[payment-items] initial notification failed", {
+          itemId: created.id,
+          error: String(e),
+        });
+      }
+    }
 
     return { id: created.id };
   });
@@ -243,7 +304,7 @@ export const deletePaymentItem = createServerFn({ method: "POST" })
       );
     if ((count ?? 0) > 0) {
       throw new Error(
-        "Cannot delete: payments already collected. Cancel instead.",
+        "Suppression impossible : des paiements ont déjà été encaissés. Annulez le poste plutôt que de le supprimer.",
       );
     }
     const { error } = await supabaseAdmin
@@ -278,7 +339,7 @@ export const reassignPaymentItem = createServerFn({ method: "POST" })
       .eq("id", data.itemId)
       .eq("club_id", data.clubId)
       .maybeSingle();
-    if (!item) throw new Error("Item not found");
+    if (!item) throw new Error("Poste de paiement introuvable");
 
     // Remove assignments + pending obligations (keep paid/partial untouched)
     await supabaseAdmin
@@ -391,4 +452,125 @@ async function applyTarget(
       onConflict: "payment_item_id,player_id,payer_user_id",
       ignoreDuplicates: true,
     });
+}
+
+/* --------------------------- notifications --------------------------- */
+
+function frDate(iso: string | null | undefined): string | undefined {
+  if (!iso) return undefined;
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function fmtMoney(cents: number, currency: string): string {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(cents / 100);
+}
+
+/**
+ * Envoie une notification email initiale aux payeurs / parents / joueurs
+ * de chaque obligation d'un poste de paiement nouvellement ouvert.
+ *
+ * - Idempotent : la clé d'idempotence inclut l'id de l'obligation et l'email
+ *   destinataire — relancer la création (ex. re-tentative) ne renverra pas
+ *   plusieurs fois le même email au même destinataire.
+ * - Non bloquant : un échec d'envoi est loggé mais ne fait pas remonter
+ *   d'erreur à l'admin (qui voit "Poste créé" malgré tout).
+ */
+async function notifyMembersOfNewPaymentItem(
+  clubId: string,
+  itemId: string,
+): Promise<void> {
+  const { data: item } = await supabaseAdmin
+    .from("payment_items")
+    .select(
+      "id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name)",
+    )
+    .eq("id", itemId)
+    .maybeSingle();
+  if (!item) return;
+
+  const { data: obligations } = await supabaseAdmin
+    .from("payment_obligations")
+    .select("id, player_id, payer_user_id, amount_due_cents, currency")
+    .eq("payment_item_id", itemId)
+    .eq("club_id", clubId)
+    .eq("status", "pending");
+
+  if (!obligations || obligations.length === 0) return;
+
+  const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
+  const clubName = (item as any).clubs?.name ?? "Clubero";
+  const dueLabel = frDate(item.due_date);
+  const offsetDays = item.due_date
+    ? Math.round(
+        (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) /
+          86_400_000,
+      )
+    : 0;
+
+  for (const o of obligations) {
+    const recipients = new Set<string>();
+
+    // Payeur (tuteur principal) — récupère l'email via auth.admin.
+    if (o.payer_user_id) {
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(
+        o.payer_user_id,
+      );
+      if (u?.user?.email) recipients.add(u.user.email.toLowerCase());
+    }
+
+    // Email du joueur lui-même + des parents.
+    let playerName: string | null = null;
+    if (o.player_id) {
+      const { data: p } = await supabaseAdmin
+        .from("players")
+        .select("first_name, last_name, email")
+        .eq("id", o.player_id)
+        .maybeSingle();
+      if (p) {
+        playerName = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || null;
+        if (p.email) recipients.add(p.email.toLowerCase());
+      }
+      const { data: parents } = await supabaseAdmin
+        .from("player_parents")
+        .select("email")
+        .eq("player_id", o.player_id);
+      for (const pp of parents ?? []) {
+        if (pp.email) recipients.add(pp.email.toLowerCase());
+      }
+    }
+
+    for (const email of recipients) {
+      try {
+        await enqueueTransactionalEmailServer({
+          templateName: "payment-reminder",
+          recipientEmail: email,
+          idempotencyKey: `pay-init:${o.id}:${email}`,
+          templateData: {
+            kind: "initial",
+            clubName,
+            playerName,
+            itemTitle: item.title,
+            amountLabel: fmtMoney(o.amount_due_cents, item.currency),
+            remainingLabel: null,
+            dueDateLabel: dueLabel,
+            offsetDays,
+            payUrl: `${baseUrl}/payments`,
+          },
+        });
+      } catch (e) {
+        console.error("[payment-items] enqueue initial notification failed", {
+          obligationId: o.id,
+          email,
+          error: String(e),
+        });
+      }
+    }
+  }
 }

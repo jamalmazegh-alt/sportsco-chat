@@ -26,7 +26,35 @@ async function assertFinAdmin(
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only financial admins can perform this action");
+  throw new Error("Seuls les admins financiers peuvent effectuer cette opération");
+}
+
+/**
+ * Lecture seule : autorise admin ou financial_admin. À utiliser pour les
+ * listings & suivis qui ne modifient aucun argent (ex. dialog "Suivi" qui
+ * affiche qui a payé combien).
+ */
+async function assertAdminOrFinAdmin(
+  supabase: SupabaseClient,
+  userId: string,
+  clubId: string,
+): Promise<void> {
+  const { data } = await supabase
+    .from("club_members")
+    .select("roles, role")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  const isAdmin =
+    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
+  if (isAdmin) return;
+  const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
+    _user_id: userId,
+    _club_id: clubId,
+    _role: "financial_admin",
+  });
+  if (isFin === true) return;
+  throw new Error("Seuls les admins du club ou les admins financiers peuvent consulter ces données");
 }
 
 function getOrigin(): string {
@@ -696,7 +724,8 @@ export const listObligationsForItem = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertFinAdmin(context.supabase, context.userId, data.clubId);
+    // Lecture seule — accessible aux admins club ET aux admins financiers.
+    await assertAdminOrFinAdmin(context.supabase, context.userId, data.clubId);
 
     const { data: obls } = await supabaseAdmin
       .from("payment_obligations")
