@@ -91,7 +91,7 @@ async function assertFinAdmin(
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Only club admins or financial admins can manage payment items");
+  throw new Error("Seuls les admins du club ou les admins financiers peuvent gérer les postes de paiement");
 }
 
 const ItemInput = z.object({
