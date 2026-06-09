@@ -470,12 +470,12 @@ function CreateItemDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="h-4 w-4" /> Nouveau poste
+          <Plus className="h-4 w-4" /> Nouvelle collecte
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer un poste de paiement</DialogTitle>
+          <DialogTitle>Créer une collecte de fonds</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
