@@ -13,21 +13,29 @@ interface Props {
   dueDateLabel?: string | null;
   offsetDays: number; // negative = before due date, positive = after
   payUrl: string;
+  /** "initial" = première notification à l'ouverture du poste ; "reminder" (défaut) = relance. */
+  kind?: "initial" | "reminder";
 }
 
 const PaymentReminderEmail = (p: Props) => {
   const overdue = p.offsetDays > 0;
-  const lead = overdue
-    ? `Le paiement pour « ${p.itemTitle} » est en retard de ${p.offsetDays} jour${p.offsetDays > 1 ? "s" : ""}.`
-    : p.offsetDays === 0
-      ? `Le paiement pour « ${p.itemTitle} » est dû aujourd'hui.`
-      : `Le paiement pour « ${p.itemTitle} » est dû dans ${Math.abs(p.offsetDays)} jour${Math.abs(p.offsetDays) > 1 ? "s" : ""}.`;
+  const isInitial = p.kind === "initial";
+  const title = isInitial
+    ? "Nouveau paiement à régler"
+    : overdue
+      ? "Paiement en retard"
+      : "Rappel de paiement";
+  const lead = isInitial
+    ? `Votre club ${p.clubName} a ouvert un nouveau paiement : « ${p.itemTitle} »${p.dueDateLabel ? `, à régler avant le ${p.dueDateLabel}` : ""}.`
+    : overdue
+      ? `Le paiement pour « ${p.itemTitle} » est en retard de ${p.offsetDays} jour${p.offsetDays > 1 ? "s" : ""}.`
+      : p.offsetDays === 0
+        ? `Le paiement pour « ${p.itemTitle} » est dû aujourd'hui.`
+        : `Le paiement pour « ${p.itemTitle} » est dû dans ${Math.abs(p.offsetDays)} jour${Math.abs(p.offsetDays) > 1 ? "s" : ""}.`;
 
   return (
-    <EmailShell preview={`Rappel — ${p.itemTitle}`} locale="fr">
-      <Heading style={h1}>
-        {overdue ? "Paiement en retard" : "Rappel de paiement"}
-      </Heading>
+    <EmailShell preview={`${isInitial ? "Nouveau paiement" : "Rappel"} — ${p.itemTitle}`} locale="fr">
+      <Heading style={h1}>{title}</Heading>
       <Text style={leadStyle}>{lead}</Text>
       <Section style={card}>
         <Row k="Club" v={p.clubName} />
