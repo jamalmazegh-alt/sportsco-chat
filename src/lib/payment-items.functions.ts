@@ -205,7 +205,7 @@ export const createPaymentItem = createServerFn({ method: "POST" })
       .eq("id", data.item.season_id)
       .eq("club_id", data.clubId)
       .maybeSingle();
-    if (!season) throw new Error("Invalid season for this club");
+    if (!season) throw new Error("Saison invalide pour ce club");
 
     // Insert item
     const { data: created, error } = await supabaseAdmin
@@ -230,6 +230,21 @@ export const createPaymentItem = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     await applyTarget(data.clubId, created.id, data.target, data.item);
+
+    // Notification initiale aux payeurs / parents / joueurs ciblés. On ne
+    // notifie que les postes ouverts (les brouillons restent silencieux).
+    // L'envoi est non bloquant — un échec d'email ne doit pas faire échouer
+    // la création du poste côté admin.
+    if (data.item.status === "open") {
+      try {
+        await notifyMembersOfNewPaymentItem(data.clubId, created.id);
+      } catch (e) {
+        console.error("[payment-items] initial notification failed", {
+          itemId: created.id,
+          error: String(e),
+        });
+      }
+    }
 
     return { id: created.id };
   });
