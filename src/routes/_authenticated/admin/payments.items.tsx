@@ -371,6 +371,7 @@ function CreateItemDialog({
   seasonId: string;
   onCreated: () => void;
 }) {
+  const { t } = useTranslation();
   const createFn = useServerFn(createPaymentItem);
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<
