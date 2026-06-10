@@ -84,7 +84,9 @@ export function CookieConsentBanner() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[100] p-4 md:p-6">
+    <div
+      className="fixed inset-x-0 z-[100] p-4 md:p-6 bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0"
+    >
       <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-elevated p-5 md:p-6">
         <div className="flex items-start gap-4">
           <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
