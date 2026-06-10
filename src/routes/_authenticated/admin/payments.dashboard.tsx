@@ -79,6 +79,7 @@ function downloadCsv(csv: string, filename: string) {
 }
 
 function PaymentsDashboardPage() {
+  const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const [seasonId, setSeasonId] = useState<string | "all">("all");
