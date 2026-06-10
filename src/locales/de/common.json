@@ -1817,5 +1817,24 @@
     "emptyDashboard": "Kein Beitragseinzug.",
     "menuTitle": "Beitragseinzüge",
     "menuHint": "Mitgliedsbeiträge, Lizenzen, Ausrüstung, Reisen"
+  },
+  "tournamentToClub": {
+    "title": "Verwalten Sie Ihren Verein das ganze Jahr",
+    "subtitle": "Aufstellungen, Anwesenheit, Fahrgemeinschaften, Disziplin — alles was Sie für Ihre Mannschaften brauchen, nicht nur an Turniertagen.",
+    "ctaPrimary": "30 Tage kostenlos testen",
+    "ctaSecondary": "Mehr erfahren",
+    "dismiss": "Schließen"
+  },
+  "pricing": {
+    "tournamentHero": {
+      "title": "Sie haben ein großartiges Turnier organisiert.",
+      "subtitle": "Machen Sie den nächsten Schritt: Verwalten Sie Ihren Verein das ganze Jahr mit Clubero."
+    },
+    "clubBenefits": [
+      "Aufstellungen und Anwesenheit mit einem Klick",
+      "Fahrgemeinschaften und Reiseplanung",
+      "Disziplin-Tracking und Spielerhistorie",
+      "Zentrale Kommunikation mit Eltern"
+    ]
   }
 }

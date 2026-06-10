@@ -1817,5 +1817,24 @@
     "emptyDashboard": "Nenhuma arrecadação.",
     "menuTitle": "Arrecadações",
     "menuHint": "Mensalidades, licenças, equipamento, deslocações"
+  },
+  "tournamentToClub": {
+    "title": "Gerencie seu clube o ano todo",
+    "subtitle": "Convocações, presenças, carona, disciplina — tudo o que precisa para as suas equipas, não só nos dias de torneio.",
+    "ctaPrimary": "Experimentar grátis por 30 dias",
+    "ctaSecondary": "Saber mais",
+    "dismiss": "Fechar"
+  },
+  "pricing": {
+    "tournamentHero": {
+      "title": "Você organizou um ótimo torneio.",
+      "subtitle": "Dê o próximo passo: gerencie o seu clube o ano todo com a Clubero."
+    },
+    "clubBenefits": [
+      "Convocações e presenças com um clique",
+      "Carona e coordenação de viagens",
+      "Acompanhamento disciplinar e histórico dos jogadores",
+      "Comunicação centralizada com os pais"
+    ]
   }
 }

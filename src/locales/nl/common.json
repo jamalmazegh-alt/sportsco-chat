@@ -1817,5 +1817,24 @@
     "emptyDashboard": "Geen inzameling.",
     "menuTitle": "Inzamelingen",
     "menuHint": "Contributies, licenties, materiaal, verplaatsingen"
+  },
+  "tournamentToClub": {
+    "title": "Beheer uw club het hele jaar",
+    "subtitle": "Oproepen, aanwezigheid, carpool, discipline — alles wat u nodig heeft voor uw teams, niet alleen op turnooidagen.",
+    "ctaPrimary": "30 dagen gratis proberen",
+    "ctaSecondary": "Meer informatie",
+    "dismiss": "Sluiten"
+  },
+  "pricing": {
+    "tournamentHero": {
+      "title": "U heeft een geweldig toernooi georganiseerd.",
+      "subtitle": "Zet de volgende stap: beheer uw club het hele jaar met Clubero."
+    },
+    "clubBenefits": [
+      "Oproepen en aanwezigheid met één klik",
+      "Carpooling en reisplanning",
+      "Disciplinetracking en spelersgeschiedenis",
+      "Gecentraliseerde communicatie met ouders"
+    ]
   }
 }
