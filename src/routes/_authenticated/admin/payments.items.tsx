@@ -165,7 +165,7 @@ function PaymentItemsPage() {
   const remindFn = useServerFn(sendItemRemindersNow);
   const remind = useMutation({
     mutationFn: (itemId: string) => remindFn({ data: { paymentItemId: itemId } }),
-    onSuccess: (res) => toast.success(`Rappels envoyés (${res.sent})`),
+    onSuccess: (res) => toast.success(t("fundraising.remindersSent", { count: res.sent })),
     onError: (e: Error) => toast.error(e.message),
   });
 
