@@ -1790,5 +1790,32 @@
       "title": "Sei stato aggiunto a una squadra",
       "body": "Ora sei allenatore di {{teamName}} presso {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Raccolte fondi",
+    "titleSingular": "Raccolta fondi",
+    "metaSuffix": "Raccolte",
+    "subtitle": "Quote, licenze, attrezzatura, trasferte… assegnate a tutto il club, a squadre o giocatori specifici. Viene inviata un'email automatica ai membri interessati all'apertura della raccolta.",
+    "newButton": "Nuova raccolta",
+    "createTitle": "Crea una raccolta fondi",
+    "created": "Raccolta creata — i membri interessati riceveranno un'email",
+    "deleted": "Raccolta eliminata",
+    "statusUpdated": "Stato aggiornato",
+    "remindersSent": "Promemoria inviati ({{count}})",
+    "empty": "Nessuna raccolta fondi per questa stagione.",
+    "noSeason": "Nessuna stagione configurata",
+    "noSeasonHint": "Crea una stagione prima di aggiungere una raccolta fondi.",
+    "configureSeasons": "Configura stagioni",
+    "notFound": "Raccolta fondi non trovata",
+    "dashboardTitle": "Dashboard finanziaria",
+    "dashboardSubtitle": "Incassi, saldi residui ed esportazioni contabili",
+    "byItem": "Per raccolta",
+    "byMethod": "Per metodo",
+    "byMonth": "Per mese",
+    "exportItems": "Esporta per raccolta (CSV)",
+    "exportTransactions": "Esporta transazioni (CSV)",
+    "emptyDashboard": "Nessuna raccolta fondi.",
+    "menuTitle": "Raccolte fondi",
+    "menuHint": "Quote, licenze, attrezzatura, trasferte"
   }
 }

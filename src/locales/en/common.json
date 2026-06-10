@@ -1790,5 +1790,32 @@
       "title": "You have been added to a team",
       "body": "You are now coach of {{teamName}} at {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Payment collections",
+    "titleSingular": "Payment collection",
+    "metaSuffix": "Collections",
+    "subtitle": "Memberships, licenses, gear, trips… assigned to the whole club, specific teams or players. An email is sent automatically to relevant members when the collection opens.",
+    "newButton": "New collection",
+    "createTitle": "Create a payment collection",
+    "created": "Collection created — affected members will receive an email",
+    "deleted": "Collection deleted",
+    "statusUpdated": "Status updated",
+    "remindersSent": "Reminders sent ({{count}})",
+    "empty": "No payment collection for this season.",
+    "noSeason": "No season configured",
+    "noSeasonHint": "Create a season before adding a payment collection.",
+    "configureSeasons": "Configure seasons",
+    "notFound": "Payment collection not found",
+    "dashboardTitle": "Financial dashboard",
+    "dashboardSubtitle": "Cash-in, outstanding balances and accounting exports",
+    "byItem": "By collection",
+    "byMethod": "By method",
+    "byMonth": "By month",
+    "exportItems": "Export by collection (CSV)",
+    "exportTransactions": "Export transactions (CSV)",
+    "emptyDashboard": "No payment collection.",
+    "menuTitle": "Payment collections",
+    "menuHint": "Memberships, licenses, gear, trips"
   }
 }

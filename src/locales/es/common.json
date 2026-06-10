@@ -1790,5 +1790,32 @@
       "title": "Has sido añadido a un equipo",
       "body": "Ahora eres entrenador de {{teamName}} en {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Recaudaciones",
+    "titleSingular": "Recaudación",
+    "metaSuffix": "Recaudaciones",
+    "subtitle": "Cuotas, licencias, equipamiento, desplazamientos… asignados a todo el club, a equipos o jugadores concretos. Se envía un correo automático a los miembros implicados al abrir la recaudación.",
+    "newButton": "Nueva recaudación",
+    "createTitle": "Crear una recaudación",
+    "created": "Recaudación creada — los miembros implicados recibirán un correo",
+    "deleted": "Recaudación eliminada",
+    "statusUpdated": "Estado actualizado",
+    "remindersSent": "Recordatorios enviados ({{count}})",
+    "empty": "No hay recaudación para esta temporada.",
+    "noSeason": "No hay temporada configurada",
+    "noSeasonHint": "Crea una temporada antes de añadir una recaudación.",
+    "configureSeasons": "Configurar temporadas",
+    "notFound": "Recaudación no encontrada",
+    "dashboardTitle": "Panel financiero",
+    "dashboardSubtitle": "Cobros, saldos pendientes y exportaciones contables",
+    "byItem": "Por recaudación",
+    "byMethod": "Por método",
+    "byMonth": "Por mes",
+    "exportItems": "Exportar por recaudación (CSV)",
+    "exportTransactions": "Exportar transacciones (CSV)",
+    "emptyDashboard": "Ninguna recaudación.",
+    "menuTitle": "Recaudaciones",
+    "menuHint": "Cuotas, licencias, equipamiento, desplazamientos"
   }
 }

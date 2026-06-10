@@ -1790,5 +1790,32 @@
       "title": "Sie wurden einem Team hinzugefügt",
       "body": "Sie sind jetzt Trainer von {{teamName}} bei {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Beitragseinzüge",
+    "titleSingular": "Beitragseinzug",
+    "metaSuffix": "Einzüge",
+    "subtitle": "Mitgliedsbeiträge, Lizenzen, Ausrüstung, Reisen… zugewiesen an den gesamten Verein, bestimmte Mannschaften oder Spieler. Beim Öffnen des Einzugs wird automatisch eine E-Mail an die betroffenen Mitglieder gesendet.",
+    "newButton": "Neuer Einzug",
+    "createTitle": "Beitragseinzug erstellen",
+    "created": "Einzug erstellt — die betroffenen Mitglieder erhalten eine E-Mail",
+    "deleted": "Einzug gelöscht",
+    "statusUpdated": "Status aktualisiert",
+    "remindersSent": "Erinnerungen gesendet ({{count}})",
+    "empty": "Kein Beitragseinzug für diese Saison.",
+    "noSeason": "Keine Saison konfiguriert",
+    "noSeasonHint": "Erstellen Sie eine Saison, bevor Sie einen Beitragseinzug hinzufügen.",
+    "configureSeasons": "Saisons konfigurieren",
+    "notFound": "Beitragseinzug nicht gefunden",
+    "dashboardTitle": "Finanz-Dashboard",
+    "dashboardSubtitle": "Einnahmen, offene Salden und Buchhaltungs-Exporte",
+    "byItem": "Nach Einzug",
+    "byMethod": "Nach Methode",
+    "byMonth": "Nach Monat",
+    "exportItems": "Nach Einzug exportieren (CSV)",
+    "exportTransactions": "Transaktionen exportieren (CSV)",
+    "emptyDashboard": "Kein Beitragseinzug.",
+    "menuTitle": "Beitragseinzüge",
+    "menuHint": "Mitgliedsbeiträge, Lizenzen, Ausrüstung, Reisen"
   }
 }

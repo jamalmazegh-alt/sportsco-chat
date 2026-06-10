@@ -1790,5 +1790,32 @@
       "title": "Vous avez été ajouté à une équipe",
       "body": "Vous êtes maintenant coach de {{teamName}} au club {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Collectes de fonds",
+    "titleSingular": "Collecte de fonds",
+    "metaSuffix": "Collectes",
+    "subtitle": "Cotisations, licences, équipements, déplacements… affectés à tout le club, à des équipes ou à des joueurs précis. Un email est envoyé automatiquement aux membres concernés à l'ouverture de la collecte.",
+    "newButton": "Nouvelle collecte",
+    "createTitle": "Créer une collecte de fonds",
+    "created": "Collecte créée — les membres concernés vont recevoir un email",
+    "deleted": "Collecte supprimée",
+    "statusUpdated": "Statut mis à jour",
+    "remindersSent": "Rappels envoyés ({{count}})",
+    "empty": "Aucune collecte de fonds pour cette saison.",
+    "noSeason": "Aucune saison configurée",
+    "noSeasonHint": "Créez une saison avant d'ajouter des collectes de fonds.",
+    "configureSeasons": "Configurer les saisons",
+    "notFound": "Collecte de fonds introuvable",
+    "dashboardTitle": "Tableau de bord financier",
+    "dashboardSubtitle": "Encaissements, soldes restants et exports comptables",
+    "byItem": "Par collecte",
+    "byMethod": "Par méthode",
+    "byMonth": "Par mois",
+    "exportItems": "Exporter par collecte (CSV)",
+    "exportTransactions": "Exporter les transactions (CSV)",
+    "emptyDashboard": "Aucune collecte de fonds.",
+    "menuTitle": "Collectes de fonds",
+    "menuHint": "Cotisations, licences, équipements, déplacements"
   }
 }
