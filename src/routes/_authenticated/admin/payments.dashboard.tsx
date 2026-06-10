@@ -229,10 +229,10 @@ function PaymentsDashboardPage() {
           {/* Export buttons */}
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleExportTx}>
-              <Download className="h-4 w-4 mr-2" /> Exporter les transactions (CSV)
+              <Download className="h-4 w-4 mr-2" /> {t("fundraising.exportTransactions")}
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportItems}>
-              <Download className="h-4 w-4 mr-2" /> Exporter par collecte (CSV)
+              <Download className="h-4 w-4 mr-2" /> {t("fundraising.exportItems")}
             </Button>
           </div>
 
