@@ -1790,5 +1790,32 @@
       "title": "Je bent toegevoegd aan een team",
       "body": "Je bent nu coach van {{teamName}} bij {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Inzamelingen",
+    "titleSingular": "Inzameling",
+    "metaSuffix": "Inzamelingen",
+    "subtitle": "Contributies, licenties, materiaal, verplaatsingen… toegewezen aan de hele club, aan teams of aan specifieke spelers. Bij het openen van de inzameling wordt automatisch een e-mail naar de betrokken leden gestuurd.",
+    "newButton": "Nieuwe inzameling",
+    "createTitle": "Inzameling aanmaken",
+    "created": "Inzameling aangemaakt — de betrokken leden ontvangen een e-mail",
+    "deleted": "Inzameling verwijderd",
+    "statusUpdated": "Status bijgewerkt",
+    "remindersSent": "Herinneringen verzonden ({{count}})",
+    "empty": "Geen inzameling voor dit seizoen.",
+    "noSeason": "Geen seizoen geconfigureerd",
+    "noSeasonHint": "Maak een seizoen aan voor je een inzameling toevoegt.",
+    "configureSeasons": "Seizoenen configureren",
+    "notFound": "Inzameling niet gevonden",
+    "dashboardTitle": "Financieel dashboard",
+    "dashboardSubtitle": "Ontvangsten, openstaande saldi en boekhoudkundige exports",
+    "byItem": "Per inzameling",
+    "byMethod": "Per methode",
+    "byMonth": "Per maand",
+    "exportItems": "Exporteren per inzameling (CSV)",
+    "exportTransactions": "Transacties exporteren (CSV)",
+    "emptyDashboard": "Geen inzameling.",
+    "menuTitle": "Inzamelingen",
+    "menuHint": "Contributies, licenties, materiaal, verplaatsingen"
   }
 }

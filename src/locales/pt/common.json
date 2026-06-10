@@ -1790,5 +1790,32 @@
       "title": "Você foi adicionado a uma equipe",
       "body": "Agora você é treinador de {{teamName}} no {{clubName}}."
     }
+  },
+  "fundraising": {
+    "title": "Arrecadações",
+    "titleSingular": "Arrecadação",
+    "metaSuffix": "Arrecadações",
+    "subtitle": "Mensalidades, licenças, equipamento, deslocações… atribuídas a todo o clube, a equipas ou a jogadores específicos. É enviado um email automático aos membros envolvidos quando a arrecadação abre.",
+    "newButton": "Nova arrecadação",
+    "createTitle": "Criar uma arrecadação",
+    "created": "Arrecadação criada — os membros envolvidos receberão um email",
+    "deleted": "Arrecadação eliminada",
+    "statusUpdated": "Estado atualizado",
+    "remindersSent": "Lembretes enviados ({{count}})",
+    "empty": "Sem arrecadação para esta época.",
+    "noSeason": "Nenhuma época configurada",
+    "noSeasonHint": "Crie uma época antes de adicionar uma arrecadação.",
+    "configureSeasons": "Configurar épocas",
+    "notFound": "Arrecadação não encontrada",
+    "dashboardTitle": "Painel financeiro",
+    "dashboardSubtitle": "Cobranças, saldos em aberto e exportações contábeis",
+    "byItem": "Por arrecadação",
+    "byMethod": "Por método",
+    "byMonth": "Por mês",
+    "exportItems": "Exportar por arrecadação (CSV)",
+    "exportTransactions": "Exportar transações (CSV)",
+    "emptyDashboard": "Nenhuma arrecadação.",
+    "menuTitle": "Arrecadações",
+    "menuHint": "Mensalidades, licenças, equipamento, deslocações"
   }
 }

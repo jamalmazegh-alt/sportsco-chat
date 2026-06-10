@@ -1,5 +1,6 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
@@ -32,7 +33,12 @@ export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")
   component: PaymentsDashboardPage,
   head: () => ({
     meta: [
-      { title: (i18nInstance.t("meta.adminPayments.title") as string) + " — Tableau de bord" },
+      {
+        title:
+          (i18nInstance.t("meta.adminPayments.title") as string) +
+          " — " +
+          (i18nInstance.t("fundraising.dashboardTitle") as string),
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -74,6 +80,7 @@ function downloadCsv(csv: string, filename: string) {
 }
 
 function PaymentsDashboardPage() {
+  const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const [seasonId, setSeasonId] = useState<string | "all">("all");
@@ -145,7 +152,7 @@ function PaymentsDashboardPage() {
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-primary" />
-          Tableau de bord financier
+          {t("fundraising.dashboardTitle")}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Encaissements, soldes restants et exports comptables
@@ -222,24 +229,24 @@ function PaymentsDashboardPage() {
           {/* Export buttons */}
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleExportTx}>
-              <Download className="h-4 w-4 mr-2" /> Exporter les transactions (CSV)
+              <Download className="h-4 w-4 mr-2" /> {t("fundraising.exportTransactions")}
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportItems}>
-              <Download className="h-4 w-4 mr-2" /> Exporter par collecte (CSV)
+              <Download className="h-4 w-4 mr-2" /> {t("fundraising.exportItems")}
             </Button>
           </div>
 
           <Tabs defaultValue="items" className="w-full">
             <TabsList>
-              <TabsTrigger value="items">Par collecte</TabsTrigger>
-              <TabsTrigger value="methods">Par méthode</TabsTrigger>
-              <TabsTrigger value="monthly">Par mois</TabsTrigger>
+              <TabsTrigger value="items">{t("fundraising.byItem")}</TabsTrigger>
+              <TabsTrigger value="methods">{t("fundraising.byMethod")}</TabsTrigger>
+              <TabsTrigger value="monthly">{t("fundraising.byMonth")}</TabsTrigger>
               <TabsTrigger value="tx">Transactions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="items" className="space-y-2 mt-4">
               {data.itemRollup.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucune collecte de fonds.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.emptyDashboard")}</p>
               ) : (
                 data.itemRollup.map((it) => (
                   <Card key={it.id}>

@@ -58,7 +58,12 @@ export const Route = createFileRoute("/_authenticated/admin/payments/items")({
   validateSearch: z.object({ season: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: i18nInstance.t("meta.adminPayments.title") + " — Collectes" },
+      {
+        title:
+          i18nInstance.t("meta.adminPayments.title") +
+          " — " +
+          i18nInstance.t("fundraising.metaSuffix"),
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -139,7 +144,7 @@ function PaymentItemsPage() {
     mutationFn: (itemId: string) =>
       deleteFn({ data: { clubId: activeClubId, itemId } }),
     onSuccess: () => {
-      toast.success("Collecte supprimée");
+      toast.success(t("fundraising.deleted"));
       qc.invalidateQueries({ queryKey: ["payment-items"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -151,7 +156,7 @@ function PaymentItemsPage() {
         data: { clubId: activeClubId, itemId: id, patch: { status } },
       }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("fundraising.statusUpdated"));
       qc.invalidateQueries({ queryKey: ["payment-items"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -160,7 +165,7 @@ function PaymentItemsPage() {
   const remindFn = useServerFn(sendItemRemindersNow);
   const remind = useMutation({
     mutationFn: (itemId: string) => remindFn({ data: { paymentItemId: itemId } }),
-    onSuccess: (res) => toast.success(`Rappels envoyés (${res.sent})`),
+    onSuccess: (res) => toast.success(t("fundraising.remindersSent", { count: res.sent })),
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -172,13 +177,10 @@ function PaymentItemsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold flex items-center gap-2">
             <Receipt className="h-6 w-6 text-primary" />
-            Collectes de fonds
+            {t("fundraising.title")}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Cotisations, licences, équipements, déplacements… affectés à tout
-            le club, à des équipes ou à des joueurs précis. Un email est
-            envoyé automatiquement aux membres concernés à l'ouverture de la
-            collecte.
+            {t("fundraising.subtitle")}
           </p>
         </div>
         <div className="flex items-end gap-2">
@@ -219,16 +221,16 @@ function PaymentItemsPage() {
 
       {seasonsQ.data && seasonsQ.data.seasons.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-          <p className="text-sm font-medium">Aucune saison configurée</p>
+          <p className="text-sm font-medium">{t("fundraising.noSeason")}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Créez une saison avant d'ajouter des collectes de fonds.
+            {t("fundraising.noSeasonHint")}
           </p>
           <Button asChild size="sm" className="mt-3">
             <Link
               to="/admin/settings/payments"
               search={{ tab: "seasons" }}
             >
-              Configurer les saisons
+              {t("fundraising.configureSeasons")}
             </Link>
           </Button>
         </div>
@@ -242,7 +244,7 @@ function PaymentItemsPage() {
 
       {itemsQ.data && itemsQ.data.items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Aucune collecte de fonds pour cette saison.
+          {t("fundraising.empty")}
         </div>
       )}
 
@@ -369,6 +371,7 @@ function CreateItemDialog({
   seasonId: string;
   onCreated: () => void;
 }) {
+  const { t } = useTranslation();
   const createFn = useServerFn(createPaymentItem);
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<
@@ -445,7 +448,7 @@ function CreateItemDialog({
       });
     },
     onSuccess: () => {
-      toast.success("Collecte créée — les membres concernés vont recevoir un email");
+      toast.success(t("fundraising.created"));
       setOpen(false);
       // reset
       setTitle("");
@@ -470,12 +473,12 @@ function CreateItemDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="h-4 w-4" /> Nouvelle collecte
+          <Plus className="h-4 w-4" /> {t("fundraising.newButton")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer une collecte de fonds</DialogTitle>
+          <DialogTitle>{t("fundraising.createTitle")}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
