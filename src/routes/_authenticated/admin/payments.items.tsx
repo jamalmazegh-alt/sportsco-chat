@@ -156,7 +156,7 @@ function PaymentItemsPage() {
         data: { clubId: activeClubId, itemId: id, patch: { status } },
       }),
     onSuccess: () => {
-      toast.success("Statut mis à jour");
+      toast.success(t("fundraising.statusUpdated"));
       qc.invalidateQueries({ queryKey: ["payment-items"] });
     },
     onError: (e: Error) => toast.error(e.message),
