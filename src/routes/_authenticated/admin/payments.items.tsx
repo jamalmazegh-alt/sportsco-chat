@@ -244,7 +244,7 @@ function PaymentItemsPage() {
 
       {itemsQ.data && itemsQ.data.items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Aucune collecte de fonds pour cette saison.
+          {t("fundraising.empty")}
         </div>
       )}
 
