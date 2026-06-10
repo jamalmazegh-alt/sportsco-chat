@@ -41,6 +41,7 @@ import { template as coachAssignedTemplate } from './coach-assigned'
 import { template as absenceDeclaredTemplate } from './absence-declared'
 import { template as dataExportReadyTemplate } from './data-export-ready'
 import { template as accountDeletedTemplate } from './account-deleted'
+import { template as tournamentCompletedTemplate } from './tournament-completed'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-confirmation': inquiryConfirmationTemplate,
@@ -67,4 +68,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'absence-declared': absenceDeclaredTemplate,
   'data-export-ready': dataExportReadyTemplate,
   'account-deleted': accountDeletedTemplate,
+  'tournament-completed': tournamentCompletedTemplate,
 }
