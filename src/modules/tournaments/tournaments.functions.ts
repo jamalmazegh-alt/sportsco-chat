@@ -297,6 +297,14 @@ export const updateTournament = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
+
+    // Read previous status to detect transition → completed (for trigger email).
+    const { data: previous } = await supabase
+      .from("tournaments")
+      .select("status, name, slug")
+      .eq("id", data.tournament_id)
+      .single();
+
     const { data: row, error } = await supabase
       .from("tournaments")
       .update(data.patch)
@@ -304,8 +312,66 @@ export const updateTournament = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
+
+    // Tournament just transitioned to completed → send post-tournament email
+    // (idempotent: idempotencyKey scopes to the tournament id).
+    if (
+      data.patch.status === "completed" &&
+      previous?.status !== "completed"
+    ) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        // Find organiser's email + locale via auth.users
+        const { data: organiser } = await supabaseAdmin.auth.admin.getUserById(
+          (row as any).created_by ?? userId,
+        );
+        const recipientEmail = organiser?.user?.email;
+        const locale =
+          (organiser?.user?.user_metadata?.locale as string | undefined) ?? "fr";
+        const firstName =
+          (organiser?.user?.user_metadata?.first_name as string | undefined) ??
+          (organiser?.user?.user_metadata?.full_name as string | undefined)?.split(
+            " ",
+          )[0];
+
+        // Lightweight summary
+        const [{ count: teamsCount }, { count: matchesCount }] = await Promise.all([
+          supabaseAdmin
+            .from("tournament_teams")
+            .select("id", { count: "exact", head: true })
+            .eq("tournament_id", data.tournament_id),
+          supabaseAdmin
+            .from("tournament_matches")
+            .select("id", { count: "exact", head: true })
+            .eq("tournament_id", data.tournament_id),
+        ]);
+
+        const pricingUrl = `https://www.clubero.app/pricing?utm_source=tournament_end_email&utm_medium=email&utm_campaign=tournament_conversion&source=tournament_conversion&tournament_id=${data.tournament_id}`;
+
+        if (recipientEmail) {
+          await enqueueTransactionalEmailServer({
+            templateName: "tournament-completed",
+            recipientEmail,
+            idempotencyKey: `tournament-completed:${data.tournament_id}`,
+            templateData: {
+              recipientFirstName: firstName,
+              tournamentName: (row as any).name ?? previous?.name ?? "",
+              teamsCount: teamsCount ?? undefined,
+              matchesCount: matchesCount ?? undefined,
+              pricingUrl,
+              locale,
+            },
+          });
+        }
+      } catch (e) {
+        // Don't fail the status update if email enqueue hiccups.
+        console.warn("tournament-completed email enqueue failed", e);
+      }
+    }
+
     return { tournament: row };
   });
+
 
 
 // ---------- Teams
