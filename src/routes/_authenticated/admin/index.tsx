@@ -84,8 +84,8 @@ function AdminSettingsPage() {
     {
       to: "/admin/payments/items",
       icon: Receipt,
-      title: "Collectes de fonds",
-      hint: "Cotisations, licences, équipements, déplacements",
+      title: t("fundraising.menuTitle"),
+      hint: t("fundraising.menuHint"),
       tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
     },
     {
