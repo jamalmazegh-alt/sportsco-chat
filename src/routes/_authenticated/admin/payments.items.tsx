@@ -473,12 +473,12 @@ function CreateItemDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="h-4 w-4" /> Nouvelle collecte
+          <Plus className="h-4 w-4" /> {t("fundraising.newButton")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Créer une collecte de fonds</DialogTitle>
+          <DialogTitle>{t("fundraising.createTitle")}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
