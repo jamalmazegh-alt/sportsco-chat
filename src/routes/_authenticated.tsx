@@ -270,9 +270,17 @@ function NoMembershipScreen({
       toast.error(mErr.message);
       return;
     }
+    // Conversion funnel tracking — best effort, non blocking
+    try {
+      const { trackConversion } = await import("@/lib/conversion-tracking");
+      trackConversion("trial_started", { club_id: club.id, plan: "trial_30d" });
+    } catch {
+      /* ignore */
+    }
     await onDone();
     setBusy(false);
   }
+
 
   async function joinClub(e: FormEvent) {
     e.preventDefault();
