@@ -144,7 +144,7 @@ function PaymentItemsPage() {
     mutationFn: (itemId: string) =>
       deleteFn({ data: { clubId: activeClubId, itemId } }),
     onSuccess: () => {
-      toast.success("Collecte supprimée");
+      toast.success(t("fundraising.deleted"));
       qc.invalidateQueries({ queryKey: ["payment-items"] });
     },
     onError: (e: Error) => toast.error(e.message),
