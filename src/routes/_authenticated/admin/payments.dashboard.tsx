@@ -152,7 +152,7 @@ function PaymentsDashboardPage() {
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-primary" />
-          Tableau de bord financier
+          {t("fundraising.dashboardTitle")}
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Encaissements, soldes restants et exports comptables
