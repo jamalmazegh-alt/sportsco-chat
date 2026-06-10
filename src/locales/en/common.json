@@ -1817,5 +1817,24 @@
     "emptyDashboard": "No payment collection.",
     "menuTitle": "Payment collections",
     "menuHint": "Memberships, licenses, gear, trips"
+  },
+  "tournamentToClub": {
+    "title": "Manage your club all year long",
+    "subtitle": "Lineups, attendance, carpooling, discipline — everything you need for your teams, not just on tournament days.",
+    "ctaPrimary": "Try free for 30 days",
+    "ctaSecondary": "Learn more",
+    "dismiss": "Dismiss"
+  },
+  "pricing": {
+    "tournamentHero": {
+      "title": "You ran a great tournament.",
+      "subtitle": "Take the next step: manage your club all year long with Clubero."
+    },
+    "clubBenefits": [
+      "One-click lineups and attendance",
+      "Carpooling and travel coordination",
+      "Discipline tracking and player history",
+      "Centralised communication with parents"
+    ]
   }
 }
