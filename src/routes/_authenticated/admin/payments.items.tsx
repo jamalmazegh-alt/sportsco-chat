@@ -177,13 +177,10 @@ function PaymentItemsPage() {
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold flex items-center gap-2">
             <Receipt className="h-6 w-6 text-primary" />
-            Collectes de fonds
+            {t("fundraising.title")}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Cotisations, licences, équipements, déplacements… affectés à tout
-            le club, à des équipes ou à des joueurs précis. Un email est
-            envoyé automatiquement aux membres concernés à l'ouverture de la
-            collecte.
+            {t("fundraising.subtitle")}
           </p>
         </div>
         <div className="flex items-end gap-2">
