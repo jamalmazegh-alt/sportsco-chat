@@ -32,7 +32,12 @@ export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")
   component: PaymentsDashboardPage,
   head: () => ({
     meta: [
-      { title: (i18nInstance.t("meta.adminPayments.title") as string) + " — Tableau de bord" },
+      {
+        title:
+          (i18nInstance.t("meta.adminPayments.title") as string) +
+          " — " +
+          (i18nInstance.t("fundraising.dashboardTitle") as string),
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
