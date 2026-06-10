@@ -448,7 +448,7 @@ function CreateItemDialog({
       });
     },
     onSuccess: () => {
-      toast.success("Collecte créée — les membres concernés vont recevoir un email");
+      toast.success(t("fundraising.created"));
       setOpen(false);
       // reset
       setTitle("");
