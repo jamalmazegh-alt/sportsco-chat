@@ -5,7 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { z } from "zod";
-import { useActiveRole, useMyRoles } from "@/lib/auth-context";
+import { useActiveRole, useMyRoles, useAuth } from "@/lib/auth-context";
+import { TournamentToClubBanner } from "@/components/tournament-to-club-banner";
 import { Button } from "@/components/ui/button";
 import {
   Trophy,
@@ -104,6 +105,7 @@ function TournamentDetailPage() {
   const { tournamentId } = Route.useParams();
   const role = useActiveRole();
   const roles = useMyRoles();
+  const { memberships } = useAuth();
 
   const getFn = useServerFn(getTournament);
   const updateFn = useServerFn(updateTournament);
@@ -344,6 +346,22 @@ function TournamentDetailPage() {
       <SubTabsNav tabs={activeSubs} tab={sub} setTab={setSub} />
 
       <div className="px-5 pt-4 space-y-4">
+        {canManage && tournament && (
+          <TournamentToClubBanner
+            tournament={{ id: tournament.id, status: tournament.status }}
+            hasRealClubMembership={memberships.length > 0}
+            resultsCount={
+              (matches as any[]).filter(
+                (m: any) =>
+                  m?.status === "completed" ||
+                  m?.home_score != null ||
+                  m?.away_score != null,
+              ).length
+            }
+            surface="tournament_admin"
+          />
+        )}
+
         {/* Registration-disabled banner when admin lands on Registrations */}
         {canManage &&
           section === "manage" &&

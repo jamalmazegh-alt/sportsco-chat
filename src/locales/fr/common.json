@@ -1817,5 +1817,24 @@
     "emptyDashboard": "Aucune collecte de fonds.",
     "menuTitle": "Collectes de fonds",
     "menuHint": "Cotisations, licences, équipements, déplacements"
+  },
+  "tournamentToClub": {
+    "title": "Gérez votre club toute l'année",
+    "subtitle": "Convocations, présences, covoiturage, discipline — tout ce qu'il vous faut pour vos équipes, pas seulement les jours de tournoi.",
+    "ctaPrimary": "Essayer gratuitement pendant 30 jours",
+    "ctaSecondary": "En savoir plus",
+    "dismiss": "Fermer"
+  },
+  "pricing": {
+    "tournamentHero": {
+      "title": "Vous avez organisé un super tournoi.",
+      "subtitle": "Passez à l'étape suivante : gérez votre club toute l'année avec Clubero."
+    },
+    "clubBenefits": [
+      "Convocations et présences en un clic",
+      "Covoiturage et organisation des déplacements",
+      "Suivi de discipline et historique des joueurs",
+      "Communication centralisée avec les parents"
+    ]
   }
 }

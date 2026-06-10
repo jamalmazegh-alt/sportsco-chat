@@ -1817,5 +1817,24 @@
     "emptyDashboard": "Ninguna recaudación.",
     "menuTitle": "Recaudaciones",
     "menuHint": "Cuotas, licencias, equipamiento, desplazamientos"
+  },
+  "tournamentToClub": {
+    "title": "Gestiona tu club durante todo el año",
+    "subtitle": "Convocatorias, asistencia, carpooling, disciplina — todo lo que necesitas para tus equipos, no solo los días de torneo.",
+    "ctaPrimary": "Probar gratis 30 días",
+    "ctaSecondary": "Más información",
+    "dismiss": "Cerrar"
+  },
+  "pricing": {
+    "tournamentHero": {
+      "title": "Organizaste un torneo genial.",
+      "subtitle": "Da el siguiente paso: gestiona tu club todo el año con Clubero."
+    },
+    "clubBenefits": [
+      "Convocatorias y asistencia con un clic",
+      "Carpooling y coordinación de desplazamientos",
+      "Seguimiento disciplinario e historial de jugadores",
+      "Comunicación centralizada con los padres"
+    ]
   }
 }
