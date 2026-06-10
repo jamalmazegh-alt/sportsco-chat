@@ -246,7 +246,7 @@ function PaymentsDashboardPage() {
 
             <TabsContent value="items" className="space-y-2 mt-4">
               {data.itemRollup.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucune collecte de fonds.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.emptyDashboard")}</p>
               ) : (
                 data.itemRollup.map((it) => (
                   <Card key={it.id}>
