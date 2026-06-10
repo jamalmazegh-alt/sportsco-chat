@@ -58,7 +58,12 @@ export const Route = createFileRoute("/_authenticated/admin/payments/items")({
   validateSearch: z.object({ season: z.string().uuid().optional() }),
   head: () => ({
     meta: [
-      { title: i18nInstance.t("meta.adminPayments.title") + " — Collectes" },
+      {
+        title:
+          i18nInstance.t("meta.adminPayments.title") +
+          " — " +
+          i18nInstance.t("fundraising.metaSuffix"),
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
