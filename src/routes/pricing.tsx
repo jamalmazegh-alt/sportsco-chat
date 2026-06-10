@@ -1,13 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Check, Sparkles, Building2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { trackConversion } from "@/lib/conversion-tracking";
 
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    source: typeof search.source === "string" ? (search.source as string) : undefined,
+    utm_source:
+      typeof search.utm_source === "string" ? (search.utm_source as string) : undefined,
+    tournament_id:
+      typeof search.tournament_id === "string"
+        ? (search.tournament_id as string)
+        : undefined,
+  }),
   head: () => ({
     meta: [
       { title: i18n.t("meta.pricing.title") },
@@ -21,13 +32,55 @@ export const Route = createFileRoute("/pricing")({
 
 function PricingPage() {
   const { t } = useTranslation("marketing");
+  const { t: tc } = useTranslation("common");
+  const search = Route.useSearch();
+  const fromTournament =
+    search.source === "tournament_conversion" ||
+    (search.utm_source ?? "").includes("tournament");
+  const clubBenefits = tc("pricing.clubBenefits", { returnObjects: true }) as string[];
   const CLUBERO_FEATURES = t("pricing.clubFeatures", { returnObjects: true }) as string[];
   const ENTERPRISE_FEATURES = t("pricing.enterpriseFeatures", { returnObjects: true }) as string[];
 
+  useEffect(() => {
+    if (fromTournament) {
+      trackConversion("pricing_viewed", {
+        source: search.source ?? search.utm_source ?? "tournament",
+        tournament_id: search.tournament_id ?? null,
+      });
+    }
+  }, [fromTournament, search.source, search.utm_source, search.tournament_id]);
 
   return (
     <MarketingLayout>
+      {fromTournament && (
+        <section className="border-b border-border/60 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10">
+          <div className="mx-auto max-w-4xl px-5 py-10 lg:px-8 lg:py-12">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md">
+                <Trophy className="h-7 w-7" />
+              </div>
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">
+                {tc("pricing.tournamentHero.title")}
+              </h2>
+              <p className="max-w-2xl text-base text-muted-foreground">
+                {tc("pricing.tournamentHero.subtitle")}
+              </p>
+              {Array.isArray(clubBenefits) && clubBenefits.length > 0 && (
+                <ul className="mt-2 grid w-full max-w-2xl gap-2 text-left sm:grid-cols-2">
+                  {clubBenefits.map((b) => (
+                    <li key={b} className="flex items-start gap-2 text-sm">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
       <section className="border-b border-border/60">
+
         <div className="mx-auto max-w-4xl px-5 py-16 text-center lg:px-8 lg:py-24">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             {t("pricing.badge")}
