@@ -238,9 +238,9 @@ function PaymentsDashboardPage() {
 
           <Tabs defaultValue="items" className="w-full">
             <TabsList>
-              <TabsTrigger value="items">Par collecte</TabsTrigger>
-              <TabsTrigger value="methods">Par méthode</TabsTrigger>
-              <TabsTrigger value="monthly">Par mois</TabsTrigger>
+              <TabsTrigger value="items">{t("fundraising.byItem")}</TabsTrigger>
+              <TabsTrigger value="methods">{t("fundraising.byMethod")}</TabsTrigger>
+              <TabsTrigger value="monthly">{t("fundraising.byMonth")}</TabsTrigger>
               <TabsTrigger value="tx">Transactions</TabsTrigger>
             </TabsList>
 
