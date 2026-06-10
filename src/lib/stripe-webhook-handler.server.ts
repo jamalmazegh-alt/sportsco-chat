@@ -279,10 +279,26 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
           const { resolvedClubId, previous } = await upsertSubscription(sub);
           if (resolvedClubId && !previous?.stripe_subscription_id) {
             await notifyAdmin("created", sub, resolvedClubId);
+            // Track conversion: paid plan activated for this club
+            try {
+              await supabaseAdmin.from("conversion_events").insert({
+                event_name: "payment_completed",
+                properties: {
+                  club_id: resolvedClubId,
+                  plan: sub.items.data[0]?.price?.id ?? null,
+                  amount: session.amount_total ?? null,
+                  currency: session.currency ?? null,
+                  stripe_subscription_id: sub.id,
+                },
+              });
+            } catch (e) {
+              console.warn("conversion_events insert (payment_completed) failed", e);
+            }
           }
         }
         break;
       }
+
       case "customer.subscription.created": {
         const sub = event.data.object as Stripe.Subscription;
         const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
