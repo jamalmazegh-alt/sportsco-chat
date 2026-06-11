@@ -10,6 +10,7 @@ import {
   BookOpen, Share2, UploadCloud, FileText, Swords,
   Camera, Hash, Heart, Pin, TrendingUp, Star, ClipboardList, Bot, ListChecks,
   Shield, GraduationCap, Award, UserPlus, Plus, Building2, UserCircle2, Network, Newspaper,
+  XCircle, Quote, Clock, Calendar, Mail, Smartphone, Layers, Radio, FileSpreadsheet, Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
