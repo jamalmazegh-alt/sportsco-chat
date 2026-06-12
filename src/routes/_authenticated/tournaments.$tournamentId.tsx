@@ -195,13 +195,10 @@ function TournamentDetailPage() {
         scrollToAnchor("section-teams");
         break;
       case "run_draw":
+        openSettings("format", "draw");
+        break;
       case "generate_matches":
-        scrollToAnchor("section-matches");
-        toast.info(
-          t("controlCenter.openSettingsForDraw", {
-            defaultValue: "Ouvre la configuration (⋯ › Format) pour lancer le tirage / générer les matchs.",
-          }),
-        );
+        openSettings("format", "schedule");
         break;
       case "enter_next_score":
         if (action.matchId) {
