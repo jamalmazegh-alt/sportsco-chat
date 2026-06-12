@@ -47,7 +47,7 @@ function DemoPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "demo", firstName, lastName, name: `${firstName} ${lastName}`.trim(), email, phone, club, role, teams, notes }),
+        body: JSON.stringify({ kind: "demo", firstName, lastName, name: `${firstName} ${lastName}`.trim(), email, phone, club, role, teams, notes, locale: i18n.language?.slice(0, 2) || "fr" }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
