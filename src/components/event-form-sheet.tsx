@@ -68,7 +68,7 @@ type GoogleAutocompleteService = {
   ) => void;
 };
 
-export type EventType = "training" | "match" | "tournament" | "meeting" | "other";
+export type EventType = "training" | "match" | "tournament" | "meeting";
 export type CompetitionType = "friendly" | "championship" | "cup";
 
 export type EventFormValues = {
@@ -616,7 +616,7 @@ export function EventFormSheet({
       toast.success(t("events.publish"));
       onOpenChange(false);
       onSaved(data.id);
-      if (sendNow && type !== "other" && type !== "meeting") {
+      if (sendNow && type !== "meeting") {
         navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
       }
     } else {
@@ -663,7 +663,7 @@ export function EventFormSheet({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
+                {(["training", "match", "tournament", "meeting"] as const).map((k) => (
                   <SelectItem key={k} value={k}>
                     {t(`events.types.${k}`)}
                   </SelectItem>
@@ -863,7 +863,7 @@ export function EventFormSheet({
             <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
           </div>
 
-          {mode === "create" && type !== "other" && type !== "meeting" && (
+          {mode === "create" && type !== "meeting" && !isRecurring && (
             <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
               <Checkbox
                 checked={sendNow}
