@@ -204,7 +204,7 @@ export const updateSeriesOccurrence = createServerFn({ method: "POST" })
 
     let q = supabase.from("events").update(data.patch).eq("series_id", ev.series_id).is("deleted_at", null);
     if (data.scope === "future") q = q.gte("starts_at", ev.starts_at);
-    const { error, count } = await q.select("id", { count: "exact", head: true });
+    const { data: rows, error } = await q.select("id");
     if (error) throw new Error(error.message);
-    return { updatedCount: count ?? 0 };
+    return { updatedCount: rows?.length ?? 0 };
   });
