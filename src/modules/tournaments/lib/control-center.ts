@@ -1,0 +1,226 @@
+/**
+ * Sprint 1 — Tournament workflow V2
+ *
+ * Pure helpers driving the Centre de contrôle:
+ *  - stepper progress (Inscriptions → Tirage → Poules → Flights → Finales)
+ *  - "Continue" CTA (strict priority algorithm)
+ *  - live/upcoming/done counters
+ *
+ * Reads only existing data shapes (tournaments / tournament_teams / tournament_groups
+ * / tournament_matches / tournament_flights). No schema change.
+ */
+
+export type StepId = "registrations" | "draw" | "pools" | "flights" | "finals";
+
+export type StepState = "todo" | "current" | "done";
+
+export interface StepperStep {
+  id: StepId;
+  state: StepState;
+}
+
+export type ContinueActionKind =
+  | "add_team"
+  | "run_draw"
+  | "generate_matches"
+  | "enter_next_score"
+  | "create_flights"
+  | "share_results"
+  | "publish_tournament"
+  | "all_done";
+
+export interface ContinueAction {
+  kind: ContinueActionKind;
+  /** First unplayed/live match to focus when kind === "enter_next_score". */
+  matchId?: string | null;
+  /** Optional anchor id to scroll to. */
+  anchor?: string;
+}
+
+interface MatchLike {
+  id: string;
+  round: string;
+  status: string;
+  scheduled_at: string | null;
+  score_a: number | null;
+  score_b: number | null;
+  validated_at?: string | null;
+}
+
+interface TournamentLike {
+  status: string;
+  format?: string | null;
+  num_teams?: number | null;
+}
+
+const LIVE_STATUSES = new Set(["live"]);
+const DONE_STATUSES = new Set([
+  "completed",
+  "forfeit_a",
+  "forfeit_b",
+  "no_show_a",
+  "no_show_b",
+  "abandoned",
+]);
+const UPCOMING_STATUSES = new Set(["scheduled"]);
+
+const FORMATS_WITHOUT_POOLS = new Set([
+  "knockout",
+  "double_elimination",
+  "swiss",
+  "round_robin_home_away",
+]);
+
+const FORMATS_WITH_FLIGHTS = new Set(["mixed", "flighted_finals"]);
+
+export function isPoolMatch(m: MatchLike): boolean {
+  return m.round === "group";
+}
+export function isKnockoutMatch(m: MatchLike): boolean {
+  return m.round !== "group";
+}
+
+export function countMatches(matches: MatchLike[]) {
+  let done = 0;
+  let live = 0;
+  let upcoming = 0;
+  for (const m of matches) {
+    if (DONE_STATUSES.has(m.status)) done++;
+    else if (LIVE_STATUSES.has(m.status)) live++;
+    else if (UPCOMING_STATUSES.has(m.status)) upcoming++;
+  }
+  return { done, live, upcoming, total: matches.length };
+}
+
+export function getLiveMatches<T extends MatchLike>(matches: T[]): T[] {
+  return matches.filter((m) => LIVE_STATUSES.has(m.status));
+}
+
+/** Sort matches "next first": scheduled_at asc, ids fallback. */
+function chronological<T extends MatchLike>(matches: T[]): T[] {
+  return [...matches].sort((a, b) => {
+    const ta = a.scheduled_at ? Date.parse(a.scheduled_at) : Number.MAX_SAFE_INTEGER;
+    const tb = b.scheduled_at ? Date.parse(b.scheduled_at) : Number.MAX_SAFE_INTEGER;
+    if (ta !== tb) return ta - tb;
+    return a.id.localeCompare(b.id);
+  });
+}
+
+/** Next match that needs a score entered (live first, then upcoming chronologically). */
+export function findNextScoreMatch<T extends MatchLike>(matches: T[]): T | null {
+  const live = chronological(matches.filter((m) => LIVE_STATUSES.has(m.status)));
+  if (live.length > 0) return live[0];
+  const upcoming = chronological(
+    matches.filter(
+      (m) => UPCOMING_STATUSES.has(m.status) && (m.score_a === null || m.score_b === null),
+    ),
+  );
+  return upcoming[0] ?? null;
+}
+
+function poolsRequired(format: string | null | undefined): boolean {
+  if (!format) return true;
+  return !FORMATS_WITHOUT_POOLS.has(format);
+}
+
+function flightsExpected(
+  format: string | null | undefined,
+  flightsCount: number,
+): boolean {
+  if (!format) return flightsCount > 0;
+  return FORMATS_WITH_FLIGHTS.has(format) || flightsCount > 0;
+}
+
+export interface ComputeArgs {
+  tournament: TournamentLike;
+  teamsCount: number;
+  groupsCount: number;
+  matches: MatchLike[];
+  flightsCount: number;
+}
+
+/** Returns the 5-step progress array with computed state. */
+export function computeStepper(args: ComputeArgs): StepperStep[] {
+  const { tournament, teamsCount, groupsCount, matches, flightsCount } = args;
+  const minTeams = Math.max(2, tournament.num_teams ?? 2);
+  const regDone = teamsCount >= minTeams && tournament.status !== "draft";
+  const drawDone = groupsCount > 0 || (!poolsRequired(tournament.format) && matches.length > 0);
+  const poolMatches = matches.filter(isPoolMatch);
+  const koMatches = matches.filter(isKnockoutMatch);
+  const poolsDone =
+    !poolsRequired(tournament.format) ||
+    (poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status)));
+  const flightsDone = !flightsExpected(tournament.format, flightsCount) || flightsCount > 0;
+  const finalsDone =
+    koMatches.length > 0 && koMatches.every((m) => DONE_STATUSES.has(m.status));
+
+  const flags: Record<StepId, boolean> = {
+    registrations: regDone,
+    draw: drawDone,
+    pools: poolsDone,
+    flights: flightsDone,
+    finals: finalsDone,
+  };
+  const order: StepId[] = ["registrations", "draw", "pools", "flights", "finals"];
+  let currentSet = false;
+  return order.map<StepperStep>((id) => {
+    if (flags[id]) return { id, state: "done" };
+    if (!currentSet) {
+      currentSet = true;
+      return { id, state: "current" };
+    }
+    return { id, state: "todo" };
+  });
+}
+
+/**
+ * Continue button — priority order (first match wins).
+ *
+ *  1. Missing teams         -> "add_team"
+ *  2. Draw not generated    -> "run_draw"
+ *  3. Matches not generated -> "generate_matches"
+ *  4. A score is pending    -> "enter_next_score"
+ *  5. Pools done, no flights-> "create_flights"
+ *  6. Everything finished   -> "share_results"
+ */
+export function computeContinueAction(args: ComputeArgs): ContinueAction {
+  const { tournament, teamsCount, groupsCount, matches, flightsCount } = args;
+  const minTeams = Math.max(2, tournament.num_teams ?? 2);
+
+  // 1) Missing teams
+  if (teamsCount < minTeams) {
+    return { kind: "add_team", anchor: "section-teams" };
+  }
+
+  // Tournament still in draft after teams added → propose publish
+  if (tournament.status === "draft") {
+    return { kind: "publish_tournament" };
+  }
+
+  // 2) Draw not generated (only when pools are expected)
+  if (poolsRequired(tournament.format) && groupsCount === 0) {
+    return { kind: "run_draw", anchor: "section-matches" };
+  }
+
+  // 3) Matches not generated
+  if (matches.length === 0) {
+    return { kind: "generate_matches", anchor: "section-matches" };
+  }
+
+  // 4) A score is pending (live or scheduled)
+  const next = findNextScoreMatch(matches);
+  if (next) {
+    return { kind: "enter_next_score", matchId: next.id, anchor: "section-matches" };
+  }
+
+  // 5) Pools done, no flights yet (only when flights make sense)
+  const poolMatches = matches.filter(isPoolMatch);
+  const poolsDone =
+    poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status));
+  if (poolsDone && flightsExpected(tournament.format, flightsCount) && flightsCount === 0) {
+    return { kind: "create_flights", anchor: "section-flights" };
+  }
+
+  // 6) All done
+  return { kind: "all_done" };
+}
