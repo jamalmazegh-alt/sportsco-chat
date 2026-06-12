@@ -432,7 +432,8 @@ export function EventFormSheet({
   const [convocDate, setConvocDate] = useState<Date | undefined>(convocInit.date);
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
-  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
+  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat (legacy)
+  const [isRecurring, setIsRecurring] = useState<boolean>(true);
   const [sendNow, setSendNow] = useState<boolean>(false);
 
   const [busy, setBusy] = useState(false);
@@ -466,6 +467,7 @@ export function EventFormSheet({
     setConvocDate(c.date);
     setConvocTime(c.time);
     setRepeatWeeks(1);
+    setIsRecurring(true);
     setSendNow(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
