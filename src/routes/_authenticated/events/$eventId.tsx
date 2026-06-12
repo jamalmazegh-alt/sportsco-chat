@@ -2377,6 +2377,8 @@ function EventDetail() {
                 )}
               </div>
               {(() => {
+                // Suspension check only applies to matches/tournaments, not meetings or "other" events
+                if (event.type === "meeting" || event.type === "other") return null;
                 const suspendedSelected = Array.from(selectedIds)
                   .map((pid) => {
                     const s = suspensionByPlayer.get(pid);
