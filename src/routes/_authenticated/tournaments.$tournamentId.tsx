@@ -17,7 +17,6 @@ import {
   GitBranch,
   AlertTriangle,
   ClipboardList,
-  
   ChevronRight,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
@@ -42,7 +41,10 @@ import { FlightsManager } from "@/modules/tournaments/components/FlightsManager"
 import { TournamentStepper } from "@/modules/tournaments/components/TournamentStepper";
 import { ContinueCTA } from "@/modules/tournaments/components/ContinueCTA";
 import { LiveCourts } from "@/modules/tournaments/components/LiveCourts";
-import { TournamentSettingsMenu } from "@/modules/tournaments/components/TournamentSettingsMenu";
+import {
+  TournamentSettingsMenu,
+  type SettingsTopic,
+} from "@/modules/tournaments/components/TournamentSettingsMenu";
 import {
   computeStepper,
   computeContinueAction,
@@ -101,6 +103,14 @@ function TournamentDetailPage() {
 
   // Score-entry auto-open id (consumed once by MatchesList)
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
+
+  // Settings sheet ("⋯") controlled state so the Continue CTA can open a topic in 1 tap
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTopic, setSettingsTopic] = useState<SettingsTopic | null>(null);
+  const openSettings = (topic: SettingsTopic) => {
+    setSettingsTopic(topic);
+    setSettingsOpen(true);
+  };
 
   const isLoading = q.isLoading;
   const hasData = !!q.data;
@@ -178,12 +188,9 @@ function TournamentDetailPage() {
         break;
       case "run_draw":
       case "generate_matches":
-        scrollToAnchor("section-matches");
-        toast.info(
-          t("controlCenter.openSettingsForDraw", {
-            defaultValue: "Ouvre la configuration (⋯ › Format) pour lancer le tirage / générer les matchs.",
-          }),
-        );
+        // Open the settings sheet directly on the Format topic (draw +
+        // schedule generation live there) — 1 tap, no redirection toast.
+        openSettings("format");
         break;
       case "enter_next_score":
         if (action.matchId) {
@@ -195,7 +202,7 @@ function TournamentDetailPage() {
         scrollToAnchor("section-flights");
         break;
       case "share_results":
-        scrollToAnchor("section-share");
+        openSettings("share");
         break;
       case "publish_tournament":
         publish.mutate("published");
@@ -243,6 +250,10 @@ function TournamentDetailPage() {
               matches={matches as any[]}
               groups={groups as any[]}
               publicUrl={publicUrl}
+              open={settingsOpen}
+              onOpenChange={setSettingsOpen}
+              topic={settingsTopic}
+              onTopicChange={setSettingsTopic}
             />
           )}
         </div>
@@ -456,7 +467,6 @@ function TournamentDetailPage() {
           </Section>
         )}
 
-        <div id="section-share" />
       </div>
 
       {/* ─── Sticky bottom CTA ───────────────────────────────────────────── */}

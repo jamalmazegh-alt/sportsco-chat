@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Info,
@@ -7,7 +6,7 @@ import {
   CreditCard,
   MapPin,
   Share2,
-  
+  UserCog,
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
@@ -25,9 +24,17 @@ import { RegistrationSettingsPanel } from "./RegistrationSettingsPanel";
 import { PaymentSettingsPanel } from "./PaymentSettingsPanel";
 import { FieldsManager } from "./FieldsManager";
 import { TournamentRulesEditor } from "./TournamentRulesEditor";
+import { StaffAndOfficialsPanel } from "./StaffAndOfficialsPanel";
 import { ShareDialog } from "./ShareDialog";
 
-type Topic = "infos" | "format" | "registrations" | "payments" | "fields" | "share";
+export type SettingsTopic =
+  | "infos"
+  | "format"
+  | "registrations"
+  | "payments"
+  | "fields"
+  | "staff"
+  | "share";
 
 interface Props {
   tournament: any;
@@ -35,14 +42,20 @@ interface Props {
   matches: any[];
   groups: any[];
   publicUrl: string;
+  /** Controlled state so the Continue CTA can open a topic in 1 tap. */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  topic: SettingsTopic | null;
+  onTopicChange: (topic: SettingsTopic | null) => void;
 }
 
-const TOPICS: { id: Topic; icon: typeof Info; labelKey: string; defaultLabel: string }[] = [
+const TOPICS: { id: SettingsTopic; icon: typeof Info; labelKey: string; defaultLabel: string }[] = [
   { id: "infos", icon: Info, labelKey: "controlCenter.settings.infos", defaultLabel: "Informations & règles" },
   { id: "format", icon: Shuffle, labelKey: "controlCenter.settings.format", defaultLabel: "Format" },
   { id: "registrations", icon: ClipboardList, labelKey: "controlCenter.settings.registrations", defaultLabel: "Inscriptions" },
   { id: "payments", icon: CreditCard, labelKey: "controlCenter.settings.payments", defaultLabel: "Paiement" },
   { id: "fields", icon: MapPin, labelKey: "controlCenter.settings.fields", defaultLabel: "Terrains" },
+  { id: "staff", icon: UserCog, labelKey: "sections.staffAndOfficials", defaultLabel: "Staff & arbitres" },
   { id: "share", icon: Share2, labelKey: "controlCenter.settings.share", defaultLabel: "Partage" },
 ];
 
@@ -52,16 +65,19 @@ export function TournamentSettingsMenu({
   matches,
   groups,
   publicUrl,
+  open,
+  onOpenChange,
+  topic,
+  onTopicChange,
 }: Props) {
   const { t } = useTranslation("tournaments");
-  const [open, setOpen] = useState(false);
-  const [topic, setTopic] = useState<Topic | null>(null);
+  const setTopic = onTopicChange;
 
   return (
     <Sheet
       open={open}
       onOpenChange={(o) => {
-        setOpen(o);
+        onOpenChange(o);
         if (!o) setTopic(null);
       }}
     >
@@ -136,8 +152,10 @@ export function TournamentSettingsMenu({
 
           {topic === "format" && (
             <div className="p-4">
+              {/* view="all" exposes format + draw + schedule generation —
+                  view="format" alone hides the draw/schedule actions entirely. */}
               <GroupsAndFixtures
-                view="format"
+                view="all"
                 tournamentId={tournament.id}
                 format={tournament.format}
                 status={tournament.status}
@@ -179,6 +197,12 @@ export function TournamentSettingsMenu({
                   payment_mode: tournament.payment_mode ?? "offline",
                 }}
               />
+            </div>
+          )}
+
+          {topic === "staff" && (
+            <div className="p-4">
+              <StaffAndOfficialsPanel tournamentId={tournament.id} />
             </div>
           )}
 
