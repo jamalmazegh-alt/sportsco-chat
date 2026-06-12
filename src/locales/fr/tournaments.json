@@ -1093,5 +1093,44 @@
       "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
       "noMatches": "Matches will be generated after group stage."
     }
+  },
+  "controlCenter": {
+    "nextAction": "Prochaine action",
+    "liveCourts": "En direct",
+    "liveBadge": "LIVE",
+    "nextMatches": "Prochains matchs",
+    "flightsReady": "Les poules sont terminées. Crée les Flights pour générer les 3 tableaux.",
+    "openSettingsForDraw": "Ouvre la configuration (⋯ › Format) pour lancer le tirage / générer les matchs.",
+    "steps": {
+      "registrations": "Inscriptions",
+      "draw": "Tirage",
+      "pools": "Poules",
+      "flights": "Flights",
+      "finals": "Finales"
+    },
+    "cta": {
+      "add_team": "Ajouter une équipe",
+      "run_draw": "Lancer le tirage",
+      "generate_matches": "Générer les matchs",
+      "enter_next_score": "Saisir le prochain score",
+      "create_flights": "Créer les Flights",
+      "share_results": "Partager les résultats",
+      "publish_tournament": "Publier le tournoi",
+      "all_done": "Tout est terminé"
+    },
+    "counters": {
+      "done": "Terminés",
+      "live": "En cours",
+      "upcoming": "À venir"
+    },
+    "settings": {
+      "title": "Configuration",
+      "infos": "Infos & règles",
+      "format": "Format",
+      "registrations": "Inscriptions",
+      "payments": "Paiement",
+      "fields": "Terrains",
+      "share": "Partage"
+    }
   }
 }

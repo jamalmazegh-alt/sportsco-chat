@@ -1093,5 +1093,44 @@
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
     }
+  },
+  "controlCenter": {
+    "nextAction": "Next action",
+    "liveCourts": "Live now",
+    "liveBadge": "LIVE",
+    "nextMatches": "Upcoming matches",
+    "flightsReady": "Group stage is complete. Create the Flights to generate the 3 brackets.",
+    "openSettingsForDraw": "Open settings (⋯ › Format) to run the draw / generate matches.",
+    "steps": {
+      "registrations": "Registrations",
+      "draw": "Draw",
+      "pools": "Pools",
+      "flights": "Flights",
+      "finals": "Finals"
+    },
+    "cta": {
+      "add_team": "Add a team",
+      "run_draw": "Run the draw",
+      "generate_matches": "Generate matches",
+      "enter_next_score": "Enter the next score",
+      "create_flights": "Create the Flights",
+      "share_results": "Share the results",
+      "publish_tournament": "Publish the tournament",
+      "all_done": "All done"
+    },
+    "counters": {
+      "done": "Done",
+      "live": "Live",
+      "upcoming": "Upcoming"
+    },
+    "settings": {
+      "title": "Settings",
+      "infos": "Info & rules",
+      "format": "Format",
+      "registrations": "Registrations",
+      "payments": "Payments",
+      "fields": "Fields",
+      "share": "Share"
+    }
   }
 }
