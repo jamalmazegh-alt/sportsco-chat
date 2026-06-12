@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
 import { useNavigate } from "@tanstack/react-router";
+import { RecurringTrainingPlanner } from "@/components/recurring-training-planner";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
