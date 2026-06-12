@@ -478,11 +478,11 @@ function Counter({
   value: number;
   tone: "emerald" | "orange" | "muted";
 }) {
-  const styles: Record<typeof tone, string> = {
+  const styles: Record<"emerald" | "orange" | "muted", string> = {
     emerald: "text-emerald-600 dark:text-emerald-400",
     orange: "text-orange-600 dark:text-orange-400",
     muted: "text-muted-foreground",
-  } as any;
+  };
   return (
     <div className="rounded-xl border border-border bg-card px-3 py-2.5 text-center">
       <div className={cn("text-2xl font-bold tabular-nums", styles[tone])}>{value}</div>
