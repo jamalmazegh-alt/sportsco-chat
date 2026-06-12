@@ -270,6 +270,8 @@ function MatchCard({
   events,
   scoring,
   refereeOptions,
+  autoOpen,
+  onAutoOpenConsumed,
 }: {
   match: Match;
   tournamentId: string;
@@ -280,6 +282,8 @@ function MatchCard({
   events: MatchEvent[];
   scoring?: ScoringRules;
   refereeOptions: RefereeOption[];
+  autoOpen?: boolean;
+  onAutoOpenConsumed?: () => void;
 }) {
   const { t } = useTranslation("tournaments");
   const setsMode = scoring?.mode === "sets";
@@ -296,6 +300,17 @@ function MatchCard({
   const isKnockout = match.round !== "group";
   const tied = a === b;
   const hasPenalty = (match.penalty_score_a ?? null) !== null && (match.penalty_score_b ?? null) !== null;
+  const cardRef = useRef<HTMLLIElement>(null);
+
+  // Sprint 1 — Continue CTA can request to open the score dialog directly.
+  useEffect(() => {
+    if (!autoOpen || !canManage || !teamA || !teamB) return;
+    setOpen(true);
+    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    onAutoOpenConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpen]);
+
 
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
