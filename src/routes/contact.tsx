@@ -53,7 +53,7 @@ function ContactPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, club, message }),
+        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, club, message, locale: i18n.language?.slice(0, 2) || "fr" }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
