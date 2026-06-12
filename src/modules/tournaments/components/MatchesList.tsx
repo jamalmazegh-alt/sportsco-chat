@@ -685,7 +685,7 @@ function MatchCard({
   })();
 
   return (
-    <li>
+    <li ref={cardRef}>
       <div
         className={`w-full rounded-xl border border-border bg-card overflow-hidden border-l-4 ${lifecycleStyle.border} ${lifecycle === "live" ? "shadow-md" : "shadow-sm"} transition-shadow`}
       >
