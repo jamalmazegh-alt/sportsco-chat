@@ -2136,6 +2136,7 @@ function EventDetail() {
           if (!o && !cancelEventSubmitting) {
             setCancelEventOpen(false);
             setCancelEventReason("");
+            setCancelScope("single");
           }
         }}
       >
@@ -2144,6 +2145,29 @@ function EventDetail() {
             <DialogTitle>{t("events.cancelEventTitle")}</DialogTitle>
             <DialogDescription>{t("events.cancelEventDescription")}</DialogDescription>
           </DialogHeader>
+          {event.series_id && (
+            <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="text-sm font-medium">{t("events.series.scopeTitle", { defaultValue: "Cette séance fait partie d'une série" })}</div>
+              <div className="space-y-1.5">
+                {(["single", "future", "all"] as const).map((s) => (
+                  <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="cancel-scope"
+                      checked={cancelScope === s}
+                      onChange={() => setCancelScope(s)}
+                      className="accent-primary"
+                    />
+                    <span>
+                      {s === "single" && t("events.series.scopeSingle", { defaultValue: "Cette séance uniquement" })}
+                      {s === "future" && t("events.series.scopeFuture", { defaultValue: "Celle-ci et toutes les suivantes" })}
+                      {s === "all" && t("events.series.scopeAll", { defaultValue: "Toute la série" })}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("events.cancelEventReasonLabel")}</label>
             <Textarea
