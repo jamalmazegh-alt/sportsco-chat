@@ -273,6 +273,7 @@ function EventDetail() {
   const [cancelEventOpen, setCancelEventOpen] = useState(false);
   const [cancelEventReason, setCancelEventReason] = useState("");
   const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
+  const [cancelScope, setCancelScope] = useState<"single" | "future" | "all">("single");
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleNewDate, setRescheduleNewDate] = useState("");
   const [rescheduleReason, setRescheduleReason] = useState("");
@@ -285,7 +286,7 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled")
+        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached")
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -1148,19 +1149,32 @@ function EventDetail() {
       return;
     }
     setCancelEventSubmitting(true);
+    const cancelPatch = {
+      status: "cancelled" as const,
+      cancellation_reason: reason,
+      cancelled_at: new Date().toISOString(),
+      responses_locked: true,
+    };
     const { error } = await supabase
       .from("events")
-      .update({
-        status: "cancelled",
-        cancellation_reason: reason,
-        cancelled_at: new Date().toISOString(),
-        responses_locked: true,
-      })
+      .update(cancelPatch)
       .eq("id", event.id);
     if (error) {
       setCancelEventSubmitting(false);
       toast.error(error.message);
       return;
+    }
+    // Series scope propagation: also cancel sibling occurrences when requested
+    if (event.series_id && cancelScope !== "single") {
+      let q = supabase
+        .from("events")
+        .update(cancelPatch)
+        .eq("series_id", event.series_id)
+        .neq("id", event.id)
+        .neq("status", "cancelled")
+        .is("deleted_at", null);
+      if (cancelScope === "future") q = q.gte("starts_at", event.starts_at);
+      await q;
     }
 
     // Notify all convoked players + their parents (in-app + email) and post on the wall
@@ -1270,6 +1284,7 @@ function EventDetail() {
     setCancelEventSubmitting(false);
     setCancelEventOpen(false);
     setCancelEventReason("");
+    setCancelScope("single");
     toast.success(t("events.cancelEventSuccess"));
     qc.invalidateQueries({ queryKey: ["event", eventId] });
     qc.invalidateQueries({ queryKey: ["events"] });
@@ -2122,6 +2137,7 @@ function EventDetail() {
           if (!o && !cancelEventSubmitting) {
             setCancelEventOpen(false);
             setCancelEventReason("");
+            setCancelScope("single");
           }
         }}
       >
@@ -2130,6 +2146,29 @@ function EventDetail() {
             <DialogTitle>{t("events.cancelEventTitle")}</DialogTitle>
             <DialogDescription>{t("events.cancelEventDescription")}</DialogDescription>
           </DialogHeader>
+          {event.series_id && (
+            <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="text-sm font-medium">{t("events.series.scopeTitle", { defaultValue: "Cette séance fait partie d'une série" })}</div>
+              <div className="space-y-1.5">
+                {(["single", "future", "all"] as const).map((s) => (
+                  <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input
+                      type="radio"
+                      name="cancel-scope"
+                      checked={cancelScope === s}
+                      onChange={() => setCancelScope(s)}
+                      className="accent-primary"
+                    />
+                    <span>
+                      {s === "single" && t("events.series.scopeSingle", { defaultValue: "Cette séance uniquement" })}
+                      {s === "future" && t("events.series.scopeFuture", { defaultValue: "Celle-ci et toutes les suivantes" })}
+                      {s === "all" && t("events.series.scopeAll", { defaultValue: "Toute la série" })}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("events.cancelEventReasonLabel")}</label>
             <Textarea
