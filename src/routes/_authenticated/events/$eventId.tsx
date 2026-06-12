@@ -1149,19 +1149,32 @@ function EventDetail() {
       return;
     }
     setCancelEventSubmitting(true);
+    const cancelPatch = {
+      status: "cancelled" as const,
+      cancellation_reason: reason,
+      cancelled_at: new Date().toISOString(),
+      responses_locked: true,
+    };
     const { error } = await supabase
       .from("events")
-      .update({
-        status: "cancelled",
-        cancellation_reason: reason,
-        cancelled_at: new Date().toISOString(),
-        responses_locked: true,
-      })
+      .update(cancelPatch)
       .eq("id", event.id);
     if (error) {
       setCancelEventSubmitting(false);
       toast.error(error.message);
       return;
+    }
+    // Series scope propagation: also cancel sibling occurrences when requested
+    if (event.series_id && cancelScope !== "single") {
+      let q = supabase
+        .from("events")
+        .update(cancelPatch)
+        .eq("series_id", event.series_id)
+        .neq("id", event.id)
+        .neq("status", "cancelled")
+        .is("deleted_at", null);
+      if (cancelScope === "future") q = q.gte("starts_at", event.starts_at);
+      await q;
     }
 
     // Notify all convoked players + their parents (in-app + email) and post on the wall
