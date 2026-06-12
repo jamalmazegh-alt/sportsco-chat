@@ -1284,6 +1284,7 @@ function EventDetail() {
     setCancelEventSubmitting(false);
     setCancelEventOpen(false);
     setCancelEventReason("");
+    setCancelScope("single");
     toast.success(t("events.cancelEventSuccess"));
     qc.invalidateQueries({ queryKey: ["event", eventId] });
     qc.invalidateQueries({ queryKey: ["events"] });
