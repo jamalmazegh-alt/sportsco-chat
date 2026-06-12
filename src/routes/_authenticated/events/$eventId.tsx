@@ -273,6 +273,7 @@ function EventDetail() {
   const [cancelEventOpen, setCancelEventOpen] = useState(false);
   const [cancelEventReason, setCancelEventReason] = useState("");
   const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
+  const [cancelScope, setCancelScope] = useState<"single" | "future" | "all">("single");
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleNewDate, setRescheduleNewDate] = useState("");
   const [rescheduleReason, setRescheduleReason] = useState("");
