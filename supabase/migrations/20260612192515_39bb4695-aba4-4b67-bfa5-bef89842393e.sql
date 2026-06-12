@@ -1,0 +1,1 @@
+UPDATE public.events SET type = 'meeting' WHERE type = 'other';

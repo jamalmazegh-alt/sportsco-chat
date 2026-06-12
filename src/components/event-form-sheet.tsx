@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
 import { useNavigate } from "@tanstack/react-router";
+import { RecurringTrainingPlanner } from "@/components/recurring-training-planner";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -68,7 +69,7 @@ type GoogleAutocompleteService = {
   ) => void;
 };
 
-export type EventType = "training" | "match" | "tournament" | "meeting" | "other";
+export type EventType = "training" | "match" | "tournament" | "meeting";
 export type CompetitionType = "friendly" | "championship" | "cup";
 
 export type EventFormValues = {
@@ -432,7 +433,8 @@ export function EventFormSheet({
   const [convocDate, setConvocDate] = useState<Date | undefined>(convocInit.date);
   const [convocTime, setConvocTime] = useState(convocInit.time);
 
-  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat
+  const [repeatWeeks, setRepeatWeeks] = useState<number>(1); // 1 = no repeat (legacy)
+  const [isRecurring, setIsRecurring] = useState<boolean>(true);
   const [sendNow, setSendNow] = useState<boolean>(false);
 
   const [busy, setBusy] = useState(false);
@@ -466,6 +468,7 @@ export function EventFormSheet({
     setConvocDate(c.date);
     setConvocTime(c.time);
     setRepeatWeeks(1);
+    setIsRecurring(true);
     setSendNow(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -616,7 +619,7 @@ export function EventFormSheet({
       toast.success(t("events.publish"));
       onOpenChange(false);
       onSaved(data.id);
-      if (sendNow && type !== "other" && type !== "meeting") {
+      if (sendNow && type !== "meeting") {
         navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
       }
     } else {
@@ -663,7 +666,7 @@ export function EventFormSheet({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
+                {(["training", "match", "tournament", "meeting"] as const).map((k) => (
                   <SelectItem key={k} value={k}>
                     {t(`events.types.${k}`)}
                   </SelectItem>
@@ -778,51 +781,82 @@ export function EventFormSheet({
             </>
           ) : type === "training" ? (
             <>
-              <DateOnlyField
-                label={t("events.trainingDate")}
-                date={startDate}
-                onDate={setStartDate}
-                required
-              />
-              <div className="grid grid-cols-3 gap-2">
-                <TimeField
-                  label={t("events.convocationTimeShort")}
-                  time={convocTime}
-                  onTime={setConvocTime}
-                />
-                <TimeField
-                  label={t("events.startTime")}
-                  time={startTime}
-                  onTime={(v) => {
-                    setStartTime(v);
-                    if (!endTime && v) {
-                      setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
-                    }
-                  }}
-                  required
-                />
-                <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
-              </div>
               {mode === "create" && (
                 <div className="space-y-1.5">
-                  <Label>{t("events.repeat")}</Label>
-                  <Select value={String(repeatWeeks)} onValueChange={(v) => setRepeatWeeks(Number(v))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">{t("events.repeatNone")}</SelectItem>
-                      {[2, 4, 6, 8, 10, 12, 16, 20].map((n) => (
-                        <SelectItem key={n} value={String(n)}>
-                          {t("events.repeatWeeks", { count: n })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {repeatWeeks > 1 && (
-                    <p className="text-[11px] text-muted-foreground">{t("events.repeatHint")}</p>
-                  )}
+                  <Label>{t("events.series.mode", { defaultValue: "Planification" })}</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: false, label: t("events.series.modeSingle", { defaultValue: "Séance unique" }) },
+                      { v: true, label: t("events.series.modeRecurring", { defaultValue: "Planning récurrent" }) },
+                    ] as const).map((opt) => (
+                      <button
+                        key={String(opt.v)}
+                        type="button"
+                        onClick={() => setIsRecurring(opt.v)}
+                        className={cn(
+                          "rounded-xl py-2.5 text-sm font-medium border transition",
+                          isRecurring === opt.v
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-card border-border text-muted-foreground",
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              )}
+              {!(mode === "create" && isRecurring) && (
+                <>
+                  <DateOnlyField
+                    label={t("events.trainingDate")}
+                    date={startDate}
+                    onDate={setStartDate}
+                    required
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <TimeField
+                      label={t("events.convocationTimeShort")}
+                      time={convocTime}
+                      onTime={setConvocTime}
+                    />
+                    <TimeField
+                      label={t("events.startTime")}
+                      time={startTime}
+                      onTime={(v) => {
+                        setStartTime(v);
+                        if (!endTime && v) {
+                          setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
+                        }
+                      }}
+                      required
+                    />
+                    <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
+                  </div>
+                </>
+              )}
+              {mode === "create" && isRecurring && teamId && title.trim() && (
+                <RecurringTrainingPlanner
+                  teamId={teamId}
+                  title={title.trim()}
+                  defaultLocation={location || null}
+                  isOfficial={true}
+                  onCreated={(res) => {
+                    toast.success(
+                      t("events.series.created", {
+                        defaultValue: "{{count}} séances créées",
+                        count: res.createdCount,
+                      }),
+                    );
+                    onOpenChange(false);
+                    onSaved(res.seriesId);
+                  }}
+                />
+              )}
+              {mode === "create" && isRecurring && (!teamId || !title.trim()) && (
+                <p className="text-xs text-muted-foreground rounded-lg border border-dashed border-border p-3">
+                  {t("events.series.needsTitleAndTeam", { defaultValue: "Choisissez une équipe et donnez un nom pour configurer la série." })}
+                </p>
               )}
             </>
           ) : (
@@ -845,51 +879,55 @@ export function EventFormSheet({
             </>
           )}
 
-          <AddressField
-            label={t("events.location")}
-            value={location ?? ""}
-            onValueChange={setLocation}
-            onPlaceUrl={(url) => setLocationUrl(url ?? "")}
-            placeholder={t("events.locationHint")}
-            helper={t("events.locationGoogleHelper")}
-          />
-          <div className="space-y-1.5">
-            <Label>{t("events.details")}</Label>
-            <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>{t("events.attachments")}</Label>
-            <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
-          </div>
-
-          {mode === "create" && type !== "other" && type !== "meeting" && (
-            <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
-              <Checkbox
-                checked={sendNow}
-                onCheckedChange={(v) => setSendNow(v === true)}
-                className="mt-0.5"
+          {!(mode === "create" && type === "training" && isRecurring) && (
+            <>
+              <AddressField
+                label={t("events.location")}
+                value={location ?? ""}
+                onValueChange={setLocation}
+                onPlaceUrl={(url) => setLocationUrl(url ?? "")}
+                placeholder={t("events.locationHint")}
+                helper={t("events.locationGoogleHelper")}
               />
-              <div className="space-y-0.5">
-                <div className="text-sm font-medium">
-                  {t("events.openConvocationAfterCreate")}
-                </div>
-                <div className="text-[11px] text-muted-foreground">
-                  {t("events.openConvocationAfterCreateHint")}
-                </div>
+              <div className="space-y-1.5">
+                <Label>{t("events.details")}</Label>
+                <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
               </div>
-            </label>
-          )}
 
-          <Button type="submit" className="w-full h-11" disabled={busy || !teamId || titleMissing}>
-            {busy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : mode === "create" ? (
-              t("events.publish")
-            ) : (
-              t("common.save")
-            )}
-          </Button>
+              <div className="space-y-1.5">
+                <Label>{t("events.attachments")}</Label>
+                <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
+              </div>
+
+              {mode === "create" && type !== "meeting" && (
+                <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
+                  <Checkbox
+                    checked={sendNow}
+                    onCheckedChange={(v) => setSendNow(v === true)}
+                    className="mt-0.5"
+                  />
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium">
+                      {t("events.openConvocationAfterCreate")}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {t("events.openConvocationAfterCreateHint")}
+                    </div>
+                  </div>
+                </label>
+              )}
+
+              <Button type="submit" className="w-full h-11" disabled={busy || !teamId || titleMissing}>
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : mode === "create" ? (
+                  t("events.publish")
+                ) : (
+                  t("common.save")
+                )}
+              </Button>
+            </>
+          )}
       </form>
     </ResponsiveFormDialog>
   );

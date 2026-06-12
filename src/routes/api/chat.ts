@@ -440,7 +440,7 @@ export const Route = createFileRoute("/api/chat")({
             inputSchema: z.object({
               teamName: z.string().min(1).describe("Nom (ou portion) de l'équipe. Sera matché de façon flexible parmi les équipes encadrées."),
               title: z.string().min(1).max(200).describe("Titre de l'événement (ex : 'U13 vs FC Riverside', 'Entraînement hebdo')."),
-              type: z.enum(["training", "match", "tournament", "meeting", "other"]),
+              type: z.enum(["training", "match", "tournament", "meeting"]),
               startsAt: z.string().describe("Date/heure de début au format ISO 8601 avec fuseau (ex : '2025-05-24T14:30:00+02:00'). Convertis toujours les indications relatives (samedi prochain 14h30) en ISO complet AVANT d'appeler."),
               endsAt: z.string().optional().describe("Date/heure de fin ISO 8601 (optionnel)."),
               convocationTime: z.string().optional().describe("Heure du rendez-vous (convocation) au format ISO 8601 avec fuseau. Renseigne-la dès que l'utilisateur mentionne une heure de RDV distincte (ex : RDV 11h00 pour un match à 12h30)."),

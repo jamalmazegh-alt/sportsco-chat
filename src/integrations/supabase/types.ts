@@ -1074,6 +1074,9 @@ export type Database = {
           meeting_point: string | null
           opponent: string | null
           responses_locked: boolean
+          series_detached: boolean
+          series_id: string | null
+          series_slot_id: string | null
           starts_at: string
           status: Database["public"]["Enums"]["event_status"]
           team_id: string
@@ -1104,6 +1107,9 @@ export type Database = {
           meeting_point?: string | null
           opponent?: string | null
           responses_locked?: boolean
+          series_detached?: boolean
+          series_id?: string | null
+          series_slot_id?: string | null
           starts_at: string
           status?: Database["public"]["Enums"]["event_status"]
           team_id: string
@@ -1134,6 +1140,9 @@ export type Database = {
           meeting_point?: string | null
           opponent?: string | null
           responses_locked?: boolean
+          series_detached?: boolean
+          series_id?: string | null
+          series_slot_id?: string | null
           starts_at?: string
           status?: Database["public"]["Enums"]["event_status"]
           team_id?: string
@@ -1141,6 +1150,20 @@ export type Database = {
           type?: Database["public"]["Enums"]["event_type"]
         }
         Relationships: [
+          {
+            foreignKeyName: "events_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "training_series"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_series_slot_id_fkey"
+            columns: ["series_slot_id"]
+            isOneToOne: false
+            referencedRelation: "training_series_slots"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "events_team_id_fkey"
             columns: ["team_id"]
@@ -4371,6 +4394,103 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      training_series: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_on: string
+          excluded_dates: string[]
+          id: string
+          is_official: boolean
+          location: string | null
+          starts_on: string
+          team_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_on: string
+          excluded_dates?: string[]
+          id?: string
+          is_official?: boolean
+          location?: string | null
+          starts_on: string
+          team_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_on?: string
+          excluded_dates?: string[]
+          id?: string
+          is_official?: boolean
+          location?: string | null
+          starts_on?: string
+          team_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_series_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_series_slots: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          location: string | null
+          meeting_time: string | null
+          position: number
+          series_id: string
+          start_time: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          location?: string | null
+          meeting_time?: string | null
+          position?: number
+          series_id: string
+          start_time: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          location?: string | null
+          meeting_time?: string | null
+          position?: number
+          series_id?: string
+          start_time?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_series_slots_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "training_series"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_consents: {
         Row: {

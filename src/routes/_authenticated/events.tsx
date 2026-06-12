@@ -203,11 +203,7 @@ function EventsPage() {
     eventTypesByDate.forEach((type, ts) => { if (type === "meeting") arr.push(new Date(ts)); });
     return arr;
   }, [eventTypesByDate]);
-  const otherDates = useMemo(() => {
-    const arr: Date[] = [];
-    eventTypesByDate.forEach((type, ts) => { if (type === "other") arr.push(new Date(ts)); });
-    return arr;
-  }, [eventTypesByDate]);
+  const otherDates = useMemo(() => [] as Date[], []);
 
   const selectedDayEvents = useMemo(() => {
     return (events ?? []).filter((e) => isSameDay(new Date(e.starts_at), selectedDay));
