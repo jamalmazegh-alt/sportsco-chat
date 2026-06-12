@@ -102,6 +102,24 @@ function TournamentDetailPage() {
   // Score-entry auto-open id (consumed once by MatchesList)
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
 
+  // Controlled settings sheet (so the CTA can deep-link into a specific panel/view)
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTopic, setSettingsTopic] = useState<
+    "infos" | "format" | "registrations" | "payments" | "fields" | "share" | null
+  >(null);
+  const [settingsFormatView, setSettingsFormatView] = useState<
+    "all" | "format" | "draw" | "schedule"
+  >("format");
+
+  const openSettings = (
+    topic: "infos" | "format" | "registrations" | "payments" | "fields" | "share",
+    formatView: "all" | "format" | "draw" | "schedule" = "format",
+  ) => {
+    setSettingsTopic(topic);
+    setSettingsFormatView(formatView);
+    setSettingsOpen(true);
+  };
+
   const isLoading = q.isLoading;
   const hasData = !!q.data;
   const { tournament, groups, teams, matches, flights } = (q.data ?? {
