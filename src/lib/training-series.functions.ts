@@ -162,9 +162,9 @@ export const deleteSeriesOccurrence = createServerFn({ method: "POST" })
     }
     let q = supabase.from("events").update({ deleted_at: new Date().toISOString() }).eq("series_id", ev.series_id).is("deleted_at", null);
     if (data.scope === "future") q = q.gte("starts_at", ev.starts_at);
-    const { error, count } = await q.select("id", { count: "exact", head: true });
+    const { data: rows, error } = await q.select("id");
     if (error) throw new Error(error.message);
-    return { deletedCount: count ?? 0 };
+    return { deletedCount: rows?.length ?? 0 };
   });
 
 // Update scope for simple field patch (title/location/description)
