@@ -102,6 +102,24 @@ function TournamentDetailPage() {
   // Score-entry auto-open id (consumed once by MatchesList)
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
 
+  // Controlled settings sheet (so the CTA can deep-link into a specific panel/view)
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTopic, setSettingsTopic] = useState<
+    "infos" | "format" | "registrations" | "payments" | "fields" | "share" | null
+  >(null);
+  const [settingsFormatView, setSettingsFormatView] = useState<
+    "all" | "format" | "draw" | "schedule"
+  >("format");
+
+  const openSettings = (
+    topic: "infos" | "format" | "registrations" | "payments" | "fields" | "share",
+    formatView: "all" | "format" | "draw" | "schedule" = "format",
+  ) => {
+    setSettingsTopic(topic);
+    setSettingsFormatView(formatView);
+    setSettingsOpen(true);
+  };
+
   const isLoading = q.isLoading;
   const hasData = !!q.data;
   const { tournament, groups, teams, matches, flights } = (q.data ?? {
@@ -177,13 +195,10 @@ function TournamentDetailPage() {
         scrollToAnchor("section-teams");
         break;
       case "run_draw":
+        openSettings("format", "draw");
+        break;
       case "generate_matches":
-        scrollToAnchor("section-matches");
-        toast.info(
-          t("controlCenter.openSettingsForDraw", {
-            defaultValue: "Ouvre la configuration (⋯ › Format) pour lancer le tirage / générer les matchs.",
-          }),
-        );
+        openSettings("format", "schedule");
         break;
       case "enter_next_score":
         if (action.matchId) {
@@ -243,6 +258,10 @@ function TournamentDetailPage() {
               matches={matches as any[]}
               groups={groups as any[]}
               publicUrl={publicUrl}
+              open={settingsOpen}
+              onOpenChange={setSettingsOpen}
+              initialTopic={settingsTopic}
+              initialFormatView={settingsFormatView}
             />
           )}
         </div>
