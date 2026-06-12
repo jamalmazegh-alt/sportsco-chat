@@ -780,51 +780,82 @@ export function EventFormSheet({
             </>
           ) : type === "training" ? (
             <>
-              <DateOnlyField
-                label={t("events.trainingDate")}
-                date={startDate}
-                onDate={setStartDate}
-                required
-              />
-              <div className="grid grid-cols-3 gap-2">
-                <TimeField
-                  label={t("events.convocationTimeShort")}
-                  time={convocTime}
-                  onTime={setConvocTime}
-                />
-                <TimeField
-                  label={t("events.startTime")}
-                  time={startTime}
-                  onTime={(v) => {
-                    setStartTime(v);
-                    if (!endTime && v) {
-                      setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
-                    }
-                  }}
-                  required
-                />
-                <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
-              </div>
               {mode === "create" && (
                 <div className="space-y-1.5">
-                  <Label>{t("events.repeat")}</Label>
-                  <Select value={String(repeatWeeks)} onValueChange={(v) => setRepeatWeeks(Number(v))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">{t("events.repeatNone")}</SelectItem>
-                      {[2, 4, 6, 8, 10, 12, 16, 20].map((n) => (
-                        <SelectItem key={n} value={String(n)}>
-                          {t("events.repeatWeeks", { count: n })}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {repeatWeeks > 1 && (
-                    <p className="text-[11px] text-muted-foreground">{t("events.repeatHint")}</p>
-                  )}
+                  <Label>{t("events.series.mode", { defaultValue: "Planification" })}</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([
+                      { v: false, label: t("events.series.modeSingle", { defaultValue: "Séance unique" }) },
+                      { v: true, label: t("events.series.modeRecurring", { defaultValue: "Planning récurrent" }) },
+                    ] as const).map((opt) => (
+                      <button
+                        key={String(opt.v)}
+                        type="button"
+                        onClick={() => setIsRecurring(opt.v)}
+                        className={cn(
+                          "rounded-xl py-2.5 text-sm font-medium border transition",
+                          isRecurring === opt.v
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-card border-border text-muted-foreground",
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              )}
+              {!(mode === "create" && isRecurring) && (
+                <>
+                  <DateOnlyField
+                    label={t("events.trainingDate")}
+                    date={startDate}
+                    onDate={setStartDate}
+                    required
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <TimeField
+                      label={t("events.convocationTimeShort")}
+                      time={convocTime}
+                      onTime={setConvocTime}
+                    />
+                    <TimeField
+                      label={t("events.startTime")}
+                      time={startTime}
+                      onTime={(v) => {
+                        setStartTime(v);
+                        if (!endTime && v) {
+                          setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
+                        }
+                      }}
+                      required
+                    />
+                    <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
+                  </div>
+                </>
+              )}
+              {mode === "create" && isRecurring && teamId && title.trim() && (
+                <RecurringTrainingPlanner
+                  teamId={teamId}
+                  title={title.trim()}
+                  defaultLocation={location || null}
+                  isOfficial={true}
+                  onCreated={(res) => {
+                    toast.success(
+                      t("events.series.created", {
+                        defaultValue: "{{count}} séances créées",
+                        count: res.createdCount,
+                      }),
+                    );
+                    onOpenChange(false);
+                    onSaved(res.seriesId);
+                  }}
+                />
+              )}
+              {mode === "create" && isRecurring && (!teamId || !title.trim()) && (
+                <p className="text-xs text-muted-foreground rounded-lg border border-dashed border-border p-3">
+                  {t("events.series.needsTitleAndTeam", { defaultValue: "Choisissez une équipe et donnez un nom pour configurer la série." })}
+                </p>
               )}
             </>
           ) : (
