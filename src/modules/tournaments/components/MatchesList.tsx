@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -114,9 +114,14 @@ interface Props {
   canManage?: boolean;
   fields?: string[];
   scoring?: ScoringRules;
+  /** When provided, auto-opens the score-entry dialog for that match
+   *  (Sprint 1: lets the Continue CTA jump straight into score entry). */
+  autoOpenMatchId?: string | null;
+  /** Called after the auto-open has been consumed, so the parent can reset its state. */
+  onAutoOpenConsumed?: () => void;
 }
 
-export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
+export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring, autoOpenMatchId, onAutoOpenConsumed }: Props) {
   const { t } = useTranslation("tournaments");
   const { user } = useAuth();
   const currentUserId = user?.id ?? null;
@@ -209,6 +214,8 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
                 events={eventsByMatch.get(m.id) ?? []}
                 scoring={scoring}
                 refereeOptions={refereeOptions}
+                autoOpen={autoOpenMatchId === m.id}
+                onAutoOpenConsumed={onAutoOpenConsumed}
               />
             ))}
           </ul>
@@ -263,6 +270,8 @@ function MatchCard({
   events,
   scoring,
   refereeOptions,
+  autoOpen,
+  onAutoOpenConsumed,
 }: {
   match: Match;
   tournamentId: string;
@@ -273,6 +282,8 @@ function MatchCard({
   events: MatchEvent[];
   scoring?: ScoringRules;
   refereeOptions: RefereeOption[];
+  autoOpen?: boolean;
+  onAutoOpenConsumed?: () => void;
 }) {
   const { t } = useTranslation("tournaments");
   const setsMode = scoring?.mode === "sets";
@@ -289,6 +300,17 @@ function MatchCard({
   const isKnockout = match.round !== "group";
   const tied = a === b;
   const hasPenalty = (match.penalty_score_a ?? null) !== null && (match.penalty_score_b ?? null) !== null;
+  const cardRef = useRef<HTMLLIElement>(null);
+
+  // Sprint 1 — Continue CTA can request to open the score dialog directly.
+  useEffect(() => {
+    if (!autoOpen || !canManage || !teamA || !teamB) return;
+    setOpen(true);
+    cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    onAutoOpenConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpen]);
+
 
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
@@ -663,7 +685,7 @@ function MatchCard({
   })();
 
   return (
-    <li>
+    <li ref={cardRef}>
       <div
         className={`w-full rounded-xl border border-border bg-card overflow-hidden border-l-4 ${lifecycleStyle.border} ${lifecycle === "live" ? "shadow-md" : "shadow-sm"} transition-shadow`}
       >

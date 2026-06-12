@@ -1093,5 +1093,44 @@
       "empty": "No flights configured yet.",
       "noMatches": "Matches will be generated after group stage."
     }
+  },
+  "controlCenter": {
+    "nextAction": "Volgende actie",
+    "liveCourts": "Live",
+    "liveBadge": "LIVE",
+    "nextMatches": "Volgende wedstrijden",
+    "flightsReady": "Groepsfase voltooid. Maak de Flights om de 3 tableaus te genereren.",
+    "openSettingsForDraw": "Open instellingen (⋯ › Format) om de loting te starten / wedstrijden te genereren.",
+    "steps": {
+      "registrations": "Inschrijvingen",
+      "draw": "Loting",
+      "pools": "Poules",
+      "flights": "Flights",
+      "finals": "Finales"
+    },
+    "cta": {
+      "add_team": "Team toevoegen",
+      "run_draw": "Loting starten",
+      "generate_matches": "Wedstrijden genereren",
+      "enter_next_score": "Volgende score invoeren",
+      "create_flights": "Flights aanmaken",
+      "share_results": "Resultaten delen",
+      "publish_tournament": "Toernooi publiceren",
+      "all_done": "Alles klaar"
+    },
+    "counters": {
+      "done": "Klaar",
+      "live": "Live",
+      "upcoming": "Komend"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "infos": "Info & regels",
+      "format": "Format",
+      "registrations": "Inschrijvingen",
+      "payments": "Betaling",
+      "fields": "Velden",
+      "share": "Delen"
+    }
   }
 }
