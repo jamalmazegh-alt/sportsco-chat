@@ -609,6 +609,8 @@
   },
   "events": {
     "isOfficial": "Partido oficial",
+    "isOfficialTournament": "Torneo oficial",
+    "isOfficialTournamentDescription": "Los resultados y las estadísticas de los jugadores se contarán en el palmarés del club.",
     "whatsappShare": {
       "modeWhatsappOnly": "Solo WhatsApp",
       "modeHybrid": "Híbrido",

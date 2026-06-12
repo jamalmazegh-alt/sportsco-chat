@@ -609,6 +609,8 @@
   },
   "events": {
     "isOfficial": "Official match",
+    "isOfficialTournament": "Official tournament",
+    "isOfficialTournamentDescription": "Results and player statistics will be counted in the club's records.",
     "whatsappShare": {
       "modeWhatsappOnly": "WhatsApp only",
       "modeHybrid": "Hybrid",

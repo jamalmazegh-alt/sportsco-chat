@@ -609,6 +609,8 @@
   },
   "events": {
     "isOfficial": "Pflichtspiel",
+    "isOfficialTournament": "Offizielles Turnier",
+    "isOfficialTournamentDescription": "Ergebnisse und Spielerstatistiken werden in die Vereinsbilanz eingerechnet.",
     "whatsappShare": {
       "modeWhatsappOnly": "Nur WhatsApp",
       "modeHybrid": "Hybride",
