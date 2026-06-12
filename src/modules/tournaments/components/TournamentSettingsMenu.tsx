@@ -7,7 +7,7 @@ import {
   CreditCard,
   MapPin,
   Share2,
-  Settings2,
+  
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
