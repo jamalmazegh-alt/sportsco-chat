@@ -114,9 +114,14 @@ interface Props {
   canManage?: boolean;
   fields?: string[];
   scoring?: ScoringRules;
+  /** When provided, auto-opens the score-entry dialog for that match
+   *  (Sprint 1: lets the Continue CTA jump straight into score entry). */
+  autoOpenMatchId?: string | null;
+  /** Called after the auto-open has been consumed, so the parent can reset its state. */
+  onAutoOpenConsumed?: () => void;
 }
 
-export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring }: Props) {
+export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring, autoOpenMatchId, onAutoOpenConsumed }: Props) {
   const { t } = useTranslation("tournaments");
   const { user } = useAuth();
   const currentUserId = user?.id ?? null;
