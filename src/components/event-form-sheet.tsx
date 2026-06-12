@@ -673,9 +673,14 @@ export function EventFormSheet({
           </div>
 
           {type === "tournament" && (
-            <div className="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2.5">
-              <Label className="text-sm font-normal">{t("events.isOfficial")}</Label>
-              <Switch checked={isOfficial} onCheckedChange={setIsOfficial} />
+            <div className="space-y-2 rounded-xl border border-border bg-card px-3 py-2.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-normal">{t("events.isOfficialTournament")}</Label>
+                <Switch checked={isOfficial} onCheckedChange={setIsOfficial} />
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t("events.isOfficialTournamentDescription")}
+              </p>
             </div>
           )}
 

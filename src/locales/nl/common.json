@@ -609,6 +609,8 @@
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
+    "isOfficialTournament": "Officieel toernooi",
+    "isOfficialTournamentDescription": "Resultaten en spelersstatistieken worden meegeteld in de clubhistorie.",
     "whatsappShare": {
       "modeWhatsappOnly": "Alleen WhatsApp",
       "modeHybrid": "Hybride",
