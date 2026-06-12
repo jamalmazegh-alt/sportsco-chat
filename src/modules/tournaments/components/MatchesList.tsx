@@ -214,6 +214,8 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
                 events={eventsByMatch.get(m.id) ?? []}
                 scoring={scoring}
                 refereeOptions={refereeOptions}
+                autoOpen={autoOpenMatchId === m.id}
+                onAutoOpenConsumed={onAutoOpenConsumed}
               />
             ))}
           </ul>
