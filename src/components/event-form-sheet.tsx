@@ -879,51 +879,55 @@ export function EventFormSheet({
             </>
           )}
 
-          <AddressField
-            label={t("events.location")}
-            value={location ?? ""}
-            onValueChange={setLocation}
-            onPlaceUrl={(url) => setLocationUrl(url ?? "")}
-            placeholder={t("events.locationHint")}
-            helper={t("events.locationGoogleHelper")}
-          />
-          <div className="space-y-1.5">
-            <Label>{t("events.details")}</Label>
-            <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>{t("events.attachments")}</Label>
-            <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
-          </div>
-
-          {mode === "create" && type !== "meeting" && !isRecurring && (
-            <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
-              <Checkbox
-                checked={sendNow}
-                onCheckedChange={(v) => setSendNow(v === true)}
-                className="mt-0.5"
+          {!(mode === "create" && type === "training" && isRecurring) && (
+            <>
+              <AddressField
+                label={t("events.location")}
+                value={location ?? ""}
+                onValueChange={setLocation}
+                onPlaceUrl={(url) => setLocationUrl(url ?? "")}
+                placeholder={t("events.locationHint")}
+                helper={t("events.locationGoogleHelper")}
               />
-              <div className="space-y-0.5">
-                <div className="text-sm font-medium">
-                  {t("events.openConvocationAfterCreate")}
-                </div>
-                <div className="text-[11px] text-muted-foreground">
-                  {t("events.openConvocationAfterCreateHint")}
-                </div>
+              <div className="space-y-1.5">
+                <Label>{t("events.details")}</Label>
+                <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
               </div>
-            </label>
-          )}
 
-          <Button type="submit" className="w-full h-11" disabled={busy || !teamId || titleMissing}>
-            {busy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : mode === "create" ? (
-              t("events.publish")
-            ) : (
-              t("common.save")
-            )}
-          </Button>
+              <div className="space-y-1.5">
+                <Label>{t("events.attachments")}</Label>
+                <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
+              </div>
+
+              {mode === "create" && type !== "meeting" && (
+                <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
+                  <Checkbox
+                    checked={sendNow}
+                    onCheckedChange={(v) => setSendNow(v === true)}
+                    className="mt-0.5"
+                  />
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-medium">
+                      {t("events.openConvocationAfterCreate")}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {t("events.openConvocationAfterCreateHint")}
+                    </div>
+                  </div>
+                </label>
+              )}
+
+              <Button type="submit" className="w-full h-11" disabled={busy || !teamId || titleMissing}>
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : mode === "create" ? (
+                  t("events.publish")
+                ) : (
+                  t("common.save")
+                )}
+              </Button>
+            </>
+          )}
       </form>
     </ResponsiveFormDialog>
   );
