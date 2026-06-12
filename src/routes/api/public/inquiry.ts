@@ -26,6 +26,7 @@ const InquirySchema = z.object({
   teams: z.string().trim().max(40).optional().default(""),
   message: z.string().trim().max(4000).optional().default(""),
   notes: z.string().trim().max(4000).optional().default(""),
+  locale: z.enum(["fr", "en", "es", "de", "it", "nl", "pt"]).optional().default("fr"),
   // Honeypot: must be empty. Bots filling every field will populate it.
   website: z.string().max(0).optional().default(""),
 });
@@ -158,7 +159,7 @@ export const Route = createFileRoute("/api/public/inquiry")({
         // 2) Confirmation email to the user (best-effort)
         try {
           const confirmId = crypto.randomUUID();
-          const confirmData = { kind: parsed.kind, name: parsed.name };
+          const confirmData = { kind: parsed.kind, name: parsed.name, locale: parsed.locale };
           const confirmEl = React.createElement(confirmTemplate.component, confirmData);
           const confirmHtml = await render(confirmEl);
           const confirmText = await render(confirmEl, { plainText: true });
