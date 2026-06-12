@@ -17,7 +17,7 @@ import {
   GitBranch,
   AlertTriangle,
   ClipboardList,
-  Award,
+  
   ChevronRight,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
