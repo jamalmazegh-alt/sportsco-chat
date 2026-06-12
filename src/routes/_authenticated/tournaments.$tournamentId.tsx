@@ -258,6 +258,10 @@ function TournamentDetailPage() {
               matches={matches as any[]}
               groups={groups as any[]}
               publicUrl={publicUrl}
+              open={settingsOpen}
+              onOpenChange={setSettingsOpen}
+              initialTopic={settingsTopic}
+              initialFormatView={settingsFormatView}
             />
           )}
         </div>
