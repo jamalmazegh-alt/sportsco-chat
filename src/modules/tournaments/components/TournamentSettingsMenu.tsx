@@ -10,7 +10,6 @@ import {
   Settings2,
   ChevronRight,
   MoreVertical,
-  X,
 } from "lucide-react";
 import {
   Sheet,
