@@ -86,10 +86,15 @@ function TournamentDetailPage() {
   const updateFn = useServerFn(updateTournament);
   const qc = useQueryClient();
 
+  const search = Route.useSearch();
+  const isTvMode = search.display === "tv";
+
   const q = useQuery({
     queryKey: ["tournament", tournamentId],
     queryFn: (): Promise<TournamentDetail> => getFn({ data: { tournament_id: tournamentId } }),
-  });
+    // Sprint 2 — cockpit live updates via polling (no realtime channel).
+    refetchInterval: 20_000,
+    refetchIntervalInBackground: false,
 
   const publish = useMutation({
     mutationFn: (status: "published" | "in_progress" | "completed" | "draft") =>
