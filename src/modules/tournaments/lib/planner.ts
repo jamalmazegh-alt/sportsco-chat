@@ -37,8 +37,10 @@ export interface ScheduleInput {
   deadlineHHMM?: string;
   /** Minutes between matches on the same court — default 3. */
   changeoverMin?: number;
-  /** Lunch break in minutes — default 45. */
+  /** Lunch break duration in minutes — 0 = none, default 45. */
   lunchMin?: number;
+  /** Lunch break start — default 12:30. Ignored when lunchMin is 0. */
+  lunchStartHHMM?: string;
 }
 
 export type ScheduleVerdict = "ok" | "warn" | "bad";
@@ -122,7 +124,8 @@ export function computeSchedule(input: ScheduleInput): ScheduleResult {
   const terrains = Math.max(1, Math.floor(input.terrains));
   const duration = Math.max(1, Math.floor(input.durationMin));
   const changeover = input.changeoverMin ?? 3;
-  const lunch = input.lunchMin ?? 45;
+  const lunchDuration = input.lunchMin ?? 45;
+  const lunchStartMin = parseHHMM(input.lunchStartHHMM ?? "12:30");
   const startMin = parseHHMM(input.startHHMM ?? "09:00");
   const deadlineMin = parseHHMM(input.deadlineHHMM ?? "18:00");
 
@@ -131,7 +134,10 @@ export function computeSchedule(input: ScheduleInput): ScheduleResult {
   const total = poolMatches + finalMatches;
   const slotMin = duration + changeover;
   const rounds = Math.ceil(total / terrains);
-  const endMin = startMin + rounds * slotMin + lunch;
+  const playEndMin = startMin + rounds * slotMin;
+  const crossesLunch =
+    lunchDuration > 0 && startMin < lunchStartMin && playEndMin > lunchStartMin;
+  const endMin = crossesLunch ? playEndMin + lunchDuration : playEndMin;
   const marginMin = deadlineMin - endMin;
 
   let verdict: ScheduleVerdict;
@@ -230,6 +236,17 @@ export function recommendationToWizardFormat(
           : "mixed",
     numTeams: reco.pools * reco.perPool,
   };
+}
+
+/** End time (HH:MM) from lunch start + duration. */
+export function lunchEndHHMM(startHHMM: string, durationMin: number): string {
+  return formatHHMM(parseHHMM(startHHMM) + durationMin);
+}
+
+/** Human-readable lunch window, e.g. "12:30 → 13:15". */
+export function formatLunchRange(startHHMM: string, durationMin: number): string | null {
+  if (durationMin <= 0) return null;
+  return `${startHHMM} → ${lunchEndHHMM(startHHMM, durationMin)}`;
 }
 
 // ---------- Future LLM seam (documented only — DO NOT implement in v1)

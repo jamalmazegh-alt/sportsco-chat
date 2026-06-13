@@ -63,6 +63,46 @@ describe("computeSchedule", () => {
     const yes = computeSchedule({ teams: 16, terrains: 4, durationMin: 20, flights: true });
     expect(yes.total).toBeGreaterThan(no.total);
   });
+
+  it("lunch none ends earlier than default 45 min break", () => {
+    const withLunch = computeSchedule({
+      teams: 16,
+      terrains: 3,
+      durationMin: 20,
+      flights: false,
+      lunchMin: 45,
+      lunchStartHHMM: "12:30",
+    });
+    const noLunch = computeSchedule({
+      teams: 16,
+      terrains: 3,
+      durationMin: 20,
+      flights: false,
+      lunchMin: 0,
+    });
+    expect(withLunch.endHHMM).toBe("13:35");
+    expect(noLunch.endHHMM).toBe("12:50");
+  });
+
+  it("longer lunch pushes end time later", () => {
+    const short = computeSchedule({
+      teams: 16,
+      terrains: 3,
+      durationMin: 20,
+      flights: false,
+      lunchMin: 30,
+      lunchStartHHMM: "12:30",
+    });
+    const long = computeSchedule({
+      teams: 16,
+      terrains: 3,
+      durationMin: 20,
+      flights: false,
+      lunchMin: 60,
+      lunchStartHHMM: "12:30",
+    });
+    expect(long.endHHMM > short.endHHMM).toBe(true);
+  });
 });
 
 describe("recommendFormat", () => {

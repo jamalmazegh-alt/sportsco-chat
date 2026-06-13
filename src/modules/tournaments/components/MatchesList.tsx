@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Loader2,
   Check,
@@ -31,6 +31,7 @@ import {
   Eye,
   CalendarClock,
   Gavel,
+  ChevronRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -271,6 +272,298 @@ function eventMeta(kind: string, t: (k: string) => string) {
     : { emoji: "•", label: kind };
 }
 
+function eventSummaryBadge(events: MatchEvent[]): string | null {
+  const goals = events.filter((e) => e.kind === "goal" || e.kind === "own_goal").length;
+  const yellows = events.filter(
+    (e) => e.kind === "yellow_card" || e.kind === "second_yellow",
+  ).length;
+  const reds = events.filter((e) => e.kind === "red_card").length;
+  const parts: string[] = [];
+  if (goals) parts.push(`⚽×${goals}`);
+  if (yellows) parts.push(`🟨×${yellows}`);
+  if (reds) parts.push(`🟥×${reds}`);
+  return parts.length ? parts.join("  ") : null;
+}
+
+type DraftGoal = {
+  id: string;
+  type: "goal";
+  teamId: string;
+  scorer: string;
+  assist: string;
+  minute: string;
+};
+
+type DraftCard = {
+  id: string;
+  type: "card";
+  teamId: string;
+  player: string;
+  cardKind: "yellow_card" | "red_card";
+  minute: string;
+};
+
+type DraftEvent = DraftGoal | DraftCard;
+
+function draftEventLabel(
+  draft: DraftEvent,
+  teamA: Team | undefined,
+  teamB: Team | undefined,
+  t: (k: string) => string,
+): string {
+  const team =
+    draft.teamId === teamA?.id
+      ? (teamA.short_name ?? teamA.name)
+      : (teamB?.short_name ?? teamB?.name);
+  if (draft.type === "goal") {
+    const who = draft.scorer || draft.assist || t("matches.matchDetails.goal");
+    const min = draft.minute ? ` ${draft.minute}'` : "";
+    return `⚽${min} ${who} (${team})`;
+  }
+  const emoji = draft.cardKind === "red_card" ? "🟥" : "🟨";
+  const min = draft.minute ? ` ${draft.minute}'` : "";
+  return `${emoji}${min} ${draft.player || "—"} (${team})`;
+}
+
+function MatchDetailsSection({
+  events,
+  pendingEvents,
+  onRemoveSaved,
+  onRemovePending,
+  onAddGoal,
+  onAddCard,
+  teamA,
+  teamB,
+  disabled,
+  t,
+}: {
+  events: MatchEvent[];
+  pendingEvents: DraftEvent[];
+  onRemoveSaved: (id: string) => void;
+  onRemovePending: (id: string) => void;
+  onAddGoal: (draft: Omit<DraftGoal, "id" | "type">) => void;
+  onAddCard: (draft: Omit<DraftCard, "id" | "type">) => void;
+  teamA: Team | undefined;
+  teamB: Team | undefined;
+  disabled?: boolean;
+  t: (k: string) => string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [goalTeam, setGoalTeam] = useState(teamA?.id ?? "");
+  const [goalScorer, setGoalScorer] = useState("");
+  const [goalAssist, setGoalAssist] = useState("");
+  const [goalMinute, setGoalMinute] = useState("");
+  const [cardTeam, setCardTeam] = useState(teamA?.id ?? "");
+  const [cardPlayer, setCardPlayer] = useState("");
+  const [cardKind, setCardKind] = useState<"yellow_card" | "red_card">("yellow_card");
+  const [cardMinute, setCardMinute] = useState("");
+
+  const hasAny = events.length > 0 || pendingEvents.length > 0;
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger
+        type="button"
+        className="flex w-full items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground hover:bg-muted/50"
+      >
+        <ChevronRight
+          className={`h-3.5 w-3.5 shrink-0 transition-transform ${open ? "rotate-90" : ""}`}
+        />
+        <span>{t("matches.matchDetails.title")}</span>
+        {hasAny && !open && (
+          <span className="ml-auto text-[10px] font-normal tabular-nums">
+            {eventSummaryBadge([...events, ...pendingEvents.map((d) => ({
+              id: d.id,
+              match_id: "",
+              team_id: d.teamId,
+              kind: d.type === "goal" ? "goal" : d.cardKind,
+              player_name: d.type === "goal" ? d.scorer : d.player,
+              minute: d.minute ? parseInt(d.minute, 10) : null,
+            }))]}
+          </span>
+        )}
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2 space-y-3 rounded-lg border border-border bg-muted/20 p-3">
+        {(events.length > 0 || pendingEvents.length > 0) && (
+          <ul className="space-y-1.5">
+            {events.map((ev) => {
+              const meta = eventMeta(ev.kind, t);
+              const isA = ev.team_id === teamA?.id;
+              return (
+                <li
+                  key={ev.id}
+                  className="flex items-center gap-2 rounded-md bg-background px-2 py-1.5 text-[11px]"
+                >
+                  <span>{meta.emoji}</span>
+                  {ev.minute != null && <span className="font-mono">{ev.minute}'</span>}
+                  {ev.player_name && <span>{ev.player_name}</span>}
+                  <span className="text-muted-foreground">
+                    {isA ? (teamA?.short_name ?? teamA?.name) : (teamB?.short_name ?? teamB?.name)}
+                  </span>
+                  {!disabled && (
+                    <button
+                      type="button"
+                      onClick={() => onRemoveSaved(ev.id)}
+                      className="ml-auto text-muted-foreground hover:text-destructive"
+                      aria-label={t("matches.events.deleteAria")}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+            {pendingEvents.map((draft) => (
+              <li
+                key={draft.id}
+                className="flex items-center gap-2 rounded-md border border-dashed border-primary/30 bg-primary/5 px-2 py-1.5 text-[11px]"
+              >
+                <span>{draftEventLabel(draft, teamA, teamB, t)}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {t("matches.matchDetails.pending")}
+                </span>
+                {!disabled && (
+                  <button
+                    type="button"
+                    onClick={() => onRemovePending(draft.id)}
+                    className="ml-auto text-muted-foreground hover:text-destructive"
+                    aria-label={t("matches.events.deleteAria")}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {!disabled && teamA && teamB && (
+          <div className="space-y-3 border-t border-border pt-3">
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                {t("matches.matchDetails.addGoal")}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={goalTeam} onValueChange={setGoalTeam}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder={t("matches.events.team")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={teamA.id}>{teamA.name}</SelectItem>
+                    <SelectItem value={teamB.id}>{teamB.name}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder={t("matches.matchDetails.scorer")}
+                  value={goalScorer}
+                  onChange={(e) => setGoalScorer(e.target.value)}
+                />
+                <Input
+                  className="h-8 text-xs"
+                  placeholder={t("matches.matchDetails.assist")}
+                  value={goalAssist}
+                  onChange={(e) => setGoalAssist(e.target.value)}
+                />
+                <Input
+                  className="h-8 text-xs"
+                  placeholder={t("matches.events.minute")}
+                  inputMode="numeric"
+                  value={goalMinute}
+                  onChange={(e) => setGoalMinute(e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                disabled={!goalTeam}
+                onClick={() => {
+                  onAddGoal({
+                    teamId: goalTeam,
+                    scorer: goalScorer.trim(),
+                    assist: goalAssist.trim(),
+                    minute: goalMinute.trim(),
+                  });
+                  setGoalScorer("");
+                  setGoalAssist("");
+                  setGoalMinute("");
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t("matches.matchDetails.addGoalBtn")}
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                {t("matches.matchDetails.addCard")}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <Select value={cardTeam} onValueChange={setCardTeam}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder={t("matches.events.team")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={teamA.id}>{teamA.name}</SelectItem>
+                    <SelectItem value={teamB.id}>{teamB.name}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder={t("matches.events.player")}
+                  value={cardPlayer}
+                  onChange={(e) => setCardPlayer(e.target.value)}
+                />
+                <Select
+                  value={cardKind}
+                  onValueChange={(v) => setCardKind(v as "yellow_card" | "red_card")}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yellow_card">🟨 {t("matches.events.yellow_card")}</SelectItem>
+                    <SelectItem value="red_card">🟥 {t("matches.events.red_card")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  className="h-8 text-xs"
+                  placeholder={t("matches.events.minute")}
+                  inputMode="numeric"
+                  value={cardMinute}
+                  onChange={(e) => setCardMinute(e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                disabled={!cardTeam}
+                onClick={() => {
+                  onAddCard({
+                    teamId: cardTeam,
+                    player: cardPlayer.trim(),
+                    cardKind,
+                    minute: cardMinute.trim(),
+                  });
+                  setCardPlayer("");
+                  setCardMinute("");
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t("matches.matchDetails.addCardBtn")}
+              </Button>
+            </div>
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 function MatchCard({
   match,
   tournamentId,
@@ -358,6 +651,54 @@ function MatchCard({
 
   const save = useMutation({
     mutationFn: async () => {
+      const persistPendingEvents = async () => {
+        for (const draft of pendingEvents) {
+          const minute =
+            draft.type === "goal"
+              ? draft.minute
+                ? parseInt(draft.minute, 10)
+                : null
+              : draft.minute
+                ? parseInt(draft.minute, 10)
+                : null;
+          if (draft.type === "goal") {
+            await evFn({
+              data: {
+                tournament_id: tournamentId,
+                match_id: match.id,
+                team_id: draft.teamId,
+                kind: "goal",
+                player_name: draft.scorer || null,
+                minute,
+              },
+            });
+            if (draft.assist) {
+              await evFn({
+                data: {
+                  tournament_id: tournamentId,
+                  match_id: match.id,
+                  team_id: draft.teamId,
+                  kind: "assist",
+                  player_name: draft.assist,
+                  minute,
+                },
+              });
+            }
+          } else {
+            await evFn({
+              data: {
+                tournament_id: tournamentId,
+                match_id: match.id,
+                team_id: draft.teamId,
+                kind: draft.cardKind,
+                player_name: draft.player || null,
+                minute,
+              },
+            });
+          }
+        }
+      };
+
       if (setsMode && sets.length > 0) {
         const agg = aggregateSetsScore(sets);
         const result = await fn({
@@ -370,6 +711,7 @@ function MatchCard({
             status: "completed",
           },
         });
+        await persistPendingEvents();
         await valFn({
           data: { tournament_id: tournamentId, match_id: match.id, validated: true },
         });
@@ -387,6 +729,7 @@ function MatchCard({
           status: "completed",
         },
       });
+      await persistPendingEvents();
       await valFn({
         data: { tournament_id: tournamentId, match_id: match.id, validated: true },
       });
@@ -395,9 +738,8 @@ function MatchCard({
 
     onSuccess: () => {
       toast.success(t("matches.scoreSavedValidated"));
+      setPendingEvents([]);
       invalidateAll();
-      // Fix G — keep the dialog open on a success state so the organizer can
-      // chain straight into the next match ("Match suivant →") or close.
       setJustSaved(true);
     },
     onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
@@ -541,31 +883,8 @@ function MatchCard({
     onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
 
-  // Add event form
-  const [evTeam, setEvTeam] = useState<string>(match.team_a_id ?? "");
-  const [evKind, setEvKind] = useState<string>("yellow_card");
-  const [evPlayer, setEvPlayer] = useState("");
-  const [evMinute, setEvMinute] = useState<string>("");
-
-  const addEvent = useMutation({
-    mutationFn: () =>
-      evFn({
-        data: {
-          tournament_id: tournamentId,
-          match_id: match.id,
-          team_id: evTeam || null,
-          kind: evKind as any,
-          player_name: evPlayer || null,
-          minute: evMinute ? parseInt(evMinute, 10) : null,
-        },
-      }),
-    onSuccess: () => {
-      setEvPlayer("");
-      setEvMinute("");
-      invalidateAll();
-    },
-    onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
-  });
+  // Match details (goals / cards) — saved on score submit
+  const [pendingEvents, setPendingEvents] = useState<DraftEvent[]>([]);
 
   const removeEvent = useMutation({
     mutationFn: (event_id: string) => evDelFn({ data: { tournament_id: tournamentId, event_id } }),
@@ -678,8 +997,8 @@ function MatchCard({
   })();
 
   // State-dependent primary CTA
-  const [eventFormOpen, setEventFormOpen] = useState(false);
   const hasScore = match.score_a != null && match.score_b != null;
+  const eventsBadge = eventSummaryBadge(events);
 
   const primaryCta = (() => {
     if (!canManage) return null;
@@ -824,6 +1143,12 @@ function MatchCard({
             </p>
           )}
 
+          {eventsBadge && (
+            <p className="mt-1.5 text-center text-[10px] text-muted-foreground tabular-nums">
+              {eventsBadge}
+            </p>
+          )}
+
           {(match.referee_user_id || match.referee_name) && (
             <p className="mt-1.5 text-center text-[10px] text-muted-foreground inline-flex items-center justify-center gap-1 w-full">
               <Flag className="h-3 w-3" />
@@ -942,11 +1267,6 @@ function MatchCard({
                   {t("matches.fieldAndTime")}
                 </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => setEventFormOpen((o) => !o)}>
-                  <Plus className="h-3.5 w-3.5" />
-                  {t("matches.addEventAction")}
-                </DropdownMenuItem>
-
                 <DropdownMenuSeparator />
 
                 <DropdownMenuSub>
@@ -1030,104 +1350,16 @@ function MatchCard({
           </div>
         )}
 
-        {/* Events chips */}
-        {events.length > 0 && (
-          <ul className="px-3 pb-3 flex flex-wrap gap-1.5">
-            {events.map((ev) => {
-              const meta = eventMeta(ev.kind, t);
-              const isA = ev.team_id === match.team_a_id;
-              return (
-                <li
-                  key={ev.id}
-                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px]"
-                >
-                  <span>{meta.emoji}</span>
-                  {ev.minute != null && <span className="font-mono">{ev.minute}'</span>}
-                  {ev.player_name && <span>{ev.player_name}</span>}
-                  <span className="text-muted-foreground">
-                    {isA ? (teamA?.short_name ?? teamA?.name) : (teamB?.short_name ?? teamB?.name)}
-                  </span>
-                  {canManage && (
-                    <button
-                      type="button"
-                      onClick={() => removeEvent.mutate(ev.id)}
-                      className="text-muted-foreground hover:text-destructive ml-0.5"
-                      aria-label={t("matches.events.deleteAria")}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        {/* Event add form (toggled from kebab) */}
-        {canManage && (
-          <Collapsible open={eventFormOpen} onOpenChange={setEventFormOpen}>
-            <CollapsibleContent className="mx-3 mb-3 rounded-lg border border-border bg-muted/30 p-2 space-y-2">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <Select value={evKind} onValueChange={setEvKind}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EVENT_KIND_VALUES.map((k) => (
-                      <SelectItem key={k.value} value={k.value}>
-                        {k.emoji} {t(`matches.events.${k.value}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={evTeam} onValueChange={setEvTeam}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder={t("matches.events.team")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teamA && <SelectItem value={teamA.id}>{teamA.name}</SelectItem>}
-                    {teamB && <SelectItem value={teamB.id}>{teamB.name}</SelectItem>}
-                  </SelectContent>
-                </Select>
-                <Input
-                  className="h-8 text-xs"
-                  placeholder={t("matches.events.player")}
-                  value={evPlayer}
-                  onChange={(e) => setEvPlayer(e.target.value)}
-                />
-                <Input
-                  className="h-8 text-xs"
-                  type="number"
-                  min={0}
-                  max={200}
-                  placeholder={t("matches.events.minute")}
-                  value={evMinute}
-                  onChange={(e) => setEvMinute(e.target.value)}
-                />
-              </div>
-              <Button
-                size="sm"
-                className="h-8 text-xs w-full"
-                onClick={() => addEvent.mutate()}
-                disabled={addEvent.isPending || !evTeam}
-              >
-                {addEvent.isPending ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Plus className="h-3 w-3" />
-                )}
-                {t("matches.events.add")}
-              </Button>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
       </div>
 
       <ResponsiveFormDialog
         open={open}
         onOpenChange={(o) => {
           setOpen(o);
-          if (!o) setJustSaved(false);
+          if (!o) {
+            setJustSaved(false);
+            setPendingEvents([]);
+          }
         }}
         title={t("matches.title")}
       >
@@ -1273,6 +1505,33 @@ function MatchCard({
                 </p>
               )}
             </div>
+          )}
+
+          {canManage && teamA && teamB && (
+            <MatchDetailsSection
+              events={events}
+              pendingEvents={pendingEvents}
+              onRemoveSaved={(id) => removeEvent.mutate(id)}
+              onRemovePending={(id) =>
+                setPendingEvents((prev) => prev.filter((d) => d.id !== id))
+              }
+              onAddGoal={(draft) =>
+                setPendingEvents((prev) => [
+                  ...prev,
+                  { id: crypto.randomUUID(), type: "goal", ...draft },
+                ])
+              }
+              onAddCard={(draft) =>
+                setPendingEvents((prev) => [
+                  ...prev,
+                  { id: crypto.randomUUID(), type: "card", ...draft },
+                ])
+              }
+              teamA={teamA}
+              teamB={teamB}
+              disabled={validated}
+              t={t}
+            />
           )}
 
           {validated ? (

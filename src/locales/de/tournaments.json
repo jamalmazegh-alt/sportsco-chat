@@ -841,7 +841,18 @@
     "moreActions": "Autres actions",
     "addEventAction": "Ereignis hinzufügen",
     "changeStatusAction": "Status ändern",
-    "vs": "VS"
+    "vs": "VS",
+    "matchDetails": {
+      "title": "Détails du match (buteurs, passeurs, cartons)",
+      "addGoal": "Ajouter un but",
+      "addCard": "Ajouter un carton",
+      "scorer": "Buteur (opt.)",
+      "assist": "Passeur (opt.)",
+      "addGoalBtn": "Ajouter le but",
+      "addCardBtn": "Ajouter le carton",
+      "pending": "en attente",
+      "goal": "But"
+    }
   },
   "list": {
     "metaTitle": "Turniere — Clubero",
@@ -1235,7 +1246,11 @@
       "simTotal": "Spiele gesamt",
       "simSlot": "Slot (Dauer + Pause)",
       "simLunch": "Mittagspause",
-      "simTerrains": "Plätze"
+      "simTerrains": "Plätze",
+      "simLunchNone": "Aucune",
+      "simLunchDuration": "Durée pause déjeuner",
+      "simLunchMin": "{{min}} min",
+      "simLunchStart": "Heure de début"
     },
     "footerSub": {
       "question": "Der Assistent bleibt — anpassen ohne Datenverlust",
@@ -1381,7 +1396,11 @@
     "verdictWarn": "⚠ Ça passe juste",
     "verdictBad": "✗ Trop serré, ajoute un terrain",
     "breakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} matchs de poule + {{finalMatches}} finales",
-    "estimateDisclaimer": "Estimation indicative (pauses, retards non inclus)."
+    "estimateDisclaimer": "Estimation indicative (pauses, retards non inclus).",
+    "lunch": "Pause déjeuner",
+    "lunchNone": "Aucune",
+    "lunchMin": "{{min}} min",
+    "lunchStart": "Début"
   },
   "rulesAi": {
     "generate": "Générer un règlement avec lIA",
