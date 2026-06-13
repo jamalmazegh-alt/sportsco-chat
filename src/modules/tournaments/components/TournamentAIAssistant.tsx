@@ -274,7 +274,7 @@ export function TournamentAIAssistant({
     : t(`aiAssistant.headerHint.${currentStep}`, { defaultValue: "" });
 
   return (
-    <div className="flex h-[78vh] max-h-[640px] flex-col overflow-hidden rounded-2xl border border-border bg-card">
+    <div className="relative flex h-[78vh] max-h-[640px] flex-col overflow-hidden rounded-2xl border border-border bg-card">
       {/* Persistent AI header */}
       <div className="bg-gradient-to-br from-[hsl(260_55%_56%)] to-[hsl(258_50%_42%)] px-4 pt-3 pb-3 text-white">
         <div className="flex items-center gap-2">
