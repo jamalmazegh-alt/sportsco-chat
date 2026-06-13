@@ -137,17 +137,40 @@ export function TournamentAIAssistant({
     setConfig((c) => ({ ...c, ...partial }));
   }
 
+  // When user edits a single answer from the summary, the next advance/confirm
+  // bounces straight back to the summary instead of re-walking the whole wizard.
+  const returnToSummaryRef = useRef(false);
+
   function advance() {
+    if (returnToSummaryRef.current) {
+      returnToSummaryRef.current = false;
+      const summaryIdx = steps.indexOf("summary");
+      if (summaryIdx >= 0) {
+        setStepIdx(summaryIdx);
+        return;
+      }
+    }
     setStepIdx((i) => Math.min(i + 1, steps.length - 1));
   }
 
   function back() {
+    if (returnToSummaryRef.current) {
+      returnToSummaryRef.current = false;
+      const summaryIdx = steps.indexOf("summary");
+      if (summaryIdx >= 0) {
+        setStepIdx(summaryIdx);
+        return;
+      }
+    }
     setStepIdx((i) => Math.max(0, i - 1));
   }
 
   function goToStep(id: AssistantStepId) {
     const idx = steps.indexOf(id);
-    if (idx >= 0) setStepIdx(idx);
+    if (idx >= 0) {
+      returnToSummaryRef.current = true;
+      setStepIdx(idx);
+    }
   }
 
   // Auto-scroll question into view on step change (B-06)
