@@ -36,6 +36,7 @@ import { RegistrationsManager } from "@/modules/tournaments/components/Registrat
 import { PublishWorkflow } from "@/modules/tournaments/components/PublishWorkflow";
 import { PublishProgrammeCard } from "@/modules/tournaments/components/PublishProgrammeCard";
 import { FlightsManager } from "@/modules/tournaments/components/FlightsManager";
+import { FinalStandings } from "@/modules/tournaments/components/FinalStandings";
 
 import { TournamentStepper } from "@/modules/tournaments/components/TournamentStepper";
 import { ContinueCTA } from "@/modules/tournaments/components/ContinueCTA";
@@ -553,6 +554,13 @@ function TournamentDetailPage() {
 
       {/* ─── Sections (anchors, not tabs) ────────────────────────────────── */}
       <div className="px-5 pt-6 space-y-8">
+        {/* Classement final (podium) — affiché en haut quand toutes les finales sont terminées. */}
+        <FinalStandings
+          matches={matches as unknown as React.ComponentProps<typeof FinalStandings>["matches"]}
+          teams={teams as unknown as React.ComponentProps<typeof FinalStandings>["teams"]}
+          flights={flights as unknown as React.ComponentProps<typeof FinalStandings>["flights"]}
+          tournamentName={tournament.name}
+        />
         {/* Poules / Classement en haut : composition + résultats live, mis à jour
             automatiquement après chaque tirage via invalidateQueries(['tournament', id]). */}
         {groups.length > 0 && (
