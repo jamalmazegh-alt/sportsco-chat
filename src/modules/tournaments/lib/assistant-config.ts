@@ -217,6 +217,7 @@ export function buildSchedulePreview(cfg: AssistantTournamentConfig): ScheduleRe
     teams,
     terrains: cfg.terrains,
     durationMin: cfg.matchDurationMin,
+    changeoverMin: cfg.pauseMin,
     flights: configUsesFlights(cfg),
   });
 }
@@ -228,6 +229,7 @@ export function buildRecommendation(cfg: AssistantTournamentConfig): Recommendat
     teams,
     terrains: 1,
     durationMin: cfg.matchDurationMin,
+    changeoverMin: cfg.pauseMin,
     flights: configUsesFlights(cfg),
   });
 
@@ -289,6 +291,7 @@ export function configToCreatePayload(
   };
   update: {
     match_duration_min: number;
+    break_min: number;
     fields: string[];
     settings: ReturnType<typeof defaultRulesForSport>;
   };
@@ -319,6 +322,7 @@ export function configToCreatePayload(
     },
     update: {
       match_duration_min: cfg.matchDurationMin,
+      break_min: cfg.pauseMin,
       fields:
         cfg.terrainNaming === "now" && cfg.terrainNames.length === cfg.terrains
           ? cfg.terrainNames.map((n, i) => n.trim() || `Terrain ${i + 1}`)

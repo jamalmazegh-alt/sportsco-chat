@@ -1068,9 +1068,9 @@
       "error": "Génération impossible pour cette structure. Réessaie avec un autre template ou en mode manuel."
     },
     "rulesCount": "règles",
-    "thirdPlace": "3e place",
-    "fifthPlace": "5e place",
-    "seventhPlace": "7e place",
+    "thirdPlace": "Match pour la 3ᵉ place (petite finale)",
+    "fifthPlace": "Match pour la 5ᵉ place",
+    "seventhPlace": "Match pour la 7ᵉ place",
     "draftRulesSummary": "{{n}} règle(s) de qualification configurée(s)",
     "templates": {
       "champions": "Champions / Europa",
@@ -1160,7 +1160,7 @@
     "title": "Créer un tournoi",
     "subtitle": "Deux portes, zéro jargon. Choisis ton flow.",
     "aiTitle": "Créer avec l'IA",
-    "aiHint": "4 questions, une recommandation prête à créer.",
+    "aiHint": "Questions une par une — ton tournoi entièrement configuré.",
     "aiBadge": "Nouveau",
     "quickTitle": "Mode rapide",
     "quickHint": "5 écrans, gros boutons, aucune surprise.",

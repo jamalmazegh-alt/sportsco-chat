@@ -604,13 +604,12 @@ function MatchCard({
     }
   > = {
     scheduled: {
-      // B12 — navy (secondary token = Clubero brand) instead of neutral slate.
-      border: "border-l-secondary/60",
-      headerBg: "bg-secondary/5",
+      border: "border-l-[hsl(149_50%_36%)]/60",
+      headerBg: "bg-[hsl(149_50%_36%)]/5",
       badge:
-        "bg-secondary/10 text-secondary dark:text-secondary-foreground/80 border border-secondary/20",
-      cta: "bg-secondary text-secondary-foreground hover:bg-secondary/90",
-      dot: "bg-secondary/60",
+        "bg-[hsl(149_50%_36%)]/10 text-[hsl(149_55%_25%)] border border-[hsl(149_50%_36%)]/25",
+      cta: "bg-[hsl(149_50%_36%)] text-white hover:bg-[hsl(149_55%_30%)]",
+      dot: "bg-[hsl(149_50%_36%)]/70",
     },
     live: {
       border: "border-l-orange-500",

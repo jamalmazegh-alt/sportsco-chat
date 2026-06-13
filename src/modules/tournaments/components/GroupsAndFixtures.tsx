@@ -225,7 +225,9 @@ export function GroupsAndFixtures({
   const [regenGroupsOpen, setRegenGroupsOpen] = useState(false);
   const [genBracketOpen, setGenBracketOpen] = useState(false);
 
-  const [numGroups, setNumGroups] = useState(2);
+  const [numGroups, setNumGroups] = useState(() =>
+    Math.min(4, Math.max(2, Math.floor(teams.length / 4) || 2)),
+  );
   const [qualifiers, setQualifiers] = useState(2);
   const [thirdPlace, setThirdPlace] = useState(false);
 
@@ -432,7 +434,7 @@ export function GroupsAndFixtures({
               {/* B-04 — once the tournament is in_progress/completed the draw
                   must not be re-triggered from this surface. The dialog still
                   exposes a confirm-protected Relancer for emergencies. */}
-              {["in_progress", "completed"].includes(status) ? (
+              {["published", "in_progress", "completed"].includes(status) ? (
                 <p className="text-[11px] text-amber-600 dark:text-amber-400">
                   {t("groups.drawLockedStarted", {
                     defaultValue:

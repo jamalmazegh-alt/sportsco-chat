@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   assistantStepOrder,
+  buildRecommendation,
   buildSchedulePreview,
   clearAssistantDraft,
   configToCreatePayload,
@@ -32,6 +33,7 @@ import {
 } from "../lib/assistant-config";
 import { createTournament, updateTournament } from "../tournaments.functions";
 import { updateTournamentPaymentSettings } from "../tournament-payments.functions";
+import { answerTournamentQuestion } from "@/lib/llm/tournament-assistant.functions";
 
 interface Props {
   clubId: string;
@@ -328,7 +330,7 @@ export function TournamentAIAssistant({
       {/* Scrollable screen */}
       <div ref={screenRef} className="flex-1 overflow-y-auto bg-[#fbf7f2] px-4 pt-3 pb-2">
         {/* Live recap chips (B-08: only when at least one answer) */}
-        <RecapChips config={config} answeredCount={stepIdx} t={t} />
+        <RecapChips config={config} answeredCount={stepIdx} steps={steps} stepIdx={stepIdx} t={t} />
 
         {onSummary ? (
           <SummaryView
@@ -406,6 +408,7 @@ export function TournamentAIAssistant({
             ? t("aiAssistant.footerSub.summary")
             : t("aiAssistant.footerSub.question")}
         </p>
+        <AssistantAskBox config={config} t={t} />
       </div>
 
       {/* Expert settings overlay sheet (mockup: preserves answers, never loses progress) */}
@@ -487,37 +490,45 @@ export function TournamentAIAssistant({
 function RecapChips({
   config,
   answeredCount,
+  steps,
+  stepIdx,
   t,
 }: {
   config: AssistantTournamentConfig;
   answeredCount: number;
+  steps: AssistantStepId[];
+  stepIdx: number;
   t: (k: string, o?: Record<string, unknown>) => string;
 }) {
   if (answeredCount === 0) return null;
+  const past = (id: AssistantStepId) => {
+    const idx = steps.indexOf(id);
+    return idx >= 0 && stepIdx > idx;
+  };
   const chips: string[] = [];
-  if (config.sport)
+  if (past("sport") && config.sport)
     chips.push(t(`teams.sports.${config.sport}`, { defaultValue: config.sport }));
-  if (config.sport && config.playersPerTeam)
+  if (past("playersPerTeam") && config.playersPerTeam)
     chips.push(t("aiAssistant.recap.playersPerTeam", { n: config.playersPerTeam }));
-  if (answeredCount >= 2 || config.numTeams)
+  if (past("numTeams"))
     chips.push(t("aiAssistant.recap.teams", { n: config.numTeams }));
-  if (config.scheduleFormat === "pools_finals" && config.numTeams) {
+  if (past("scheduleFormat") && config.scheduleFormat === "pools_finals" && config.numTeams) {
     const label = poolsLabel(config.numTeams, t);
     if (label) chips.push(label);
   }
-  if (configFlightsLabel(config))
+  if (past("flightsTemplate") && configFlightsLabel(config))
     chips.push(t(`aiAssistant.recap.flights_${config.flightsTemplate}`));
-  if (answeredCount >= 5)
+  if (past("matchDuration"))
     chips.push(t("aiAssistant.recap.match", { min: config.matchDurationMin }));
-  if (config.pauseMin >= 0 && answeredCount >= 6)
+  if (past("pause"))
     chips.push(t("aiAssistant.recap.pause", { min: config.pauseMin }));
-  if (answeredCount >= 7)
+  if (past("terrains"))
     chips.push(t("aiAssistant.recap.terrains", { n: config.terrains }));
-  if (config.paid && config.registrationFeeCents > 0)
-    chips.push(`${(config.registrationFeeCents / 100).toFixed(0)} €`);
-  else if (answeredCount > 0 && config.paid === false && config.numTeams > 0 && config.terrains > 0)
-    // free chip only when paid step is past
-    chips.push("");
+  if (past("paid")) {
+    if (config.paid && config.registrationFeeCents > 0)
+      chips.push(`${(config.registrationFeeCents / 100).toFixed(0)} €`);
+    else chips.push(t("aiAssistant.opts.free"));
+  }
 
   const filtered = chips.filter(Boolean);
   if (filtered.length === 0) return null;
@@ -1147,6 +1158,65 @@ function SimLine({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between border-t border-white/15 py-1 text-[12.5px] text-white/80 first-of-type:border-t-0 first-of-type:pt-2">
       <span>{label}</span>
       <span>{value}</span>
+    </div>
+  );
+}
+
+/** B-09 — Q&A IA accessible pendant tout le flux (fallback silencieux si LLM off). */
+function AssistantAskBox({
+  config,
+  t,
+}: {
+  config: AssistantTournamentConfig;
+  t: (k: string, o?: Record<string, unknown>) => string;
+}) {
+  const { i18n } = useTranslation("tournaments");
+  const ask = useServerFn(answerTournamentQuestion);
+  const [q, setQ] = useState("");
+  const [answer, setAnswer] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const reco = useMemo(() => buildRecommendation(config), [config]);
+  const locale = i18n.language?.startsWith("en") ? "en" : "fr";
+
+  async function send() {
+    const question = q.trim();
+    if (!question || busy) return;
+    setBusy(true);
+    setAnswer(null);
+    try {
+      const res = await ask({
+        data: { question, reco, history: [], locale },
+      });
+      setAnswer(res.ok ? res.data.answer : t("aiAssistant.askQuestion.fallback"));
+      setQ("");
+    } catch {
+      setAnswer(t("aiAssistant.askQuestion.fallback"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-2 space-y-1.5 border-t border-border/60 pt-2">
+      <p className="text-[10px] font-semibold text-muted-foreground">
+        {t("aiAssistant.askQuestion.label")}
+      </p>
+      <div className="flex gap-2">
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && send()}
+          placeholder={t("aiAssistant.askQuestion.placeholder")}
+          disabled={busy}
+          className="h-8 text-xs"
+        />
+        <Button type="button" size="sm" onClick={send} disabled={busy || !q.trim()} className="h-8 px-2">
+          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : t("aiAssistant.askQuestion.send")}
+        </Button>
+      </div>
+      {answer && (
+        <p className="text-[11px] leading-snug text-muted-foreground italic">{answer}</p>
+      )}
     </div>
   );
 }
