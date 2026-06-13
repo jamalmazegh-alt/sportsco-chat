@@ -255,7 +255,10 @@ export function configToCreatePayload(
     },
     update: {
       match_duration_min: cfg.matchDurationMin,
-      fields: Array.from({ length: cfg.terrains }, (_, i) => `Terrain ${i + 1}`),
+      fields:
+        cfg.terrainNaming === "now" && cfg.terrainNames.length === cfg.terrains
+          ? cfg.terrainNames.map((n, i) => n.trim() || `Terrain ${i + 1}`)
+          : Array.from({ length: cfg.terrains }, (_, i) => `Terrain ${i + 1}`),
       settings: rules,
     },
     payment: cfg.paid
