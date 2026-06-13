@@ -22,6 +22,11 @@ type StepKey = "teams" | "allDay" | "trophies" | "paid";
 
 const STEP_ORDER: StepKey[] = ["teams", "allDay", "trophies", "paid"];
 
+function stepToAnswerKey(step: StepKey): keyof AssistantAnswers {
+  if (step === "trophies") return "multipleTrophies";
+  return step;
+}
+
 const TEAM_OPTIONS = [8, 12, 16, 24, 32];
 
 export function TournamentAIAssistant({ onCreate, onAdjust, onSimulate }: Props) {
