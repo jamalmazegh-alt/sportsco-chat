@@ -192,14 +192,18 @@ export function computeStepper(args: ComputeArgs): StepperStep[] {
 export function computeContinueAction(args: ComputeArgs): ContinueAction {
   const { tournament, teamsCount, groupsCount, matches, flightsCount } = args;
 
-  // 1) Missing teams
-  if (teamsCount < MIN_TEAMS_TO_START) {
-    return { kind: "add_team", anchor: "section-teams" };
-  }
-
-  // Tournament still in draft after teams added → propose publish
+  // 0) A draft must always offer a way to go live — independent of the team
+  // count. Publishing is *not* gated on teams (online-registration tournaments
+  // are published precisely to start collecting them). Since the standalone
+  // "Publier" button was removed from PublishWorkflow (Fix D), the CTA is now
+  // the single publish surface, so it must surface publish even with 0–1 teams.
   if (tournament.status === "draft") {
     return { kind: "publish_tournament" };
+  }
+
+  // 1) Missing teams (only relevant once the tournament is live)
+  if (teamsCount < MIN_TEAMS_TO_START) {
+    return { kind: "add_team", anchor: "section-teams" };
   }
 
   // 2) Draw not generated (only when pools are expected)

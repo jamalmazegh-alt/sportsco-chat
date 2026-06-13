@@ -65,6 +65,18 @@ describe("computeContinueAction — priority order", () => {
     expect(action.kind).toBe("publish_tournament");
   });
 
+  // Fix D edge — a draft must never be left without a publish path. Publishing
+  // is not gated on the team count (draft → publish wins over add_team).
+  it.each([0, 1])(
+    "still proposes publish for a draft with only %i team(s)",
+    (teamsCount) => {
+      const action = computeContinueAction(
+        args({ teamsCount, tournament: { status: "draft", format: "groups_knockout" } }),
+      );
+      expect(action.kind).toBe("publish_tournament");
+    },
+  );
+
   it("2) run_draw when pools expected and no group generated", () => {
     expect(computeContinueAction(args({ teamsCount: 8 })).kind).toBe("run_draw");
   });
