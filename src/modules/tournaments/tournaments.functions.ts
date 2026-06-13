@@ -654,6 +654,103 @@ export const autoCreateGroupsAndFixtures = createServerFn({ method: "POST" })
     return { groups_created: groups!.length, matches_created: matchRows.length };
   });
 
+// ---------- Pool editor (manual team→group reassignment before matches start)
+
+export const reassignTeamsToGroups = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        assignments: z
+          .array(
+            z.object({
+              team_id: z.string().uuid(),
+              group_id: z.string().uuid(),
+            }),
+          )
+          .min(1)
+          .max(256),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertCanManage(supabase, userId, data.tournament_id);
+    await assertTournamentMutable(data.tournament_id, "structure");
+
+    // Reject if any group match has already started/finished
+    const { data: started, error: stErr } = await supabase
+      .from("tournament_matches")
+      .select("id, status")
+      .eq("tournament_id", data.tournament_id)
+      .eq("round", "group")
+      .in("status", ["live", "completed"]);
+    if (stErr) throw new Response(stErr.message, { status: 400 });
+    if (started && started.length > 0) {
+      throw new Response("Impossible: des matchs de poule ont déjà commencé", { status: 400 });
+    }
+
+    // Validate groups belong to tournament
+    const { data: groups, error: gErr } = await supabase
+      .from("tournament_groups")
+      .select("id")
+      .eq("tournament_id", data.tournament_id);
+    if (gErr) throw new Response(gErr.message, { status: 400 });
+    const validGroupIds = new Set((groups ?? []).map((g) => g.id));
+    for (const a of data.assignments) {
+      if (!validGroupIds.has(a.group_id)) {
+        throw new Response("Poule invalide", { status: 400 });
+      }
+    }
+
+    // Apply assignments
+    for (const a of data.assignments) {
+      const { error: uErr } = await supabase
+        .from("tournament_teams")
+        .update({ group_id: a.group_id } as any)
+        .eq("id", a.team_id)
+        .eq("tournament_id", data.tournament_id);
+      if (uErr) throw new Response(uErr.message, { status: 400 });
+    }
+
+    // Regenerate group fixtures from the new distribution
+    await supabase
+      .from("tournament_matches")
+      .delete()
+      .eq("tournament_id", data.tournament_id)
+      .eq("round", "group");
+
+    const { data: teams } = await supabase
+      .from("tournament_teams")
+      .select("id, group_id")
+      .eq("tournament_id", data.tournament_id);
+
+    const matchRows: any[] = [];
+    let matchNum = 0;
+    for (const g of groups ?? []) {
+      const ids = (teams ?? []).filter((t) => t.group_id === g.id).map((t) => t.id);
+      const pairings = generateRoundRobin(ids);
+      for (const p of pairings) {
+        matchNum++;
+        matchRows.push({
+          tournament_id: data.tournament_id,
+          group_id: g.id,
+          round: "group",
+          match_number: matchNum,
+          team_a_id: p.teamAId,
+          team_b_id: p.teamBId,
+          status: "scheduled",
+        });
+      }
+    }
+    if (matchRows.length) {
+      const { error: mErr } = await supabase.from("tournament_matches").insert(matchRows);
+      if (mErr) throw new Response(mErr.message, { status: 400 });
+    }
+    return { ok: true, matches_created: matchRows.length };
+  });
+
 // ---------- Score entry
 
 export const recordMatchScore = createServerFn({ method: "POST" })

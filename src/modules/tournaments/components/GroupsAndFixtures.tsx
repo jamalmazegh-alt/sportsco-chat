@@ -30,6 +30,7 @@ import {
   autoScheduleMatches,
 } from "../tournaments.functions";
 import { DrawDialog } from "./DrawDialog";
+import { PoolEditorDialog } from "./PoolEditorDialog";
 import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 
 interface Props {
@@ -223,6 +224,7 @@ export function GroupsAndFixtures({
   const qc = useQueryClient();
   const [drawOpen, setDrawOpen] = useState(false);
   const [regenGroupsOpen, setRegenGroupsOpen] = useState(false);
+  const [poolEditorOpen, setPoolEditorOpen] = useState(false);
   const [genBracketOpen, setGenBracketOpen] = useState(false);
 
   const [numGroups, setNumGroups] = useState(() =>
@@ -519,6 +521,15 @@ export function GroupsAndFixtures({
                 {t("groups.regenerateWarn")}
               </p>
             )}
+            {groupsCount > 0 && status !== "in_progress" && status !== "completed" && (
+              <Button
+                onClick={() => setPoolEditorOpen(true)}
+                variant="outline"
+                className="w-full h-11"
+              >
+                {t("poolEditor.openButton", "Modifier les poules manuellement")}
+              </Button>
+            )}
           </Block>
         )}
 
@@ -780,6 +791,12 @@ export function GroupsAndFixtures({
           await genGroups.mutateAsync();
           setRegenGroupsOpen(false);
         }}
+      />
+
+      <PoolEditorDialog
+        open={poolEditorOpen}
+        onOpenChange={setPoolEditorOpen}
+        tournamentId={tournamentId}
       />
 
       <DestructiveConfirmSheet
