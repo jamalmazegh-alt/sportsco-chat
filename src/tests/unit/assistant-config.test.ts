@@ -120,8 +120,8 @@ describe("assistant-config", () => {
       lunchStart: "12:30",
     });
     const payload = configToCreatePayload("00000000-0000-0000-0000-000000000001", cfg);
-    expect((payload.update.settings as Record<string, unknown>).lunch_start).toBe("12:30");
-    expect((payload.update.settings as Record<string, unknown>).lunch_end).toBe("13:15");
+    expect((payload.update.settings as unknown as Record<string, unknown>).lunch_start).toBe("12:30");
+    expect((payload.update.settings as unknown as Record<string, unknown>).lunch_end).toBe("13:15");
   });
 
   it("clears lunch settings when duration is zero", () => {
@@ -132,8 +132,8 @@ describe("assistant-config", () => {
       lunchDurationMin: 0,
     });
     const payload = configToCreatePayload("00000000-0000-0000-0000-000000000001", cfg);
-    expect((payload.update.settings as Record<string, unknown>).lunch_start).toBeNull();
-    expect((payload.update.settings as Record<string, unknown>).lunch_end).toBeNull();
+    expect((payload.update.settings as unknown as Record<string, unknown>).lunch_start).toBeNull();
+    expect((payload.update.settings as unknown as Record<string, unknown>).lunch_end).toBeNull();
   });
 
   it("uses nearestSupportedTeams for wizard num_teams", () => {

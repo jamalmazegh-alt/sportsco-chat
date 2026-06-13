@@ -205,7 +205,7 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
   steps.push("matchDuration", "lunchDuration");
-  if (cfg.lunchDurationMin > 0) {
+  if ((cfg.lunchDurationMin ?? 0) > 0) {
     steps.push("lunchStart");
   }
   steps.push("pause", "terrains", "terrainNaming");
@@ -335,14 +335,14 @@ export function configToCreatePayload(
     enabled: cfg.useFairPlay,
   };
   if (cfg.lunchDurationMin > 0) {
-    (rules as Record<string, unknown>).lunch_start = cfg.lunchStart;
-    (rules as Record<string, unknown>).lunch_end = lunchEndHHMM(
+    (rules as unknown as Record<string, unknown>).lunch_start = cfg.lunchStart;
+    (rules as unknown as Record<string, unknown>).lunch_end = lunchEndHHMM(
       cfg.lunchStart,
       cfg.lunchDurationMin,
     );
   } else {
-    (rules as Record<string, unknown>).lunch_start = null;
-    (rules as Record<string, unknown>).lunch_end = null;
+    (rules as unknown as Record<string, unknown>).lunch_start = null;
+    (rules as unknown as Record<string, unknown>).lunch_end = null;
   }
 
   return {

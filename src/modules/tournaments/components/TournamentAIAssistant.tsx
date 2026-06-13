@@ -839,7 +839,7 @@ function QuestionView(p: QuestionViewProps) {
               value={config.lunchStart}
               onChange={(e) => patch({ lunchStart: e.target.value })}
             />
-            <Button type="button" className="w-full" onClick={() => advance()}>
+            <Button type="button" className="w-full" onClick={p.onAdvance}>
               {t("aiAssistant.cta.next")}
             </Button>
           </div>
@@ -1346,7 +1346,7 @@ function AssistantAskBox({ config, t }: { config: AssistantTournamentConfig; t: 
       const res = await answerTournamentQuestion({
         data: { question: q, context: config },
       });
-      setAnswer(res.answer);
+      setAnswer(res.ok ? res.data.answer : t("aiAssistant.askQuestion.fallback"));
     } catch {
       toast.error(t("aiAssistant.askQuestion.fallback"));
     } finally {
