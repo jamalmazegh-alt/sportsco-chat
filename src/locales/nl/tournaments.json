@@ -1168,53 +1168,104 @@
     "back": "Retour"
   },
   "aiAssistant": {
-    "intro": "Salut 👋 On crée ton tournoi en une minute.",
-    "recoIntro": "Parfait. Voici ce que je te recommande 👇",
-    "recoBadge": "Recommandation Clubero",
-    "recoTitle": "{{pools}} poules de {{perPool}}",
-    "recoFlightsSuffix": "3 trophées",
+    "intro": "Hoi 👋 We stellen je toernooi stap voor stap in.",
+    "summaryIntro": "Perfect — hier is het overzicht. Klaar om te maken.",
+    "recoIntro": "Perfect. Dit raad ik aan 👇",
+    "recoBadge": "Clubero-configuratie",
+    "recoTitle": "{{pools}} poules van {{perPool}}",
+    "recoFlightsSuffix": "3 trofeeën",
     "q": {
-      "teams": "Combien d'équipes attends-tu ?",
-      "allDay": "Tout le monde doit-il jouer toute la journée ?",
-      "trophies": "Tu veux plusieurs trophées (Champions, Europa…) ?",
-      "paid": "Le tournoi est-il payant ?"
+      "sport": "Welke sport?",
+      "playersPerTeam": "Hoeveel spelers per team op het veld?",
+      "numTeams": "Hoeveel teams doen mee?",
+      "scheduleFormat": "Welk format voor de dag?",
+      "eliminatedContinue": "Spelen uitgeschakelde pouleteams door?",
+      "flightsTemplate": "Welke tabellen voor uit poules?",
+      "matchDuration": "Duur van een wedstrijd?",
+      "terrains": "Hoeveel velden beschikbaar?",
+      "paid": "Is het toernooi betaald?",
+      "paidAmount": "Bedrag per team?",
+      "name": "Hoe heet het toernooi?",
+      "date": "Welke datum (en einddatum bij meerdere dagen)?",
+      "location": "Waar vindt het plaats?",
+      "summary": "Overzicht"
     },
     "opts": {
-      "allDayYes": "Oui, du temps de jeu pour tous",
-      "allDayNo": "Non, place aux meilleurs",
-      "trophiesYes": "Oui, plusieurs finales",
-      "trophiesNo": "Non, un seul vainqueur",
-      "free": "Gratuit",
-      "paid": "Payant"
+      "playersPerTeam": "{{count}} spelers",
+      "customTeamsPlaceholder": "Ander aantal…",
+      "customDurationPlaceholder": "Andere duur (min)…",
+      "durationMin": "{{min}} min",
+      "eliminatedYes": "Ja — klasseringswedstrijden / meerdere tabellen (elk team blijft spelen)",
+      "eliminatedNo": "Nee — uitgeschakelde pouleteams stoppen",
+      "eliminatedYesShort": "Klassering / flights",
+      "eliminatedNoShort": "Stop na poules",
+      "flightsChampions": "Champions · Europa · Conference",
+      "flightsSimple": "Eenvoudige troost",
+      "pricePlaceholder": "Bedrag in €",
+      "priceValue": "{{amount}} € / team",
+      "allDayYes": "Ja, speeltijd voor iedereen",
+      "allDayNo": "Nee, focus op de besten",
+      "trophiesYes": "Ja, meerdere finales",
+      "trophiesNo": "Nee, één winnaar",
+      "free": "Gratis",
+      "paid": "Betaald"
     },
     "cta": {
-      "create": "Créer le tournoi",
-      "adjust": "Ajuster",
-      "simulate": "Simuler",
-      "restart": "Recommencer"
+      "create": "Toernooi maken",
+      "adjust": "Aanpassen",
+      "adjustPoint": "Punt aanpassen",
+      "pickStep": "Welk punt wijzigen?",
+      "simulate": "Simuleren",
+      "restart": "Opnieuw",
+      "expert": "Expertmodus",
+      "expertSettings": "Gedetailleerde instellingen",
+      "confirm": "Bevestigen",
+      "next": "Doorgaan"
+    },
+    "livePreview": {
+      "title": "Toernooi in opbouw",
+      "sport": "Sport",
+      "teams": "Teams",
+      "playersPerTeam": "Format",
+      "format": "Verloop",
+      "eliminated": "Uit poules",
+      "duration": "Wedstrijdduur",
+      "durationValue": "{{min}} min",
+      "terrains": "Velden",
+      "name": "Naam",
+      "scheduleBreakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} poulewedstrijden + {{finalMatches}} finales · {{total}} wedstrijden · einde ~{{end}}"
+    },
+    "errors": {
+      "invalidTeams": "Geef een aantal teams tussen 2 en 64.",
+      "invalidDuration": "Geef een duur tussen 5 en 120 minuten.",
+      "invalidPrice": "Geef een geldig bedrag.",
+      "invalidName": "De naam moet minstens 2 tekens zijn.",
+      "invalidDate": "Kies een startdatum.",
+      "invalidLocation": "Geef een locatie.",
+      "incomplete": "Configuratie onvolledig."
     },
     "formats": {
-      "poolsFinals": "Poules + phases finales",
-      "roundRobin": "Championnat (round-robin)",
-      "singleElim": "Élimination directe"
+      "poolsFinals": "Poules + finale fase",
+      "roundRobin": "Competitie",
+      "singleElim": "Directe eliminatie"
     },
     "recoLine": {
-      "teams": "Équipes",
-      "finals": "Phase finale",
+      "teams": "Teams",
+      "finals": "Finale fase",
       "flightsValue": "Champions · Europa · Conference",
-      "matches": "Matchs au total",
-      "estimatedEnd": "Durée estimée",
-      "terrains": "Terrains conseillés"
+      "matches": "Totaal wedstrijden",
+      "estimatedEnd": "Geschatte duur",
+      "terrains": "Aanbevolen velden"
     },
     "explanation": {
-      "loading": "Analyse en cours…"
+      "loading": "Bezig met analyseren…"
     },
     "askQuestion": {
-      "label": "Une question sur ce format ?",
-      "placeholder": "Ex. Et si jai un terrain de moins ?",
-      "send": "Envoyer",
+      "label": "Een vraag over dit format?",
+      "placeholder": "Bijv. Wat als ik een veld minder heb?",
+      "send": "Versturen",
       "thinking": "…",
-      "fallback": "Je ne peux pas répondre pour le moment, réessaie plus tard."
+      "fallback": "Ik kan nu niet antwoorden, probeer het later."
     }
   },
   "simulator": {
