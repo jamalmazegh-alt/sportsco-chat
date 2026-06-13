@@ -334,7 +334,46 @@ function TournamentDetailPage() {
             tone="muted"
           />
         </div>
+        {/* Sprint 2 — Cockpit metrics: only when scheduled_at data exists. */}
+        {(estimatedEnd || averageDelay !== null) && (
+          <div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-border bg-card/50 px-3 py-2 text-xs">
+            {estimatedEnd && (
+              <span className="text-muted-foreground">
+                {t("cockpit.estimatedEnd", { defaultValue: "Fin prévue" })}{" "}
+                <strong className="text-foreground tabular-nums">
+                  {estimatedEnd.toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </strong>
+              </span>
+            )}
+            {averageDelay !== null && (
+              <span
+                className={cn(
+                  "tabular-nums",
+                  averageDelay >= 10 ? "text-amber-600 font-semibold" : "text-muted-foreground",
+                )}
+              >
+                {t("cockpit.averageDelay", {
+                  defaultValue: "Retard moyen {{minutes}} min",
+                  minutes: averageDelay,
+                })}
+              </span>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* ─── Alerts (Sprint 2) ─────────────────────────────────────────── */}
+      {canManage && alerts.length > 0 && (
+        <div className="px-5 pt-4">
+          <AlertsPanel
+            alerts={alerts}
+            onAlertClick={(a) => handleAlertClick(a)}
+          />
+        </div>
+      )}
 
       {/* ─── Live courts ─────────────────────────────────────────────────── */}
       <div className="px-5 pt-5">
