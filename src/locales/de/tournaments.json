@@ -1266,6 +1266,21 @@
       "send": "Senden",
       "thinking": "…",
       "fallback": "Ich kann gerade nicht antworten, versuche es später."
+    },
+    "expertSheet": {
+      "title": "Detaillierte Einstellungen",
+      "subtitle": "Expertenmodus — Feineinstellung, ohne den Assistenten zu verlassen.",
+      "keep": "✓ Deine Antworten bleiben erhalten — Schließen verliert nichts.",
+      "points": "Punkte & Wertung",
+      "pointsHint": "S3/U1/N0 · direkter Vergleich, Tordiff…",
+      "flights": "Tableaus & Platzierungsspiele",
+      "flightsHint": "Champions/Europa/Conference · Spiel um Platz 3…",
+      "fields": "Plätze & Schiedsrichter",
+      "fieldsHint": "Plätze benennen, zuweisen",
+      "registration": "Anmeldung & Zahlung",
+      "registrationHint": "Online, Preis, Validierung",
+      "openExpert": "Experteneditor öffnen",
+      "close": "Zurück zum Assistenten"
     }
   },
   "simulator": {

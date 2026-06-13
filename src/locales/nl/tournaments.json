@@ -1266,6 +1266,21 @@
       "send": "Versturen",
       "thinking": "…",
       "fallback": "Ik kan nu niet antwoorden, probeer het later."
+    },
+    "expertSheet": {
+      "title": "Gedetailleerde instellingen",
+      "subtitle": "Expertmodus — fijn afstellen zonder de assistent te verlaten.",
+      "keep": "✓ Je antwoorden blijven bewaard — sluiten verliest niets.",
+      "points": "Punten & tiebreakers",
+      "pointsHint": "W3/G1/V0 · onderling, doelsaldo…",
+      "flights": "Tableaus & klassementswedstrijden",
+      "flightsHint": "Champions/Europa/Conference · 3e plaats…",
+      "fields": "Velden & scheidsrechters",
+      "fieldsHint": "Velden benoemen, toewijzen",
+      "registration": "Inschrijving & betaling",
+      "registrationHint": "Online, prijs, validatie",
+      "openExpert": "Expert-editor openen",
+      "close": "Terug naar assistent"
     }
   },
   "simulator": {

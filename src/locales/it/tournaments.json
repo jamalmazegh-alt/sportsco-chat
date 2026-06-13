@@ -1266,6 +1266,21 @@
       "send": "Invia",
       "thinking": "…",
       "fallback": "Non posso rispondere ora, riprova più tardi."
+    },
+    "expertSheet": {
+      "title": "Impostazioni dettagliate",
+      "subtitle": "Modalità esperto — regola senza lasciare l'assistente.",
+      "keep": "✓ Le tue risposte vengono mantenute — chiudere non perde nulla.",
+      "points": "Punti e spareggi",
+      "pointsHint": "V3/P1/S0 · scontro diretto, diff. reti…",
+      "flights": "Tabelloni e partite di classifica",
+      "flightsHint": "Champions/Europa/Conference · 3° posto…",
+      "fields": "Campi e arbitri",
+      "fieldsHint": "Nominare i campi, assegnare",
+      "registration": "Iscrizioni e pagamento",
+      "registrationHint": "Online, prezzo, validazione",
+      "openExpert": "Apri editor esperto",
+      "close": "Torna all'assistente"
     }
   },
   "simulator": {

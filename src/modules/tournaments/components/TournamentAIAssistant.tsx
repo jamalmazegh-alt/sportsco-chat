@@ -79,6 +79,7 @@ export function TournamentAIAssistant({
   const [customDuration, setCustomDuration] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [showSim, setShowSim] = useState(false);
+  const [showExpertSheet, setShowExpertSheet] = useState(false);
 
   const steps = useMemo(() => {
     const order = assistantStepOrder(config);
@@ -273,7 +274,7 @@ export function TournamentAIAssistant({
     : t(`aiAssistant.headerHint.${currentStep}`, { defaultValue: "" });
 
   return (
-    <div className="flex h-[78vh] max-h-[640px] flex-col overflow-hidden rounded-2xl border border-border bg-card">
+    <div className="relative flex h-[78vh] max-h-[640px] flex-col overflow-hidden rounded-2xl border border-border bg-card">
       {/* Persistent AI header */}
       <div className="bg-gradient-to-br from-[hsl(260_55%_56%)] to-[hsl(258_50%_42%)] px-4 pt-3 pb-3 text-white">
         <div className="flex items-center gap-2">
@@ -364,7 +365,7 @@ export function TournamentAIAssistant({
             type="button"
             variant="outline"
             className="flex-1"
-            onClick={() => onOpenExpert(config)}
+            onClick={() => setShowExpertSheet(true)}
           >
             {t("aiAssistant.cta.expertSettings")}
           </Button>
@@ -390,6 +391,77 @@ export function TournamentAIAssistant({
             : t("aiAssistant.footerSub.question")}
         </p>
       </div>
+
+      {/* Expert settings overlay sheet (mockup: preserves answers, never loses progress) */}
+      {showExpertSheet && (
+        <div
+          className="absolute inset-0 z-50 flex items-end bg-[hsl(225_35%_15%)]/45 animate-in fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowExpertSheet(false);
+          }}
+        >
+          <div className="max-h-[78%] w-full overflow-y-auto rounded-t-3xl bg-white px-4 pb-6 pt-4 animate-in slide-in-from-bottom">
+            <h3 className="text-base font-bold text-foreground">
+              {t("aiAssistant.expertSheet.title")}
+            </h3>
+            <p className="mb-3 text-xs text-muted-foreground">
+              {t("aiAssistant.expertSheet.subtitle")}
+            </p>
+            <div className="mb-2.5 rounded-lg bg-[hsl(149_45%_92%)] px-3 py-2 text-[11.5px] font-semibold text-[hsl(149_55%_25%)]">
+              {t("aiAssistant.expertSheet.keep")}
+            </div>
+            {(
+              [
+                { icon: "⚖️", title: "points", hint: "pointsHint" },
+                { icon: "🏆", title: "flights", hint: "flightsHint" },
+                { icon: "🧑‍⚖️", title: "fields", hint: "fieldsHint" },
+                { icon: "📝", title: "registration", hint: "registrationHint" },
+              ] as const
+            ).map((row, i) => (
+              <button
+                key={row.title}
+                type="button"
+                onClick={() => {
+                  setShowExpertSheet(false);
+                  onOpenExpert(config);
+                }}
+                className={cn(
+                  "flex w-full items-center gap-3 px-1 py-3 text-left text-sm hover:bg-muted/40",
+                  i > 0 && "border-t border-border",
+                )}
+              >
+                <span className="w-7 text-center text-base">{row.icon}</span>
+                <span className="flex-1">
+                  <b className="block text-foreground">
+                    {t(`aiAssistant.expertSheet.${row.title}`)}
+                  </b>
+                  <span className="block text-[11px] text-muted-foreground">
+                    {t(`aiAssistant.expertSheet.${row.hint}`)}
+                  </span>
+                </span>
+                <span className="text-muted-foreground">›</span>
+              </button>
+            ))}
+            <Button
+              type="button"
+              className="mt-3 w-full"
+              onClick={() => {
+                setShowExpertSheet(false);
+                onOpenExpert(config);
+              }}
+            >
+              {t("aiAssistant.expertSheet.openExpert")}
+            </Button>
+            <button
+              type="button"
+              onClick={() => setShowExpertSheet(false)}
+              className="mt-2 w-full rounded-xl bg-muted px-3 py-3 text-sm font-bold text-foreground"
+            >
+              {t("aiAssistant.expertSheet.close")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
