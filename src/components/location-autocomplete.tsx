@@ -110,12 +110,34 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
     timer.current = setTimeout(async () => {
       setLoading(true);
       try {
+        const googleService = googleServiceRef.current;
+        if (googleService) {
+          googleService.getPlacePredictions(
+            {
+              input: v,
+              componentRestrictions: { country: ["fr", "be", "ch", "lu", "mc"] },
+              types: ["establishment", "geocode"],
+            },
+            (predictions: Array<{ description: string; place_id: string }> | null) => {
+              setSuggestions(
+                (predictions ?? []).map((item) => ({
+                  display_name: item.description,
+                  place_id: item.place_id,
+                  source: "google",
+                })),
+              );
+              setOpen((predictions ?? []).length > 0);
+              setLoading(false);
+            },
+          );
+          return;
+        }
         const res = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q=${encodeURIComponent(v)}`,
           { headers: { "Accept-Language": navigator.language || "fr" } }
         );
         const data: Suggestion[] = await res.json();
-        setSuggestions(data);
+        setSuggestions(data.map((item) => ({ ...item, source: "osm" })));
         setOpen(true);
       } catch {
         setSuggestions([]);
