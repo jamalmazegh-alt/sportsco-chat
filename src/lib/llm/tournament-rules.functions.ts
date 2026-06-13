@@ -54,14 +54,15 @@ export const generateTournamentRules = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
 
     // 1. Authorise: caller must be able to read the tournament via RLS.
-    const { data: tournament, error } = await supabase
+    const { data: tournamentRow, error } = await supabase
       .from("tournaments")
-      .select("id, name, sport, format, starts_at, ends_at, location, category, club_id")
+      .select("id, name, sport, format, starts_on, ends_on, location, category, club_id")
       .eq("id", data.tournamentId)
       .maybeSingle();
-    if (error || !tournament) {
+    if (error || !tournamentRow) {
       return { ok: false as const, reason: "not_found" as const };
     }
+    const tournament = tournamentRow as TournamentMeta & { id: string };
 
     // 2. Daily rate-limit per tournament
     const allowed = await checkLlmDailyLimit(data.tournamentId, "tournament_rules", 5);
