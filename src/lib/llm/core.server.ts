@@ -197,7 +197,7 @@ export async function cacheSet(
   try {
     await supabaseAdmin
       .from("llm_cache")
-      .upsert({ cache_key: key, feature, locale, response: response as object });
+      .upsert({ cache_key: key, feature, locale, response: response as never });
   } catch {
     /* ignore */
   }
