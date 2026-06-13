@@ -597,6 +597,9 @@ function TournamentDetailPage() {
               flights={flights as unknown as React.ComponentProps<typeof FlightsManager>["flights"]}
               hasGroups={groups.length > 0}
               groupMatchesCompleted={poolMatchesDone}
+              bracketsGenerated={matches.some(
+                (m) => (m as { flight_id?: string | null }).flight_id != null,
+              )}
             />
           </Section>
         )}

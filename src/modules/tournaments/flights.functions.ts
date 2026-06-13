@@ -147,8 +147,15 @@ export const saveFlights = createServerFn({ method: "POST" })
 
 export const generateAllFlightBrackets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { tournament_id: string }) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  .inputValidator((input: { tournament_id: string; force?: boolean }) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        // B3 — régénération destructive : confirmation requise si des matchs de
+        // flight ont déjà démarré / ont un score.
+        force: z.boolean().default(false),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -212,6 +219,16 @@ export const generateAllFlightBrackets = createServerFn({ method: "POST" })
         `Cannot generate flights: ${incompleteGroupMatches.length} group matches are not completed`,
         { status: 409 },
       );
+    }
+
+    // B3 — ne jamais wiper silencieusement des résultats de flight existants.
+    const flightHasProgress = (matches ?? []).some(
+      (m: any) =>
+        m.flight_id &&
+        (m.status !== "scheduled" || m.score_a != null || m.score_b != null),
+    );
+    if (flightHasProgress && !data.force) {
+      throw new Response("FLIGHTS_ALREADY_STARTED", { status: 409 });
     }
 
     // Pour chaque Flight : qualifier les équipes puis générer le bracket

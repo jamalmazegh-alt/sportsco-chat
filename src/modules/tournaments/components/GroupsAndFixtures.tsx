@@ -289,15 +289,33 @@ export function GroupsAndFixtures({
   });
 
   const genKnockout = useMutation({
-    mutationFn: () =>
+    mutationFn: (force: boolean = false) =>
       genKnockoutFn({
-        data: { tournament_id: tournamentId, third_place: thirdPlace },
+        data: { tournament_id: tournamentId, third_place: thirdPlace, force },
       }),
     onSuccess: (res) => {
       toast.success(t("groups.bracketCreatedToast", { count: res.matches_created }));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? t("common.error")),
+    onError: (e: any) => {
+      const msg = String(e?.message ?? "");
+      // B3 — backstop : régénérer une phase finale avec résultats exige une
+      // confirmation forte (le serveur refuse sinon via 409).
+      if (msg.includes("FINALS_ALREADY_STARTED")) {
+        if (
+          window.confirm(
+            t("groups.regenFinalsConfirm", {
+              defaultValue:
+                "La phase finale a déjà des résultats. Régénérer EFFACERA tous ces résultats. Continuer ?",
+            }),
+          )
+        ) {
+          genKnockout.mutate(true);
+        }
+        return;
+      }
+      toast.error(e?.message ?? t("common.error"));
+    },
   });
 
   const saveSettings = useMutation({
@@ -763,8 +781,10 @@ export function GroupsAndFixtures({
         cancelLabel={t("draw.cancel")}
         confirmLabel={t("groups.bracketConfirmAction")}
         loading={genKnockout.isPending}
-        onConfirm={async () => {
-          await genKnockout.mutateAsync();
+        onConfirm={() => {
+          // mutate (not mutateAsync) — l'éventuel 409 est géré dans onError
+          // (confirmation forte), sans rejet non géré ici.
+          genKnockout.mutate(false);
           setGenBracketOpen(false);
         }}
       />
