@@ -224,6 +224,7 @@ export function GroupsAndFixtures({
   const qc = useQueryClient();
   const [drawOpen, setDrawOpen] = useState(false);
   const [regenGroupsOpen, setRegenGroupsOpen] = useState(false);
+  const [poolEditorOpen, setPoolEditorOpen] = useState(false);
   const [genBracketOpen, setGenBracketOpen] = useState(false);
 
   const [numGroups, setNumGroups] = useState(() =>
