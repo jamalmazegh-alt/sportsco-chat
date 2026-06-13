@@ -65,6 +65,18 @@ describe("computeContinueAction — priority order", () => {
     expect(action.kind).toBe("publish_tournament");
   });
 
+  // Fix D edge — a draft must never be left without a publish path. Publishing
+  // is not gated on the team count (draft → publish wins over add_team).
+  it.each([0, 1])(
+    "still proposes publish for a draft with only %i team(s)",
+    (teamsCount) => {
+      const action = computeContinueAction(
+        args({ teamsCount, tournament: { status: "draft", format: "groups_knockout" } }),
+      );
+      expect(action.kind).toBe("publish_tournament");
+    },
+  );
+
   it("2) run_draw when pools expected and no group generated", () => {
     expect(computeContinueAction(args({ teamsCount: 8 })).kind).toBe("run_draw");
   });
@@ -168,6 +180,27 @@ describe("countMatches / findNextScoreMatch", () => {
       match({ id: "m1", status: "scheduled", scheduled_at: "2026-06-13T10:00:00Z" }),
       match({ id: "m2", status: "scheduled", scheduled_at: "2026-06-13T09:00:00Z" }),
     ]);
+    expect(next?.id).toBe("m2");
+  });
+
+  // Fix G — once every match has a score, there is no "next match" to chain to.
+  it("returns null when all matches are already played (no next match)", () => {
+    expect(
+      findNextScoreMatch([
+        match({ id: "m1", status: "completed", score_a: 2, score_b: 1 }),
+        match({ id: "m2", status: "completed", score_a: 0, score_b: 0 }),
+      ]),
+    ).toBeNull();
+  });
+
+  // Fix G — chaining excludes the just-saved match to surface the following one.
+  it("excluding the saved match yields the next unplayed one", () => {
+    const all = [
+      match({ id: "m1", status: "live", score_a: 0, score_b: 0 }),
+      match({ id: "m2", status: "scheduled", scheduled_at: "2026-06-13T09:00:00Z" }),
+      match({ id: "m3", status: "scheduled", scheduled_at: "2026-06-13T10:00:00Z" }),
+    ];
+    const next = findNextScoreMatch(all.filter((m) => m.id !== "m1"));
     expect(next?.id).toBe("m2");
   });
 });

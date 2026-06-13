@@ -800,6 +800,8 @@
     "statusUpdated": "Statut mis à jour",
     "matchStatusUpdated": "Statut du match mis à jour",
     "scoreSavedValidated": "Score enregistré et validé",
+    "nextMatch": "Match suivant",
+    "allMatchesEntered": "Tous les matchs sont saisis.",
     "errorGeneric": "Erreur",
     "validate": "Valider le score",
     "unvalidate": "Dévalider",
@@ -1058,6 +1060,12 @@
     "noGroups": "Crée d'abord la phase de poules. Les Flights se génèrent après.",
     "savedToast": "Flights enregistrés",
     "generatedToast": "{{n}} matchs créés",
+    "fallback": {
+      "title": "Ce format ne permet pas la génération automatique des 3 flights",
+      "body": "La structure des poules (effectifs irréguliers ou trop petits) ne se répartit pas proprement en Champions / Europa / Conference. Choisis un template Consolante / Médailles / Coupe-Plaque, ou personnalise les flights manuellement.",
+      "empty": "Aucun bracket généré : la structure ne qualifie pas assez d'équipes par flight. Ajuste la répartition, utilise un template de repli (Consolante / Médailles) ou configure les flights manuellement.",
+      "error": "Génération impossible pour cette structure. Réessaie avec un autre template ou en mode manuel."
+    },
     "rulesCount": "règles",
     "thirdPlace": "3e place",
     "fifthPlace": "5e place",

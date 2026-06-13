@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Trophy, Loader2, Plus, X, Wand2, PlayCircle } from "lucide-react";
+import { Trophy, Loader2, Plus, X, Wand2, PlayCircle, AlertTriangle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import {
 import {
   proposeFlightDistributions,
   defaultQualificationRules,
+  canAutoGenerateChampions,
   type QualRule,
 } from "../lib/flights";
 import {
@@ -87,6 +88,14 @@ export function FlightsManager({
   const distributions = useMemo(
     () => proposeFlightDistributions(numTeams),
     [numTeams],
+  );
+
+  // Fix F — le format "Champions" (3 flights) n'est pas toujours applicable
+  // (poules irrégulières, trop petites, une seule poule). On informe alors
+  // l'organisateur et on l'oriente vers les templates de repli / le mode manuel.
+  const championsApplicable = useMemo(
+    () => canAutoGenerateChampions(numTeams, numGroups),
+    [numTeams, numGroups],
   );
 
   const applyDistribution = (sizes: number[]) => {
@@ -187,15 +196,35 @@ export function FlightsManager({
   const generate = useMutation({
     mutationFn: () => genFn({ data: { tournament_id: tournamentId } }),
     onSuccess: (res: any) => {
-      toast.success(
-        t("flights.generatedToast", {
-          defaultValue: "{{n}} matchs créés",
-          n: res?.created ?? 0,
-        }),
-      );
+      const created = res?.created ?? 0;
+      if (created === 0) {
+        // Fix F — aucun bracket généré : la répartition ne permet pas de
+        // qualifier ≥ 2 équipes par flight. On l'explique au lieu d'un
+        // discret "0 matchs créés" et on oriente vers un autre template.
+        toast.warning(
+          t("flights.fallback.empty", {
+            defaultValue:
+              "Aucun bracket généré : la structure ne qualifie pas assez d'équipes par flight. Ajuste la répartition, utilise un template de repli (Consolante / Médailles) ou configure les flights manuellement.",
+          }),
+        );
+      } else {
+        toast.success(
+          t("flights.generatedToast", {
+            defaultValue: "{{n}} matchs créés",
+            n: created,
+          }),
+        );
+      }
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? "Error"),
+    onError: (e: any) =>
+      toast.error(
+        e?.message ??
+          t("flights.fallback.error", {
+            defaultValue:
+              "Génération impossible pour cette structure. Réessaie avec un autre template ou en mode manuel.",
+          }),
+      ),
   });
 
   if (!hasGroups) {
@@ -318,6 +347,27 @@ export function FlightsManager({
                 </button>
               ))}
             </div>
+
+            {/* Fix F — message de repli si "Champions" non applicable */}
+            {template === "champions" && !championsApplicable && (
+              <div className="mt-3 flex items-start gap-3 rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-950/20 p-3">
+                <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                    {t("flights.fallback.title", {
+                      defaultValue:
+                        "Ce format ne permet pas la génération automatique des 3 flights",
+                    })}
+                  </p>
+                  <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5">
+                    {t("flights.fallback.body", {
+                      defaultValue:
+                        "La structure des poules (effectifs irréguliers ou trop petits) ne se répartit pas proprement en Champions / Europa / Conference. Choisis un template Consolante / Médailles / Coupe-Plaque, ou personnalise les flights manuellement.",
+                    })}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
 

@@ -5,9 +5,34 @@ import {
   qualifyTeamsToFlight,
   generateFlightBracket,
   computeOverallStandings,
+  canAutoGenerateChampions,
   type GroupStandingInput,
   type QualRule,
 } from "@/modules/tournaments/lib/flights";
+
+describe("canAutoGenerateChampions (Fix F applicability)", () => {
+  it("is applicable for regular structures with ≥3 teams per group", () => {
+    expect(canAutoGenerateChampions(8, 2)).toBe(true); // 2 poules × 4
+    expect(canAutoGenerateChampions(9, 3)).toBe(true); // 3 poules × 3
+    expect(canAutoGenerateChampions(16, 4)).toBe(true); // 4 poules × 4
+    expect(canAutoGenerateChampions(20, 5)).toBe(true); // 5 poules × 4
+  });
+
+  it("is NOT applicable for irregular group sizes", () => {
+    expect(canAutoGenerateChampions(10, 3)).toBe(false); // 10/3 non entier
+    expect(canAutoGenerateChampions(14, 4)).toBe(false); // 14/4 non entier
+  });
+
+  it("is NOT applicable when groups are too small (<3 per group)", () => {
+    expect(canAutoGenerateChampions(6, 3)).toBe(false); // 3 poules × 2
+    expect(canAutoGenerateChampions(4, 2)).toBe(false); // 2 poules × 2
+  });
+
+  it("is NOT applicable with a single group", () => {
+    expect(canAutoGenerateChampions(8, 1)).toBe(false);
+    expect(canAutoGenerateChampions(8, 0)).toBe(false);
+  });
+});
 
 describe("proposeFlightDistributions", () => {
   it("handles 12 teams with clean powers of 2", () => {

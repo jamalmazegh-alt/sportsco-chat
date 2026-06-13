@@ -267,8 +267,48 @@ function TournamentDetailPage() {
         <TournamentStepper steps={stepper} />
       </header>
 
-      {/* ─── Banners (publish workflow, club banner, registrations off) ─── */}
-      <div className="px-5 space-y-3">
+      {/* ─── PROCHAINE ACTION (hero) ─────────────────────────────────────── */}
+      {/* Fix D — ordre : stepper → prochaine action → compteurs → terrains.
+          Les bannières (publication, club, inscriptions) passent sous ce bloc. */}
+      {canManage && (
+        <div className="px-5 pt-4">
+          <ContinueCTA action={continueAction} onAction={handleContinue} variant="hero" />
+        </div>
+      )}
+
+      {/* ─── Counters ─────────────────────────────────────────────────── */}
+      <div className="px-5 pt-4">
+        <div className="grid grid-cols-3 gap-2">
+          <Counter
+            label={t("controlCenter.counters.done", { defaultValue: "Terminés" })}
+            value={counters.done}
+            tone="emerald"
+          />
+          <Counter
+            label={t("controlCenter.counters.live", { defaultValue: "En cours" })}
+            value={counters.live}
+            tone="orange"
+          />
+          <Counter
+            label={t("controlCenter.counters.upcoming", { defaultValue: "À venir" })}
+            value={counters.upcoming}
+            tone="muted"
+          />
+        </div>
+      </div>
+
+      {/* ─── Live courts ─────────────────────────────────────────────────── */}
+      <div className="px-5 pt-5">
+        <LiveCourts
+          matches={matches as any[]}
+          teams={teams as any[]}
+          onSelect={canManage ? focusMatch : undefined}
+        />
+      </div>
+
+      {/* ─── Banners (publish workflow, club banner, registrations off) ─────
+          Fix D — déplacées sous la prochaine action / compteurs / terrains. */}
+      <div className="px-5 pt-5 space-y-3">
         {canManage && (
           <PublishWorkflow
             tournament={tournament as any}
@@ -280,7 +320,6 @@ function TournamentDetailPage() {
             }
             publicUrl={publicUrl}
             busy={publish.isPending}
-            onPublish={() => publish.mutate("published")}
             onStart={() => publish.mutate("in_progress")}
             onClose={() => publish.mutate("completed")}
           />
@@ -320,43 +359,6 @@ function TournamentDetailPage() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* ─── PROCHAINE ACTION (hero) ─────────────────────────────────────── */}
-      {canManage && (
-        <div className="px-5 pt-4">
-          <ContinueCTA action={continueAction} onAction={handleContinue} variant="hero" />
-        </div>
-      )}
-
-      {/* ─── Counters ─────────────────────────────────────────────────── */}
-      <div className="px-5 pt-4">
-        <div className="grid grid-cols-3 gap-2">
-          <Counter
-            label={t("controlCenter.counters.done", { defaultValue: "Terminés" })}
-            value={counters.done}
-            tone="emerald"
-          />
-          <Counter
-            label={t("controlCenter.counters.live", { defaultValue: "En cours" })}
-            value={counters.live}
-            tone="orange"
-          />
-          <Counter
-            label={t("controlCenter.counters.upcoming", { defaultValue: "À venir" })}
-            value={counters.upcoming}
-            tone="muted"
-          />
-        </div>
-      </div>
-
-      {/* ─── Live courts ─────────────────────────────────────────────────── */}
-      <div className="px-5 pt-5">
-        <LiveCourts
-          matches={matches as any[]}
-          teams={teams as any[]}
-          onSelect={canManage ? focusMatch : undefined}
-        />
       </div>
 
       {/* ─── Publish programme card (existing) ───────────────────────────── */}

@@ -800,6 +800,8 @@
     "statusUpdated": "Stato aggiornato",
     "matchStatusUpdated": "Stato della partita aggiornato",
     "scoreSavedValidated": "Risultato salvato e confermato",
+    "nextMatch": "Partita successiva",
+    "allMatchesEntered": "Tutte le partite sono state inserite.",
     "errorGeneric": "Errore",
     "validate": "Conferma risultato",
     "unvalidate": "Annulla conferma",
@@ -1058,6 +1060,12 @@
     "noGroups": "Crea prima la fase a gironi. I Flights si generano dopo.",
     "savedToast": "Flights salvati",
     "generatedToast": "{{n}} partite create",
+    "fallback": {
+      "title": "Questo formato non consente la generazione automatica dei 3 flight",
+      "body": "La struttura dei gironi (irregolare o troppo piccola) non si suddivide in modo pulito in Champions / Europa / Conference. Scegli un template Consolazione / Medaglie / Coppa-Piatto, oppure personalizza i flight manualmente.",
+      "empty": "Nessun tabellone generato: la struttura non qualifica abbastanza squadre per flight. Modifica la ripartizione, usa un template di ripiego (Consolazione / Medaglie) o configura i flight manualmente.",
+      "error": "Generazione impossibile per questa struttura. Riprova con un altro template o in modalità manuale."
+    },
     "rulesCount": "regole",
     "thirdPlace": "3º posto",
     "fifthPlace": "5º posto",

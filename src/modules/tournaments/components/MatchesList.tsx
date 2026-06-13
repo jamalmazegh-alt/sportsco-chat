@@ -64,6 +64,7 @@ import {
 
 import type { ScoringRules, SetScore } from "../lib/formats";
 import { aggregateSetsScore, formatSets, DEFAULT_SETS_RULES } from "../lib/formats";
+import { findNextScoreMatch } from "../lib/control-center";
 
 interface Team {
   id: string;
@@ -126,6 +127,12 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
   const { user } = useAuth();
   const currentUserId = user?.id ?? null;
   const teamMap = new Map(teams.map((t) => [t.id, t]));
+
+  // Fix G — chain score entry to the next unplayed match (live-first, then
+  // chronological) reusing findNextScoreMatch from the control-center helpers.
+  const [chainMatchId, setChainMatchId] = useState<string | null>(null);
+  const nextUnplayedAfter = (currentId: string): string | null =>
+    findNextScoreMatch(matches.filter((m) => m.id !== currentId))?.id ?? null;
 
   const listFn = useServerFn(listMatchEvents);
   const eventsQ = useQuery({
@@ -214,8 +221,13 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
                 events={eventsByMatch.get(m.id) ?? []}
                 scoring={scoring}
                 refereeOptions={refereeOptions}
-                autoOpen={autoOpenMatchId === m.id}
-                onAutoOpenConsumed={onAutoOpenConsumed}
+                autoOpen={autoOpenMatchId === m.id || chainMatchId === m.id}
+                onAutoOpenConsumed={() => {
+                  if (chainMatchId === m.id) setChainMatchId(null);
+                  if (autoOpenMatchId === m.id) onAutoOpenConsumed?.();
+                }}
+                nextMatchId={nextUnplayedAfter(m.id)}
+                onAdvanceToNext={(id) => setChainMatchId(id)}
               />
             ))}
           </ul>
@@ -272,6 +284,8 @@ function MatchCard({
   refereeOptions,
   autoOpen,
   onAutoOpenConsumed,
+  nextMatchId,
+  onAdvanceToNext,
 }: {
   match: Match;
   tournamentId: string;
@@ -284,11 +298,15 @@ function MatchCard({
   refereeOptions: RefereeOption[];
   autoOpen?: boolean;
   onAutoOpenConsumed?: () => void;
+  /** Fix G — id of the next unplayed match, to chain score entry. */
+  nextMatchId?: string | null;
+  onAdvanceToNext?: (id: string) => void;
 }) {
   const { t } = useTranslation("tournaments");
   const setsMode = scoring?.mode === "sets";
   const setsRules = scoring?.sets ?? DEFAULT_SETS_RULES;
   const [open, setOpen] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [a, setA] = useState(match.score_a ?? 0);
   const [b, setB] = useState(match.score_b ?? 0);
@@ -305,6 +323,7 @@ function MatchCard({
   // Sprint 1 — Continue CTA can request to open the score dialog directly.
   useEffect(() => {
     if (!autoOpen || !canManage || !teamA || !teamB) return;
+    setJustSaved(false);
     setOpen(true);
     cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     onAutoOpenConsumed?.();
@@ -365,7 +384,9 @@ function MatchCard({
     onSuccess: () => {
       toast.success(t("matches.scoreSavedValidated"));
       invalidateAll();
-      setOpen(false);
+      // Fix G — keep the dialog open on a success state so the organizer can
+      // chain straight into the next match ("Match suivant →") or close.
+      setJustSaved(true);
     },
     onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
@@ -1081,7 +1102,14 @@ function MatchCard({
 
 
 
-      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("matches.title")}>
+      <ResponsiveFormDialog
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o);
+          if (!o) setJustSaved(false);
+        }}
+        title={t("matches.title")}
+      >
         <div className="space-y-4 mt-4 pb-6">
           {validated && (
             <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 px-3 py-2.5 flex items-start gap-2">
@@ -1239,6 +1267,42 @@ function MatchCard({
               )}
               {t("matches.unvalidateToEdit", { defaultValue: "Dévalider pour modifier" })}
             </Button>
+          ) : justSaved ? (
+            <div className="space-y-2">
+              <p className="flex items-center justify-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                <Check className="h-4 w-4" />
+                {t("matches.scoreSavedValidated")}
+              </p>
+              {nextMatchId ? (
+                <Button
+                  onClick={() => {
+                    setOpen(false);
+                    setJustSaved(false);
+                    onAdvanceToNext?.(nextMatchId);
+                  }}
+                  className="w-full h-12"
+                >
+                  <Zap className="h-4 w-4" />
+                  {t("matches.nextMatch", { defaultValue: "Match suivant" })}
+                </Button>
+              ) : (
+                <p className="text-center text-xs text-muted-foreground">
+                  {t("matches.allMatchesEntered", {
+                    defaultValue: "Tous les matchs sont saisis.",
+                  })}
+                </p>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setOpen(false);
+                  setJustSaved(false);
+                }}
+                className="w-full h-11"
+              >
+                {t("common.close", { defaultValue: "Fermer" })}
+              </Button>
+            </div>
           ) : (
             <Button
               onClick={() => save.mutate()}
