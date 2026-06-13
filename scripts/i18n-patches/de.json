@@ -17,11 +17,13 @@
     "terrainNaming": "Jetzt benennen oder später.",
     "terrainNames": "Jedem Platz einen Namen geben.",
     "paid": "Kostenpflichtige oder kostenlose Anmeldung?",
-    "paidAmount": "Gebühr pro Team.",
+    "paidAmount": "Wähle einen Preis oder gib einen eigenen ein.",
     "name": "Name auf der öffentlichen Seite.",
     "date": "Wann findet das Turnier statt?",
     "location": "Adresse oder Stadt des Austragungsorts.",
-    "summary": "Alles bereit. Prüfen, Zeiten simulieren, dann erstellen."
+    "summary": "Alles bereit. Tippe eine Zeile zum Bearbeiten und erstelle.",
+    "breaks": "Pause zwischen Spielen und Mittagspause — alles auf einem Bildschirm.",
+    "fairPlay": "Karten-Bonus/Malus zur Entscheidung bei Punktgleichheit."
   },
   "questionLabel": "Frage {{n}}",
   "tapHint": "Antwort antippen — der Assistent macht automatisch weiter",
@@ -39,11 +41,13 @@
     "pools6x4": "6 Gruppen à 4",
     "pools8x4": "8 Gruppen à 4",
     "flights_champions": "Champions · Europa · Conference",
-    "flights_simple": "Haupt · Trost"
+    "flights_simple": "Haupt · Trost",
+    "lunch": "Mittag {{range}}",
+    "fairPlay": "Fair Play"
   },
   "summary": {
     "title": "Bereit zum Erstellen 🎉",
-    "subtitle": "Alles konfiguriert — kein einziges Menü geöffnet.",
+    "subtitle": "Tippe eine Zeile zum Bearbeiten — du kommst direkt hierher zurück.",
     "editAnswer": "Antwort ändern",
     "sport": "Sport & Format",
     "teams": "Teams",
@@ -69,7 +73,9 @@
   "q": {
     "pause": "Pause zwischen Spielen?",
     "terrainNaming": "Plätze benennen?",
-    "terrainNames": "Name jedes Platzes"
+    "terrainNames": "Name jedes Platzes",
+    "breaks": "Pausen und Mittagessen",
+    "fairPlay": "Fair Play aktivieren?"
   },
   "opts": {
     "poolsFinalsHint": "Am häufigsten",
@@ -82,6 +88,15 @@
     "terrainNamingNow": "Jetzt benennen",
     "terrainNamingNowHint": "Zentral, Platz A…",
     "terrainNamingLater": "Später",
-    "terrainNamingLaterHint": "Platz 1, 2, 3…"
+    "terrainNamingLaterHint": "Platz 1, 2, 3…",
+    "pauseLabel": "Pause zwischen Spielen (min)",
+    "lunchLabel": "Mittagspause",
+    "lunchStart": "Beginn",
+    "lunchEnd": "Ende",
+    "lunchAdd": "+ Mittagspause hinzufügen",
+    "priceCustom": "Oder ein anderer Betrag:",
+    "lunch0": "Keine Pause",
+    "fairPlayYes": "Ja, mit Bonus/Malus",
+    "fairPlayNo": "Nein, kein Fair Play"
   }
 }

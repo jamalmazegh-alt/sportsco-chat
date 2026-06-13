@@ -17,11 +17,13 @@
     "terrainNaming": "Nominali ora o più tardi.",
     "terrainNames": "Dai un nome a ogni campo.",
     "paid": "Iscrizione a pagamento o gratuita?",
-    "paidAmount": "Quota per squadra.",
+    "paidAmount": "Scegli un importo o inserisci il tuo.",
     "name": "Nome mostrato sulla pagina pubblica.",
     "date": "Quando si svolge il torneo?",
     "location": "Indirizzo o città della struttura.",
-    "summary": "Tutto pronto. Controlla, simula gli orari se vuoi e crea."
+    "summary": "Tutto pronto. Tocca una riga per modificarla, poi crea.",
+    "breaks": "Pausa tra partite e finestra pranzo — tutto in una schermata.",
+    "fairPlay": "Bonus/malus cartellini come spareggio."
   },
   "questionLabel": "Domanda {{n}}",
   "tapHint": "Tocca una risposta — l'assistente prosegue da solo",
@@ -39,11 +41,13 @@
     "pools6x4": "6 gironi da 4",
     "pools8x4": "8 gironi da 4",
     "flights_champions": "Champions · Europa · Conference",
-    "flights_simple": "Principale · Consolazione"
+    "flights_simple": "Principale · Consolazione",
+    "lunch": "pranzo {{range}}",
+    "fairPlay": "fair play"
   },
   "summary": {
     "title": "Pronto per creare 🎉",
-    "subtitle": "Tutto configurato — senza aprire un solo menu.",
+    "subtitle": "Tocca una riga per modificarla — torni subito qui.",
     "editAnswer": "Modifica una risposta",
     "sport": "Sport e formato",
     "teams": "Squadre",
@@ -69,7 +73,9 @@
   "q": {
     "pause": "Pausa tra le partite?",
     "terrainNaming": "Nominare i campi?",
-    "terrainNames": "Nome di ogni campo"
+    "terrainNames": "Nome di ogni campo",
+    "breaks": "Pause e pranzo",
+    "fairPlay": "Attivare il fair play?"
   },
   "opts": {
     "poolsFinalsHint": "Il più comune",
@@ -82,6 +88,15 @@
     "terrainNamingNow": "Nominali ora",
     "terrainNamingNowHint": "Centrale, Campo A…",
     "terrainNamingLater": "Più tardi",
-    "terrainNamingLaterHint": "Campo 1, 2, 3…"
+    "terrainNamingLaterHint": "Campo 1, 2, 3…",
+    "pauseLabel": "Pausa tra partite (min)",
+    "lunchLabel": "Pausa pranzo",
+    "lunchStart": "Inizio",
+    "lunchEnd": "Fine",
+    "lunchAdd": "+ Aggiungi pausa pranzo",
+    "priceCustom": "Oppure un altro importo:",
+    "lunch0": "Nessuna pausa",
+    "fairPlayYes": "Sì, con bonus/malus",
+    "fairPlayNo": "No, senza fair play"
   }
 }
