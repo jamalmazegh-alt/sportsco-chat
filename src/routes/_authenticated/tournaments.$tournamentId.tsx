@@ -481,10 +481,14 @@ function TournamentDetailPage() {
             teamsCount={teams.length}
             matchesCount={matches.length}
             fieldsCount={
-              // settings.fields is jsonb — probe defensively.
-              Array.isArray((tournament.settings as { fields?: unknown } | null)?.fields)
-                ? ((tournament.settings as { fields?: unknown }).fields as unknown[]).length
-                : 0
+              // B-05 — fields live in the top-level `fields` column
+              // (saveSettings/wizard write there). Keep the legacy
+              // settings.fields probe as a fallback for older rows.
+              Array.isArray(tournament.fields)
+                ? (tournament.fields as unknown[]).length
+                : Array.isArray((tournament.settings as { fields?: unknown } | null)?.fields)
+                  ? ((tournament.settings as { fields?: unknown }).fields as unknown[]).length
+                  : 0
             }
             publicUrl={publicUrl}
             busy={publish.isPending}

@@ -91,7 +91,10 @@ export function DrawDialog({
 
   const [mode, setMode] = useState<DrawMode>("auto");
   const [numGroups, setNumGroups] = useState(Math.max(2, Math.min(4, Math.floor(teams.length / 2) || 2)));
+  // B-03 — keep raw string buffers so users can clear the input freely.
+  const [numGroupsRaw, setNumGroupsRaw] = useState(String(Math.max(2, Math.min(4, Math.floor(teams.length / 2) || 2))));
   const [qualifiers, setQualifiers] = useState(2);
+  const [qualifiersRaw, setQualifiersRaw] = useState("2");
   const [thirdPlace, setThirdPlace] = useState(false);
 
   // Animation state
@@ -348,12 +351,23 @@ export function DrawDialog({
                       <Label>{t("draw.numGroups")}</Label>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         min={1}
                         max={Math.min(16, Math.floor(teams.length / 2))}
-                        value={numGroups}
-                        onChange={(e) =>
-                          setNumGroups(Math.max(1, parseInt(e.target.value || "1", 10)))
-                        }
+                        value={numGroupsRaw}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setNumGroupsRaw(v);
+                          const n = parseInt(v, 10);
+                          if (Number.isFinite(n) && n >= 1) setNumGroups(n);
+                        }}
+                        onBlur={() => {
+                          const n = parseInt(numGroupsRaw, 10);
+                          const maxN = Math.min(16, Math.max(1, Math.floor(teams.length / 2)));
+                          const clamped = Number.isFinite(n) ? Math.min(maxN, Math.max(1, n)) : 1;
+                          setNumGroups(clamped);
+                          setNumGroupsRaw(String(clamped));
+                        }}
                         disabled={drawing}
                       />
                     </div>
@@ -361,12 +375,22 @@ export function DrawDialog({
                       <Label>{t("draw.qualifiersPerGroup")}</Label>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         min={1}
                         max={8}
-                        value={qualifiers}
-                        onChange={(e) =>
-                          setQualifiers(Math.max(1, parseInt(e.target.value || "1", 10)))
-                        }
+                        value={qualifiersRaw}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setQualifiersRaw(v);
+                          const n = parseInt(v, 10);
+                          if (Number.isFinite(n) && n >= 1) setQualifiers(n);
+                        }}
+                        onBlur={() => {
+                          const n = parseInt(qualifiersRaw, 10);
+                          const clamped = Number.isFinite(n) ? Math.min(8, Math.max(1, n)) : 1;
+                          setQualifiers(clamped);
+                          setQualifiersRaw(String(clamped));
+                        }}
                         disabled={drawing}
                       />
                     </div>
@@ -416,21 +440,35 @@ export function DrawDialog({
                   <p className="text-sm text-muted-foreground">
                     {t("draw.autoDesc")}
                   </p>
-                  <Button
-                    onClick={() => maybeConfirm(runAuto)}
-                    disabled={applyMut.isPending}
-                    className="w-full"
-                  >
-                    {applyMut.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" />
-                        {t("draw.launch")}
-                      </>
-                    )}
-                  </Button>
+                  {/* B-04 — once the draw is done, hide the green CTA. The
+                      footer "Relancer" (outline + confirm sheet) is the only
+                      way to re-roll, with strong confirmation. */}
+                  {!finished ? (
+                    <Button
+                      onClick={() => maybeConfirm(runAuto)}
+                      disabled={applyMut.isPending || tournamentStarted}
+                      className="w-full"
+                      variant={hasExistingDraw ? "outline" : "default"}
+                    >
+                      {applyMut.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          {hasExistingDraw ? t("draw.relaunch") : t("draw.launch")}
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      {t("draw.relaunchFromFooterHint", {
+                        defaultValue:
+                          'Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus).',
+                      })}
+                    </p>
+                  )}
                 </TabsContent>
+
 
                 {/* PROGRESSIVE */}
                 <TabsContent value="progressive" className="space-y-3">
@@ -441,12 +479,20 @@ export function DrawDialog({
                   {!drawing && revealed.length === 0 && !finished && (
                     <Button
                       onClick={() => maybeConfirm(startProgressive)}
-                      disabled={applyMut.isPending}
+                      disabled={applyMut.isPending || tournamentStarted}
                       className="w-full"
+                      variant={hasExistingDraw ? "outline" : "default"}
                     >
                       <Shuffle className="h-4 w-4" />
-                      {t("draw.launch")}
+                      {hasExistingDraw ? t("draw.relaunch") : t("draw.launch")}
                     </Button>
+                  )}
+                  {/* B-04 — once finished, the launch CTA is hidden; use the
+                      footer Relancer button (with confirm sheet) instead. */}
+                  {finished && !drawing && (
+                    <p className="text-xs text-muted-foreground italic">
+                      {t("draw.relaunchFromFooterHint", { defaultValue: '' })}
+                    </p>
                   )}
 
 
@@ -596,20 +642,25 @@ export function DrawDialog({
                       </div>
                     ))}
                   </div>
-                  <Button
-                    onClick={() => maybeConfirm(runManual)}
-                    disabled={applyMut.isPending}
-                    className="w-full"
-                  >
-                    {applyMut.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Hand className="h-4 w-4" />
-                        {t("draw.validateManual")}
-                      </>
-                    )}
-                  </Button>
+                  {/* B-04 — hide the manual validate CTA after success; force
+                      the user through the footer Relancer + confirm flow. */}
+                  {!finished && (
+                    <Button
+                      onClick={() => maybeConfirm(runManual)}
+                      disabled={applyMut.isPending || tournamentStarted}
+                      className="w-full"
+                      variant={hasExistingDraw ? "outline" : "default"}
+                    >
+                      {applyMut.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Hand className="h-4 w-4" />
+                          {hasExistingDraw ? t("draw.relaunch") : t("draw.validateManual")}
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </TabsContent>
 
               </Tabs>

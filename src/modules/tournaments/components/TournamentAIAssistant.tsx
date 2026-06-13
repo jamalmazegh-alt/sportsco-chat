@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   assistantStepOrder,
   buildSchedulePreview,
+  clearAssistantDraft,
   configToCreatePayload,
   defaultMatchDuration,
   defaultPlayersPerTeam,
@@ -22,8 +23,10 @@ import {
   MATCH_DURATION_PRESETS,
   PAUSE_PRESETS,
   playersPerTeamOptions,
+  readAssistantDraft,
   TEAM_COUNT_PRESETS,
   TERRAIN_PRESETS,
+  writeAssistantDraft,
   type AssistantStepId,
   type AssistantTournamentConfig,
 } from "../lib/assistant-config";
@@ -60,8 +63,12 @@ export function TournamentAIAssistant({
   const updateFn = useServerFn(updateTournament);
   const paymentFn = useServerFn(updateTournamentPaymentSettings);
 
-  const [config, setConfig] = useState<AssistantTournamentConfig>(() =>
-    emptyConfig(
+  // B-01 — hydrate from sessionStorage so reopening the wizard never loses
+  // the user's answers. Falls back to a fresh config seeded with `defaultSport`.
+  const [config, setConfig] = useState<AssistantTournamentConfig>(() => {
+    const draft = readAssistantDraft();
+    if (draft?.config) return draft.config;
+    return emptyConfig(
       defaultSport
         ? {
             sport: defaultSport,
@@ -72,14 +79,20 @@ export function TournamentAIAssistant({
             ),
           }
         : undefined,
-    ),
-  );
-  const [stepIdx, setStepIdx] = useState(0);
+    );
+  });
+  const [stepIdx, setStepIdx] = useState(() => readAssistantDraft()?.stepIdx ?? 0);
   const [customTeams, setCustomTeams] = useState("");
   const [customDuration, setCustomDuration] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [showSim, setShowSim] = useState(false);
   const [showExpertSheet, setShowExpertSheet] = useState(false);
+
+  // B-01 — persist the draft on every change so croix/back/refresh never erase
+  // user answers. Cleared explicitly on successful create or abandon-confirm.
+  useEffect(() => {
+    writeAssistantDraft({ config, stepIdx, savedAt: Date.now() });
+  }, [config, stepIdx]);
 
   const steps = useMemo(() => {
     const order = assistantStepOrder(config);
@@ -258,6 +271,9 @@ export function TournamentAIAssistant({
       return res;
     },
     onSuccess: (res) => {
+      // B-01 — draft consumed: clear the persisted answers so a fresh wizard
+      // session starts blank next time.
+      clearAssistantDraft();
       toast.success(t("wizard.createdToast"));
       qc.invalidateQueries({ queryKey: ["tournaments", clubId] });
       navigate({

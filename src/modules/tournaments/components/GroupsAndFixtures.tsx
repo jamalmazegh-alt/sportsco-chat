@@ -114,6 +114,11 @@ function Stepper({
   className?: string;
 }) {
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
+  // B-03 — raw string buffer so the user can clear the input and type freely.
+  const [raw, setRaw] = useState(String(value));
+  useEffect(() => {
+    setRaw(String(value));
+  }, [value]);
   return (
     <div className={cn("space-y-1.5", className)}>
       <label className="text-[11px] font-medium text-muted-foreground block">{label}</label>
@@ -129,8 +134,19 @@ function Stepper({
         <input
           type="number"
           inputMode="numeric"
-          value={value}
-          onChange={(e) => onChange(clamp(parseInt(e.target.value || String(min), 10)))}
+          value={raw}
+          onChange={(e) => {
+            const v = e.target.value;
+            setRaw(v);
+            const n = parseInt(v, 10);
+            if (Number.isFinite(n)) onChange(clamp(n));
+          }}
+          onBlur={() => {
+            const n = parseInt(raw, 10);
+            const next = Number.isFinite(n) ? clamp(n) : min;
+            onChange(next);
+            setRaw(String(next));
+          }}
           className="flex-1 min-w-0 bg-transparent text-center text-base font-bold tabular-nums outline-none border-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
         <button
@@ -413,15 +429,27 @@ export function GroupsAndFixtures({
               <p className="text-xs text-muted-foreground">
                 {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
               </p>
-              <Button
-                onClick={() => setDrawOpen(true)}
-                disabled={numTeams < 2}
-                className="w-full h-11"
-                variant={hasExistingDraw ? "outline" : "default"}
-              >
-                <Dices className="h-4 w-4" />
-                {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
-              </Button>
+              {/* B-04 — once the tournament is in_progress/completed the draw
+                  must not be re-triggered from this surface. The dialog still
+                  exposes a confirm-protected Relancer for emergencies. */}
+              {["in_progress", "completed"].includes(status) ? (
+                <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                  {t("groups.drawLockedStarted", {
+                    defaultValue:
+                      "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats.",
+                  })}
+                </p>
+              ) : (
+                <Button
+                  onClick={() => setDrawOpen(true)}
+                  disabled={numTeams < 2}
+                  className="w-full h-11"
+                  variant={hasExistingDraw ? "outline" : "default"}
+                >
+                  <Dices className="h-4 w-4" />
+                  {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
+                </Button>
+              )}
             </Block>
 
             <DrawDialog

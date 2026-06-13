@@ -119,6 +119,70 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
   };
 }
 
+/**
+ * B-01 — sessionStorage draft helpers.
+ * The wizard persists `{ config, stepIdx }` so closing the dialog (croix,
+ * navigation) never erases the user's answers; reopening rehydrates them.
+ * Cleared on successful tournament creation, on explicit "Recommencer", or
+ * when the user confirms an abandon.
+ */
+export const ASSISTANT_DRAFT_KEY = "clubero:wizard:ai-draft";
+
+export interface AssistantDraft {
+  config: AssistantTournamentConfig;
+  stepIdx: number;
+  savedAt: number;
+}
+
+export function readAssistantDraft(): AssistantDraft | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(ASSISTANT_DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as AssistantDraft;
+    if (!parsed || typeof parsed !== "object" || !parsed.config) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function writeAssistantDraft(draft: AssistantDraft): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(ASSISTANT_DRAFT_KEY, JSON.stringify(draft));
+  } catch {
+    /* quota full / private mode — silently ignore */
+  }
+}
+
+export function clearAssistantDraft(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(ASSISTANT_DRAFT_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * A draft "has progress" as soon as the user moved past the first question or
+ * filled any meaningful field. Used to decide whether to prompt a confirm
+ * before closing the dialog.
+ */
+export function draftHasProgress(draft: AssistantDraft | null): boolean {
+  if (!draft) return false;
+  if (draft.stepIdx > 0) return true;
+  const c = draft.config;
+  return (
+    !!c.name?.trim() ||
+    !!c.startsOn ||
+    !!c.location?.trim() ||
+    c.paid ||
+    c.registrationFeeCents > 0
+  );
+}
+
 /** Étapes actives selon les réponses déjà données. */
 export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): AssistantStepId[] {
   const steps: AssistantStepId[] = ["sport", "playersPerTeam", "numTeams", "scheduleFormat"];
