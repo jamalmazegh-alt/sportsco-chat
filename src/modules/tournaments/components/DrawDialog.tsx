@@ -351,12 +351,23 @@ export function DrawDialog({
                       <Label>{t("draw.numGroups")}</Label>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         min={1}
                         max={Math.min(16, Math.floor(teams.length / 2))}
-                        value={numGroups}
-                        onChange={(e) =>
-                          setNumGroups(Math.max(1, parseInt(e.target.value || "1", 10)))
-                        }
+                        value={numGroupsRaw}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setNumGroupsRaw(v);
+                          const n = parseInt(v, 10);
+                          if (Number.isFinite(n) && n >= 1) setNumGroups(n);
+                        }}
+                        onBlur={() => {
+                          const n = parseInt(numGroupsRaw, 10);
+                          const maxN = Math.min(16, Math.max(1, Math.floor(teams.length / 2)));
+                          const clamped = Number.isFinite(n) ? Math.min(maxN, Math.max(1, n)) : 1;
+                          setNumGroups(clamped);
+                          setNumGroupsRaw(String(clamped));
+                        }}
                         disabled={drawing}
                       />
                     </div>
@@ -364,12 +375,22 @@ export function DrawDialog({
                       <Label>{t("draw.qualifiersPerGroup")}</Label>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         min={1}
                         max={8}
-                        value={qualifiers}
-                        onChange={(e) =>
-                          setQualifiers(Math.max(1, parseInt(e.target.value || "1", 10)))
-                        }
+                        value={qualifiersRaw}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setQualifiersRaw(v);
+                          const n = parseInt(v, 10);
+                          if (Number.isFinite(n) && n >= 1) setQualifiers(n);
+                        }}
+                        onBlur={() => {
+                          const n = parseInt(qualifiersRaw, 10);
+                          const clamped = Number.isFinite(n) ? Math.min(8, Math.max(1, n)) : 1;
+                          setQualifiers(clamped);
+                          setQualifiersRaw(String(clamped));
+                        }}
                         disabled={drawing}
                       />
                     </div>
