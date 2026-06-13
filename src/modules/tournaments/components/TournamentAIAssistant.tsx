@@ -396,6 +396,7 @@ export function TournamentAIAssistant({
             onConfirmCustomDuration={confirmCustomDuration}
             onPause={selectPause}
             onConfirmCustomPause={confirmCustomPause}
+            onConfirmBreaks={confirmBreaks}
             onLunchDuration={selectLunchDuration}
             onFairPlay={selectFairPlay}
             onTerrains={selectTerrains}
