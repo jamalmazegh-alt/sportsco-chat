@@ -2,12 +2,53 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getGoogleMapsKey } from "@/lib/maps.functions";
 
 interface Suggestion {
   display_name: string;
-  lat: string;
-  lon: string;
-  place_id: number;
+  lat?: string;
+  lon?: string;
+  place_id: number | string;
+  source?: "google" | "osm";
+}
+
+declare global {
+  interface Window {
+    google?: any;
+    __cluberoGoogleMapsPromise?: Promise<void>;
+  }
+}
+
+let cachedMapsKeyPromise: Promise<string | null> | null = null;
+
+function fetchGoogleMapsKey(): Promise<string | null> {
+  if (!cachedMapsKeyPromise) {
+    cachedMapsKeyPromise = getGoogleMapsKey().then((res) => res.key).catch(() => null);
+  }
+  return cachedMapsKeyPromise;
+}
+
+function loadGoogleMapsPlaces(key: string | null | undefined): Promise<void> | null {
+  if (typeof window === "undefined" || !key) return null;
+  if (window.google?.maps?.places) return Promise.resolve();
+  if (!window.__cluberoGoogleMapsPromise) {
+    window.__cluberoGoogleMapsPromise = new Promise((resolve, reject) => {
+      const existing = document.querySelector<HTMLScriptElement>("script[data-clubero-google-maps]");
+      if (existing) {
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", () => reject(new Error("Google Maps load failed")), { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+      script.async = true;
+      script.dataset.cluberoGoogleMaps = "true";
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Google Maps load failed"));
+      document.head.appendChild(script);
+    });
+  }
+  return window.__cluberoGoogleMapsPromise;
 }
 
 interface Props {
@@ -26,6 +67,7 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const googleServiceRef = useRef<any>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +81,21 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
     }
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchGoogleMapsKey().then((key) => {
+      const loader = loadGoogleMapsPlaces(key);
+      loader?.then(() => {
+        if (!cancelled && window.google?.maps?.places) {
+          googleServiceRef.current = new window.google.maps.places.AutocompleteService();
+        }
+      }).catch(() => undefined);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function onInput(v: string) {
