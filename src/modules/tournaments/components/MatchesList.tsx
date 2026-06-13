@@ -372,14 +372,17 @@ function MatchDetailsSection({
         <span>{t("matches.matchDetails.title")}</span>
         {hasAny && !open && (
           <span className="ml-auto text-[10px] font-normal tabular-nums">
-            {eventSummaryBadge([...events, ...pendingEvents.map((d) => ({
-              id: d.id,
-              match_id: "",
-              team_id: d.teamId,
-              kind: d.type === "goal" ? "goal" : d.cardKind,
-              player_name: d.type === "goal" ? d.scorer : d.player,
-              minute: d.minute ? parseInt(d.minute, 10) : null,
-            }))]}
+            {eventSummaryBadge([
+              ...events,
+              ...pendingEvents.map((d) => ({
+                id: d.id,
+                match_id: "",
+                team_id: d.teamId,
+                kind: d.type === "goal" ? "goal" : d.cardKind,
+                player_name: d.type === "goal" ? d.scorer : d.player,
+                minute: d.minute ? parseInt(d.minute, 10) : null,
+              })),
+            ])}
           </span>
         )}
       </CollapsibleTrigger>
