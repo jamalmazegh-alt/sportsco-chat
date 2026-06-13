@@ -54,6 +54,22 @@ const SUPPORTED_SPORTS = [
   "rugby",
 ] as const;
 
+/** "HH:MM" → minutes */
+function parseHHMM(s: string): number {
+  const [h, m] = s.split(":").map((x) => parseInt(x, 10));
+  return (h || 0) * 60 + (m || 0);
+}
+function formatHHMM(min: number): string {
+  const safe = Math.max(0, Math.min(24 * 60 - 1, Math.round(min)));
+  return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+}
+function computeLunchEnd(start: string, durationMin: number): string {
+  return formatHHMM(parseHHMM(start) + durationMin);
+}
+function diffMinutes(start: string, end: string): number {
+  return parseHHMM(end) - parseHHMM(start);
+}
+
 export function TournamentAIAssistant({
   clubId,
   defaultSport,
