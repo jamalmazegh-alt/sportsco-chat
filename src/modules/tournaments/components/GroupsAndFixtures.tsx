@@ -429,15 +429,27 @@ export function GroupsAndFixtures({
               <p className="text-xs text-muted-foreground">
                 {numTeams < 2 ? t("groups.drawHintEmpty") : t("groups.drawHint")}
               </p>
-              <Button
-                onClick={() => setDrawOpen(true)}
-                disabled={numTeams < 2}
-                className="w-full h-11"
-                variant={hasExistingDraw ? "outline" : "default"}
-              >
-                <Dices className="h-4 w-4" />
-                {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
-              </Button>
+              {/* B-04 — once the tournament is in_progress/completed the draw
+                  must not be re-triggered from this surface. The dialog still
+                  exposes a confirm-protected Relancer for emergencies. */}
+              {["in_progress", "completed"].includes(status) ? (
+                <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                  {t("groups.drawLockedStarted", {
+                    defaultValue:
+                      "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats.",
+                  })}
+                </p>
+              ) : (
+                <Button
+                  onClick={() => setDrawOpen(true)}
+                  disabled={numTeams < 2}
+                  className="w-full h-11"
+                  variant={hasExistingDraw ? "outline" : "default"}
+                >
+                  <Dices className="h-4 w-4" />
+                  {hasExistingDraw ? t("groups.drawRelaunch") : t("groups.drawLaunch")}
+                </Button>
+              )}
             </Block>
 
             <DrawDialog
