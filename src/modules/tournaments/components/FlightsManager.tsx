@@ -563,28 +563,63 @@ function DraftEditor({
           <X className="h-4 w-4" />
         </button>
       </div>
+      {/* B9 — logique de dépendance : 7e place requiert 5e, 5e requiert 3e.
+          Décocher 3e désactive automatiquement les options dépendantes. */}
       <div className="flex flex-wrap gap-3 text-xs">
         <label className="flex items-center gap-1.5">
           <Checkbox
             checked={draft.enable_third_place}
-            onCheckedChange={(v) =>
-              onChange({ ...draft, enable_third_place: !!v })
-            }
+            onCheckedChange={(v) => {
+              const checked = !!v;
+              onChange({
+                ...draft,
+                enable_third_place: checked,
+                // Décocher 3e retire 5e et 7e (impossible sans 3e).
+                enable_fifth_place: checked ? draft.enable_fifth_place : false,
+                enable_seventh_place: checked ? draft.enable_seventh_place : false,
+              });
+            }}
           />
           {t("flights.thirdPlace", { defaultValue: "3e place" })}
         </label>
-        <label className="flex items-center gap-1.5">
+        <label
+          className={`flex items-center gap-1.5 ${!draft.enable_third_place ? "opacity-40 pointer-events-none" : ""}`}
+          title={
+            !draft.enable_third_place
+              ? t("flights.fifthPlaceDisabled", {
+                  defaultValue: "Activer la 3e place d'abord",
+                })
+              : undefined
+          }
+        >
           <Checkbox
             checked={draft.enable_fifth_place}
-            onCheckedChange={(v) =>
-              onChange({ ...draft, enable_fifth_place: !!v })
-            }
+            disabled={!draft.enable_third_place}
+            onCheckedChange={(v) => {
+              const checked = !!v;
+              onChange({
+                ...draft,
+                enable_fifth_place: checked,
+                // Décocher 5e retire 7e.
+                enable_seventh_place: checked ? draft.enable_seventh_place : false,
+              });
+            }}
           />
           {t("flights.fifthPlace", { defaultValue: "5e place" })}
         </label>
-        <label className="flex items-center gap-1.5">
+        <label
+          className={`flex items-center gap-1.5 ${!draft.enable_fifth_place ? "opacity-40 pointer-events-none" : ""}`}
+          title={
+            !draft.enable_fifth_place
+              ? t("flights.seventhPlaceDisabled", {
+                  defaultValue: "Activer la 5e place d'abord",
+                })
+              : undefined
+          }
+        >
           <Checkbox
             checked={draft.enable_seventh_place}
+            disabled={!draft.enable_fifth_place}
             onCheckedChange={(v) =>
               onChange({ ...draft, enable_seventh_place: !!v })
             }
