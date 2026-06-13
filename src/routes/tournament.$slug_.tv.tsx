@@ -559,16 +559,23 @@ function MatchesGrid({
                 : "border-border"
             }`}
           >
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <span>
-                {m.scheduled_at
-                  ? new Date(m.scheduled_at).toLocaleString(i18n.language, {
+            <div className="flex items-center justify-between text-base font-semibold text-muted-foreground">
+              <span className="inline-flex items-center gap-2">
+                {m.field && (
+                  <span className="rounded-md bg-primary/10 px-2 py-0.5 text-primary font-bold">
+                    {t("common.field")} {m.field}
+                  </span>
+                )}
+                {m.scheduled_at && (
+                  <span className="tabular-nums">
+                    {new Date(m.scheduled_at).toLocaleString(i18n.language, {
                       weekday: "short",
                       hour: "2-digit",
                       minute: "2-digit",
-                    })
-                  : "—"}
-                {m.field ? ` · ${m.field}` : ""}
+                    })}
+                  </span>
+                )}
+                {!m.field && !m.scheduled_at && "—"}
               </span>
               {live && (
                 <span className="flex items-center gap-1.5 text-red-500 font-bold uppercase tracking-wider">
@@ -582,14 +589,14 @@ function MatchesGrid({
                 </span>
               )}
             </div>
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 my-3">
-              <span className={`truncate text-right font-bold ${teamSize}`}>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 my-3">
+              <span className={`text-right font-bold leading-tight break-words ${teamSize}`}>
                 {a?.name ?? t("common.tbd")}
               </span>
               <span className={`tabular-nums font-black ${scoreSize}`}>
                 {m.score_a ?? "–"} : {m.score_b ?? "–"}
               </span>
-              <span className={`truncate font-bold ${teamSize}`}>
+              <span className={`font-bold leading-tight break-words ${teamSize}`}>
                 {b?.name ?? t("common.tbd")}
               </span>
             </div>
