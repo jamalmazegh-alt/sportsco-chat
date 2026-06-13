@@ -103,7 +103,10 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     eliminatedContinue: true,
     flightsTemplate: "champions",
     matchDurationMin: 20,
+    pauseMin: 3,
     terrains: 3,
+    terrainNaming: "later",
+    terrainNames: [],
     paid: false,
     registrationFeeCents: 0,
     registrationCurrency: "eur",
@@ -123,7 +126,9 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
     steps.push("eliminatedContinue");
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
-  steps.push("matchDuration", "terrains", "paid");
+  steps.push("matchDuration", "pause", "terrains", "terrainNaming");
+  if (cfg.terrainNaming === "now") steps.push("terrainNames");
+  steps.push("paid");
   if (cfg.paid) steps.push("paidAmount");
   steps.push("name", "date", "location", "summary");
   return steps;
