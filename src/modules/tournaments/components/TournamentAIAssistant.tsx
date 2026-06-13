@@ -1046,6 +1046,33 @@ function QuestionView(p: QuestionViewProps) {
 
         {stepId === "paidAmount" && (
           <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              {PRICE_PRESETS_EUR.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => {
+                    setPaidAmount(String(n));
+                    patch({
+                      registrationFeeCents: n * 100,
+                      registrationCurrency: config.registrationCurrency || "eur",
+                    });
+                    p.onAdvance();
+                  }}
+                  className={cn(
+                    "rounded-xl border-[1.5px] py-3 text-center text-[18px] font-extrabold transition shadow-sm",
+                    config.registrationFeeCents === n * 100
+                      ? "border-[hsl(149_50%_36%)] bg-[hsl(149_45%_92%)] text-[hsl(149_55%_25%)]"
+                      : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
+                  )}
+                >
+                  {n} €
+                </button>
+              ))}
+            </div>
+            <Label className="text-[11.5px] text-muted-foreground">
+              {t("aiAssistant.opts.priceCustom", { defaultValue: "Ou un autre montant :" })}
+            </Label>
             <div className="flex gap-2">
               <Input
                 type="number"
