@@ -30,6 +30,7 @@ import {
   autoScheduleMatches,
 } from "../tournaments.functions";
 import { DrawDialog } from "./DrawDialog";
+import { PoolEditorDialog } from "./PoolEditorDialog";
 import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 
 interface Props {
