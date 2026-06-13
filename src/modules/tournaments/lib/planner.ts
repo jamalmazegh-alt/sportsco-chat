@@ -84,7 +84,7 @@ const POOLCFG: Record<number, { pools: number; size: number }> = {
 
 const SUPPORTED_TEAM_COUNTS: readonly number[] = [8, 12, 16, 24, 32];
 
-function nearestSupportedTeams(teams: number): number {
+export function nearestSupportedTeams(teams: number): number {
   let best = SUPPORTED_TEAM_COUNTS[0];
   let bestDiff = Math.abs(teams - best);
   for (const n of SUPPORTED_TEAM_COUNTS) {

@@ -8,14 +8,15 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Calculator } from "lucide-react";
+import { Sparkles, Zap, Calculator, Settings2 } from "lucide-react";
 import { TournamentWizard } from "./TournamentWizard";
 import { TournamentAIAssistant } from "./TournamentAIAssistant";
 import { TournamentSimulator } from "./TournamentSimulator";
 import {
-  recommendationToWizardFormat,
-  type Recommendation,
-} from "../lib/planner";
+  configToWizardFormat,
+  configUsesFlights,
+  type AssistantTournamentConfig,
+} from "../lib/assistant-config";
 
 interface Props {
   clubId: string;
@@ -29,26 +30,31 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
   const { t } = useTranslation("tournaments");
   const [mode, setMode] = useState<Mode>("chooser");
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [prefill, setPrefill] = useState<
-    { format: "mixed" | "group" | "knockout"; numTeams: number; flightsTemplate: "champions" | null } | undefined
-  >(undefined);
+  const [assistantPrefill, setAssistantPrefill] = useState<AssistantTournamentConfig | undefined>(
+    undefined,
+  );
+  const [simSeed, setSimSeed] = useState<{ teams: number; flights: boolean } | undefined>(
+    undefined,
+  );
 
   function close() {
     onOpenChange(false);
-    // reset after dialog animation
     setTimeout(() => {
       setMode("chooser");
-      setPrefill(undefined);
+      setAssistantPrefill(undefined);
+      setSimSeed(undefined);
     }, 200);
   }
 
-  function openWizardFromReco(reco: Recommendation) {
-    const mapped = recommendationToWizardFormat(reco);
-    setPrefill({
-      format: mapped.format,
-      numTeams: mapped.numTeams,
-      flightsTemplate: reco.flights,
-    });
+  function openExpertFromConfig(cfg: AssistantTournamentConfig) {
+    setAssistantPrefill(cfg);
+    onOpenChange(false);
+    setMode("chooser");
+    setWizardOpen(true);
+  }
+
+  function openQuickWizard() {
+    setAssistantPrefill(undefined);
     onOpenChange(false);
     setMode("chooser");
     setWizardOpen(true);
@@ -57,7 +63,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
   return (
     <>
       <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-xl max-h-[92vh] overflow-y-auto">
           {mode === "chooser" && (
             <>
               <DialogHeader>
@@ -76,11 +82,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
                   icon={<Zap className="h-5 w-5" />}
                   title={t("createChooser.quickTitle")}
                   hint={t("createChooser.quickHint")}
-                  onClick={() => {
-                    setPrefill(undefined);
-                    onOpenChange(false);
-                    setWizardOpen(true);
-                  }}
+                  onClick={openQuickWizard}
                 />
                 <Button
                   variant="ghost"
@@ -97,17 +99,40 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
 
           {mode === "ai" && (
             <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  {t("createChooser.aiTitle")}
-                </DialogTitle>
+              <DialogHeader className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <DialogTitle className="flex items-center gap-2 text-left">
+                    <Sparkles className="h-5 w-5 shrink-0 text-primary" />
+                    {t("createChooser.aiTitle")}
+                  </DialogTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={openQuickWizard}
+                  >
+                    <Settings2 className="h-3.5 w-3.5" />
+                    {t("aiAssistant.cta.expertSettings")}
+                  </Button>
+                </div>
+                <DialogDescription className="text-left">
+                  {t("createChooser.aiHint")}
+                </DialogDescription>
               </DialogHeader>
               <TournamentAIAssistant
-                onCreate={openWizardFromReco}
-                onAdjust={openWizardFromReco}
-                onSimulate={() => setMode("simulator")}
+                clubId={clubId}
+                onOpenExpert={openExpertFromConfig}
+                onSimulate={(cfg) => {
+                  setSimSeed({
+                    teams: configToWizardFormat(cfg).numTeams,
+                    flights: configUsesFlights(cfg),
+                  });
+                  setMode("simulator");
+                }}
               />
+              <Button variant="ghost" size="sm" onClick={() => setMode("chooser")}>
+                ← {t("createChooser.back")}
+              </Button>
             </>
           )}
 
@@ -120,8 +145,11 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
                 </DialogTitle>
                 <DialogDescription>{t("simulator.subtitle")}</DialogDescription>
               </DialogHeader>
-              <TournamentSimulator />
-              <Button variant="ghost" size="sm" onClick={() => setMode("chooser")}>
+              <TournamentSimulator
+                initialTeams={simSeed?.teams}
+                initialFlights={simSeed?.flights}
+              />
+              <Button variant="ghost" size="sm" onClick={() => setMode(mode === "simulator" && simSeed ? "ai" : "chooser")}>
                 ← {t("createChooser.back")}
               </Button>
             </>
@@ -133,7 +161,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
         clubId={clubId}
         open={wizardOpen}
         onOpenChange={setWizardOpen}
-        initialValues={prefill}
+        assistantPrefill={assistantPrefill}
       />
     </>
   );

@@ -18,10 +18,12 @@ import {
   AlertTriangle,
   ClipboardList,
   ChevronRight,
+  MapPin,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { googleMapsSearchUrl } from "@/lib/google-maps";
 import { getTournament, updateTournament } from "@/modules/tournaments/tournaments.functions";
 import { resolveScoring, type ScoringRules } from "@/modules/tournaments/lib/formats";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
@@ -356,7 +358,22 @@ function TournamentDetailPage() {
             <h1 className="text-xl font-semibold truncate">{tournament.name}</h1>
             <p className="text-xs text-muted-foreground mt-0.5 truncate">
               {tournament.sport} · {tournament.starts_on}
-              {tournament.location ? ` · ${tournament.location}` : ""}
+              {tournament.location && googleMapsSearchUrl(tournament.location) ? (
+                <>
+                  {" · "}
+                  <a
+                    href={googleMapsSearchUrl(tournament.location)!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-0.5 hover:underline"
+                  >
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    {tournament.location}
+                  </a>
+                </>
+              ) : tournament.location ? (
+                ` · ${tournament.location}`
+              ) : null}
             </p>
           </div>
           {canManage && (
