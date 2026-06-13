@@ -25,6 +25,7 @@ import {
   LUNCH_DURATION_PRESETS,
   MATCH_DURATION_PRESETS,
   PAUSE_PRESETS,
+  PRICE_PRESETS_EUR,
   playersPerTeamOptions,
   readAssistantDraft,
   TEAM_COUNT_PRESETS,
@@ -53,6 +54,22 @@ const SUPPORTED_SPORTS = [
   "handball",
   "rugby",
 ] as const;
+
+/** "HH:MM" → minutes */
+function parseHHMM(s: string): number {
+  const [h, m] = s.split(":").map((x) => parseInt(x, 10));
+  return (h || 0) * 60 + (m || 0);
+}
+function formatHHMM(min: number): string {
+  const safe = Math.max(0, Math.min(24 * 60 - 1, Math.round(min)));
+  return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+}
+function computeLunchEnd(start: string, durationMin: number): string {
+  return formatHHMM(parseHHMM(start) + durationMin);
+}
+function diffMinutes(start: string, end: string): number {
+  return parseHHMM(end) - parseHHMM(start);
+}
 
 export function TournamentAIAssistant({
   clubId,
@@ -121,17 +138,40 @@ export function TournamentAIAssistant({
     setConfig((c) => ({ ...c, ...partial }));
   }
 
+  // When user edits a single answer from the summary, the next advance/confirm
+  // bounces straight back to the summary instead of re-walking the whole wizard.
+  const returnToSummaryRef = useRef(false);
+
   function advance() {
+    if (returnToSummaryRef.current) {
+      returnToSummaryRef.current = false;
+      const summaryIdx = steps.indexOf("summary");
+      if (summaryIdx >= 0) {
+        setStepIdx(summaryIdx);
+        return;
+      }
+    }
     setStepIdx((i) => Math.min(i + 1, steps.length - 1));
   }
 
   function back() {
+    if (returnToSummaryRef.current) {
+      returnToSummaryRef.current = false;
+      const summaryIdx = steps.indexOf("summary");
+      if (summaryIdx >= 0) {
+        setStepIdx(summaryIdx);
+        return;
+      }
+    }
     setStepIdx((i) => Math.max(0, i - 1));
   }
 
   function goToStep(id: AssistantStepId) {
     const idx = steps.indexOf(id);
-    if (idx >= 0) setStepIdx(idx);
+    if (idx >= 0) {
+      returnToSummaryRef.current = true;
+      setStepIdx(idx);
+    }
   }
 
   // Auto-scroll question into view on step change (B-06)
@@ -197,7 +237,7 @@ export function TournamentAIAssistant({
   }
   function selectPause(n: number) {
     patch({ pauseMin: n });
-    advance();
+    // breaks step stays open — user may still tweak lunch range
   }
   function confirmCustomPause() {
     const n = parseInt(customPause, 10);
@@ -205,12 +245,14 @@ export function TournamentAIAssistant({
       toast.error(t("aiAssistant.errors.invalidPause", { defaultValue: "Pause invalide (0-60 min)" }));
       return;
     }
-    selectPause(n);
+    patch({ pauseMin: n });
     setCustomPause("");
+  }
+  function confirmBreaks() {
+    advance();
   }
   function selectLunchDuration(n: number) {
     patch({ lunchDurationMin: n });
-    advance();
   }
   function selectFairPlay(v: boolean) {
     patch({ useFairPlay: v });
@@ -394,6 +436,7 @@ export function TournamentAIAssistant({
             onConfirmCustomDuration={confirmCustomDuration}
             onPause={selectPause}
             onConfirmCustomPause={confirmCustomPause}
+            onConfirmBreaks={confirmBreaks}
             onLunchDuration={selectLunchDuration}
             onFairPlay={selectFairPlay}
             onTerrains={selectTerrains}
@@ -555,14 +598,13 @@ function RecapChips({
     chips.push(t(`aiAssistant.recap.flights_${config.flightsTemplate}`));
   if (past("matchDuration"))
     chips.push(t("aiAssistant.recap.match", { min: config.matchDurationMin }));
-  if (past("lunchDuration")) {
+  if (past("breaks")) {
+    chips.push(t("aiAssistant.recap.pause", { min: config.pauseMin }));
     if (config.lunchDurationMin > 0)
       chips.push(t("aiAssistant.recap.lunch", { range: lunchLabelForConfig(config) }));
   }
   if (past("fairPlay") && config.useFairPlay)
     chips.push(t("aiAssistant.recap.fairPlay"));
-  if (past("pause"))
-    chips.push(t("aiAssistant.recap.pause", { min: config.pauseMin }));
   if (past("terrains"))
     chips.push(t("aiAssistant.recap.terrains", { n: config.terrains }));
   if (past("paid")) {
@@ -641,6 +683,7 @@ interface QuestionViewProps {
   onConfirmCustomDuration: () => void;
   onPause: (n: number) => void;
   onConfirmCustomPause: () => void;
+  onConfirmBreaks: () => void;
   onLunchDuration: (n: number) => void;
   onFairPlay: (v: boolean) => void;
   onTerrains: (n: number) => void;
@@ -822,24 +865,108 @@ function QuestionView(p: QuestionViewProps) {
           </div>
         )}
 
-        {stepId === "lunchDuration" && (
-          <OptList>
-            {LUNCH_DURATION_PRESETS.map((n) => (
-              <Opt key={n} onClick={() => p.onLunchDuration(n)}>
-                {t(`aiAssistant.opts.lunch${n}`)}
-              </Opt>
-            ))}
-          </OptList>
-        )}
+        {stepId === "breaks" && (
+          <div className="space-y-5">
+            {/* --- Pause entre matchs --- */}
+            <div className="space-y-2">
+              <Label className="text-[12.5px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t("aiAssistant.opts.pauseLabel", { defaultValue: "Pause entre matchs (min)" })}
+              </Label>
+              <OptGrid cols={4}>
+                {PAUSE_PRESETS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => p.onPause(n)}
+                    className={cn(
+                      "rounded-xl border-[1.5px] py-3 text-center text-[18px] font-extrabold transition shadow-sm",
+                      config.pauseMin === n
+                        ? "border-[hsl(149_50%_36%)] bg-[hsl(149_45%_92%)] text-[hsl(149_55%_25%)]"
+                        : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </OptGrid>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  min={0}
+                  max={60}
+                  placeholder={t("aiAssistant.opts.customPausePlaceholder", { defaultValue: "Autre…" })}
+                  value={customPause}
+                  onChange={(e) => setCustomPause(e.target.value)}
+                />
+                <Button type="button" variant="secondary" onClick={p.onConfirmCustomPause}>
+                  {t("aiAssistant.cta.confirm")}
+                </Button>
+              </div>
+            </div>
 
-        {stepId === "lunchStart" && (
-          <div className="space-y-3">
-            <Input
-              type="time"
-              value={config.lunchStart}
-              onChange={(e) => patch({ lunchStart: e.target.value })}
-            />
-            <Button type="button" className="w-full" onClick={p.onAdvance}>
+            {/* --- Pause déjeuner --- */}
+            <div className="space-y-2 border-t border-dashed border-border pt-4">
+              <Label className="text-[12.5px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t("aiAssistant.opts.lunchLabel", { defaultValue: "Pause déjeuner" })}
+              </Label>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => patch({ lunchDurationMin: 0 })}
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-[12px] font-bold transition",
+                    config.lunchDurationMin === 0
+                      ? "border-[hsl(149_50%_36%)] bg-[hsl(149_45%_92%)] text-[hsl(149_55%_25%)]"
+                      : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
+                  )}
+                >
+                  {t("aiAssistant.opts.lunch0", { defaultValue: "Sans" })}
+                </button>
+                {config.lunchDurationMin > 0 && (
+                  <span className="text-[11.5px] text-muted-foreground">
+                    {lunchLabelForConfig(config)}
+                  </span>
+                )}
+              </div>
+              {config.lunchDurationMin === 0 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => patch({ lunchDurationMin: 45 })}
+                >
+                  {t("aiAssistant.opts.lunchAdd", { defaultValue: "+ Ajouter une plage déjeuner" })}
+                </Button>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      {t("aiAssistant.opts.lunchStart", { defaultValue: "Début" })}
+                    </Label>
+                    <Input
+                      type="time"
+                      value={config.lunchStart}
+                      onChange={(e) => patch({ lunchStart: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      {t("aiAssistant.opts.lunchEnd", { defaultValue: "Fin" })}
+                    </Label>
+                    <Input
+                      type="time"
+                      value={computeLunchEnd(config.lunchStart, config.lunchDurationMin)}
+                      onChange={(e) => {
+                        const dur = diffMinutes(config.lunchStart, e.target.value);
+                        if (dur > 0 && dur <= 240) patch({ lunchDurationMin: dur });
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Button type="button" className="w-full" onClick={p.onConfirmBreaks}>
               {t("aiAssistant.cta.next")}
             </Button>
           </div>
@@ -854,31 +981,6 @@ function QuestionView(p: QuestionViewProps) {
               {t("aiAssistant.opts.fairPlayNo")}
             </Opt>
           </OptList>
-        )}
-
-        {stepId === "pause" && (
-          <div className="space-y-3">
-            <OptGrid cols={4}>
-              {PAUSE_PRESETS.map((n) => (
-                <OptG key={n} onClick={() => p.onPause(n)}>
-                  {n}
-                </OptG>
-              ))}
-            </OptGrid>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                min={0}
-                max={60}
-                placeholder={t("aiAssistant.opts.customPausePlaceholder", { defaultValue: "Autre…" })}
-                value={customPause}
-                onChange={(e) => setCustomPause(e.target.value)}
-              />
-              <Button type="button" variant="secondary" onClick={p.onConfirmCustomPause}>
-                {t("aiAssistant.cta.confirm")}
-              </Button>
-            </div>
-          </div>
         )}
 
         {stepId === "terrains" && (
@@ -945,6 +1047,33 @@ function QuestionView(p: QuestionViewProps) {
 
         {stepId === "paidAmount" && (
           <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              {PRICE_PRESETS_EUR.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => {
+                    setPaidAmount(String(n));
+                    patch({
+                      registrationFeeCents: n * 100,
+                      registrationCurrency: config.registrationCurrency || "eur",
+                    });
+                    p.onAdvance();
+                  }}
+                  className={cn(
+                    "rounded-xl border-[1.5px] py-3 text-center text-[18px] font-extrabold transition shadow-sm",
+                    config.registrationFeeCents === n * 100
+                      ? "border-[hsl(149_50%_36%)] bg-[hsl(149_45%_92%)] text-[hsl(149_55%_25%)]"
+                      : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
+                  )}
+                >
+                  {n} €
+                </button>
+              ))}
+            </div>
+            <Label className="text-[11.5px] text-muted-foreground">
+              {t("aiAssistant.opts.priceCustom", { defaultValue: "Ou un autre montant :" })}
+            </Label>
             <div className="flex gap-2">
               <Input
                 type="number"
@@ -1160,7 +1289,7 @@ function SummaryView({
         <SRow
           k={t("aiAssistant.summary.simLunch")}
           v={lunchLabel || t("aiAssistant.summary.simLunchNone")}
-          onEdit={() => onEdit("lunchDuration")}
+          onEdit={() => onEdit("breaks")}
         />
         <SRow
           k={t("aiAssistant.expertSheet.fairPlay")}

@@ -17,11 +17,13 @@
     "terrainNaming": "Nomear agora ou mais tarde.",
     "terrainNames": "Dá um nome a cada campo.",
     "paid": "Inscrição paga ou gratuita?",
-    "paidAmount": "Valor por equipa.",
+    "paidAmount": "Escolhe um valor ou introduz o teu.",
     "name": "Nome mostrado na página pública.",
     "date": "Quando se realiza o torneio?",
     "location": "Morada ou cidade do recinto.",
-    "summary": "Tudo pronto. Verifica, simula horários se quiseres e cria."
+    "summary": "Tudo pronto. Toca numa linha para ajustar e cria.",
+    "breaks": "Pausa entre jogos e horário do almoço — tudo num só ecrã.",
+    "fairPlay": "Bónus/penalização de cartões como desempate."
   },
   "questionLabel": "Pergunta {{n}}",
   "tapHint": "Toca numa resposta — o assistente continua sozinho",
@@ -39,11 +41,13 @@
     "pools6x4": "6 grupos de 4",
     "pools8x4": "8 grupos de 4",
     "flights_champions": "Champions · Europa · Conference",
-    "flights_simple": "Principal · Consolação"
+    "flights_simple": "Principal · Consolação",
+    "lunch": "almoço {{range}}",
+    "fairPlay": "fair play"
   },
   "summary": {
     "title": "Pronto a criar 🎉",
-    "subtitle": "Tudo configurado — sem abrir um único menu.",
+    "subtitle": "Toca numa linha para editar — voltas logo aqui.",
     "editAnswer": "Alterar uma resposta",
     "sport": "Desporto e formato",
     "teams": "Equipas",
@@ -69,7 +73,9 @@
   "q": {
     "pause": "Pausa entre jogos?",
     "terrainNaming": "Nomear os campos?",
-    "terrainNames": "Nome de cada campo"
+    "terrainNames": "Nome de cada campo",
+    "breaks": "Pausas e almoço",
+    "fairPlay": "Ativar fair play?"
   },
   "opts": {
     "poolsFinalsHint": "O mais comum",
@@ -82,6 +88,15 @@
     "terrainNamingNow": "Nomear agora",
     "terrainNamingNowHint": "Central, Campo A…",
     "terrainNamingLater": "Mais tarde",
-    "terrainNamingLaterHint": "Campo 1, 2, 3…"
+    "terrainNamingLaterHint": "Campo 1, 2, 3…",
+    "pauseLabel": "Pausa entre jogos (min)",
+    "lunchLabel": "Pausa para almoço",
+    "lunchStart": "Início",
+    "lunchEnd": "Fim",
+    "lunchAdd": "+ Adicionar pausa para almoço",
+    "priceCustom": "Ou outro valor:",
+    "lunch0": "Sem pausa",
+    "fairPlayYes": "Sim, com bónus/penalização",
+    "fairPlayNo": "Sem fair play"
   }
 }

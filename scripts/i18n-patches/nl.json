@@ -17,11 +17,13 @@
     "terrainNaming": "Nu benoemen of later.",
     "terrainNames": "Geef elk veld een naam.",
     "paid": "Betaalde of gratis inschrijving?",
-    "paidAmount": "Bedrag per team.",
+    "paidAmount": "Kies een bedrag of voer je eigen in.",
     "name": "Naam op de publieke pagina.",
     "date": "Wanneer vindt het toernooi plaats?",
     "location": "Adres of stad van de locatie.",
-    "summary": "Alles klaar. Controleer, simuleer tijden en maak aan."
+    "summary": "Alles klaar. Tik op een rij om aan te passen en maak aan.",
+    "breaks": "Pauze tussen wedstrijden en lunch — alles op één scherm.",
+    "fairPlay": "Kaarten-bonus/penalty als tiebreaker."
   },
   "questionLabel": "Vraag {{n}}",
   "tapHint": "Tik een antwoord — de assistent gaat vanzelf verder",
@@ -39,11 +41,13 @@
     "pools6x4": "6 poules van 4",
     "pools8x4": "8 poules van 4",
     "flights_champions": "Champions · Europa · Conference",
-    "flights_simple": "Hoofd · Troost"
+    "flights_simple": "Hoofd · Troost",
+    "lunch": "lunch {{range}}",
+    "fairPlay": "fair play"
   },
   "summary": {
     "title": "Klaar om te maken 🎉",
-    "subtitle": "Alles geconfigureerd — geen enkel menu geopend.",
+    "subtitle": "Tik op een rij om te bewerken — je komt direct hier terug.",
     "editAnswer": "Antwoord wijzigen",
     "sport": "Sport & format",
     "teams": "Teams",
@@ -69,7 +73,9 @@
   "q": {
     "pause": "Pauze tussen wedstrijden?",
     "terrainNaming": "Velden benoemen?",
-    "terrainNames": "Naam van elk veld"
+    "terrainNames": "Naam van elk veld",
+    "breaks": "Pauzes en lunch",
+    "fairPlay": "Fair play activeren?"
   },
   "opts": {
     "poolsFinalsHint": "Meest voorkomend",
@@ -82,6 +88,15 @@
     "terrainNamingNow": "Nu benoemen",
     "terrainNamingNowHint": "Centraal, Veld A…",
     "terrainNamingLater": "Later",
-    "terrainNamingLaterHint": "Veld 1, 2, 3…"
+    "terrainNamingLaterHint": "Veld 1, 2, 3…",
+    "pauseLabel": "Pauze tussen wedstrijden (min)",
+    "lunchLabel": "Lunchpauze",
+    "lunchStart": "Begin",
+    "lunchEnd": "Einde",
+    "lunchAdd": "+ Lunchpauze toevoegen",
+    "priceCustom": "Of een ander bedrag:",
+    "lunch0": "Geen pauze",
+    "fairPlayYes": "Ja, met bonus/penalty",
+    "fairPlayNo": "Geen fair play"
   }
 }

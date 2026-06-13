@@ -54,10 +54,8 @@ export type AssistantStepId =
   | "eliminatedContinue"
   | "flightsTemplate"
   | "matchDuration"
-  | "lunchDuration"
-  | "lunchStart"
+  | "breaks"
   | "fairPlay"
-  | "pause"
   | "terrains"
   | "terrainNaming"
   | "terrainNames"
@@ -73,6 +71,8 @@ export const MATCH_DURATION_PRESETS = [8, 10, 12, 15, 20] as const;
 export const PAUSE_PRESETS = [0, 3, 5, 10] as const;
 export const LUNCH_DURATION_PRESETS = [0, 30, 45, 60] as const;
 export const TERRAIN_PRESETS = [1, 2, 3, 4, 5] as const;
+/** Price chips (in €) for the paid registration step. Manual entry stays available. */
+export const PRICE_PRESETS_EUR = [5, 10, 15, 20, 30, 50] as const;
 
 const FOOTBALL_PLAYERS = [5, 7, 8, 9, 11] as const;
 const GENERIC_PLAYERS = [5, 7, 11] as const;
@@ -204,11 +204,7 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
     steps.push("eliminatedContinue");
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
-  steps.push("matchDuration", "lunchDuration");
-  if ((cfg.lunchDurationMin ?? 0) > 0) {
-    steps.push("lunchStart");
-  }
-  steps.push("pause", "terrains", "terrainNaming");
+  steps.push("matchDuration", "breaks", "terrains", "terrainNaming");
   if (cfg.terrainNaming === "now") steps.push("terrainNames");
   steps.push("fairPlay", "paid");
   if (cfg.paid) steps.push("paidAmount");
