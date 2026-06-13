@@ -553,6 +553,18 @@ function TournamentDetailPage() {
 
       {/* ─── Sections (anchors, not tabs) ────────────────────────────────── */}
       <div className="px-5 pt-6 space-y-8">
+        {/* Poules / Classement en haut : composition + résultats live, mis à jour
+            automatiquement après chaque tirage via invalidateQueries(['tournament', id]). */}
+        {groups.length > 0 && (
+          <Section
+            id="section-standings"
+            icon={ListOrdered}
+            title={t("tabs.standings", { defaultValue: "Poules & classement" })}
+          >
+            <StandingsView tournamentId={tournament.id} />
+          </Section>
+        )}
+
         <Section
           id="section-matches"
           icon={Calendar}
@@ -587,13 +599,16 @@ function TournamentDetailPage() {
           />
         </Section>
 
-        <Section
-          id="section-standings"
-          icon={ListOrdered}
-          title={t("tabs.standings", { defaultValue: "Classement" })}
-        >
-          <StandingsView tournamentId={tournament.id} />
-        </Section>
+        {/* Classement (fallback si aucun groupe — vue vide gérée par StandingsView) */}
+        {groups.length === 0 && (
+          <Section
+            id="section-standings"
+            icon={ListOrdered}
+            title={t("tabs.standings", { defaultValue: "Classement" })}
+          >
+            <StandingsView tournamentId={tournament.id} />
+          </Section>
+        )}
 
         {/* Flights (auto-shown when pool matches are completed or flights exist) */}
         {showFlightsSection && (
