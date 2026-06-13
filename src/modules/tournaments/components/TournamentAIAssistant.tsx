@@ -88,6 +88,7 @@ export function TournamentAIAssistant({
   const [stepIdx, setStepIdx] = useState(() => readAssistantDraft()?.stepIdx ?? 0);
   const [customTeams, setCustomTeams] = useState("");
   const [customDuration, setCustomDuration] = useState("");
+  const [customPause, setCustomPause] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [showSim, setShowSim] = useState(false);
   const [showExpertSheet, setShowExpertSheet] = useState(false);
@@ -102,6 +103,13 @@ export function TournamentAIAssistant({
     const order = assistantStepOrder(config);
     return defaultSport ? order.filter((s) => s !== "sport") : order;
   }, [config, defaultSport]);
+
+  // Clamp stepIdx when steps change (B-06)
+  useEffect(() => {
+    if (stepIdx >= steps.length) {
+      setStepIdx(steps.length - 1);
+    }
+  }, [steps.length]);
 
   const currentStep: AssistantStepId = steps[stepIdx] ?? "summary";
   const onSummary = currentStep === "summary";
@@ -189,6 +197,23 @@ export function TournamentAIAssistant({
   }
   function selectPause(n: number) {
     patch({ pauseMin: n });
+    advance();
+  }
+  function confirmCustomPause() {
+    const n = parseInt(customPause, 10);
+    if (!Number.isFinite(n) || n < 0 || n > 60) {
+      toast.error(t("aiAssistant.errors.invalidPause", { defaultValue: "Pause invalide (0-60 min)" }));
+      return;
+    }
+    selectPause(n);
+    setCustomPause("");
+  }
+  function selectLunchDuration(n: number) {
+    patch({ lunchDurationMin: n });
+    advance();
+  }
+  function selectFairPlay(v: boolean) {
+    patch({ useFairPlay: v });
     advance();
   }
   function selectTerrains(n: number) {
@@ -294,9 +319,9 @@ export function TournamentAIAssistant({
     : t(`aiAssistant.headerHint.${currentStep}`, { defaultValue: "" });
 
   return (
-    <div className="relative flex h-[78vh] max-h-[640px] flex-col overflow-hidden rounded-2xl border border-border bg-card">
-      {/* Persistent AI header */}
-      <div className="bg-gradient-to-br from-[hsl(260_55%_56%)] to-[hsl(258_50%_42%)] px-4 pt-3 pb-3 text-white">
+    <div className="relative flex min-h-[500px] flex-col rounded-2xl border border-border bg-card">
+      {/* Persistent AI header — Lizard green gradient fix */}
+      <div className="bg-gradient-to-br from-[hsl(149_55%_46%)] to-[hsl(149_50%_32%)] px-4 pt-3 pb-3 text-white rounded-t-2xl">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/20 text-sm">
             <Sparkles className="h-4 w-4" />
@@ -330,7 +355,7 @@ export function TournamentAIAssistant({
       </div>
 
       {/* Scrollable screen */}
-      <div ref={screenRef} className="flex-1 overflow-y-auto bg-[#fbf7f2] px-4 pt-3 pb-2">
+      <div ref={screenRef} className="flex-1 bg-[#fbf7f2] px-4 pt-3 pb-2">
         {/* Live recap chips (B-08: only when at least one answer) */}
         <RecapChips config={config} answeredCount={stepIdx} steps={steps} stepIdx={stepIdx} t={t} />
 
@@ -352,6 +377,8 @@ export function TournamentAIAssistant({
             setCustomTeams={setCustomTeams}
             customDuration={customDuration}
             setCustomDuration={setCustomDuration}
+            customPause={customPause}
+            setCustomPause={setCustomPause}
             paidAmount={paidAmount}
             setPaidAmount={setPaidAmount}
             patch={patch}
@@ -366,6 +393,9 @@ export function TournamentAIAssistant({
             onDuration={selectDuration}
             onConfirmCustomDuration={confirmCustomDuration}
             onPause={selectPause}
+            onConfirmCustomPause={confirmCustomPause}
+            onLunchDuration={selectLunchDuration}
+            onFairPlay={selectFairPlay}
             onTerrains={selectTerrains}
             onTerrainNaming={selectTerrainNaming}
             onConfirmTerrainNames={confirmTerrainNames}
@@ -374,13 +404,14 @@ export function TournamentAIAssistant({
             onConfirmName={confirmName}
             onConfirmDate={confirmDate}
             onConfirmLocation={confirmLocation}
+            onAdvance={advance}
             t={t}
           />
         )}
       </div>
 
       {/* Sticky CTA footer */}
-      <div className="border-t border-border bg-[#fbf7f2] px-4 py-3">
+      <div className="border-t border-border bg-[#fbf7f2] px-4 py-3 rounded-b-2xl">
         <div className="flex gap-2">
           <Button
             type="button"
@@ -414,7 +445,7 @@ export function TournamentAIAssistant({
         <AssistantAskBox config={config} t={t} />
       </div>
 
-      {/* Expert settings overlay sheet (mockup: preserves answers, never loses progress) */}
+      {/* Expert settings overlay sheet */}
       {showExpertSheet && (
         <div
           className="absolute inset-0 z-50 flex items-end bg-[hsl(225_35%_15%)]/45 animate-in fade-in"
@@ -422,7 +453,7 @@ export function TournamentAIAssistant({
             if (e.target === e.currentTarget) setShowExpertSheet(false);
           }}
         >
-          <div className="max-h-[78%] w-full overflow-y-auto rounded-t-3xl bg-white px-4 pb-6 pt-4 animate-in slide-in-from-bottom">
+          <div className="max-h-[85%] w-full overflow-y-auto rounded-t-3xl bg-white px-4 pb-6 pt-4 animate-in slide-in-from-bottom">
             <h3 className="text-base font-bold text-foreground">
               {t("aiAssistant.expertSheet.title")}
             </h3>
@@ -438,6 +469,7 @@ export function TournamentAIAssistant({
                 { icon: "🏆", title: "flights", hint: "flightsHint" },
                 { icon: "🧑‍⚖️", title: "fields", hint: "fieldsHint" },
                 { icon: "📝", title: "registration", hint: "registrationHint" },
+                { icon: "🃏", title: "fairPlay", hint: "fairPlayHint" },
               ] as const
             ).map((row, i) => (
               <button
@@ -523,6 +555,12 @@ function RecapChips({
     chips.push(t(`aiAssistant.recap.flights_${config.flightsTemplate}`));
   if (past("matchDuration"))
     chips.push(t("aiAssistant.recap.match", { min: config.matchDurationMin }));
+  if (past("lunchDuration")) {
+    if (config.lunchDurationMin > 0)
+      chips.push(t("aiAssistant.recap.lunch", { range: lunchLabelForConfig(config) }));
+  }
+  if (past("fairPlay") && config.useFairPlay)
+    chips.push(t("aiAssistant.recap.fairPlay"));
   if (past("pause"))
     chips.push(t("aiAssistant.recap.pause", { min: config.pauseMin }));
   if (past("terrains"))
@@ -537,7 +575,7 @@ function RecapChips({
   if (filtered.length === 0) return null;
 
   return (
-    <div className="mb-3 rounded-2xl border border-border bg-white p-3">
+    <div className="mb-3 rounded-2xl border border-border bg-white p-3 shadow-sm">
       <div className="mb-2 flex items-center justify-between text-[10.5px] font-bold uppercase tracking-wider text-muted-foreground">
         <span>{t("aiAssistant.recap.title")}</span>
         <span className="text-[hsl(149_50%_36%)]">
@@ -586,6 +624,8 @@ interface QuestionViewProps {
   setCustomTeams: (v: string) => void;
   customDuration: string;
   setCustomDuration: (v: string) => void;
+  customPause: string;
+  setCustomPause: (v: string) => void;
   paidAmount: string;
   setPaidAmount: (v: string) => void;
   patch: (p: Partial<AssistantTournamentConfig>) => void;
@@ -600,6 +640,9 @@ interface QuestionViewProps {
   onDuration: (n: number) => void;
   onConfirmCustomDuration: () => void;
   onPause: (n: number) => void;
+  onConfirmCustomPause: () => void;
+  onLunchDuration: (n: number) => void;
+  onFairPlay: (v: boolean) => void;
   onTerrains: (n: number) => void;
   onTerrainNaming: (v: "now" | "later") => void;
   onConfirmTerrainNames: () => void;
@@ -608,6 +651,7 @@ interface QuestionViewProps {
   onConfirmName: () => void;
   onConfirmDate: () => void;
   onConfirmLocation: () => void;
+  onAdvance: () => void;
   t: (k: string, o?: Record<string, unknown>) => string;
 }
 
@@ -620,6 +664,8 @@ function QuestionView(p: QuestionViewProps) {
     setCustomTeams,
     customDuration,
     setCustomDuration,
+    customPause,
+    setCustomPause,
     paidAmount,
     setPaidAmount,
     patch,
@@ -634,7 +680,7 @@ function QuestionView(p: QuestionViewProps) {
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-3 py-1.5 text-[12.5px] font-semibold text-foreground hover:bg-muted"
+            className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-3 py-1.5 text-[12.5px] font-semibold text-foreground hover:bg-muted shadow-sm"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
             {t("common.back")}
@@ -776,14 +822,63 @@ function QuestionView(p: QuestionViewProps) {
           </div>
         )}
 
-        {stepId === "pause" && (
-          <OptGrid cols={4}>
-            {PAUSE_PRESETS.map((n) => (
-              <OptG key={n} onClick={() => p.onPause(n)}>
-                {n}
-              </OptG>
+        {stepId === "lunchDuration" && (
+          <OptList>
+            {LUNCH_DURATION_PRESETS.map((n) => (
+              <Opt key={n} onClick={() => p.onLunchDuration(n)}>
+                {t(`aiAssistant.opts.lunch${n}`)}
+              </Opt>
             ))}
-          </OptGrid>
+          </OptList>
+        )}
+
+        {stepId === "lunchStart" && (
+          <div className="space-y-3">
+            <Input
+              type="time"
+              value={config.lunchStart}
+              onChange={(e) => patch({ lunchStart: e.target.value })}
+            />
+            <Button type="button" className="w-full" onClick={() => advance()}>
+              {t("aiAssistant.cta.next")}
+            </Button>
+          </div>
+        )}
+
+        {stepId === "fairPlay" && (
+          <OptList>
+            <Opt onClick={() => p.onFairPlay(true)}>
+              {t("aiAssistant.opts.fairPlayYes")}
+            </Opt>
+            <Opt onClick={() => p.onFairPlay(false)}>
+              {t("aiAssistant.opts.fairPlayNo")}
+            </Opt>
+          </OptList>
+        )}
+
+        {stepId === "pause" && (
+          <div className="space-y-3">
+            <OptGrid cols={4}>
+              {PAUSE_PRESETS.map((n) => (
+                <OptG key={n} onClick={() => p.onPause(n)}>
+                  {n}
+                </OptG>
+              ))}
+            </OptGrid>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min={0}
+                max={60}
+                placeholder={t("aiAssistant.opts.customPausePlaceholder", { defaultValue: "Autre…" })}
+                value={customPause}
+                onChange={(e) => setCustomPause(e.target.value)}
+              />
+              <Button type="button" variant="secondary" onClick={p.onConfirmCustomPause}>
+                {t("aiAssistant.cta.confirm")}
+              </Button>
+            </div>
+          </div>
         )}
 
         {stepId === "terrains" && (
@@ -958,7 +1053,7 @@ function Opt({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-2xl border-[1.5px] border-border bg-white px-3.5 py-3 text-left text-[15px] font-semibold text-foreground transition hover:border-[hsl(149_50%_36%)] hover:bg-[hsl(149_45%_92%)]"
+      className="rounded-2xl border-[1.5px] border-border bg-white px-3.5 py-3 text-left text-[15px] font-semibold text-foreground transition hover:border-[hsl(149_50%_36%)] hover:bg-[hsl(149_45%_92%)] shadow-sm"
     >
       <span className="block">{children}</span>
       {hint && (
@@ -986,7 +1081,7 @@ function OptG({ children, onClick }: { children: React.ReactNode; onClick: () =>
     <button
       type="button"
       onClick={onClick}
-      className="rounded-xl border-[1.5px] border-border bg-white py-3.5 text-center text-[20px] font-extrabold text-foreground transition hover:border-[hsl(149_50%_36%)] hover:bg-[hsl(149_45%_92%)] hover:text-[hsl(149_55%_25%)]"
+      className="rounded-xl border-[1.5px] border-border bg-white py-3.5 text-center text-[20px] font-extrabold text-foreground transition hover:border-[hsl(149_50%_36%)] hover:bg-[hsl(149_45%_92%)] hover:text-[hsl(149_55%_25%)] shadow-sm"
     >
       {children}
     </button>
@@ -1018,7 +1113,7 @@ function SummaryView({
         <button
           type="button"
           onClick={() => onEdit("sport")}
-          className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-3 py-1.5 text-[12.5px] font-semibold text-foreground hover:bg-muted"
+          className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-3 py-1.5 text-[12.5px] font-semibold text-foreground hover:bg-muted shadow-sm"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           {t("aiAssistant.summary.editAnswer")}
@@ -1031,7 +1126,7 @@ function SummaryView({
         {t("aiAssistant.summary.subtitle")}
       </p>
 
-      <div className="rounded-2xl border border-border bg-white px-3.5 py-1 mb-3">
+      <div className="rounded-2xl border border-border bg-white px-3.5 py-1 mb-3 shadow-sm">
         <SRow
           k={t("aiAssistant.summary.sport")}
           v={`${t(`teams.sports.${config.sport}`, { defaultValue: config.sport })} · ${t("aiAssistant.opts.playersPerTeam", { count: config.playersPerTeam })}`}
@@ -1063,127 +1158,148 @@ function SummaryView({
           onEdit={() => onEdit("matchDuration")}
         />
         <SRow
+          k={t("aiAssistant.summary.simLunch")}
+          v={lunchLabel || t("aiAssistant.summary.simLunchNone")}
+          onEdit={() => onEdit("lunchDuration")}
+        />
+        <SRow
+          k={t("aiAssistant.expertSheet.fairPlay")}
+          v={config.useFairPlay ? t("aiAssistant.opts.fairPlayYes") : t("aiAssistant.opts.fairPlayNo")}
+          onEdit={() => onEdit("fairPlay")}
+        />
+        <SRow
           k={t("aiAssistant.summary.registration")}
           v={
             config.paid
-              ? `${t("aiAssistant.opts.paid")} · ${(config.registrationFeeCents / 100).toFixed(0)} €`
+              ? t("aiAssistant.opts.priceValue", { amount: config.registrationFeeCents / 100 })
               : t("aiAssistant.opts.free")
           }
           onEdit={() => onEdit("paid")}
         />
-        {config.name.trim() && (
-          <SRow
-            k={t("aiAssistant.summary.name")}
-            v={config.name.trim()}
-            onEdit={() => onEdit("name")}
-          />
-        )}
-        {config.startsOn && (
-          <SRow
-            k={t("aiAssistant.summary.date")}
-            v={
-              config.endsOn && config.endsOn !== config.startsOn
-                ? `${config.startsOn} → ${config.endsOn}`
-                : config.startsOn
-            }
-            onEdit={() => onEdit("date")}
-          />
-        )}
-        {config.location && (
-          <SRow
-            k={t("aiAssistant.summary.location")}
-            v={config.location}
-            onEdit={() => onEdit("location")}
-          />
-        )}
+        <SRow k={t("aiAssistant.summary.name")} v={config.name} onEdit={() => onEdit("name")} />
+        <SRow
+          k={t("aiAssistant.summary.date")}
+          v={config.startsOn + (config.endsOn && config.endsOn !== config.startsOn ? ` → ${config.endsOn}` : "")}
+          onEdit={() => onEdit("date")}
+        />
+        <SRow
+          k={t("aiAssistant.summary.location")}
+          v={config.location}
+          onEdit={() => onEdit("location")}
+          last
+        />
       </div>
 
-      <button
-        type="button"
-        onClick={onToggleSim}
-        className="mb-2.5 w-full rounded-2xl border-[1.5px] border-foreground bg-white px-3 py-3 text-[14px] font-extrabold text-foreground hover:bg-muted"
-      >
-        ⏱ {t("aiAssistant.summary.simulateCta")}
-      </button>
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={onToggleSim}
+          className="flex w-full items-center justify-between rounded-xl bg-[hsl(149_45%_92%)] px-4 py-3.5 text-left transition hover:bg-[hsl(149_45%_88%)]"
+        >
+          <span className="text-[14.5px] font-bold text-[hsl(149_55%_25%)]">
+            {t("aiAssistant.summary.simulateCta")}
+          </span>
+          <span className="text-[hsl(149_55%_25%)]">{showSim ? "↑" : "↓"}</span>
+        </button>
 
-      {showSim && (
-        <div className="mb-3 animate-in fade-in rounded-2xl bg-[hsl(225_35%_18%)] p-4 text-white">
-          <div className="text-[11px] font-extrabold uppercase tracking-wider text-white/70">
-            {t("aiAssistant.summary.simTitle")}
-          </div>
-          <div className="my-1 text-2xl font-extrabold">
-            09:00 → {schedule.endHHMM}
-          </div>
-          <SimLine label={t("aiAssistant.summary.simTotal")} value={String(schedule.total)} />
-          <SimLine
-            label={t("aiAssistant.summary.simSlot")}
-            value={`${config.matchDurationMin} + ${config.pauseMin} = ${config.matchDurationMin + config.pauseMin} min`}
-          />
-          <SimLine
-            label={t("aiAssistant.summary.simLunch")}
-            value={
-              lunchLabel ?? t("aiAssistant.summary.simLunchNone")
-            }
-          />
-          {config.lunchDurationMin > 0 && (
-            <div className="border-t border-white/15 py-2 space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-white/70">
-                {t("aiAssistant.summary.simLunchDuration")}
+        {showSim && (
+          <div className="mt-2 rounded-xl border border-[hsl(149_30%_80%)] bg-white p-4 animate-in slide-in-from-top-2">
+            <h4 className="mb-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
+              {t("aiAssistant.summary.simTitle")}
+            </h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-[11px] text-muted-foreground">
+                  {t("aiAssistant.summary.simTotal")}
+                </Label>
+                <p className="text-lg font-bold">{schedule.total}</p>
+              </div>
+              <div>
+                <Label className="text-[11px] text-muted-foreground">
+                  {t("aiAssistant.summary.simSlot")}
+                </Label>
+                <p className="text-lg font-bold">
+                  {config.matchDurationMin + config.pauseMin} min
+                </p>
+              </div>
+              <div className="col-span-2 border-t pt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold">
+                    {t("aiAssistant.summary.simLunch")}
+                  </span>
+                  <div className="flex gap-2">
+                    {[0, 30, 45, 60].map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => onPatch({ lunchDurationMin: m })}
+                        className={cn(
+                          "rounded-md px-2 py-1 text-[11px] font-bold transition",
+                          config.lunchDurationMin === m
+                            ? "bg-[hsl(149_50%_36%)] text-white"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80",
+                        )}
+                      >
+                        {m === 0 ? "Non" : `${m}m`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {config.lunchDurationMin > 0 && (
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-sm font-semibold">
+                      {t("aiAssistant.summary.simLunchStart")}
+                    </span>
+                    <input
+                      type="time"
+                      value={config.lunchStart}
+                      onChange={(e) => onPatch({ lunchStart: e.target.value })}
+                      className="rounded-md border border-border px-2 py-1 text-sm font-bold"
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="col-span-2 border-t pt-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-sm font-semibold">
+                    {t("aiAssistant.summary.simTerrains")}
+                  </span>
+                  <span className="text-sm font-bold">{config.terrains}</span>
+                </div>
+                <div className="flex gap-1.5">
+                  {TERRAIN_PRESETS.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => onPatch({ terrains: n })}
+                      className={cn(
+                        "h-8 flex-1 rounded-md text-[11px] font-bold transition",
+                        config.terrains === n
+                          ? "bg-[hsl(149_50%_36%)] text-white"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80",
+                      )}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 border-t border-dashed pt-4">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium">{t("cockpit.estimatedEnd")}</span>
+                <span className="text-2xl font-black text-[hsl(149_55%_25%)]">
+                  {schedule.endHHMM}
+                </span>
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {schedule.verdict}
               </p>
-              <div className="flex flex-wrap gap-1.5">
-                {LUNCH_DURATION_PRESETS.map((min) => (
-                  <button
-                    key={min}
-                    type="button"
-                    onClick={() => onPatch({ lunchDurationMin: min })}
-                    className={cn(
-                      "rounded-lg px-2.5 py-1 text-[11px] font-bold",
-                      config.lunchDurationMin === min
-                        ? "bg-white text-[hsl(225_35%_18%)]"
-                        : "bg-white/15 text-white hover:bg-white/25",
-                    )}
-                  >
-                    {min === 0
-                      ? t("aiAssistant.summary.simLunchNone")
-                      : t("aiAssistant.summary.simLunchMin", { min })}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-[11px] text-white/70 shrink-0">
-                  {t("aiAssistant.summary.simLunchStart")}
-                </label>
-                <input
-                  type="time"
-                  value={config.lunchStart}
-                  onChange={(e) => onPatch({ lunchStart: e.target.value })}
-                  className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-[12px] text-white"
-                />
-              </div>
             </div>
-          )}
-          {config.lunchDurationMin === 0 && (
-            <div className="border-t border-white/15 py-2">
-              <div className="flex flex-wrap gap-1.5">
-                {LUNCH_DURATION_PRESETS.filter((m) => m > 0).map((min) => (
-                  <button
-                    key={min}
-                    type="button"
-                    onClick={() => onPatch({ lunchDurationMin: min })}
-                    className="rounded-lg bg-white/15 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-white/25"
-                  >
-                    {t("aiAssistant.summary.simLunchMin", { min })}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <SimLine
-            label={t("aiAssistant.summary.simTerrains")}
-            value={String(config.terrains)}
-          />
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1192,91 +1308,89 @@ function SRow({
   k,
   v,
   onEdit,
+  last,
 }: {
   k: string;
   v: string;
   onEdit: () => void;
+  last?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2 border-t border-border py-2.5 text-[13.5px] first:border-t-0">
-      <span className="text-muted-foreground">{k}</span>
-      <div className="flex items-center gap-2">
-        <span className="font-bold text-foreground">{v}</span>
-        <button
-          type="button"
-          onClick={onEdit}
-          className="text-[12px] font-bold text-[hsl(149_50%_36%)] hover:underline"
-        >
-          ✎
-        </button>
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={onEdit}
+      className={cn(
+        "flex w-full items-center justify-between py-2.5 text-left transition hover:opacity-70",
+        !last && "border-b border-border/50",
+      )}
+    >
+      <span className="text-[13px] text-muted-foreground">{k}</span>
+      <span className="text-[13px] font-bold text-foreground underline decoration-muted/30 underline-offset-4">
+        {v}
+      </span>
+    </button>
   );
 }
 
-function SimLine({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between border-t border-white/15 py-1 text-[12.5px] text-white/80 first-of-type:border-t-0 first-of-type:pt-2">
-      <span>{label}</span>
-      <span>{value}</span>
-    </div>
-  );
-}
+/* ------- AI Ask box ------- */
 
-/** B-09 — Q&A IA accessible pendant tout le flux (fallback silencieux si LLM off). */
-function AssistantAskBox({
-  config,
-  t,
-}: {
-  config: AssistantTournamentConfig;
-  t: (k: string, o?: Record<string, unknown>) => string;
-}) {
-  const { i18n } = useTranslation("tournaments");
-  const ask = useServerFn(answerTournamentQuestion);
+function AssistantAskBox({ config, t }: { config: AssistantTournamentConfig; t: any }) {
   const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const reco = useMemo(() => buildRecommendation(config), [config]);
-  const locale = i18n.language?.startsWith("en") ? "en" : "fr";
 
-  async function send() {
-    const question = q.trim();
-    if (!question || busy) return;
-    setBusy(true);
-    setAnswer(null);
+  async function ask() {
+    if (!q.trim() || loading) return;
+    setLoading(true);
     try {
-      const res = await ask({
-        data: { question, reco, history: [], locale },
+      const res = await answerTournamentQuestion({
+        data: { question: q, context: config },
       });
-      setAnswer(res.ok ? res.data.answer : t("aiAssistant.askQuestion.fallback"));
-      setQ("");
+      setAnswer(res.answer);
     } catch {
-      setAnswer(t("aiAssistant.askQuestion.fallback"));
+      toast.error(t("aiAssistant.askQuestion.fallback"));
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
   }
 
   return (
-    <div className="mt-2 space-y-1.5 border-t border-border/60 pt-2">
-      <p className="text-[10px] font-semibold text-muted-foreground">
-        {t("aiAssistant.askQuestion.label")}
-      </p>
-      <div className="flex gap-2">
+    <div className="mt-3 border-t border-border pt-3">
+      <div className="flex items-center gap-2">
+        <Sparkles className="h-3.5 w-3.5 text-[hsl(260_55%_56%)]" />
+        <span className="text-[11.5px] font-bold text-muted-foreground">
+          {t("aiAssistant.askQuestion.label")}
+        </span>
+      </div>
+      <div className="mt-1.5 flex gap-1.5">
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder={t("aiAssistant.askQuestion.placeholder")}
-          disabled={busy}
-          className="h-8 text-xs"
+          className="h-8 text-[11.5px]"
+          onKeyDown={(e) => e.key === "Enter" && ask()}
         />
-        <Button type="button" size="sm" onClick={send} disabled={busy || !q.trim()} className="h-8 px-2">
-          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : t("aiAssistant.askQuestion.send")}
+        <Button
+          size="sm"
+          variant="secondary"
+          className="h-8 px-3 text-[11.5px]"
+          disabled={loading || !q.trim()}
+          onClick={ask}
+        >
+          {loading ? "…" : t("aiAssistant.askQuestion.send")}
         </Button>
       </div>
       {answer && (
-        <p className="text-[11px] leading-snug text-muted-foreground italic">{answer}</p>
+        <div className="mt-2 rounded-lg bg-white p-2.5 text-[11.5px] leading-relaxed shadow-sm ring-1 ring-border animate-in fade-in zoom-in-95">
+          <button
+            type="button"
+            className="float-right text-muted-foreground"
+            onClick={() => setAnswer(null)}
+          >
+            ×
+          </button>
+          {answer}
+        </div>
       )}
     </div>
   );
