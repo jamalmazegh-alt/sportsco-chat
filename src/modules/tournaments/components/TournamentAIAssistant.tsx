@@ -48,12 +48,15 @@ export function TournamentAIAssistant({ onCreate, onAdjust, onSimulate }: Props)
     <div className="flex flex-col gap-3">
       {/* Conversation history */}
       <div className="space-y-3">
-        {STEP_ORDER.slice(0, stepIdx).map((key) => (
-          <div key={key} className="space-y-2">
-            <Bubble role="ai">{t(`aiAssistant.q.${key}`)}</Bubble>
-            <Bubble role="me">{formatAnswer(t, key, answers[key])}</Bubble>
-          </div>
-        ))}
+        {STEP_ORDER.slice(0, stepIdx).map((key) => {
+          const ansKey = stepToAnswerKey(key);
+          return (
+            <div key={key} className="space-y-2">
+              <Bubble role="ai">{t(`aiAssistant.q.${key}`)}</Bubble>
+              <Bubble role="me">{formatAnswer(t, key, answers[ansKey])}</Bubble>
+            </div>
+          );
+        })}
 
         {!done && (
           <div className="space-y-2">
