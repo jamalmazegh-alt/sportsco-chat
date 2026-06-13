@@ -557,14 +557,13 @@ function RecapChips({
     chips.push(t(`aiAssistant.recap.flights_${config.flightsTemplate}`));
   if (past("matchDuration"))
     chips.push(t("aiAssistant.recap.match", { min: config.matchDurationMin }));
-  if (past("lunchDuration")) {
+  if (past("breaks")) {
+    chips.push(t("aiAssistant.recap.pause", { min: config.pauseMin }));
     if (config.lunchDurationMin > 0)
       chips.push(t("aiAssistant.recap.lunch", { range: lunchLabelForConfig(config) }));
   }
   if (past("fairPlay") && config.useFairPlay)
     chips.push(t("aiAssistant.recap.fairPlay"));
-  if (past("pause"))
-    chips.push(t("aiAssistant.recap.pause", { min: config.pauseMin }));
   if (past("terrains"))
     chips.push(t("aiAssistant.recap.terrains", { n: config.terrains }));
   if (past("paid")) {
