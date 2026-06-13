@@ -307,21 +307,48 @@ export function FlightsManager({
             <FlightCard key={f.id} flight={f} />
           ))}
           {groupMatchesCompleted ? (
-            <Button
-              className="w-full"
-              variant={bracketsGenerated ? "outline" : "default"}
-              onClick={onGenerateClick}
-              disabled={generate.isPending}
-            >
-              {generate.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <PlayCircle className="h-4 w-4" />
-              )}
-              {bracketsGenerated
-                ? t("flights.regenerate", { defaultValue: "Régénérer les brackets" })
-                : t("flights.generate", { defaultValue: "Générer les brackets" })}
-            </Button>
+            bracketsGenerated ? (
+              // Dangereux : la régénération efface des résultats existants.
+              // On la cache derrière un disclosure + double confirmation.
+              <details className="rounded-lg border border-dashed border-amber-500/40 bg-amber-50/40 p-2">
+                <summary className="cursor-pointer text-xs font-semibold text-amber-700">
+                  {t("flights.advancedDanger", { defaultValue: "Options avancées (dangereux)" })}
+                </summary>
+                <p className="mt-2 text-[11px] text-amber-700/90">
+                  {t("flights.regenWarn", {
+                    defaultValue:
+                      "Régénérer les brackets efface tous les résultats de phase finale déjà saisis.",
+                  })}
+                </p>
+                <Button
+                  className="mt-2 w-full"
+                  variant="outline"
+                  size="sm"
+                  onClick={onGenerateClick}
+                  disabled={generate.isPending}
+                >
+                  {generate.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <PlayCircle className="h-4 w-4" />
+                  )}
+                  {t("flights.regenerate", { defaultValue: "Régénérer les brackets" })}
+                </Button>
+              </details>
+            ) : (
+              <Button
+                className="w-full"
+                onClick={onGenerateClick}
+                disabled={generate.isPending}
+              >
+                {generate.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <PlayCircle className="h-4 w-4" />
+                )}
+                {t("flights.generate", { defaultValue: "Générer les brackets" })}
+              </Button>
+            )
           ) : (
             <p className="text-xs text-muted-foreground text-center">
               {t("flights.waitGroups", {
