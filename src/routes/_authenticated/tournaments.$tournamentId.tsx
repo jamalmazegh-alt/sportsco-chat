@@ -286,6 +286,66 @@ function TournamentDetailPage() {
   }
   if (!hasData || !tournament) return null;
 
+  // Sprint 2 — TV / projector mode (?display=tv). Read-only big-blocks layout.
+  if (isTvMode) {
+    return (
+      <div className="min-h-screen bg-background p-6 space-y-6">
+        <div className="flex items-center gap-3">
+          <Trophy className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold">{tournament.name}</h1>
+            <p className="text-sm text-muted-foreground">
+              {tournament.sport}
+              {tournament.location ? ` · ${tournament.location}` : ""}
+            </p>
+          </div>
+          <div className="ml-auto text-right">
+            <div className="text-3xl font-bold tabular-nums">
+              {new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+            </div>
+            {estimatedEnd && (
+              <div className="text-xs text-muted-foreground">
+                {t("cockpit.estimatedEnd", { defaultValue: "Fin prévue" })}{" "}
+                {estimatedEnd.toLocaleTimeString(undefined, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <Counter
+            label={t("controlCenter.counters.done", { defaultValue: "Terminés" })}
+            value={counters.done}
+            tone="emerald"
+          />
+          <Counter
+            label={t("controlCenter.counters.live", { defaultValue: "En cours" })}
+            value={counters.live}
+            tone="orange"
+          />
+          <Counter
+            label={t("controlCenter.counters.upcoming", { defaultValue: "À venir" })}
+            value={counters.upcoming}
+            tone="muted"
+          />
+        </div>
+        <div className="grid lg:grid-cols-2 gap-6">
+          <LiveCourts
+            matches={matches as unknown as React.ComponentProps<typeof LiveCourts>["matches"]}
+            teams={teams as unknown as React.ComponentProps<typeof LiveCourts>["teams"]}
+          />
+          <div className="space-y-4">
+            <ContinueCTA action={continueAction} onAction={() => {}} variant="hero" />
+            <AlertsPanel alerts={alerts} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="pb-24">
       {/* ─── Header ─────────────────────────────────────────────────────── */}
