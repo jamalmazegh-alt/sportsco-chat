@@ -45,6 +45,8 @@ interface Props {
   }>;
   hasGroups: boolean;
   groupMatchesCompleted: boolean;
+  /** B3 — true si des matchs de flight existent déjà (régénération = destructive). */
+  bracketsGenerated?: boolean;
 }
 
 interface DraftFlight {
@@ -64,6 +66,7 @@ export function FlightsManager({
   flights,
   hasGroups,
   groupMatchesCompleted,
+  bracketsGenerated = false,
 }: Props) {
   const { t, i18n } = useTranslation("tournaments");
   const qc = useQueryClient();
@@ -194,7 +197,8 @@ export function FlightsManager({
   });
 
   const generate = useMutation({
-    mutationFn: () => genFn({ data: { tournament_id: tournamentId } }),
+    mutationFn: (force: boolean) =>
+      genFn({ data: { tournament_id: tournamentId, force } }),
     onSuccess: (res: any) => {
       const created = res?.created ?? 0;
       if (created === 0) {
@@ -217,15 +221,50 @@ export function FlightsManager({
       }
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) =>
+    onError: (e: any) => {
+      const msg = String(e?.message ?? "");
+      // B3 — backstop : le serveur refuse la régénération destructive sans force.
+      if (msg.includes("FLIGHTS_ALREADY_STARTED")) {
+        if (
+          window.confirm(
+            t("flights.regenConfirm", {
+              defaultValue:
+                "Des matchs de phase finale ont déjà des résultats. Régénérer les brackets EFFACERA tous ces résultats. Continuer ?",
+            }),
+          )
+        ) {
+          generate.mutate(true);
+        }
+        return;
+      }
       toast.error(
         e?.message ??
           t("flights.fallback.error", {
             defaultValue:
               "Génération impossible pour cette structure. Réessaie avec un autre template ou en mode manuel.",
           }),
-      ),
+      );
+    },
   });
+
+  // B3 — un bracket déjà généré ne se régénère qu'après confirmation forte.
+  const onGenerateClick = () => {
+    if (bracketsGenerated) {
+      if (
+        !window.confirm(
+          t("flights.regenConfirm", {
+            defaultValue:
+              "Des matchs de phase finale ont déjà des résultats. Régénérer les brackets EFFACERA tous ces résultats. Continuer ?",
+          }),
+        )
+      ) {
+        return;
+      }
+      generate.mutate(true);
+    } else {
+      generate.mutate(false);
+    }
+  };
 
   if (!hasGroups) {
     return (
@@ -270,7 +309,8 @@ export function FlightsManager({
           {groupMatchesCompleted ? (
             <Button
               className="w-full"
-              onClick={() => generate.mutate()}
+              variant={bracketsGenerated ? "outline" : "default"}
+              onClick={onGenerateClick}
               disabled={generate.isPending}
             >
               {generate.isPending ? (
@@ -278,7 +318,9 @@ export function FlightsManager({
               ) : (
                 <PlayCircle className="h-4 w-4" />
               )}
-              {t("flights.generate", { defaultValue: "Générer les brackets" })}
+              {bracketsGenerated
+                ? t("flights.regenerate", { defaultValue: "Régénérer les brackets" })
+                : t("flights.generate", { defaultValue: "Générer les brackets" })}
             </Button>
           ) : (
             <p className="text-xs text-muted-foreground text-center">
