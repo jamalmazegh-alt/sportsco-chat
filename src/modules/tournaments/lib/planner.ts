@@ -220,11 +220,11 @@ export function recommendFormat(answers: AssistantAnswers): Recommendation {
  */
 export function recommendationToWizardFormat(
   reco: Recommendation,
-): { format: "mixed" | "round_robin" | "knockout"; numTeams: number } {
+): { format: "mixed" | "group" | "knockout"; numTeams: number } {
   return {
     format:
       reco.format === "round_robin"
-        ? "round_robin"
+        ? "group"
         : reco.format === "single_elim"
           ? "knockout"
           : "mixed",

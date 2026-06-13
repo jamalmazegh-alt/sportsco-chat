@@ -30,7 +30,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
   const [mode, setMode] = useState<Mode>("chooser");
   const [wizardOpen, setWizardOpen] = useState(false);
   const [prefill, setPrefill] = useState<
-    { format: "mixed" | "round_robin" | "knockout"; numTeams: number; flightsTemplate: "champions" | null } | undefined
+    { format: "mixed" | "group" | "knockout"; numTeams: number; flightsTemplate: "champions" | null } | undefined
   >(undefined);
 
   function close() {
