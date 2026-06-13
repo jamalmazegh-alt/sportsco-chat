@@ -271,6 +271,9 @@ export function TournamentAIAssistant({
       return res;
     },
     onSuccess: (res) => {
+      // B-01 — draft consumed: clear the persisted answers so a fresh wizard
+      // session starts blank next time.
+      clearAssistantDraft();
       toast.success(t("wizard.createdToast"));
       qc.invalidateQueries({ queryKey: ["tournaments", clubId] });
       navigate({
