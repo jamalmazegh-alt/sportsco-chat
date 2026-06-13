@@ -170,4 +170,25 @@ describe("countMatches / findNextScoreMatch", () => {
     ]);
     expect(next?.id).toBe("m2");
   });
+
+  // Fix G — once every match has a score, there is no "next match" to chain to.
+  it("returns null when all matches are already played (no next match)", () => {
+    expect(
+      findNextScoreMatch([
+        match({ id: "m1", status: "completed", score_a: 2, score_b: 1 }),
+        match({ id: "m2", status: "completed", score_a: 0, score_b: 0 }),
+      ]),
+    ).toBeNull();
+  });
+
+  // Fix G — chaining excludes the just-saved match to surface the following one.
+  it("excluding the saved match yields the next unplayed one", () => {
+    const all = [
+      match({ id: "m1", status: "live", score_a: 0, score_b: 0 }),
+      match({ id: "m2", status: "scheduled", scheduled_at: "2026-06-13T09:00:00Z" }),
+      match({ id: "m3", status: "scheduled", scheduled_at: "2026-06-13T10:00:00Z" }),
+    ];
+    const next = findNextScoreMatch(all.filter((m) => m.id !== "m1"));
+    expect(next?.id).toBe("m2");
+  });
 });

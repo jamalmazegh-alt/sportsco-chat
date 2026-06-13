@@ -800,6 +800,8 @@
     "statusUpdated": "Status bijgewerkt",
     "matchStatusUpdated": "Status van de wedstrijd bijgewerkt",
     "scoreSavedValidated": "Resultaat opgeslagen en bevestigd",
+    "nextMatch": "Volgende wedstrijd",
+    "allMatchesEntered": "Alle wedstrijden zijn ingevoerd.",
     "errorGeneric": "Fout",
     "validate": "Resultaat bevestigen",
     "unvalidate": "Bevestiging ongedaan maken",
@@ -1058,6 +1060,12 @@
     "noGroups": "Maak eerst de groepsfase. Flights worden daarna gegenereerd.",
     "savedToast": "Flights opgeslagen",
     "generatedToast": "{{n}} wedstrijden aangemaakt",
+    "fallback": {
+      "title": "Dit format kan de 3 flights niet automatisch genereren",
+      "body": "De groepsstructuur (onregelmatig of te klein) laat zich niet netjes verdelen in Champions / Europa / Conference. Kies een sjabloon Troost / Medailles / Cup-Plate, of stel de flights handmatig in.",
+      "empty": "Geen schema gegenereerd: de structuur kwalificeert niet genoeg teams per flight. Pas de verdeling aan, gebruik een terugvalsjabloon (Troost / Medailles) of stel de flights handmatig in.",
+      "error": "Genereren is niet mogelijk voor deze structuur. Probeer een ander sjabloon of de handmatige modus."
+    },
     "rulesCount": "regels",
     "thirdPlace": "3e plaats",
     "fifthPlace": "5e plaats",

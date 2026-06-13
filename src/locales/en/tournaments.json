@@ -800,6 +800,8 @@
     "statusUpdated": "Status updated",
     "matchStatusUpdated": "Match status updated",
     "scoreSavedValidated": "Score saved and validated",
+    "nextMatch": "Next match",
+    "allMatchesEntered": "All matches have been entered.",
     "errorGeneric": "Error",
     "validate": "Validate score",
     "unvalidate": "Unvalidate",
@@ -1058,6 +1060,12 @@
     "noGroups": "Create the group stage first. Flights are generated after.",
     "savedToast": "Flights saved",
     "generatedToast": "{{n}} matches created",
+    "fallback": {
+      "title": "This format can't auto-generate the 3 flights",
+      "body": "The group structure (irregular or too small) doesn't split cleanly into Champions / Europa / Conference. Pick a Consolation / Medals / Cup-Plate template, or customise the flights manually.",
+      "empty": "No bracket generated: the structure doesn't qualify enough teams per flight. Adjust the distribution, use a fallback template (Consolation / Medals) or configure the flights manually.",
+      "error": "Generation isn't possible for this structure. Try another template or manual mode."
+    },
     "rulesCount": "rules",
     "thirdPlace": "3rd place",
     "fifthPlace": "5th place",

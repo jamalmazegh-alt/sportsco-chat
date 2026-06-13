@@ -800,6 +800,8 @@
     "statusUpdated": "Status aktualisiert",
     "matchStatusUpdated": "Status des Spiels aktualisiert",
     "scoreSavedValidated": "Ergebnis gespeichert und bestätigt",
+    "nextMatch": "Nächstes Spiel",
+    "allMatchesEntered": "Alle Spiele wurden erfasst.",
     "errorGeneric": "Fehler",
     "validate": "Ergebnis bestätigen",
     "unvalidate": "Bestätigung aufheben",
@@ -1058,6 +1060,12 @@
     "noGroups": "Erstelle zuerst die Gruppenphase. Flights werden danach generiert.",
     "savedToast": "Flights gespeichert",
     "generatedToast": "{{n}} Spiele erstellt",
+    "fallback": {
+      "title": "Dieses Format kann die 3 Flights nicht automatisch erzeugen",
+      "body": "Die Gruppenstruktur (unregelmäßig oder zu klein) lässt sich nicht sauber in Champions / Europa / Conference aufteilen. Wähle eine Vorlage Trost / Medaillen / Cup-Plate oder konfiguriere die Flights manuell.",
+      "empty": "Kein Bracket erzeugt: Die Struktur qualifiziert nicht genug Teams pro Flight. Passe die Verteilung an, nutze eine Ausweichvorlage (Trost / Medaillen) oder konfiguriere die Flights manuell.",
+      "error": "Erzeugung für diese Struktur nicht möglich. Versuche eine andere Vorlage oder den manuellen Modus."
+    },
     "rulesCount": "Regeln",
     "thirdPlace": "3. Platz",
     "fifthPlace": "5. Platz",

@@ -1,7 +1,7 @@
 /**
- * PublishWorkflow — bannière statut + checklist + dialog de confirmation.
- * Remplace le petit bouton "Publier" par un parcours guidé qui explique
- * ce qui se passe et vérifie la complétude avant de publier.
+ * PublishWorkflow — bannière statut + checklist de pré-publication + actions
+ * de cycle de vie (Démarrer / Clôturer). L'action « Publier » vit désormais
+ * uniquement dans le Continue CTA (Fix D — pas de doublon de bouton).
  */
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -16,17 +16,8 @@ import {
   Flag,
   Trophy,
   Copy,
-  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type Status = "draft" | "published" | "in_progress" | "completed" | "cancelled";
@@ -48,7 +39,6 @@ interface Props {
   fieldsCount: number;
   publicUrl: string;
   busy: boolean;
-  onPublish: () => void;
   onStart: () => void;
   onClose: () => void;
 }
@@ -68,12 +58,10 @@ export function PublishWorkflow({
   fieldsCount,
   publicUrl,
   busy,
-  onPublish,
   onStart,
   onClose,
 }: Props) {
   const { t } = useTranslation("tournaments");
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [checklistOpen, setChecklistOpen] = useState(true);
 
   const registrationEnabled =
@@ -136,15 +124,6 @@ export function PublishWorkflow({
 
   const status = tournament.status;
   const stepIndex = Math.max(0, STEPS.indexOf(status));
-
-  const handlePublishClick = () => {
-    if (blockingMissing) {
-      setChecklistOpen(true);
-      toast.error(t("publishFlow.blockingHint"));
-      return;
-    }
-    setConfirmOpen(true);
-  };
 
   const copyLink = async () => {
     try {
@@ -218,19 +197,12 @@ export function PublishWorkflow({
             <h2 className="text-lg font-bold leading-tight">{meta.title}</h2>
             <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
 
-            {status !== "completed" && status !== "cancelled" && (
+            {/* Fix D — the "Publier" action lives only in the Continue CTA
+                (publish_tournament step) to avoid two competing publish buttons.
+                The pre-publish checklist below stays for guidance. Start/Close
+                remain here as they are not covered by the CTA. */}
+            {status === "published" || status === "in_progress" ? (
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                {status === "draft" && (
-                  <Button
-                    size="sm"
-                    onClick={handlePublishClick}
-                    disabled={busy}
-                    className="gap-2"
-                  >
-                    <Rocket className="h-4 w-4" />
-                    {t("publishFlow.ctaPublish")}
-                  </Button>
-                )}
                 {status === "published" && (
                   <>
                     <Button
@@ -266,7 +238,7 @@ export function PublishWorkflow({
                   </Button>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -310,69 +282,6 @@ export function PublishWorkflow({
           </div>
         )}
       </div>
-
-      {/* Confirm dialog */}
-      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Rocket className="h-5 w-5 text-primary" />
-              {t("publishFlow.confirmTitle")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("publishFlow.confirmBody")}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="rounded-lg border border-border bg-muted/40 p-3 flex items-center justify-between gap-2">
-            <span className="text-sm font-mono truncate" title={publicUrl}>
-              {publicUrl}
-            </span>
-            <a
-              href={publicUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="text-muted-foreground hover:text-foreground shrink-0"
-              aria-label={t("detail.viewPublic")}
-            >
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            {t("publishFlow.confirmFooterNote")}
-          </p>
-
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setConfirmOpen(false)}
-              disabled={busy}
-            >
-              {t("publishFlow.confirmCancel")}
-            </Button>
-            <Button
-              onClick={() => {
-                onPublish();
-                setConfirmOpen(false);
-                // Friendly toast with copy action
-                toast.success(t("publishFlow.publishedToast"), {
-                  description: t("publishFlow.publishedToastBody"),
-                  action: {
-                    label: t("publishFlow.copyLink"),
-                    onClick: copyLink,
-                  },
-                });
-              }}
-              disabled={busy}
-              className="gap-2"
-            >
-              <Rocket className="h-4 w-4" />
-              {t("publishFlow.confirmCta")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 }

@@ -190,6 +190,30 @@ export function defaultQualificationRules(
   return rules;
 }
 
+/**
+ * Détecte si la génération automatique d'un format type "Champions" (3 flights
+ * Champions / Europa / Conference) est applicable à la structure réelle.
+ *
+ * Heuristique volontairement simple et testable (Fix F) :
+ *  - il faut au moins 2 poules pour alimenter chaque flight (≥ 2 équipes/bracket) ;
+ *  - les poules doivent être régulières (même effectif → entier) ;
+ *  - chaque poule doit compter ≥ 3 positions pour découper en 3 flights.
+ *
+ * Les cas atypiques (effectifs irréguliers, poules trop petites, une seule
+ * poule) renvoient `false` : l'UI propose alors un repli sur les templates
+ * existants (Consolante / Médailles / Coupe-Plaque) ou le mode manuel.
+ */
+export function canAutoGenerateChampions(
+  numTeams: number,
+  numGroups: number,
+): boolean {
+  if (numGroups < 2) return false;
+  const perGroup = numTeams / numGroups;
+  if (!Number.isInteger(perGroup)) return false;
+  if (perGroup < 3) return false;
+  return true;
+}
+
 // ---------- Application des règles
 
 /**
