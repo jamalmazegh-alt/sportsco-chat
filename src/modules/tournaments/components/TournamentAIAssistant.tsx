@@ -85,6 +85,7 @@ export function TournamentAIAssistant({ onCreate, onAdjust, onSimulate }: Props)
           <>
             <Bubble role="ai">{t("aiAssistant.recoIntro")}</Bubble>
             <RecoCard reco={reco} t={t} />
+            <AIExplanation reco={reco} answers={fullAnswers} />
             <div className="flex flex-col gap-2 pt-2">
               <Button
                 size="lg"
@@ -109,6 +110,7 @@ export function TournamentAIAssistant({ onCreate, onAdjust, onSimulate }: Props)
                 )}
               </div>
             </div>
+            <AIFollowUp reco={reco} />
           </>
         )}
       </div>
