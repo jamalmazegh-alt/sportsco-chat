@@ -1205,7 +1205,35 @@
       "matches": "Matchs au total",
       "estimatedEnd": "Durée estimée",
       "terrains": "Terrains conseillés"
+    },
+    "explanation": {
+      "loading": "Analyse en cours…"
+    },
+    "askQuestion": {
+      "label": "Une question sur ce format ?",
+      "placeholder": "Ex. Et si j'ai un terrain de moins ?",
+      "send": "Envoyer",
+      "thinking": "…",
+      "fallback": "Je ne peux pas répondre pour le moment, réessaie plus tard."
     }
+  },
+  "rulesAi": {
+    "generate": "Générer un règlement avec l'IA",
+    "modalTitle": "Règlement proposé",
+    "modalDescription": "Prévisualise, puis insère ou régénère. Tu pourras toujours le modifier ensuite.",
+    "insert": "Insérer dans le règlement",
+    "regenerate": "Regénérer",
+    "close": "Fermer",
+    "loading": "Génération en cours…",
+    "rateLimited": "Limite quotidienne atteinte (5 générations / jour). Voici un modèle de base.",
+    "error": "Génération indisponible. Voici un modèle de base."
+  },
+  "coachInsightsAi": {
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation…",
+    "refreshDone": "Insights mis à jour",
+    "refreshLimited": "Tu as déjà actualisé aujourd'hui. Réessaie demain.",
+    "refreshError": "Impossible d'actualiser pour le moment."
   },
   "simulator": {
     "title": "Simulateur de tournoi",

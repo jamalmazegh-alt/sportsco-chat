@@ -1205,6 +1205,16 @@
       "matches": "Matchs au total",
       "estimatedEnd": "Durée estimée",
       "terrains": "Terrains conseillés"
+    },
+    "explanation": {
+      "loading": "Analyse en cours…"
+    },
+    "askQuestion": {
+      "label": "Une question sur ce format ?",
+      "placeholder": "Ex. Et si jai un terrain de moins ?",
+      "send": "Envoyer",
+      "thinking": "…",
+      "fallback": "Je ne peux pas répondre pour le moment, réessaie plus tard."
     }
   },
   "simulator": {
@@ -1225,5 +1235,23 @@
     "verdictBad": "✗ Trop serré, ajoute un terrain",
     "breakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} matchs de poule + {{finalMatches}} finales",
     "estimateDisclaimer": "Estimation indicative (pauses, retards non inclus)."
+  },
+  "rulesAi": {
+    "generate": "Générer un règlement avec lIA",
+    "modalTitle": "Règlement proposé",
+    "modalDescription": "Prévisualise, puis insère ou régénère.",
+    "insert": "Insérer dans le règlement",
+    "regenerate": "Regénérer",
+    "close": "Fermer",
+    "loading": "Génération en cours…",
+    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
+    "error": "Génération indisponible. Voici un modèle de base."
+  },
+  "coachInsightsAi": {
+    "refresh": "Actualiser",
+    "refreshing": "Actualisation…",
+    "refreshDone": "Insights mis à jour",
+    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
+    "refreshError": "Impossible dactualiser pour le moment."
   }
 }
