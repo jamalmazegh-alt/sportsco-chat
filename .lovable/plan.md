@@ -1,42 +1,84 @@
-Gros lot multi-sujets sur le wizard tournoi + dashboard. Je propose de découper en 6 chantiers ordonnés par impact, livrés en une seule passe.
 
-## 1. Wizard — fusion Pause + Déjeuner (1 écran)
-- Supprimer les étapes séparées `lunchDuration` / `lunchStart`, fusionner avec `pause` en un seul écran "Pauses".
-- Champs : pause entre matchs (presets + manuel), plage déjeuner (heure début + heure fin → on déduit `lunchDurationMin`), bouton "Pas de pause déjeuner".
-- Mise à jour `assistantStepOrder`, `TournamentAIAssistant.tsx`, locales FR + sync EN/DE/ES/IT/NL/PT.
+# Plan — 7 corrections tournoi
 
-## 2. Wizard — prix tournoi avec presets + manuel
-- Étape `paidAmount` : grille de chips (0, 5, 10, 15, 20, 30, 50 €) + champ "Autre montant" libre.
-- Format cohérent avec la devise (cents internes, affichage €).
+## 1. Simulateur : timeline visuelle
+Restaurer une vue chronologique :
+- Champ **heure de début** du tournoi (HH:MM, défaut 09:00)
+- Barre horizontale avec 3 segments colorés : **Poules** (vert), **Éliminatoires** (orange), **Finales** (or)
+- Largeur de chaque segment = durée calculée (matchs × durée / terrains + pauses)
+- Heures de fin de chaque phase affichées sous les segments
+- Recalcul instantané quand on change nb équipes / terrains / durée / pauses
+- Heure de finale + heure de fin globale en gros au-dessus
 
-## 3. Wizard — récap final éditable à la carte
-- Écran `summary` : liste cliquable de tous les groupes (Sport, Équipes, Format, Pauses, Terrains, Prix, Identité, Lieu).
-- Clic sur un item → saut direct à l'étape correspondante, après modif **retour direct au summary** (pas de re-parcours).
-- Implémentation : `pushReturnToSummary` flag dans state ; `goNext` détecte le flag et saute à `summary`.
+Fichier : `src/modules/tournaments/components/TournamentSimulator.tsx` (+ helper dans `lib/planner.ts` si besoin).
 
-## 4. Dashboard tournoi — poules en haut + refresh auto
-- Réordonner les sections de `tournaments.$tournamentId.tsx` : bloc Poules / Fixtures **avant** les autres widgets, dès que le tournoi a un format à poules.
-- Après tirage (`DrawDialog` onSuccess) : `queryClient.invalidateQueries` sur les clés poules + fixtures pour rafraîchissement immédiat.
+## 2. Agent IA repositionné
+Bouton flottant actuellement caché en bas-gauche derrière le bottom-nav.
+→ Le déplacer en **bas-droite au-dessus du bottom-nav** (bottom: 80px right: 16px), ou **haut-droite** dans le header du dashboard tournoi.
+→ Réduire taille (48px), badge "IA" discret.
 
-## 5. Édition des poules avant le début des matchs
-- Dans `GroupsAndFixtures` (status `published` ou `draft`, **avant** `in_progress`) : bouton "Modifier les poules" qui ouvre un éditeur drag-and-drop simple (déplacer une équipe d'une poule à l'autre, renommer).
-- Verrouillage strict dès que `status === in_progress`.
-- Sauvegarde via mutation existante de réassignation d'équipes aux poules.
+Fichier : `src/modules/tournaments/components/TournamentAIAssistant.tsx` (FAB) ou wrapper dans `tournaments.$tournamentId.tsx`.
 
-## 6. Revue complète i18n
-- Audit `tournaments.aiAssistant.*` sur 7 locales (FR ref + EN/DE/ES/IT/NL/PT) : corriger incohérences (mentions "lézard", "motif", placeholders mal traduits remontés par l'utilisateur).
-- Lancer `scripts/sync-tournaments-i18n.mjs` après mise à jour des overrides dans `scripts/i18n-patches/*.json`.
-- Vérifier `scripts/check-i18n-parity.mjs` passe.
+## 3. Récap wizard "à la carte" (vrai)
+Le récap doit lister **chaque paramètre** comme une ligne cliquable :
+```
+Nb équipes        8         >
+Durée match       15 min    >
+Pauses            5 min     >
+Déjeuner          12h-13h   >
+Terrains          2         >
+Prix              10 €      >
+...
+```
+Click → `goToStep(stepId)` + `returnToSummaryRef = true`. Sur "Suivant" du step modifié → retour direct au récap (déjà implémenté côté logique, mais l'UI summary actuelle ne liste pas tous les items).
 
-## Détails techniques
+Fichier : `src/modules/tournaments/components/TournamentAIAssistant.tsx` (renderSummary).
 
-- **State wizard** : ajout `returnToSummary: boolean` dans le draft `sessionStorage`. Réinitialisé après retour summary.
-- **Lunch model** : on garde `lunchDurationMin` + `lunchStart` en interne (compat planner) mais l'UI expose début/fin.
-- **Pool editor** : composant `PoolEditor.tsx` (nouveau), réutilise `pool_assignments` table, mutation `reassignTeamToPool` (à créer si absente).
-- **Locales** : je liste les clés douteuses en commentaire dans les patches, puis sync.
+## 4. Écran TV (`t.$slug.tv.tsx`)
+Cartes match actuelles : noms tronqués, pas de terrain/horaire visibles.
+→ Layout carte refondé :
+- Ligne 1 : **Terrain N · HH:MM** (petit, muted)
+- Ligne 2 : nom équipe A (taille réduite, `truncate` retiré au profit de `break-words` ou `text-balance`)
+- Score
+- Ligne 3 : nom équipe B
+→ Réduire `text-3xl/4xl` à `text-xl` pour laisser place aux noms complets.
 
-## Hors scope (à confirmer si besoin)
-- Pas de refonte visuelle du dashboard au-delà du réordonnancement.
-- Pas de changement du modèle DB pour les poules (juste UI + mutation existante).
+Fichier : `src/routes/t.$slug.tv.tsx` (et/ou `tournament.$slug_.tv.tsx`).
 
-OK pour partir là-dessus ?
+## 5. Classement final tournoi
+Quand toutes les finales sont terminées :
+- Si **mono-trophée** : podium 1/2/3 + classement complet
+- Si **multi-flights** : podium 1/2/3 **par flight** (Champions, Coupe, etc.)
+- Section "Classement final" en haut du dashboard (au-dessus des poules) avec confettis/trophées
+- Bouton "Partager le classement"
+
+Fichier : nouveau `src/modules/tournaments/components/FinalStandings.tsx` + intégration dans `tournaments.$tournamentId.tsx`.
+
+## 6. "Régénérer les brackets" déplacé
+Bouton actuellement bien visible dans le bloc Flights → **dangereux**.
+→ Le retirer de la vue principale.
+→ Le mettre dans le **menu détaillé** (settings tournoi / onglet "Avancé") avec double confirmation.
+
+Fichier : `src/modules/tournaments/components/FlightsBlock.tsx` (ou équivalent) + déplacer vers settings.
+
+## 7. État "démarré" automatique
+Aujourd'hui on peut saisir tous les scores sans cliquer "Démarrer".
+→ Quand le **premier score est saisi**, passer automatiquement `status = in_progress` côté server (mutation `recordMatchScore`).
+→ Masquer le bouton "Démarrer le tournoi" si `status >= in_progress`.
+
+Fichier : `src/modules/tournaments/tournaments.functions.ts` (mutation score) + UI dashboard.
+
+---
+
+## Ordre d'exécution
+1. Simulateur timeline (autonome, gros impact UX)
+2. FAB IA repositionné (5 min)
+3. Récap wizard à la carte (impact UX)
+4. TV layout
+5. Auto-start tournoi
+6. Régénérer brackets → settings
+7. Classement final
+
+Tests unitaires mis à jour pour le planner timeline + auto-start.
+
+Confirmes-tu l'ordre et le contenu ?
