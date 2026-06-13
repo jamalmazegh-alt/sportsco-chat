@@ -1,12 +1,13 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { Clock, UserX, Trophy, Shield, X, Sparkles, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, UserX, Trophy, Shield, X, Sparkles, ChevronRight, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { dismissInsight } from "@/lib/insights.functions";
+import { refreshCoachInsights } from "@/lib/llm/coach-insights.functions";
 import { toast } from "sonner";
 import {
   AlertDialog,
