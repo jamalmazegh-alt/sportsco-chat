@@ -930,6 +930,17 @@ function QuestionView(p: QuestionViewProps) {
           </div>
         )}
 
+        {stepId === "fairPlay" && (
+          <OptList>
+            <Opt onClick={() => p.onFairPlay(true)}>
+              {t("aiAssistant.opts.fairPlayYes")}
+            </Opt>
+            <Opt onClick={() => p.onFairPlay(false)}>
+              {t("aiAssistant.opts.fairPlayNo")}
+            </Opt>
+          </OptList>
+        )}
+
         {stepId === "terrains" && (
           <OptGrid>
             {TERRAIN_PRESETS.map((n) => (
