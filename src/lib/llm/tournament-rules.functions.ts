@@ -22,12 +22,18 @@ const OutputSchema = z.object({
   html: z.string().min(20).max(6000),
 });
 
-function fallbackHtml(t: {
+interface TournamentMeta {
   name?: string | null;
   sport?: string | null;
   format?: string | null;
-  starts_at?: string | null;
-}): string {
+  starts_on?: string | null;
+  ends_on?: string | null;
+  location?: string | null;
+  category?: string | null;
+  club_id?: string | null;
+}
+
+function fallbackHtml(t: TournamentMeta): string {
   const name = t.name ?? "Tournoi";
   const sport = t.sport ?? "";
   const fmt = t.format ?? "";
