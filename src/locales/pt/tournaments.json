@@ -1168,53 +1168,104 @@
     "back": "Retour"
   },
   "aiAssistant": {
-    "intro": "Salut 👋 On crée ton tournoi en une minute.",
-    "recoIntro": "Parfait. Voici ce que je te recommande 👇",
-    "recoBadge": "Recommandation Clubero",
-    "recoTitle": "{{pools}} poules de {{perPool}}",
-    "recoFlightsSuffix": "3 trophées",
+    "intro": "Olá 👋 Vamos configurar o teu torneio passo a passo.",
+    "summaryIntro": "Perfeito — aqui está o resumo. Pronto para criar.",
+    "recoIntro": "Perfeito. Eis o que recomendo 👇",
+    "recoBadge": "Configuração Clubero",
+    "recoTitle": "{{pools}} grupos de {{perPool}}",
+    "recoFlightsSuffix": "3 troféus",
     "q": {
-      "teams": "Combien d'équipes attends-tu ?",
-      "allDay": "Tout le monde doit-il jouer toute la journée ?",
-      "trophies": "Tu veux plusieurs trophées (Champions, Europa…) ?",
-      "paid": "Le tournoi est-il payant ?"
+      "sport": "Qual desporto?",
+      "playersPerTeam": "Quantos jogadores por equipa em campo?",
+      "numTeams": "Quantas equipas participam?",
+      "scheduleFormat": "Qual formato para o dia?",
+      "eliminatedContinue": "As eliminadas dos grupos continuam a jogar?",
+      "flightsTemplate": "Que quadros para eliminadas dos grupos?",
+      "matchDuration": "Duração de um jogo?",
+      "terrains": "Quantos campos disponíveis?",
+      "paid": "O torneio é pago?",
+      "paidAmount": "Valor por equipa?",
+      "name": "Como se chama o torneio?",
+      "date": "Que data (e fim se for de vários dias)?",
+      "location": "Onde se realiza?",
+      "summary": "Resumo"
     },
     "opts": {
-      "allDayYes": "Oui, du temps de jeu pour tous",
-      "allDayNo": "Non, place aux meilleurs",
-      "trophiesYes": "Oui, plusieurs finales",
-      "trophiesNo": "Non, un seul vainqueur",
-      "free": "Gratuit",
-      "paid": "Payant"
+      "playersPerTeam": "{{count}} jogadores",
+      "customTeamsPlaceholder": "Outro número…",
+      "customDurationPlaceholder": "Outra duração (min)…",
+      "durationMin": "{{min}} min",
+      "eliminatedYes": "Sim — jogos de classificação / vários quadros (cada equipa mantém jogos)",
+      "eliminatedNo": "Não — as eliminadas dos grupos param",
+      "eliminatedYesShort": "Classificação / flights",
+      "eliminatedNoShort": "Paragem após grupos",
+      "flightsChampions": "Champions · Europa · Conference",
+      "flightsSimple": "Consolação simples",
+      "pricePlaceholder": "Valor em €",
+      "priceValue": "{{amount}} € / equipa",
+      "allDayYes": "Sim, tempo de jogo para todos",
+      "allDayNo": "Não, foco nos melhores",
+      "trophiesYes": "Sim, várias finais",
+      "trophiesNo": "Não, um único vencedor",
+      "free": "Gratuito",
+      "paid": "Pago"
     },
     "cta": {
-      "create": "Créer le tournoi",
-      "adjust": "Ajuster",
-      "simulate": "Simuler",
-      "restart": "Recommencer"
+      "create": "Criar torneio",
+      "adjust": "Ajustar",
+      "adjustPoint": "Ajustar um ponto",
+      "pickStep": "Que ponto modificar?",
+      "simulate": "Simular",
+      "restart": "Recomeçar",
+      "expert": "Modo especialista",
+      "expertSettings": "Definições detalhadas",
+      "confirm": "Confirmar",
+      "next": "Continuar"
+    },
+    "livePreview": {
+      "title": "Torneio em curso",
+      "sport": "Desporto",
+      "teams": "Equipas",
+      "playersPerTeam": "Formato",
+      "format": "Desenrolar",
+      "eliminated": "Eliminadas grupos",
+      "duration": "Duração jogo",
+      "durationValue": "{{min}} min",
+      "terrains": "Campos",
+      "name": "Nome",
+      "scheduleBreakdown": "{{pools}} grupos × {{perPool}} → {{poolMatches}} jogos de grupo + {{finalMatches}} finais · {{total}} jogos · fim ~{{end}}"
+    },
+    "errors": {
+      "invalidTeams": "Indica um número de equipas entre 2 e 64.",
+      "invalidDuration": "Indica uma duração entre 5 e 120 minutos.",
+      "invalidPrice": "Indica um valor válido.",
+      "invalidName": "O nome deve ter pelo menos 2 caracteres.",
+      "invalidDate": "Escolhe uma data de início.",
+      "invalidLocation": "Indica um local.",
+      "incomplete": "Configuração incompleta."
     },
     "formats": {
-      "poolsFinals": "Poules + phases finales",
-      "roundRobin": "Championnat (round-robin)",
-      "singleElim": "Élimination directe"
+      "poolsFinals": "Grupos + fase final",
+      "roundRobin": "Campeonato",
+      "singleElim": "Eliminação direta"
     },
     "recoLine": {
-      "teams": "Équipes",
-      "finals": "Phase finale",
+      "teams": "Equipas",
+      "finals": "Fase final",
       "flightsValue": "Champions · Europa · Conference",
-      "matches": "Matchs au total",
-      "estimatedEnd": "Durée estimée",
-      "terrains": "Terrains conseillés"
+      "matches": "Jogos totais",
+      "estimatedEnd": "Duração estimada",
+      "terrains": "Campos recomendados"
     },
     "explanation": {
-      "loading": "Analyse en cours…"
+      "loading": "A analisar…"
     },
     "askQuestion": {
-      "label": "Une question sur ce format ?",
-      "placeholder": "Ex. Et si jai un terrain de moins ?",
-      "send": "Envoyer",
+      "label": "Uma pergunta sobre este formato?",
+      "placeholder": "Ex. E se tiver um campo a menos?",
+      "send": "Enviar",
       "thinking": "…",
-      "fallback": "Je ne peux pas répondre pour le moment, réessaie plus tard."
+      "fallback": "Não consigo responder agora, tenta mais tarde."
     }
   },
   "simulator": {
