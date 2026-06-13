@@ -334,6 +334,16 @@ export function configToCreatePayload(
     ...rules.fairPlay,
     enabled: cfg.useFairPlay,
   };
+  if (cfg.useFairPlay) {
+    const ordered = rules.tiebreakers.filter((key) => key !== "fair_play");
+    const drawLotIndex = ordered.indexOf("draw_lot");
+    rules.tiebreakers =
+      drawLotIndex >= 0
+        ? [...ordered.slice(0, drawLotIndex), "fair_play", ...ordered.slice(drawLotIndex)]
+        : [...ordered, "fair_play"];
+  } else {
+    rules.tiebreakers = rules.tiebreakers.filter((key) => key !== "fair_play");
+  }
   if (cfg.lunchDurationMin > 0) {
     (rules as unknown as Record<string, unknown>).lunch_start = cfg.lunchStart;
     (rules as unknown as Record<string, unknown>).lunch_end = lunchEndHHMM(
