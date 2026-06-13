@@ -113,6 +113,53 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     },
   });
 
+  const REFRESH_KEY = `coach-insights-last-refresh:${clubId}`;
+  const [lastRefreshAt, setLastRefreshAt] = useState<number>(() => {
+    if (typeof window === "undefined") return 0;
+    return Number(window.localStorage.getItem(REFRESH_KEY) ?? 0);
+  });
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const cooldownRemainingMs = Math.max(0, lastRefreshAt + 24 * 3600 * 1000 - now);
+  const cooldownActive = cooldownRemainingMs > 0;
+
+  const refreshMutation = useMutation({
+    mutationFn: () => refreshCoachInsights({ data: { clubId } }),
+    onSuccess: (res) => {
+      if (res?.ok) {
+        const ts = Date.now();
+        setLastRefreshAt(ts);
+        try {
+          window.localStorage.setItem(REFRESH_KEY, String(ts));
+        } catch {
+          /* ignore */
+        }
+        toast.success(t("coachInsightsAi.refreshDone", { ns: "tournaments" }));
+        qc.invalidateQueries({ queryKey: ["coach-insights", clubId, user?.id] });
+      } else if (res?.reason === "rate_limited") {
+        // Server says we already used today's quota — sync local cooldown.
+        const ts = Date.now();
+        setLastRefreshAt(ts);
+        try {
+          window.localStorage.setItem(REFRESH_KEY, String(ts));
+        } catch {
+          /* ignore */
+        }
+        toast.error(t("coachInsightsAi.refreshLimited", { ns: "tournaments" }));
+      } else {
+        toast.error(t("coachInsightsAi.refreshError", { ns: "tournaments" }));
+      }
+    },
+    onError: () => {
+      toast.error(t("coachInsightsAi.refreshError", { ns: "tournaments" }));
+    },
+  });
+
+  const refreshDisabled = refreshMutation.isPending || cooldownActive;
+
   if (!insights || insights.length === 0) return null;
 
   const handleAction = (ins: InsightRow) => {
