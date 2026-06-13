@@ -1266,6 +1266,21 @@
       "send": "Enviar",
       "thinking": "…",
       "fallback": "Não consigo responder agora, tenta mais tarde."
+    },
+    "expertSheet": {
+      "title": "Definições detalhadas",
+      "subtitle": "Modo perito — ajusta sem sair do assistente.",
+      "keep": "✓ As tuas respostas são guardadas — fechar não perde nada.",
+      "points": "Pontos e desempates",
+      "pointsHint": "V3/E1/D0 · confronto direto, dif. golos…",
+      "flights": "Quadros e jogos de classificação",
+      "flightsHint": "Champions/Europa/Conference · 3.º lugar…",
+      "fields": "Campos e árbitros",
+      "fieldsHint": "Nomear campos, atribuir",
+      "registration": "Inscrições e pagamento",
+      "registrationHint": "Online, preço, validação",
+      "openExpert": "Abrir editor perito",
+      "close": "Voltar ao assistente"
     }
   },
   "simulator": {

@@ -1266,6 +1266,21 @@
       "send": "Send",
       "thinking": "…",
       "fallback": "I can't answer right now, try again later."
+    },
+    "expertSheet": {
+      "title": "Detailed settings",
+      "subtitle": "Expert mode — fine-tune without leaving the assistant.",
+      "keep": "✓ Your answers are kept — closing loses nothing.",
+      "points": "Points & tiebreakers",
+      "pointsHint": "W3/D1/L0 · head-to-head, goal diff…",
+      "flights": "Flights & ranking matches",
+      "flightsHint": "Champions/Europa/Conference · 3rd place…",
+      "fields": "Courts & referees",
+      "fieldsHint": "Name courts, assign refs",
+      "registration": "Registration & payment",
+      "registrationHint": "Online, price, validation",
+      "openExpert": "Open expert editor",
+      "close": "Back to assistant"
     }
   },
   "simulator": {

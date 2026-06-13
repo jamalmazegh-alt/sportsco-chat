@@ -1266,6 +1266,21 @@
       "send": "Enviar",
       "thinking": "…",
       "fallback": "No puedo responder ahora, inténtalo más tarde."
+    },
+    "expertSheet": {
+      "title": "Ajustes detallados",
+      "subtitle": "Modo experto — ajusta sin salir del asistente.",
+      "keep": "✓ Tus respuestas se conservan — cerrar no pierde nada.",
+      "points": "Puntos y desempates",
+      "pointsHint": "V3/E1/D0 · enfrentamiento, dif. goles…",
+      "flights": "Tablas y partidos de clasificación",
+      "flightsHint": "Champions/Europa/Conference · 3ᵉʳ puesto…",
+      "fields": "Pistas y árbitros",
+      "fieldsHint": "Nombrar pistas, asignar",
+      "registration": "Inscripción y pago",
+      "registrationHint": "En línea, precio, validación",
+      "openExpert": "Abrir editor experto",
+      "close": "Volver al asistente"
     }
   },
   "simulator": {
