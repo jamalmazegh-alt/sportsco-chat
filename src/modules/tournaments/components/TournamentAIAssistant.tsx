@@ -1112,7 +1112,7 @@ function SummaryView({
       <div className="mb-2.5">
         <button
           type="button"
-          onClick={() => onEdit("sport")}
+          onClick={() => onEdit("location")}
           className="inline-flex items-center gap-1 rounded-lg border border-border bg-white px-3 py-1.5 text-[12.5px] font-semibold text-foreground hover:bg-muted shadow-sm"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
