@@ -1,0 +1,87 @@
+{
+  "headerTitle": "Assistente Clubero",
+  "headerCount": {
+    "q": "Domanda {{current}} / {{total}}",
+    "summary": "Riepilogo"
+  },
+  "headerHint": {
+    "sport": "Tutto il resto si adatta allo sport scelto.",
+    "playersPerTeam": "Numero di giocatori in campo.",
+    "numTeams": "Calcolo i gironi dietro le quinte.",
+    "scheduleFormat": "Il più comune: gironi poi fase finale.",
+    "eliminatedContinue": "Decide se ci sono partite di classifica.",
+    "flightsTemplate": "Più trofei = ogni livello ha la sua finale.",
+    "matchDuration": "In minuti — tempo di gioco per partita.",
+    "pause": "Tempo di rotazione tra due partite sullo stesso campo.",
+    "terrains": "Più campi = fine anticipata.",
+    "terrainNaming": "Nominali ora o più tardi.",
+    "terrainNames": "Dai un nome a ogni campo.",
+    "paid": "Iscrizione a pagamento o gratuita?",
+    "paidAmount": "Quota per squadra.",
+    "name": "Nome mostrato sulla pagina pubblica.",
+    "date": "Quando si svolge il torneo?",
+    "location": "Indirizzo o città della struttura.",
+    "summary": "Tutto pronto. Controlla, simula gli orari se vuoi e crea."
+  },
+  "questionLabel": "Domanda {{n}}",
+  "tapHint": "Tocca una risposta — l'assistente prosegue da solo",
+  "recap": {
+    "title": "Il tuo torneo",
+    "building": "si costruisce ↓",
+    "playersPerTeam": "da {{n}}",
+    "teams": "{{n}} squadre",
+    "match": "partite {{min}} min",
+    "pause": "pausa {{min}} min",
+    "terrains": "{{n}} campi",
+    "pools284": "2 gironi da 4",
+    "pools4x3": "4 gironi da 3",
+    "pools4x4": "4 gironi da 4",
+    "pools6x4": "6 gironi da 4",
+    "pools8x4": "8 gironi da 4",
+    "flights_champions": "Champions · Europa · Conference",
+    "flights_simple": "Principale · Consolazione"
+  },
+  "summary": {
+    "title": "Pronto per creare 🎉",
+    "subtitle": "Tutto configurato — senza aprire un solo menu.",
+    "editAnswer": "Modifica una risposta",
+    "sport": "Sport e formato",
+    "teams": "Squadre",
+    "finals": "Fase finale",
+    "singleBracket": "Tabellone unico",
+    "matches": "Partite",
+    "matchesValue": "{{min}} min · pausa {{pause}} min · {{terrains}} campi",
+    "registration": "Iscrizione",
+    "name": "Nome",
+    "date": "Data",
+    "location": "Luogo",
+    "simulateCta": "Simula orari (vedi ora di fine)",
+    "simTitle": "Stima orari",
+    "simTotal": "Partite totali",
+    "simSlot": "Slot (durata + pausa)",
+    "simLunch": "Pausa pranzo",
+    "simTerrains": "Campi"
+  },
+  "footerSub": {
+    "question": "L'assistente resta qui — modifica senza perdere nulla",
+    "summary": "Modificabile in qualsiasi momento dopo"
+  },
+  "q": {
+    "pause": "Pausa tra le partite?",
+    "terrainNaming": "Nominare i campi?",
+    "terrainNames": "Nome di ogni campo"
+  },
+  "opts": {
+    "poolsFinalsHint": "Il più comune",
+    "roundRobinHint": "Tutti contro tutti",
+    "singleElimHint": "Veloce, un vincitore",
+    "eliminatedYesHint": "Ogni squadra continua a giocare (più tabelloni)",
+    "eliminatedNoHint": "Solo le qualificate continuano",
+    "flightsChampionsHint": "3 tabelloni — ogni livello con finale",
+    "flightsSimpleHint": "2 tabelloni — finale principale + consolazione",
+    "terrainNamingNow": "Nominali ora",
+    "terrainNamingNowHint": "Centrale, Campo A…",
+    "terrainNamingLater": "Più tardi",
+    "terrainNamingLaterHint": "Campo 1, 2, 3…"
+  }
+}

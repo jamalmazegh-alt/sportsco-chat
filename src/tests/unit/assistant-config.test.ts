@@ -100,6 +100,17 @@ describe("assistant-config", () => {
     });
   });
 
+  it("builds create payload with break_min from pause", () => {
+    const cfg = emptyConfig({
+      name: "Test Cup",
+      startsOn: "2026-06-15",
+      location: "Stade A",
+      pauseMin: 5,
+    });
+    const payload = configToCreatePayload("00000000-0000-0000-0000-000000000001", cfg);
+    expect(payload.update.break_min).toBe(5);
+  });
+
   it("uses nearestSupportedTeams for wizard num_teams", () => {
     expect(nearestSupportedTeams(10)).toBe(8);
     expect(nearestSupportedTeams(20)).toBe(16);

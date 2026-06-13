@@ -116,16 +116,18 @@ export function DrawDialog({
 
   useEffect(() => {
     if (!open) return;
-    // Reset state on open
+    // Reset state on open — preserve "finished" when a draw already exists (B-04).
     setMode("auto");
     setRevealed([]);
     setPool([]);
-    setFinished(false);
+    setFinished(hasExistingDraw);
     setDrawing(false);
     const init: Record<string, number | null> = {};
     teams.forEach((t) => (init[t.id] = null));
     setManualAssign(init);
-  }, [open, teams]);
+  }, [open, teams, hasExistingDraw]);
+
+  const drawLocked = ["published", "in_progress", "completed"].includes(status);
 
   useEffect(() => {
     return () => {
@@ -675,7 +677,7 @@ export function DrawDialog({
           )}
 
           <DialogFooter className="gap-2 sm:gap-2">
-            {hasExistingDraw && !drawing && (
+            {hasExistingDraw && !drawing && !drawLocked && (
               <Button
                 variant="outline"
                 onClick={() => {

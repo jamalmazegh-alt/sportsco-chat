@@ -1,0 +1,87 @@
+{
+  "headerTitle": "Clubero-Assistent",
+  "headerCount": {
+    "q": "Frage {{current}} / {{total}}",
+    "summary": "Zusammenfassung"
+  },
+  "headerHint": {
+    "sport": "Alles Weitere passt sich dem gewählten Sport an.",
+    "playersPerTeam": "Anzahl Spieler auf dem Feld.",
+    "numTeams": "Ich berechne die Gruppen im Hintergrund.",
+    "scheduleFormat": "Am häufigsten: Gruppen, dann K.-o.-Phase.",
+    "eliminatedContinue": "Entscheidet, ob Platzierungsspiele stattfinden.",
+    "flightsTemplate": "Mehrere Trophäen = jedes Niveau hat ein Finale.",
+    "matchDuration": "In Minuten — reine Spielzeit pro Match.",
+    "pause": "Wechselzeit zwischen zwei Spielen auf einem Platz.",
+    "terrains": "Mehr Plätze = früheres Ende.",
+    "terrainNaming": "Jetzt benennen oder später.",
+    "terrainNames": "Jedem Platz einen Namen geben.",
+    "paid": "Kostenpflichtige oder kostenlose Anmeldung?",
+    "paidAmount": "Gebühr pro Team.",
+    "name": "Name auf der öffentlichen Seite.",
+    "date": "Wann findet das Turnier statt?",
+    "location": "Adresse oder Stadt des Austragungsorts.",
+    "summary": "Alles bereit. Prüfen, Zeiten simulieren, dann erstellen."
+  },
+  "questionLabel": "Frage {{n}}",
+  "tapHint": "Antwort antippen — der Assistent macht automatisch weiter",
+  "recap": {
+    "title": "Dein Turnier",
+    "building": "nimmt Form an ↓",
+    "playersPerTeam": "{{n}}er",
+    "teams": "{{n}} Teams",
+    "match": "{{min}} Min. Spiele",
+    "pause": "{{min}} Min. Pause",
+    "terrains": "{{n}} Plätze",
+    "pools284": "2 Gruppen à 4",
+    "pools4x3": "4 Gruppen à 3",
+    "pools4x4": "4 Gruppen à 4",
+    "pools6x4": "6 Gruppen à 4",
+    "pools8x4": "8 Gruppen à 4",
+    "flights_champions": "Champions · Europa · Conference",
+    "flights_simple": "Haupt · Trost"
+  },
+  "summary": {
+    "title": "Bereit zum Erstellen 🎉",
+    "subtitle": "Alles konfiguriert — kein einziges Menü geöffnet.",
+    "editAnswer": "Antwort ändern",
+    "sport": "Sport & Format",
+    "teams": "Teams",
+    "finals": "Finalphase",
+    "singleBracket": "Einzelner Turnierbaum",
+    "matches": "Spiele",
+    "matchesValue": "{{min}} Min. · {{pause}} Min. Pause · {{terrains}} Plätze",
+    "registration": "Anmeldung",
+    "name": "Name",
+    "date": "Datum",
+    "location": "Ort",
+    "simulateCta": "Zeitplan simulieren (Endzeit ansehen)",
+    "simTitle": "Zeitschätzung",
+    "simTotal": "Spiele gesamt",
+    "simSlot": "Slot (Dauer + Pause)",
+    "simLunch": "Mittagspause",
+    "simTerrains": "Plätze"
+  },
+  "footerSub": {
+    "question": "Der Assistent bleibt — anpassen ohne Datenverlust",
+    "summary": "Später jederzeit änderbar"
+  },
+  "q": {
+    "pause": "Pause zwischen Spielen?",
+    "terrainNaming": "Plätze benennen?",
+    "terrainNames": "Name jedes Platzes"
+  },
+  "opts": {
+    "poolsFinalsHint": "Am häufigsten",
+    "roundRobinHint": "Jeder gegen jeden",
+    "singleElimHint": "Schnell, ein Sieger",
+    "eliminatedYesHint": "Jedes Team behält Spiele (mehrere Tabellen)",
+    "eliminatedNoHint": "Nur Qualifikanten spielen weiter",
+    "flightsChampionsHint": "3 Tabellen — jedes Niveau mit Finale",
+    "flightsSimpleHint": "2 Tabellen — Hauptfinale + Trost",
+    "terrainNamingNow": "Jetzt benennen",
+    "terrainNamingNowHint": "Zentral, Platz A…",
+    "terrainNamingLater": "Später",
+    "terrainNamingLaterHint": "Platz 1, 2, 3…"
+  }
+}
