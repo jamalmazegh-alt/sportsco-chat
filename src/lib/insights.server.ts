@@ -1,7 +1,7 @@
 // Server-only helpers for coach insights detection + AI message generation.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
+import { z } from "zod";
+import { callLLM } from "@/lib/llm/core.server";
 
 type InsightType =
   | "pending_convocations"
@@ -314,42 +314,36 @@ async function detectMissingGuardian(clubId: string): Promise<DetectedInsight[]>
   return out;
 }
 
+const InsightMessagesSchema = z.object({
+  fr: z.string().min(1).max(280),
+  en: z.string().min(1).max(280),
+});
+
 async function generateMessages(
   userPrompt: string,
+  clubId: string,
 ): Promise<{ fr: string; en: string } | null> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) {
-    console.warn("[insights] LOVABLE_API_KEY missing — falling back to default messages");
-    return null;
-  }
   const system = `You are a helpful assistant for sports club coaches.
 Generate two short, friendly, actionable insight messages
 for a coach based on the structured data provided.
 One in French, one in English.
 Keep each message under 120 characters.
 Be direct and specific — include names and numbers.
-Return JSON only: { "fr": "...", "en": "..." }`;
+Return JSON only, with this exact shape:
+{ "fr": "...", "en": "..." }
+Do not wrap in markdown or add commentary.`;
 
-  try {
-    const gateway = createLovableAiGatewayProvider(apiKey);
-    const model = gateway("google/gemini-2.5-flash-lite");
-    const { text } = await generateText({
-      model,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: userPrompt },
-      ],
-    });
-    const cleaned = text.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(cleaned);
-    if (typeof parsed?.fr === "string" && typeof parsed?.en === "string") {
-      return { fr: parsed.fr, en: parsed.en };
-    }
-    return null;
-  } catch (e) {
-    console.error("[insights] AI generation failed", e);
-    return null;
-  }
+  const res = await callLLM({
+    feature: "coach_insights",
+    userId: null,
+    clubId,
+    system,
+    prompt: userPrompt,
+    schema: InsightMessagesSchema,
+    jsonResponse: true,
+  });
+  if (!res.ok) return null;
+  return { fr: res.data.fr, en: res.data.en };
 }
 
 function fallbackMessages(ins: DetectedInsight): { fr: string; en: string } {
@@ -419,7 +413,7 @@ export async function detectAndGenerateInsightsForClub(
 
   let created = 0;
   for (const ins of fresh) {
-    const ai = await generateMessages(ins.userPrompt);
+    const ai = await generateMessages(ins.userPrompt, ins.club_id);
     const msgs = ai ?? fallbackMessages(ins);
     const { error } = await supabaseAdmin.from("coach_insights").insert({
       club_id: ins.club_id,

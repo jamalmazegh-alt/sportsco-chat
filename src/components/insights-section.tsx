@@ -1,12 +1,13 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { Clock, UserX, Trophy, Shield, X, Sparkles, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, UserX, Trophy, Shield, X, Sparkles, ChevronRight, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { dismissInsight } from "@/lib/insights.functions";
+import { refreshCoachInsights } from "@/lib/llm/coach-insights.functions";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -112,6 +113,53 @@ export function InsightsSection({ clubId }: { clubId: string }) {
     },
   });
 
+  const REFRESH_KEY = `coach-insights-last-refresh:${clubId}`;
+  const [lastRefreshAt, setLastRefreshAt] = useState<number>(() => {
+    if (typeof window === "undefined") return 0;
+    return Number(window.localStorage.getItem(REFRESH_KEY) ?? 0);
+  });
+  const [now, setNow] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const cooldownRemainingMs = Math.max(0, lastRefreshAt + 24 * 3600 * 1000 - now);
+  const cooldownActive = cooldownRemainingMs > 0;
+
+  const refreshMutation = useMutation({
+    mutationFn: () => refreshCoachInsights({ data: { clubId } }),
+    onSuccess: (res) => {
+      if (res?.ok) {
+        const ts = Date.now();
+        setLastRefreshAt(ts);
+        try {
+          window.localStorage.setItem(REFRESH_KEY, String(ts));
+        } catch {
+          /* ignore */
+        }
+        toast.success(t("coachInsightsAi.refreshDone", { ns: "tournaments" }));
+        qc.invalidateQueries({ queryKey: ["coach-insights", clubId, user?.id] });
+      } else if (res?.reason === "rate_limited") {
+        // Server says we already used today's quota — sync local cooldown.
+        const ts = Date.now();
+        setLastRefreshAt(ts);
+        try {
+          window.localStorage.setItem(REFRESH_KEY, String(ts));
+        } catch {
+          /* ignore */
+        }
+        toast.error(t("coachInsightsAi.refreshLimited", { ns: "tournaments" }));
+      } else {
+        toast.error(t("coachInsightsAi.refreshError", { ns: "tournaments" }));
+      }
+    },
+    onError: () => {
+      toast.error(t("coachInsightsAi.refreshError", { ns: "tournaments" }));
+    },
+  });
+
+  const refreshDisabled = refreshMutation.isPending || cooldownActive;
+
   if (!insights || insights.length === 0) return null;
 
   const handleAction = (ins: InsightRow) => {
@@ -161,9 +209,36 @@ export function InsightsSection({ clubId }: { clubId: string }) {
             {t("insights.title")}
           </h2>
         </div>
-        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
-          {insights.length}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
+            {insights.length}
+          </span>
+          <button
+            type="button"
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshDisabled}
+            title={
+              cooldownActive
+                ? t("coachInsightsAi.refreshLimited", { ns: "tournaments" })
+                : t("coachInsightsAi.refresh", { ns: "tournaments" })
+            }
+            aria-label={t("coachInsightsAi.refresh", { ns: "tournaments" })}
+            className={cn(
+              "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors",
+              "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+            )}
+          >
+            <RefreshCw
+              className={cn("h-3 w-3", refreshMutation.isPending && "animate-spin")}
+            />
+            <span>
+              {refreshMutation.isPending
+                ? t("coachInsightsAi.refreshing", { ns: "tournaments" })
+                : t("coachInsightsAi.refresh", { ns: "tournaments" })}
+            </span>
+          </button>
+        </div>
       </div>
       <div className="space-y-2">
         {insights.map((ins) => {
