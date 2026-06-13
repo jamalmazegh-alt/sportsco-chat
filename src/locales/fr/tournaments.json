@@ -1234,7 +1234,7 @@
     "refreshDone": "Insights mis à jour",
     "refreshLimited": "Tu as déjà actualisé aujourd'hui. Réessaie demain.",
     "refreshError": "Impossible d'actualiser pour le moment."
-  }
+  },
   "simulator": {
     "title": "Simulateur de tournoi",
     "subtitle": "Ajuste les paramètres, vois l'impact en direct.",
