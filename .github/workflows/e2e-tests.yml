@@ -35,11 +35,29 @@ jobs:
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
 
+      - name: Start app (bughunt Supabase)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          bun run dev -- --host 127.0.0.1 --port 8080 &
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8080/ >/dev/null; then
+              echo "App ready on http://127.0.0.1:8080"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "App failed to start within 120s"
+          exit 1
+
       - name: Run E2E tests
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          E2E_BASE_URL: ${{ secrets.E2E_BASE_URL }}
+          E2E_BASE_URL: http://127.0.0.1:8080
           E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
           E2E_COACH_EMAIL: ${{ secrets.E2E_COACH_EMAIL }}
