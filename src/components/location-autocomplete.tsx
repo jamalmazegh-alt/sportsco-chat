@@ -14,7 +14,6 @@ interface Suggestion {
 
 declare global {
   interface Window {
-    google?: any;
     __cluberoGoogleMapsPromise?: Promise<void>;
   }
 }
@@ -30,7 +29,7 @@ function fetchGoogleMapsKey(): Promise<string | null> {
 
 function loadGoogleMapsPlaces(key: string | null | undefined): Promise<void> | null {
   if (typeof window === "undefined" || !key) return null;
-  if (window.google?.maps?.places) return Promise.resolve();
+  if ((window as any).google?.maps?.places) return Promise.resolve();
   if (!window.__cluberoGoogleMapsPromise) {
     window.__cluberoGoogleMapsPromise = new Promise((resolve, reject) => {
       const existing = document.querySelector<HTMLScriptElement>("script[data-clubero-google-maps]");
@@ -88,8 +87,9 @@ export function LocationAutocomplete({ value, onChange, placeholder, className }
     fetchGoogleMapsKey().then((key) => {
       const loader = loadGoogleMapsPlaces(key);
       loader?.then(() => {
-        if (!cancelled && window.google?.maps?.places) {
-          googleServiceRef.current = new window.google.maps.places.AutocompleteService();
+        const googlePlaces = (window as any).google?.maps?.places;
+        if (!cancelled && googlePlaces) {
+          googleServiceRef.current = new googlePlaces.AutocompleteService();
         }
       }).catch(() => undefined);
     });
