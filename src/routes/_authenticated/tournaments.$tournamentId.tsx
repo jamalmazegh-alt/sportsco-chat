@@ -95,6 +95,9 @@ function TournamentDetailPage() {
     // Sprint 2 — cockpit live updates via polling (no realtime channel).
     refetchInterval: 20_000,
     refetchIntervalInBackground: false,
+  });
+
+
 
   const publish = useMutation({
     mutationFn: (status: "published" | "in_progress" | "completed" | "draft") =>
