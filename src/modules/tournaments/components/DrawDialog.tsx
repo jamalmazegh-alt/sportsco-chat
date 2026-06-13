@@ -440,21 +440,35 @@ export function DrawDialog({
                   <p className="text-sm text-muted-foreground">
                     {t("draw.autoDesc")}
                   </p>
-                  <Button
-                    onClick={() => maybeConfirm(runAuto)}
-                    disabled={applyMut.isPending}
-                    className="w-full"
-                  >
-                    {applyMut.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" />
-                        {t("draw.launch")}
-                      </>
-                    )}
-                  </Button>
+                  {/* B-04 — once the draw is done, hide the green CTA. The
+                      footer "Relancer" (outline + confirm sheet) is the only
+                      way to re-roll, with strong confirmation. */}
+                  {!finished ? (
+                    <Button
+                      onClick={() => maybeConfirm(runAuto)}
+                      disabled={applyMut.isPending || tournamentStarted}
+                      className="w-full"
+                      variant={hasExistingDraw ? "outline" : "default"}
+                    >
+                      {applyMut.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          {hasExistingDraw ? t("draw.relaunch") : t("draw.launch")}
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      {t("draw.relaunchFromFooterHint", {
+                        defaultValue:
+                          'Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus).',
+                      })}
+                    </p>
+                  )}
                 </TabsContent>
+
 
                 {/* PROGRESSIVE */}
                 <TabsContent value="progressive" className="space-y-3">
