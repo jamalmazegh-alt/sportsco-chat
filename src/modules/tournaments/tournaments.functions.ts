@@ -798,6 +798,23 @@ export const recordMatchScore = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     // B2 — faire avancer le bracket après la saisie du score.
     await applyBracketProgression(data.tournament_id);
+    // Auto-démarrage : dès qu'un score est saisi sur un tournoi "published",
+    // on bascule en "in_progress" sans demander à l'organisateur.
+    try {
+      const { data: tRow } = await supabase
+        .from("tournaments")
+        .select("status")
+        .eq("id", data.tournament_id)
+        .single();
+      if (tRow?.status === "published") {
+        await supabase
+          .from("tournaments")
+          .update({ status: "in_progress" })
+          .eq("id", data.tournament_id);
+      }
+    } catch {
+      /* best-effort */
+    }
     return { match: row };
   });
 
