@@ -87,7 +87,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
+      <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : requestClose())}>
         <DialogContent
           className={
             mode === "ai"
