@@ -23,7 +23,12 @@ export interface AssistantTournamentConfig {
   eliminatedContinue: boolean;
   flightsTemplate: FlightsTemplateChoice;
   matchDurationMin: number;
+  /** Pause entre deux matchs sur un terrain (rotation). */
+  pauseMin: number;
   terrains: number;
+  /** "now" = nommer les terrains tout de suite, "later" = plus tard. */
+  terrainNaming: "now" | "later";
+  terrainNames: string[];
   paid: boolean;
   registrationFeeCents: number;
   registrationCurrency: string;
@@ -42,7 +47,10 @@ export type AssistantStepId =
   | "eliminatedContinue"
   | "flightsTemplate"
   | "matchDuration"
+  | "pause"
   | "terrains"
+  | "terrainNaming"
+  | "terrainNames"
   | "paid"
   | "paidAmount"
   | "name"
@@ -52,6 +60,7 @@ export type AssistantStepId =
 
 export const TEAM_COUNT_PRESETS = [8, 12, 16, 24, 32] as const;
 export const MATCH_DURATION_PRESETS = [8, 10, 12, 15, 20] as const;
+export const PAUSE_PRESETS = [0, 3, 5, 10] as const;
 export const TERRAIN_PRESETS = [1, 2, 3, 4, 5] as const;
 
 const FOOTBALL_PLAYERS = [5, 7, 8, 9, 11] as const;
