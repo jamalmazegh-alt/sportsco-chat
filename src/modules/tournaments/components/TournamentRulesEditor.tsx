@@ -57,6 +57,7 @@ import {
   generateRulesPdf,
   listTournamentDocuments,
 } from "../tournaments.functions";
+import { TournamentRulesAIGenerator } from "./TournamentRulesAIGenerator";
 
 interface Props {
   tournamentId: string;
