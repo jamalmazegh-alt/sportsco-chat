@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Info,
@@ -11,13 +11,7 @@ import {
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { GroupsAndFixtures } from "./GroupsAndFixtures";
@@ -27,6 +21,12 @@ import { FieldsManager } from "./FieldsManager";
 import { TournamentRulesEditor } from "./TournamentRulesEditor";
 import { StaffAndOfficialsPanel } from "./StaffAndOfficialsPanel";
 import { ShareDialog } from "./ShareDialog";
+import type {
+  TournamentWithClub,
+  TournamentTeamRow,
+  TournamentMatchRow,
+  TournamentGroupRow,
+} from "../types";
 
 export type SettingsTopic =
   | "infos"
@@ -40,10 +40,10 @@ export type SettingsTopic =
 export type FormatView = "all" | "format" | "draw" | "schedule";
 
 interface Props {
-  tournament: any;
-  teams: any[];
-  matches: any[];
-  groups: any[];
+  tournament: TournamentWithClub;
+  teams: TournamentTeamRow[];
+  matches: TournamentMatchRow[];
+  groups: TournamentGroupRow[];
   publicUrl: string;
   /** Controlled open state (optional). */
   open?: boolean;
@@ -55,12 +55,42 @@ interface Props {
 }
 
 const TOPICS: { id: SettingsTopic; icon: typeof Info; labelKey: string; defaultLabel: string }[] = [
-  { id: "infos", icon: Info, labelKey: "controlCenter.settings.infos", defaultLabel: "Informations & règles" },
-  { id: "format", icon: Shuffle, labelKey: "controlCenter.settings.format", defaultLabel: "Format" },
-  { id: "registrations", icon: ClipboardList, labelKey: "controlCenter.settings.registrations", defaultLabel: "Inscriptions" },
-  { id: "payments", icon: CreditCard, labelKey: "controlCenter.settings.payments", defaultLabel: "Paiement" },
-  { id: "fields", icon: MapPin, labelKey: "controlCenter.settings.fields", defaultLabel: "Terrains" },
-  { id: "staff", icon: UserCog, labelKey: "sections.staffAndOfficials", defaultLabel: "Staff & arbitres" },
+  {
+    id: "infos",
+    icon: Info,
+    labelKey: "controlCenter.settings.infos",
+    defaultLabel: "Informations & règles",
+  },
+  {
+    id: "format",
+    icon: Shuffle,
+    labelKey: "controlCenter.settings.format",
+    defaultLabel: "Format",
+  },
+  {
+    id: "registrations",
+    icon: ClipboardList,
+    labelKey: "controlCenter.settings.registrations",
+    defaultLabel: "Inscriptions",
+  },
+  {
+    id: "payments",
+    icon: CreditCard,
+    labelKey: "controlCenter.settings.payments",
+    defaultLabel: "Paiement",
+  },
+  {
+    id: "fields",
+    icon: MapPin,
+    labelKey: "controlCenter.settings.fields",
+    defaultLabel: "Terrains",
+  },
+  {
+    id: "staff",
+    icon: UserCog,
+    labelKey: "sections.staffAndOfficials",
+    defaultLabel: "Staff & arbitres",
+  },
   { id: "share", icon: Share2, labelKey: "controlCenter.settings.share", defaultLabel: "Partage" },
 ];
 
@@ -107,10 +137,7 @@ export function TournamentSettingsMenu({
           <MoreVertical className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent
-        side="right"
-        className="w-full sm:max-w-md p-0 flex flex-col"
-      >
+      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
         <SheetHeader className="px-4 py-3 border-b border-border flex-row items-center gap-2 space-y-0">
           {topic && (
             <Button
@@ -177,7 +204,9 @@ export function TournamentSettingsMenu({
               <GroupsAndFixtures
                 view={formatView}
                 tournamentId={tournament.id}
-                format={tournament.format}
+                // GroupsAndFixtures only handles the pool/KO subset; the jsonb
+                // columns (fields/settings) are narrowed at this boundary.
+                format={tournament.format as "group" | "knockout" | "mixed"}
                 status={tournament.status}
                 numTeams={teams.length}
                 teams={teams}
@@ -188,8 +217,12 @@ export function TournamentSettingsMenu({
                 breakMin={tournament.break_min}
                 dailyStartTime={tournament.daily_start_time}
                 dailyEndTime={tournament.daily_end_time}
-                fields={tournament.fields}
-                settings={tournament.settings}
+                fields={tournament.fields as string[] | null}
+                settings={
+                  tournament.settings as unknown as ComponentProps<
+                    typeof GroupsAndFixtures
+                  >["settings"]
+                }
               />
             </div>
           )}
@@ -230,10 +263,12 @@ export function TournamentSettingsMenu({
             <div className="p-4">
               <FieldsManager
                 tournamentId={tournament.id}
-                fields={tournament.fields}
+                // jsonb fields → string[]; MatchRow → FieldsManager's local
+                // Match shape — boundary casts, no runtime change.
+                fields={tournament.fields as string[] | null}
                 dailyStartTime={tournament.daily_start_time}
                 dailyEndTime={tournament.daily_end_time}
-                matches={matches}
+                matches={matches as unknown as ComponentProps<typeof FieldsManager>["matches"]}
                 teams={teams}
               />
             </div>

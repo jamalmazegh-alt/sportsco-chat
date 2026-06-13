@@ -22,11 +22,8 @@ import {
 import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import {
-  getTournament,
-  updateTournament,
-} from "@/modules/tournaments/tournaments.functions";
-import { resolveScoring } from "@/modules/tournaments/lib/formats";
+import { getTournament, updateTournament } from "@/modules/tournaments/tournaments.functions";
+import { resolveScoring, type ScoringRules } from "@/modules/tournaments/lib/formats";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 
 import { TeamsManager } from "@/modules/tournaments/components/TeamsManager";
@@ -52,6 +49,7 @@ import {
   countMatches,
   type ContinueAction,
 } from "@/modules/tournaments/lib/control-center";
+import type { TournamentDetail } from "@/modules/tournaments/types";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
   component: TournamentDetailPage,
@@ -89,7 +87,7 @@ function TournamentDetailPage() {
 
   const q = useQuery({
     queryKey: ["tournament", tournamentId],
-    queryFn: () => getFn({ data: { tournament_id: tournamentId } }),
+    queryFn: (): Promise<TournamentDetail> => getFn({ data: { tournament_id: tournamentId } }),
   });
 
   const publish = useMutation({
@@ -99,7 +97,10 @@ function TournamentDetailPage() {
       toast.success(t("detail.statusUpdated"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: any) => toast.error(e?.message ?? t("common.error", { defaultValue: "Erreur" })),
+    onError: (e: unknown) =>
+      toast.error(
+        (e as { message?: string })?.message ?? t("common.error", { defaultValue: "Erreur" }),
+      ),
   });
 
   // Score-entry auto-open id (consumed once by MatchesList)
@@ -117,16 +118,15 @@ function TournamentDetailPage() {
   };
 
   const isLoading = q.isLoading;
-  const hasData = !!q.data;
-  const { tournament, groups, teams, matches, flights } = (q.data ?? {
-    tournament: null as any,
-    groups: [] as any[],
-    teams: [] as any[],
-    matches: [] as any[],
-    flights: [] as any[],
-  });
+  const data = q.data;
+  const hasData = !!data;
+  const tournament = data?.tournament ?? null;
+  const groups = data?.groups ?? [];
+  const teams = data?.teams ?? [];
+  const matches = data?.matches ?? [];
+  const flights = data?.flights ?? [];
   const canManage =
-    (q.data as any)?.canManage === true ||
+    data?.canManage === true ||
     roles.includes("admin") ||
     roles.includes("tournament_manager") ||
     (role as string) === "dirigeant";
@@ -138,50 +138,51 @@ function TournamentDetailPage() {
     : "";
   const scoring = tournament
     ? resolveScoring(
-        (tournament as any).sport,
-        ((tournament as any).settings as any)?.scoring,
+        tournament.sport,
+        // settings is jsonb (Json) — read the optional scoring block.
+        (tournament.settings as { scoring?: Partial<ScoringRules> } | null)?.scoring,
       )
     : null;
-  const mergedRules = tournament ? mergeRules((tournament as any).settings) : null;
+  const mergedRules = tournament ? mergeRules(tournament.settings) : null;
   const registrationEnabled = mergedRules?.registration.enabled ?? false;
 
   // ─── Sprint 1: control-center derivations ─────────────────────────────────
+  // Depend on the (react-query stable) `data` reference rather than the derived
+  // `?? []` fallbacks, which would otherwise create new identities each render.
   const stepper = useMemo(
     () =>
-      tournament
+      data?.tournament
         ? computeStepper({
-            tournament: tournament as any,
-            teamsCount: (teams as any[]).length,
-            groupsCount: (groups as any[]).length,
-            matches: matches as any[],
-            flightsCount: (flights as any[]).length,
+            tournament: data.tournament,
+            teamsCount: data.teams.length,
+            groupsCount: data.groups.length,
+            matches: data.matches,
+            flightsCount: data.flights.length,
           })
         : [],
-    [tournament, teams, groups, matches, flights],
+    [data],
   );
 
   const continueAction: ContinueAction = useMemo(
     () =>
-      tournament
+      data?.tournament
         ? computeContinueAction({
-            tournament: tournament as any,
-            teamsCount: (teams as any[]).length,
-            groupsCount: (groups as any[]).length,
-            matches: matches as any[],
-            flightsCount: (flights as any[]).length,
+            tournament: data.tournament,
+            teamsCount: data.teams.length,
+            groupsCount: data.groups.length,
+            matches: data.matches,
+            flightsCount: data.flights.length,
           })
         : { kind: "all_done" },
-    [tournament, teams, groups, matches, flights],
+    [data],
   );
 
-  const counters = useMemo(() => countMatches(matches as any[]), [matches]);
+  const counters = useMemo(() => countMatches(data?.matches ?? []), [data]);
 
-  const hasFlights = (flights as any[]).length > 0;
+  const hasFlights = flights.length > 0;
   const poolMatchesDone =
-    (matches as any[]).filter((m: any) => m.round === "group").length > 0 &&
-    (matches as any[])
-      .filter((m: any) => m.round === "group")
-      .every((m: any) => m.status === "completed");
+    matches.filter((m) => m.round === "group").length > 0 &&
+    matches.filter((m) => m.round === "group").every((m) => m.status === "completed");
   const showFlightsSection = canManage && (hasFlights || poolMatchesDone);
 
   // Handle Continue CTA clicks
@@ -251,9 +252,9 @@ function TournamentDetailPage() {
           {canManage && (
             <TournamentSettingsMenu
               tournament={tournament}
-              teams={teams as any[]}
-              matches={matches as any[]}
-              groups={groups as any[]}
+              teams={teams}
+              matches={matches}
+              groups={groups}
               publicUrl={publicUrl}
               open={settingsOpen}
               onOpenChange={setSettingsOpen}
@@ -299,9 +300,11 @@ function TournamentDetailPage() {
 
       {/* ─── Live courts ─────────────────────────────────────────────────── */}
       <div className="px-5 pt-5">
+        {/* DB rows vs LiveCourts' local shapes — cast to the component's own
+            prop types (jsonb/enum columns diverge), no runtime change. */}
         <LiveCourts
-          matches={matches as any[]}
-          teams={teams as any[]}
+          matches={matches as unknown as React.ComponentProps<typeof LiveCourts>["matches"]}
+          teams={teams as unknown as React.ComponentProps<typeof LiveCourts>["teams"]}
           onSelect={canManage ? focusMatch : undefined}
         />
       </div>
@@ -311,11 +314,12 @@ function TournamentDetailPage() {
       <div className="px-5 pt-5 space-y-3">
         {canManage && (
           <PublishWorkflow
-            tournament={tournament as any}
-            teamsCount={(teams as any[])?.length ?? 0}
+            tournament={tournament}
+            teamsCount={teams.length}
             fieldsCount={
-              Array.isArray(((tournament as any).settings as any)?.fields)
-                ? ((tournament as any).settings as any).fields.length
+              // settings.fields is jsonb — probe defensively.
+              Array.isArray((tournament.settings as { fields?: unknown } | null)?.fields)
+                ? ((tournament.settings as { fields?: unknown }).fields as unknown[]).length
                 : 0
             }
             publicUrl={publicUrl}
@@ -330,12 +334,17 @@ function TournamentDetailPage() {
             tournament={{ id: tournament.id, status: tournament.status }}
             hasRealClubMembership={memberships.length > 0}
             resultsCount={
-              (matches as any[]).filter(
-                (m: any) =>
-                  m?.status === "completed" ||
-                  m?.home_score != null ||
-                  m?.away_score != null,
-              ).length
+              // home_score/away_score are legacy field probes (not on the row);
+              // read them defensively without changing the original behaviour.
+              matches.filter((m) => {
+                const legacy = m as unknown as {
+                  home_score?: number | null;
+                  away_score?: number | null;
+                };
+                return (
+                  m.status === "completed" || legacy.home_score != null || legacy.away_score != null
+                );
+              }).length
             }
             surface="tournament_admin"
           />
@@ -367,8 +376,8 @@ function TournamentDetailPage() {
           <PublishProgrammeCard
             tournamentId={tournament.id}
             status={tournament.status}
-            teams={(teams as any[]).map((tt) => ({ id: tt.id, group_id: tt.group_id ?? null }))}
-            matchesCount={(matches as any[])?.length ?? 0}
+            teams={teams.map((tt) => ({ id: tt.id, group_id: tt.group_id ?? null }))}
+            matchesCount={matches.length}
             hasStartDate={Boolean(tournament.starts_on)}
           />
         </div>
@@ -383,10 +392,12 @@ function TournamentDetailPage() {
         >
           <MatchesList
             tournamentId={tournament.id}
-            matches={matches as any}
-            teams={teams as any}
+            // DB rows vs the component's local Match/Team shapes (jsonb sets,
+            // enum columns) — cast to the component's own prop types.
+            matches={matches as unknown as React.ComponentProps<typeof MatchesList>["matches"]}
+            teams={teams as unknown as React.ComponentProps<typeof MatchesList>["teams"]}
             canManage={canManage}
-            fields={((tournament as any).fields as string[] | null) ?? []}
+            fields={(tournament.fields as string[] | null) ?? []}
             scoring={scoring ?? undefined}
             autoOpenMatchId={focusMatchId}
             onAutoOpenConsumed={() => setFocusMatchId(null)}
@@ -401,9 +412,10 @@ function TournamentDetailPage() {
           <TeamsManager
             tournamentId={tournament.id}
             clubId={tournament.club_id}
-            teams={teams as any}
-            maxTeams={(tournament as any).num_teams ?? null}
-            sport={(tournament as any).sport ?? null}
+            // TeamRow vs TeamsManager's local Team shape — cast to its prop type.
+            teams={teams as unknown as React.ComponentProps<typeof TeamsManager>["teams"]}
+            maxTeams={tournament.num_teams ?? null}
+            sport={tournament.sport ?? null}
           />
         </Section>
 
@@ -433,23 +445,28 @@ function TournamentDetailPage() {
             )}
             <FlightsManager
               tournamentId={tournament.id}
-              numTeams={(teams as any[]).length}
-              numGroups={(groups as any[]).length}
-              flights={(flights as any[]) ?? []}
-              hasGroups={(groups as any[]).length > 0}
+              numTeams={teams.length}
+              numGroups={groups.length}
+              // FlightRow vs FlightsManager's local flight shape — cast to its prop type.
+              flights={flights as unknown as React.ComponentProps<typeof FlightsManager>["flights"]}
+              hasGroups={groups.length > 0}
               groupMatchesCompleted={poolMatchesDone}
             />
           </Section>
         )}
 
         {/* Bracket (knockout) */}
-        {(matches as any[]).some((m: any) => m.round !== "group") && (
+        {matches.some((m) => m.round !== "group") && (
           <Section
             id="section-bracket"
             icon={GitBranch}
             title={t("tabs.bracket", { defaultValue: "Phase finale" })}
           >
-            <BracketView matches={matches as any} teams={teams as any} />
+            {/* DB rows vs BracketView's local shapes — cast to its prop types. */}
+            <BracketView
+              matches={matches as unknown as React.ComponentProps<typeof BracketView>["matches"]}
+              teams={teams as unknown as React.ComponentProps<typeof BracketView>["teams"]}
+            />
           </Section>
         )}
 
@@ -465,15 +482,17 @@ function TournamentDetailPage() {
               tournamentId={tournament.id}
               tournament={{
                 club_id: tournament.club_id ?? null,
-                registration_fee: (tournament as any).registration_fee ?? 0,
-                payment_mode: (tournament as any).payment_mode ?? "offline",
-                club_stripe_charges_enabled:
-                  (tournament as any).club_stripe_charges_enabled ?? false,
+                registration_fee: tournament.registration_fee ?? 0,
+                // payment_mode is a free-form string column; narrow to the union.
+                payment_mode: (tournament.payment_mode ?? "offline") as
+                  | "offline"
+                  | "online"
+                  | "both",
+                club_stripe_charges_enabled: tournament.club_stripe_charges_enabled ?? false,
               }}
             />
           </Section>
         )}
-
       </div>
 
       {/* ─── Sticky bottom CTA ───────────────────────────────────────────── */}
@@ -538,10 +557,7 @@ function Section({
         <Icon className={cn("h-4 w-4", highlight ? "text-primary" : "text-muted-foreground")} />
         <h2 className="text-sm font-semibold uppercase tracking-wide flex-1">{title}</h2>
         <ChevronRight
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform",
-            open && "rotate-90",
-          )}
+          className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-90")}
         />
       </button>
       {open && <div className="pt-2">{children}</div>}
