@@ -19,4 +19,9 @@ describe("googleMapsSearchUrl", () => {
     const existing = "https://www.google.com/maps/place/Paris";
     expect(googleMapsSearchUrl(existing)).toBe(existing);
   });
+
+  it("passes through Google Maps short links", () => {
+    const existing = "https://maps.app.goo.gl/abc123";
+    expect(googleMapsSearchUrl(existing)).toBe(existing);
+  });
 });
