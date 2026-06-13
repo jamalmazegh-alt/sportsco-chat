@@ -285,3 +285,92 @@ function Flag({
     <span className={cn("rounded-md px-2 py-1 text-[11px] font-bold", cls)}>{children}</span>
   );
 }
+
+function AIExplanation({ reco, answers }: { reco: Recommendation; answers: AssistantAnswers }) {
+  const { t, i18n } = useTranslation("tournaments");
+  const locale = i18n.language?.startsWith("en") ? "en" : "fr";
+  const explain = useServerFn(explainRecommendation);
+  const [text, setText] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setText(null);
+    explain({ data: { reco, answers, locale } })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.ok) setText(res.data.explanation);
+      })
+      .catch(() => {})
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [explain, reco, answers, locale]);
+
+  if (loading) {
+    return (
+      <p className="px-1 pt-2 text-xs italic text-muted-foreground">
+        {t("aiAssistant.explanation.loading")}
+      </p>
+    );
+  }
+  if (!text) return null;
+  return <p className="px-1 pt-2 text-sm italic text-muted-foreground">{text}</p>;
+}
+
+function AIFollowUp({ reco }: { reco: Recommendation }) {
+  const { t, i18n } = useTranslation("tournaments");
+  const locale = i18n.language?.startsWith("en") ? "en" : "fr";
+  const ask = useServerFn(answerTournamentQuestion);
+  const [history, setHistory] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function send() {
+    const question = q.trim();
+    if (!question || busy) return;
+    setBusy(true);
+    setHistory((h) => [...h, { role: "user", content: question }]);
+    setQ("");
+    try {
+      const res = await ask({
+        data: { question, reco, history: history.slice(-6), locale },
+      });
+      const answer = res.ok ? res.data.answer : t("aiAssistant.askQuestion.fallback");
+      setHistory((h) => [...h, { role: "assistant", content: answer }]);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="pt-4 border-t border-border space-y-2">
+      <p className="text-xs font-semibold text-muted-foreground">
+        {t("aiAssistant.askQuestion.label")}
+      </p>
+      {history.length > 0 && (
+        <div className="space-y-2">
+          {history.map((m, i) => (
+            <Bubble key={i} role={m.role === "user" ? "me" : "ai"}>
+              {m.content}
+            </Bubble>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && send()}
+          placeholder={t("aiAssistant.askQuestion.placeholder")}
+          disabled={busy}
+        />
+        <Button onClick={send} disabled={busy || !q.trim()} size="icon">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+        </Button>
+      </div>
+    </div>
+  );
+}
