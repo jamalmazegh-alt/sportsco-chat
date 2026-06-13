@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Calculator, Settings2 } from "lucide-react";
+import { Sparkles, Zap, Calculator } from "lucide-react";
 import { TournamentWizard } from "./TournamentWizard";
 import { TournamentAIAssistant } from "./TournamentAIAssistant";
 import { TournamentSimulator } from "./TournamentSimulator";
