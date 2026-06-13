@@ -49,7 +49,29 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
     }, 200);
   }
 
+  /**
+   * B-01 / B-02 — guard against losing wizard answers. When the user tries to
+   * close the dialog while the AI assistant has progress, ask before wiping
+   * the draft. The "Réglages détaillés" path (openExpertFromConfig) and the
+   * simulator transition (onSimulate) preserve the draft automatically.
+   */
+  function requestClose() {
+    const draft = readAssistantDraft();
+    if (mode === "ai" && draftHasProgress(draft)) {
+      const ok = window.confirm(
+        t("createChooser.abandonConfirm", {
+          defaultValue:
+            "Quitter l'assistant ? Tes réponses seront effacées. Tu peux aussi fermer pour les retrouver à la prochaine ouverture.",
+        }),
+      );
+      if (!ok) return;
+      clearAssistantDraft();
+    }
+    close();
+  }
+
   function openExpertFromConfig(cfg: AssistantTournamentConfig) {
+    // Draft is preserved — the expert wizard reads it via assistantPrefill.
     setAssistantPrefill(cfg);
     onOpenChange(false);
     setMode("chooser");
