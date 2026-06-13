@@ -1278,13 +1278,19 @@ function SummaryView({
           onEdit={() => onEdit("scheduleFormat")}
         />
         <SRow
-          k={t("aiAssistant.summary.matches")}
-          v={t("aiAssistant.summary.matchesValue", {
-            min: config.matchDurationMin,
-            pause: config.pauseMin,
-            terrains: config.terrains,
-          })}
+          k={t("aiAssistant.summary.matchDuration", { defaultValue: "Durée d'un match" })}
+          v={`${config.matchDurationMin} min`}
           onEdit={() => onEdit("matchDuration")}
+        />
+        <SRow
+          k={t("aiAssistant.summary.pause", { defaultValue: "Pause entre matchs" })}
+          v={config.pauseMin > 0 ? `${config.pauseMin} min` : t("aiAssistant.opts.none", { defaultValue: "Aucune" })}
+          onEdit={() => onEdit("breaks")}
+        />
+        <SRow
+          k={t("aiAssistant.summary.terrains", { defaultValue: "Terrains" })}
+          v={String(config.terrains)}
+          onEdit={() => onEdit("terrains")}
         />
         <SRow
           k={t("aiAssistant.summary.simLunch")}
