@@ -59,6 +59,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
     tab: typeof search.tab === "string" ? search.tab : undefined,
     sub: typeof search.sub === "string" ? search.sub : undefined,
     focusMatch: typeof search.focusMatch === "string" ? search.focusMatch : undefined,
+    display: search.display === "tv" ? ("tv" as const) : undefined,
   }),
   head: () => ({
     meta: [
