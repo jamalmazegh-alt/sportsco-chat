@@ -42,6 +42,7 @@ export interface AssistantTournamentConfig {
   startsOn: string;
   endsOn: string;
   location: string;
+  useFairPlay: boolean;
   category: string;
 }
 
@@ -53,6 +54,9 @@ export type AssistantStepId =
   | "eliminatedContinue"
   | "flightsTemplate"
   | "matchDuration"
+  | "lunchDuration"
+  | "lunchStart"
+  | "fairPlay"
   | "pause"
   | "terrains"
   | "terrainNaming"
@@ -120,6 +124,7 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     registrationFeeCents: 0,
     registrationCurrency: "eur",
     name: "",
+    useFairPlay: true,
     startsOn: "",
     endsOn: "",
     location: "",
@@ -194,6 +199,9 @@ export function draftHasProgress(draft: AssistantDraft | null): boolean {
 
 /** Étapes actives selon les réponses déjà données. */
 export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): AssistantStepId[] {
+  steps.push("lunchDuration");
+  if (cfg.lunchDurationMin > 0) steps.push("lunchStart");
+  steps.push("fairPlay");
   const steps: AssistantStepId[] = ["sport", "playersPerTeam", "numTeams", "scheduleFormat"];
   if (cfg.scheduleFormat === "pools_finals") {
     steps.push("eliminatedContinue");
