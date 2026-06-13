@@ -1442,6 +1442,66 @@ export type Database = {
           },
         ]
       }
+      llm_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          feature: string
+          locale: string
+          response: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          feature: string
+          locale: string
+          response: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          feature?: string
+          locale?: string
+          response?: Json
+        }
+        Relationships: []
+      }
+      llm_usage: {
+        Row: {
+          club_id: string | null
+          created_at: string
+          feature: string
+          id: string
+          model: string
+          status: string
+          tokens_in: number
+          tokens_out: number
+          user_id: string | null
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string
+          feature: string
+          id?: string
+          model: string
+          status: string
+          tokens_in?: number
+          tokens_out?: number
+          user_id?: string | null
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string
+          feature?: string
+          id?: string
+          model?: string
+          status?: string
+          tokens_in?: number
+          tokens_out?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       match_results: {
         Row: {
           away_score: number
