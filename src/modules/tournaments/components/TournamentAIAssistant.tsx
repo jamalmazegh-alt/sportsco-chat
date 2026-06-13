@@ -1238,7 +1238,7 @@ function SummaryView({
         <SRow
           k={t("aiAssistant.summary.simLunch")}
           v={lunchLabel || t("aiAssistant.summary.simLunchNone")}
-          onEdit={() => onEdit("lunchDuration")}
+          onEdit={() => onEdit("breaks")}
         />
         <SRow
           k={t("aiAssistant.expertSheet.fairPlay")}
