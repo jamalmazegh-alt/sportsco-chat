@@ -462,6 +462,7 @@ function TournamentDetailPage() {
           <PublishWorkflow
             tournament={tournament}
             teamsCount={teams.length}
+            matchesCount={matches.length}
             fieldsCount={
               // settings.fields is jsonb — probe defensively.
               Array.isArray((tournament.settings as { fields?: unknown } | null)?.fields)
@@ -620,8 +621,7 @@ function TournamentDetailPage() {
         )}
 
         {/* Registrations (managers only, draft/published — B8: hidden once started) */}
-        {canManage &&
-          (tournament.status === "draft" || tournament.status === "published") && (
+        {canManage && (tournament.status === "draft" || tournament.status === "published") && (
           <Section
             id="section-registrations"
             icon={ClipboardList}

@@ -37,6 +37,8 @@ interface Props {
   tournament: Tournament;
   teamsCount: number;
   fieldsCount: number;
+  /** B7 — required to start: at least one match must be generated. */
+  matchesCount: number;
   publicUrl: string;
   busy: boolean;
   onStart: () => void;
@@ -56,6 +58,7 @@ export function PublishWorkflow({
   tournament,
   teamsCount,
   fieldsCount,
+  matchesCount,
   publicUrl,
   busy,
   onStart,
@@ -64,8 +67,7 @@ export function PublishWorkflow({
   const { t } = useTranslation("tournaments");
   const [checklistOpen, setChecklistOpen] = useState(true);
 
-  const registrationEnabled =
-    (tournament as any)?.settings?.registration?.enabled === true;
+  const registrationEnabled = (tournament as any)?.settings?.registration?.enabled === true;
 
   const checks: Check[] = useMemo(
     () => [
@@ -118,6 +120,8 @@ export function PublishWorkflow({
   );
 
   const blockingMissing = checks.some((c) => c.required && !c.ok);
+  // B7 — cannot start without a generated schedule.
+  const canStart = matchesCount > 0;
   const requiredChecks = checks.filter((c) => c.required);
   const recommendedChecks = checks.filter((c) => !c.required);
   const doneRequired = requiredChecks.filter((c) => c.ok).length;
@@ -137,13 +141,7 @@ export function PublishWorkflow({
   const meta = bannerMeta(status, t);
 
   return (
-    <section
-      className={cn(
-        "rounded-2xl border overflow-hidden",
-        meta.borderClass,
-        meta.bgClass,
-      )}
-    >
+    <section className={cn("rounded-2xl border overflow-hidden", meta.borderClass, meta.bgClass)}>
       {/* Stepper */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-2">
         {STEPS.map((s, i) => {
@@ -208,18 +206,19 @@ export function PublishWorkflow({
                     <Button
                       size="sm"
                       onClick={onStart}
-                      disabled={busy}
+                      disabled={busy || !canStart}
+                      title={!canStart ? t("publishFlow.startBlockedNoMatches") : undefined}
                       className="gap-2"
                     >
                       <PlayCircle className="h-4 w-4" />
                       {t("publishFlow.ctaStart")}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={copyLink}
-                      className="gap-2"
-                    >
+                    {!canStart && (
+                      <p className="w-full text-xs text-destructive">
+                        {t("publishFlow.startBlockedNoMatches")}
+                      </p>
+                    )}
+                    <Button size="sm" variant="outline" onClick={copyLink} className="gap-2">
                       <Copy className="h-4 w-4" />
                       {t("publishFlow.copyLink")}
                     </Button>
@@ -302,10 +301,7 @@ function ChecklistGroup({
       </p>
       <ul className="space-y-1.5">
         {items.map((c) => (
-          <li
-            key={c.key}
-            className="flex items-start gap-2 text-sm"
-          >
+          <li key={c.key} className="flex items-start gap-2 text-sm">
             {c.ok ? (
               <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
             ) : tone === "required" ? (
@@ -313,13 +309,7 @@ function ChecklistGroup({
             ) : (
               <Circle className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
             )}
-            <span
-              className={cn(
-                c.ok && "text-muted-foreground line-through",
-              )}
-            >
-              {c.label}
-            </span>
+            <span className={cn(c.ok && "text-muted-foreground line-through")}>{c.label}</span>
           </li>
         ))}
       </ul>

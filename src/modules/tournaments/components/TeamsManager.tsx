@@ -9,7 +9,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
-import { Plus, Trash2, Users, Loader2, HelpCircle, Upload, Pencil, UsersRound, Download } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Users,
+  Loader2,
+  HelpCircle,
+  Upload,
+  Pencil,
+  UsersRound,
+  Download,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   addTournamentTeam,
@@ -18,7 +28,6 @@ import {
   bulkAddTournamentTeams,
 } from "../tournaments.functions";
 import { TeamRosterDialog } from "./TeamRosterDialog";
-
 
 interface TeamRow {
   id: string;
@@ -86,7 +95,17 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
       setSeed("");
       setSelectedTeamId("");
     },
-    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
+    onError: (e: unknown) => {
+      // B4 — TanStack Start wraps server Response errors; extract the message
+      // from wherever the adapter places it (.message, .data, or toString).
+      const msg =
+        (e as { message?: string })?.message ||
+        (e as { data?: { message?: string } })?.data?.message ||
+        String(e) ||
+        t("teams.errorToast");
+      console.error("[TeamsManager] addTournamentTeam failed:", e);
+      toast.error(msg);
+    },
   });
 
   const remove = useMutation({
@@ -111,7 +130,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
   // Parse CSV / line list. Format per line: name[,short_name[,seed]]
   function parseBulk(text: string) {
-    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    const lines = text
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
     const rows: Array<{ name: string; short_name?: string | null; seed?: number | null }> = [];
     for (const line of lines) {
       // skip header
@@ -195,11 +217,9 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     }
   }
 
-  const atLimit =
-    typeof maxTeams === "number" && maxTeams > 0 && teams.length >= maxTeams;
+  const atLimit = typeof maxTeams === "number" && maxTeams > 0 && teams.length >= maxTeams;
 
-  const limitSuffix =
-    typeof maxTeams === "number" && maxTeams > 0 ? ` / ${maxTeams}` : "";
+  const limitSuffix = typeof maxTeams === "number" && maxTeams > 0 ? ` / ${maxTeams}` : "";
 
   return (
     <div className="space-y-3">
@@ -231,11 +251,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
               </div>
               <div className="space-y-1.5">
                 <Label>{t("teams.dialog.csvFileLabel")}</Label>
-                <Input
-                  type="file"
-                  accept=".csv,text/csv,text/plain"
-                  onChange={onCsvFile}
-                />
+                <Input type="file" accept=".csv,text/csv,text/plain" onChange={onCsvFile} />
                 <p
                   className="text-[11px] text-muted-foreground"
                   dangerouslySetInnerHTML={{ __html: t("teams.dialog.csvHint") }}
@@ -253,11 +269,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                 />
               </div>
               <Button type="submit" className="w-full" disabled={bulk.isPending}>
-                {bulk.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  t("teams.import")
-                )}
+                {bulk.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.import")}
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 {t("teams.dialog.logoHint")}
@@ -298,11 +310,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                 <>
                   <div className="space-y-1.5">
                     <Label>{t("teams.dialog.name")}</Label>
-                    <Input
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
+                    <Input required value={name} onChange={(e) => setName(e.target.value)} />
                   </div>
                   <div className="space-y-1.5">
                     <Label>{t("teams.dialog.logo")}</Label>
@@ -347,10 +355,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                 <div className="space-y-1.5">
                   <Label className="flex items-center gap-1.5">
                     {t("teams.dialog.seed")}
-                    <span
-                      className="text-muted-foreground"
-                      title={t("teams.dialog.seedTooltip")}
-                    >
+                    <span className="text-muted-foreground" title={t("teams.dialog.seedTooltip")}>
                       <HelpCircle className="h-3.5 w-3.5" />
                     </span>
                   </Label>
@@ -360,26 +365,21 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                     onChange={(e) => setSeed(e.target.value)}
                   >
                     <option value="">{t("teams.dialog.seedNone")}</option>
-                    {Array.from({ length: Math.max(teams.length + 1, maxTeams ?? 16) }).map((_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {t("teams.dialog.seedOption", { n: i + 1 })}
-                        {i === 0 ? t("teams.dialog.seedBest") : ""}
-                      </option>
-                    ))}
+                    {Array.from({ length: Math.max(teams.length + 1, maxTeams ?? 16) }).map(
+                      (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {t("teams.dialog.seedOption", { n: i + 1 })}
+                          {i === 0 ? t("teams.dialog.seedBest") : ""}
+                        </option>
+                      ),
+                    )}
                   </select>
-                  <p className="text-[11px] text-muted-foreground">
-                    {t("teams.dialog.seedHint")}
-                  </p>
+                  <p className="text-[11px] text-muted-foreground">{t("teams.dialog.seedHint")}</p>
                 </div>
-
               </div>
 
               <Button type="submit" className="w-full" disabled={add.isPending}>
-                {add.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  t("teams.add")
-                )}
+                {add.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.add")}
               </Button>
             </form>
           </ResponsiveFormDialog>
@@ -400,11 +400,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
             >
               <div className="h-10 w-10 rounded-lg bg-muted shrink-0 overflow-hidden flex items-center justify-center">
                 {tm.logo_url ? (
-                  <img
-                    src={tm.logo_url}
-                    alt={tm.name}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={tm.logo_url} alt={tm.name} className="h-full w-full object-cover" />
                 ) : (
                   <Users className="h-4 w-4 text-muted-foreground" />
                 )}
@@ -488,9 +484,7 @@ function EditTeamDialog({
   const [editShort, setEditShort] = useState(team.short_name ?? "");
   const [editSeed, setEditSeed] = useState(team.seed ? String(team.seed) : "");
   const [editLogo, setEditLogo] = useState<Attachment[]>(
-    team.logo_url
-      ? [{ url: team.logo_url, path: "", name: "logo", type: "image/*", size: 0 }]
-      : [],
+    team.logo_url ? [{ url: team.logo_url, path: "", name: "logo", type: "image/*", size: 0 }] : [],
   );
 
   const save = useMutation({
@@ -566,7 +560,6 @@ function EditTeamDialog({
               ))}
             </select>
           </div>
-
         </div>
         <Button type="submit" className="w-full" disabled={save.isPending}>
           {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.dialog.save")}

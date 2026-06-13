@@ -14,10 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import {
   Loader2,
   Check,
@@ -122,7 +119,16 @@ interface Props {
   onAutoOpenConsumed?: () => void;
 }
 
-export function MatchesList({ tournamentId, matches, teams, canManage, fields, scoring, autoOpenMatchId, onAutoOpenConsumed }: Props) {
+export function MatchesList({
+  tournamentId,
+  matches,
+  teams,
+  canManage,
+  fields,
+  scoring,
+  autoOpenMatchId,
+  onAutoOpenConsumed,
+}: Props) {
   const { t } = useTranslation("tournaments");
   const { user } = useAuth();
   const currentUserId = user?.id ?? null;
@@ -152,29 +158,22 @@ export function MatchesList({ tournamentId, matches, teams, canManage, fields, s
     queryFn: () => refFn({ data: { tournament_id: tournamentId } }),
     enabled: !!canManage,
   });
-  const refereeOptions: RefereeOption[] = ((refereesQ.data?.referees ?? []) as any[]).map(
-    (r) => ({
-      member_id: r.id as string,
-      user_id: (r.user_id as string | null) ?? null,
-      label: r.label as string,
-      offline: !!r.offline,
-    }),
-  );
+  const refereeOptions: RefereeOption[] = ((refereesQ.data?.referees ?? []) as any[]).map((r) => ({
+    member_id: r.id as string,
+    user_id: (r.user_id as string | null) ?? null,
+    label: r.label as string,
+    offline: !!r.offline,
+  }));
 
   // "My matches" filter — visible when current user is referee on at least one match.
   const assignedToMe = useMemo(
-    () =>
-      currentUserId
-        ? matches.filter((m) => m.referee_user_id === currentUserId).length
-        : 0,
+    () => (currentUserId ? matches.filter((m) => m.referee_user_id === currentUserId).length : 0),
     [matches, currentUserId],
   );
   const [onlyMine, setOnlyMine] = useState(false);
   const showFilter = assignedToMe > 0;
   const visibleMatches =
-    showFilter && onlyMine
-      ? matches.filter((m) => m.referee_user_id === currentUserId)
-      : matches;
+    showFilter && onlyMine ? matches.filter((m) => m.referee_user_id === currentUserId) : matches;
 
   const grouped = visibleMatches.reduce<Record<string, Match[]>>((acc, m) => {
     const key = m.round === "group" ? t("matches.groupPhase") : roundLabel(m.round, t);
@@ -312,12 +311,11 @@ function MatchCard({
   const [b, setB] = useState(match.score_b ?? 0);
   const [penA, setPenA] = useState(match.penalty_score_a ?? 0);
   const [penB, setPenB] = useState(match.penalty_score_b ?? 0);
-  const [sets, setSets] = useState<SetScore[]>(
-    (match.sets ?? []).map((s) => ({ a: s.a, b: s.b })),
-  );
+  const [sets, setSets] = useState<SetScore[]>((match.sets ?? []).map((s) => ({ a: s.a, b: s.b })));
   const isKnockout = match.round !== "group";
   const tied = a === b;
-  const hasPenalty = (match.penalty_score_a ?? null) !== null && (match.penalty_score_b ?? null) !== null;
+  const hasPenalty =
+    (match.penalty_score_a ?? null) !== null && (match.penalty_score_b ?? null) !== null;
   const cardRef = useRef<HTMLLIElement>(null);
 
   // Sprint 1 — Continue CTA can request to open the score dialog directly.
@@ -343,7 +341,6 @@ function MatchCard({
     return () => clearTimeout(timer);
   }, [justSaved, nextMatchId]);
 
-
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
   const valFn = useServerFn(validateMatch);
@@ -355,6 +352,8 @@ function MatchCard({
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     qc.invalidateQueries({ queryKey: ["tournament-events", tournamentId] });
+    // B10 — StandingsView uses a separate query key; must be invalidated too.
+    qc.invalidateQueries({ queryKey: ["tournament-standings", tournamentId] });
   };
 
   const save = useMutation({
@@ -420,7 +419,6 @@ function MatchCard({
     onSuccess: () => invalidateAll(),
     onError: (e: any) => toast.error(e?.message ?? t("matches.errorGeneric")),
   });
-
 
   const validateM = useMutation({
     mutationFn: (validated: boolean) =>
@@ -570,8 +568,7 @@ function MatchCard({
   });
 
   const removeEvent = useMutation({
-    mutationFn: (event_id: string) =>
-      evDelFn({ data: { tournament_id: tournamentId, event_id } }),
+    mutationFn: (event_id: string) => evDelFn({ data: { tournament_id: tournamentId, event_id } }),
     onSuccess: () => invalidateAll(),
   });
 
@@ -596,18 +593,22 @@ function MatchCard({
           ? "scheduled"
           : "other";
 
-  const LIFECYCLE_STYLES: Record<Lifecycle, {
-    border: string;
-    headerBg: string;
-    badge: string;
-    cta: string;
-    dot: string;
-  }> = {
+  const LIFECYCLE_STYLES: Record<
+    Lifecycle,
+    {
+      border: string;
+      headerBg: string;
+      badge: string;
+      cta: string;
+      dot: string;
+    }
+  > = {
     scheduled: {
       // B12 — navy (secondary token = Clubero brand) instead of neutral slate.
       border: "border-l-secondary/60",
       headerBg: "bg-secondary/5",
-      badge: "bg-secondary/10 text-secondary dark:text-secondary-foreground/80 border border-secondary/20",
+      badge:
+        "bg-secondary/10 text-secondary dark:text-secondary-foreground/80 border border-secondary/20",
       cta: "bg-secondary text-secondary-foreground hover:bg-secondary/90",
       dot: "bg-secondary/60",
     },
@@ -628,7 +629,8 @@ function MatchCard({
     validated: {
       border: "border-l-emerald-500",
       headerBg: "bg-emerald-500/5",
-      badge: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30",
+      badge:
+        "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30",
       cta: "bg-card border border-border text-muted-foreground hover:bg-muted/60",
       dot: "bg-emerald-500",
     },
@@ -764,9 +766,7 @@ function MatchCard({
               <ScoreStepper
                 label={teamA.short_name ?? teamA.name}
                 value={match.score_a ?? 0}
-                onChange={(v) =>
-                  liveUpdate.mutate({ score_a: v, score_b: match.score_b ?? 0 })
-                }
+                onChange={(v) => liveUpdate.mutate({ score_a: v, score_b: match.score_b ?? 0 })}
                 disabled={liveUpdate.isPending}
                 size="md"
               />
@@ -774,9 +774,7 @@ function MatchCard({
               <ScoreStepper
                 label={teamB.short_name ?? teamB.name}
                 value={match.score_b ?? 0}
-                onChange={(v) =>
-                  liveUpdate.mutate({ score_a: match.score_a ?? 0, score_b: v })
-                }
+                onChange={(v) => liveUpdate.mutate({ score_a: match.score_a ?? 0, score_b: v })}
                 disabled={liveUpdate.isPending}
                 size="md"
               />
@@ -958,7 +956,19 @@ function MatchCard({
                     {t("matches.changeStatusAction")}
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
-                    {(["scheduled", "live", "completed", "forfeit_a", "forfeit_b", "no_show_a", "no_show_b", "abandoned", "cancelled"] as const).map((s) => (
+                    {(
+                      [
+                        "scheduled",
+                        "live",
+                        "completed",
+                        "forfeit_a",
+                        "forfeit_b",
+                        "no_show_a",
+                        "no_show_b",
+                        "abandoned",
+                        "cancelled",
+                      ] as const
+                    ).map((s) => (
                       <DropdownMenuItem
                         key={s}
                         onClick={() => statusM.mutate(s)}
@@ -1036,7 +1046,7 @@ function MatchCard({
                   {ev.minute != null && <span className="font-mono">{ev.minute}'</span>}
                   {ev.player_name && <span>{ev.player_name}</span>}
                   <span className="text-muted-foreground">
-                    {isA ? teamA?.short_name ?? teamA?.name : teamB?.short_name ?? teamB?.name}
+                    {isA ? (teamA?.short_name ?? teamA?.name) : (teamB?.short_name ?? teamB?.name)}
                   </span>
                   {canManage && (
                     <button
@@ -1114,8 +1124,6 @@ function MatchCard({
         )}
       </div>
 
-
-
       <ResponsiveFormDialog
         open={open}
         onOpenChange={(o) => {
@@ -1133,7 +1141,9 @@ function MatchCard({
                   {t("matches.lockedTitle", { defaultValue: "Match validé" })}
                 </p>
                 <p className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 leading-snug mt-0.5">
-                  {t("matches.lockedHelper", { defaultValue: "Pour modifier le score, dévalidez d'abord le match." })}
+                  {t("matches.lockedHelper", {
+                    defaultValue: "Pour modifier le score, dévalidez d'abord le match.",
+                  })}
                 </p>
               </div>
             </div>
@@ -1141,7 +1151,10 @@ function MatchCard({
           {setsMode ? (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                {t("matches.bestOfSets", { bestOf: setsRules.bestOf, points: setsRules.pointsToWin })}
+                {t("matches.bestOfSets", {
+                  bestOf: setsRules.bestOf,
+                  points: setsRules.pointsToWin,
+                })}
                 {setsRules.tieBreakPoints !== setsRules.pointsToWin
                   ? t("matches.tieBreak", { points: setsRules.tieBreakPoints })
                   : ""}
@@ -1152,10 +1165,7 @@ function MatchCard({
                 </p>
               )}
               {sets.map((s, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg border border-border bg-muted/30 p-3"
-                >
+                <div key={i} className="rounded-lg border border-border bg-muted/30 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-muted-foreground">
                       {t("matches.setLabel", { n: i + 1 })}
@@ -1320,7 +1330,11 @@ function MatchCard({
           ) : (
             <Button
               onClick={() => save.mutate()}
-              disabled={save.isPending || (setsMode && sets.length === 0) || (!setsMode && isKnockout && tied && penA === penB)}
+              disabled={
+                save.isPending ||
+                (setsMode && sets.length === 0) ||
+                (!setsMode && isKnockout && tied && penA === penB)
+              }
               className="w-full h-12"
             >
               {save.isPending ? (
@@ -1333,9 +1347,11 @@ function MatchCard({
         </div>
       </ResponsiveFormDialog>
 
-
-
-      <ResponsiveFormDialog open={editOpen} onOpenChange={setEditOpen} title={t("matches.scheduleTitle")}>
+      <ResponsiveFormDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        title={t("matches.scheduleTitle")}
+      >
         <div className="space-y-4 mt-4 pb-6">
           <div className="space-y-1.5">
             <Label>{t("matches.field")}</Label>
@@ -1374,8 +1390,16 @@ function MatchCard({
               <Input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} />
             </div>
           </div>
-          <Button onClick={() => saveSched.mutate()} disabled={saveSched.isPending} className="w-full">
-            {saveSched.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("matches.saveSchedule")}
+          <Button
+            onClick={() => saveSched.mutate()}
+            disabled={saveSched.isPending}
+            className="w-full"
+          >
+            {saveSched.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("matches.saveSchedule")
+            )}
           </Button>
 
           <div className="pt-4 border-t border-border space-y-3">
@@ -1418,7 +1442,11 @@ function MatchCard({
               onClick={() => saveRef.mutate()}
               disabled={saveRef.isPending || (refMode === "free" && !refFreeName.trim())}
             >
-              {saveRef.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("matches.assignReferee")}
+              {saveRef.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("matches.assignReferee")
+              )}
             </Button>
           </div>
         </div>

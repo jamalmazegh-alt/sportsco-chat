@@ -902,7 +902,8 @@
     "publishedToast": "Turnier veröffentlicht",
     "publishedToastBody": "Teile den öffentlichen Link, um ihn bekannt zu machen.",
     "copyLink": "Link kopieren",
-    "linkCopied": "Link kopiert"
+    "linkCopied": "Link kopiert",
+    "startBlockedNoMatches": "Erstelle zuerst den Spielplan, bevor du startest"
   },
   "tabs": {
     "teams": "Teams",

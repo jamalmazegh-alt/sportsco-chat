@@ -48,6 +48,21 @@ export function PublishProgrammeCard({
     enabled: status === "published",
   });
 
+  // B1 — useMutation MUST be declared before any early return so that the hook
+  // call order is stable across renders (React rules of hooks).
+  const m = useMutation({
+    mutationFn: () => publishFn({ data: { tournament_id: tournamentId } }),
+    onSuccess: () => {
+      toast.success(t("tournament.programmePublished"));
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      setConfirmOpen(false);
+    },
+    onError: (e: any) => {
+      toast.error(e?.message ?? "Error");
+      setConfirmOpen(false);
+    },
+  });
+
   // Only show when tournament is in the "published" stage
   if (status !== "published") return null;
 
@@ -76,20 +91,6 @@ export function PublishProgrammeCard({
   ];
   const allOk = checks.every((c) => c.ok) && !regsQuery.isLoading;
 
-
-  const m = useMutation({
-    mutationFn: () => publishFn({ data: { tournament_id: tournamentId } }),
-    onSuccess: () => {
-      toast.success(t("tournament.programmePublished"));
-      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
-      setConfirmOpen(false);
-    },
-    onError: (e: any) => {
-      toast.error(e?.message ?? "Error");
-      setConfirmOpen(false);
-    },
-  });
-
   return (
     <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
       <div className="flex items-start gap-3">
@@ -97,9 +98,7 @@ export function PublishProgrammeCard({
           <Rocket className="h-5 w-5 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="text-base font-semibold">
-            {t("tournament.publishProgramme")}
-          </h2>
+          <h2 className="text-base font-semibold">{t("tournament.publishProgramme")}</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
             {t("tournament.publishProgrammeSubtitle")}
           </p>
@@ -147,9 +146,7 @@ export function PublishProgrammeCard({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("tournament.publishConfirmTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("tournament.publishConfirmBody")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("tournament.publishConfirmBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={m.isPending}>
