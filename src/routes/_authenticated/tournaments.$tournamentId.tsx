@@ -47,8 +47,13 @@ import {
   computeStepper,
   computeContinueAction,
   countMatches,
+  computeEstimatedEnd,
+  computeAverageDelay,
+  computeAlerts,
   type ContinueAction,
+  type CockpitAlert,
 } from "@/modules/tournaments/lib/control-center";
+import { AlertsPanel } from "@/modules/tournaments/components/AlertsPanel";
 import type { TournamentDetail } from "@/modules/tournaments/types";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
