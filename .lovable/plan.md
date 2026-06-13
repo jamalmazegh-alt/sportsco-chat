@@ -1,4 +1,6 @@
 # Sprint 5 — IA / LLM (Lovable-ready)
+<!-- resync -->
+
 
 Objectif : brancher le LLM (Lovable AI Gateway) sur 3 zones à forte valeur, sans jamais remplacer le moteur déterministe. Fallback silencieux obligatoire.
 
