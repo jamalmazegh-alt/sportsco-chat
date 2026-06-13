@@ -902,7 +902,8 @@
     "publishedToast": "Toernooi gepubliceerd",
     "publishedToastBody": "Deel de openbare link om het bekend te maken.",
     "copyLink": "Link kopiëren",
-    "linkCopied": "Link gekopieerd"
+    "linkCopied": "Link gekopieerd",
+    "startBlockedNoMatches": "Genereer het wedstrijdschema voordat je start"
   },
   "tabs": {
     "teams": "Teams",

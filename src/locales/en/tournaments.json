@@ -902,7 +902,8 @@
     "publishedToast": "Tournament published",
     "publishedToastBody": "Share the public link to spread the word.",
     "copyLink": "Copy link",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "startBlockedNoMatches": "Generate the match schedule before starting"
   },
   "tabs": {
     "teams": "Teams",

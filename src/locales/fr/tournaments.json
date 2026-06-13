@@ -902,7 +902,8 @@
     "publishedToast": "Tournoi publié",
     "publishedToastBody": "Partagez le lien public pour le faire connaître.",
     "copyLink": "Copier le lien",
-    "linkCopied": "Lien copié"
+    "linkCopied": "Lien copié",
+    "startBlockedNoMatches": "Générez le calendrier des matchs avant de démarrer"
   },
   "tabs": {
     "teams": "Équipes",

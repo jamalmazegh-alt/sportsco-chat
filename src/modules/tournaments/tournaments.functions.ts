@@ -47,9 +47,6 @@ async function applyBracketProgression(tournamentId: string): Promise<void> {
   }
 }
 
-
-
-
 // ---------- Schemas
 
 const tournamentFormat = z.enum([
@@ -113,7 +110,6 @@ async function assertCanManage(
 
 // uniqueSlug moved to ./lib/slug.ts as uniqueTournamentSlug (shared with passes.functions.ts)
 
-
 // ---------- CRUD
 
 export const createTournament = createServerFn({ method: "POST" })
@@ -143,12 +139,10 @@ export const createTournament = createServerFn({ method: "POST" })
       .eq("id", data.club_id)
       .maybeSingle();
     if (clubRow?.is_personal) {
-      throw new Response(
-        "Personal organizer clubs must create tournaments via a paid pass",
-        { status: 403 },
-      );
+      throw new Response("Personal organizer clubs must create tournaments via a paid pass", {
+        status: 403,
+      });
     }
-
 
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
     const initialRules = defaultRulesForSport(data.sport);
@@ -245,7 +239,6 @@ export const listMyPersonalTournaments = createServerFn({ method: "POST" })
     return { tournaments: rows ?? [] };
   });
 
-
 export const getTournament = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { tournament_id: string }) =>
@@ -327,7 +320,6 @@ export const updateTournament = createServerFn({ method: "POST" })
             // B6 — colonne jsonb réelle (map terrain -> URL de stream), écrite
             // par FieldsManager ; absente du schéma .strict() => rejet auparavant.
             field_streams: z.record(z.string(), z.string()).optional(),
-
           })
           .strict(),
       })
@@ -336,6 +328,20 @@ export const updateTournament = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
+
+    // B7 — gate in_progress: refuse if no matches have been generated yet.
+    if (data.patch.status === "in_progress") {
+      const { count } = await supabase
+        .from("tournament_matches")
+        .select("id", { count: "exact", head: true })
+        .eq("tournament_id", data.tournament_id);
+      if (!count) {
+        throw new Response(
+          "Le calendrier n'est pas encore généré — lancez le tirage avant de démarrer.",
+          { status: 400 },
+        );
+      }
+    }
 
     // Read previous status to detect transition → completed (for trigger email).
     const { data: previous } = await supabase
@@ -354,10 +360,7 @@ export const updateTournament = createServerFn({ method: "POST" })
 
     // Tournament just transitioned to completed → send post-tournament email
     // (idempotent: idempotencyKey scopes to the tournament id).
-    if (
-      data.patch.status === "completed" &&
-      previous?.status !== "completed"
-    ) {
+    if (data.patch.status === "completed" && previous?.status !== "completed") {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         // Find organiser's email + locale via auth.users
@@ -365,13 +368,10 @@ export const updateTournament = createServerFn({ method: "POST" })
           (row as any).created_by ?? userId,
         );
         const recipientEmail = organiser?.user?.email;
-        const locale =
-          (organiser?.user?.user_metadata?.locale as string | undefined) ?? "fr";
+        const locale = (organiser?.user?.user_metadata?.locale as string | undefined) ?? "fr";
         const firstName =
           (organiser?.user?.user_metadata?.first_name as string | undefined) ??
-          (organiser?.user?.user_metadata?.full_name as string | undefined)?.split(
-            " ",
-          )[0];
+          (organiser?.user?.user_metadata?.full_name as string | undefined)?.split(" ")[0];
 
         // Lightweight summary
         const [{ count: teamsCount }, { count: matchesCount }] = await Promise.all([
@@ -411,8 +411,6 @@ export const updateTournament = createServerFn({ method: "POST" })
     return { tournament: row };
   });
 
-
-
 // ---------- Teams
 
 const addTeamSchema = z.object({
@@ -436,10 +434,7 @@ export const addTournamentTeam = createServerFn({ method: "POST" })
       .from("tournament_teams")
       .select("id", { count: "exact", head: true })
       .eq("tournament_id", data.tournament_id);
-    if (
-      typeof tournament.num_teams === "number" &&
-      (count ?? 0) >= tournament.num_teams
-    ) {
+    if (typeof tournament.num_teams === "number" && (count ?? 0) >= tournament.num_teams) {
       throw new Response(
         `Limite atteinte : ce tournoi est configuré pour ${tournament.num_teams} équipes.`,
         { status: 400 },
@@ -550,9 +545,7 @@ export const bulkAddTournamentTeams = createServerFn({ method: "POST" })
 export const removeTournamentTeam = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { team_id: string; tournament_id: string }) =>
-    z
-      .object({ team_id: z.string().uuid(), tournament_id: z.string().uuid() })
-      .parse(input),
+    z.object({ team_id: z.string().uuid(), tournament_id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -600,10 +593,7 @@ export const autoCreateGroupsAndFixtures = createServerFn({ method: "POST" })
       .delete()
       .eq("tournament_id", data.tournament_id)
       .eq("round", "group");
-    await supabase
-      .from("tournament_groups")
-      .delete()
-      .eq("tournament_id", data.tournament_id);
+    await supabase.from("tournament_groups").delete().eq("tournament_id", data.tournament_id);
 
     // Create groups (Poule A, B, ...)
     const groupRows = [];
@@ -714,7 +704,6 @@ export const recordMatchScore = createServerFn({ method: "POST" })
     return { match: row };
   });
 
-
 // ---------- Standings (server-computed, RLS-aware)
 
 export const getGroupStandings = createServerFn({ method: "POST" })
@@ -823,7 +812,6 @@ export const getGroupStandings = createServerFn({ method: "POST" })
     return { standings: result, rules };
   });
 
-
 // ---------- Knockout / double-elimination generation
 
 const DOUBLE_ELIM_TEAM_COUNTS = [4, 8, 16] as const;
@@ -866,12 +854,14 @@ function buildKnockoutMatchRows(
     bracket_position: m.bracketPosition,
     match_number: startNumber + idx,
     bracket_side: m.side ?? null,
-    team_a_id: m.teamASource && typeof m.teamASource === "object" && "teamId" in m.teamASource
-      ? (m.teamASource as { teamId: string }).teamId
-      : null,
-    team_b_id: m.teamBSource && typeof m.teamBSource === "object" && "teamId" in m.teamBSource
-      ? (m.teamBSource as { teamId: string }).teamId
-      : null,
+    team_a_id:
+      m.teamASource && typeof m.teamASource === "object" && "teamId" in m.teamASource
+        ? (m.teamASource as { teamId: string }).teamId
+        : null,
+    team_b_id:
+      m.teamBSource && typeof m.teamBSource === "object" && "teamId" in m.teamBSource
+        ? (m.teamBSource as { teamId: string }).teamId
+        : null,
     team_a_source: m.teamASource as any,
     team_b_source: m.teamBSource as any,
     status: "scheduled" as const,
@@ -1060,8 +1050,6 @@ export const getPublicTournament = createServerFn({ method: "POST" })
       events: eRes.data ?? [],
     };
   });
-
-
 
 // ---------- Auto-schedule (assigns scheduled_at and field to each match)
 
@@ -1293,8 +1281,6 @@ export const updateTournamentSponsors = createServerFn({ method: "POST" })
     return { sponsors: merged.branding.sponsors ?? [] };
   });
 
-
-
 // ---------- Match validation & dispute
 
 export const validateMatch = createServerFn({ method: "POST" })
@@ -1334,11 +1320,7 @@ export const validateMatch = createServerFn({ method: "POST" })
             .eq("tournament_id", data.tournament_id)
             .not("validated_at", "is", null)
             .gt("match_number", current.match_number)
-            .or(
-              teamIds
-                .map((id) => `team_a_id.eq.${id},team_b_id.eq.${id}`)
-                .join(","),
-            )
+            .or(teamIds.map((id) => `team_a_id.eq.${id},team_b_id.eq.${id}`).join(","))
             .limit(1);
           if (later && later.length > 0) {
             throw new Response(
@@ -1433,7 +1415,6 @@ export const setMatchStatus = createServerFn({ method: "POST" })
 
 // ---------- Match events (cards, goals)
 
-
 export const recordMatchEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
@@ -1520,10 +1501,12 @@ export const listMatchEvents = createServerFn({ method: "POST" })
 export const generateRulesPdf = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      tournament_id: z.string().uuid(),
-      language: z.enum(["fr", "en"]).optional(),
-    }).parse(input),
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        language: z.enum(["fr", "en"]).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -1534,8 +1517,9 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
     const rules = { ...rulesRaw, language: lang };
 
     if (rules.regulations.mode === "uploaded" && rules.regulations.uploadedUrl) {
-      const { data: row, error: insErr } = await (await import("@/integrations/supabase/client.server"))
-        .supabaseAdmin
+      const { data: row, error: insErr } = await (
+        await import("@/integrations/supabase/client.server")
+      ).supabaseAdmin
         .from("tournament_documents")
         .insert({
           tournament_id: tournament.id,
@@ -1590,9 +1574,7 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
       .from("tournament-documents")
       .upload(path, bytes, { contentType: "application/pdf", upsert: false });
     if (upErr) throw new Response(upErr.message, { status: 500 });
-    const { data: pub } = supabaseAdmin.storage
-      .from("tournament-documents")
-      .getPublicUrl(path);
+    const { data: pub } = supabaseAdmin.storage.from("tournament-documents").getPublicUrl(path);
     const file_url = pub.publicUrl;
     const { data: row, error: insErr } = await supabaseAdmin
       .from("tournament_documents")
@@ -1612,9 +1594,7 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
 
 export const listTournamentDocuments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ tournament_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: rows, error } = await supabase
@@ -1711,9 +1691,7 @@ export const upsertTeamPlayer = createServerFn({ method: "POST" })
 
 export const deleteTeamPlayer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ player_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ player_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase
@@ -1789,10 +1767,7 @@ export const listTournamentRegistrations = createServerFn({ method: "POST" })
     z
       .object({
         tournament_id: z.string().uuid(),
-        status: z
-          .enum(["pending", "approved", "rejected", "cancelled"])
-          .nullable()
-          .optional(),
+        status: z.enum(["pending", "approved", "rejected", "cancelled"]).nullable().optional(),
       })
       .parse(input),
   )
@@ -1869,24 +1844,18 @@ export const decideRegistration = createServerFn({ method: "POST" })
     const players = Array.isArray(reg.players) ? (reg.players as any[]) : [];
     if (players.length > 0) {
       const rows = players
-        .filter(
-          (p) =>
-            p && typeof p.first_name === "string" && typeof p.last_name === "string",
-        )
+        .filter((p) => p && typeof p.first_name === "string" && typeof p.last_name === "string")
         .map((p) => ({
           tournament_team_id: team.id,
           tournament_id: reg.tournament_id,
           first_name: String(p.first_name).slice(0, 80),
           last_name: String(p.last_name).slice(0, 80),
-          jersey_number:
-            typeof p.jersey_number === "number" ? p.jersey_number : null,
+          jersey_number: typeof p.jersey_number === "number" ? p.jersey_number : null,
           position: p.position ? String(p.position).slice(0, 40) : null,
           is_captain: !!p.is_captain,
         }));
       if (rows.length > 0) {
-        const { error: pErr } = await supabase
-          .from("tournament_team_players")
-          .insert(rows);
+        const { error: pErr } = await supabase.from("tournament_team_players").insert(rows);
         if (pErr) console.error("Failed to insert roster", pErr);
       }
     }
@@ -1899,8 +1868,7 @@ export const decideRegistration = createServerFn({ method: "POST" })
       .maybeSingle();
     const fee = (tInfo as any)?.registration_fee ?? 0;
     const mode = (tInfo as any)?.payment_mode ?? "offline";
-    const requiresOnlinePayment =
-      fee > 0 && (mode === "online" || mode === "both");
+    const requiresOnlinePayment = fee > 0 && (mode === "online" || mode === "both");
 
     const updatePayload = {
       status: "approved" as const,
@@ -1988,9 +1956,7 @@ function isDrawPublished(tournament: {
 
 export const applyTeamDraw = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.union([drawGroupsSchema, drawKnockoutSchema]).parse(input),
-  )
+  .inputValidator((input: unknown) => z.union([drawGroupsSchema, drawKnockoutSchema]).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
@@ -2016,10 +1982,9 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
 
     if (data.mode === "groups") {
       if (tournament.format === "knockout") {
-        throw new Response(
-          "Ce tournoi est en élimination directe, choisis le mode bracket.",
-          { status: 400 },
-        );
+        throw new Response("Ce tournoi est en élimination directe, choisis le mode bracket.", {
+          status: 400,
+        });
       }
       for (const a of data.assignments) {
         if (!teamIds.has(a.team_id)) {
@@ -2036,10 +2001,7 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
         .delete()
         .eq("tournament_id", data.tournament_id)
         .eq("round", "group");
-      await supabase
-        .from("tournament_groups")
-        .delete()
-        .eq("tournament_id", data.tournament_id);
+      await supabase.from("tournament_groups").delete().eq("tournament_id", data.tournament_id);
 
       // Create groups
       const groupRows = [];
@@ -2057,7 +2019,9 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
         .select("*");
       if (gErr) throw gErr;
 
-      const groupsByIdx = (groups ?? []).slice().sort((a: any, b: any) => a.sort_order - b.sort_order);
+      const groupsByIdx = (groups ?? [])
+        .slice()
+        .sort((a: any, b: any) => a.sort_order - b.sort_order);
       const teamUpdates: Promise<any>[] = [];
       const matchRows: any[] = [];
       let matchNum = 0;
@@ -2098,10 +2062,7 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
 
     // mode === "knockout"
     if (tournament.format === "group") {
-      throw new Response(
-        "Ce tournoi est en poules, choisis le mode poules.",
-        { status: 400 },
-      );
+      throw new Response("Ce tournoi est en poules, choisis le mode poules.", { status: 400 });
     }
     for (const id of data.bracket_order) {
       if (!teamIds.has(id)) {
@@ -2133,7 +2094,6 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
     return { matches_created: rows.length };
   });
 
-
 // ============================================================
 // Collaborators (co-organizers & referees) + referee assignment
 // ============================================================
@@ -2142,9 +2102,7 @@ const emailSchema = z.string().trim().email().max(254);
 
 export const listTournamentCollaborators = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ tournament_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     // Only tournament managers can list collaborators
@@ -2223,11 +2181,7 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
       const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: tournament }, { data: inviter }] = await Promise.all([
-        supabaseAdmin
-          .from("tournaments")
-          .select("name")
-          .eq("id", data.tournament_id)
-          .maybeSingle(),
+        supabaseAdmin.from("tournaments").select("name").eq("id", data.tournament_id).maybeSingle(),
         supabaseAdmin
           .from("profiles")
           .select("first_name, last_name, full_name")
@@ -2291,23 +2245,18 @@ export const revokeTournamentCollaborator = createServerFn({ method: "POST" })
 
 export const acceptTournamentInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ token: z.string().min(8).max(120) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ token: z.string().min(8).max(120) }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: result, error } = await (supabase as any).rpc(
-      "accept_tournament_invite",
-      { _token: data.token },
-    );
+    const { data: result, error } = await (supabase as any).rpc("accept_tournament_invite", {
+      _token: data.token,
+    });
     if (error) throw new Response(error.message, { status: 400 });
     return { result };
   });
 
 export const getTournamentInviteByToken = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    z.object({ token: z.string().min(8).max(120) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ token: z.string().min(8).max(120) }).parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: result, error } = await (supabaseAdmin as any).rpc(
@@ -2322,9 +2271,7 @@ export const getTournamentInviteByToken = createServerFn({ method: "GET" })
 
 export const listTournamentReferees = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ tournament_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);

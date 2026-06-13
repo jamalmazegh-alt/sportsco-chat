@@ -203,6 +203,7 @@ export function TournamentSettingsMenu({
                   sub-view ("draw"/"schedule") when deep-linked by the CTA. */}
               <GroupsAndFixtures
                 view={formatView}
+                onViewChange={setFormatView}
                 tournamentId={tournament.id}
                 // GroupsAndFixtures only handles the pool/KO subset; the jsonb
                 // columns (fields/settings) are narrowed at this boundary.
