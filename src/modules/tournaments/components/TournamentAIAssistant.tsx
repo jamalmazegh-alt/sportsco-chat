@@ -21,6 +21,8 @@ import {
   defaultTerrains,
   emptyConfig,
   isConfigComplete,
+  lunchLabelForConfig,
+  LUNCH_DURATION_PRESETS,
   MATCH_DURATION_PRESETS,
   PAUSE_PRESETS,
   playersPerTeamOptions,
@@ -338,6 +340,7 @@ export function TournamentAIAssistant({
             showSim={showSim}
             onToggleSim={() => setShowSim((v) => !v)}
             onEdit={goToStep}
+            onPatch={patch}
             t={t}
           />
         ) : (
@@ -997,15 +1000,18 @@ function SummaryView({
   showSim,
   onToggleSim,
   onEdit,
+  onPatch,
   t,
 }: {
   config: AssistantTournamentConfig;
   showSim: boolean;
   onToggleSim: () => void;
   onEdit: (id: AssistantStepId) => void;
+  onPatch: (patch: Partial<AssistantTournamentConfig>) => void;
   t: (k: string, o?: Record<string, unknown>) => string;
 }) {
   const schedule = buildSchedulePreview(config);
+  const lunchLabel = lunchLabelForConfig(config);
   return (
     <div className="animate-in fade-in duration-200">
       <div className="mb-2.5">
@@ -1115,8 +1121,63 @@ function SummaryView({
           />
           <SimLine
             label={t("aiAssistant.summary.simLunch")}
-            value="12:30 → 13:15"
+            value={
+              lunchLabel ?? t("aiAssistant.summary.simLunchNone")
+            }
           />
+          {config.lunchDurationMin > 0 && (
+            <div className="border-t border-white/15 py-2 space-y-2">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                {t("aiAssistant.summary.simLunchDuration")}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {LUNCH_DURATION_PRESETS.map((min) => (
+                  <button
+                    key={min}
+                    type="button"
+                    onClick={() => onPatch({ lunchDurationMin: min })}
+                    className={cn(
+                      "rounded-lg px-2.5 py-1 text-[11px] font-bold",
+                      config.lunchDurationMin === min
+                        ? "bg-white text-[hsl(225_35%_18%)]"
+                        : "bg-white/15 text-white hover:bg-white/25",
+                    )}
+                  >
+                    {min === 0
+                      ? t("aiAssistant.summary.simLunchNone")
+                      : t("aiAssistant.summary.simLunchMin", { min })}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-[11px] text-white/70 shrink-0">
+                  {t("aiAssistant.summary.simLunchStart")}
+                </label>
+                <input
+                  type="time"
+                  value={config.lunchStart}
+                  onChange={(e) => onPatch({ lunchStart: e.target.value })}
+                  className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-[12px] text-white"
+                />
+              </div>
+            </div>
+          )}
+          {config.lunchDurationMin === 0 && (
+            <div className="border-t border-white/15 py-2">
+              <div className="flex flex-wrap gap-1.5">
+                {LUNCH_DURATION_PRESETS.filter((m) => m > 0).map((min) => (
+                  <button
+                    key={min}
+                    type="button"
+                    onClick={() => onPatch({ lunchDurationMin: min })}
+                    className="rounded-lg bg-white/15 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-white/25"
+                  >
+                    {t("aiAssistant.summary.simLunchMin", { min })}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <SimLine
             label={t("aiAssistant.summary.simTerrains")}
             value={String(config.terrains)}

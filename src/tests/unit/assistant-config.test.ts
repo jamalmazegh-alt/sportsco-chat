@@ -111,6 +111,31 @@ describe("assistant-config", () => {
     expect(payload.update.break_min).toBe(5);
   });
 
+  it("persists lunch settings in tournament settings", () => {
+    const cfg = emptyConfig({
+      name: "Lunch Cup",
+      startsOn: "2026-06-15",
+      location: "Stade A",
+      lunchDurationMin: 45,
+      lunchStart: "12:30",
+    });
+    const payload = configToCreatePayload("00000000-0000-0000-0000-000000000001", cfg);
+    expect((payload.update.settings as Record<string, unknown>).lunch_start).toBe("12:30");
+    expect((payload.update.settings as Record<string, unknown>).lunch_end).toBe("13:15");
+  });
+
+  it("clears lunch settings when duration is zero", () => {
+    const cfg = emptyConfig({
+      name: "No Lunch Cup",
+      startsOn: "2026-06-15",
+      location: "Stade A",
+      lunchDurationMin: 0,
+    });
+    const payload = configToCreatePayload("00000000-0000-0000-0000-000000000001", cfg);
+    expect((payload.update.settings as Record<string, unknown>).lunch_start).toBeNull();
+    expect((payload.update.settings as Record<string, unknown>).lunch_end).toBeNull();
+  });
+
   it("uses nearestSupportedTeams for wizard num_teams", () => {
     expect(nearestSupportedTeams(10)).toBe(8);
     expect(nearestSupportedTeams(20)).toBe(16);

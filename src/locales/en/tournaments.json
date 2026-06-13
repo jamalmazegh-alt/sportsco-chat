@@ -840,6 +840,17 @@
     "disputedHelper": "Score under review — flagged by a team",
     "moreActions": "More actions",
     "addEventAction": "Add an event",
+    "matchDetails": {
+      "title": "Match details (scorers, assists, cards)",
+      "addGoal": "Add a goal",
+      "addCard": "Add a card",
+      "scorer": "Scorer (opt.)",
+      "assist": "Assist (opt.)",
+      "addGoalBtn": "Add goal",
+      "addCardBtn": "Add card",
+      "pending": "pending",
+      "goal": "Goal"
+    },
     "changeStatusAction": "Change status",
     "vs": "VS"
   },
@@ -1235,6 +1246,10 @@
       "simTotal": "Total matches",
       "simSlot": "Slot (duration + break)",
       "simLunch": "Lunch break",
+      "simLunchNone": "None",
+      "simLunchDuration": "Lunch break duration",
+      "simLunchMin": "{{min}} min",
+      "simLunchStart": "Start time",
       "simTerrains": "Pitches"
     },
     "footerSub": {
@@ -1372,6 +1387,10 @@
     "duration": "Durée d'un match",
     "flights": "Plusieurs trophées",
     "flightsHint": "Champions · Europa · Conference",
+    "lunch": "Lunch break",
+    "lunchNone": "None",
+    "lunchMin": "{{min}} min",
+    "lunchStart": "Start",
     "estimatedEnd": "Heure de fin estimée",
     "matches": "Matchs",
     "rounds": "Tours",

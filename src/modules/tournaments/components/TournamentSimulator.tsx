@@ -4,8 +4,14 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Clock, MapPin, Plus, Timer, Trophy } from "lucide-react";
-import { computeSchedule, type ScheduleVerdict } from "../lib/planner";
+import {
+  computeSchedule,
+  formatLunchRange,
+  type ScheduleVerdict,
+} from "../lib/planner";
+import { LUNCH_DURATION_PRESETS } from "../lib/assistant-config";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -31,10 +37,20 @@ export function TournamentSimulator({
   const [terrains, setTerrains] = useState(3);
   const [duration, setDuration] = useState(20);
   const [flights, setFlights] = useState(initialFlights);
+  const [lunchDurationMin, setLunchDurationMin] = useState(45);
+  const [lunchStart, setLunchStart] = useState("12:30");
 
   const result = useMemo(
-    () => computeSchedule({ teams, terrains, durationMin: duration, flights }),
-    [teams, terrains, duration, flights],
+    () =>
+      computeSchedule({
+        teams,
+        terrains,
+        durationMin: duration,
+        flights,
+        lunchMin: lunchDurationMin,
+        lunchStartHHMM: lunchStart,
+      }),
+    [teams, terrains, duration, flights, lunchDurationMin, lunchStart],
   );
 
   const gain = useMemo(() => {
@@ -166,6 +182,48 @@ export function TournamentSimulator({
           </div>
         </div>
         <Switch checked={flights} onCheckedChange={setFlights} />
+      </div>
+
+      {/* Lunch break */}
+      <div className="rounded-lg border border-border bg-card p-3 space-y-3">
+        <Label className="text-xs font-semibold uppercase text-muted-foreground">
+          {t("simulator.lunch")}
+        </Label>
+        <div className="flex flex-wrap gap-2">
+          {LUNCH_DURATION_PRESETS.map((min) => (
+            <button
+              key={min}
+              type="button"
+              onClick={() => setLunchDurationMin(min)}
+              className={cn(
+                "rounded-lg border px-3 py-1.5 text-xs font-bold transition-all",
+                lunchDurationMin === min
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card text-foreground hover:border-primary/50",
+              )}
+            >
+              {min === 0
+                ? t("simulator.lunchNone")
+                : t("simulator.lunchMin", { min })}
+            </button>
+          ))}
+        </div>
+        {lunchDurationMin > 0 && (
+          <div className="flex items-center gap-2">
+            <Label className="text-xs text-muted-foreground shrink-0">
+              {t("simulator.lunchStart")}
+            </Label>
+            <Input
+              type="time"
+              value={lunchStart}
+              onChange={(e) => setLunchStart(e.target.value)}
+              className="h-8 w-auto text-sm"
+            />
+            <span className="text-xs text-muted-foreground tabular-nums">
+              {formatLunchRange(lunchStart, lunchDurationMin)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Breakdown */}

@@ -4,6 +4,8 @@
  */
 import {
   computeSchedule,
+  formatLunchRange,
+  lunchEndHHMM,
   nearestSupportedTeams,
   type Recommendation,
   type ScheduleResult,
@@ -25,6 +27,10 @@ export interface AssistantTournamentConfig {
   matchDurationMin: number;
   /** Pause entre deux matchs sur un terrain (rotation). */
   pauseMin: number;
+  /** Pause déjeuner en minutes — 0 = aucune. */
+  lunchDurationMin: number;
+  /** Heure de début du déjeuner (HH:MM). */
+  lunchStart: string;
   terrains: number;
   /** "now" = nommer les terrains tout de suite, "later" = plus tard. */
   terrainNaming: "now" | "later";
@@ -61,6 +67,7 @@ export type AssistantStepId =
 export const TEAM_COUNT_PRESETS = [8, 12, 16, 24, 32] as const;
 export const MATCH_DURATION_PRESETS = [8, 10, 12, 15, 20] as const;
 export const PAUSE_PRESETS = [0, 3, 5, 10] as const;
+export const LUNCH_DURATION_PRESETS = [0, 30, 45, 60] as const;
 export const TERRAIN_PRESETS = [1, 2, 3, 4, 5] as const;
 
 const FOOTBALL_PLAYERS = [5, 7, 8, 9, 11] as const;
@@ -104,6 +111,8 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     flightsTemplate: "champions",
     matchDurationMin: 20,
     pauseMin: 3,
+    lunchDurationMin: 45,
+    lunchStart: "12:30",
     terrains: 3,
     terrainNaming: "later",
     terrainNames: [],
@@ -218,8 +227,14 @@ export function buildSchedulePreview(cfg: AssistantTournamentConfig): ScheduleRe
     terrains: cfg.terrains,
     durationMin: cfg.matchDurationMin,
     changeoverMin: cfg.pauseMin,
+    lunchMin: cfg.lunchDurationMin,
+    lunchStartHHMM: cfg.lunchStart,
     flights: configUsesFlights(cfg),
   });
+}
+
+export function lunchLabelForConfig(cfg: AssistantTournamentConfig): string | null {
+  return formatLunchRange(cfg.lunchStart, cfg.lunchDurationMin);
 }
 
 export function buildRecommendation(cfg: AssistantTournamentConfig): Recommendation {
@@ -306,6 +321,16 @@ export function configToCreatePayload(
     ...rules.roster,
     playersPerTeam: cfg.playersPerTeam,
   };
+  if (cfg.lunchDurationMin > 0) {
+    (rules as Record<string, unknown>).lunch_start = cfg.lunchStart;
+    (rules as Record<string, unknown>).lunch_end = lunchEndHHMM(
+      cfg.lunchStart,
+      cfg.lunchDurationMin,
+    );
+  } else {
+    (rules as Record<string, unknown>).lunch_start = null;
+    (rules as Record<string, unknown>).lunch_end = null;
+  }
 
   return {
     create: {
