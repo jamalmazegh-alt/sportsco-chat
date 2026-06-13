@@ -127,7 +127,7 @@ export function DrawDialog({
     setManualAssign(init);
   }, [open, teams, hasExistingDraw]);
 
-  const drawLocked = ["published", "in_progress", "completed"].includes(status);
+  const drawLocked = ["in_progress", "completed"].includes(status) || (status === "published" && hasExistingDraw);
 
   useEffect(() => {
     return () => {
@@ -312,6 +312,7 @@ export function DrawDialog({
 
   const canDraw = teams.length >= 2;
   const tournamentStarted = ["in_progress", "completed"].includes(status);
+  const launchLocked = tournamentStarted || (status === "published" && hasExistingDraw);
 
   return (
     <>
@@ -448,7 +449,7 @@ export function DrawDialog({
                   {!finished ? (
                     <Button
                       onClick={() => maybeConfirm(runAuto)}
-                      disabled={applyMut.isPending || tournamentStarted}
+                      disabled={applyMut.isPending || launchLocked}
                       className="w-full"
                       variant={hasExistingDraw ? "outline" : "default"}
                     >
@@ -481,7 +482,7 @@ export function DrawDialog({
                   {!drawing && revealed.length === 0 && !finished && (
                     <Button
                       onClick={() => maybeConfirm(startProgressive)}
-                      disabled={applyMut.isPending || tournamentStarted}
+                      disabled={applyMut.isPending || launchLocked}
                       className="w-full"
                       variant={hasExistingDraw ? "outline" : "default"}
                     >
@@ -649,7 +650,7 @@ export function DrawDialog({
                   {!finished && (
                     <Button
                       onClick={() => maybeConfirm(runManual)}
-                      disabled={applyMut.isPending || tournamentStarted}
+                      disabled={applyMut.isPending || launchLocked}
                       className="w-full"
                       variant={hasExistingDraw ? "outline" : "default"}
                     >
