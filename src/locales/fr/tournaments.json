@@ -1168,18 +1168,41 @@
     "back": "Retour"
   },
   "aiAssistant": {
-    "intro": "Salut 👋 On crée ton tournoi en une minute.",
+    "intro": "Salut 👋 On configure ton tournoi ensemble, étape par étape.",
+    "summaryIntro": "Parfait — voici le récap de ton tournoi. Tout est prêt à être créé.",
     "recoIntro": "Parfait. Voici ce que je te recommande 👇",
-    "recoBadge": "Recommandation Clubero",
+    "recoBadge": "Configuration Clubero",
     "recoTitle": "{{pools}} poules de {{perPool}}",
     "recoFlightsSuffix": "3 trophées",
     "q": {
-      "teams": "Combien d'équipes attends-tu ?",
-      "allDay": "Tout le monde doit-il jouer toute la journée ?",
-      "trophies": "Tu veux plusieurs trophées (Champions, Europa…) ?",
-      "paid": "Le tournoi est-il payant ?"
+      "sport": "Quel sport ?",
+      "playersPerTeam": "Combien de joueurs par équipe sur le terrain ?",
+      "numTeams": "Combien d'équipes participent ?",
+      "scheduleFormat": "Quel déroulé pour la journée ?",
+      "eliminatedContinue": "Les éliminés des poules continuent-ils à jouer ?",
+      "flightsTemplate": "Quels tableaux pour les équipes éliminées des poules ?",
+      "matchDuration": "Durée d'un match (temps de jeu) ?",
+      "terrains": "Combien de terrains disponibles ?",
+      "paid": "Le tournoi est-il payant ?",
+      "paidAmount": "Quel montant par équipe ?",
+      "name": "Comment s'appelle le tournoi ?",
+      "date": "Quelle date (et fin si plusieurs jours) ?",
+      "location": "Où se déroule le tournoi ?",
+      "summary": "Récapitulatif"
     },
     "opts": {
+      "playersPerTeam": "{{count}} joueurs",
+      "customTeamsPlaceholder": "Autre nombre…",
+      "customDurationPlaceholder": "Autre durée (min)…",
+      "durationMin": "{{min}} min",
+      "eliminatedYes": "Oui — matchs de classement / plusieurs tableaux (chaque équipe garde des matchs)",
+      "eliminatedNo": "Non — les éliminés des poules s'arrêtent",
+      "eliminatedYesShort": "Classement / flights",
+      "eliminatedNoShort": "Arrêt après poules",
+      "flightsChampions": "Champions · Europa · Conference",
+      "flightsSimple": "Consolante simple",
+      "pricePlaceholder": "Montant en €",
+      "priceValue": "{{amount}} € / équipe",
       "allDayYes": "Oui, du temps de jeu pour tous",
       "allDayNo": "Non, place aux meilleurs",
       "trophiesYes": "Oui, plusieurs finales",
@@ -1190,12 +1213,40 @@
     "cta": {
       "create": "Créer le tournoi",
       "adjust": "Ajuster",
+      "adjustPoint": "Ajuster un point",
+      "pickStep": "Quel point modifier ?",
       "simulate": "Simuler",
-      "restart": "Recommencer"
+      "restart": "Recommencer",
+      "expert": "Mode expert",
+      "expertSettings": "Réglages détaillés",
+      "confirm": "Valider",
+      "next": "Continuer"
+    },
+    "livePreview": {
+      "title": "Tournoi en cours",
+      "sport": "Sport",
+      "teams": "Équipes",
+      "playersPerTeam": "Format",
+      "format": "Déroulé",
+      "eliminated": "Éliminés poules",
+      "duration": "Durée match",
+      "durationValue": "{{min}} min",
+      "terrains": "Terrains",
+      "name": "Nom",
+      "scheduleBreakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} matchs poule + {{finalMatches}} finales · {{total}} matchs · fin ~{{end}}"
+    },
+    "errors": {
+      "invalidTeams": "Indique un nombre d'équipes entre 2 et 64.",
+      "invalidDuration": "Indique une durée entre 5 et 120 minutes.",
+      "invalidPrice": "Indique un montant valide.",
+      "invalidName": "Le nom doit faire au moins 2 caractères.",
+      "invalidDate": "Choisis une date de début.",
+      "invalidLocation": "Indique un lieu.",
+      "incomplete": "Configuration incomplète."
     },
     "formats": {
-      "poolsFinals": "Poules + phases finales",
-      "roundRobin": "Championnat (round-robin)",
+      "poolsFinals": "Poules + phase finale",
+      "roundRobin": "Championnat",
       "singleElim": "Élimination directe"
     },
     "recoLine": {

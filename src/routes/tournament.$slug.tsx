@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { googleMapsSearchUrl } from "@/lib/google-maps";
 import { Button } from "@/components/ui/button";
 
 import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
@@ -282,10 +283,9 @@ function PublicTournamentPage() {
                   {tournament.starts_on}
                   {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
                 </span>
-                {tournament.location && (
-                  // B13 — lien Google Maps (encodage URL correct).
+                {tournament.location && googleMapsSearchUrl(tournament.location) && (
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tournament.location)}`}
+                    href={googleMapsSearchUrl(tournament.location)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 hover:underline"
@@ -978,10 +978,9 @@ function PublishedRegistrationView({
                   {tournament.starts_on}
                   {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
                 </span>
-                {tournament.location && (
-                  // B13 — lien Google Maps (encodage URL correct).
+                {tournament.location && googleMapsSearchUrl(tournament.location) && (
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tournament.location)}`}
+                    href={googleMapsSearchUrl(tournament.location)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 hover:underline"
@@ -1086,13 +1085,12 @@ function PublishedRegistrationView({
               <dt className="text-xs text-muted-foreground">{t("common.match", { defaultValue: "Sport" })}</dt>
               <dd className="font-medium">{tournament.sport}</dd>
             </div>
-            {tournament.location && (
+            {tournament.location && googleMapsSearchUrl(tournament.location) && (
               <div>
                 <dt className="text-xs text-muted-foreground">Lieu</dt>
                 <dd className="font-medium">
-                  {/* B13 — lien Google Maps */}
                   <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tournament.location)}`}
+                    href={googleMapsSearchUrl(tournament.location)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"

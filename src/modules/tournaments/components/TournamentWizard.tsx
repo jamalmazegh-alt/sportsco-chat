@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
@@ -14,6 +14,11 @@ import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { Loader2, ChevronRight, ChevronLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { createTournament, updateTournament } from "../tournaments.functions";
+import {
+  configToCreatePayload,
+  configToWizardFormat,
+  type AssistantTournamentConfig,
+} from "../lib/assistant-config";
 
 
 type Format =
@@ -37,9 +42,11 @@ interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   initialValues?: InitialValues;
+  /** Full config from the AI assistant (mode expert). */
+  assistantPrefill?: AssistantTournamentConfig;
 }
 
-export function TournamentWizard({ clubId, open, onOpenChange, initialValues }: Props) {
+export function TournamentWizard({ clubId, open, onOpenChange, initialValues, assistantPrefill }: Props) {
   const { t } = useTranslation("tournaments");
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
@@ -59,6 +66,30 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues }: 
   const qc = useQueryClient();
   const fn = useServerFn(createTournament);
   const updateFn = useServerFn(updateTournament);
+
+  useEffect(() => {
+    if (!open) return;
+    if (assistantPrefill) {
+      const mapped = configToWizardFormat(assistantPrefill);
+      setName(assistantPrefill.name);
+      setSport(assistantPrefill.sport);
+      setCustomSportName(assistantPrefill.customSportName ?? "");
+      setCategory(assistantPrefill.category);
+      setStartsOn(assistantPrefill.startsOn);
+      setEndsOn(assistantPrefill.endsOn);
+      setLocation(assistantPrefill.location);
+      setFormat(mapped.format);
+      setNumTeams(mapped.numTeams);
+      setNumTeamsRaw(String(mapped.numTeams));
+      setStep(0);
+      return;
+    }
+    if (initialValues?.format) setFormat(initialValues.format);
+    if (initialValues?.numTeams) {
+      setNumTeams(initialValues.numTeams);
+      setNumTeamsRaw(String(initialValues.numTeams));
+    }
+  }, [open, assistantPrefill, initialValues]);
 
   const create = useMutation({
     mutationFn: async () => {
@@ -83,6 +114,15 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues }: 
           data: {
             tournament_id: res.tournament.id,
             patch: { cover_image_url: logo[0].url },
+          },
+        });
+      }
+      if (assistantPrefill) {
+        const payload = configToCreatePayload(clubId, assistantPrefill);
+        await updateFn({
+          data: {
+            tournament_id: res.tournament.id,
+            patch: payload.update,
           },
         });
       }
