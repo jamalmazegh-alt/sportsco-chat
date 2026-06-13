@@ -330,6 +330,19 @@ function MatchCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpen]);
 
+  // B11 — Auto-close dialog after score save when there is no next match.
+  // When a next match exists, the organizer chooses between "Match suivant" and
+  // "Fermer" (Fix G intent preserved). Without one, closing is the only action
+  // so we spare the extra tap with a short delay.
+  useEffect(() => {
+    if (!justSaved || nextMatchId) return;
+    const timer = setTimeout(() => {
+      setOpen(false);
+      setJustSaved(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [justSaved, nextMatchId]);
+
 
   const fn = useServerFn(recordMatchScore);
   const schedFn = useServerFn(updateMatchSchedule);
@@ -591,11 +604,12 @@ function MatchCard({
     dot: string;
   }> = {
     scheduled: {
-      border: "border-l-slate-400 dark:border-l-slate-500",
-      headerBg: "bg-muted/40",
-      badge: "bg-muted text-muted-foreground border border-border",
-      cta: "bg-foreground text-background hover:bg-foreground/90",
-      dot: "bg-slate-400",
+      // B12 — navy (secondary token = Clubero brand) instead of neutral slate.
+      border: "border-l-secondary/60",
+      headerBg: "bg-secondary/5",
+      badge: "bg-secondary/10 text-secondary dark:text-secondary-foreground/80 border border-secondary/20",
+      cta: "bg-secondary text-secondary-foreground hover:bg-secondary/90",
+      dot: "bg-secondary/60",
     },
     live: {
       border: "border-l-orange-500",

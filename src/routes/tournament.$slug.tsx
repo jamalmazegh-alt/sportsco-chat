@@ -283,10 +283,16 @@ function PublicTournamentPage() {
                   {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
                 </span>
                 {tournament.location && (
-                  <span className="inline-flex items-center gap-1.5">
+                  // B13 — lien Google Maps (encodage URL correct).
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tournament.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:underline"
+                  >
                     <MapPin className="h-3.5 w-3.5" />
                     {tournament.location}
-                  </span>
+                  </a>
                 )}
                 <span className="inline-flex items-center gap-1.5">
                   <Trophy className="h-3.5 w-3.5" />
@@ -973,10 +979,16 @@ function PublishedRegistrationView({
                   {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
                 </span>
                 {tournament.location && (
-                  <span className="inline-flex items-center gap-1.5">
+                  // B13 — lien Google Maps (encodage URL correct).
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tournament.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:underline"
+                  >
                     <MapPin className="h-3.5 w-3.5" />
                     {tournament.location}
-                  </span>
+                  </a>
                 )}
                 <span className="inline-flex items-center gap-1.5">
                   <Trophy className="h-3.5 w-3.5" />
@@ -1077,7 +1089,17 @@ function PublishedRegistrationView({
             {tournament.location && (
               <div>
                 <dt className="text-xs text-muted-foreground">Lieu</dt>
-                <dd className="font-medium">{tournament.location}</dd>
+                <dd className="font-medium">
+                  {/* B13 — lien Google Maps */}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tournament.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    {tournament.location}
+                  </a>
+                </dd>
               </div>
             )}
           </dl>

@@ -616,8 +616,9 @@ function TournamentDetailPage() {
           </Section>
         )}
 
-        {/* Registrations (managers only) */}
-        {canManage && (
+        {/* Registrations (managers only, draft/published — B8: hidden once started) */}
+        {canManage &&
+          (tournament.status === "draft" || tournament.status === "published") && (
           <Section
             id="section-registrations"
             icon={ClipboardList}
