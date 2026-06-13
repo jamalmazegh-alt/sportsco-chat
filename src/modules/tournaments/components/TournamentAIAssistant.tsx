@@ -79,6 +79,7 @@ export function TournamentAIAssistant({
   const [customDuration, setCustomDuration] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
   const [showSim, setShowSim] = useState(false);
+  const [showExpertSheet, setShowExpertSheet] = useState(false);
 
   const steps = useMemo(() => {
     const order = assistantStepOrder(config);
