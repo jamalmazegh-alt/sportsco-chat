@@ -25,6 +25,7 @@ import {
   LUNCH_DURATION_PRESETS,
   MATCH_DURATION_PRESETS,
   PAUSE_PRESETS,
+  PRICE_PRESETS_EUR,
   playersPerTeamOptions,
   readAssistantDraft,
   TEAM_COUNT_PRESETS,
