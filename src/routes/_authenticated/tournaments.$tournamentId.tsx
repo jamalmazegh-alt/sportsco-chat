@@ -262,6 +262,21 @@ function TournamentDetailPage() {
     scrollToAnchor("section-matches");
   };
 
+  // Sprint 2 — 1-tap alert routing. Detection only, no auto-correction.
+  const handleAlertClick = (a: CockpitAlert) => {
+    switch (a.kind) {
+      case "late_match":
+        if (a.matchId) focusMatch(a.matchId);
+        break;
+      case "missing_referee":
+        openSettings("staff");
+        break;
+      case "finals_not_generated":
+        scrollToAnchor("section-flights");
+        break;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
