@@ -63,9 +63,7 @@ describe("computeEstimatedEnd", () => {
 describe("computeAverageDelay", () => {
   it("returns null when no overdue match", () => {
     expect(computeAverageDelay([m("a", { scheduled_at: null })], NOW)).toBeNull();
-    expect(
-      computeAverageDelay([m("a", { scheduled_at: "2026-06-13T15:00:00Z" })], NOW),
-    ).toBeNull();
+    expect(computeAverageDelay([m("a", { scheduled_at: "2026-06-13T15:00:00Z" })], NOW)).toBeNull();
   });
 
   it("computes average of overdue delays in minutes", () => {
@@ -92,7 +90,7 @@ describe("computeAverageDelay", () => {
 });
 
 describe("computeAlerts", () => {
-  const t = { status: "in_progress", format: "groups_knockout" };
+  const t = { status: "in_progress", format: "mixed" };
 
   it("returns empty when everything is fine", () => {
     const out = computeAlerts({
@@ -137,6 +135,19 @@ describe("computeAlerts", () => {
     expect(out.some((x) => x.kind === "finals_not_generated")).toBe(true);
   });
 
+  it("does NOT alert finals for a format without a finals phase (round-robin)", () => {
+    const out = computeAlerts({
+      tournament: { status: "in_progress", format: "group" },
+      matches: [
+        m("a", { status: "completed", round: "group" }),
+        m("b", { status: "completed", round: "group" }),
+      ],
+      flightsCount: 0,
+      now: NOW,
+    });
+    expect(out.some((x) => x.kind === "finals_not_generated")).toBe(false);
+  });
+
   it("sorts by severity (high → low)", () => {
     const out = computeAlerts({
       tournament: t,
@@ -150,6 +161,8 @@ describe("computeAlerts", () => {
       now: NOW,
     });
     expect(out[0].severity).toBe("high");
-    expect(out[out.length - 1].severity === "medium" || out[out.length - 1].severity === "low").toBe(true);
+    expect(
+      out[out.length - 1].severity === "medium" || out[out.length - 1].severity === "low",
+    ).toBe(true);
   });
 });

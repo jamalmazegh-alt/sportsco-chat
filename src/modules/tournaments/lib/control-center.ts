@@ -134,10 +134,7 @@ function poolsRequired(format: string | null | undefined): boolean {
   return !FORMATS_WITHOUT_POOLS.has(format);
 }
 
-function flightsExpected(
-  format: string | null | undefined,
-  flightsCount: number,
-): boolean {
+function flightsExpected(format: string | null | undefined, flightsCount: number): boolean {
   if (!format) return flightsCount > 0;
   return FORMATS_WITH_FLIGHTS.has(format) || flightsCount > 0;
 }
@@ -161,8 +158,7 @@ export function computeStepper(args: ComputeArgs): StepperStep[] {
     !poolsRequired(tournament.format) ||
     (poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status)));
   const flightsDone = !flightsExpected(tournament.format, flightsCount) || flightsCount > 0;
-  const finalsDone =
-    koMatches.length > 0 && koMatches.every((m) => DONE_STATUSES.has(m.status));
+  const finalsDone = koMatches.length > 0 && koMatches.every((m) => DONE_STATUSES.has(m.status));
 
   const flags: Record<StepId, boolean> = {
     registrations: regDone,
@@ -228,8 +224,7 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
 
   // 5) Pools done, no flights yet (only when flights make sense)
   const poolMatches = matches.filter(isPoolMatch);
-  const poolsDone =
-    poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status));
+  const poolsDone = poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status));
   if (poolsDone && flightsExpected(tournament.format, flightsCount) && flightsCount === 0) {
     return { kind: "create_flights", anchor: "section-flights" };
   }
@@ -260,9 +255,7 @@ export function computeEstimatedEnd(
   matches: MatchLike[],
   matchDurationMin?: number | null,
 ): Date | null {
-  const unfinished = matches.filter(
-    (m) => !DONE_STATUSES.has(m.status) && m.scheduled_at,
-  );
+  const unfinished = matches.filter((m) => !DONE_STATUSES.has(m.status) && m.scheduled_at);
   if (unfinished.length === 0) return null;
   const latestMs = unfinished.reduce((acc, m) => {
     const ts = Date.parse(m.scheduled_at!);
@@ -361,9 +354,15 @@ export function computeAlerts(args: AlertsArgs): CockpitAlert[] {
   // Finals/knockout not generated yet
   const poolMatches = args.matches.filter(isPoolMatch);
   const koMatches = args.matches.filter(isKnockoutMatch);
-  const poolsDone =
-    poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status));
-  if (poolsDone && koMatches.length === 0) {
+  const poolsDone = poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status));
+  // Only alert when a finals/flights phase is actually expected for this format
+  // (reuse the same predicate as computeContinueAction → CTA and alert never
+  // contradict each other). A pure round-robin with no finals must not alert.
+  if (
+    poolsDone &&
+    koMatches.length === 0 &&
+    flightsExpected(args.tournament.format, args.flightsCount)
+  ) {
     out.push({
       id: "finals:not-generated",
       kind: "finals_not_generated",

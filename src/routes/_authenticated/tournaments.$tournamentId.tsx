@@ -102,8 +102,6 @@ function TournamentDetailPage() {
     refetchIntervalInBackground: false,
   });
 
-
-
   const publish = useMutation({
     mutationFn: (status: "published" | "in_progress" | "completed" | "draft") =>
       updateFn({ data: { tournament_id: tournamentId, patch: { status } } }),
@@ -345,7 +343,6 @@ function TournamentDetailPage() {
     );
   }
 
-
   return (
     <div className="pb-24">
       {/* ─── Header ─────────────────────────────────────────────────────── */}
@@ -443,10 +440,7 @@ function TournamentDetailPage() {
       {/* ─── Alerts (Sprint 2) ─────────────────────────────────────────── */}
       {canManage && alerts.length > 0 && (
         <div className="px-5 pt-4">
-          <AlertsPanel
-            alerts={alerts}
-            onAlertClick={(a) => handleAlertClick(a)}
-          />
+          <AlertsPanel alerts={alerts} onAlertClick={(a) => handleAlertClick(a)} />
         </div>
       )}
 
