@@ -793,6 +793,12 @@ export function GroupsAndFixtures({
         }}
       />
 
+      <PoolEditorDialog
+        open={poolEditorOpen}
+        onOpenChange={setPoolEditorOpen}
+        tournamentId={tournamentId}
+      />
+
       <DestructiveConfirmSheet
         open={genBracketOpen}
         onOpenChange={setGenBracketOpen}
