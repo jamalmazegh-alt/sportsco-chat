@@ -823,62 +823,110 @@ function QuestionView(p: QuestionViewProps) {
           </div>
         )}
 
-        {stepId === "lunchDuration" && (
-          <OptList>
-            {LUNCH_DURATION_PRESETS.map((n) => (
-              <Opt key={n} onClick={() => p.onLunchDuration(n)}>
-                {t(`aiAssistant.opts.lunch${n}`)}
-              </Opt>
-            ))}
-          </OptList>
-        )}
+        {stepId === "breaks" && (
+          <div className="space-y-5">
+            {/* --- Pause entre matchs --- */}
+            <div className="space-y-2">
+              <Label className="text-[12.5px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t("aiAssistant.opts.pauseLabel", { defaultValue: "Pause entre matchs (min)" })}
+              </Label>
+              <OptGrid cols={4}>
+                {PAUSE_PRESETS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => p.onPause(n)}
+                    className={cn(
+                      "rounded-xl border-[1.5px] py-3 text-center text-[18px] font-extrabold transition shadow-sm",
+                      config.pauseMin === n
+                        ? "border-[hsl(149_50%_36%)] bg-[hsl(149_45%_92%)] text-[hsl(149_55%_25%)]"
+                        : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
+                    )}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </OptGrid>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  min={0}
+                  max={60}
+                  placeholder={t("aiAssistant.opts.customPausePlaceholder", { defaultValue: "Autre…" })}
+                  value={customPause}
+                  onChange={(e) => setCustomPause(e.target.value)}
+                />
+                <Button type="button" variant="secondary" onClick={p.onConfirmCustomPause}>
+                  {t("aiAssistant.cta.confirm")}
+                </Button>
+              </div>
+            </div>
 
-        {stepId === "lunchStart" && (
-          <div className="space-y-3">
-            <Input
-              type="time"
-              value={config.lunchStart}
-              onChange={(e) => patch({ lunchStart: e.target.value })}
-            />
-            <Button type="button" className="w-full" onClick={p.onAdvance}>
+            {/* --- Pause déjeuner --- */}
+            <div className="space-y-2 border-t border-dashed border-border pt-4">
+              <Label className="text-[12.5px] font-bold uppercase tracking-wider text-muted-foreground">
+                {t("aiAssistant.opts.lunchLabel", { defaultValue: "Pause déjeuner" })}
+              </Label>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => patch({ lunchDurationMin: 0 })}
+                  className={cn(
+                    "rounded-lg border px-3 py-2 text-[12px] font-bold transition",
+                    config.lunchDurationMin === 0
+                      ? "border-[hsl(149_50%_36%)] bg-[hsl(149_45%_92%)] text-[hsl(149_55%_25%)]"
+                      : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
+                  )}
+                >
+                  {t("aiAssistant.opts.lunch0", { defaultValue: "Sans" })}
+                </button>
+                {config.lunchDurationMin > 0 && (
+                  <span className="text-[11.5px] text-muted-foreground">
+                    {lunchLabelForConfig(config)}
+                  </span>
+                )}
+              </div>
+              {config.lunchDurationMin === 0 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => patch({ lunchDurationMin: 45 })}
+                >
+                  {t("aiAssistant.opts.lunchAdd", { defaultValue: "+ Ajouter une plage déjeuner" })}
+                </Button>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      {t("aiAssistant.opts.lunchStart", { defaultValue: "Début" })}
+                    </Label>
+                    <Input
+                      type="time"
+                      value={config.lunchStart}
+                      onChange={(e) => patch({ lunchStart: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      {t("aiAssistant.opts.lunchEnd", { defaultValue: "Fin" })}
+                    </Label>
+                    <Input
+                      type="time"
+                      value={computeLunchEnd(config.lunchStart, config.lunchDurationMin)}
+                      onChange={(e) => {
+                        const dur = diffMinutes(config.lunchStart, e.target.value);
+                        if (dur > 0 && dur <= 240) patch({ lunchDurationMin: dur });
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Button type="button" className="w-full" onClick={p.onConfirmBreaks}>
               {t("aiAssistant.cta.next")}
             </Button>
-          </div>
-        )}
-
-        {stepId === "fairPlay" && (
-          <OptList>
-            <Opt onClick={() => p.onFairPlay(true)}>
-              {t("aiAssistant.opts.fairPlayYes")}
-            </Opt>
-            <Opt onClick={() => p.onFairPlay(false)}>
-              {t("aiAssistant.opts.fairPlayNo")}
-            </Opt>
-          </OptList>
-        )}
-
-        {stepId === "pause" && (
-          <div className="space-y-3">
-            <OptGrid cols={4}>
-              {PAUSE_PRESETS.map((n) => (
-                <OptG key={n} onClick={() => p.onPause(n)}>
-                  {n}
-                </OptG>
-              ))}
-            </OptGrid>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                min={0}
-                max={60}
-                placeholder={t("aiAssistant.opts.customPausePlaceholder", { defaultValue: "Autre…" })}
-                value={customPause}
-                onChange={(e) => setCustomPause(e.target.value)}
-              />
-              <Button type="button" variant="secondary" onClick={p.onConfirmCustomPause}>
-                {t("aiAssistant.cta.confirm")}
-              </Button>
-            </div>
           </div>
         )}
 
