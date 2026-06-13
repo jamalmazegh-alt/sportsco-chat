@@ -662,6 +662,10 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                   )}
                   {t("rules.generatePdf")}
                 </Button>
+                <TournamentRulesAIGenerator
+                  tournamentId={tournamentId}
+                  locale={lang.startsWith("en") ? "en" : "fr"}
+                />
               </div>
               {docsQuery.data?.documents && docsQuery.data.documents.length > 0 && (
                 <ul className="space-y-1.5 pt-2">
