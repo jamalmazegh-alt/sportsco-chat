@@ -1155,5 +1155,75 @@
       "missingReferee": "Arbitre manquant (démarrage dans {{minutes}} min)",
       "finalsNotGenerated": "Phase finale non générée — les poules sont terminées"
     }
+  },
+  "createChooser": {
+    "title": "Créer un tournoi",
+    "subtitle": "Deux portes, zéro jargon. Choisis ton flow.",
+    "aiTitle": "Créer avec l'IA",
+    "aiHint": "4 questions, une recommandation prête à créer.",
+    "aiBadge": "Nouveau",
+    "quickTitle": "Mode rapide",
+    "quickHint": "5 écrans, gros boutons, aucune surprise.",
+    "simulatorLink": "Simuler un format avant de créer",
+    "back": "Retour"
+  },
+  "aiAssistant": {
+    "intro": "Salut 👋 On crée ton tournoi en une minute.",
+    "recoIntro": "Parfait. Voici ce que je te recommande 👇",
+    "recoBadge": "Recommandation Clubero",
+    "recoTitle": "{{pools}} poules de {{perPool}}",
+    "recoFlightsSuffix": "3 trophées",
+    "q": {
+      "teams": "Combien d'équipes attends-tu ?",
+      "allDay": "Tout le monde doit-il jouer toute la journée ?",
+      "trophies": "Tu veux plusieurs trophées (Champions, Europa…) ?",
+      "paid": "Le tournoi est-il payant ?"
+    },
+    "opts": {
+      "allDayYes": "Oui, du temps de jeu pour tous",
+      "allDayNo": "Non, place aux meilleurs",
+      "trophiesYes": "Oui, plusieurs finales",
+      "trophiesNo": "Non, un seul vainqueur",
+      "free": "Gratuit",
+      "paid": "Payant"
+    },
+    "cta": {
+      "create": "Créer le tournoi",
+      "adjust": "Ajuster",
+      "simulate": "Simuler",
+      "restart": "Recommencer"
+    },
+    "formats": {
+      "poolsFinals": "Poules + phases finales",
+      "roundRobin": "Championnat (round-robin)",
+      "singleElim": "Élimination directe"
+    },
+    "recoLine": {
+      "teams": "Équipes",
+      "finals": "Phase finale",
+      "flightsValue": "Champions · Europa · Conference",
+      "matches": "Matchs au total",
+      "estimatedEnd": "Durée estimée",
+      "terrains": "Terrains conseillés"
+    }
+  },
+  "simulator": {
+    "title": "Simulateur de tournoi",
+    "subtitle": "Ajuste les paramètres, vois l'impact en direct.",
+    "teams": "Équipes",
+    "terrains": "Terrains",
+    "duration": "Durée d'un match",
+    "flights": "Plusieurs trophées",
+    "flightsHint": "Champions · Europa · Conference",
+    "estimatedEnd": "Heure de fin estimée",
+    "matches": "Matchs",
+    "rounds": "Tours",
+    "margin": "Marge avant 18h",
+    "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
+    "verdictOk": "✓ Tient largement la journée",
+    "verdictWarn": "⚠ Ça passe juste",
+    "verdictBad": "✗ Trop serré, ajoute un terrain",
+    "breakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} matchs de poule + {{finalMatches}} finales",
+    "estimateDisclaimer": "Estimation indicative (pauses, retards non inclus)."
   }
 }

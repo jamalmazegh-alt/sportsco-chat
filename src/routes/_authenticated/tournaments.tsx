@@ -13,7 +13,7 @@ import {
   listMyPersonalTournaments,
 } from "@/modules/tournaments/tournaments.functions";
 import { listMyAvailablePasses } from "@/modules/tournaments/passes.functions";
-import { TournamentWizard } from "@/modules/tournaments/components/TournamentWizard";
+import { TournamentCreateChooser } from "@/modules/tournaments/components/TournamentCreateChooser";
 import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 import { TournamentUpgradeCard } from "@/modules/tournaments/components/TournamentUpgradeCard";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
@@ -85,7 +85,7 @@ function TournamentsList() {
       </div>
 
       {canManage && !noClub && activeClubId && (
-        <TournamentWizard
+        <TournamentCreateChooser
           clubId={activeClubId}
           open={open}
           onOpenChange={setOpen}

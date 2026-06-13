@@ -25,13 +25,21 @@ type Format =
   | "flighted_finals"
   | "consolation";
 
+interface InitialValues {
+  format?: Format;
+  numTeams?: number;
+  /** Informational flag — applied via flights template post-create (Sprint 4). */
+  flightsTemplate?: "champions" | null;
+}
+
 interface Props {
   clubId: string;
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  initialValues?: InitialValues;
 }
 
-export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
+export function TournamentWizard({ clubId, open, onOpenChange, initialValues }: Props) {
   const { t } = useTranslation("tournaments");
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
@@ -41,10 +49,10 @@ export function TournamentWizard({ clubId, open, onOpenChange }: Props) {
   const [startsOn, setStartsOn] = useState("");
   const [endsOn, setEndsOn] = useState("");
   const [location, setLocation] = useState("");
-  const [format, setFormat] = useState<Format>("mixed");
+  const [format, setFormat] = useState<Format>(initialValues?.format ?? "mixed");
   const [swissRounds, setSwissRounds] = useState<number>(5);
-  const [numTeams, setNumTeams] = useState(8);
-  const [numTeamsRaw, setNumTeamsRaw] = useState("8");
+  const [numTeams, setNumTeams] = useState(initialValues?.numTeams ?? 8);
+  const [numTeamsRaw, setNumTeamsRaw] = useState(String(initialValues?.numTeams ?? 8));
   const [logo, setLogo] = useState<Attachment[]>([]);
 
   const navigate = useNavigate();
