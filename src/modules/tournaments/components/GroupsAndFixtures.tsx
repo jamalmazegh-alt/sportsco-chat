@@ -521,6 +521,15 @@ export function GroupsAndFixtures({
                 {t("groups.regenerateWarn")}
               </p>
             )}
+            {groupsCount > 0 && status !== "in_progress" && status !== "completed" && (
+              <Button
+                onClick={() => setPoolEditorOpen(true)}
+                variant="outline"
+                className="w-full h-11"
+              >
+                {t("poolEditor.openButton", "Modifier les poules manuellement")}
+              </Button>
+            )}
           </Block>
         )}
 
