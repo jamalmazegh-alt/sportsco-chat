@@ -91,7 +91,10 @@ export function DrawDialog({
 
   const [mode, setMode] = useState<DrawMode>("auto");
   const [numGroups, setNumGroups] = useState(Math.max(2, Math.min(4, Math.floor(teams.length / 2) || 2)));
+  // B-03 — keep raw string buffers so users can clear the input freely.
+  const [numGroupsRaw, setNumGroupsRaw] = useState(String(Math.max(2, Math.min(4, Math.floor(teams.length / 2) || 2))));
   const [qualifiers, setQualifiers] = useState(2);
+  const [qualifiersRaw, setQualifiersRaw] = useState("2");
   const [thirdPlace, setThirdPlace] = useState(false);
 
   // Animation state
