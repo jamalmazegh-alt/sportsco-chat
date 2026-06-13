@@ -188,6 +188,30 @@ function TournamentDetailPage() {
 
   const counters = useMemo(() => countMatches(data?.matches ?? []), [data]);
 
+  // Sprint 2 — Cockpit metrics + alerts (pure, recomputed when data changes).
+  const estimatedEnd = useMemo(
+    () =>
+      data?.tournament
+        ? computeEstimatedEnd(data.matches, data.tournament.match_duration_min)
+        : null,
+    [data],
+  );
+  const averageDelay = useMemo(
+    () => (data?.matches ? computeAverageDelay(data.matches) : null),
+    [data],
+  );
+  const alerts = useMemo(
+    () =>
+      data?.tournament
+        ? computeAlerts({
+            tournament: data.tournament,
+            matches: data.matches,
+            flightsCount: data.flights.length,
+          })
+        : [],
+    [data],
+  );
+
   const hasFlights = flights.length > 0;
   const poolMatchesDone =
     matches.filter((m) => m.round === "group").length > 0 &&
