@@ -7,8 +7,16 @@ export function AssistantFab() {
   const { t } = useTranslation();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // Hide on the assistant page itself and on auth/onboarding flows
-  if (pathname.startsWith("/assistant") || pathname.startsWith("/login") || pathname.startsWith("/onboarding")) {
+  // Hide on the assistant page itself, on auth/onboarding flows, and on
+  // tournament pages where it adds noise without context-specific help.
+  if (
+    pathname.startsWith("/assistant") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/tournaments/") ||
+    pathname.startsWith("/tournament/") ||
+    pathname.startsWith("/t/")
+  ) {
     return null;
   }
 
