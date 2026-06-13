@@ -1,7 +1,7 @@
 // Server-only helpers for coach insights detection + AI message generation.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway";
+import { z } from "zod";
+import { callLLM } from "@/lib/llm/core.server";
 
 type InsightType =
   | "pending_convocations"
