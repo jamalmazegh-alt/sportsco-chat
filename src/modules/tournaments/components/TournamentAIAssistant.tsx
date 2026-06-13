@@ -197,7 +197,7 @@ export function TournamentAIAssistant({
   }
   function selectPause(n: number) {
     patch({ pauseMin: n });
-    advance();
+    // breaks step stays open — user may still tweak lunch range
   }
   function confirmCustomPause() {
     const n = parseInt(customPause, 10);
@@ -205,12 +205,14 @@ export function TournamentAIAssistant({
       toast.error(t("aiAssistant.errors.invalidPause", { defaultValue: "Pause invalide (0-60 min)" }));
       return;
     }
-    selectPause(n);
+    patch({ pauseMin: n });
     setCustomPause("");
+  }
+  function confirmBreaks() {
+    advance();
   }
   function selectLunchDuration(n: number) {
     patch({ lunchDurationMin: n });
-    advance();
   }
   function selectFairPlay(v: boolean) {
     patch({ useFairPlay: v });
