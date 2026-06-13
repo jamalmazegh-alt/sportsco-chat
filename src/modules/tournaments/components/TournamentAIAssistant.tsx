@@ -1,13 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy, Users, Clock, MapPin, Award, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Sparkles, Trophy, Users, Clock, MapPin, Award, ChevronRight, Loader2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   recommendFormat,
   type AssistantAnswers,
   type Recommendation,
 } from "../lib/planner";
+import {
+  explainRecommendation,
+  answerTournamentQuestion,
+} from "@/lib/llm/tournament-assistant.functions";
 
 interface Props {
   /** Called when the user clicks "Create" on the reco card. */
