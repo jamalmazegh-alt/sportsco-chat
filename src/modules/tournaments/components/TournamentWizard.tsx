@@ -232,6 +232,10 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
               />
             </div>
             <div className="space-y-1.5">
+            <div className="flex items-center gap-2 py-2">
+              <input type="checkbox" id="fairplay" checked={assistantPrefill?.useFairPlay ?? true} readOnly />
+              <Label htmlFor="fairplay">{t("tournament.fairPlay")}</Label>
+            </div>
               <Label>{t("wizard.categoryOptional")}</Label>
               <Input
                 value={category}

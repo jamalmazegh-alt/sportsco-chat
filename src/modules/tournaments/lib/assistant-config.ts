@@ -42,6 +42,7 @@ export interface AssistantTournamentConfig {
   startsOn: string;
   endsOn: string;
   location: string;
+  useFairPlay: boolean;
   category: string;
 }
 
@@ -53,6 +54,9 @@ export type AssistantStepId =
   | "eliminatedContinue"
   | "flightsTemplate"
   | "matchDuration"
+  | "lunchDuration"
+  | "lunchStart"
+  | "fairPlay"
   | "pause"
   | "terrains"
   | "terrainNaming"
@@ -123,6 +127,7 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     startsOn: "",
     endsOn: "",
     location: "",
+    useFairPlay: true,
     category: "",
     ...partial,
   };
@@ -199,9 +204,13 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
     steps.push("eliminatedContinue");
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
-  steps.push("matchDuration", "pause", "terrains", "terrainNaming");
+  steps.push("matchDuration", "lunchDuration");
+  if ((cfg.lunchDurationMin ?? 0) > 0) {
+    steps.push("lunchStart");
+  }
+  steps.push("pause", "terrains", "terrainNaming");
   if (cfg.terrainNaming === "now") steps.push("terrainNames");
-  steps.push("paid");
+  steps.push("fairPlay", "paid");
   if (cfg.paid) steps.push("paidAmount");
   steps.push("name", "date", "location", "summary");
   return steps;
@@ -321,15 +330,29 @@ export function configToCreatePayload(
     ...rules.roster,
     playersPerTeam: cfg.playersPerTeam,
   };
-  if (cfg.lunchDurationMin > 0) {
-    (rules as Record<string, unknown>).lunch_start = cfg.lunchStart;
-    (rules as Record<string, unknown>).lunch_end = lunchEndHHMM(
+  rules.fairPlay = {
+    ...rules.fairPlay,
+    enabled: cfg.useFairPlay,
+  };
+  if (cfg.useFairPlay) {
+    const ordered = rules.tiebreakers.filter((key) => key !== "fair_play");
+    const drawLotIndex = ordered.indexOf("draw_lot");
+    rules.tiebreakers =
+      drawLotIndex >= 0
+        ? [...ordered.slice(0, drawLotIndex), "fair_play", ...ordered.slice(drawLotIndex)]
+        : [...ordered, "fair_play"];
+  } else {
+    rules.tiebreakers = rules.tiebreakers.filter((key) => key !== "fair_play");
+  }
+  if ((cfg.lunchDurationMin ?? 0) > 0) {
+    (rules as unknown as Record<string, unknown>).lunch_start = cfg.lunchStart;
+    (rules as unknown as Record<string, unknown>).lunch_end = lunchEndHHMM(
       cfg.lunchStart,
       cfg.lunchDurationMin,
     );
   } else {
-    (rules as Record<string, unknown>).lunch_start = null;
-    (rules as Record<string, unknown>).lunch_end = null;
+    (rules as unknown as Record<string, unknown>).lunch_start = null;
+    (rules as unknown as Record<string, unknown>).lunch_end = null;
   }
 
   return {

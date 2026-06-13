@@ -1218,6 +1218,8 @@
       "teams": "{{n}} équipes",
       "match": "matchs {{min}} min",
       "pause": "pause {{min}} min",
+      "lunch": "déjeuner {{range}}",
+      "fairPlay": "fair-play",
       "terrains": "{{n}} terrains",
       "pools284": "2 poules de 4",
       "pools4x3": "4 poules de 3",
@@ -1279,6 +1281,7 @@
       "playersPerTeam": "{{count}} joueurs",
       "customTeamsPlaceholder": "Autre nombre…",
       "customDurationPlaceholder": "Autre durée (min)…",
+      "customPausePlaceholder": "Autre pause (min)…",
       "durationMin": "{{min}} min",
       "poolsFinalsHint": "Le plus courant",
       "roundRobinHint": "Tout le monde se rencontre",
@@ -1305,6 +1308,13 @@
       "trophiesNo": "Non, un seul vainqueur",
       "free": "Gratuit",
       "paid": "Payant"
+      ,
+      "fairPlayYes": "Oui, avec bonus/malus",
+      "fairPlayNo": "Non, pas de fair-play",
+      "lunch0": "Non, pas de pause",
+      "lunch30": "30 min",
+      "lunch45": "45 min",
+      "lunch60": "1 heure"
     },
     "cta": {
       "create": "Créer le tournoi",
@@ -1375,6 +1385,8 @@
       "fieldsHint": "Nommer les terrains, affecter",
       "registration": "Inscriptions & paiement",
       "registrationHint": "En ligne, prix, validation",
+      "fairPlay": "Fair-play",
+      "fairPlayHint": "Activer le bonus/malus cartons",
       "openExpert": "Ouvrir l'éditeur expert",
       "close": "Revenir à l'assistant"
     }

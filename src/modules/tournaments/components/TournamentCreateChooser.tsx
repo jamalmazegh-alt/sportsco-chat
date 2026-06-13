@@ -91,7 +91,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
         <DialogContent
           className={
             mode === "ai"
-              ? "max-w-md p-0 overflow-hidden bg-transparent border-0 shadow-none"
+              ? "max-w-md max-h-[96vh] !top-[2vh] !translate-y-0 p-0 overflow-y-auto bg-transparent border-0 shadow-none"
               : "max-w-xl max-h-[92vh] overflow-y-auto"
           }
         >

@@ -434,11 +434,13 @@ export function GroupsAndFixtures({
               {/* B-04 — once the tournament is in_progress/completed the draw
                   must not be re-triggered from this surface. The dialog still
                   exposes a confirm-protected Relancer for emergencies. */}
-              {["published", "in_progress", "completed"].includes(status) ? (
+              {(["in_progress", "completed"].includes(status) || (status === "published" && hasExistingDraw)) ? (
                 <p className="text-[11px] text-amber-600 dark:text-amber-400">
                   {t("groups.drawLockedStarted", {
                     defaultValue:
-                      "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats.",
+                      status === "published"
+                        ? "Le tournoi est publié — la relance du tirage est verrouillée pour préserver le programme."
+                        : "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats.",
                   })}
                 </p>
               ) : (
