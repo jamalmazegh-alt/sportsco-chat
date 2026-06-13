@@ -13,8 +13,11 @@ import { TournamentWizard } from "./TournamentWizard";
 import { TournamentAIAssistant } from "./TournamentAIAssistant";
 import { TournamentSimulator } from "./TournamentSimulator";
 import {
+  clearAssistantDraft,
   configToWizardFormat,
   configUsesFlights,
+  draftHasProgress,
+  readAssistantDraft,
   type AssistantTournamentConfig,
 } from "../lib/assistant-config";
 
