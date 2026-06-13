@@ -124,10 +124,10 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     registrationFeeCents: 0,
     registrationCurrency: "eur",
     name: "",
-    useFairPlay: true,
     startsOn: "",
     endsOn: "",
     location: "",
+    useFairPlay: true,
     category: "",
     ...partial,
   };
@@ -199,17 +199,18 @@ export function draftHasProgress(draft: AssistantDraft | null): boolean {
 
 /** Étapes actives selon les réponses déjà données. */
 export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): AssistantStepId[] {
-  steps.push("lunchDuration");
-  if (cfg.lunchDurationMin > 0) steps.push("lunchStart");
-  steps.push("fairPlay");
   const steps: AssistantStepId[] = ["sport", "playersPerTeam", "numTeams", "scheduleFormat"];
   if (cfg.scheduleFormat === "pools_finals") {
     steps.push("eliminatedContinue");
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
-  steps.push("matchDuration", "pause", "terrains", "terrainNaming");
+  steps.push("matchDuration", "lunchDuration");
+  if (cfg.lunchDurationMin > 0) {
+    steps.push("lunchStart");
+  }
+  steps.push("pause", "terrains", "terrainNaming");
   if (cfg.terrainNaming === "now") steps.push("terrainNames");
-  steps.push("paid");
+  steps.push("fairPlay", "paid");
   if (cfg.paid) steps.push("paidAmount");
   steps.push("name", "date", "location", "summary");
   return steps;
@@ -328,6 +329,10 @@ export function configToCreatePayload(
   rules.roster = {
     ...rules.roster,
     playersPerTeam: cfg.playersPerTeam,
+  };
+  rules.fairPlay = {
+    ...rules.fairPlay,
+    enabled: cfg.useFairPlay,
   };
   if (cfg.lunchDurationMin > 0) {
     (rules as Record<string, unknown>).lunch_start = cfg.lunchStart;
