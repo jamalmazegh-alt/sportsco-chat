@@ -114,6 +114,11 @@ function Stepper({
   className?: string;
 }) {
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
+  // B-03 — raw string buffer so the user can clear the input and type freely.
+  const [raw, setRaw] = useState(String(value));
+  useEffect(() => {
+    setRaw(String(value));
+  }, [value]);
   return (
     <div className={cn("space-y-1.5", className)}>
       <label className="text-[11px] font-medium text-muted-foreground block">{label}</label>
@@ -129,8 +134,19 @@ function Stepper({
         <input
           type="number"
           inputMode="numeric"
-          value={value}
-          onChange={(e) => onChange(clamp(parseInt(e.target.value || String(min), 10)))}
+          value={raw}
+          onChange={(e) => {
+            const v = e.target.value;
+            setRaw(v);
+            const n = parseInt(v, 10);
+            if (Number.isFinite(n)) onChange(clamp(n));
+          }}
+          onBlur={() => {
+            const n = parseInt(raw, 10);
+            const next = Number.isFinite(n) ? clamp(n) : min;
+            onChange(next);
+            setRaw(String(next));
+          }}
           className="flex-1 min-w-0 bg-transparent text-center text-base font-bold tabular-nums outline-none border-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
         <button
