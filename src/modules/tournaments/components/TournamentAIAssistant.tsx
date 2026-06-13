@@ -365,7 +365,7 @@ export function TournamentAIAssistant({
             type="button"
             variant="outline"
             className="flex-1"
-            onClick={() => onOpenExpert(config)}
+            onClick={() => setShowExpertSheet(true)}
           >
             {t("aiAssistant.cta.expertSettings")}
           </Button>
