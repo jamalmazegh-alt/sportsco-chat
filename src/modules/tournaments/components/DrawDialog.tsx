@@ -479,12 +479,20 @@ export function DrawDialog({
                   {!drawing && revealed.length === 0 && !finished && (
                     <Button
                       onClick={() => maybeConfirm(startProgressive)}
-                      disabled={applyMut.isPending}
+                      disabled={applyMut.isPending || tournamentStarted}
                       className="w-full"
+                      variant={hasExistingDraw ? "outline" : "default"}
                     >
                       <Shuffle className="h-4 w-4" />
-                      {t("draw.launch")}
+                      {hasExistingDraw ? t("draw.relaunch") : t("draw.launch")}
                     </Button>
+                  )}
+                  {/* B-04 — once finished, the launch CTA is hidden; use the
+                      footer Relancer button (with confirm sheet) instead. */}
+                  {finished && !drawing && (
+                    <p className="text-xs text-muted-foreground italic">
+                      {t("draw.relaunchFromFooterHint", { defaultValue: '' })}
+                    </p>
                   )}
 
 
