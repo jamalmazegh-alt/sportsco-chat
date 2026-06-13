@@ -12,6 +12,11 @@ import {
   ageToCategory,
   sanitizeRestrictedHtml,
 } from "../../lib/llm/core.server";
+import {
+  buildConsecutiveAbsencePrompt,
+  buildPendingConvocationsPrompt,
+  rehydrateMessages,
+} from "../../lib/llm/insights-prompts";
 
 describe("anonymizePlayers", () => {
   it("returns 'Joueur A', 'Joueur B', …", () => {
@@ -52,6 +57,75 @@ describe("ageToCategory", () => {
     [30, "Senior"],
   ])("ageToCategory(%s) === %s", (age, expected) => {
     expect(ageToCategory(age)).toBe(expected);
+  });
+});
+
+describe("insights LLM prompts — no real PII reaches the gateway", () => {
+  const REAL = {
+    p1: { id: "11111111-1111-1111-1111-111111111111", fullName: "Zinedine Zidane" },
+    p2: { id: "alice@example.com", fullName: "Kylian Mbappé" },
+    p3: { id: "p-3", fullName: "Antoine Griezmann" },
+  };
+
+  function assertNoRealPii(prompt: string) {
+    for (const p of Object.values(REAL)) {
+      // No real first/last names
+      for (const part of p.fullName.split(/\s+/)) {
+        expect(prompt).not.toContain(part);
+      }
+      // No raw ids / emails
+      expect(prompt).not.toContain(p.id);
+    }
+    expect(prompt).not.toContain("@");
+  }
+
+  it("consecutive-absence prompt contains only a label, no real name/id", () => {
+    const { prompt, rehydrate } = buildConsecutiveAbsencePrompt({
+      player: REAL.p1,
+      absenceCount: 3,
+    });
+    assertNoRealPii(prompt);
+    expect(prompt).toContain("Joueur A");
+    expect(prompt).toContain("3");
+    expect(rehydrate["Joueur A"]).toBe(REAL.p1.fullName);
+  });
+
+  it("pending-convocations prompt contains only labels, no real names/emails", () => {
+    const { prompt, rehydrate } = buildPendingConvocationsPrompt({
+      players: [REAL.p1, REAL.p2, REAL.p3],
+      pendingCount: 3,
+    });
+    assertNoRealPii(prompt);
+    expect(prompt).toContain("Joueur A");
+    expect(prompt).toContain("Joueur B");
+    expect(prompt).toContain("Joueur C");
+    expect(rehydrate["Joueur A"]).toBe(REAL.p1.fullName);
+    expect(rehydrate["Joueur B"]).toBe(REAL.p2.fullName);
+    expect(rehydrate["Joueur C"]).toBe(REAL.p3.fullName);
+  });
+
+  it("rehydration restores the real names server-side (labels → names)", () => {
+    const { rehydrate } = buildPendingConvocationsPrompt({
+      players: [REAL.p1, REAL.p2],
+      pendingCount: 2,
+    });
+    const out = rehydrateMessages(
+      {
+        fr: "Joueur A et Joueur B n'ont pas répondu.",
+        en: "Joueur A and Joueur B haven't responded.",
+      },
+      rehydrate,
+    );
+    expect(out.fr).toContain(REAL.p1.fullName);
+    expect(out.fr).toContain(REAL.p2.fullName);
+    expect(out.en).toContain(REAL.p1.fullName);
+    expect(out.fr).not.toContain("Joueur A");
+  });
+
+  it("rehydration replaces longer labels first (Joueur AA not clobbered)", () => {
+    const map = { "Joueur A": "Alice", "Joueur AA": "Bob" };
+    const out = rehydrateMessages({ fr: "Joueur AA & Joueur A", en: "Joueur AA & Joueur A" }, map);
+    expect(out.fr).toBe("Bob & Alice");
   });
 });
 

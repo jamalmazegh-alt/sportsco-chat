@@ -2,6 +2,26 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { z } from "zod";
 import { callLLM } from "@/lib/llm/core.server";
+import {
+  buildConsecutiveAbsencePrompt,
+  buildPendingConvocationsPrompt,
+  rehydrateMessages,
+  type AnonPrompt,
+} from "@/lib/llm/insights-prompts";
+
+/**
+ * Kill switch for LLM-generated insight messages.
+ *
+ * OFF by default — so production stops sending any data to the LLM until an
+ * operator explicitly opts in with INSIGHTS_LLM_ENABLED="true". When OFF every
+ * insight falls back to a deterministic, server-built message (no PII leaves
+ * the server). Even when ON, prompts are fully anonymised (see insights-prompts)
+ * and the "missing_guardian" insight is ALWAYS deterministic (never sends a
+ * minor's name to a third-party LLM).
+ */
+function isInsightsLlmEnabled(): boolean {
+  return process.env.INSIGHTS_LLM_ENABLED === "true";
+}
 
 type InsightType =
   | "pending_convocations"
@@ -22,8 +42,12 @@ interface DetectedInsight {
   action_payload: Record<string, unknown> | null;
   dedup_key: string;
   expires_at: string | null;
-  // AI prompt context
-  userPrompt: string;
+  /**
+   * Anonymised LLM prompt + re-hydration map. Present ONLY for insight types
+   * that are allowed to use the LLM. `null`/absent → always deterministic
+   * (e.g. missing_guardian, missing_score).
+   */
+  llm?: AnonPrompt | null;
 }
 
 function isoDay(d: Date = new Date()): string {
@@ -85,9 +109,11 @@ async function detectPendingConvocations(clubId: string): Promise<DetectedInsigh
     const pending = all.filter((c) => c.status === "pending");
     if (pending.length < 3) continue;
     const present = all.filter((c) => c.status === "present").length;
-    const pendingNames = pending
-      .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
-      .filter(Boolean);
+    const pendingPlayers = pending.map((c) => ({
+      id: String(c.player_id),
+      fullName: `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim(),
+    }));
+    const pendingNames = pendingPlayers.map((p) => p.fullName).filter(Boolean);
     out.push({
       insight_type: "pending_convocations",
       club_id: clubId,
@@ -105,7 +131,11 @@ async function detectPendingConvocations(clubId: string): Promise<DetectedInsigh
       action_payload: { event_id: ev.id },
       dedup_key: `pending_convocations:${ev.id}:${isoDay()}`,
       expires_at: ev.starts_at,
-      userPrompt: `Match '${ev.title}' starts in less than 48h. ${pending.length} players haven't responded yet: ${pendingNames.join(", ")}. Generate a short alert message for the coach.`,
+      // Anonymised: only opaque labels reach the LLM, never real names/titles.
+      llm: buildPendingConvocationsPrompt({
+        players: pendingPlayers,
+        pendingCount: pending.length,
+      }),
     });
   }
   return out;
@@ -194,7 +224,11 @@ async function detectConsecutiveAbsences(clubId: string): Promise<DetectedInsigh
       action_payload: { player_id: playerId },
       dedup_key: `consecutive_absences:${playerId}:${isoWeek()}`,
       expires_at: new Date(Date.now() + 7 * 86400 * 1000).toISOString(),
-      userPrompt: `${fullName} has been absent or no-show ${lastThree.length} times in a row. Generate a short alert suggesting the coach check in.`,
+      // Anonymised: only an opaque label reaches the LLM, never the real name.
+      llm: buildConsecutiveAbsencePrompt({
+        player: { id: String(playerId), fullName },
+        absenceCount: lastThree.length,
+      }),
     });
   }
   return out;
@@ -240,7 +274,7 @@ async function detectMissingScore(clubId: string): Promise<DetectedInsight[]> {
       action_payload: { event_id: ev.id },
       dedup_key: `missing_score:${ev.id}`,
       expires_at: new Date(Date.now() + 14 * 86400 * 1000).toISOString(),
-      userPrompt: `Match '${ev.title}' on ${ev.starts_at} has no score recorded yet. Generate a short reminder to enter the score.`,
+      // Deterministic only — no LLM (event title can carry identifying info).
     });
   }
   return out;
@@ -308,7 +342,8 @@ async function detectMissingGuardian(clubId: string): Promise<DetectedInsight[]>
       action_payload: { player_id: p.id },
       dedup_key: `missing_guardian:${p.id}`,
       expires_at: new Date(Date.now() + 30 * 86400 * 1000).toISOString(),
-      userPrompt: `${fullName} is a minor with no guardian linked in the system. Generate a short GDPR compliance reminder.`,
+      // GDPR: a minor's name must NEVER be sent to a third-party LLM.
+      // This insight is ALWAYS deterministic (no `llm` prompt).
     });
   }
   return out;
@@ -328,7 +363,9 @@ Generate two short, friendly, actionable insight messages
 for a coach based on the structured data provided.
 One in French, one in English.
 Keep each message under 120 characters.
-Be direct and specific — include names and numbers.
+Be direct and specific — include the numbers.
+The players are given to you as anonymised labels (e.g. "Joueur A", "Joueur B").
+Use those labels VERBATIM. Never invent, expand, translate or guess a real name.
 Return JSON only, with this exact shape:
 { "fr": "...", "en": "..." }
 Do not wrap in markdown or add commentary.`;
@@ -411,10 +448,20 @@ export async function detectAndGenerateInsightsForClub(
   const existingKeys = new Set((existing ?? []).map((r: any) => r.dedup_key));
   const fresh = detected.filter((d) => !existingKeys.has(d.dedup_key));
 
+  const llmEnabled = isInsightsLlmEnabled();
+
   let created = 0;
   for (const ins of fresh) {
-    const ai = await generateMessages(ins.userPrompt, ins.club_id);
-    const msgs = ai ?? fallbackMessages(ins);
+    // LLM only when (a) globally enabled AND (b) this insight type is allowed
+    // (has an anonymised prompt). Otherwise → deterministic fallback.
+    let msgs: { fr: string; en: string };
+    if (llmEnabled && ins.llm) {
+      const ai = await generateMessages(ins.llm.prompt, ins.club_id);
+      // Re-hydrate the real names server-side; the LLM only ever saw labels.
+      msgs = ai ? rehydrateMessages(ai, ins.llm.rehydrate) : fallbackMessages(ins);
+    } else {
+      msgs = fallbackMessages(ins);
+    }
     const { error } = await supabaseAdmin.from("coach_insights").insert({
       club_id: ins.club_id,
       team_id: ins.team_id,
