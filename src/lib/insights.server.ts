@@ -413,7 +413,7 @@ export async function detectAndGenerateInsightsForClub(
 
   let created = 0;
   for (const ins of fresh) {
-    const ai = await generateMessages(ins.userPrompt);
+    const ai = await generateMessages(ins.userPrompt, ins.club_id);
     const msgs = ai ?? fallbackMessages(ins);
     const { error } = await supabaseAdmin.from("coach_insights").insert({
       club_id: ins.club_id,
