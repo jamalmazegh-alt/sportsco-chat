@@ -209,9 +209,36 @@ export function InsightsSection({ clubId }: { clubId: string }) {
             {t("insights.title")}
           </h2>
         </div>
-        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
-          {insights.length}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
+            {insights.length}
+          </span>
+          <button
+            type="button"
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshDisabled}
+            title={
+              cooldownActive
+                ? t("coachInsightsAi.refreshLimited", { ns: "tournaments" })
+                : t("coachInsightsAi.refresh", { ns: "tournaments" })
+            }
+            aria-label={t("coachInsightsAi.refresh", { ns: "tournaments" })}
+            className={cn(
+              "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors",
+              "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+            )}
+          >
+            <RefreshCw
+              className={cn("h-3 w-3", refreshMutation.isPending && "animate-spin")}
+            />
+            <span>
+              {refreshMutation.isPending
+                ? t("coachInsightsAi.refreshing", { ns: "tournaments" })
+                : t("coachInsightsAi.refresh", { ns: "tournaments" })}
+            </span>
+          </button>
+        </div>
       </div>
       <div className="space-y-2">
         {insights.map((ins) => {
