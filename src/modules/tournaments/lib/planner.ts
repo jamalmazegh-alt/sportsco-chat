@@ -82,7 +82,7 @@ const POOLCFG: Record<number, { pools: number; size: number }> = {
   32: { pools: 8, size: 4 },
 };
 
-const SUPPORTED_TEAM_COUNTS = [8, 12, 16, 24, 32] as const;
+const SUPPORTED_TEAM_COUNTS: readonly number[] = [8, 12, 16, 24, 32];
 
 function nearestSupportedTeams(teams: number): number {
   let best = SUPPORTED_TEAM_COUNTS[0];
