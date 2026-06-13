@@ -49,14 +49,7 @@ function addMinutesToTime(time: string, minutes: number): string {
 
 declare global {
   interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          AutocompleteService: new () => GoogleAutocompleteService;
-          AutocompleteSessionToken: new () => unknown;
-        };
-      };
-    };
+    google?: any;
     __squadlyGoogleMapsPromise?: Promise<void>;
   }
 }
