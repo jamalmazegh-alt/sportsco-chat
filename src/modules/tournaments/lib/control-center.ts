@@ -45,11 +45,15 @@ interface MatchLike {
   score_a: number | null;
   score_b: number | null;
   validated_at?: string | null;
+  field?: string | null;
+  referee_user_id?: string | null;
+  referee_name?: string | null;
 }
 
 interface TournamentLike {
   status: string;
   format?: string | null;
+  match_duration_min?: number | null;
 }
 
 /**
