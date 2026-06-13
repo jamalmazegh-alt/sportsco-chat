@@ -8,8 +8,44 @@ import { generateKnockoutBracket } from "./lib/bracket";
 import { generateDoubleEliminationBracket } from "./lib/double-elim";
 import { mergeRules, DEFAULT_RULES, defaultRulesForSport } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
+import { computeProgressionUpdates } from "./lib/progression";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { assertTournamentMutable } from "@/lib/tournament-guards.server";
+
+/**
+ * B2 — propage les vainqueurs/perdants dans tous les brackets (KO + flights)
+ * à partir de l'état courant des matchs. Idempotent : à appeler après toute
+ * écriture de score / statut / (dé)validation. Utilise le client admin
+ * (déjà autorisé par assertCanManage en amont) pour mettre à jour les matchs
+ * avals sans se heurter au RLS.
+ */
+async function applyBracketProgression(tournamentId: string): Promise<void> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: matches } = await supabaseAdmin
+      .from("tournament_matches")
+      .select(
+        "id, flight_id, round, match_number, team_a_id, team_b_id, team_a_source, team_b_source, score_a, score_b, penalty_score_a, penalty_score_b, status, winner_team_id",
+      )
+      .eq("tournament_id", tournamentId);
+    if (!matches || matches.length === 0) return;
+    const updates = computeProgressionUpdates(matches as never);
+    for (const u of updates) {
+      await supabaseAdmin
+        .from("tournament_matches")
+        .update({
+          team_a_id: u.team_a_id,
+          team_b_id: u.team_b_id,
+          winner_team_id: u.winner_team_id,
+        } as never)
+        .eq("id", u.id)
+        .eq("tournament_id", tournamentId);
+    }
+  } catch (e) {
+    // La propagation ne doit jamais faire échouer l'écriture du score elle-même.
+    console.warn("[bracket] progression failed", e);
+  }
+}
 
 
 
@@ -288,6 +324,9 @@ export const updateTournament = createServerFn({ method: "POST" })
             daily_end_time: z.string().optional(),
 
             fields: z.array(z.string().min(1).max(60)).max(20).optional(),
+            // B6 — colonne jsonb réelle (map terrain -> URL de stream), écrite
+            // par FieldsManager ; absente du schéma .strict() => rejet auparavant.
+            field_streams: z.record(z.string(), z.string()).optional(),
 
           })
           .strict(),
@@ -670,6 +709,8 @@ export const recordMatchScore = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
+    // B2 — faire avancer le bracket après la saisie du score.
+    await applyBracketProgression(data.tournament_id);
     return { match: row };
   });
 
@@ -844,6 +885,9 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
       .object({
         tournament_id: z.string().uuid(),
         third_place: z.boolean().default(false),
+        // B3 — régénération destructive : exige une confirmation explicite si
+        // des matchs de phase finale ont déjà démarré / ont un score.
+        force: z.boolean().default(false),
       })
       .parse(input),
   )
@@ -851,6 +895,19 @@ export const generateKnockoutFromGroups = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertCanManage(supabase, userId, data.tournament_id);
     await assertTournamentMutable(data.tournament_id, "structure");
+
+    // B3 — ne jamais wiper silencieusement des résultats existants.
+    const { data: existingKo } = await supabase
+      .from("tournament_matches")
+      .select("status, score_a, score_b")
+      .eq("tournament_id", data.tournament_id)
+      .neq("round", "group");
+    const koHasProgress = (existingKo ?? []).some(
+      (m) => m.status !== "scheduled" || m.score_a != null || m.score_b != null,
+    );
+    if (koHasProgress && !data.force) {
+      throw new Response("FINALS_ALREADY_STARTED", { status: 409 });
+    }
 
     const { data: t } = await supabase
       .from("tournaments")
@@ -1302,6 +1359,8 @@ export const validateMatch = createServerFn({ method: "POST" })
       .eq("id", data.match_id)
       .eq("tournament_id", data.tournament_id);
     if (error) throw new Response(error.message, { status: 400 });
+    // B2 — (dé)validation : recalcule la progression du bracket.
+    await applyBracketProgression(data.tournament_id);
     return { ok: true };
   });
 
@@ -1367,6 +1426,8 @@ export const setMatchStatus = createServerFn({ method: "POST" })
       .eq("id", data.match_id)
       .eq("tournament_id", data.tournament_id);
     if (error) throw new Response(error.message, { status: 400 });
+    // B2 — forfait / no-show / dévalidation de statut : recalcule la progression.
+    await applyBracketProgression(data.tournament_id);
     return { ok: true };
   });
 
