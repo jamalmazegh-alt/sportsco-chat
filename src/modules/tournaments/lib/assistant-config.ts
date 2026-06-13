@@ -344,7 +344,7 @@ export function configToCreatePayload(
   } else {
     rules.tiebreakers = rules.tiebreakers.filter((key) => key !== "fair_play");
   }
-  if (cfg.lunchDurationMin > 0) {
+  if ((cfg.lunchDurationMin ?? 0) > 0) {
     (rules as unknown as Record<string, unknown>).lunch_start = cfg.lunchStart;
     (rules as unknown as Record<string, unknown>).lunch_end = lunchEndHHMM(
       cfg.lunchStart,
