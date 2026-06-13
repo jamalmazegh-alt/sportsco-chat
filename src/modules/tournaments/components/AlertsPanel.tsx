@@ -16,8 +16,7 @@ const ICONS = {
 
 const SEV_STYLES: Record<CockpitAlert["severity"], string> = {
   high: "border-rose-300/60 bg-rose-50 dark:bg-rose-950/20 text-rose-900 dark:text-rose-200",
-  medium:
-    "border-amber-300/60 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200",
+  medium: "border-amber-300/60 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200",
   low: "border-border bg-muted/40 text-foreground",
 };
 
@@ -26,7 +25,10 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
   if (alerts.length === 0) return null;
 
   return (
-    <section aria-label={t("cockpit.alerts.heading", { defaultValue: "Alertes" })} className="space-y-2">
+    <section
+      aria-label={t("cockpit.alerts.heading", { defaultValue: "Alertes" })}
+      className="space-y-2"
+    >
       <header className="flex items-center gap-2 px-1">
         <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

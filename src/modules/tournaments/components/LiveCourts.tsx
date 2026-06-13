@@ -54,9 +54,7 @@ export function LiveCourts({
 
   // Sprint 2 — group by `field` when most matches have one. Otherwise fall
   // back to the flat list (Sprint 1 behaviour, unchanged).
-  const activeMatches = matches.filter(
-    (m) => m.status === "live" || m.status === "scheduled",
-  );
+  const activeMatches = matches.filter((m) => m.status === "live" || m.status === "scheduled");
   const withField = activeMatches.filter((m) => m.field && m.field.trim() !== "");
   const useFieldGrouping = withField.length > 0 && withField.length >= activeMatches.length / 2;
 
@@ -183,9 +181,7 @@ function FieldGroupedView({
                   muted
                 />
               )}
-              {!current && !next && (
-                <p className="px-1 py-2 text-xs text-muted-foreground">—</p>
-              )}
+              {!current && !next && <p className="px-1 py-2 text-xs text-muted-foreground">—</p>}
             </div>
           );
         })}
