@@ -643,6 +643,7 @@ interface QuestionViewProps {
   onConfirmCustomDuration: () => void;
   onPause: (n: number) => void;
   onConfirmCustomPause: () => void;
+  onConfirmBreaks: () => void;
   onLunchDuration: (n: number) => void;
   onFairPlay: (v: boolean) => void;
   onTerrains: (n: number) => void;
