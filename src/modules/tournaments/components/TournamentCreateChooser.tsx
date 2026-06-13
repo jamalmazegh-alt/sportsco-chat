@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Calculator, Settings2 } from "lucide-react";
+import { Sparkles, Zap, Calculator } from "lucide-react";
 import { TournamentWizard } from "./TournamentWizard";
 import { TournamentAIAssistant } from "./TournamentAIAssistant";
 import { TournamentSimulator } from "./TournamentSimulator";
@@ -63,7 +63,13 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
   return (
     <>
       <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
-        <DialogContent className="max-w-xl max-h-[92vh] overflow-y-auto">
+        <DialogContent
+          className={
+            mode === "ai"
+              ? "max-w-md p-0 overflow-hidden bg-transparent border-0 shadow-none"
+              : "max-w-xl max-h-[92vh] overflow-y-auto"
+          }
+        >
           {mode === "chooser" && (
             <>
               <DialogHeader>
@@ -99,25 +105,9 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
 
           {mode === "ai" && (
             <>
-              <DialogHeader className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <DialogTitle className="flex items-center gap-2 text-left">
-                    <Sparkles className="h-5 w-5 shrink-0 text-primary" />
-                    {t("createChooser.aiTitle")}
-                  </DialogTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="shrink-0"
-                    onClick={openQuickWizard}
-                  >
-                    <Settings2 className="h-3.5 w-3.5" />
-                    {t("aiAssistant.cta.expertSettings")}
-                  </Button>
-                </div>
-                <DialogDescription className="text-left">
-                  {t("createChooser.aiHint")}
-                </DialogDescription>
+              <DialogHeader className="sr-only">
+                <DialogTitle>{t("createChooser.aiTitle")}</DialogTitle>
+                <DialogDescription>{t("createChooser.aiHint")}</DialogDescription>
               </DialogHeader>
               <TournamentAIAssistant
                 clubId={clubId}
@@ -130,9 +120,6 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
                   setMode("simulator");
                 }}
               />
-              <Button variant="ghost" size="sm" onClick={() => setMode("chooser")}>
-                ← {t("createChooser.back")}
-              </Button>
             </>
           )}
 

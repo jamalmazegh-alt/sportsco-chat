@@ -23,7 +23,12 @@ export interface AssistantTournamentConfig {
   eliminatedContinue: boolean;
   flightsTemplate: FlightsTemplateChoice;
   matchDurationMin: number;
+  /** Pause entre deux matchs sur un terrain (rotation). */
+  pauseMin: number;
   terrains: number;
+  /** "now" = nommer les terrains tout de suite, "later" = plus tard. */
+  terrainNaming: "now" | "later";
+  terrainNames: string[];
   paid: boolean;
   registrationFeeCents: number;
   registrationCurrency: string;
@@ -42,7 +47,10 @@ export type AssistantStepId =
   | "eliminatedContinue"
   | "flightsTemplate"
   | "matchDuration"
+  | "pause"
   | "terrains"
+  | "terrainNaming"
+  | "terrainNames"
   | "paid"
   | "paidAmount"
   | "name"
@@ -52,6 +60,7 @@ export type AssistantStepId =
 
 export const TEAM_COUNT_PRESETS = [8, 12, 16, 24, 32] as const;
 export const MATCH_DURATION_PRESETS = [8, 10, 12, 15, 20] as const;
+export const PAUSE_PRESETS = [0, 3, 5, 10] as const;
 export const TERRAIN_PRESETS = [1, 2, 3, 4, 5] as const;
 
 const FOOTBALL_PLAYERS = [5, 7, 8, 9, 11] as const;
@@ -94,7 +103,10 @@ export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): Assis
     eliminatedContinue: true,
     flightsTemplate: "champions",
     matchDurationMin: 20,
+    pauseMin: 3,
     terrains: 3,
+    terrainNaming: "later",
+    terrainNames: [],
     paid: false,
     registrationFeeCents: 0,
     registrationCurrency: "eur",
@@ -114,7 +126,9 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
     steps.push("eliminatedContinue");
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
-  steps.push("matchDuration", "terrains", "paid");
+  steps.push("matchDuration", "pause", "terrains", "terrainNaming");
+  if (cfg.terrainNaming === "now") steps.push("terrainNames");
+  steps.push("paid");
   if (cfg.paid) steps.push("paidAmount");
   steps.push("name", "date", "location", "summary");
   return steps;
@@ -241,7 +255,10 @@ export function configToCreatePayload(
     },
     update: {
       match_duration_min: cfg.matchDurationMin,
-      fields: Array.from({ length: cfg.terrains }, (_, i) => `Terrain ${i + 1}`),
+      fields:
+        cfg.terrainNaming === "now" && cfg.terrainNames.length === cfg.terrains
+          ? cfg.terrainNames.map((n, i) => n.trim() || `Terrain ${i + 1}`)
+          : Array.from({ length: cfg.terrains }, (_, i) => `Terrain ${i + 1}`),
       settings: rules,
     },
     payment: cfg.paid
