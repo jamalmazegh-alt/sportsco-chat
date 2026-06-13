@@ -1140,5 +1140,19 @@
       "fields": "Campos",
       "share": "Compartir"
     }
+  },
+  "cockpit": {
+    "tvMode": "Mode TV",
+    "exitTv": "Quitter le mode TV",
+    "next": "Prochain",
+    "estimatedEnd": "Fin prévue",
+    "averageDelay": "Retard moyen {{minutes}} min",
+    "alerts": {
+      "title": "{{count}} chose(s) à régler",
+      "heading": "Alertes",
+      "lateMatch": "Match en retard de {{minutes}} min",
+      "missingReferee": "Arbitre manquant (démarrage dans {{minutes}} min)",
+      "finalsNotGenerated": "Phase finale non générée — les poules sont terminées"
+    }
   }
 }

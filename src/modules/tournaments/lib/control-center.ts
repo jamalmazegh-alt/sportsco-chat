@@ -45,11 +45,15 @@ interface MatchLike {
   score_a: number | null;
   score_b: number | null;
   validated_at?: string | null;
+  field?: string | null;
+  referee_user_id?: string | null;
+  referee_name?: string | null;
 }
 
 interface TournamentLike {
   status: string;
   format?: string | null;
+  match_duration_min?: number | null;
 }
 
 /**
@@ -236,4 +240,137 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
     return { kind: "all_done" };
   }
   return { kind: "share_results" };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sprint 2 — Cockpit (jour J) — pure helpers
+// All read-only over existing data shapes. No schema change.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const COCKPIT_LATE_THRESHOLD_MIN = 10;
+export const COCKPIT_SOON_WINDOW_MIN = 30;
+export const COCKPIT_DEFAULT_MATCH_DURATION_MIN = 30;
+
+/**
+ * Estimated end-of-tournament time.
+ * = max(scheduled_at) of unfinished matches + match duration.
+ * Returns null when no unfinished match has a scheduled_at (don't invent a value).
+ */
+export function computeEstimatedEnd(
+  matches: MatchLike[],
+  matchDurationMin?: number | null,
+): Date | null {
+  const unfinished = matches.filter(
+    (m) => !DONE_STATUSES.has(m.status) && m.scheduled_at,
+  );
+  if (unfinished.length === 0) return null;
+  const latestMs = unfinished.reduce((acc, m) => {
+    const ts = Date.parse(m.scheduled_at!);
+    return Number.isFinite(ts) && ts > acc ? ts : acc;
+  }, Number.NEGATIVE_INFINITY);
+  if (!Number.isFinite(latestMs)) return null;
+  const duration =
+    typeof matchDurationMin === "number" && matchDurationMin > 0
+      ? matchDurationMin
+      : COCKPIT_DEFAULT_MATCH_DURATION_MIN;
+  return new Date(latestMs + duration * 60_000);
+}
+
+/**
+ * Average delay (in minutes), over live/scheduled matches whose scheduled_at is past.
+ * Returns null when no such match exists (don't invent a value).
+ */
+export function computeAverageDelay(matches: MatchLike[], now: Date = new Date()): number | null {
+  const nowMs = now.getTime();
+  const lateOrLive = matches.filter((m) => {
+    if (DONE_STATUSES.has(m.status)) return false;
+    if (!m.scheduled_at) return false;
+    const ts = Date.parse(m.scheduled_at);
+    return Number.isFinite(ts) && ts <= nowMs;
+  });
+  if (lateOrLive.length === 0) return null;
+  const total = lateOrLive.reduce((acc, m) => acc + (nowMs - Date.parse(m.scheduled_at!)), 0);
+  return Math.round(total / lateOrLive.length / 60_000);
+}
+
+// ─── Alerts ─────────────────────────────────────────────────────────────────
+export type AlertKind = "late_match" | "missing_referee" | "finals_not_generated";
+export type AlertSeverity = "high" | "medium" | "low";
+
+export interface CockpitAlert {
+  id: string;
+  kind: AlertKind;
+  severity: AlertSeverity;
+  matchId?: string;
+  /** Late minutes for late_match, soon-in-minutes for missing_referee. */
+  minutes?: number;
+}
+
+export interface AlertsArgs {
+  tournament: TournamentLike;
+  matches: MatchLike[];
+  flightsCount: number;
+  now?: Date;
+  lateThresholdMin?: number;
+  soonWindowMin?: number;
+}
+
+/**
+ * Pure detector. Alerts only DETECT and POINT — they never auto-correct.
+ * Sorted by severity (high → low).
+ */
+export function computeAlerts(args: AlertsArgs): CockpitAlert[] {
+  const now = (args.now ?? new Date()).getTime();
+  const lateThreshold = args.lateThresholdMin ?? COCKPIT_LATE_THRESHOLD_MIN;
+  const soonWindow = args.soonWindowMin ?? COCKPIT_SOON_WINDOW_MIN;
+  const out: CockpitAlert[] = [];
+
+  for (const m of args.matches) {
+    if (DONE_STATUSES.has(m.status)) continue;
+    if (!m.scheduled_at) continue;
+    const ts = Date.parse(m.scheduled_at);
+    if (!Number.isFinite(ts)) continue;
+    const lateMin = Math.round((now - ts) / 60_000);
+
+    // Late match (high)
+    if (lateMin >= lateThreshold) {
+      out.push({
+        id: `late:${m.id}`,
+        kind: "late_match",
+        severity: "high",
+        matchId: m.id,
+        minutes: lateMin,
+      });
+    }
+
+    // Missing referee within the soon window (medium)
+    const minutesUntil = Math.round((ts - now) / 60_000);
+    const startingSoon = minutesUntil >= 0 && minutesUntil <= soonWindow;
+    const isLive = LIVE_STATUSES.has(m.status);
+    if ((startingSoon || isLive) && !m.referee_user_id && !m.referee_name) {
+      out.push({
+        id: `ref:${m.id}`,
+        kind: "missing_referee",
+        severity: "medium",
+        matchId: m.id,
+        minutes: isLive ? 0 : minutesUntil,
+      });
+    }
+  }
+
+  // Finals/knockout not generated yet
+  const poolMatches = args.matches.filter(isPoolMatch);
+  const koMatches = args.matches.filter(isKnockoutMatch);
+  const poolsDone =
+    poolMatches.length > 0 && poolMatches.every((m) => DONE_STATUSES.has(m.status));
+  if (poolsDone && koMatches.length === 0) {
+    out.push({
+      id: "finals:not-generated",
+      kind: "finals_not_generated",
+      severity: "low",
+    });
+  }
+
+  const rank: Record<AlertSeverity, number> = { high: 0, medium: 1, low: 2 };
+  return out.sort((a, b) => rank[a.severity] - rank[b.severity]);
 }

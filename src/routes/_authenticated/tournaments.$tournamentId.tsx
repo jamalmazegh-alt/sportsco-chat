@@ -47,8 +47,13 @@ import {
   computeStepper,
   computeContinueAction,
   countMatches,
+  computeEstimatedEnd,
+  computeAverageDelay,
+  computeAlerts,
   type ContinueAction,
+  type CockpitAlert,
 } from "@/modules/tournaments/lib/control-center";
+import { AlertsPanel } from "@/modules/tournaments/components/AlertsPanel";
 import type { TournamentDetail } from "@/modules/tournaments/types";
 
 export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId")({
@@ -59,6 +64,7 @@ export const Route = createFileRoute("/_authenticated/tournaments/$tournamentId"
     tab: typeof search.tab === "string" ? search.tab : undefined,
     sub: typeof search.sub === "string" ? search.sub : undefined,
     focusMatch: typeof search.focusMatch === "string" ? search.focusMatch : undefined,
+    display: search.display === "tv" ? ("tv" as const) : undefined,
   }),
   head: () => ({
     meta: [
@@ -85,10 +91,18 @@ function TournamentDetailPage() {
   const updateFn = useServerFn(updateTournament);
   const qc = useQueryClient();
 
+  const search = Route.useSearch();
+  const isTvMode = search.display === "tv";
+
   const q = useQuery({
     queryKey: ["tournament", tournamentId],
     queryFn: (): Promise<TournamentDetail> => getFn({ data: { tournament_id: tournamentId } }),
+    // Sprint 2 — cockpit live updates via polling (no realtime channel).
+    refetchInterval: 20_000,
+    refetchIntervalInBackground: false,
   });
+
+
 
   const publish = useMutation({
     mutationFn: (status: "published" | "in_progress" | "completed" | "draft") =>
@@ -179,6 +193,30 @@ function TournamentDetailPage() {
 
   const counters = useMemo(() => countMatches(data?.matches ?? []), [data]);
 
+  // Sprint 2 — Cockpit metrics + alerts (pure, recomputed when data changes).
+  const estimatedEnd = useMemo(
+    () =>
+      data?.tournament
+        ? computeEstimatedEnd(data.matches, data.tournament.match_duration_min)
+        : null,
+    [data],
+  );
+  const averageDelay = useMemo(
+    () => (data?.matches ? computeAverageDelay(data.matches) : null),
+    [data],
+  );
+  const alerts = useMemo(
+    () =>
+      data?.tournament
+        ? computeAlerts({
+            tournament: data.tournament,
+            matches: data.matches,
+            flightsCount: data.flights.length,
+          })
+        : [],
+    [data],
+  );
+
   const hasFlights = flights.length > 0;
   const poolMatchesDone =
     matches.filter((m) => m.round === "group").length > 0 &&
@@ -224,6 +262,21 @@ function TournamentDetailPage() {
     scrollToAnchor("section-matches");
   };
 
+  // Sprint 2 — 1-tap alert routing. Detection only, no auto-correction.
+  const handleAlertClick = (a: CockpitAlert) => {
+    switch (a.kind) {
+      case "late_match":
+        if (a.matchId) focusMatch(a.matchId);
+        break;
+      case "missing_referee":
+        openSettings("staff");
+        break;
+      case "finals_not_generated":
+        scrollToAnchor("section-flights");
+        break;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -232,6 +285,66 @@ function TournamentDetailPage() {
     );
   }
   if (!hasData || !tournament) return null;
+
+  // Sprint 2 — TV / projector mode (?display=tv). Read-only big-blocks layout.
+  if (isTvMode) {
+    return (
+      <div className="min-h-screen bg-background p-6 space-y-6">
+        <div className="flex items-center gap-3">
+          <Trophy className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold">{tournament.name}</h1>
+            <p className="text-sm text-muted-foreground">
+              {tournament.sport}
+              {tournament.location ? ` · ${tournament.location}` : ""}
+            </p>
+          </div>
+          <div className="ml-auto text-right">
+            <div className="text-3xl font-bold tabular-nums">
+              {new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+            </div>
+            {estimatedEnd && (
+              <div className="text-xs text-muted-foreground">
+                {t("cockpit.estimatedEnd", { defaultValue: "Fin prévue" })}{" "}
+                {estimatedEnd.toLocaleTimeString(undefined, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <Counter
+            label={t("controlCenter.counters.done", { defaultValue: "Terminés" })}
+            value={counters.done}
+            tone="emerald"
+          />
+          <Counter
+            label={t("controlCenter.counters.live", { defaultValue: "En cours" })}
+            value={counters.live}
+            tone="orange"
+          />
+          <Counter
+            label={t("controlCenter.counters.upcoming", { defaultValue: "À venir" })}
+            value={counters.upcoming}
+            tone="muted"
+          />
+        </div>
+        <div className="grid lg:grid-cols-2 gap-6">
+          <LiveCourts
+            matches={matches as unknown as React.ComponentProps<typeof LiveCourts>["matches"]}
+            teams={teams as unknown as React.ComponentProps<typeof LiveCourts>["teams"]}
+          />
+          <div className="space-y-4">
+            <ContinueCTA action={continueAction} onAction={() => {}} variant="hero" />
+            <AlertsPanel alerts={alerts} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="pb-24">
@@ -296,7 +409,46 @@ function TournamentDetailPage() {
             tone="muted"
           />
         </div>
+        {/* Sprint 2 — Cockpit metrics: only when scheduled_at data exists. */}
+        {(estimatedEnd || averageDelay !== null) && (
+          <div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-border bg-card/50 px-3 py-2 text-xs">
+            {estimatedEnd && (
+              <span className="text-muted-foreground">
+                {t("cockpit.estimatedEnd", { defaultValue: "Fin prévue" })}{" "}
+                <strong className="text-foreground tabular-nums">
+                  {estimatedEnd.toLocaleTimeString(undefined, {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </strong>
+              </span>
+            )}
+            {averageDelay !== null && (
+              <span
+                className={cn(
+                  "tabular-nums",
+                  averageDelay >= 10 ? "text-amber-600 font-semibold" : "text-muted-foreground",
+                )}
+              >
+                {t("cockpit.averageDelay", {
+                  defaultValue: "Retard moyen {{minutes}} min",
+                  minutes: averageDelay,
+                })}
+              </span>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* ─── Alerts (Sprint 2) ─────────────────────────────────────────── */}
+      {canManage && alerts.length > 0 && (
+        <div className="px-5 pt-4">
+          <AlertsPanel
+            alerts={alerts}
+            onAlertClick={(a) => handleAlertClick(a)}
+          />
+        </div>
+      )}
 
       {/* ─── Live courts ─────────────────────────────────────────────────── */}
       <div className="px-5 pt-5">
