@@ -642,20 +642,25 @@ export function DrawDialog({
                       </div>
                     ))}
                   </div>
-                  <Button
-                    onClick={() => maybeConfirm(runManual)}
-                    disabled={applyMut.isPending}
-                    className="w-full"
-                  >
-                    {applyMut.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Hand className="h-4 w-4" />
-                        {t("draw.validateManual")}
-                      </>
-                    )}
-                  </Button>
+                  {/* B-04 — hide the manual validate CTA after success; force
+                      the user through the footer Relancer + confirm flow. */}
+                  {!finished && (
+                    <Button
+                      onClick={() => maybeConfirm(runManual)}
+                      disabled={applyMut.isPending || tournamentStarted}
+                      className="w-full"
+                      variant={hasExistingDraw ? "outline" : "default"}
+                    >
+                      {applyMut.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Hand className="h-4 w-4" />
+                          {hasExistingDraw ? t("draw.relaunch") : t("draw.validateManual")}
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </TabsContent>
 
               </Tabs>
