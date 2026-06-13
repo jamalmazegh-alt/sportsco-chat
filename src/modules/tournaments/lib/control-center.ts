@@ -50,8 +50,15 @@ interface MatchLike {
 interface TournamentLike {
   status: string;
   format?: string | null;
-  num_teams?: number | null;
 }
+
+/**
+ * Minimum number of teams required to start the workflow.
+ * IMPORTANT: `tournaments.num_teams` is the MAX capacity (e.g. "3 / 16 équipes"),
+ * never use it as a requirement — otherwise the CTA stays stuck on "Ajouter
+ * une équipe" until the tournament is full.
+ */
+const MIN_TEAMS_TO_START = 2;
 
 const LIVE_STATUSES = new Set(["live"]);
 const DONE_STATUSES = new Set([
@@ -142,8 +149,7 @@ export interface ComputeArgs {
 /** Returns the 5-step progress array with computed state. */
 export function computeStepper(args: ComputeArgs): StepperStep[] {
   const { tournament, teamsCount, groupsCount, matches, flightsCount } = args;
-  const minTeams = Math.max(2, tournament.num_teams ?? 2);
-  const regDone = teamsCount >= minTeams && tournament.status !== "draft";
+  const regDone = teamsCount >= MIN_TEAMS_TO_START && tournament.status !== "draft";
   const drawDone = groupsCount > 0 || (!poolsRequired(tournament.format) && matches.length > 0);
   const poolMatches = matches.filter(isPoolMatch);
   const koMatches = matches.filter(isKnockoutMatch);
@@ -185,10 +191,9 @@ export function computeStepper(args: ComputeArgs): StepperStep[] {
  */
 export function computeContinueAction(args: ComputeArgs): ContinueAction {
   const { tournament, teamsCount, groupsCount, matches, flightsCount } = args;
-  const minTeams = Math.max(2, tournament.num_teams ?? 2);
 
   // 1) Missing teams
-  if (teamsCount < minTeams) {
+  if (teamsCount < MIN_TEAMS_TO_START) {
     return { kind: "add_team", anchor: "section-teams" };
   }
 
@@ -221,6 +226,10 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
     return { kind: "create_flights", anchor: "section-flights" };
   }
 
-  // 6) All done
-  return { kind: "all_done" };
+  // 6) Everything finished → share the results (spec priority 6).
+  // Once the tournament is closed, fall back to a plain "all done" state.
+  if (tournament.status === "completed") {
+    return { kind: "all_done" };
+  }
+  return { kind: "share_results" };
 }

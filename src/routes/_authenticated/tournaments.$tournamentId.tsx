@@ -17,7 +17,6 @@ import {
   GitBranch,
   AlertTriangle,
   ClipboardList,
-  
   ChevronRight,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
@@ -42,7 +41,11 @@ import { FlightsManager } from "@/modules/tournaments/components/FlightsManager"
 import { TournamentStepper } from "@/modules/tournaments/components/TournamentStepper";
 import { ContinueCTA } from "@/modules/tournaments/components/ContinueCTA";
 import { LiveCourts } from "@/modules/tournaments/components/LiveCourts";
-import { TournamentSettingsMenu } from "@/modules/tournaments/components/TournamentSettingsMenu";
+import {
+  TournamentSettingsMenu,
+  type SettingsTopic,
+  type FormatView,
+} from "@/modules/tournaments/components/TournamentSettingsMenu";
 import {
   computeStepper,
   computeContinueAction,
@@ -104,17 +107,10 @@ function TournamentDetailPage() {
 
   // Controlled settings sheet (so the CTA can deep-link into a specific panel/view)
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsTopic, setSettingsTopic] = useState<
-    "infos" | "format" | "registrations" | "payments" | "fields" | "share" | null
-  >(null);
-  const [settingsFormatView, setSettingsFormatView] = useState<
-    "all" | "format" | "draw" | "schedule"
-  >("format");
+  const [settingsTopic, setSettingsTopic] = useState<SettingsTopic | null>(null);
+  const [settingsFormatView, setSettingsFormatView] = useState<FormatView>("format");
 
-  const openSettings = (
-    topic: "infos" | "format" | "registrations" | "payments" | "fields" | "share",
-    formatView: "all" | "format" | "draw" | "schedule" = "format",
-  ) => {
+  const openSettings = (topic: SettingsTopic, formatView: FormatView = "format") => {
     setSettingsTopic(topic);
     setSettingsFormatView(formatView);
     setSettingsOpen(true);
@@ -198,6 +194,7 @@ function TournamentDetailPage() {
         openSettings("format", "draw");
         break;
       case "generate_matches":
+        // Deep-link into the Format panel's schedule sub-view — 1 tap, no toast.
         openSettings("format", "schedule");
         break;
       case "enter_next_score":
@@ -210,7 +207,7 @@ function TournamentDetailPage() {
         scrollToAnchor("section-flights");
         break;
       case "share_results":
-        scrollToAnchor("section-share");
+        openSettings("share");
         break;
       case "publish_tournament":
         publish.mutate("published");
@@ -475,7 +472,6 @@ function TournamentDetailPage() {
           </Section>
         )}
 
-        <div id="section-share" />
       </div>
 
       {/* ─── Sticky bottom CTA ───────────────────────────────────────────── */}

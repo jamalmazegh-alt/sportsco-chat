@@ -7,6 +7,7 @@ import {
   CreditCard,
   MapPin,
   Share2,
+  UserCog,
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
@@ -24,6 +25,7 @@ import { RegistrationSettingsPanel } from "./RegistrationSettingsPanel";
 import { PaymentSettingsPanel } from "./PaymentSettingsPanel";
 import { FieldsManager } from "./FieldsManager";
 import { TournamentRulesEditor } from "./TournamentRulesEditor";
+import { StaffAndOfficialsPanel } from "./StaffAndOfficialsPanel";
 import { ShareDialog } from "./ShareDialog";
 
 export type SettingsTopic =
@@ -32,6 +34,7 @@ export type SettingsTopic =
   | "registrations"
   | "payments"
   | "fields"
+  | "staff"
   | "share";
 
 export type FormatView = "all" | "format" | "draw" | "schedule";
@@ -57,6 +60,7 @@ const TOPICS: { id: SettingsTopic; icon: typeof Info; labelKey: string; defaultL
   { id: "registrations", icon: ClipboardList, labelKey: "controlCenter.settings.registrations", defaultLabel: "Inscriptions" },
   { id: "payments", icon: CreditCard, labelKey: "controlCenter.settings.payments", defaultLabel: "Paiement" },
   { id: "fields", icon: MapPin, labelKey: "controlCenter.settings.fields", defaultLabel: "Terrains" },
+  { id: "staff", icon: UserCog, labelKey: "sections.staffAndOfficials", defaultLabel: "Staff & arbitres" },
   { id: "share", icon: Share2, labelKey: "controlCenter.settings.share", defaultLabel: "Partage" },
 ];
 
@@ -168,6 +172,8 @@ export function TournamentSettingsMenu({
 
           {topic === "format" && (
             <div className="p-4">
+              {/* formatView is "all" by default from the menu, or a targeted
+                  sub-view ("draw"/"schedule") when deep-linked by the CTA. */}
               <GroupsAndFixtures
                 view={formatView}
                 tournamentId={tournament.id}
@@ -211,6 +217,12 @@ export function TournamentSettingsMenu({
                   payment_mode: tournament.payment_mode ?? "offline",
                 }}
               />
+            </div>
+          )}
+
+          {topic === "staff" && (
+            <div className="p-4">
+              <StaffAndOfficialsPanel tournamentId={tournament.id} />
             </div>
           )}
 
