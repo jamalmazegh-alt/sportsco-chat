@@ -204,11 +204,7 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
     steps.push("eliminatedContinue");
     if (cfg.eliminatedContinue) steps.push("flightsTemplate");
   }
-  steps.push("matchDuration", "lunchDuration");
-  if ((cfg.lunchDurationMin ?? 0) > 0) {
-    steps.push("lunchStart");
-  }
-  steps.push("pause", "terrains", "terrainNaming");
+  steps.push("matchDuration", "breaks", "terrains", "terrainNaming");
   if (cfg.terrainNaming === "now") steps.push("terrainNames");
   steps.push("fairPlay", "paid");
   if (cfg.paid) steps.push("paidAmount");
