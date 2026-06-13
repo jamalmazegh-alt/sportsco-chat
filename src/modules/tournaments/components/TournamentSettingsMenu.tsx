@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Info,
@@ -36,17 +37,21 @@ export type SettingsTopic =
   | "staff"
   | "share";
 
+export type FormatView = "all" | "format" | "draw" | "schedule";
+
 interface Props {
   tournament: any;
   teams: any[];
   matches: any[];
   groups: any[];
   publicUrl: string;
-  /** Controlled state so the Continue CTA can open a topic in 1 tap. */
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  topic: SettingsTopic | null;
-  onTopicChange: (topic: SettingsTopic | null) => void;
+  /** Controlled open state (optional). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Initial topic to land on (controlled). */
+  initialTopic?: SettingsTopic | null;
+  /** Initial sub-view for the Format panel (only used when topic === "format"). */
+  initialFormatView?: FormatView;
 }
 
 const TOPICS: { id: SettingsTopic; icon: typeof Info; labelKey: string; defaultLabel: string }[] = [
@@ -65,22 +70,34 @@ export function TournamentSettingsMenu({
   matches,
   groups,
   publicUrl,
-  open,
+  open: openProp,
   onOpenChange,
-  topic,
-  onTopicChange,
+  initialTopic = null,
+  initialFormatView = "format",
 }: Props) {
   const { t } = useTranslation("tournaments");
-  const setTopic = onTopicChange;
+  const isControlled = openProp !== undefined;
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = isControlled ? openProp : internalOpen;
+  const [topic, setTopic] = useState<SettingsTopic | null>(initialTopic);
+  const [formatView, setFormatView] = useState<FormatView>(initialFormatView);
+
+  // Sync initial topic/view whenever the sheet is opened externally
+  useEffect(() => {
+    if (open) {
+      setTopic(initialTopic);
+      setFormatView(initialFormatView);
+    }
+  }, [open, initialTopic, initialFormatView]);
+
+  const setOpen = (o: boolean) => {
+    if (!isControlled) setInternalOpen(o);
+    onOpenChange?.(o);
+    if (!o) setTopic(null);
+  };
 
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o);
-        if (!o) setTopic(null);
-      }}
-    >
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           variant="outline"
@@ -121,7 +138,10 @@ export function TournamentSettingsMenu({
                 <li key={id}>
                   <button
                     type="button"
-                    onClick={() => setTopic(id)}
+                    onClick={() => {
+                      if (id === "format") setFormatView("format");
+                      setTopic(id);
+                    }}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left",
                       "hover:bg-muted/60 transition-colors",
@@ -152,10 +172,10 @@ export function TournamentSettingsMenu({
 
           {topic === "format" && (
             <div className="p-4">
-              {/* view="all" exposes format + draw + schedule generation —
-                  view="format" alone hides the draw/schedule actions entirely. */}
+              {/* formatView is "all" by default from the menu, or a targeted
+                  sub-view ("draw"/"schedule") when deep-linked by the CTA. */}
               <GroupsAndFixtures
-                view="all"
+                view={formatView}
                 tournamentId={tournament.id}
                 format={tournament.format}
                 status={tournament.status}

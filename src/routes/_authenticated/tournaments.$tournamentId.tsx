@@ -44,6 +44,7 @@ import { LiveCourts } from "@/modules/tournaments/components/LiveCourts";
 import {
   TournamentSettingsMenu,
   type SettingsTopic,
+  type FormatView,
 } from "@/modules/tournaments/components/TournamentSettingsMenu";
 import {
   computeStepper,
@@ -104,11 +105,14 @@ function TournamentDetailPage() {
   // Score-entry auto-open id (consumed once by MatchesList)
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
 
-  // Settings sheet ("⋯") controlled state so the Continue CTA can open a topic in 1 tap
+  // Controlled settings sheet (so the CTA can deep-link into a specific panel/view)
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTopic, setSettingsTopic] = useState<SettingsTopic | null>(null);
-  const openSettings = (topic: SettingsTopic) => {
+  const [settingsFormatView, setSettingsFormatView] = useState<FormatView>("format");
+
+  const openSettings = (topic: SettingsTopic, formatView: FormatView = "format") => {
     setSettingsTopic(topic);
+    setSettingsFormatView(formatView);
     setSettingsOpen(true);
   };
 
@@ -187,10 +191,11 @@ function TournamentDetailPage() {
         scrollToAnchor("section-teams");
         break;
       case "run_draw":
+        openSettings("format", "draw");
+        break;
       case "generate_matches":
-        // Open the settings sheet directly on the Format topic (draw +
-        // schedule generation live there) — 1 tap, no redirection toast.
-        openSettings("format");
+        // Deep-link into the Format panel's schedule sub-view — 1 tap, no toast.
+        openSettings("format", "schedule");
         break;
       case "enter_next_score":
         if (action.matchId) {
@@ -252,8 +257,8 @@ function TournamentDetailPage() {
               publicUrl={publicUrl}
               open={settingsOpen}
               onOpenChange={setSettingsOpen}
-              topic={settingsTopic}
-              onTopicChange={setSettingsTopic}
+              initialTopic={settingsTopic}
+              initialFormatView={settingsFormatView}
             />
           )}
         </div>
