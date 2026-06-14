@@ -1,6 +1,5 @@
 import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
 import { createFileRoute } from '@tanstack/react-router'
-import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import type { Json } from '@/integrations/supabase/types'
 
 // Suppression event payload sent by the Go API when Mailgun reports
@@ -104,6 +103,7 @@ export const Route = createFileRoute("/lovable/email/suppression")({
 
         const normalizedEmail = payload.email.toLowerCase()
         const metadata = toJsonMetadata(payload.metadata)
+        const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
         // 1. Upsert to suppressed_emails (idempotent — safe for retries)
         const { error: suppressError } = await supabaseAdmin
