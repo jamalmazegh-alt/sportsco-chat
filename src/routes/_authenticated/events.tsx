@@ -397,22 +397,43 @@ function EventsPage() {
             {t("events.viewCalendar", { defaultValue: "Calendrier" })}
           </button>
         </div>
-        {view === "list" && pastCount > 0 && (
-          <button
-            type="button"
-            onClick={() => setShowPast((s) => !s)}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-              showPast
-                ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
-                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
-            )}
-          >
-            {showPast ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {view === "list" && pastCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowPast((s) => !s)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+                showPast
+                  ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+              )}
+            >
+              {showPast ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              {showPast ? t("events.hidePast") : t("events.showPast", { count: pastCount })}
+            </button>
+          )}
+          {view === "list" && (
+            <button
+              type="button"
+              onClick={() => setShowCancelled((s) => !s)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
+                showCancelled
+                  ? "border-red-500/40 bg-red-500/10 text-red-700 hover:bg-red-500/15 dark:text-red-300"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
+              )}
+              title={t("events.cancelledToggle", { defaultValue: "Annulés" })}
+            >
+              <Ban className="h-3.5 w-3.5" />
+              {showCancelled
+                ? t("events.hideCancelled", { defaultValue: "Masquer annulés" })
+                : t("events.showCancelled", { defaultValue: "Voir annulés" })}
+            </button>
+          )}
+        </div>
       </div>
+
 
       {isCoach && pendingFollowUps && pendingFollowUps > 0 ? (
         <div className="flex justify-end -mt-3">
