@@ -52,8 +52,8 @@ interface Props {
   teams: Team[];
   onClose: () => void;
   onCreated: (eventId?: string) => void;
-  /** Hand-off to EventFormSheet pre-filled with current answers. */
-  onOpenExpert: (initial: Record<string, unknown>) => void;
+  /** Hand-off to EventFormSheet pre-filled with current answers. Includes a snapshot of wizard state for round-trips. */
+  onOpenExpert: (initial: Record<string, unknown>, snapshot?: EventWizardState) => void;
   /** Optional initial state — restores prior wizard answers (e.g. coming back from expert). */
   initialState?: EventWizardState;
 }
