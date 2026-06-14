@@ -589,15 +589,100 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
           </StepQuestion>
         )}
 
+        {current === "halves" && (
+          <StepQuestion title={t("eventWizard.q.halves", { defaultValue: "Format du match ?" })}>
+            <div className="grid grid-cols-3 gap-2">
+              {(
+                [
+                  ["1x60", 60],
+                  ["2x30", 60],
+                  ["2x35", 70],
+                  ["2x40", 80],
+                  ["2x45", 90],
+                  ["2x50", 100],
+                ] as const
+              ).map(([label, mins]) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    setState((s) => ({
+                      ...s,
+                      halvesFormat: label,
+                      durationMin: mins,
+                      step: s.step + 1,
+                    }));
+                  }}
+                  className={cn(
+                    "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
+                    state.halvesFormat === label
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card hover:bg-muted/40",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => go(1)}>
+              {t("eventWizard.skip", { defaultValue: "Passer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
+        {current === "gameformat" && (
+          <StepQuestion title={t("eventWizard.q.gameformat", { defaultValue: "Format de jeu ?" })}>
+            <div className="grid grid-cols-3 gap-2">
+              {["3v3", "5v5", "7v7", "8v8", "9v9", "11v11"].map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => answer("gameFormat", g)}
+                  className={cn(
+                    "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
+                    state.gameFormat === g
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card hover:bg-muted/40",
+                  )}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+            <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => go(1)}>
+              {t("eventWizard.skip", { defaultValue: "Passer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
         {current === "meetingpoint" && (
-          <StepQuestion title={t("eventWizard.q.meetingpoint", { defaultValue: "Point de rendez-vous ?" })}>
-            {([
-              ["stadium", "📍", t("eventWizard.meeting.stadium", { defaultValue: "Stade habituel" })],
-              ["club_parking", "🅿️", t("eventWizard.meeting.parking", { defaultValue: "Parking du club" })],
-              ["custom", "📌", t("eventWizard.meeting.custom", { defaultValue: "Adresse personnalisée" })],
-            ] as const).map(([v, e, l]) => (
-              <DoorButton key={v} icon={e} label={l} active={state.meetingPoint === v} onClick={() => answer("meetingPoint", v)} />
-            ))}
+          <StepQuestion title={t("eventWizard.q.meetingpoint", { defaultValue: "Adresse et heure de rendez-vous" })}>
+            <Label className="text-xs">
+              {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
+            </Label>
+            <Input
+              autoFocus
+              value={state.meetingPoint ?? ""}
+              onChange={(e) => patch("meetingPoint", e.target.value)}
+              placeholder={t("eventWizard.meeting.addressPlaceholder", {
+                defaultValue: "Adresse du point de rendez-vous",
+              })}
+            />
+            <Label className="text-xs mt-2">
+              {t("eventWizard.meeting.time", { defaultValue: "Heure de rendez-vous" })}
+            </Label>
+            <TimePicker
+              value={state.meetingTime ?? ""}
+              onChange={(v: string) => patch("meetingTime", v)}
+              className="w-full"
+            />
+            <Button
+              className="w-full mt-2"
+              disabled={!state.meetingPoint?.trim()}
+              onClick={() => go(1)}
+            >
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
           </StepQuestion>
         )}
 
