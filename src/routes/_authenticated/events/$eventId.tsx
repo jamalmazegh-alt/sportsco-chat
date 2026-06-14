@@ -1978,6 +1978,29 @@ function EventDetail() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">{t("events.rescheduleReasonLabel")}</label>
+              <div className="flex flex-wrap gap-1.5">
+                {([
+                  ["pitchUnavailable", "Terrain impraticable"],
+                  ["weather", "Météo"],
+                  ["lackOfPlayers", "Manque de joueurs"],
+                  ["opponentRequest", "Demande adversaire"],
+                  ["scheduling", "Conflit d'agenda"],
+                  ["other", "Autre"],
+                ] as const).map(([key, fr]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() =>
+                      setRescheduleReason(
+                        t(`events.rescheduleReasonPresets.${key}`, { defaultValue: fr }),
+                      )
+                    }
+                    className="rounded-full border border-border bg-card px-2.5 py-1 text-xs hover:border-primary hover:bg-primary/5"
+                  >
+                    {t(`events.rescheduleReasonPresets.${key}`, { defaultValue: fr })}
+                  </button>
+                ))}
+              </div>
               <Textarea
                 value={rescheduleReason}
                 onChange={(e) => setRescheduleReason(e.target.value)}
@@ -2178,6 +2201,29 @@ function EventDetail() {
           )}
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("events.cancelEventReasonLabel")}</label>
+            <div className="flex flex-wrap gap-1.5">
+              {([
+                ["pitchUnavailable", "Terrain impraticable"],
+                ["weather", "Météo"],
+                ["lackOfPlayers", "Manque de joueurs"],
+                ["opponentForfeit", "Adversaire forfait"],
+                ["refereeDecision", "Décision arbitrale"],
+                ["other", "Autre"],
+              ] as const).map(([key, fr]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() =>
+                    setCancelEventReason(
+                      t(`events.cancelReasonPresets.${key}`, { defaultValue: fr }),
+                    )
+                  }
+                  className="rounded-full border border-border bg-card px-2.5 py-1 text-xs hover:border-primary hover:bg-primary/5"
+                >
+                  {t(`events.cancelReasonPresets.${key}`, { defaultValue: fr })}
+                </button>
+              ))}
+            </div>
             <Textarea
               value={cancelEventReason}
               onChange={(e) => setCancelEventReason(e.target.value)}
@@ -2561,8 +2607,15 @@ function EventDetail() {
       {/* "My response" merged into the unified Convocation card below */}
 
 
-      {/* Match result + scorers (matches only) */}
-      {event.type === "match" && (
+      {/* Match result + scorers (matches only, hidden when the event is cancelled) */}
+      {event.type === "match" && event.status === "cancelled" && (
+        <div className="rounded-2xl border border-red-300/60 bg-red-50/30 p-4 text-sm text-red-700 dark:bg-red-950/20 dark:text-red-300">
+          {t("events.scoreDisabledCancelled", {
+            defaultValue: "Événement annulé — édition du score et des faits de match désactivée.",
+          })}
+        </div>
+      )}
+      {event.type === "match" && event.status !== "cancelled" && (
         <MatchResultCard
           eventId={event.id}
           teamId={event.team_id}

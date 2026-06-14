@@ -46,14 +46,16 @@ import {
   draftHasProgress,
 } from "./event-wizard-draft";
 
-type Team = { id: string; name: string; sport?: string | null };
+type Team = { id: string; name: string; sport?: string | null; competitions?: string[] | null };
 
 interface Props {
   teams: Team[];
   onClose: () => void;
   onCreated: (eventId?: string) => void;
-  /** Hand-off to EventFormSheet pre-filled with current answers. */
-  onOpenExpert: (initial: Record<string, unknown>) => void;
+  /** Hand-off to EventFormSheet pre-filled with current answers. Includes a snapshot of wizard state for round-trips. */
+  onOpenExpert: (initial: Record<string, unknown>, snapshot?: EventWizardState) => void;
+  /** Optional initial state — restores prior wizard answers (e.g. coming back from expert). */
+  initialState?: EventWizardState;
 }
 
 type Step =
@@ -132,7 +134,7 @@ function halvesToMinutes(label: string): number | null {
   return parseInt(m[1], 10) * parseInt(m[2], 10);
 }
 
-export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) {
+export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialState }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
   const qc = useQueryClient();
@@ -140,7 +142,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
   const createSeriesFn = useServerFn(createTrainingSeries);
   const createEventFn = useServerFn(createEvent);
 
-  const [state, setState] = useState<EventWizardState>(() => defaultState());
+  const [state, setState] = useState<EventWizardState>(() => initialState ?? defaultState());
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
@@ -880,25 +882,62 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
         )}
 
         {current === "official" && (
-          <StepQuestion title={t("eventWizard.q.official", { defaultValue: "Officiel ou amical ?" })}>
-            <DoorButton
-              icon="🏆"
-              label={t("eventWizard.officialYes", { defaultValue: "Officiel" })}
-              active={state.competitionType === "championship"}
-              onClick={() => {
-                patch("isOfficial", true);
-                answer("competitionType", "championship");
-              }}
-            />
+          <StepQuestion title={t("eventWizard.q.official", { defaultValue: "Type de match ?" })}>
             <DoorButton
               icon="🤝"
               label={t("eventWizard.officialNo", { defaultValue: "Amical" })}
               active={state.competitionType === "friendly"}
               onClick={() => {
+                markTouched("official");
                 patch("isOfficial", false);
-                answer("competitionType", "friendly");
+                patch("competitionType", "friendly");
+                patch("competitionName", undefined);
               }}
             />
+            <DoorButton
+              icon="🏆"
+              label={t("eventWizard.officialChampionship", { defaultValue: "Championnat" })}
+              active={state.competitionType === "championship"}
+              onClick={() => {
+                markTouched("official");
+                patch("isOfficial", true);
+                patch("competitionType", "championship");
+                // Pre-fill competition name from team config if available and empty
+                const fromTeam = (selectedTeam?.competitions ?? [])[0];
+                if (!state.competitionName && fromTeam) patch("competitionName", fromTeam);
+              }}
+            />
+            <DoorButton
+              icon="🥇"
+              label={t("eventWizard.officialCup", { defaultValue: "Coupe" })}
+              active={state.competitionType === "cup"}
+              onClick={() => {
+                markTouched("official");
+                patch("isOfficial", true);
+                patch("competitionType", "cup");
+              }}
+            />
+            {(state.competitionType === "championship" || state.competitionType === "cup") && (
+              <div className="mt-2 space-y-1.5">
+                <Label className="text-xs">
+                  {t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}
+                </Label>
+                <Input
+                  value={state.competitionName ?? ""}
+                  onChange={(e) => patch("competitionName", e.target.value)}
+                  placeholder={t("eventWizard.competitionNamePlaceholder", {
+                    defaultValue: "Ex: U15 D2, Coupe régionale…",
+                  })}
+                />
+              </div>
+            )}
+            <Button
+              className="w-full mt-2"
+              disabled={!state.competitionType}
+              onClick={() => go(1)}
+            >
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
           </StepQuestion>
         )}
 
@@ -1001,7 +1040,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
               variant="ghost"
               size="sm"
               className="w-full text-xs"
-              onClick={() => onOpenExpert(toEventFormInitial(state, title))}
+              onClick={() => onOpenExpert(toEventFormInitial(state, title), state)}
             >
               <Settings2 className="h-3.5 w-3.5" />
               {t("eventWizard.expert", { defaultValue: "Réglages détaillés" })}
@@ -1012,7 +1051,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
             variant="ghost"
             size="sm"
             className="w-full text-xs"
-            onClick={() => onOpenExpert(toEventFormInitial(state, title))}
+            onClick={() => onOpenExpert(toEventFormInitial(state, title), state)}
           >
             <Settings2 className="h-3.5 w-3.5" />
             {t("eventWizard.expert", { defaultValue: "Réglages détaillés" })}

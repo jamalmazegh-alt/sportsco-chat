@@ -45,6 +45,7 @@ export interface EventWizardState {
   opponent?: string;
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
+  competitionName?: string;
   location?: string;
   locationUrl?: string | null;
   description?: string; // free comment added by the user
@@ -180,7 +181,7 @@ export function toEventPayloadInput(
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
-    competitionName: null,
+    competitionName: state.competitionName?.trim() ? state.competitionName.trim() : null,
     isHome: isMatch ? state.isHome === "home" : null,
     meetingPoint: isAwayMatch ? state.meetingPoint ?? null : null,
     startsAt: startsIso,
@@ -220,7 +221,7 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competition_type: state.competitionType ?? "friendly",
-    competition_name: null,
+    competition_name: state.competitionName?.trim() ? state.competitionName.trim() : null,
     is_home: state.type === "match" ? state.isHome === "home" : null,
     meeting_point: state.type === "match" && state.isHome === "away" ? state.meetingPoint ?? null : null,
     starts_at: startsIso ?? "",

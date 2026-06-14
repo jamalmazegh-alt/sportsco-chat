@@ -20,6 +20,7 @@ import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
+import { EventTypeBadge } from "@/lib/event-type-icon";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
@@ -476,6 +477,7 @@ function HomePage() {
                           </p>
                         )}
                         <div className="flex items-center gap-2">
+                          <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
                           <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
                           {actionRequired && (
                             <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
@@ -542,13 +544,16 @@ function HomePage() {
                           : "border-border bg-card p-4",
                       )}
                     >
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         {isFirst && (
                           <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-bold mb-1">
                             {t("dashboard.nextEvent")}
                           </p>
                         )}
-                        <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
+                          <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
+                        </div>
                         <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
                           <Calendar className="h-3 w-3" />
                           {formatWhen(new Date(e.starts_at))}
