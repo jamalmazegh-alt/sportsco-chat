@@ -264,13 +264,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     }));
   }
 
-  function toggleWeekday(wd: number) {
-    setState((s) => {
-      const cur = s.recurrence?.weekdays ?? [];
-      const next = cur.includes(wd) ? cur.filter((w) => w !== wd) : [...cur, wd].sort();
-      return { ...s, recurrence: { ...(s.recurrence ?? { mode: "weekly_multi", weekdays: next }), weekdays: next } };
-    });
-  }
+
+
 
   // A series is offered (and honored) for recurring trainings AND "other" events.
   const seriesEligible = state.type === "training" || state.type === "other";
