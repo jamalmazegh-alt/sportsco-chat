@@ -361,14 +361,16 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     duration: t("eventWizard.hint.duration", { defaultValue: "Combien de temps ?" }),
     halves: t("eventWizard.hint.halves", { defaultValue: "Format du temps de jeu." }),
     gameformat: t("eventWizard.hint.gameformat", { defaultValue: "Combien de joueurs sur le terrain ?" }),
-    series: t("eventWizard.hint.series", { defaultValue: "Unique ou toute la saison ?" }),
+    series: t("eventWizard.hint.series", { defaultValue: "Unique ou récurrent ?" }),
     homeaway: t("eventWizard.hint.homeaway", { defaultValue: "À domicile ou en déplacement ?" }),
     meetingpoint: t("eventWizard.hint.meetingpoint", { defaultValue: "Adresse et heure de rendez-vous." }),
+    meetingtime: t("eventWizard.hint.meetingtime", { defaultValue: "À quelle heure les joueurs doivent-ils se présenter ?" }),
     opponent: t("eventWizard.hint.opponent", { defaultValue: "L'adversaire." }),
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
     convocation: t("eventWizard.hint.convocation", { defaultValue: "À qui on envoie ?" }),
     carpool: t("eventWizard.hint.carpool", { defaultValue: "Activer le covoiturage ?" }),
+    comment: t("eventWizard.hint.comment", { defaultValue: "Un commentaire à ajouter ? (facultatif)" }),
     summary: t("eventWizard.hint.summary", { defaultValue: "Tout est prêt." }),
   };
 
