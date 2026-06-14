@@ -505,11 +505,11 @@
     "titlePre": "A copilot for your ",
     "titleHighlight": "coaching week",
     "titlePost": ".",
-    "body": "Clubero combines a conversational AI assistant with proactive insights that remind the coach what to do — call-ups to send, missing follow-ups, feedback to write. Nothing falls through the cracks.",
+    "body": "Clubero combines a conversational AI assistant, guided wizards to create events and tournaments without forms, and proactive insights that remind the coach what to do. Nothing falls through the cracks.",
     "p1Title": "Proactive insights",
     "p1Body": "\"4 players haven't replied\", \"No feedback recorded for Saturday's match\", \"Squad incomplete for Tuesday\" — surfaced on the home screen as soon as you open the app.",
     "p2Title": "Daily AI assistant",
-    "p2Body": "\"Create the U13 call-up for Saturday\", \"Who missed the last 3 trainings?\", \"Draft a message to the group\" — the assistant gets it done.",
+    "p2Body": "\"Create the U13 call-up for Saturday\", \"Who missed the last 3 trainings?\", \"Draft a message to the group\" — the assistant gets it done. It can also draft an event for you (match, training, meeting) in a few exchanges.",
     "p3Title": "One-click tasks",
     "p3Body": "Every insight offers the direct action: send a reminder, create the event, record notes, send the nudge.",
     "p4Title": "Guided onboarding",
@@ -784,6 +784,14 @@
       {
         "q": "How do I get help?",
         "a": "Email support is included on every plan. The Club and Federation plans get priority support and dedicated onboarding."
+      },
+      {
+        "q": "Do you really have an AI to create my events?",
+        "a": "Yes. Instead of filling out a long form, a guided assistant asks the right questions (team, type, date, opponent, meeting point…) and creates the draft for a match, training, tournament or meeting. You stay in control: nothing is published without your approval. The conversational assistant can also create a draft from chat ('Create the U13 call-up for Saturday 2:30 PM')."
+      },
+      {
+        "q": "And what about organising a tournament?",
+        "a": "The tournament assistant recommends the right format (pools + finals, knockout, Swiss, mixed) from a handful of answers: number of teams, available duration, courts, multiple trophies or not, paid or free. It computes the number of matches, the estimated end time and the number of courts you should plan. You stay in control to adjust before launching."
       }
     ]
   },
@@ -879,9 +887,9 @@
       "titlePre": "Run a ",
       "titleHighlight": "tournament",
       "titlePost": " in minutes.",
-      "subtitle": "Groups, brackets, schedule, fields, live standings and online registration — everything included. Share a public link or a TV screen to follow scores live in the venue.",
-      "feat1Title": "Automatic groups + brackets",
-      "feat1Body": "Draws, multi-field schedule and qualifications computed for you.",
+      "subtitle": "An AI assistant guides you to configure pools, brackets, courts and duration. Online registrations, live standings, TV mode — all included. Share a public link to follow scores live.",
+      "feat1Title": "AI assistant & recommended format",
+      "feat1Body": "Answer a few questions (number of teams, duration, full day or not): the AI recommends the right format (pools + finals, knockout, Swiss), and auto-computes the multi-court schedule and qualifications.",
       "feat2Title": "Live standings",
       "feat2Body": "Scores update in real time. Spectators and teams follow from their phone.",
       "feat3Title": "Online registrations & payments",

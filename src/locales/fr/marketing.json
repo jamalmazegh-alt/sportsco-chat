@@ -505,11 +505,11 @@
     "titlePre": "Un copilote pour ",
     "titleHighlight": "votre semaine",
     "titlePost": " de coach.",
-    "body": "Clubero combine un assistant IA conversationnel et des insights proactifs qui rappellent au coach ce qu'il doit faire — convocations à envoyer, relances manquantes, retours à saisir. Plus rien ne passe à travers.",
+    "body": "Clubero combine un assistant IA conversationnel, des wizards guidés pour créer événements et tournois sans formulaire, et des insights proactifs qui rappellent au coach ce qu'il doit faire. Plus rien ne passe à travers.",
     "p1Title": "Insights proactifs",
     "p1Body": "« 4 joueurs n'ont pas répondu », « Aucun retour saisi pour le match de samedi », « Effectif incomplet pour mardi » — affichés sur l'accueil dès que vous ouvrez l'app.",
     "p2Title": "Assistant IA quotidien",
-    "p2Body": "« Crée la convoc U13 pour samedi », « Qui a manqué les 3 derniers entraînements ? », « Rédige un message au groupe » — l'assistant fait le travail.",
+    "p2Body": "« Crée la convoc U13 pour samedi », « Qui a manqué les 3 derniers entraînements ? », « Rédige un message au groupe » — l'assistant fait le travail. Il peut aussi créer un brouillon d'événement (match, entraînement, réunion) pour vous, en quelques échanges.",
     "p3Title": "Tâches en un clic",
     "p3Body": "Chaque insight propose l'action directe : relancer, créer l'événement, saisir les notes, envoyer le rappel.",
     "p4Title": "Onboarding guidé",
@@ -784,6 +784,14 @@
       {
         "q": "Comment obtenir de l'aide ?",
         "a": "Le support par e-mail est inclus dans toutes les offres. Les plans Club et Fédération bénéficient d'un support prioritaire et d'un onboarding dédié."
+      },
+      {
+        "q": "Vous avez vraiment une IA pour créer mes événements ?",
+        "a": "Oui. Au lieu de remplir un long formulaire, un assistant guidé vous pose les bonnes questions (équipe, type, date, adversaire, lieu de RDV…) et crée le brouillon de match, entraînement, tournoi ou réunion. Vous restez maître : rien n'est publié sans votre validation. L'assistant conversationnel peut aussi créer un brouillon depuis le chat ('Crée la convoc U13 pour samedi 14h30')."
+      },
+      {
+        "q": "Et pour organiser un tournoi ?",
+        "a": "L'assistant tournoi recommande le bon format (poules + finales, élimination directe, Suisse, mixte) à partir de quelques réponses : nombre d'équipes, durée disponible, terrains, plusieurs trophées ou pas, payant ou gratuit. Il calcule le nombre de matchs, l'heure de fin estimée et le nombre de terrains à prévoir. Vous gardez la main pour ajuster avant de lancer."
       }
     ]
   },
@@ -879,9 +887,9 @@
       "titlePre": "Organisez un ",
       "titleHighlight": "tournoi",
       "titlePost": " en quelques minutes.",
-      "subtitle": "Poules, brackets, calendrier, terrains, classements en temps réel et inscriptions en ligne — tout est inclus. Partagez un lien public ou un écran TV pour suivre les scores en direct dans la salle.",
-      "feat1Title": "Poules + brackets automatiques",
-      "feat1Body": "Tirage au sort, calendrier multi-terrains et qualifications calculées toutes seules.",
+      "subtitle": "Un assistant IA vous guide pour configurer poules, brackets, terrains et durée. Inscriptions en ligne, classements en temps réel, mode TV — tout est inclus. Partagez un lien public pour suivre les scores en direct.",
+      "feat1Title": "Assistant IA & format recommandé",
+      "feat1Body": "Répondez à quelques questions (nombre d'équipes, durée, journée complète ou non) : l'IA recommande le bon format (poules + finales, élimination, Suisse), calcule le calendrier multi-terrains et qualifications automatiquement.",
       "feat2Title": "Classements live",
       "feat2Body": "Les scores se mettent à jour en temps réel. Spectateurs et équipes suivent depuis leur téléphone.",
       "feat3Title": "Inscriptions & paiements en ligne",

@@ -505,11 +505,11 @@
     "titlePre": "Un copiloto para ",
     "titleHighlight": "tu semana",
     "titlePost": " como entrenador.",
-    "body": "Clubero combina un asistente de IA conversacional con información proactiva que recuerda al entrenador sus tareas: convocatorias que enviar, seguimientos pendientes, comentarios que registrar. Nada se le escapa.",
+    "body": "Clubero combina un asistente IA conversacional, asistentes guiados para crear eventos y torneos sin formularios, y avisos proactivos que recuerdan al entrenador qué hacer. Nada se queda atrás.",
     "p1Title": "Información proactiva",
     "p1Body": "«4 jugadores no han respondido», «No se han registrado comentarios para el partido del sábado», «Convocatoria incompleta para el martes» — se muestra en la página de inicio en cuanto abres la aplicación.",
     "p2Title": "Asistente de IA diario",
-    "p2Body": "«Crea la convocatoria sub-13 para el sábado», «¿Quién faltó a los últimos 3 entrenamientos?», «Escribe un mensaje al grupo» — el asistente hace el trabajo.",
+    "p2Body": "«Crea la convocatoria U13 para el sábado», «¿Quién faltó a los 3 últimos entrenamientos?», «Redacta un mensaje al grupo»: el asistente lo hace. También puede crear un borrador de evento (partido, entrenamiento, reunión) en unos pocos mensajes.",
     "p3Title": "Tareas con un clic",
     "p3Body": "Cada información ofrece la acción directa: hacer seguimiento, crear evento, registrar notas, enviar recordatorio.",
     "p4Title": "Incorporación guiada",
@@ -784,6 +784,14 @@
       {
         "q": "¿Cómo obtengo ayuda?",
         "a": "El soporte por correo electrónico está incluido en todos los planes."
+      },
+      {
+        "q": "¿De verdad tenéis una IA para crear mis eventos?",
+        "a": "Sí. En lugar de rellenar un formulario largo, un asistente guiado hace las preguntas correctas (equipo, tipo, fecha, rival, lugar de quedada…) y crea el borrador de partido, entrenamiento, torneo o reunión. Mantienes el control: nada se publica sin tu validación. El asistente conversacional también puede crear un borrador desde el chat («Crea la convocatoria U13 para el sábado a las 14:30»)."
+      },
+      {
+        "q": "¿Y para organizar un torneo?",
+        "a": "El asistente de torneos recomienda el formato correcto (grupos + finales, eliminatoria, Suizo, mixto) a partir de unas respuestas: número de equipos, duración disponible, pistas, varios trofeos o no, gratis o de pago. Calcula el número de partidos, la hora estimada de finalización y el número de pistas a prever. Tú decides ajustar antes de lanzar."
       }
     ]
   },
@@ -879,9 +887,9 @@
       "titlePre": "Organiza un ",
       "titleHighlight": "Torneo",
       "titlePost": " en minutos.",
-      "subtitle": "Fases de grupos, fases eliminatorias, calendario de partidos, campos, clasificaciones en tiempo real e inscripción en línea, todo incluido. Comparte un enlace público o una pantalla de TV para seguir los resultados en vivo en el pabellón.",
-      "feat1Title": "Fases de grupos + fases eliminatorias automáticas",
-      "feat1Body": "Sorteo, calendario de partidos en múltiples campos y clasificaciones calculadas automáticamente.",
+      "subtitle": "Un asistente IA te guía para configurar grupos, cuadros, pistas y duración. Inscripciones en línea, clasificaciones en directo, modo TV: todo incluido. Comparte un enlace público para seguir los marcadores en vivo.",
+      "feat1Title": "Asistente IA y formato recomendado",
+      "feat1Body": "Responde a unas preguntas (número de equipos, duración, jornada completa o no): la IA recomienda el formato adecuado (grupos + finales, eliminatoria, Suizo) y calcula automáticamente el calendario multi-pista y las clasificaciones.",
       "feat2Title": "Clasificaciones en vivo",
       "feat2Body": "Los resultados se actualizan en tiempo real. Espectadores y equipos siguen todo desde el móvil.",
       "feat3Title": "Inscripciones y pagos en línea",

@@ -505,11 +505,11 @@
     "titlePre": "Een copiloot voor ",
     "titleHighlight": "jouw week",
     "titlePost": " als coach.",
-    "body": "Clubero combineert een conversatie-AI-assistent met proactieve inzichten die de Coach herinneren aan zijn taken — te versturen opstellingen, ontbrekende follow-ups, vast te leggen feedback. Niets wordt meer vergeten.",
+    "body": "Clubero combineert een conversationele AI-assistent, begeleide wizards om events en toernooien zonder formulier aan te maken, en proactieve tips die de coach helpen onthouden wat hij moet doen. Niets glipt er nog door.",
     "p1Title": "Proactieve inzichten",
     "p1Body": "“4 Spelers hebben niet gereageerd”, “Geen feedback vastgelegd voor de wedstrijd van zaterdag”, “Selectie onvolledig voor dinsdag” — weergegeven op de startpagina zodra je de app opent.",
     "p2Title": "Dagelijkse AI-assistent",
-    "p2Body": "“Maak de O13-opstelling voor zaterdag”, “Wie heeft de laatste 3 trainingen gemist?”, “Stuur een bericht naar de groep” — de assistent doet het werk.",
+    "p2Body": "\"Maak de U13-oproep voor zaterdag\", \"Wie miste de laatste 3 trainingen?\", \"Stel een bericht op voor de groep\" – de assistent doet het werk. Hij kan ook in een paar berichten een conceptevent (wedstrijd, training, vergadering) voor je aanmaken.",
     "p3Title": "Taken met één klik",
     "p3Body": "Elke inzicht biedt de directe actie aan: herinneren, evenement aanmaken, notities vastleggen, herinnering sturen.",
     "p4Title": "Begeleide onboarding",
@@ -784,6 +784,14 @@
       {
         "q": "Hoe krijg ik hulp?",
         "a": "E-mailondersteuning is inbegrepen bij alle abonnementen."
+      },
+      {
+        "q": "Hebben jullie echt een AI om mijn events aan te maken?",
+        "a": "Ja. In plaats van een lang formulier stelt een begeleide assistent de juiste vragen (team, type, datum, tegenstander, verzamelplaats…) en maakt het concept voor wedstrijd, training, toernooi of vergadering. Jij houdt de controle: niets wordt gepubliceerd zonder jouw bevestiging. De conversationele assistent kan ook een concept aanmaken vanuit de chat ('Maak de U13-oproep voor zaterdag 14:30 uur')."
+      },
+      {
+        "q": "En voor een toernooi?",
+        "a": "De toernooi-assistent raadt het juiste formaat aan (poules + finales, knockout, Zwitsers, gemengd) op basis van enkele antwoorden: aantal teams, beschikbare duur, velden, meerdere prijzen of niet, gratis of betaald. Hij berekent het aantal wedstrijden, het geschatte eindtijdstip en het benodigde aantal velden. Je kunt nog aanpassen voordat je start."
       }
     ]
   },
@@ -879,9 +887,9 @@
       "titlePre": "Organiseer een ",
       "titleHighlight": "Toernooi",
       "titlePost": " in enkele minuten.",
-      "subtitle": "Groepen, knock-outschema's, speelschema, velden, real-time standen en online inschrijving — alles inbegrepen. Deel een openbare link of een tv-scherm om de resultaten live in de zaal te volgen.",
-      "feat1Title": "Groepen + automatische knock-outschema's",
-      "feat1Body": "Loting, speelschema over meerdere velden en automatisch berekende kwalificaties.",
+      "subtitle": "Een AI-assistent begeleidt je bij het instellen van poules, brackets, velden en duur. Online inschrijvingen, live klassementen, tv-modus – alles inbegrepen. Deel een publieke link om de scores live te volgen.",
+      "feat1Title": "AI-assistent & aanbevolen formaat",
+      "feat1Body": "Beantwoord enkele vragen (aantal teams, duur, hele dag of niet): de AI raadt het juiste formaat aan (poules + finales, knockout, Zwitsers) en berekent automatisch het multi-veld-schema en de kwalificaties.",
       "feat2Title": "Live Standen",
       "feat2Body": "Resultaten worden in real-time bijgewerkt. Toeschouwers en Teams volgen alles via hun mobiel.",
       "feat3Title": "Online inschrijvingen & betalingen",
