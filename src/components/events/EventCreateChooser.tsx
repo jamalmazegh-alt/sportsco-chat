@@ -184,7 +184,6 @@ export function EventCreateChooser({ clubId, teams, userId, open, onOpenChange, 
               </DialogHeader>
               <EventWizard
                 teams={teams}
-                userId={userId}
                 onClose={() => close()}
                 onCreated={() => {
                   clearDraft();

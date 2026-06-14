@@ -4,6 +4,7 @@ import {
   defaultDuration,
   countOccurrences,
   toEventInsert,
+  toEventPayloadInput,
   toIso,
   addMinutesIso,
   autoTitle,
@@ -53,7 +54,7 @@ describe("event-wizard-config", () => {
 
   it("toEventInsert returns null when mandatory fields missing", () => {
     const s = defaultState();
-    expect(toEventInsert(s, "u1", "x")).toBeNull();
+    expect(toEventInsert(s, "x")).toBeNull();
   });
 
   it("toEventInsert builds full payload for match", () => {
@@ -68,13 +69,46 @@ describe("event-wizard-config", () => {
     s.meetingPoint = "stadium";
     s.location = "Stade municipal";
     s.competitionType = "championship";
-    const p = toEventInsert(s, "user-1", "U15 vs FC X");
+    const p = toEventInsert(s, "U15 vs FC X");
     expect(p).not.toBeNull();
     expect(p!.type).toBe("match");
     expect(p!.is_home).toBe(false);
     expect(p!.opponent).toBe("FC X");
     expect(p!.meeting_point).toBe("stadium");
     expect(p!.competition_type).toBe("championship");
+    expect(p!.is_official).toBe(true);
+  });
+
+  it("#1 'other' stays 'other' (never silently becomes training)", () => {
+    const s = defaultState();
+    s.type = "other";
+    s.teamId = "00000000-0000-0000-0000-000000000001";
+    s.startDate = "2025-09-06";
+    const p = toEventInsert(s, "Réunion parents");
+    expect(p).not.toBeNull();
+    expect(p!.type).toBe("other");
+    const init = toEventPayloadInput(s, "Réunion parents");
+    expect(init!.type).toBe("other");
+  });
+
+  it("#3 carpool answer is persisted on a simple event", () => {
+    const s = defaultState();
+    s.type = "training";
+    s.teamId = "00000000-0000-0000-0000-000000000001";
+    s.startDate = "2025-09-06";
+    s.carpoolEnabled = true;
+    const p = toEventInsert(s, "Entraînement U15");
+    expect(p!.carpool_enabled).toBe(true);
+  });
+
+  it("carpool absent → key omitted (DB default/trigger applies)", () => {
+    const s = defaultState();
+    s.type = "training";
+    s.teamId = "00000000-0000-0000-0000-000000000001";
+    s.startDate = "2025-09-06";
+    const p = toEventInsert(s, "Entraînement U15");
+    expect(p).not.toBeNull();
+    expect("carpool_enabled" in (p as object)).toBe(false);
   });
 });
 

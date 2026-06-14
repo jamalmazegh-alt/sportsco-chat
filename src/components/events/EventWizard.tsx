@@ -23,14 +23,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { TimePicker } from "@/components/ui/time-picker";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
-import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { createTrainingSeries } from "@/lib/training-series.functions";
+import { createEvent } from "@/lib/events/events.functions";
 import {
   defaultDuration,
   defaultStartTime,
   defaultState,
-  toEventInsert,
+  toEventPayloadInput,
   toEventFormInitial,
   autoTitle,
   countOccurrences,
@@ -49,7 +49,6 @@ type Team = { id: string; name: string };
 
 interface Props {
   teams: Team[];
-  userId: string;
   onClose: () => void;
   onCreated: (eventId?: string) => void;
   /** Hand-off to EventFormSheet pre-filled with current answers. */
@@ -71,12 +70,13 @@ type Step =
   | "carpool"
   | "summary";
 
-export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }: Props) {
+export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
   const qc = useQueryClient();
   const navigate = useNavigate();
   const createSeriesFn = useServerFn(createTrainingSeries);
+  const createEventFn = useServerFn(createEvent);
 
   const [state, setState] = useState<EventWizardState>(() => defaultState());
   const [draftOffered, setDraftOffered] = useState(false);
@@ -180,18 +180,21 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
     });
   }
 
+  // A series is offered (and honored) for recurring trainings AND "other" events.
+  const seriesEligible = state.type === "training" || state.type === "other";
+  const isSeriesSubmit =
+    seriesEligible &&
+    !!recurrence &&
+    recurrence.mode !== "single" &&
+    recurrence.weekdays.length > 0 &&
+    !!recurrence.startsOn &&
+    !!recurrence.endsOn;
+
   // ---- Submit ----
   const createMut = useMutation({
     mutationFn: async () => {
-      // Series path?
-      if (
-        state.type === "training" &&
-        recurrence &&
-        recurrence.mode !== "single" &&
-        recurrence.weekdays.length > 0 &&
-        recurrence.startsOn &&
-        recurrence.endsOn
-      ) {
+      // Series path (training or other).
+      if (isSeriesSubmit && recurrence) {
         const slots = recurrence.weekdays.map((wd) => ({
           weekday: wd,
           start_time: state.startTime,
@@ -201,12 +204,15 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
         const res = await createSeriesFn({
           data: {
             teamId: state.teamId,
+            type: state.type === "other" ? "other" : "training",
             title,
             description: null,
             location: state.location ?? null,
-            startsOn: recurrence.startsOn,
-            endsOn: recurrence.endsOn,
+            startsOn: recurrence.startsOn!,
+            endsOn: recurrence.endsOn!,
             isOfficial: false,
+            carpoolEnabled:
+              typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : null,
             slots,
             excludedDates: [],
             excludedRanges: [],
@@ -215,15 +221,11 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
         return { kind: "series" as const, ...res };
       }
 
-      const payload = toEventInsert(state, userId, title);
-      if (!payload) throw new Error("missing-fields");
-      const { data, error } = await supabase
-        .from("events")
-        .insert(payload as never)
-        .select("id")
-        .single();
-      if (error || !data) throw new Error(error?.message ?? "insert-failed");
-      return { kind: "single" as const, eventId: data.id };
+      // Single event — goes through the shared createEvent server fn (no local insert).
+      const input = toEventPayloadInput(state, title);
+      if (!input) throw new Error("missing-fields");
+      const { id } = await createEventFn({ data: input });
+      return { kind: "single" as const, eventId: id };
     },
     onSuccess: (res) => {
       clearDraft();
@@ -232,8 +234,8 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
       if (res.kind === "series") {
         toast.success(
           t("eventWizard.seriesCreated", {
-            count: (res as { createdCount: number }).createdCount,
-            defaultValue: "{{count}} entraînements créés",
+            count: res.createdCount,
+            defaultValue: "{{count}} événements créés",
           }),
         );
         onCreated();
@@ -244,19 +246,28 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
     },
     onError: (e: unknown) => {
       const msg = e instanceof Error ? e.message : "error";
-      toast.error(msg);
+      toast.error(msg === "duplicate" ? t("events.duplicateExists", { defaultValue: msg }) : msg);
     },
   });
+
+  function goToConvocation(eventId: string) {
+    // 'all' → picker pre-checked with the whole team; 'selection' → empty picker.
+    navigate({
+      to: "/events/$eventId",
+      params: { eventId },
+      search: (state.convocScope === "all" ? { send: 1, action: "all" } : { send: 1 }) as never,
+    });
+  }
 
   function createAndConvocate() {
     createMut.mutate(undefined, {
       onSuccess: (res) => {
-        if (res.kind === "single" && state.convocScope !== "none") {
-          navigate({
-            to: "/events/$eventId",
-            params: { eventId: res.eventId },
-            search: { send: 1 } as never,
-          });
+        if (state.convocScope === "none") return;
+        if (res.kind === "single") {
+          goToConvocation(res.eventId);
+        } else if (res.kind === "series" && res.firstEventId) {
+          // At minimum, convoke the first occurrence of the series.
+          goToConvocation(res.firstEventId);
         }
       },
     });
@@ -679,7 +690,7 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
               >
                 {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("eventWizard.create", { defaultValue: "Créer" })}
               </Button>
-              {state.convocScope !== "none" && state.type !== "meeting" && seriesCount === 0 && (
+              {state.convocScope !== "none" && state.type !== "meeting" && (
                 <Button
                   className="flex-1"
                   variant="default"
