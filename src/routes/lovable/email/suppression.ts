@@ -1,6 +1,7 @@
 import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { supabaseAdmin } from '@/integrations/supabase/client.server'
+import type { Json } from '@/integrations/supabase/types'
 
 // Suppression event payload sent by the Go API when Mailgun reports
 // a bounce, complaint, or unsubscribe.
@@ -51,6 +52,11 @@ function mapReasonToMessage(reason: string): string {
   }
 }
 
+function toJsonMetadata(metadata: Record<string, unknown> | undefined): Json | null {
+  if (!metadata) return null
+  return JSON.parse(JSON.stringify(metadata)) as Json
+}
+
 export const Route = createFileRoute("/lovable/email/suppression")({
   server: {
     handlers: {
@@ -97,6 +103,7 @@ export const Route = createFileRoute("/lovable/email/suppression")({
         }
 
         const normalizedEmail = payload.email.toLowerCase()
+        const metadata = toJsonMetadata(payload.metadata)
 
         // 1. Upsert to suppressed_emails (idempotent — safe for retries)
         const { error: suppressError } = await supabaseAdmin
@@ -105,7 +112,7 @@ export const Route = createFileRoute("/lovable/email/suppression")({
             {
               email: normalizedEmail,
               reason: payload.reason,
-              metadata: payload.metadata ?? null,
+              metadata,
             },
             { onConflict: 'email' },
           )
@@ -130,7 +137,7 @@ export const Route = createFileRoute("/lovable/email/suppression")({
             recipient_email: normalizedEmail,
             status: sendLogStatus,
             error_message: sendLogMessage,
-            metadata: payload.metadata ?? null,
+            metadata,
           })
 
         if (insertError) {
