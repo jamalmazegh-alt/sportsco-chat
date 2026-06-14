@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban, Eye, EyeOff, Clock } from "lucide-react";
-import { EventFormSheet } from "@/components/event-form-sheet";
+import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
@@ -345,24 +345,24 @@ function EventsPage() {
             <p className="text-sm text-muted-foreground truncate mt-0.5">{club.name}</p>
           )}
         </div>
-        {isCoach && user && (
-          <EventFormSheet
-            open={open}
-            onOpenChange={setOpen}
-            mode="create"
+        {isCoach && user && activeClubId && (
+          <EventCreateChooser
+            clubId={activeClubId}
             teams={teams ?? []}
             userId={user.id}
+            open={open}
+            onOpenChange={setOpen}
             onSaved={() => {
               qc.invalidateQueries({ queryKey: ["events"] });
               qc.invalidateQueries({ queryKey: ["upcoming"] });
             }}
-            trigger={
-              <Button size="sm" className="h-9">
-                <Plus className="h-4 w-4" />
-                {t("events.create")}
-              </Button>
-            }
           />
+        )}
+        {isCoach && user && (
+          <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("events.create")}
+          </Button>
         )}
       </div>
 
@@ -443,23 +443,10 @@ function EventsPage() {
           }
           action={
             isCoach && user ? (
-              <EventFormSheet
-                open={open}
-                onOpenChange={setOpen}
-                mode="create"
-                teams={teams ?? []}
-                userId={user.id}
-                onSaved={() => {
-                  qc.invalidateQueries({ queryKey: ["events"] });
-                  qc.invalidateQueries({ queryKey: ["upcoming"] });
-                }}
-                trigger={
-                  <Button size="sm" className="h-9">
-                    <Plus className="h-4 w-4" />
-                    {t("events.create")}
-                  </Button>
-                }
-              />
+              <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" />
+                {t("events.create")}
+              </Button>
             ) : null
           }
         />

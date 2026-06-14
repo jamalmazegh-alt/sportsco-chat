@@ -1861,5 +1861,106 @@
       "Seguimiento disciplinario e historial de jugadores",
       "Comunicación centralizada con los padres"
     ]
+  },
+  "eventCreateChooser": {
+    "title": "New event",
+    "subtitle": "How do you want to create this event?",
+    "assistant": "Create with assistant",
+    "assistantHint": "Guided, question by question",
+    "repeatTraining": "Repeat last training",
+    "repeatMatch": "Repeat last match",
+    "classic": "Classic form",
+    "classicHint": "The full form at once"
+  },
+  "eventWizard": {
+    "title": "New event",
+    "back": "Back",
+    "continue": "Continue",
+    "create": "Create",
+    "createAndConvoke": "Create & invite",
+    "expert": "Detailed settings",
+    "resume": "Resume",
+    "draftPrompt": "Resume your draft?",
+    "abandonConfirm": "Leave the assistant? Your answers will be saved as draft.",
+    "noTeams": "No team available.",
+    "pickDate": "Pick a date",
+    "locationPlaceholder": "City stadium",
+    "carpoolLabel": "Parents offer/book seats",
+    "readyTitle": "All set",
+    "home": "Home",
+    "away": "Away",
+    "officialYes": "Official",
+    "officialNo": "Friendly",
+    "seriesCreated_one": "{{count}} training created",
+    "seriesCreated_other": "{{count}} trainings created",
+    "hint": {
+      "type": "We adapt questions to the type.",
+      "team": "The team concerned.",
+      "when": "Start date and time — use shortcuts or calendar.",
+      "duration": "How long?",
+      "series": "Create your whole season at once.",
+      "homeaway": "Home or away?",
+      "meetingpoint": "Where to meet?",
+      "opponent": "Which opponent?",
+      "official": "Official or friendly?",
+      "location": "Where does it happen?",
+      "convocation": "You'll be able to send invites right after.",
+      "carpool": "Enable carpool for this trip?",
+      "summary": "All set — you can create."
+    },
+    "q": {
+      "type": "What kind of event?",
+      "team": "Which team?",
+      "when": "When?",
+      "duration": "Duration?",
+      "series": "Is this training part of a series?",
+      "homeaway": "Home or away?",
+      "meetingpoint": "Meeting point?",
+      "opponent": "Against which team?",
+      "official": "Official or friendly?",
+      "location": "Where?",
+      "convocation": "Invite players?",
+      "carpool": "Enable carpool?"
+    },
+    "chip": {
+      "tonight": "Tonight",
+      "tomorrow": "Tomorrow",
+      "saturday": "Saturday",
+      "nextWeek": "Next week"
+    },
+    "series": {
+      "single": "Single event",
+      "weeklyOne": "Every week (1 day)",
+      "weeklyMulti": "Several days a week",
+      "daysOfWeek": "Days of the week",
+      "startsOn": "Start",
+      "endsOn": "End",
+      "preview_one": "Create {{count}} training",
+      "preview_other": "Create {{count}} trainings"
+    },
+    "meeting": {
+      "stadium": "Usual stadium",
+      "parking": "Club parking",
+      "custom": "Custom address"
+    },
+    "convoc": {
+      "all": "Whole team",
+      "selection": "Pick players",
+      "none": "Not now"
+    },
+    "weekdayShort": {
+      "0": "S",
+      "1": "M",
+      "2": "T",
+      "3": "W",
+      "4": "T",
+      "5": "F",
+      "6": "S"
+    },
+    "recap": {
+      "title": "Your event",
+      "series_one": "series {{count}} session",
+      "series_other": "series {{count}} sessions"
+    }
   }
 }
