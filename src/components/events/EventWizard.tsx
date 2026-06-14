@@ -1040,7 +1040,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               variant="ghost"
               size="sm"
               className="w-full text-xs"
-              onClick={() => onOpenExpert(toEventFormInitial(state, title))}
+              onClick={() => onOpenExpert(toEventFormInitial(state, title), state)}
             >
               <Settings2 className="h-3.5 w-3.5" />
               {t("eventWizard.expert", { defaultValue: "Réglages détaillés" })}
@@ -1051,7 +1051,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             variant="ghost"
             size="sm"
             className="w-full text-xs"
-            onClick={() => onOpenExpert(toEventFormInitial(state, title))}
+            onClick={() => onOpenExpert(toEventFormInitial(state, title), state)}
           >
             <Settings2 className="h-3.5 w-3.5" />
             {t("eventWizard.expert", { defaultValue: "Réglages détaillés" })}
