@@ -98,6 +98,9 @@ type Props = {
   mode: "create" | "edit";
   userId: string;
   onSaved: (eventId: string) => void;
+  /** Optional: when set, renders a "back" button at the top of the form (used when opened from the wizard). */
+  onBack?: () => void;
+  backLabel?: string;
 };
 
 function toGoogleMapsUrl(address: string): string {
