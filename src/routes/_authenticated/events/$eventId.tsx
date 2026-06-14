@@ -2607,8 +2607,15 @@ function EventDetail() {
       {/* "My response" merged into the unified Convocation card below */}
 
 
-      {/* Match result + scorers (matches only) */}
-      {event.type === "match" && (
+      {/* Match result + scorers (matches only, hidden when the event is cancelled) */}
+      {event.type === "match" && event.status === "cancelled" && (
+        <div className="rounded-2xl border border-red-300/60 bg-red-50/30 p-4 text-sm text-red-700 dark:bg-red-950/20 dark:text-red-300">
+          {t("events.scoreDisabledCancelled", {
+            defaultValue: "Événement annulé — édition du score et des faits de match désactivée.",
+          })}
+        </div>
+      )}
+      {event.type === "match" && event.status !== "cancelled" && (
         <MatchResultCard
           eventId={event.id}
           teamId={event.team_id}
