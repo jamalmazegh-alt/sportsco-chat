@@ -991,7 +991,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
               >
                 {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("eventWizard.create", { defaultValue: "Créer" })}
               </Button>
-              {state.convocScope !== "none" && state.type !== "meeting" && (
+              {state.convocScope !== "none" && (
                 <Button
                   className="flex-1"
                   variant="default"
