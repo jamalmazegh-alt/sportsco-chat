@@ -45,6 +45,7 @@ export interface EventWizardState {
   opponent?: string;
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
+  competitionName?: string;
   location?: string;
   locationUrl?: string | null;
   description?: string; // free comment added by the user
