@@ -1,9 +1,9 @@
-import { Calendar, Dumbbell, Swords, Trophy, Users, type LucideIcon } from "lucide-react";
+import { Calendar, Volleyball, Goal, Trophy, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, LucideIcon> = {
-  training: Dumbbell,
-  match: Swords,
+  training: Volleyball,
+  match: Goal,
   tournament: Trophy,
   meeting: Users,
   other: Calendar,
