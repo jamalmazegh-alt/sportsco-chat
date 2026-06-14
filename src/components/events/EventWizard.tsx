@@ -436,7 +436,7 @@ export function EventWizard({ teams, userId, onClose, onCreated, onOpenExpert }:
                   />
                 </PopoverContent>
               </Popover>
-              <TimePicker value={state.startTime} onChange={(v) => patch("startTime", v)} className="w-full" />
+              <TimePicker value={state.startTime} onChange={(v: string) => patch("startTime", v)} className="w-full" />
             </div>
             <Button
               className="w-full mt-3"
