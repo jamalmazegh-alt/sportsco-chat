@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Repeat, Settings2, Zap } from "lucide-react";
-import { format } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
+import { Sparkles, Settings2 } from "lucide-react";
 import { EventFormSheet, type EventFormValues } from "@/components/event-form-sheet";
 import { EventWizard } from "./EventWizard";
 import { readDraft, clearDraft, draftHasProgress } from "./event-wizard-draft";
@@ -29,36 +25,10 @@ interface Props {
 
 type Mode = "chooser" | "wizard" | "expert" | "expert-prefilled";
 
-export function EventCreateChooser({ clubId, teams, userId, open, onOpenChange, onSaved }: Props) {
+export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved }: Props) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("chooser");
   const [expertInitial, setExpertInitial] = useState<Partial<EventFormValues> | undefined>();
-
-  // Fetch last training & last match for "Reprendre" quick paths
-  const teamIds = teams.map((tm) => tm.id);
-  const { data: recent } = useQuery({
-    queryKey: ["events-recent", clubId, teamIds.join(",")],
-    enabled: open && teamIds.length > 0,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("events")
-        .select(
-          "id, type, team_id, title, location, location_url, opponent, competition_type, competition_name, is_home, meeting_point, starts_at, ends_at",
-        )
-        .in("team_id", teamIds)
-        .in("type", ["training", "match"])
-        .is("deleted_at", null)
-        .order("starts_at", { ascending: false })
-        .limit(20);
-      const last: Record<"training" | "match", any | null> = { training: null, match: null };
-      for (const e of data ?? []) {
-        if ((e.type === "training" || e.type === "match") && !last[e.type as "training" | "match"]) {
-          last[e.type as "training" | "match"] = e;
-        }
-      }
-      return last;
-    },
-  });
 
   function close(forceClear = false) {
     const draft = readDraft();
@@ -81,38 +51,6 @@ export function EventCreateChooser({ clubId, teams, userId, open, onOpenChange, 
   function openExpertEmpty() {
     setExpertInitial(undefined);
     setMode("expert");
-  }
-
-  function openExpertRepeat(template: "training" | "match") {
-    const last = recent?.[template];
-    if (!last) return;
-    // Pre-fill but bump date to tomorrow as a starting point
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const oldStart = new Date(last.starts_at);
-    tomorrow.setHours(oldStart.getHours(), oldStart.getMinutes(), 0, 0);
-    let newEnd: string | null = null;
-    if (last.ends_at) {
-      const dur = new Date(last.ends_at).getTime() - new Date(last.starts_at).getTime();
-      newEnd = new Date(tomorrow.getTime() + dur).toISOString();
-    }
-    setExpertInitial({
-      team_id: last.team_id,
-      type: last.type as EventFormValues["type"],
-      title: last.title,
-      description: null,
-      location: last.location,
-      location_url: last.location_url,
-      opponent: last.opponent,
-      competition_type: (last.competition_type as EventFormValues["competition_type"]) ?? null,
-      competition_name: last.competition_name,
-      is_home: last.is_home,
-      meeting_point: last.meeting_point,
-      starts_at: tomorrow.toISOString(),
-      ends_at: newEnd,
-      convocation_time: null,
-    });
-    setMode("expert-prefilled");
   }
 
   function startWizard() {
@@ -148,22 +86,6 @@ export function EventCreateChooser({ clubId, teams, userId, open, onOpenChange, 
                   primary
                   onClick={startWizard}
                 />
-                {recent?.training && (
-                  <DoorButton
-                    icon={<Repeat className="h-5 w-5" />}
-                    title={t("eventCreateChooser.repeatTraining", { defaultValue: "Reprendre le dernier entraînement" })}
-                    hint={recapEvent(recent.training)}
-                    onClick={() => openExpertRepeat("training")}
-                  />
-                )}
-                {recent?.match && (
-                  <DoorButton
-                    icon={<Repeat className="h-5 w-5" />}
-                    title={t("eventCreateChooser.repeatMatch", { defaultValue: "Reprendre le dernier match" })}
-                    hint={recapEvent(recent.match)}
-                    onClick={() => openExpertRepeat("match")}
-                  />
-                )}
                 <DoorButton
                   icon={<Settings2 className="h-5 w-5" />}
                   title={t("eventCreateChooser.classic", { defaultValue: "Création classique" })}
@@ -258,18 +180,3 @@ function DoorButton({
   );
 }
 
-function recapEvent(e: {
-  title: string;
-  starts_at: string;
-  location: string | null;
-  opponent: string | null;
-}): string {
-  const date = format(new Date(e.starts_at), "EEE d MMM HH:mm");
-  const parts: string[] = [date];
-  if (e.location) parts.push(e.location);
-  if (e.opponent) parts.push(`vs ${e.opponent}`);
-  return parts.join(" · ");
-}
-
-// reference to silence unused import in some bundlers
-void Zap;

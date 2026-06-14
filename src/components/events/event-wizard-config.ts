@@ -37,8 +37,11 @@ export interface EventWizardState {
   startDate?: string; // yyyy-mm-dd
   startTime: string; // HH:mm
   durationMin: number;
+  halvesFormat?: string; // e.g. "2x45"
+  gameFormat?: string; // e.g. "11v11"
   isHome?: IsHome;
-  meetingPoint?: string;
+  meetingPoint?: string; // free address (away matches)
+  meetingTime?: string; // HH:mm (away matches)
   opponent?: string;
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
@@ -148,22 +151,33 @@ export function toEventPayloadInput(
   const startsIso = toIso(state.startDate, state.startTime);
   if (!startsIso) return null;
   const endsIso = addMinutesIso(startsIso, state.durationMin);
+  const isMatch = state.type === "match";
+  const isHomeMatch = isMatch && state.isHome === "home";
+  const isAwayMatch = isMatch && state.isHome === "away";
+
+  // Append game format to description when set
+  const desc = state.gameFormat ? `Format: ${state.gameFormat}` : null;
+
+  // Convocation time = startDate + meetingTime (away matches)
+  const convocIso = isAwayMatch && state.meetingTime
+    ? toIso(state.startDate, state.meetingTime)
+    : null;
 
   return {
     teamId: state.teamId,
-    type: state.type, // 'other' stays 'other' — the enum supports it.
+    type: state.type,
     title,
-    description: null,
-    location: state.location ?? null,
+    description: desc,
+    location: isHomeMatch ? null : state.location ?? null,
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
     competitionName: null,
-    isHome: state.type === "match" ? state.isHome === "home" : null,
-    meetingPoint: state.meetingPoint ?? null,
+    isHome: isMatch ? state.isHome === "home" : null,
+    meetingPoint: isAwayMatch ? state.meetingPoint ?? null : null,
     startsAt: startsIso,
     endsAt: endsIso,
-    convocationTime: null,
+    convocationTime: convocIso,
     isOfficial: state.isOfficial,
     carpoolEnabled: typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : undefined,
   };
@@ -190,17 +204,20 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
     team_id: state.teamId || "",
     type: state.type || "training",
     title,
-    description: null,
-    location: state.location ?? null,
+    description: state.gameFormat ? `Format: ${state.gameFormat}` : null,
+    location: state.type === "match" && state.isHome === "home" ? null : state.location ?? null,
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competition_type: state.competitionType ?? "friendly",
     competition_name: null,
     is_home: state.type === "match" ? state.isHome === "home" : null,
-    meeting_point: state.meetingPoint ?? null,
+    meeting_point: state.type === "match" && state.isHome === "away" ? state.meetingPoint ?? null : null,
     starts_at: startsIso ?? "",
     ends_at: endsIso,
-    convocation_time: null,
+    convocation_time:
+      state.type === "match" && state.isHome === "away" && state.meetingTime
+        ? toIso(state.startDate, state.meetingTime)
+        : null,
     is_official: state.type === "match" ? true : Boolean(state.isOfficial),
   };
 }
