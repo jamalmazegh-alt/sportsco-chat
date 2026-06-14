@@ -477,6 +477,7 @@ function HomePage() {
                           </p>
                         )}
                         <div className="flex items-center gap-2">
+                          <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
                           <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
                           {actionRequired && (
                             <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
