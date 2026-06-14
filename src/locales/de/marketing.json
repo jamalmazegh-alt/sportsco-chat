@@ -505,11 +505,11 @@
     "titlePre": "Ein Kopilot für ",
     "titleHighlight": "deine Woche",
     "titlePost": " de coach.",
-    "body": "Clubero verbindet einen dialogfähigen KI-Assistenten mit proaktiven Insights, die den Trainer an seine Aufgaben erinnern — zu verschickende Aufgebote, fehlende Nachfass-Aktionen, zu erfassendes Feedback. Nichts fällt mehr durch.",
+    "body": "Clubero kombiniert einen dialogbasierten KI-Assistenten, geführte Wizards zum Erstellen von Events und Turnieren ohne Formulare und proaktive Hinweise, die den Trainer an die Aufgaben erinnern. Nichts geht mehr verloren.",
     "p1Title": "Insights proactifs",
     "p1Body": "„4 Spieler haben nicht geantwortet“, „Kein Feedback erfasst für das Samstagsspiel“, „Kader unvollständig für Dienstag“ — angezeigt auf der Startseite, sobald du die App öffnest.",
     "p2Title": "Assistant IA quotidien",
-    "p2Body": "„Erstelle das U13-Aufgebot für Samstag“, „Wer hat die letzten 3 Trainings verpasst?“, „Schreibe eine Nachricht an die Gruppe“ — der Assistent erledigt die Arbeit.",
+    "p2Body": "«Erstelle die U13-Einberufung für Samstag», «Wer hat die letzten 3 Trainings verpasst?», «Verfasse eine Nachricht an die Gruppe» – der Assistent erledigt es. Er kann dir in wenigen Schritten auch einen Event-Entwurf (Spiel, Training, Besprechung) anlegen.",
     "p3Title": "Aufgaben mit einem Klick",
     "p3Body": "Jeder Insight bietet die direkte Aktion an: nachhaken, Event erstellen, Notizen erfassen, Erinnerung senden.",
     "p4Title": "Geführtes Onboarding",
@@ -784,6 +784,14 @@
       {
         "q": "Wie erhalte ich Hilfe?",
         "a": "E-Mail-Support ist in allen Plänen enthalten."
+      },
+      {
+        "q": "Habt ihr wirklich eine KI, die meine Events erstellt?",
+        "a": "Ja. Statt eines langen Formulars stellt ein geführter Assistent die richtigen Fragen (Team, Typ, Datum, Gegner, Treffpunkt …) und legt den Entwurf für Spiel, Training, Turnier oder Besprechung an. Du behältst die Kontrolle: nichts wird ohne deine Freigabe veröffentlicht. Der Dialogassistent kann einen Entwurf auch aus dem Chat erstellen («Erstelle die U13-Einberufung für Samstag 14:30 Uhr»)."
+      },
+      {
+        "q": "Und wie ist es mit der Turnierorganisation?",
+        "a": "Der Turnier-Assistent empfiehlt das passende Format (Gruppen + Finals, K.-o., Schweizer, gemischt) auf Basis weniger Antworten: Anzahl Teams, verfügbare Dauer, Plätze, mehrere Trophäen oder nicht, kostenlos oder kostenpflichtig. Er berechnet die Anzahl Spiele, die voraussichtliche Endzeit und die nötige Anzahl Plätze. Du kannst vor dem Start jederzeit anpassen."
       }
     ]
   },
@@ -879,9 +887,9 @@
       "titlePre": "Organisiere ein ",
       "titleHighlight": "Turnier",
       "titlePost": " in wenigen Minuten.",
-      "subtitle": "Gruppen, Turnierbäume, Spielplan, Plätze, Echtzeit-Tabellen und Online-Anmeldung — alles inklusive. Teile einen öffentlichen Link oder einen TV-Screen, um die Ergebnisse live in der Halle zu verfolgen.",
-      "feat1Title": "Gruppen + automatische Turnierbäume",
-      "feat1Body": "Auslosung, Spielplan über mehrere Plätze und automatisch berechnete Qualifikationen.",
+      "subtitle": "Ein KI-Assistent führt dich durch die Konfiguration von Gruppen, Brackets, Plätzen und Dauer. Online-Anmeldungen, Live-Tabellen, TV-Modus – alles inklusive. Teile einen öffentlichen Link, um die Ergebnisse live zu verfolgen.",
+      "feat1Title": "KI-Assistent & empfohlenes Format",
+      "feat1Body": "Beantworte ein paar Fragen (Anzahl Teams, Dauer, ganzer Tag oder nicht): Die KI empfiehlt das passende Format (Gruppen + Finals, K.-o., Schweizer System) und berechnet automatisch den Mehrplatz-Spielplan und die Qualifikationen.",
       "feat2Title": "Live-Tabellen",
       "feat2Body": "Ergebnisse aktualisieren sich in Echtzeit. Zuschauer und Mannschaften verfolgen alles per Handy.",
       "feat3Title": "Online-Anmeldungen & -Zahlungen",

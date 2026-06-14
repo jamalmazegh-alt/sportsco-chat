@@ -505,11 +505,11 @@
     "titlePre": "Un copilota per ",
     "titleHighlight": "la tua settimana",
     "titlePost": " da Allenatore.",
-    "body": "Clubero combina un assistente IA conversazionale con insight proattivi che ricordano all'Allenatore i suoi compiti: convocazioni da inviare, follow-up mancanti, feedback da registrare. Nulla viene più trascurato.",
+    "body": "Clubero unisce un assistente IA conversazionale, wizard guidati per creare eventi e tornei senza moduli, e suggerimenti proattivi che ricordano all'allenatore cosa fare. Niente sfugge più.",
     "p1Title": "Insight proattivi",
     "p1Body": "“4 Giocatori non hanno risposto”, “Nessun feedback registrato per la partita di sabato”, “Roster incompleto per martedì” — visualizzati sulla homepage non appena apri l'app.",
     "p2Title": "Assistente IA quotidiano",
-    "p2Body": "“Crea la convocazione U13 per sabato”, “Chi ha saltato gli ultimi 3 allenamenti?”, “Scrivi un messaggio al gruppo” — l'assistente fa il lavoro.",
+    "p2Body": "«Crea la convocazione U13 per sabato», «Chi ha saltato gli ultimi 3 allenamenti?», «Scrivi un messaggio al gruppo»: l'assistente lo fa. Può anche creare per te una bozza di evento (partita, allenamento, riunione) in pochi scambi.",
     "p3Title": "Azioni con un clic",
     "p3Body": "Ogni insight offre un'azione diretta: fare un follow-up, creare un Evento, registrare note, inviare un promemoria.",
     "p4Title": "Onboarding guidato",
@@ -784,6 +784,14 @@
       {
         "q": "Come posso ottenere aiuto?",
         "a": "Il supporto via email è incluso in tutti i piani."
+      },
+      {
+        "q": "Avete davvero un'IA per creare i miei eventi?",
+        "a": "Sì. Invece di compilare un lungo modulo, un assistente guidato fa le domande giuste (squadra, tipo, data, avversario, luogo di ritrovo…) e crea la bozza di partita, allenamento, torneo o riunione. Resti tu il responsabile: nulla viene pubblicato senza la tua conferma. L'assistente conversazionale può anche creare una bozza dalla chat («Crea la convocazione U13 per sabato alle 14:30»)."
+      },
+      {
+        "q": "E per organizzare un torneo?",
+        "a": "L'assistente torneo consiglia il formato corretto (gironi + finali, eliminazione, Svizzero, misto) a partire da poche risposte: numero di squadre, durata disponibile, campi, più trofei o no, gratis o a pagamento. Calcola il numero di partite, l'orario di fine stimato e il numero di campi da prevedere. Decidi tu se modificare prima di lanciare."
       }
     ]
   },
@@ -879,9 +887,9 @@
       "titlePre": "Organizza un ",
       "titleHighlight": "Torneo",
       "titlePost": " in pochi minuti.",
-      "subtitle": "Gironi, tabelloni, calendario, campi, classifiche in tempo reale e iscrizioni online — tutto incluso. Condividi un link pubblico o uno schermo TV per seguire i risultati in diretta nella struttura.",
-      "feat1Title": "Gironi + tabelloni automatici",
-      "feat1Body": "Sorteggio, calendario su più campi e qualificazioni calcolate automaticamente.",
+      "subtitle": "Un assistente IA ti guida nella configurazione di gironi, tabelloni, campi e durata. Iscrizioni online, classifiche in tempo reale, modalità TV: tutto incluso. Condividi un link pubblico per seguire i risultati in diretta.",
+      "feat1Title": "Assistente IA e formato consigliato",
+      "feat1Body": "Rispondi ad alcune domande (numero di squadre, durata, giornata intera o no): l'IA consiglia il formato giusto (gironi + finali, eliminazione, Svizzero) e calcola automaticamente il calendario multi-campo e le qualificazioni.",
       "feat2Title": "Classifiche live",
       "feat2Body": "I risultati si aggiornano in tempo reale. Spettatori e squadre seguono tutto tramite cellulare.",
       "feat3Title": "Iscrizioni e pagamenti online",
