@@ -158,11 +158,16 @@ export function toEventPayloadInput(
   const isHomeMatch = isMatch && state.isHome === "home";
   const isAwayMatch = isMatch && state.isHome === "away";
 
-  // Append game format to description when set
-  const desc = state.gameFormat ? `Format: ${state.gameFormat}` : null;
+  // Combine game format + user comment into description
+  const descParts: string[] = [];
+  if (state.gameFormat) descParts.push(`Format: ${state.gameFormat}`);
+  if (state.description?.trim()) descParts.push(state.description.trim());
+  const desc = descParts.length ? descParts.join("\n") : null;
 
-  // Convocation time = startDate + meetingTime (away matches)
-  const convocIso = isAwayMatch && state.meetingTime
+  // Convocation time = startDate + meetingTime
+  // - Away matches: meeting point + meeting time
+  // - Training/other: meeting time is "be there at" hour
+  const convocIso = state.meetingTime
     ? toIso(state.startDate, state.meetingTime)
     : null;
 
