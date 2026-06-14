@@ -30,6 +30,7 @@ import {
   autoScheduleMatches,
 } from "../tournaments.functions";
 import { DrawDialog } from "./DrawDialog";
+import { recommendedPools } from "../lib/planner";
 import { PoolEditorDialog } from "./PoolEditorDialog";
 import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 
@@ -227,9 +228,7 @@ export function GroupsAndFixtures({
   const [poolEditorOpen, setPoolEditorOpen] = useState(false);
   const [genBracketOpen, setGenBracketOpen] = useState(false);
 
-  const [numGroups, setNumGroups] = useState(() =>
-    Math.min(4, Math.max(2, Math.floor(teams.length / 4) || 2)),
-  );
+  const [numGroups, setNumGroups] = useState(() => recommendedPools(teams.length));
   const [qualifiers, setQualifiers] = useState(2);
   const [thirdPlace, setThirdPlace] = useState(false);
 

@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dices, Loader2, Shuffle, Hand, Sparkles, RotateCcw, Trophy, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { applyTeamDraw } from "../tournaments.functions";
+import { recommendedPools } from "../lib/planner";
 
 interface TeamLite {
   id: string;
@@ -90,9 +91,12 @@ export function DrawDialog({
   const drawMode: "groups" | "knockout" = supportsGroups ? "groups" : "knockout";
 
   const [mode, setMode] = useState<DrawMode>("auto");
-  const [numGroups, setNumGroups] = useState(Math.max(2, Math.min(4, Math.floor(teams.length / 2) || 2)));
+  // Default pool count = the AI Assistant's deterministic recommendation
+  // (same POOLCFG mapping), instead of an ad-hoc heuristic.
+  const recommendedGroups = recommendedPools(teams.length);
+  const [numGroups, setNumGroups] = useState(recommendedGroups);
   // B-03 — keep raw string buffers so users can clear the input freely.
-  const [numGroupsRaw, setNumGroupsRaw] = useState(String(Math.max(2, Math.min(4, Math.floor(teams.length / 2) || 2))));
+  const [numGroupsRaw, setNumGroupsRaw] = useState(String(recommendedGroups));
   const [qualifiers, setQualifiers] = useState(2);
   const [qualifiersRaw, setQualifiersRaw] = useState("2");
   const [thirdPlace, setThirdPlace] = useState(false);
@@ -122,6 +126,10 @@ export function DrawDialog({
     setPool([]);
     setFinished(hasExistingDraw);
     setDrawing(false);
+    // Re-apply the assistant's recommended pool count for the current team set.
+    const reco = recommendedPools(teams.length);
+    setNumGroups(reco);
+    setNumGroupsRaw(String(reco));
     const init: Record<string, number | null> = {};
     teams.forEach((t) => (init[t.id] = null));
     setManualAssign(init);

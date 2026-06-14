@@ -400,6 +400,7 @@
     "empty": "Nessuna squadra iscritta",
     "addedToast": "Squadra aggiunta",
     "updatedToast": "Squadra aggiornata",
+    "deletedToast": "Squadra eliminata",
     "errorToast": "Errore",
     "importedToast_one": "{{count}} squadra importata",
     "importedToast_other": "{{count}} squadre importate",
@@ -438,7 +439,15 @@
       "clubero": " · Clubero",
       "external": " · Esterna",
       "players": "Giocatori",
-      "edit": "Modifica"
+      "edit": "Modifica",
+      "delete": "Elimina"
+    },
+    "deleteConfirm": {
+      "title": "Eliminare {{name}}?",
+      "description": "Questa squadra sarà rimossa dal torneo. Questa azione è irreversibile.",
+      "consequences": "I giocatori, la testa di serie e lo storico di questa squadra nel torneo andranno persi. Le partite già giocate potrebbero esserne influenzate.",
+      "confirm": "Elimina squadra",
+      "cancel": "Annulla"
     }
   },
   "roster": {
