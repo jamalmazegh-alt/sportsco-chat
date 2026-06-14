@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
+import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 function redactEmail(email: string | null | undefined): string {
   if (!email) return '***'
@@ -12,10 +12,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-        if (!supabaseUrl || !supabaseServiceKey) {
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
           return Response.json({ error: 'Server configuration error' }, { status: 500 })
         }
 
@@ -27,10 +24,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
           return Response.json({ error: 'Token is required' }, { status: 400 })
         }
 
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-        // Look up the token
-        const { data: tokenRecord, error: lookupError } = await supabase
+        const { data: tokenRecord, error: lookupError } = await supabaseAdmin
           .from('email_unsubscribe_tokens')
           .select('*')
           .eq('token', token)
@@ -48,10 +42,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
       },
 
       POST: async ({ request }) => {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-        if (!supabaseUrl || !supabaseServiceKey) {
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
           return Response.json({ error: 'Server configuration error' }, { status: 500 })
         }
 
@@ -90,10 +81,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
           return Response.json({ error: 'Token is required' }, { status: 400 })
         }
 
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-        // Look up the token
-        const { data: tokenRecord, error: lookupError } = await supabase
+        const { data: tokenRecord, error: lookupError } = await supabaseAdmin
           .from('email_unsubscribe_tokens')
           .select('*')
           .eq('token', token)
@@ -108,7 +96,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
         }
 
         // Atomic check-and-update to avoid TOCTOU race
-        const { data: updated, error: updateError } = await supabase
+        const { data: updated, error: updateError } = await supabaseAdmin
           .from('email_unsubscribe_tokens')
           .update({ used_at: new Date().toISOString() })
           .eq('token', token)
@@ -126,7 +114,7 @@ export const Route = createFileRoute("/email/unsubscribe")({
         }
 
         // Add email to suppressed list (upsert to handle duplicates)
-        const { error: suppressError } = await supabase
+        const { error: suppressError } = await supabaseAdmin
           .from('suppressed_emails')
           .upsert(
             { email: tokenRecord.email.toLowerCase(), reason: 'unsubscribe' },

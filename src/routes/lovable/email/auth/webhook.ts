@@ -2,8 +2,8 @@ import * as React from 'react'
 import { render } from '@react-email/components'
 import { parseEmailWebhookPayload } from '@lovable.dev/email-js'
 import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
-import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
+import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
 import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
@@ -149,29 +149,19 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         const text = await render(element, { plainText: true })
 
         // Enqueue email for async processing by the dispatcher (process-email-queue).
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-        if (!supabaseUrl || !supabaseServiceKey) {
-          console.error('Missing Supabase environment variables')
-          return Response.json(
-            { error: 'Server configuration error' },
-            { status: 500 }
-          )
-        }
-
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
+        // Use runtime SUPABASE_URL (via supabaseAdmin), not build-time VITE_* — a mismatch
+        // with SUPABASE_SERVICE_ROLE_KEY silently targets the wrong project.
         const messageId = crypto.randomUUID()
 
         // Log pending BEFORE enqueue so we have a record even if enqueue crashes
-        await supabase.from('email_send_log').insert({
+        await supabaseAdmin.from('email_send_log').insert({
           message_id: messageId,
           template_name: emailType,
           recipient_email: payload.data.email,
           status: 'pending',
         })
 
-        const { error: enqueueError } = await supabase.rpc('enqueue_email', {
+        const { error: enqueueError } = await supabaseAdmin.rpc('enqueue_email', {
           queue_name: 'auth_emails',
           payload: {
             run_id,
@@ -190,7 +180,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         if (enqueueError) {
           console.error('Failed to enqueue auth email', { error: enqueueError, run_id, emailType })
-          await supabase.from('email_send_log').insert({
+          await supabaseAdmin.from('email_send_log').insert({
             message_id: messageId,
             template_name: emailType,
             recipient_email: payload.data.email,
