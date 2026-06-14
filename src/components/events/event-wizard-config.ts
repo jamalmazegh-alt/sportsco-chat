@@ -37,8 +37,11 @@ export interface EventWizardState {
   startDate?: string; // yyyy-mm-dd
   startTime: string; // HH:mm
   durationMin: number;
+  halvesFormat?: string; // e.g. "2x45"
+  gameFormat?: string; // e.g. "11v11"
   isHome?: IsHome;
-  meetingPoint?: string;
+  meetingPoint?: string; // free address (away matches)
+  meetingTime?: string; // HH:mm (away matches)
   opponent?: string;
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
