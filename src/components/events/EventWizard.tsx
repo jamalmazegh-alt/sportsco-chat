@@ -46,7 +46,7 @@ import {
   draftHasProgress,
 } from "./event-wizard-draft";
 
-type Team = { id: string; name: string; sport?: string | null };
+type Team = { id: string; name: string; sport?: string | null; competitions?: string[] | null };
 
 interface Props {
   teams: Team[];
@@ -54,6 +54,8 @@ interface Props {
   onCreated: (eventId?: string) => void;
   /** Hand-off to EventFormSheet pre-filled with current answers. */
   onOpenExpert: (initial: Record<string, unknown>) => void;
+  /** Optional initial state — restores prior wizard answers (e.g. coming back from expert). */
+  initialState?: EventWizardState;
 }
 
 type Step =
