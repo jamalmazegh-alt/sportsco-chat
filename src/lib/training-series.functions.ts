@@ -6,6 +6,7 @@ import {
   type SeriesSlotInput,
   type ExcludedRange,
 } from "./training-series-generator";
+import { buildEventPayload } from "./events/event-payload";
 
 const SlotSchema = z.object({
   weekday: z.number().int().min(0).max(6),
@@ -17,12 +18,15 @@ const SlotSchema = z.object({
 
 const CreateInputSchema = z.object({
   teamId: z.string().uuid(),
+  // Series cover recurring trainings and "other" recurring events (see brief).
+  type: z.enum(["training", "other"]).default("training"),
   title: z.string().min(1).max(255),
   description: z.string().max(2000).nullable().optional(),
   location: z.string().max(255).nullable().optional(),
   startsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   endsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   isOfficial: z.boolean().default(true),
+  carpoolEnabled: z.boolean().nullable().optional(),
   slots: z.array(SlotSchema).min(1).max(14),
   excludedDates: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(366).default([]),
   excludedRanges: z
@@ -104,34 +108,42 @@ export const createTrainingSeries = createServerFn({ method: "POST" })
     const eventsPayload = occurrences
       .filter((o) => !conflictSet.has(o.startISO))
       .map((o) => ({
-        team_id: data.teamId,
-        type: "training" as const,
-        title: data.title,
-        description: data.description ?? null,
-        location: o.location,
-        starts_at: o.startISO,
-        ends_at: o.endISO,
-        convocation_time: o.meetingISO,
+        // Single source of truth: each child is built like any other event.
+        ...buildEventPayload({
+          teamId: data.teamId,
+          type: data.type,
+          title: data.title,
+          description: data.description ?? null,
+          location: o.location,
+          startsAt: o.startISO,
+          endsAt: o.endISO,
+          convocationTime: o.meetingISO,
+          isOfficial: data.isOfficial,
+          carpoolEnabled: data.carpoolEnabled ?? undefined,
+          seriesId: series.id,
+        }),
         status: "published" as const,
         created_by: userId,
-        is_official: data.isOfficial,
-        series_id: series.id,
         series_slot_id: slotIdByPosition.get(o.slotIndex) ?? null,
         convocations_sent: false,
       }));
 
     let createdCount = 0;
+    let firstEventId: string | null = null;
     if (eventsPayload.length > 0) {
       const { data: inserted, error: eErr } = await supabase
         .from("events")
-        .insert(eventsPayload)
-        .select("id");
+        .insert(eventsPayload as never)
+        .select("id, starts_at")
+        .order("starts_at", { ascending: true });
       if (eErr) throw new Error(eErr.message);
       createdCount = inserted?.length ?? 0;
+      firstEventId = (inserted?.[0]?.id as string | undefined) ?? null;
     }
 
     return {
       seriesId: series.id,
+      firstEventId,
       createdCount,
       skippedConflicts: conflictSet.size,
       totalPlanned: occurrences.length,

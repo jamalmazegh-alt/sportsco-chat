@@ -779,7 +779,14 @@ function EventDetail() {
     const preselectIds = search.preselect
       ? search.preselect.split(",").filter(Boolean)
       : undefined;
-    openPicker(preselectIds ? { preselectIds } : undefined);
+    if (preselectIds) {
+      openPicker({ preselectIds });
+    } else if (search.action === "all") {
+      // Convocation scope "all" → pre-check the whole team.
+      openPicker({ preselectAll: true });
+    } else {
+      openPicker();
+    }
     navigate({
       to: "/events/$eventId",
       params: { eventId },
@@ -787,7 +794,7 @@ function EventDetail() {
       replace: true,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search.send, search.preselect, isCoach, event, teamPlayers, autoSendConsumed]);
+  }, [search.send, search.preselect, search.action, isCoach, event, teamPlayers, autoSendConsumed]);
 
   async function sendConvocations() {
     if (!event || !user) return;

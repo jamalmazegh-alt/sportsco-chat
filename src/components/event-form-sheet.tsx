@@ -26,6 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { getGoogleMapsKey } from "@/lib/maps.functions";
 import { useNavigate } from "@tanstack/react-router";
 import { RecurringTrainingPlanner } from "@/components/recurring-training-planner";
+import { buildEventPayload, type EventAttachment } from "@/lib/events/event-payload";
 
 let cachedMapsKeyPromise: Promise<string | null> | null = null;
 function fetchGoogleMapsKey(): Promise<string | null> {
@@ -62,7 +63,7 @@ type GoogleAutocompleteService = {
   ) => void;
 };
 
-export type EventType = "training" | "match" | "tournament" | "meeting";
+export type EventType = "training" | "match" | "tournament" | "meeting" | "other";
 export type CompetitionType = "friendly" | "championship" | "cup";
 
 export type EventFormValues = {
@@ -516,24 +517,24 @@ export function EventFormSheet({
         ? combineDateTime(startDate, convocTime)
         : combineDateTime(convocDate ?? startDate, convocTime);
 
-    const payload = {
-      team_id: teamId,
+    const payload = buildEventPayload({
+      teamId,
       type,
       title: finalTitle,
       description: description || null,
       location: location || null,
-      location_url: finalLocationUrl,
-      opponent: type === "match" ? opponent || null : null,
-      competition_type: type === "match" ? competitionType : null,
-      competition_name: type === "match" ? competitionName || null : null,
-      is_home: type === "match" ? isHome === "home" : null,
-      meeting_point: type === "match" && isHome === "away" ? meetingPoint || null : null,
-      starts_at: startsIso,
-      ends_at: type === "training" ? combineDateTime(startDate, endTime) : null,
-      convocation_time: eventConvocationTime,
-      attachments: attachments as unknown as never,
-      is_official: type === "match" ? true : type === "tournament" ? isOfficial : false,
-    };
+      locationUrl: finalLocationUrl,
+      opponent,
+      competitionType,
+      competitionName: competitionName || null,
+      isHome: isHome === "home",
+      meetingPoint: meetingPoint || null,
+      startsAt: startsIso,
+      endsAt: type === "training" ? combineDateTime(startDate, endTime) : null,
+      convocationTime: eventConvocationTime,
+      isOfficial: type === "tournament" ? isOfficial : false,
+      attachments: attachments as unknown as EventAttachment[],
+    });
 
     if (mode === "create") {
       const shouldRepeat = type === "training" && repeatWeeks > 1;
@@ -570,7 +571,7 @@ export function EventFormSheet({
         }
         const { data, error } = await supabase
           .from("events")
-          .insert(toInsert.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })))
+          .insert(toInsert.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })) as never)
           .select("id");
         setBusy(false);
         if (error || !data || data.length === 0) {
@@ -601,7 +602,7 @@ export function EventFormSheet({
       }
       const { data, error } = await supabase
         .from("events")
-        .insert({ ...payload, status: "published", created_by: userId, convocations_sent: false })
+        .insert({ ...payload, status: "published", created_by: userId, convocations_sent: false } as never)
         .select("id")
         .single();
       setBusy(false);
@@ -616,7 +617,7 @@ export function EventFormSheet({
         navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
       }
     } else {
-      const { error } = await supabase.from("events").update(payload).eq("id", initial!.id!);
+      const { error } = await supabase.from("events").update(payload as never).eq("id", initial!.id!);
       setBusy(false);
       if (error) {
         toast.error(error.message);
@@ -659,7 +660,7 @@ export function EventFormSheet({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(["training", "match", "tournament", "meeting"] as const).map((k) => (
+                {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
                   <SelectItem key={k} value={k}>
                     {t(`events.types.${k}`)}
                   </SelectItem>

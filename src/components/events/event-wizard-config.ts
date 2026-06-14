@@ -8,6 +8,12 @@
  *   - a training-series payload (consumed by createTrainingSeries)
  */
 
+import {
+  buildEventPayload,
+  type BuildEventPayloadInput,
+  type EventRowPayload,
+} from "@/lib/events/event-payload";
+
 export type WizardEventType = "training" | "match" | "meeting" | "other";
 export type IsHome = "home" | "away";
 export type ConvocScope = "all" | "selection" | "none";
@@ -131,59 +137,58 @@ export function countOccurrences(
 }
 
 /**
- * Map wizard state to an event insert payload (same shape as EventFormSheet).
+ * Map wizard state to the shared builder input (single source of truth).
  * Returns null if mandatory fields are missing.
  */
-export function toEventInsert(
+export function toEventPayloadInput(
   state: EventWizardState,
-  userId: string,
   title: string,
-): null | Record<string, unknown> {
+): BuildEventPayloadInput | null {
   if (!state.type || !state.teamId || !state.startDate) return null;
   const startsIso = toIso(state.startDate, state.startTime);
   if (!startsIso) return null;
   const endsIso = addMinutesIso(startsIso, state.durationMin);
 
-  const finalLocationUrl = state.locationUrl?.trim()
-    ? state.locationUrl.trim()
-    : state.location?.trim()
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(state.location.trim())}`
-      : null;
-
-  const isMatch = state.type === "match";
-
   return {
-    team_id: state.teamId,
-    type: state.type === "other" ? "training" : state.type, // 'other' falls back to training type for now
+    teamId: state.teamId,
+    type: state.type, // 'other' stays 'other' — the enum supports it.
     title,
     description: null,
     location: state.location ?? null,
-    location_url: finalLocationUrl,
-    opponent: isMatch ? state.opponent ?? null : null,
-    competition_type: isMatch ? state.competitionType ?? "friendly" : null,
-    competition_name: null,
-    is_home: isMatch ? state.isHome === "home" : null,
-    meeting_point: isMatch && state.isHome === "away" ? state.meetingPoint ?? null : null,
-    starts_at: startsIso,
-    ends_at: state.type === "training" ? endsIso : isMatch ? endsIso : endsIso,
-    convocation_time: null,
-    status: "published",
-    created_by: userId,
-    convocations_sent: false,
-    is_official: isMatch ? true : Boolean(state.isOfficial),
+    locationUrl: state.locationUrl ?? null,
+    opponent: state.opponent ?? null,
+    competitionType: state.competitionType ?? null,
+    competitionName: null,
+    isHome: state.type === "match" ? state.isHome === "home" : null,
+    meetingPoint: state.meetingPoint ?? null,
+    startsAt: startsIso,
+    endsAt: endsIso,
+    convocationTime: null,
+    isOfficial: state.isOfficial,
+    carpoolEnabled: typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : undefined,
   };
 }
 
 /**
+ * Map wizard state to an event row payload via the shared builder.
+ * Returns null if mandatory fields are missing.
+ */
+export function toEventInsert(state: EventWizardState, title: string): null | EventRowPayload {
+  const input = toEventPayloadInput(state, title);
+  if (!input) return null;
+  return buildEventPayload(input);
+}
+
+/**
  * Build a partial EventFormValues shape for prefilling EventFormSheet
- * (the "Réglages détaillés" path).
+ * (the "Réglages détaillés" path). 'other' stays 'other'.
  */
 export function toEventFormInitial(state: EventWizardState, title: string): Record<string, unknown> {
   const startsIso = toIso(state.startDate, state.startTime);
   const endsIso = addMinutesIso(startsIso, state.durationMin);
   return {
     team_id: state.teamId || "",
-    type: state.type === "other" ? "training" : state.type || "training",
+    type: state.type || "training",
     title,
     description: null,
     location: state.location ?? null,
