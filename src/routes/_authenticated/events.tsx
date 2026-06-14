@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar, Plus, Users, Trophy, Dumbbell, BellRing, Home, Plane, List, CalendarDays, Ban, Eye, EyeOff, Clock } from "lucide-react";
-import { EventFormSheet } from "@/components/event-form-sheet";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { cn } from "@/lib/utils";
