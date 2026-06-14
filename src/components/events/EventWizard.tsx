@@ -46,7 +46,7 @@ import {
   draftHasProgress,
 } from "./event-wizard-draft";
 
-type Team = { id: string; name: string; sport?: string | null; competitions?: string[] | null };
+type Team = { id: string; name: string; sport?: string | null; championship?: string | null; competitions?: string[] | null };
 
 interface Props {
   teams: Team[];
@@ -902,8 +902,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 markTouched("official");
                 patch("isOfficial", true);
                 patch("competitionType", "championship");
-                // Pre-fill competition name from team config if available and empty
-                const fromTeam = (selectedTeam?.competitions ?? [])[0];
+                // Pre-fill competition name from team championship if available and empty
+                const fromTeam = selectedTeam?.championship;
                 if (!state.competitionName && fromTeam) patch("competitionName", fromTeam);
               }}
             />
