@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,7 @@ import {
   draftHasProgress,
 } from "./event-wizard-draft";
 
-type Team = { id: string; name: string };
+type Team = { id: string; name: string; sport?: string | null };
 
 interface Props {
   teams: Team[];
@@ -65,12 +66,71 @@ type Step =
   | "series"
   | "homeaway"
   | "meetingpoint"
+  | "meetingtime"
   | "opponent"
   | "official"
   | "location"
   | "convocation"
   | "carpool"
+  | "comment"
   | "summary";
+
+// Per-sport halves & game-format presets. "manual" = custom text input.
+function getHalvesPresets(sport: string | null | undefined): string[] {
+  switch (sport) {
+    case "football":
+    case "futsal":
+      return ["1x60", "2x30", "2x35", "2x40", "2x45"];
+    case "rugby":
+      return ["2x30", "2x35", "2x40"];
+    case "handball":
+      return ["2x20", "2x25", "2x30"];
+    case "basketball":
+      return ["4x8", "4x10", "4x12"];
+    case "ice_hockey":
+      return ["3x15", "3x20"];
+    case "field_hockey":
+      return ["4x15", "2x30", "2x35"];
+    case "volleyball":
+    case "tennis":
+    case "padel":
+      return ["best-of-3", "best-of-5"];
+    default:
+      return ["1x60", "2x30", "2x40", "2x45"];
+  }
+}
+
+function getGameFormatPresets(sport: string | null | undefined): string[] {
+  switch (sport) {
+    case "football":
+      return ["3v3", "5v5", "7v7", "8v8", "9v9", "11v11"];
+    case "futsal":
+      return ["5v5"];
+    case "rugby":
+      return ["7v7", "10v10", "13v13", "15v15"];
+    case "handball":
+      return ["7v7"];
+    case "basketball":
+      return ["3v3", "5v5"];
+    case "volleyball":
+      return ["6v6"];
+    case "ice_hockey":
+      return ["5v5"];
+    case "field_hockey":
+      return ["7v7", "11v11"];
+    case "tennis":
+    case "padel":
+      return ["1v1", "2v2"];
+    default:
+      return ["5v5", "7v7", "11v11"];
+  }
+}
+
+function halvesToMinutes(label: string): number | null {
+  const m = /^(\d+)x(\d+)$/.exec(label);
+  if (!m) return null;
+  return parseInt(m[1], 10) * parseInt(m[2], 10);
+}
 
 export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) {
   const { t, i18n } = useTranslation();
