@@ -642,6 +642,17 @@ export function EventFormSheet({
       title={mode === "create" ? t("events.create") : t("common.edit")}
     >
       <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-8">
+          {onBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 -ml-2"
+              onClick={onBack}
+            >
+              ← {backLabel ?? t("common.back", { defaultValue: "Retour" })}
+            </Button>
+          )}
           <div className="space-y-1.5">
             <Label>{t("events.selectTeam")}</Label>
             <Select value={teamId} onValueChange={setTeamId} required>
