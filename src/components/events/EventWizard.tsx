@@ -134,7 +134,7 @@ function halvesToMinutes(label: string): number | null {
   return parseInt(m[1], 10) * parseInt(m[2], 10);
 }
 
-export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) {
+export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialState }: Props) {
   const { t, i18n } = useTranslation();
   const dateLocale = i18n.language?.startsWith("fr") ? frLocale : enUS;
   const qc = useQueryClient();
@@ -142,7 +142,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
   const createSeriesFn = useServerFn(createTrainingSeries);
   const createEventFn = useServerFn(createEvent);
 
-  const [state, setState] = useState<EventWizardState>(() => defaultState());
+  const [state, setState] = useState<EventWizardState>(() => initialState ?? defaultState());
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
