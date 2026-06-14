@@ -151,22 +151,33 @@ export function toEventPayloadInput(
   const startsIso = toIso(state.startDate, state.startTime);
   if (!startsIso) return null;
   const endsIso = addMinutesIso(startsIso, state.durationMin);
+  const isMatch = state.type === "match";
+  const isHomeMatch = isMatch && state.isHome === "home";
+  const isAwayMatch = isMatch && state.isHome === "away";
+
+  // Append game format to description when set
+  const desc = state.gameFormat ? `Format: ${state.gameFormat}` : null;
+
+  // Convocation time = startDate + meetingTime (away matches)
+  const convocIso = isAwayMatch && state.meetingTime
+    ? toIso(state.startDate, state.meetingTime)
+    : null;
 
   return {
     teamId: state.teamId,
-    type: state.type, // 'other' stays 'other' — the enum supports it.
+    type: state.type,
     title,
-    description: null,
-    location: state.location ?? null,
+    description: desc,
+    location: isHomeMatch ? null : state.location ?? null,
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
     competitionName: null,
-    isHome: state.type === "match" ? state.isHome === "home" : null,
-    meetingPoint: state.meetingPoint ?? null,
+    isHome: isMatch ? state.isHome === "home" : null,
+    meetingPoint: isAwayMatch ? state.meetingPoint ?? null : null,
     startsAt: startsIso,
     endsAt: endsIso,
-    convocationTime: null,
+    convocationTime: convocIso,
     isOfficial: state.isOfficial,
     carpoolEnabled: typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : undefined,
   };
