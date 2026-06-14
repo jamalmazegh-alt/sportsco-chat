@@ -21,7 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { TimePicker } from "@/components/time-picker";
+import { TimePicker } from "@/components/ui/time-picker";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
