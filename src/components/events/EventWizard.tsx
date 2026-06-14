@@ -882,25 +882,62 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "official" && (
-          <StepQuestion title={t("eventWizard.q.official", { defaultValue: "Officiel ou amical ?" })}>
-            <DoorButton
-              icon="🏆"
-              label={t("eventWizard.officialYes", { defaultValue: "Officiel" })}
-              active={state.competitionType === "championship"}
-              onClick={() => {
-                patch("isOfficial", true);
-                answer("competitionType", "championship");
-              }}
-            />
+          <StepQuestion title={t("eventWizard.q.official", { defaultValue: "Type de match ?" })}>
             <DoorButton
               icon="🤝"
               label={t("eventWizard.officialNo", { defaultValue: "Amical" })}
               active={state.competitionType === "friendly"}
               onClick={() => {
+                markTouched("official");
                 patch("isOfficial", false);
-                answer("competitionType", "friendly");
+                patch("competitionType", "friendly");
+                patch("competitionName", undefined);
               }}
             />
+            <DoorButton
+              icon="🏆"
+              label={t("eventWizard.officialChampionship", { defaultValue: "Championnat" })}
+              active={state.competitionType === "championship"}
+              onClick={() => {
+                markTouched("official");
+                patch("isOfficial", true);
+                patch("competitionType", "championship");
+                // Pre-fill competition name from team config if available and empty
+                const fromTeam = (selectedTeam?.competitions ?? [])[0];
+                if (!state.competitionName && fromTeam) patch("competitionName", fromTeam);
+              }}
+            />
+            <DoorButton
+              icon="🥇"
+              label={t("eventWizard.officialCup", { defaultValue: "Coupe" })}
+              active={state.competitionType === "cup"}
+              onClick={() => {
+                markTouched("official");
+                patch("isOfficial", true);
+                patch("competitionType", "cup");
+              }}
+            />
+            {(state.competitionType === "championship" || state.competitionType === "cup") && (
+              <div className="mt-2 space-y-1.5">
+                <Label className="text-xs">
+                  {t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}
+                </Label>
+                <Input
+                  value={state.competitionName ?? ""}
+                  onChange={(e) => patch("competitionName", e.target.value)}
+                  placeholder={t("eventWizard.competitionNamePlaceholder", {
+                    defaultValue: "Ex: U15 D2, Coupe régionale…",
+                  })}
+                />
+              </div>
+            )}
+            <Button
+              className="w-full mt-2"
+              disabled={!state.competitionType}
+              onClick={() => go(1)}
+            >
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
           </StepQuestion>
         )}
 
