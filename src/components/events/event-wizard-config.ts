@@ -41,17 +41,20 @@ export interface EventWizardState {
   gameFormat?: string; // e.g. "11v11"
   isHome?: IsHome;
   meetingPoint?: string; // free address (away matches)
-  meetingTime?: string; // HH:mm (away matches)
+  meetingTime?: string; // HH:mm (away matches OR training convocation time)
   opponent?: string;
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
   location?: string;
   locationUrl?: string | null;
+  description?: string; // free comment added by the user
   convocScope: ConvocScope;
   carpoolEnabled?: boolean;
   recurrence?: RecurrenceState;
   // book-keeping
   step: number;
+  /** Tracks which steps the user has explicitly answered (visual hint). */
+  touched?: string[];
 }
 
 export function defaultState(): EventWizardState {
@@ -155,11 +158,16 @@ export function toEventPayloadInput(
   const isHomeMatch = isMatch && state.isHome === "home";
   const isAwayMatch = isMatch && state.isHome === "away";
 
-  // Append game format to description when set
-  const desc = state.gameFormat ? `Format: ${state.gameFormat}` : null;
+  // Combine game format + user comment into description
+  const descParts: string[] = [];
+  if (state.gameFormat) descParts.push(`Format: ${state.gameFormat}`);
+  if (state.description?.trim()) descParts.push(state.description.trim());
+  const desc = descParts.length ? descParts.join("\n") : null;
 
-  // Convocation time = startDate + meetingTime (away matches)
-  const convocIso = isAwayMatch && state.meetingTime
+  // Convocation time = startDate + meetingTime
+  // - Away matches: meeting point + meeting time
+  // - Training/other: meeting time is "be there at" hour
+  const convocIso = state.meetingTime
     ? toIso(state.startDate, state.meetingTime)
     : null;
 
@@ -200,11 +208,14 @@ export function toEventInsert(state: EventWizardState, title: string): null | Ev
 export function toEventFormInitial(state: EventWizardState, title: string): Record<string, unknown> {
   const startsIso = toIso(state.startDate, state.startTime);
   const endsIso = addMinutesIso(startsIso, state.durationMin);
+  const descParts: string[] = [];
+  if (state.gameFormat) descParts.push(`Format: ${state.gameFormat}`);
+  if (state.description?.trim()) descParts.push(state.description.trim());
   return {
     team_id: state.teamId || "",
     type: state.type || "training",
     title,
-    description: state.gameFormat ? `Format: ${state.gameFormat}` : null,
+    description: descParts.length ? descParts.join("\n") : null,
     location: state.type === "match" && state.isHome === "home" ? null : state.location ?? null,
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
@@ -214,10 +225,7 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
     meeting_point: state.type === "match" && state.isHome === "away" ? state.meetingPoint ?? null : null,
     starts_at: startsIso ?? "",
     ends_at: endsIso,
-    convocation_time:
-      state.type === "match" && state.isHome === "away" && state.meetingTime
-        ? toIso(state.startDate, state.meetingTime)
-        : null,
+    convocation_time: state.meetingTime ? toIso(state.startDate, state.meetingTime) : null,
     is_official: state.type === "match" ? true : Boolean(state.isOfficial),
   };
 }

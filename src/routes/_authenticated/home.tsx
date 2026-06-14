@@ -70,7 +70,7 @@ function HomePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("teams")
-        .select("id, name, competitions")
+        .select("id, name, sport, competitions")
         .eq("club_id", activeClubId!)
         .is("deleted_at", null)
         .order("name");

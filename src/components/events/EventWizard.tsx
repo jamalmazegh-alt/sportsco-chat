@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,7 @@ import {
   draftHasProgress,
 } from "./event-wizard-draft";
 
-type Team = { id: string; name: string };
+type Team = { id: string; name: string; sport?: string | null };
 
 interface Props {
   teams: Team[];
@@ -65,12 +66,71 @@ type Step =
   | "series"
   | "homeaway"
   | "meetingpoint"
+  | "meetingtime"
   | "opponent"
   | "official"
   | "location"
   | "convocation"
   | "carpool"
+  | "comment"
   | "summary";
+
+// Per-sport halves & game-format presets. "manual" = custom text input.
+function getHalvesPresets(sport: string | null | undefined): string[] {
+  switch (sport) {
+    case "football":
+    case "futsal":
+      return ["1x60", "2x30", "2x35", "2x40", "2x45"];
+    case "rugby":
+      return ["2x30", "2x35", "2x40"];
+    case "handball":
+      return ["2x20", "2x25", "2x30"];
+    case "basketball":
+      return ["4x8", "4x10", "4x12"];
+    case "ice_hockey":
+      return ["3x15", "3x20"];
+    case "field_hockey":
+      return ["4x15", "2x30", "2x35"];
+    case "volleyball":
+    case "tennis":
+    case "padel":
+      return ["best-of-3", "best-of-5"];
+    default:
+      return ["1x60", "2x30", "2x40", "2x45"];
+  }
+}
+
+function getGameFormatPresets(sport: string | null | undefined): string[] {
+  switch (sport) {
+    case "football":
+      return ["3v3", "5v5", "7v7", "8v8", "9v9", "11v11"];
+    case "futsal":
+      return ["5v5"];
+    case "rugby":
+      return ["7v7", "10v10", "13v13", "15v15"];
+    case "handball":
+      return ["7v7"];
+    case "basketball":
+      return ["3v3", "5v5"];
+    case "volleyball":
+      return ["6v6"];
+    case "ice_hockey":
+      return ["5v5"];
+    case "field_hockey":
+      return ["7v7", "11v11"];
+    case "tennis":
+    case "padel":
+      return ["1v1", "2v2"];
+    default:
+      return ["5v5", "7v7", "11v11"];
+  }
+}
+
+function halvesToMinutes(label: string): number | null {
+  const m = /^(\d+)x(\d+)$/.exec(label);
+  if (!m) return null;
+  return parseInt(m[1], 10) * parseInt(m[2], 10);
+}
 
 export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) {
   const { t, i18n } = useTranslation();
@@ -83,7 +143,19 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
   const [state, setState] = useState<EventWizardState>(() => defaultState());
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
+  const [touched, setTouched] = useState<Set<string>>(() => new Set());
   const screenRef = useRef<HTMLDivElement>(null);
+  function markTouched(k: string) {
+    setTouched((s) => {
+      if (s.has(k)) return s;
+      const n = new Set(s);
+      n.add(k);
+      return n;
+    });
+  }
+  function isAnswered(k: string) {
+    return touched.has(k);
+  }
 
   // Load draft once on mount
   useEffect(() => {
@@ -107,22 +179,32 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     const s: Step[] = ["type", "team"];
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
+    const isRecurring =
+      (state.type === "training" || state.type === "other") &&
+      !!state.recurrence &&
+      state.recurrence.mode !== "single";
     s.push("when");
     if (state.type === "match") {
       s.push("halves", "gameformat", "homeaway");
       if (state.isHome === "away") s.push("meetingpoint");
       s.push("opponent", "official");
-    } else {
+    } else if (!isRecurring) {
       s.push("duration");
     }
-    // No location step for matches (home: implicit; away: address captured in meetingpoint step)
-    if (state.type !== "match") s.push("location");
-    s.push("convocation");
-    if (state.type === "match" && state.isHome === "away") s.push("carpool");
-    if (state.type === "training") s.push("carpool");
+    if (state.type === "training" && !isRecurring) {
+      s.push("meetingtime");
+    }
+    // Recurring trainings: only day + time + duration, no extra steps.
+    if (!isRecurring) {
+      if (state.type !== "match") s.push("location");
+      s.push("convocation");
+      if (state.type === "match" && state.isHome === "away") s.push("carpool");
+      if (state.type === "training") s.push("carpool");
+      s.push("comment");
+    }
     s.push("summary");
     return s;
-  }, [state.type, state.isHome]);
+  }, [state.type, state.isHome, state.recurrence]);
 
   const current: Step = steps[Math.min(state.step, steps.length - 1)] ?? "type";
 
@@ -182,13 +264,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     }));
   }
 
-  function toggleWeekday(wd: number) {
-    setState((s) => {
-      const cur = s.recurrence?.weekdays ?? [];
-      const next = cur.includes(wd) ? cur.filter((w) => w !== wd) : [...cur, wd].sort();
-      return { ...s, recurrence: { ...(s.recurrence ?? { mode: "weekly_multi", weekdays: next }), weekdays: next } };
-    });
-  }
+
+
 
   // A series is offered (and honored) for recurring trainings AND "other" events.
   const seriesEligible = state.type === "training" || state.type === "other";
@@ -291,14 +368,16 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     duration: t("eventWizard.hint.duration", { defaultValue: "Combien de temps ?" }),
     halves: t("eventWizard.hint.halves", { defaultValue: "Format du temps de jeu." }),
     gameformat: t("eventWizard.hint.gameformat", { defaultValue: "Combien de joueurs sur le terrain ?" }),
-    series: t("eventWizard.hint.series", { defaultValue: "Unique ou toute la saison ?" }),
+    series: t("eventWizard.hint.series", { defaultValue: "Unique ou récurrent ?" }),
     homeaway: t("eventWizard.hint.homeaway", { defaultValue: "À domicile ou en déplacement ?" }),
     meetingpoint: t("eventWizard.hint.meetingpoint", { defaultValue: "Adresse et heure de rendez-vous." }),
+    meetingtime: t("eventWizard.hint.meetingtime", { defaultValue: "À quelle heure les joueurs doivent-ils se présenter ?" }),
     opponent: t("eventWizard.hint.opponent", { defaultValue: "L'adversaire." }),
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
     convocation: t("eventWizard.hint.convocation", { defaultValue: "À qui on envoie ?" }),
     carpool: t("eventWizard.hint.carpool", { defaultValue: "Activer le covoiturage ?" }),
+    comment: t("eventWizard.hint.comment", { defaultValue: "Un commentaire à ajouter ? (facultatif)" }),
     summary: t("eventWizard.hint.summary", { defaultValue: "Tout est prêt." }),
   };
 
@@ -474,32 +553,40 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
         {current === "duration" && (
           <StepQuestion title={t("eventWizard.q.duration", { defaultValue: "Durée ?" })}>
             <div className="grid grid-cols-3 gap-2">
-              {[60, 90, 105, 120, 150, 180].map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => answer("durationMin", m)}
-                  className={cn(
-                    "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
-                    state.durationMin === m
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-card hover:bg-muted/40",
-                  )}
-                >
-                  {m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? m % 60 : ""}` : `${m} min`}
-                </button>
-              ))}
+              {[60, 90, 105, 120, 150, 180].map((m) => {
+                const selected = state.durationMin === m;
+                const pre = selected && !isAnswered("duration");
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => {
+                      markTouched("duration");
+                      setState((s) => ({ ...s, durationMin: m, step: s.step + 1 }));
+                    }}
+                    className={cn(
+                      "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
+                      selected && !pre
+                        ? "border-primary bg-primary/10 text-primary"
+                        : pre
+                          ? "border-border bg-card text-muted-foreground/60"
+                          : "border-border bg-card hover:bg-muted/40",
+                    )}
+                  >
+                    {m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? m % 60 : ""}` : `${m} min`}
+                  </button>
+                );
+              })}
             </div>
           </StepQuestion>
         )}
 
         {current === "series" && (
-          <StepQuestion title={t("eventWizard.q.series", { defaultValue: "Cet entraînement fait-il partie d'une série ?" })}>
+          <StepQuestion title={t("eventWizard.q.series", { defaultValue: "Cet entraînement est-il récurrent ?" })}>
             {(
               [
                 ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
-                ["weekly_one", t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines (1 jour)" })],
-                ["weekly_multi", t("eventWizard.series.weeklyMulti", { defaultValue: "Plusieurs jours / semaine" })],
+                ["weekly_one", t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" })],
               ] as const
             ).map(([m, l]) => (
               <DoorButton
@@ -514,17 +601,22 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
               <div className="mt-3 space-y-3 rounded-xl border border-border bg-card p-3">
                 <div>
                   <Label className="text-xs">
-                    {t("eventWizard.series.daysOfWeek", { defaultValue: "Jours de la semaine" })}
+                    {t("eventWizard.series.dayOfWeek", { defaultValue: "Jour de la semaine" })}
                   </Label>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {[1, 2, 3, 4, 5, 6, 0].map((wd) => (
                       <button
                         key={wd}
                         type="button"
-                        onClick={() => toggleWeekday(wd)}
+                        onClick={() =>
+                          setState((s) => ({
+                            ...s,
+                            recurrence: { ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }), weekdays: [wd] },
+                          }))
+                        }
                         className={cn(
                           "h-9 w-10 rounded-md border text-xs font-semibold",
-                          recurrence.weekdays.includes(wd)
+                          recurrence.weekdays[0] === wd
                             ? "border-primary bg-primary text-primary-foreground"
                             : "border-border bg-background",
                         )}
@@ -534,6 +626,30 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
                         })}
                       </button>
                     ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label className="text-xs">
+                      {t("eventWizard.series.time", { defaultValue: "Heure" })}
+                    </Label>
+                    <TimePicker value={state.startTime} onChange={(v: string) => patch("startTime", v)} className="w-full" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">
+                      {t("eventWizard.q.duration", { defaultValue: "Durée" })}
+                    </Label>
+                    <select
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      value={state.durationMin}
+                      onChange={(e) => patch("durationMin", parseInt(e.target.value, 10))}
+                    >
+                      {[60, 75, 90, 105, 120].map((m) => (
+                        <option key={m} value={m}>
+                          {`${Math.floor(m / 60)}h${m % 60 ? m % 60 : ""}`}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -592,37 +708,54 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
         {current === "halves" && (
           <StepQuestion title={t("eventWizard.q.halves", { defaultValue: "Format du match ?" })}>
             <div className="grid grid-cols-3 gap-2">
-              {(
-                [
-                  ["1x60", 60],
-                  ["2x30", 60],
-                  ["2x35", 70],
-                  ["2x40", 80],
-                  ["2x45", 90],
-                  ["2x50", 100],
-                ] as const
-              ).map(([label, mins]) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => {
-                    setState((s) => ({
-                      ...s,
-                      halvesFormat: label,
-                      durationMin: mins,
-                      step: s.step + 1,
-                    }));
-                  }}
-                  className={cn(
-                    "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
-                    state.halvesFormat === label
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-card hover:bg-muted/40",
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
+              {getHalvesPresets(selectedTeam?.sport).map((label) => {
+                const selected = state.halvesFormat === label;
+                const pre = selected && !isAnswered("halves");
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => {
+                      markTouched("halves");
+                      const mins = halvesToMinutes(label) ?? state.durationMin;
+                      setState((s) => ({ ...s, halvesFormat: label, durationMin: mins, step: s.step + 1 }));
+                    }}
+                    className={cn(
+                      "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
+                      selected && !pre
+                        ? "border-primary bg-primary/10 text-primary"
+                        : pre
+                          ? "border-border bg-card text-muted-foreground/60"
+                          : "border-border bg-card hover:bg-muted/40",
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-3">
+              <Label className="text-xs">
+                {t("eventWizard.halvesManual", { defaultValue: "Autre format (ex. 3x30)" })}
+              </Label>
+              <Input
+                placeholder="3x30"
+                value={
+                  state.halvesFormat && !getHalvesPresets(selectedTeam?.sport).includes(state.halvesFormat)
+                    ? state.halvesFormat
+                    : ""
+                }
+                onChange={(e) => {
+                  markTouched("halves");
+                  const v = e.target.value.trim();
+                  const mins = halvesToMinutes(v);
+                  setState((s) => ({
+                    ...s,
+                    halvesFormat: v || undefined,
+                    ...(mins ? { durationMin: mins } : {}),
+                  }));
+                }}
+              />
             </div>
             <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => go(1)}>
               {t("eventWizard.skip", { defaultValue: "Passer" })}
@@ -633,21 +766,47 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
         {current === "gameformat" && (
           <StepQuestion title={t("eventWizard.q.gameformat", { defaultValue: "Format de jeu ?" })}>
             <div className="grid grid-cols-3 gap-2">
-              {["3v3", "5v5", "7v7", "8v8", "9v9", "11v11"].map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => answer("gameFormat", g)}
-                  className={cn(
-                    "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
-                    state.gameFormat === g
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-card hover:bg-muted/40",
-                  )}
-                >
-                  {g}
-                </button>
-              ))}
+              {getGameFormatPresets(selectedTeam?.sport).map((g) => {
+                const selected = state.gameFormat === g;
+                const pre = selected && !isAnswered("gameformat");
+                return (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => {
+                      markTouched("gameformat");
+                      answer("gameFormat", g);
+                    }}
+                    className={cn(
+                      "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
+                      selected && !pre
+                        ? "border-primary bg-primary/10 text-primary"
+                        : pre
+                          ? "border-border bg-card text-muted-foreground/60"
+                          : "border-border bg-card hover:bg-muted/40",
+                    )}
+                  >
+                    {g}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-3">
+              <Label className="text-xs">
+                {t("eventWizard.gameformatManual", { defaultValue: "Autre format" })}
+              </Label>
+              <Input
+                placeholder="6v6"
+                value={
+                  state.gameFormat && !getGameFormatPresets(selectedTeam?.sport).includes(state.gameFormat)
+                    ? state.gameFormat
+                    : ""
+                }
+                onChange={(e) => {
+                  markTouched("gameformat");
+                  patch("gameFormat", e.target.value.trim() || undefined);
+                }}
+              />
             </div>
             <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => go(1)}>
               {t("eventWizard.skip", { defaultValue: "Passer" })}
@@ -660,10 +819,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
             <Label className="text-xs">
               {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
             </Label>
-            <Input
-              autoFocus
+            <LocationAutocomplete
               value={state.meetingPoint ?? ""}
-              onChange={(e) => patch("meetingPoint", e.target.value)}
+              onChange={(v) => patch("meetingPoint", v)}
               placeholder={t("eventWizard.meeting.addressPlaceholder", {
                 defaultValue: "Adresse du point de rendez-vous",
               })}
@@ -682,6 +840,27 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
               onClick={() => go(1)}
             >
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
+        {current === "meetingtime" && (
+          <StepQuestion title={t("eventWizard.q.meetingtime", { defaultValue: "Heure de rendez-vous ?" })}>
+            <p className="text-xs text-muted-foreground">
+              {t("eventWizard.meetingtimeHint", {
+                defaultValue: "À quelle heure les joueurs doivent-ils se présenter ? (facultatif)",
+              })}
+            </p>
+            <TimePicker
+              value={state.meetingTime ?? ""}
+              onChange={(v: string) => patch("meetingTime", v)}
+              className="w-full"
+            />
+            <Button className="w-full mt-2" onClick={() => go(1)}>
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+            <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => { patch("meetingTime", undefined); go(1); }}>
+              {t("eventWizard.skip", { defaultValue: "Passer" })}
             </Button>
           </StepQuestion>
         )}
@@ -762,6 +941,26 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
           </StepQuestion>
         )}
 
+        {current === "comment" && (
+          <StepQuestion title={t("eventWizard.q.comment", { defaultValue: "Un commentaire à ajouter ?" })}>
+            <p className="text-xs text-muted-foreground">
+              {t("eventWizard.commentHint", { defaultValue: "Facultatif — visible par les joueurs / parents." })}
+            </p>
+            <Textarea
+              value={state.description ?? ""}
+              onChange={(e) => patch("description", e.target.value)}
+              placeholder={t("eventWizard.commentPlaceholder", {
+                defaultValue: "Prévoir tongs et serviette, paiement du tournoi, etc.",
+              })}
+              rows={4}
+            />
+            <Button className="w-full mt-2" onClick={() => go(1)}>
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
+
         {current === "summary" && (
           <div className="space-y-3">
             <div className="text-center pt-2">
@@ -787,7 +986,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
               >
                 {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("eventWizard.create", { defaultValue: "Créer" })}
               </Button>
-              {state.convocScope !== "none" && state.type !== "meeting" && (
+              {state.convocScope !== "none" && (
                 <Button
                   className="flex-1"
                   variant="default"

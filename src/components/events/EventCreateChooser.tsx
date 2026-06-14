@@ -12,7 +12,7 @@ import { EventFormSheet, type EventFormValues } from "@/components/event-form-sh
 import { EventWizard } from "./EventWizard";
 import { readDraft, clearDraft, draftHasProgress } from "./event-wizard-draft";
 
-type Team = { id: string; name: string; competitions?: string[] | null };
+type Team = { id: string; name: string; sport?: string | null; competitions?: string[] | null };
 
 interface Props {
   clubId: string;
@@ -128,6 +128,12 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
         open={isExpert && open}
         onOpenChange={(v) => {
           if (!v) {
+            const ok = window.confirm(
+              t("eventWizard.expertAbandonConfirm", {
+                defaultValue: "Quitter sans enregistrer ? Tes modifications seront perdues.",
+              }),
+            );
+            if (!ok) return;
             close(true);
           }
         }}
