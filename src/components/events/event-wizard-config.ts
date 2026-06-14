@@ -41,17 +41,20 @@ export interface EventWizardState {
   gameFormat?: string; // e.g. "11v11"
   isHome?: IsHome;
   meetingPoint?: string; // free address (away matches)
-  meetingTime?: string; // HH:mm (away matches)
+  meetingTime?: string; // HH:mm (away matches OR training convocation time)
   opponent?: string;
   isOfficial?: boolean;
   competitionType?: "friendly" | "championship" | "cup";
   location?: string;
   locationUrl?: string | null;
+  description?: string; // free comment added by the user
   convocScope: ConvocScope;
   carpoolEnabled?: boolean;
   recurrence?: RecurrenceState;
   // book-keeping
   step: number;
+  /** Tracks which steps the user has explicitly answered (visual hint). */
+  touched?: string[];
 }
 
 export function defaultState(): EventWizardState {
