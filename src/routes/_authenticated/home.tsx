@@ -20,6 +20,7 @@ import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
+import { EventTypeBadge } from "@/lib/event-type-icon";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
