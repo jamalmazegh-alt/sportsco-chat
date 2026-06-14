@@ -48,6 +48,7 @@ function EventsPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [showPast, setShowPast] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [selectedDay, setSelectedDay] = useState<Date>(() => startOfDay(new Date()));
   const [dayDialogOpen, setDayDialogOpen] = useState(false);
