@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
-import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
+import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import { TEMPLATES } from '@/lib/email-templates/registry'
 
 // Configuration baked in at scaffold time
@@ -33,10 +33,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-        if (!supabaseUrl || !supabaseServiceKey) {
+        if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
           console.error('Missing required environment variables')
           return Response.json(
             { error: 'Server configuration error' },
@@ -52,8 +49,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         }
 
         const token = authHeader.slice('Bearer '.length).trim()
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
 
         if (authError || !user) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -157,13 +153,13 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           const rlRoute = 'email-transactional-send'
           const RATE_LIMIT_PER_MINUTE = 10
 
-          await supabase
+          await supabaseAdmin
             .from('public_rate_limits')
             .upsert(
               { ip: user.id, route: rlRoute, window_start: windowStart, count: 0 },
               { onConflict: 'ip,route,window_start', ignoreDuplicates: true }
             )
-          const { data: rlRow } = await supabase
+          const { data: rlRow } = await supabaseAdmin
             .from('public_rate_limits')
             .select('count')
             .eq('ip', user.id)
@@ -177,7 +173,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               { status: 429, headers: { 'Retry-After': '60' } }
             )
           }
-          await supabase
+          await supabaseAdmin
             .from('public_rate_limits')
             .update({ count: current + 1 })
             .eq('ip', user.id)
@@ -192,7 +188,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         // Recipient scope check — recipient must be reachable from one of the
         // caller's clubs or tournaments (member, player, parent, pending invite,
         // collaborator, registration), or be the caller's own email.
-        const { data: scopeOk, error: scopeErr } = await supabase.rpc(
+        const { data: scopeOk, error: scopeErr } = await supabaseAdmin.rpc(
           'user_can_email_recipient',
           { _user_id: user.id, _email: effectiveRecipient }
         )
@@ -219,7 +215,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         }
 
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
-        const { data: suppressed, error: suppressionError } = await supabase
+        const { data: suppressed, error: suppressionError } = await supabaseAdmin
           .from('suppressed_emails')
           .select('id')
           .eq('email', effectiveRecipient.toLowerCase())
@@ -238,7 +234,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
 
         if (suppressed) {
           // Log the suppressed attempt
-          await supabase.from('email_send_log').insert({
+          await supabaseAdmin.from('email_send_log').insert({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
@@ -257,7 +253,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         let unsubscribeToken: string
 
         // Check for existing token for this email
-        const { data: existingToken, error: tokenLookupError } = await supabase
+        const { data: existingToken, error: tokenLookupError } = await supabaseAdmin
           .from('email_unsubscribe_tokens')
           .select('token, used_at')
           .eq('email', normalizedEmail)
@@ -268,7 +264,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             error: tokenLookupError,
             email_redacted: redactEmail(normalizedEmail),
           })
-          await supabase.from('email_send_log').insert({
+          await supabaseAdmin.from('email_send_log').insert({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
@@ -287,7 +283,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         } else if (!existingToken) {
           // Create new token — upsert handles concurrent inserts gracefully
           unsubscribeToken = generateToken()
-          const { error: tokenError } = await supabase
+          const { error: tokenError } = await supabaseAdmin
             .from('email_unsubscribe_tokens')
             .upsert(
               { token: unsubscribeToken, email: normalizedEmail },
@@ -298,7 +294,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             console.error('Failed to create unsubscribe token', {
               error: tokenError,
             })
-            await supabase.from('email_send_log').insert({
+            await supabaseAdmin.from('email_send_log').insert({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
@@ -313,7 +309,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
 
           // If another request raced us, our upsert was silently ignored.
           // Re-read to get the actual stored token.
-          const { data: storedToken, error: reReadError } = await supabase
+          const { data: storedToken, error: reReadError } = await supabaseAdmin
             .from('email_unsubscribe_tokens')
             .select('token')
             .eq('email', normalizedEmail)
@@ -324,7 +320,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
               error: reReadError,
               email_redacted: redactEmail(normalizedEmail),
             })
-            await supabase.from('email_send_log').insert({
+            await supabaseAdmin.from('email_send_log').insert({
               message_id: messageId,
               template_name: templateName,
               recipient_email: effectiveRecipient,
@@ -343,7 +339,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           console.warn('Unsubscribe token already used but email not suppressed', {
             email_redacted: redactEmail(normalizedEmail),
           })
-          await supabase.from('email_send_log').insert({
+          await supabaseAdmin.from('email_send_log').insert({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,
@@ -369,14 +365,14 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
         // The dispatcher (process-email-queue) handles sending, retries, and rate-limit backoff.
 
         // Log pending BEFORE enqueue so we have a record even if enqueue crashes
-        await supabase.from('email_send_log').insert({
+        await supabaseAdmin.from('email_send_log').insert({
           message_id: messageId,
           template_name: templateName,
           recipient_email: effectiveRecipient,
           status: 'pending',
         })
 
-        const { error: enqueueError } = await supabase.rpc('enqueue_email', {
+        const { error: enqueueError } = await supabaseAdmin.rpc('enqueue_email', {
           queue_name: 'transactional_emails',
           payload: {
             message_id: messageId,
@@ -401,7 +397,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             recipient_redacted: redactEmail(effectiveRecipient),
           })
 
-          await supabase.from('email_send_log').insert({
+          await supabaseAdmin.from('email_send_log').insert({
             message_id: messageId,
             template_name: templateName,
             recipient_email: effectiveRecipient,

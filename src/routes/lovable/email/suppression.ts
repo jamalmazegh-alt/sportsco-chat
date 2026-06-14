@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
 import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
 import { createFileRoute } from '@tanstack/react-router'
+import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 // Suppression event payload sent by the Go API when Mailgun reports
 // a bounce, complaint, or unsubscribe.
@@ -56,10 +56,8 @@ export const Route = createFileRoute("/lovable/email/suppression")({
     handlers: {
       POST: async ({ request }) => {
         const apiKey = process.env.LOVABLE_API_KEY
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-        if (!apiKey || !supabaseUrl || !supabaseServiceKey) {
+        if (!apiKey || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
           console.error('Missing required environment variables')
           return Response.json({ error: 'Server configuration error' }, { status: 500 })
         }
@@ -98,11 +96,10 @@ export const Route = createFileRoute("/lovable/email/suppression")({
           return Response.json({ error: 'Internal error' }, { status: 500 })
         }
 
-        const supabase = createClient(supabaseUrl, supabaseServiceKey)
         const normalizedEmail = payload.email.toLowerCase()
 
         // 1. Upsert to suppressed_emails (idempotent — safe for retries)
-        const { error: suppressError } = await supabase
+        const { error: suppressError } = await supabaseAdmin
           .from('suppressed_emails')
           .upsert(
             {
@@ -125,7 +122,7 @@ export const Route = createFileRoute("/lovable/email/suppression")({
         const sendLogStatus = mapReasonToStatus(payload.reason)
         const sendLogMessage = mapReasonToMessage(payload.reason)
 
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabaseAdmin
           .from('email_send_log')
           .insert({
             message_id: payload.message_id ?? null,
