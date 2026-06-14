@@ -12,7 +12,7 @@ import { EventFormSheet, type EventFormValues } from "@/components/event-form-sh
 import { EventWizard } from "./EventWizard";
 import { readDraft, clearDraft, draftHasProgress } from "./event-wizard-draft";
 
-type Team = { id: string; name: string; competitions?: string[] | null };
+type Team = { id: string; name: string; sport?: string | null; competitions?: string[] | null };
 
 interface Props {
   clubId: string;
