@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { render } from '@react-email/components'
+import { renderAsync } from '@react-email/components'
 import { parseEmailWebhookPayload } from '@lovable.dev/email-js'
 import { WebhookError, verifyWebhookRequest } from '@lovable.dev/webhooks-js'
+import { createClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
-import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
 import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
@@ -12,12 +12,12 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirmez votre email Clubero',
-  invite: 'Vous êtes invité·e sur Clubero',
-  magiclink: 'Votre lien de connexion Clubero',
-  recovery: 'Réinitialisez votre mot de passe Clubero',
-  email_change: 'Confirmez votre nouvelle adresse email Clubero',
-  reauthentication: 'Votre code de vérification Clubero',
+  signup: 'Confirm your email',
+  invite: "You've been invited",
+  magiclink: 'Your login link',
+  recovery: 'Reset your password',
+  email_change: 'Confirm your new email',
+  reauthentication: 'Your verification code',
 }
 
 // Template mapping
@@ -31,7 +31,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "Clubero"
+const SITE_NAME = "sportsco-chat"
 const SENDER_DOMAIN = "notify.clubero.app"
 const ROOT_DOMAIN = "clubero.app"
 const FROM_DOMAIN = "clubero.app"
@@ -145,23 +145,33 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         // Render React Email to HTML and plain text
         const element = React.createElement(EmailTemplate, templateProps)
-        const html = await render(element)
-        const text = await render(element, { plainText: true })
+        const html = await renderAsync(element)
+        const text = await renderAsync(element, { plainText: true })
 
         // Enqueue email for async processing by the dispatcher (process-email-queue).
-        // Use runtime SUPABASE_URL (via supabaseAdmin), not build-time VITE_* — a mismatch
-        // with SUPABASE_SERVICE_ROLE_KEY silently targets the wrong project.
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+        if (!supabaseUrl || !supabaseServiceKey) {
+          console.error('Missing Supabase environment variables')
+          return Response.json(
+            { error: 'Server configuration error' },
+            { status: 500 }
+          )
+        }
+
+        const supabase = createClient(supabaseUrl, supabaseServiceKey)
         const messageId = crypto.randomUUID()
 
         // Log pending BEFORE enqueue so we have a record even if enqueue crashes
-        await supabaseAdmin.from('email_send_log').insert({
+        await supabase.from('email_send_log').insert({
           message_id: messageId,
           template_name: emailType,
           recipient_email: payload.data.email,
           status: 'pending',
         })
 
-        const { error: enqueueError } = await supabaseAdmin.rpc('enqueue_email', {
+        const { error: enqueueError } = await supabase.rpc('enqueue_email', {
           queue_name: 'auth_emails',
           payload: {
             run_id,
@@ -180,7 +190,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         if (enqueueError) {
           console.error('Failed to enqueue auth email', { error: enqueueError, run_id, emailType })
-          await supabaseAdmin.from('email_send_log').insert({
+          await supabase.from('email_send_log').insert({
             message_id: messageId,
             template_name: emailType,
             recipient_email: payload.data.email,
