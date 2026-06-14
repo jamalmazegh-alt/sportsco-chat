@@ -221,7 +221,7 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competition_type: state.competitionType ?? "friendly",
-    competition_name: null,
+    competition_name: state.competitionName?.trim() ? state.competitionName.trim() : null,
     is_home: state.type === "match" ? state.isHome === "home" : null,
     meeting_point: state.type === "match" && state.isHome === "away" ? state.meetingPoint ?? null : null,
     starts_at: startsIso ?? "",
