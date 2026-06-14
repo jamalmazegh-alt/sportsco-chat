@@ -104,12 +104,20 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
 
   // Compute visible steps based on type/branches
   const steps = useMemo<Step[]>(() => {
-    const s: Step[] = ["type", "team", "when", "duration"];
+    const s: Step[] = ["type", "team"];
+    // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
-    if (state.type === "match") s.push("homeaway");
-    if (state.type === "match" && state.isHome === "away") s.push("meetingpoint");
-    if (state.type === "match") s.push("opponent", "official");
-    s.push("location", "convocation");
+    s.push("when");
+    if (state.type === "match") {
+      s.push("halves", "gameformat", "homeaway");
+      if (state.isHome === "away") s.push("meetingpoint");
+      s.push("opponent", "official");
+    } else {
+      s.push("duration");
+    }
+    // No location step for matches (home: implicit; away: address captured in meetingpoint step)
+    if (state.type !== "match") s.push("location");
+    s.push("convocation");
     if (state.type === "match" && state.isHome === "away") s.push("carpool");
     if (state.type === "training") s.push("carpool");
     s.push("summary");
