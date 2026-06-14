@@ -60,6 +60,8 @@ type Step =
   | "team"
   | "when"
   | "duration"
+  | "halves"
+  | "gameformat"
   | "series"
   | "homeaway"
   | "meetingpoint"
