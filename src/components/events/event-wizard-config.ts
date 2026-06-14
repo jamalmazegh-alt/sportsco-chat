@@ -204,17 +204,20 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
     team_id: state.teamId || "",
     type: state.type || "training",
     title,
-    description: null,
-    location: state.location ?? null,
+    description: state.gameFormat ? `Format: ${state.gameFormat}` : null,
+    location: state.type === "match" && state.isHome === "home" ? null : state.location ?? null,
     location_url: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competition_type: state.competitionType ?? "friendly",
     competition_name: null,
     is_home: state.type === "match" ? state.isHome === "home" : null,
-    meeting_point: state.meetingPoint ?? null,
+    meeting_point: state.type === "match" && state.isHome === "away" ? state.meetingPoint ?? null : null,
     starts_at: startsIso ?? "",
     ends_at: endsIso,
-    convocation_time: null,
+    convocation_time:
+      state.type === "match" && state.isHome === "away" && state.meetingTime
+        ? toIso(state.startDate, state.meetingTime)
+        : null,
     is_official: state.type === "match" ? true : Boolean(state.isOfficial),
   };
 }
