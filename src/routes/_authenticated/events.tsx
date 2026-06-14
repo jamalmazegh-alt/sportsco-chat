@@ -444,23 +444,10 @@ function EventsPage() {
           }
           action={
             isCoach && user ? (
-              <EventFormSheet
-                open={open}
-                onOpenChange={setOpen}
-                mode="create"
-                teams={teams ?? []}
-                userId={user.id}
-                onSaved={() => {
-                  qc.invalidateQueries({ queryKey: ["events"] });
-                  qc.invalidateQueries({ queryKey: ["upcoming"] });
-                }}
-                trigger={
-                  <Button size="sm" className="h-9">
-                    <Plus className="h-4 w-4" />
-                    {t("events.create")}
-                  </Button>
-                }
-              />
+              <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+                <Plus className="h-4 w-4" />
+                {t("events.create")}
+              </Button>
             ) : null
           }
         />
