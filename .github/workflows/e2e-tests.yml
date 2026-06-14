@@ -41,6 +41,9 @@ jobs:
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Optional: when set, the live AI assistant test (14) can actually run.
+          # When absent the test skips cleanly instead of hard-failing.
+          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
         run: |
           bun run dev -- --host 127.0.0.1 --port 8080 &
           for i in $(seq 1 60); do
@@ -67,6 +70,9 @@ jobs:
           E2E_PARENT_EMAIL: ${{ secrets.E2E_PARENT_EMAIL }}
           E2E_PARENT_PASSWORD: ${{ secrets.E2E_PARENT_PASSWORD }}
           E2E_REAL_AI: ${{ github.event_name == 'schedule' && '1' || '0' }}
+          # Exposed so the runner can detect the key and skip test 14 cleanly
+          # when it's absent (a live-AI test must not hard-fail without a key).
+          LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
         run: bun run test:e2e
 
       - name: Upload Playwright report
