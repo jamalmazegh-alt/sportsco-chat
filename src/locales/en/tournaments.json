@@ -400,6 +400,7 @@
     "empty": "No teams registered",
     "addedToast": "Team added",
     "updatedToast": "Team updated",
+    "deletedToast": "Team deleted",
     "errorToast": "Error",
     "importedToast_one": "{{count}} team imported",
     "importedToast_other": "{{count}} teams imported",
@@ -438,7 +439,15 @@
       "clubero": " · Clubero",
       "external": " · External",
       "players": "Players",
-      "edit": "Edit"
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteConfirm": {
+      "title": "Delete {{name}}?",
+      "description": "This team will be removed from the tournament. This action cannot be undone.",
+      "consequences": "This team's players, seed and tournament history will be lost. Matches already played may be affected.",
+      "confirm": "Delete team",
+      "cancel": "Cancel"
     }
   },
   "roster": {

@@ -27,6 +27,8 @@ interface PublishProgrammeCardProps {
   teams: { id: string; group_id: string | null }[];
   matchesCount: number;
   hasStartDate: boolean;
+  /** Registration fee in the tournament currency's smallest unit. 0/undefined = free. */
+  registrationFee?: number | null;
 }
 
 export function PublishProgrammeCard({
@@ -35,6 +37,7 @@ export function PublishProgrammeCard({
   teams,
   matchesCount,
   hasStartDate,
+  registrationFee,
 }: PublishProgrammeCardProps) {
   const { t } = useTranslation("tournaments");
   const qc = useQueryClient();
@@ -42,10 +45,14 @@ export function PublishProgrammeCard({
   const listFn = useServerFn(listTournamentRegistrationsWithPayments);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  // A free tournament has no payment to validate: manually-added teams are
+  // confirmed by default, so we don't need to fetch payment registrations.
+  const isFree = !registrationFee || registrationFee <= 0;
+
   const regsQuery = useQuery({
     queryKey: ["tournament-payments", tournamentId],
     queryFn: () => listFn({ data: { tournament_id: tournamentId } }),
-    enabled: status === "published",
+    enabled: status === "published" && !isFree,
   });
 
   // B1 — useMutation MUST be declared before any early return so that the hook
@@ -67,8 +74,11 @@ export function PublishProgrammeCard({
   if (status !== "published") return null;
 
   const PAID = new Set(["paid_online", "paid_offline", "free"]);
-  const confirmedTeamsCount =
-    regsQuery.data?.payments.filter((p: any) => PAID.has(p.payment_status)).length ?? 0;
+  // For a free tournament, every team that's been added counts as confirmed.
+  // For a paid tournament, a team is confirmed once its registration is paid.
+  const confirmedTeamsCount = isFree
+    ? teams.length
+    : (regsQuery.data?.payments.filter((p: any) => PAID.has(p.payment_status)).length ?? 0);
   const unassignedConfirmedTeamsCount = teams.filter((tt) => !tt.group_id).length;
 
   const checks = [

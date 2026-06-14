@@ -548,6 +548,7 @@ function TournamentDetailPage() {
             teams={teams.map((tt) => ({ id: tt.id, group_id: tt.group_id ?? null }))}
             matchesCount={matches.length}
             hasStartDate={Boolean(tournament.starts_on)}
+            registrationFee={tournament.registration_fee ?? 0}
           />
         </div>
       )}

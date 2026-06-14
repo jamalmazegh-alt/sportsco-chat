@@ -400,6 +400,7 @@
     "empty": "Geen Team geregistreerd",
     "addedToast": "Team toegevoegd",
     "updatedToast": "Team bijgewerkt",
+    "deletedToast": "Team verwijderd",
     "errorToast": "Fout",
     "importedToast_one": "{{count}} Team geïmporteerd",
     "importedToast_other": "{{count}} Teams geïmporteerd",
@@ -438,7 +439,15 @@
       "clubero": " · Clubero",
       "external": " · Extern",
       "players": "Spelers",
-      "edit": "Bewerken"
+      "edit": "Bewerken",
+      "delete": "Verwijderen"
+    },
+    "deleteConfirm": {
+      "title": "{{name}} verwijderen?",
+      "description": "Dit team wordt uit het toernooi verwijderd. Deze actie kan niet ongedaan worden gemaakt.",
+      "consequences": "De spelers, plaatsing en toernooigeschiedenis van dit team gaan verloren. Reeds gespeelde wedstrijden kunnen worden beïnvloed.",
+      "confirm": "Team verwijderen",
+      "cancel": "Annuleren"
     }
   },
   "roster": {

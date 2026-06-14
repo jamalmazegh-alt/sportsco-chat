@@ -99,6 +99,18 @@ export function nearestSupportedTeams(teams: number): number {
   return best;
 }
 
+/**
+ * Recommended number of pools for a given team count — the SAME deterministic
+ * mapping (POOLCFG) the AI Assistant and the Simulator use. Exposed so the
+ * draw UI can default to the assistant's recommendation instead of an ad-hoc
+ * heuristic. Clamped so a pool always has at least ~2 teams.
+ */
+export function recommendedPools(teams: number): number {
+  const cfg = POOLCFG[nearestSupportedTeams(teams)];
+  const pools = cfg?.pools ?? 2;
+  return Math.max(2, Math.min(pools, Math.max(2, Math.floor(teams / 2))));
+}
+
 function parseHHMM(hhmm: string): number {
   const [h, m] = hhmm.split(":").map(Number);
   return h * 60 + m;

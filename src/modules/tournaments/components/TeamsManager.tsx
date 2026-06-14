@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
+import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import {
   Plus,
@@ -53,6 +54,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
   const [bulkOpen, setBulkOpen] = useState(false);
   const [editing, setEditing] = useState<TeamRow | null>(null);
   const [rosterTeam, setRosterTeam] = useState<TeamRow | null>(null);
+  const [teamToDelete, setTeamToDelete] = useState<TeamRow | null>(null);
   const [mode, setMode] = useState<"external" | "internal">("external");
   const [name, setName] = useState("");
   const [shortName, setShortName] = useState("");
@@ -112,8 +114,11 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     mutationFn: (teamId: string) =>
       removeFn({ data: { team_id: teamId, tournament_id: tournamentId } }),
     onSuccess: () => {
+      toast.success(t("teams.deletedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+      setTeamToDelete(null);
     },
+    onError: (e: any) => toast.error(e?.message ?? t("teams.errorToast")),
   });
 
   const bulk = useMutation({
@@ -431,8 +436,9 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => remove.mutate(tm.id)}
+                onClick={() => setTeamToDelete(tm)}
                 disabled={remove.isPending}
+                title={t("teams.row.delete")}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -462,6 +468,26 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
           onClose={() => setRosterTeam(null)}
         />
       )}
+
+      <DestructiveConfirmSheet
+        open={!!teamToDelete}
+        onOpenChange={(v) => {
+          if (!v && !remove.isPending) setTeamToDelete(null);
+        }}
+        mode="delay"
+        delaySeconds={3}
+        title={t("teams.deleteConfirm.title", { name: teamToDelete?.name ?? "" })}
+        description={t("teams.deleteConfirm.description", {
+          name: teamToDelete?.name ?? "",
+        })}
+        consequences={t("teams.deleteConfirm.consequences")}
+        cancelLabel={t("teams.deleteConfirm.cancel")}
+        confirmLabel={t("teams.deleteConfirm.confirm")}
+        loading={remove.isPending}
+        onConfirm={() => {
+          if (teamToDelete) remove.mutate(teamToDelete.id);
+        }}
+      />
     </div>
   );
 }

@@ -400,6 +400,7 @@
     "empty": "Keine Mannschaft angemeldet",
     "addedToast": "Mannschaft hinzugefügt",
     "updatedToast": "Mannschaft aktualisiert",
+    "deletedToast": "Mannschaft gelöscht",
     "errorToast": "Fehler",
     "importedToast_one": "{{count}} Mannschaft importiert",
     "importedToast_other": "{{count}} Mannschaften importiert",
@@ -438,7 +439,15 @@
       "clubero": " · Clubero",
       "external": " · Externe",
       "players": "Spieler",
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "delete": "Löschen"
+    },
+    "deleteConfirm": {
+      "title": "{{name}} löschen?",
+      "description": "Diese Mannschaft wird aus dem Turnier entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "consequences": "Die Spieler, die Setzung und die Turnierhistorie dieser Mannschaft gehen verloren. Bereits gespielte Spiele können davon betroffen sein.",
+      "confirm": "Mannschaft löschen",
+      "cancel": "Abbrechen"
     }
   },
   "roster": {

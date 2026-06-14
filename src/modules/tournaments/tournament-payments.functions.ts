@@ -627,29 +627,62 @@ export const publishTournamentProgramme = createServerFn({ method: "POST" })
       throw new Response("missing_start_date", { status: 400 });
     }
 
-    const PAID_STATUSES = ["paid_online", "paid_offline", "free"];
-    const { data: confirmedRegs } = await supabaseAdmin
+    // A free tournament (no registration fee) has no payment to validate:
+    // every team added by the organizer counts as confirmed by default.
+    // Paid tournaments still require a settled payment per team.
+    const isFree = !tournament.registration_fee || tournament.registration_fee <= 0;
+
+    // Registrations only used to address publication emails (best-effort).
+    const { data: regRows } = await supabaseAdmin
       .from("tournament_registrations")
       .select("id, team_name, contact_email, tournament_team_id, payment_status")
-      .eq("tournament_id", data.tournament_id)
-      .in("payment_status", PAID_STATUSES);
-    const confirmed = confirmedRegs ?? [];
-    if (confirmed.length < 2) {
-      throw new Response("not_enough_confirmed_teams", { status: 400 });
+      .eq("tournament_id", data.tournament_id);
+    const allRegs = regRows ?? [];
+
+    const PAID_STATUSES = ["paid_online", "paid_offline", "free"];
+
+    // Resolve the confirmed tournament_teams + the registrations to notify.
+    let confirmedTeamRows: {
+      id: string;
+      name: string | null;
+      short_name: string | null;
+      group_id: string | null;
+    }[];
+    let notifyRegs: typeof allRegs;
+
+    if (isFree) {
+      const { data: ttRows } = await supabaseAdmin
+        .from("tournament_teams")
+        .select("id, name, short_name, group_id")
+        .eq("tournament_id", data.tournament_id);
+      confirmedTeamRows = ttRows ?? [];
+      if (confirmedTeamRows.length < 2) {
+        throw new Response("not_enough_confirmed_teams", { status: 400 });
+      }
+      // Notify any team that has a linked registration with an email.
+      notifyRegs = allRegs.filter((r) => !!r.contact_email);
+    } else {
+      const confirmed = allRegs.filter((r) => PAID_STATUSES.includes(r.payment_status));
+      if (confirmed.length < 2) {
+        throw new Response("not_enough_confirmed_teams", { status: 400 });
+      }
+      const confirmedTeamIds = confirmed
+        .map((r) => r.tournament_team_id)
+        .filter((v): v is string => !!v);
+      if (confirmedTeamIds.length === 0) {
+        throw new Response("teams_not_linked", { status: 400 });
+      }
+      const { data: ttRows } = await supabaseAdmin
+        .from("tournament_teams")
+        .select("id, name, short_name, group_id")
+        .in("id", confirmedTeamIds);
+      confirmedTeamRows = ttRows ?? [];
+      notifyRegs = confirmed;
     }
 
-    const confirmedTeamIds = confirmed
-      .map((r) => r.tournament_team_id)
-      .filter((v): v is string => !!v);
-    if (confirmedTeamIds.length === 0) {
-      throw new Response("teams_not_linked", { status: 400 });
-    }
-    const { data: ttRows } = await supabaseAdmin
-      .from("tournament_teams")
-      .select("id, name, short_name, group_id")
-      .in("id", confirmedTeamIds);
-    const teamsById = new Map((ttRows ?? []).map((t) => [t.id, t]));
-    const unassigned = (ttRows ?? []).filter((t) => !t.group_id);
+    const confirmed = confirmedTeamRows;
+    const teamsById = new Map(confirmedTeamRows.map((t) => [t.id, t]));
+    const unassigned = confirmedTeamRows.filter((t) => !t.group_id);
     if (unassigned.length > 0) {
       throw new Response("teams_without_group", { status: 400 });
     }
@@ -742,7 +775,7 @@ export const publishTournamentProgramme = createServerFn({ method: "POST" })
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
 
     let notified = 0;
-    for (const reg of confirmed) {
+    for (const reg of notifyRegs) {
       if (!reg.contact_email) continue;
       const ttId = reg.tournament_team_id;
       const fm = ttId ? firstMatchByTeam.get(ttId) : null;
