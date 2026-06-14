@@ -181,7 +181,7 @@ export function toEventPayloadInput(
     locationUrl: state.locationUrl ?? null,
     opponent: state.opponent ?? null,
     competitionType: state.competitionType ?? null,
-    competitionName: null,
+    competitionName: state.competitionName?.trim() ? state.competitionName.trim() : null,
     isHome: isMatch ? state.isHome === "home" : null,
     meetingPoint: isAwayMatch ? state.meetingPoint ?? null : null,
     startsAt: startsIso,
