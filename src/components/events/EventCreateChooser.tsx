@@ -86,22 +86,6 @@ export function EventCreateChooser({ clubId, teams, userId, open, onOpenChange, 
                   primary
                   onClick={startWizard}
                 />
-                {recent?.training && (
-                  <DoorButton
-                    icon={<Repeat className="h-5 w-5" />}
-                    title={t("eventCreateChooser.repeatTraining", { defaultValue: "Reprendre le dernier entraînement" })}
-                    hint={recapEvent(recent.training)}
-                    onClick={() => openExpertRepeat("training")}
-                  />
-                )}
-                {recent?.match && (
-                  <DoorButton
-                    icon={<Repeat className="h-5 w-5" />}
-                    title={t("eventCreateChooser.repeatMatch", { defaultValue: "Reprendre le dernier match" })}
-                    hint={recapEvent(recent.match)}
-                    onClick={() => openExpertRepeat("match")}
-                  />
-                )}
                 <DoorButton
                   icon={<Settings2 className="h-5 w-5" />}
                   title={t("eventCreateChooser.classic", { defaultValue: "Création classique" })}
@@ -196,18 +180,3 @@ function DoorButton({
   );
 }
 
-function recapEvent(e: {
-  title: string;
-  starts_at: string;
-  location: string | null;
-  opponent: string | null;
-}): string {
-  const date = format(new Date(e.starts_at), "EEE d MMM HH:mm");
-  const parts: string[] = [date];
-  if (e.location) parts.push(e.location);
-  if (e.opponent) parts.push(`vs ${e.opponent}`);
-  return parts.join(" · ");
-}
-
-// reference to silence unused import in some bundlers
-void Zap;
