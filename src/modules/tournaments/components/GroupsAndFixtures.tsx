@@ -286,6 +286,29 @@ export function GroupsAndFixtures({
   const updateFn = useServerFn(updateTournament);
   const scheduleFn = useServerFn(autoScheduleMatches);
 
+  const runAutoSchedule = async () => {
+    if (!startsOn) return;
+    const fl = fieldsList.length ? fieldsList : [t("groups.defaultFieldName")];
+    try {
+      await scheduleFn({
+        data: {
+          tournament_id: tournamentId,
+          starts_on: startsOn,
+          daily_start_time: startTime,
+          daily_end_time: endTime,
+          match_duration_min: duration,
+          break_min: pause,
+          fields: fl,
+          lunch_start_time: lunchEnabled ? lunchStart : undefined,
+          lunch_end_time: lunchEnabled ? lunchEnd : undefined,
+          min_rest_min: minRest,
+        },
+      });
+    } catch {
+      /* silent — user can re-trigger manually */
+    }
+  };
+
   const genGroups = useMutation({
     mutationFn: () =>
       genGroupsFn({
@@ -295,10 +318,11 @@ export function GroupsAndFixtures({
           qualifiers_per_group: qualifiers,
         },
       }),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       toast.success(
         t("groups.generatedToast", { groups: res.groups_created, matches: res.matches_created }),
       );
+      await runAutoSchedule();
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       // B5 — switch to the "all" view so the freshly-generated groups appear.
       onViewChange?.("all");
@@ -311,8 +335,9 @@ export function GroupsAndFixtures({
       genKnockoutFn({
         data: { tournament_id: tournamentId, third_place: thirdPlace, force },
       }),
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       toast.success(t("groups.bracketCreatedToast", { count: res.matches_created }));
+      await runAutoSchedule();
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
     onError: (e: any) => {
@@ -335,6 +360,7 @@ export function GroupsAndFixtures({
       toast.error(e?.message ?? t("common.error"));
     },
   });
+
 
   const saveSettings = useMutation({
     mutationFn: () => {
