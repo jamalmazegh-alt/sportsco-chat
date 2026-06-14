@@ -132,3 +132,16 @@ Le wizard mappe l'état interne vers `EventFormValues` (cf. `event-form-sheet.ts
 - Schéma DB (zéro migration)
 - `createTrainingSeries`, `updateSeriesOccurrence`, `deleteSeriesOccurrence`, flux convocations, carpool
 - Wizard tournoi
+
+---
+
+## Livré (commit en cours)
+- `src/components/events/event-wizard-config.ts` — types + helpers déterministes (durée par défaut, mapping payload event, comptage occurrences série)
+- `src/components/events/event-wizard-draft.ts` — sessionStorage `clubero:event-wizard-draft`
+- `src/components/events/EventWizard.tsx` — UI guidée auto-avance, guide sticky, récap live, branches selon type, étape série multi-jours avec aperçu "Créer N entraînements", bouton "Réglages détaillés" → handoff `EventFormSheet` pré-rempli
+- `src/components/events/EventCreateChooser.tsx` — 4 portes (Assistant / Reprendre training / Reprendre match / Classique), confirmation à la fermeture si brouillon
+- `src/routes/_authenticated/events.tsx` — header + EmptyState branchés sur le chooser (state `open` partagé), bouton trigger conservé
+- `src/locales/{fr,en}/common.json` — clés `eventCreateChooser.*` + `eventWizard.*` (autres locales seedées avec EN)
+- `src/tests/unit/event-wizard.test.ts` — 9 tests passent (mapping, séries, draft)
+
+Création série utilise `createTrainingSeries` (pas de boucle d'inserts). Single event = INSERT direct via supabase client, même shape que `EventFormSheet`. **Zéro migration.**
