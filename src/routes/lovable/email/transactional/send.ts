@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { render } from '@react-email/components'
 import { createFileRoute } from '@tanstack/react-router'
-import { supabaseAdmin } from '@/integrations/supabase/client.server'
 import { TEMPLATES } from '@/lib/email-templates/registry'
 
 // Configuration baked in at scaffold time
@@ -40,6 +39,7 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             { status: 500 }
           )
         }
+        const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
 
         // Verify the caller has a valid Supabase auth token.
         // In TanStack, there is no Supabase gateway — we validate the JWT ourselves.

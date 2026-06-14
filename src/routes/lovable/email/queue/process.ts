@@ -1,7 +1,6 @@
 import { sendLovableEmail } from '@lovable.dev/email-js'
 import { type SupabaseClient } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
-import { supabaseAdmin } from '@/integrations/supabase/client.server'
 
 const MAX_RETRIES = 5
 const DEFAULT_BATCH_SIZE = 10
@@ -88,6 +87,7 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
           return Response.json({ error: 'Forbidden' }, { status: 403 })
         }
 
+        const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
         const supabase: SupabaseClient<any, any> = supabaseAdmin
 
         // 1. Check rate-limit cooldown and read queue config

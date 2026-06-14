@@ -27,14 +27,14 @@ export const RecoveryEmail = ({
       <Container style={container}>
         <Heading style={h1}>Réinitialisez votre mot de passe</Heading>
         <Text style={text}>
-          Nous avons reçu une demande de réinitialisation de mot de passe pour {siteName}.
-          Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.
+          Nous avons reçu une demande de réinitialisation de votre mot de passe
+          pour {siteName}. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
         </Text>
         <Button style={button} href={confirmationUrl}>
           Réinitialiser mon mot de passe
         </Button>
         <Text style={footer}>
-          Si vous n’êtes pas à l’origine de cette demande, ignorez simplement cet e-mail.
+          Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.
           Votre mot de passe ne sera pas modifié.
         </Text>
       </Container>
