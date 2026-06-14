@@ -167,22 +167,32 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     const s: Step[] = ["type", "team"];
     // Training/other: ask recurrence early, right after team.
     if (state.type === "training" || state.type === "other") s.push("series");
+    const isRecurring =
+      (state.type === "training" || state.type === "other") &&
+      !!state.recurrence &&
+      state.recurrence.mode !== "single";
     s.push("when");
     if (state.type === "match") {
       s.push("halves", "gameformat", "homeaway");
       if (state.isHome === "away") s.push("meetingpoint");
       s.push("opponent", "official");
-    } else {
+    } else if (!isRecurring) {
       s.push("duration");
     }
-    // No location step for matches (home: implicit; away: address captured in meetingpoint step)
-    if (state.type !== "match") s.push("location");
-    s.push("convocation");
-    if (state.type === "match" && state.isHome === "away") s.push("carpool");
-    if (state.type === "training") s.push("carpool");
+    if (state.type === "training" && !isRecurring) {
+      s.push("meetingtime");
+    }
+    // Recurring trainings: only day + time + duration, no extra steps.
+    if (!isRecurring) {
+      if (state.type !== "match") s.push("location");
+      s.push("convocation");
+      if (state.type === "match" && state.isHome === "away") s.push("carpool");
+      if (state.type === "training") s.push("carpool");
+      s.push("comment");
+    }
     s.push("summary");
     return s;
-  }, [state.type, state.isHome]);
+  }, [state.type, state.isHome, state.recurrence]);
 
   const current: Step = steps[Math.min(state.step, steps.length - 1)] ?? "type";
 
