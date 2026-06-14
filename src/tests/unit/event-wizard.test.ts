@@ -80,6 +80,15 @@ describe("event-wizard-config", () => {
 
 describe("event-wizard-draft", () => {
   it("write/read/clear roundtrip", () => {
+    // shim sessionStorage for node env
+    const store = new Map<string, string>();
+    (globalThis as any).window = {
+      sessionStorage: {
+        getItem: (k: string) => store.get(k) ?? null,
+        setItem: (k: string, v: string) => store.set(k, v),
+        removeItem: (k: string) => store.delete(k),
+      },
+    };
     const s = defaultState();
     s.type = "training";
     s.teamId = "abc";
@@ -89,6 +98,7 @@ describe("event-wizard-draft", () => {
     expect(r?.teamId).toBe("abc");
     clearDraft();
     expect(readDraft()).toBeNull();
+    delete (globalThis as any).window;
   });
 
   it("draftHasProgress detects answered fields", () => {
