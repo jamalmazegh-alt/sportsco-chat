@@ -59,11 +59,10 @@ function Landing() {
   return (
     <MarketingLayout>
       <V2Hero />
-      <V2Problems />
       <V2Benefits />
-      <V2WhatsApp />
       <V2Tournaments />
       <V2SocialClub />
+      <V2WhatsApp />
       <V2ForWho />
       <V2Testimonials />
       <V2Pricing />
