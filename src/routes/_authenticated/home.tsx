@@ -11,7 +11,7 @@ import { fmt } from "@/lib/date-locale";
 import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { AttendancePill } from "@/components/attendance-pill";
-import { EventFormSheet } from "@/components/event-form-sheet";
+import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
 import { cn } from "@/lib/utils";
@@ -302,24 +302,27 @@ function HomePage() {
       {/* Quick actions */}
       {isCoach && (
         <div className="space-y-2">
-          {user && (
-            <EventFormSheet
-              open={createOpen}
-              onOpenChange={setCreateOpen}
-              mode="create"
-              teams={teams ?? []}
-              userId={user.id}
-              onSaved={() => {
-                qc.invalidateQueries({ queryKey: ["events"] });
-                qc.invalidateQueries({ queryKey: ["upcoming"] });
-              }}
-              trigger={
-                <Button className="w-full h-12 text-[15px] font-semibold shadow-sm">
-                  <Plus className="h-4 w-4" />
-                  {t("dashboard.createEvent")}
-                </Button>
-              }
-            />
+          {user && activeClubId && (
+            <>
+              <Button
+                className="w-full h-12 text-[15px] font-semibold shadow-sm"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                {t("dashboard.createEvent")}
+              </Button>
+              <EventCreateChooser
+                clubId={activeClubId}
+                teams={teams ?? []}
+                userId={user.id}
+                open={createOpen}
+                onOpenChange={setCreateOpen}
+                onSaved={() => {
+                  qc.invalidateQueries({ queryKey: ["events"] });
+                  qc.invalidateQueries({ queryKey: ["upcoming"] });
+                }}
+              />
+            </>
           )}
           {activeClubId && (
             <HomeQuickCards clubId={activeClubId} teams={teams ?? []} />
