@@ -247,24 +247,24 @@
     },
     "v2": {
       "hero": {
-        "kicker": "Gemaakt voor amateurclubs",
-        "titleA": "Het hele clubleven,",
-        "titleB": "op één plek.",
-        "subtitle": "Minder WhatsApp. Minder papierwerk. Meer sport.",
-        "body": "Clubero brengt communicatie, oproepen, evenementen, documenten, toernooien en het clubleven samen in één moderne plateforme.",
+        "kicker": "Het platform voor amateursport",
+        "titleA": "De hele club.",
+        "titleB": "Eén app.",
+        "subtitle": "Amateursport, eindelijk op één plek samen.",
+        "body": "Communicatie, oproepen, evenementen, aanwezigheden, documenten, toernooien en clubleven: alles wat jouw club levend houdt, in één modern, helder platform gemaakt voor het veld.",
         "ctaPrimary": "Gratis proberen",
         "ctaSecondary": "Bekijk een demo",
         "trust1": "Geen creditcard nodig",
         "trust2": "Binnen enkele minuten klaar",
-        "trust3": "Werkt naast WhatsApp",
+        "trust3": "Gehost in Europa",
         "audDirigeants": "Bestuur",
         "audEducateurs": "Coaches",
         "audParents": "Ouders",
         "audJoueurs": "Spelers",
         "mockTitle": "Jouw club, verbonden",
         "mockLive": "Live",
-        "mockBadge": "Eén platform",
-        "mockLine": "De hele club op één plek — van bestuur tot speler."
+        "mockBadge": "De hele club. Eén app.",
+        "mockLine": "Van bestuur tot speler — iedereen op dezelfde plek."
       },
       "problems": {
         "kicker": "Herken je dit?",

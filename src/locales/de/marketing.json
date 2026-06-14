@@ -247,24 +247,24 @@
     },
     "v2": {
       "hero": {
-        "kicker": "Gemacht für Amateurvereine",
-        "titleA": "Das ganze Vereinsleben,",
-        "titleB": "an einem Ort.",
-        "subtitle": "Weniger WhatsApp. Weniger Papierkram. Mehr Sport.",
-        "body": "Clubero bündelt Kommunikation, Aufgebote, Termine, Dokumente, Turniere und das Vereinsleben in einer modernen Plattform.",
+        "kicker": "Die Plattform für den Amateursport",
+        "titleA": "Der ganze Verein.",
+        "titleB": "Eine App.",
+        "subtitle": "Amateursport, endlich an einem Ort vereint.",
+        "body": "Kommunikation, Aufgebote, Termine, Anwesenheiten, Dokumente, Turniere und Vereinsleben: alles, was Ihren Verein lebendig hält, in einer modernen, klaren Plattform für den Platz.",
         "ctaPrimary": "Kostenlos testen",
         "ctaSecondary": "Demo ansehen",
         "trust1": "Keine Kreditkarte nötig",
         "trust2": "In wenigen Minuten startklar",
-        "trust3": "Funktioniert neben WhatsApp",
+        "trust3": "Gehostet in Europa",
         "audDirigeants": "Vorstand",
         "audEducateurs": "Trainer",
         "audParents": "Eltern",
         "audJoueurs": "Spieler",
         "mockTitle": "Ihr Verein, vernetzt",
         "mockLive": "Live",
-        "mockBadge": "Eine einzige Plattform",
-        "mockLine": "Der ganze Verein an einem Ort — vom Vorstand bis zum Spieler."
+        "mockBadge": "Der ganze Verein. Eine App.",
+        "mockLine": "Vom Vorstand bis zum Spieler — alle am selben Ort."
       },
       "problems": {
         "kicker": "Kommt Ihnen das bekannt vor?",

@@ -247,24 +247,24 @@
     },
     "v2": {
       "hero": {
-        "kicker": "Pensé pour les clubs amateurs",
-        "titleA": "Toute la vie de votre club,",
-        "titleB": "au même endroit.",
-        "subtitle": "Moins de WhatsApp. Moins de paperasse. Plus de sport.",
-        "body": "Clubero rassemble la communication, les convocations, les événements, les documents, les tournois et la vie de votre club dans une seule plateforme moderne.",
+        "kicker": "La plateforme du sport amateur",
+        "titleA": "Tout le club.",
+        "titleB": "Une seule app.",
+        "subtitle": "Le sport amateur, enfin réuni au même endroit.",
+        "body": "Communication, convocations, événements, présences, documents, tournois et vie de club : tout ce qui fait vivre votre club, dans une plateforme moderne, claire et pensée pour le terrain.",
         "ctaPrimary": "Essayer gratuitement",
         "ctaSecondary": "Voir une démo",
         "trust1": "Aucune carte bancaire requise",
-        "trust2": "Mise en place en quelques minutes",
-        "trust3": "Utilisable avec WhatsApp",
+        "trust2": "Prêt en quelques minutes",
+        "trust3": "Hébergé en Europe",
         "audDirigeants": "Dirigeants",
         "audEducateurs": "Éducateurs",
         "audParents": "Parents",
         "audJoueurs": "Joueurs",
         "mockTitle": "Votre club, connecté",
         "mockLive": "En direct",
-        "mockBadge": "Une seule plateforme",
-        "mockLine": "Tout le club au même endroit, du dirigeant au joueur."
+        "mockBadge": "Tout le club. Une seule app.",
+        "mockLine": "Du dirigeant au joueur, tout le monde au même endroit."
       },
       "problems": {
         "kicker": "À reconnaître ?",
