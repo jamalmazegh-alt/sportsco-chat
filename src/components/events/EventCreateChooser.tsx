@@ -7,10 +7,21 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Sparkles, Settings2 } from "lucide-react";
 import { EventFormSheet, type EventFormValues } from "@/components/event-form-sheet";
 import { EventWizard } from "./EventWizard";
 import { readDraft, clearDraft, draftHasProgress } from "./event-wizard-draft";
+import type { EventWizardState } from "./event-wizard-config";
 
 type Team = { id: string; name: string; sport?: string | null; competitions?: string[] | null };
 
@@ -29,27 +40,37 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
   const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("chooser");
   const [expertInitial, setExpertInitial] = useState<Partial<EventFormValues> | undefined>();
+  /** Snapshot of the wizard state when handing off to the expert form (so we can come back). */
+  const [wizardSnapshot, setWizardSnapshot] = useState<EventWizardState | null>(null);
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState<null | "wizard" | "expert">(null);
 
-  function close(forceClear = false) {
-    const draft = readDraft();
-    if (mode === "wizard" && draftHasProgress(draft) && !forceClear) {
-      const ok = window.confirm(
-        t("eventWizard.abandonConfirm", {
-          defaultValue: "Quitter l'assistant ? Tes réponses seront conservées.",
-        }),
-      );
-      if (!ok) return;
-    }
+  function reallyClose(forceClear = false) {
     if (forceClear) clearDraft();
+    setConfirmCloseOpen(null);
     onOpenChange(false);
     setTimeout(() => {
       setMode("chooser");
       setExpertInitial(undefined);
+      setWizardSnapshot(null);
     }, 200);
+  }
+
+  function requestCloseWizard() {
+    const draft = readDraft();
+    if (draftHasProgress(draft)) {
+      setConfirmCloseOpen("wizard");
+      return;
+    }
+    reallyClose();
+  }
+
+  function requestCloseExpert() {
+    setConfirmCloseOpen("expert");
   }
 
   function openExpertEmpty() {
     setExpertInitial(undefined);
+    setWizardSnapshot(null);
     setMode("expert");
   }
 
@@ -63,12 +84,20 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
     if (!open) {
       setMode("chooser");
       setExpertInitial(undefined);
+      setWizardSnapshot(null);
     }
   }, [open]);
 
   return (
     <>
-      <Dialog open={open && mode !== "expert" && mode !== "expert-prefilled"} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
+      <Dialog
+        open={open && mode !== "expert" && mode !== "expert-prefilled"}
+        onOpenChange={(v) => {
+          if (v) return onOpenChange(true);
+          if (mode === "wizard") return requestCloseWizard();
+          reallyClose();
+        }}
+      >
         <DialogContent className={mode === "wizard" ? "max-w-md p-0 overflow-hidden gap-0" : "max-w-md"}>
           {mode === "chooser" && (
             <>
@@ -106,15 +135,18 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
               </DialogHeader>
               <EventWizard
                 teams={teams}
-                onClose={() => close()}
+                initialState={wizardSnapshot ?? undefined}
+                onClose={requestCloseWizard}
                 onCreated={() => {
                   clearDraft();
                   onSaved();
                   onOpenChange(false);
                   setMode("chooser");
+                  setWizardSnapshot(null);
                 }}
-                onOpenExpert={(init) => {
+                onOpenExpert={(init, snapshot) => {
                   setExpertInitial(init as Partial<EventFormValues>);
+                  if (snapshot) setWizardSnapshot(snapshot);
                   setMode("expert-prefilled");
                 }}
               />
@@ -127,28 +159,64 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
       <EventFormSheet
         open={isExpert && open}
         onOpenChange={(v) => {
-          if (!v) {
-            const ok = window.confirm(
-              t("eventWizard.expertAbandonConfirm", {
-                defaultValue: "Quitter sans enregistrer ? Tes modifications seront perdues.",
-              }),
-            );
-            if (!ok) return;
-            close(true);
-          }
+          if (v) return;
+          requestCloseExpert();
         }}
         mode="create"
         teams={teams}
         userId={userId}
         initial={expertInitial}
+        onBack={
+          mode === "expert-prefilled"
+            ? () => {
+                // Return to wizard with previous answers intact
+                setMode("wizard");
+              }
+            : undefined
+        }
+        backLabel={t("eventWizard.backToAssistant", { defaultValue: "Retour à l'assistant" })}
         onSaved={() => {
           clearDraft();
           onSaved();
           onOpenChange(false);
           setMode("chooser");
           setExpertInitial(undefined);
+          setWizardSnapshot(null);
         }}
       />
+
+      {/* Confirm close dialog (replaces window.confirm for reliability) */}
+      <AlertDialog
+        open={confirmCloseOpen !== null}
+        onOpenChange={(v) => {
+          if (!v) setConfirmCloseOpen(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("eventWizard.confirmCloseTitle", { defaultValue: "Quitter sans enregistrer ?" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmCloseOpen === "expert"
+                ? t("eventWizard.expertAbandonConfirm", {
+                    defaultValue: "Tes modifications seront perdues.",
+                  })
+                : t("eventWizard.abandonConfirm", {
+                    defaultValue: "Tes réponses seront conservées comme brouillon.",
+                  })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => reallyClose(confirmCloseOpen === "expert")}
+            >
+              {t("common.confirm", { defaultValue: "Confirmer" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
@@ -185,4 +253,3 @@ function DoorButton({
     </button>
   );
 }
-
