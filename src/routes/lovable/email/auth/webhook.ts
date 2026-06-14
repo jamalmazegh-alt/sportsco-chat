@@ -12,12 +12,12 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: 'Confirmez votre email Clubero',
+  invite: 'Vous êtes invité·e sur Clubero',
+  magiclink: 'Votre lien de connexion Clubero',
+  recovery: 'Réinitialisez votre mot de passe Clubero',
+  email_change: 'Confirmez votre nouvelle adresse email Clubero',
+  reauthentication: 'Votre code de vérification Clubero',
 }
 
 // Template mapping
@@ -31,7 +31,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "sportsco-chat"
+const SITE_NAME = "Clubero"
 const SENDER_DOMAIN = "notify.clubero.app"
 const ROOT_DOMAIN = "clubero.app"
 const FROM_DOMAIN = "clubero.app"
