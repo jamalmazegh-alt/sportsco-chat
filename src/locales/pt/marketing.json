@@ -247,24 +247,24 @@
     },
     "v2": {
       "hero": {
-        "kicker": "Pensado para clubes amadores",
-        "titleA": "Toda a vida do seu clube,",
-        "titleB": "num só lugar.",
-        "subtitle": "Menos WhatsApp. Menos papelada. Mais desporto.",
-        "body": "O Clubero junta comunicação, convocatórias, eventos, documentos, torneios e a vida do clube numa plataforma moderna.",
+        "kicker": "A plataforma do desporto amador",
+        "titleA": "Todo o clube.",
+        "titleB": "Uma só app.",
+        "subtitle": "O desporto amador, finalmente reunido num só sítio.",
+        "body": "Comunicação, convocatórias, eventos, presenças, documentos, torneios e vida do clube: tudo o que faz viver o seu clube, numa plataforma moderna, clara e pensada para o campo.",
         "ctaPrimary": "Experimentar grátis",
         "ctaSecondary": "Ver uma demo",
         "trust1": "Sem cartão de crédito",
         "trust2": "A funcionar em poucos minutos",
-        "trust3": "Compatível com o WhatsApp",
+        "trust3": "Alojado na Europa",
         "audDirigeants": "Direção",
         "audEducateurs": "Treinadores",
         "audParents": "Pais",
         "audJoueurs": "Jogadores",
         "mockTitle": "O seu clube, ligado",
         "mockLive": "Em direto",
-        "mockBadge": "Uma única plataforma",
-        "mockLine": "Todo o clube no mesmo sítio — da direção ao jogador."
+        "mockBadge": "Todo o clube. Uma só app.",
+        "mockLine": "Da direção ao jogador — todos no mesmo sítio."
       },
       "problems": {
         "kicker": "Soa-lhe familiar?",
