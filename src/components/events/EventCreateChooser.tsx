@@ -25,7 +25,7 @@ interface Props {
 
 type Mode = "chooser" | "wizard" | "expert" | "expert-prefilled";
 
-export function EventCreateChooser({ clubId, teams, userId, open, onOpenChange, onSaved }: Props) {
+export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved }: Props) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("chooser");
   const [expertInitial, setExpertInitial] = useState<Partial<EventFormValues> | undefined>();
