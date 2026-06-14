@@ -1978,6 +1978,29 @@ function EventDetail() {
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">{t("events.rescheduleReasonLabel")}</label>
+              <div className="flex flex-wrap gap-1.5">
+                {([
+                  ["pitchUnavailable", "Terrain impraticable"],
+                  ["weather", "Météo"],
+                  ["lackOfPlayers", "Manque de joueurs"],
+                  ["opponentRequest", "Demande adversaire"],
+                  ["scheduling", "Conflit d'agenda"],
+                  ["other", "Autre"],
+                ] as const).map(([key, fr]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() =>
+                      setRescheduleReason(
+                        t(`events.rescheduleReasonPresets.${key}`, { defaultValue: fr }),
+                      )
+                    }
+                    className="rounded-full border border-border bg-card px-2.5 py-1 text-xs hover:border-primary hover:bg-primary/5"
+                  >
+                    {t(`events.rescheduleReasonPresets.${key}`, { defaultValue: fr })}
+                  </button>
+                ))}
+              </div>
               <Textarea
                 value={rescheduleReason}
                 onChange={(e) => setRescheduleReason(e.target.value)}
