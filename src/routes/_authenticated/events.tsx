@@ -117,12 +117,15 @@ function EventsPage() {
 
   const visibleEvents = useMemo(() => {
     if (!events) return [];
-    if (showPast) return events;
     return events.filter((e) => {
-      const d = new Date(e.starts_at);
-      return !(isPast(d) && !isToday(d));
+      if (!showCancelled && e.status === "cancelled") return false;
+      if (!showPast) {
+        const d = new Date(e.starts_at);
+        if (isPast(d) && !isToday(d)) return false;
+      }
+      return true;
     });
-  }, [events, showPast]);
+  }, [events, showPast, showCancelled]);
 
   const pastCount = useMemo(() => {
     if (!events) return 0;
