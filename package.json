@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
+    "dev:qa": "node scripts/dev-qa.mjs",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
