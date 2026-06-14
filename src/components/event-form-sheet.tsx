@@ -395,6 +395,8 @@ export function EventFormSheet({
   mode,
   userId,
   onSaved,
+  onBack,
+  backLabel,
 }: Props) {
   const { t } = useTranslation();
   
