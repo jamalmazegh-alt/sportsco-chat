@@ -128,6 +128,12 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
         open={isExpert && open}
         onOpenChange={(v) => {
           if (!v) {
+            const ok = window.confirm(
+              t("eventWizard.expertAbandonConfirm", {
+                defaultValue: "Quitter sans enregistrer ? Tes modifications seront perdues.",
+              }),
+            );
+            if (!ok) return;
             close(true);
           }
         }}
