@@ -946,6 +946,26 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
           </StepQuestion>
         )}
 
+        {current === "comment" && (
+          <StepQuestion title={t("eventWizard.q.comment", { defaultValue: "Un commentaire à ajouter ?" })}>
+            <p className="text-xs text-muted-foreground">
+              {t("eventWizard.commentHint", { defaultValue: "Facultatif — visible par les joueurs / parents." })}
+            </p>
+            <Textarea
+              value={state.description ?? ""}
+              onChange={(e) => patch("description", e.target.value)}
+              placeholder={t("eventWizard.commentPlaceholder", {
+                defaultValue: "Prévoir tongs et serviette, paiement du tournoi, etc.",
+              })}
+              rows={4}
+            />
+            <Button className="w-full mt-2" onClick={() => go(1)}>
+              {t("eventWizard.continue", { defaultValue: "Continuer" })}
+            </Button>
+          </StepQuestion>
+        )}
+
+
         {current === "summary" && (
           <div className="space-y-3">
             <div className="text-center pt-2">
