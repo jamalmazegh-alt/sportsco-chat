@@ -143,7 +143,19 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
   const [state, setState] = useState<EventWizardState>(() => defaultState());
   const [draftOffered, setDraftOffered] = useState(false);
   const [hasDraftPrompt, setHasDraftPrompt] = useState(false);
+  const [touched, setTouched] = useState<Set<string>>(() => new Set());
   const screenRef = useRef<HTMLDivElement>(null);
+  function markTouched(k: string) {
+    setTouched((s) => {
+      if (s.has(k)) return s;
+      const n = new Set(s);
+      n.add(k);
+      return n;
+    });
+  }
+  function isAnswered(k: string) {
+    return touched.has(k);
+  }
 
   // Load draft once on mount
   useEffect(() => {
