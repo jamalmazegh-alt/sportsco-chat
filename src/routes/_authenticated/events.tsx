@@ -346,24 +346,24 @@ function EventsPage() {
             <p className="text-sm text-muted-foreground truncate mt-0.5">{club.name}</p>
           )}
         </div>
-        {isCoach && user && (
-          <EventFormSheet
-            open={open}
-            onOpenChange={setOpen}
-            mode="create"
+        {isCoach && user && activeClubId && (
+          <EventCreateChooser
+            clubId={activeClubId}
             teams={teams ?? []}
             userId={user.id}
+            open={open}
+            onOpenChange={setOpen}
             onSaved={() => {
               qc.invalidateQueries({ queryKey: ["events"] });
               qc.invalidateQueries({ queryKey: ["upcoming"] });
             }}
-            trigger={
-              <Button size="sm" className="h-9">
-                <Plus className="h-4 w-4" />
-                {t("events.create")}
-              </Button>
-            }
           />
+        )}
+        {isCoach && user && (
+          <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" />
+            {t("events.create")}
+          </Button>
         )}
       </div>
 
