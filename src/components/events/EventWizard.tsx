@@ -107,7 +107,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert }: Props) 
     if (state.type === "match") s.push("homeaway");
     if (state.type === "match" && state.isHome === "away") s.push("meetingpoint");
     if (state.type === "match") s.push("opponent", "official");
-    s.push("location", "convocation");
+    // Home matches play at the club's usual ground → no address question.
+    // Away matches ask the address directly via the "location" step.
+    const isHomeMatch = state.type === "match" && state.isHome === "home";
+    if (!isHomeMatch) s.push("location");
+    s.push("convocation");
     if (state.type === "match" && state.isHome === "away") s.push("carpool");
     if (state.type === "training") s.push("carpool");
     s.push("summary");
