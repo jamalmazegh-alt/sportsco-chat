@@ -42,58 +42,136 @@ function redactEmail(email: string | null | undefined): string {
   return `${localPart[0]}***@${domain}`
 }
 
+// Verify a Supabase HTTP hook request signed with Standard Webhooks
+// (headers: webhook-id, webhook-timestamp, webhook-signature).
+// Secret format from Supabase dashboard: "v1,whsec_<base64>".
+async function verifySupabaseSignature(
+  rawBody: string,
+  headers: Headers,
+  secret: string,
+): Promise<boolean> {
+  const id = headers.get('webhook-id')
+  const timestamp = headers.get('webhook-timestamp')
+  const signatureHeader = headers.get('webhook-signature')
+  if (!id || !timestamp || !signatureHeader) return false
+
+  // Reject stale (>5 min skew)
+  const tsNum = Number(timestamp)
+  if (!Number.isFinite(tsNum) || Math.abs(Date.now() / 1000 - tsNum) > 300) return false
+
+  const cleaned = secret.replace(/^v1,whsec_/, '').replace(/^whsec_/, '')
+  let keyBytes: Uint8Array
+  try {
+    const bin = atob(cleaned)
+    keyBytes = Uint8Array.from(bin, (c) => c.charCodeAt(0))
+  } catch {
+    // Fall back to raw utf8 if not base64
+    keyBytes = new TextEncoder().encode(cleaned)
+  }
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    keyBytes,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const data = new TextEncoder().encode(`${id}.${timestamp}.${rawBody}`)
+  const sigBuf = await crypto.subtle.sign('HMAC', key, data)
+  const expected = btoa(String.fromCharCode(...new Uint8Array(sigBuf)))
+
+  // Header may contain multiple "v1,<sig>" entries separated by space
+  for (const part of signatureHeader.split(' ')) {
+    const [, sig] = part.split(',')
+    if (sig && sig === expected) return true
+  }
+  return false
+}
+
+function mapSupabasePayload(body: any) {
+  const action_type = body?.email_data?.email_action_type
+  const email = body?.user?.email
+  const token = body?.email_data?.token
+  const token_hash = body?.email_data?.token_hash
+  const site_url = (body?.email_data?.site_url || '').replace(/\/+$/, '')
+  const redirect_to = body?.email_data?.redirect_to || ''
+  const url = site_url && token_hash
+    ? `${site_url}/auth/v1/verify?token=${encodeURIComponent(token_hash)}&type=${encodeURIComponent(action_type)}&redirect_to=${encodeURIComponent(redirect_to)}`
+    : ''
+  return {
+    version: '1',
+    data: {
+      action_type,
+      email,
+      token,
+      url,
+      new_email: body?.email_data?.new_email,
+      old_email: body?.user?.email,
+    },
+  }
+}
+
 export const Route = createFileRoute("/lovable/email/auth/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const authSecret = process.env.AUTH_WEBHOOK_SECRET
         const apiKey = process.env.LOVABLE_API_KEY
+        const isSupabaseHook = request.headers.get('webhook-signature') !== null
 
-        if (!apiKey) {
-          console.error('LOVABLE_API_KEY not configured')
-          return Response.json(
-            { error: 'Server configuration error' },
-            { status: 500 }
-          )
-        }
-
-        // Verify signature + timestamp, then parse payload.
         let payload: any
         let run_id = ''
-        try {
-          const verified = await verifyWebhookRequest({
-            req: request,
-            secret: apiKey,
-            parser: parseEmailWebhookPayload,
-          })
-          payload = verified.payload
-          run_id = payload.run_id
-        } catch (error) {
-          if (error instanceof WebhookError) {
-            switch (error.code) {
-              case 'invalid_signature':
-              case 'missing_timestamp':
-              case 'invalid_timestamp':
-              case 'stale_timestamp':
-                console.error('Invalid webhook signature', { error: error.message })
-                return Response.json(
-                  { error: 'Invalid signature' },
-                  { status: 401 }
-                )
-              case 'invalid_payload':
-              case 'invalid_json':
-                console.error('Invalid webhook payload', { error: error.message })
-                return Response.json(
-                  { error: 'Invalid webhook payload' },
-                  { status: 400 }
-                )
-            }
-          }
 
-          console.error('Webhook verification failed', { error })
-          return Response.json(
-            { error: 'Invalid webhook payload' },
-            { status: 400 }
-          )
+        if (isSupabaseHook) {
+          if (!authSecret) {
+            console.error('AUTH_WEBHOOK_SECRET not configured')
+            return Response.json({ error: 'Server configuration error' }, { status: 500 })
+          }
+          const rawBody = await request.text()
+          const ok = await verifySupabaseSignature(rawBody, request.headers, authSecret)
+          if (!ok) {
+            console.error('Invalid Supabase webhook signature')
+            return Response.json({ error: 'Invalid signature' }, { status: 401 })
+          }
+          let parsed: any
+          try {
+            parsed = JSON.parse(rawBody)
+          } catch {
+            return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+          }
+          payload = mapSupabasePayload(parsed)
+          run_id = request.headers.get('webhook-id') || crypto.randomUUID()
+        } else {
+          if (!apiKey) {
+            console.error('LOVABLE_API_KEY not configured')
+            return Response.json({ error: 'Server configuration error' }, { status: 500 })
+          }
+          try {
+            const verified = await verifyWebhookRequest({
+              req: request,
+              secret: apiKey,
+              parser: parseEmailWebhookPayload,
+            })
+            payload = verified.payload
+            run_id = payload.run_id
+          } catch (error) {
+            if (error instanceof WebhookError) {
+              switch (error.code) {
+                case 'invalid_signature':
+                case 'missing_timestamp':
+                case 'invalid_timestamp':
+                case 'stale_timestamp':
+                  console.error('Invalid webhook signature', { error: error.message })
+                  return Response.json({ error: 'Invalid signature' }, { status: 401 })
+                case 'invalid_payload':
+                case 'invalid_json':
+                  console.error('Invalid webhook payload', { error: error.message })
+                  return Response.json({ error: 'Invalid webhook payload' }, { status: 400 })
+              }
+            }
+            console.error('Webhook verification failed', { error })
+            return Response.json({ error: 'Invalid webhook payload' }, { status: 400 })
+          }
         }
 
         if (!run_id) {
