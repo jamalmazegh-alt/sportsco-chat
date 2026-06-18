@@ -42,6 +42,57 @@ function redactEmail(email: string | null | undefined): string {
   return `${localPart[0]}***@${domain}`
 }
 
+// Short, non-reversible fingerprint (first 8 hex of SHA-256). Used to compare
+// *which* secret the deployed Worker is running across attempts WITHOUT logging
+// the secret itself.
+async function shortFingerprint(input: string | null | undefined): Promise<string> {
+  if (!input) return 'none'
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return Array.from(new Uint8Array(buf))
+    .slice(0, 4)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+// DIAGNOSTIC (temporary — remove once the reset-email root cause is confirmed).
+// Both Supabase and the Lovable proxy sign with the Standard Webhooks scheme, so
+// when password-reset emails silently fail we cannot tell "the proxy never
+// reached our Worker" (no row at all) from "reached us but we rejected the
+// signature" (row present). The verification-failure path returns 401 *before*
+// the `pending` insert, leaving zero trace. This persists a durable trace on
+// rejection. It logs only header presence and short non-reversible fingerprints
+// — never any secret.
+async function logWebhookRejection(
+  request: Request,
+  info: { path: 'supabase' | 'lovable'; reason: string; keyFingerprint: string },
+): Promise<void> {
+  try {
+    const relevant = [
+      'webhook-id',
+      'webhook-timestamp',
+      'webhook-signature',
+      'x-lovable-signature',
+      'x-lovable-timestamp',
+    ]
+    const headersPresent = relevant.filter((h) => request.headers.get(h) !== null)
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+    await supabaseAdmin.from('email_send_log').insert({
+      template_name: 'auth_webhook_diag',
+      recipient_email: '(rejected)',
+      status: 'failed',
+      error_message: `${info.path} path rejected: ${info.reason}`,
+      metadata: {
+        path: info.path,
+        reason: info.reason,
+        worker_key_fingerprint: info.keyFingerprint,
+        headers_present: headersPresent,
+      },
+    })
+  } catch (logError) {
+    console.error('Failed to record webhook-rejection diagnostic', { error: logError })
+  }
+}
+
 // Verify a Supabase HTTP hook request signed with Standard Webhooks
 // (headers: webhook-id, webhook-timestamp, webhook-signature).
 // Secret format from Supabase dashboard: "v1,whsec_<base64>".
@@ -131,6 +182,11 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           const ok = await verifySupabaseSignature(rawBody, request.headers, authSecret)
           if (!ok) {
             console.error('Invalid Supabase webhook signature')
+            await logWebhookRejection(request, {
+              path: 'supabase',
+              reason: 'invalid_signature',
+              keyFingerprint: await shortFingerprint(authSecret),
+            })
             return Response.json({ error: 'Invalid signature' }, { status: 401 })
           }
           let parsed: any
@@ -158,9 +214,20 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             if (error instanceof WebhookError) {
               switch (error.code) {
                 case 'invalid_signature':
-                case 'missing_timestamp':
                 case 'invalid_timestamp':
                 case 'stale_timestamp':
+                  // Well-formed signed request that failed verification — almost
+                  // always a LOVABLE_API_KEY mismatch between the Lovable proxy
+                  // (signer) and this Worker (verifier). Persist a durable trace.
+                  console.error('Invalid webhook signature', { code: error.code, error: error.message })
+                  await logWebhookRejection(request, {
+                    path: 'lovable',
+                    reason: error.code,
+                    keyFingerprint: await shortFingerprint(apiKey),
+                  })
+                  return Response.json({ error: 'Invalid signature' }, { status: 401 })
+                case 'missing_timestamp':
+                  // Unsigned junk — do not persist, to avoid spamming the log.
                   console.error('Invalid webhook signature', { error: error.message })
                   return Response.json({ error: 'Invalid signature' }, { status: 401 })
                 case 'invalid_payload':
