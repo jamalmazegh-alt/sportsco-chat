@@ -8,7 +8,17 @@ const MARKETING_CHAT_RATE_LIMIT_PER_HOUR = 20;
 const MAX_MESSAGE_CHARS = 2000;
 
 
-type ChatRequestBody = { messages?: unknown };
+type ChatRequestBody = { messages?: unknown; language?: unknown };
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  fr: "French",
+  en: "English",
+  de: "German",
+  es: "Spanish",
+  pt: "Portuguese",
+  it: "Italian",
+  nl: "Dutch",
+};
 
 const SYSTEM_PROMPT = `Tu es l'assistant virtuel du site vitrine de Clubero (https://www.clubero.app), une application web et mobile de gestion de club sportif amateur.
 
