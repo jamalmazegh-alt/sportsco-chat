@@ -36,10 +36,20 @@ const SUGGESTIONS = [
 ];
 
 export function MarketingChatWidget() {
+  const { i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const langRef = useRef(i18n.language);
+  useEffect(() => {
+    langRef.current = i18n.language;
+  }, [i18n.language]);
   const transport = useRef(
-    new DefaultChatTransport({ api: "/api/public/marketing-chat" })
+    new DefaultChatTransport({
+      api: "/api/public/marketing-chat",
+      prepareSendMessagesRequest: ({ messages, id, body }) => ({
+        body: { messages, id, language: langRef.current, ...body },
+      }),
+    })
   ).current;
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
