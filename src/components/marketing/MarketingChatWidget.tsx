@@ -30,7 +30,8 @@ import { VoiceInputButton } from "@/components/voice-input-button";
 
 
 export function MarketingChatWidget() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation("marketing");
+  const suggestions = t("chatWidget.suggestions", { returnObjects: true }) as string[];
   const [open, setOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const langRef = useRef(i18n.language);
