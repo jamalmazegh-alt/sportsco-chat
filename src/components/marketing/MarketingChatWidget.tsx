@@ -28,15 +28,10 @@ import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 import { VoiceInputButton } from "@/components/voice-input-button";
 
-const SUGGESTIONS = [
-  "C'est quoi Clubero, en 1 phrase ?",
-  "Quels sont vos tarifs ?",
-  "Comment se passe la démo ?",
-  "Est-ce adapté à mon club de 60 joueurs ?",
-];
 
 export function MarketingChatWidget() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation("marketing");
+  const suggestions = t("chatWidget.suggestions", { returnObjects: true }) as string[];
   const [open, setOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const langRef = useRef(i18n.language);
@@ -77,7 +72,7 @@ export function MarketingChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((s) => !s)}
-        aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}
+        aria-label={open ? t("chatWidget.ariaClose") : t("chatWidget.ariaOpen")}
         className={cn(
           "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-xl shadow-primary/20 transition-all",
           "bg-[color:var(--brand-blue-deep,theme(colors.primary.DEFAULT))] text-white hover:scale-[1.03]",
@@ -85,7 +80,7 @@ export function MarketingChatWidget() {
         )}
       >
         <Sparkles className="h-4 w-4" />
-        <span className="text-sm font-medium">Une question ?</span>
+        <span className="text-sm font-medium">{t("chatWidget.launcher")}</span>
       </button>
 
       {/* Panel */}
@@ -104,9 +99,9 @@ export function MarketingChatWidget() {
                 <MessageCircle className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-semibold leading-tight">Assistant Clubero</p>
+                <p className="text-sm font-semibold leading-tight">{t("chatWidget.title")}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  Assistant IA · réponses générées automatiquement
+                  {t("chatWidget.subtitle")}
                 </p>
               </div>
             </div>
@@ -116,7 +111,7 @@ export function MarketingChatWidget() {
                   variant="ghost"
                   size="icon-sm"
                   onClick={() => setMessages([])}
-                  aria-label="Réinitialiser"
+                  aria-label={t("chatWidget.reset")}
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>
@@ -125,7 +120,7 @@ export function MarketingChatWidget() {
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => setOpen(false)}
-                aria-label="Fermer"
+                aria-label={t("chatWidget.close")}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -137,11 +132,11 @@ export function MarketingChatWidget() {
               {messages.length === 0 ? (
                 <ConversationEmptyState
                   icon={<Sparkles className="h-7 w-7 text-primary" />}
-                  title="Bonjour 👋"
-                  description="Je peux vous expliquer Clubero, les tarifs, ou organiser une démo."
+                  title={t("chatWidget.emptyTitle")}
+                  description={t("chatWidget.emptyDescription")}
                 >
                   <div className="mt-4 grid w-full gap-2">
-                    {SUGGESTIONS.map((s) => (
+                    {suggestions.map((s: string) => (
                       <button
                         key={s}
                         type="button"
@@ -153,7 +148,7 @@ export function MarketingChatWidget() {
                     ))}
                     <Button asChild size="sm" className="mt-2 w-full">
                       <Link to="/demo" onClick={() => setOpen(false)}>
-                        Demander une démo directement
+                        {t("chatWidget.demoCta")}
                       </Link>
                     </Button>
                   </div>
@@ -186,7 +181,7 @@ export function MarketingChatWidget() {
               {status === "submitted" && (
                 <Message from="assistant">
                   <MessageContent className="bg-transparent p-0">
-                    <Shimmer>Réflexion...</Shimmer>
+                    <Shimmer>{t("chatWidget.thinking")}</Shimmer>
                   </MessageContent>
                 </Message>
               )}
@@ -198,7 +193,7 @@ export function MarketingChatWidget() {
             <PromptInput onSubmit={handleSubmit}>
               <PromptInputTextarea
                 ref={textareaRef}
-                placeholder="Posez votre question..."
+                placeholder={t("chatWidget.placeholder")}
               />
               <PromptInputFooter className="justify-end gap-1">
                 <VoiceInputButton textareaRef={textareaRef} />
