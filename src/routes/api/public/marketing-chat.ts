@@ -129,7 +129,7 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
         try {
           const result = streamText({
             model,
-            system: SYSTEM_PROMPT,
+            system: `${SYSTEM_PROMPT}\n\nIMPORTANT: The user's interface language is "${langName}" (code: ${langCode}). You MUST respond in ${langName}, regardless of the language used in previous messages or examples. Internal links (e.g. /demo, /pricing) stay as-is.`,
             stopWhen: stepCountIs(3),
             messages: await convertToModelMessages(messages as UIMessage[]),
           });
