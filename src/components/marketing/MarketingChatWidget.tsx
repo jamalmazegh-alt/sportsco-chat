@@ -181,7 +181,7 @@ export function MarketingChatWidget() {
               {status === "submitted" && (
                 <Message from="assistant">
                   <MessageContent className="bg-transparent p-0">
-                    <Shimmer>Réflexion...</Shimmer>
+                    <Shimmer>{t("chatWidget.thinking")}</Shimmer>
                   </MessageContent>
                 </Message>
               )}
@@ -193,7 +193,7 @@ export function MarketingChatWidget() {
             <PromptInput onSubmit={handleSubmit}>
               <PromptInputTextarea
                 ref={textareaRef}
-                placeholder="Posez votre question..."
+                placeholder={t("chatWidget.placeholder")}
               />
               <PromptInputFooter className="justify-end gap-1">
                 <VoiceInputButton textareaRef={textareaRef} />
