@@ -1340,5 +1340,25 @@
     "p2Body": "Descubre progresivamente los perfiles públicos de jugadores y entrenadores en Clubero, filtrados por deporte, club o región.",
     "p3Title": "Perfiles enriquecidos por clubes",
     "p3Body": "Los perfiles pueden ser enriquecidos y complementados por los clubes de Clubero: estadísticas, logros, historial de temporadas."
+  },
+  "chatWidget": {
+    "launcher": "¿Una pregunta?",
+    "ariaOpen": "Abrir asistente",
+    "ariaClose": "Cerrar asistente",
+    "title": "Asistente Clubero",
+    "subtitle": "Asistente IA · respuestas generadas automáticamente",
+    "reset": "Reiniciar",
+    "close": "Cerrar",
+    "emptyTitle": "Hola 👋",
+    "emptyDescription": "Puedo explicarte Clubero, los precios u organizar una demo.",
+    "demoCta": "Pedir una demo directamente",
+    "thinking": "Pensando...",
+    "placeholder": "Haz tu pregunta...",
+    "suggestions": [
+      "¿Qué es Clubero, en una frase?",
+      "¿Cuáles son vuestros precios?",
+      "¿Cómo funciona la demo?",
+      "¿Es adecuado para mi club de 60 jugadores?"
+    ]
   }
 }

@@ -1340,5 +1340,25 @@
     "p2Body": "Ontdek stap voor stap de openbare profielen van Spelers en Coaches op Clubero, gefilterd op sport, Club of regio.",
     "p3Title": "Profielen verrijkt door Clubs",
     "p3Body": "Profielen kunnen door Clubero-Clubs worden verrijkt en aangevuld — statistieken, successen, seizoenhistorie."
+  },
+  "chatWidget": {
+    "launcher": "Een vraag?",
+    "ariaOpen": "Assistent openen",
+    "ariaClose": "Assistent sluiten",
+    "title": "Clubero-assistent",
+    "subtitle": "AI-assistent · automatisch gegenereerde antwoorden",
+    "reset": "Resetten",
+    "close": "Sluiten",
+    "emptyTitle": "Hallo 👋",
+    "emptyDescription": "Ik kan Clubero uitleggen, prijzen geven of een demo regelen.",
+    "demoCta": "Direct een demo aanvragen",
+    "thinking": "Aan het nadenken...",
+    "placeholder": "Stel je vraag...",
+    "suggestions": [
+      "Wat is Clubero, in één zin?",
+      "Wat zijn jullie tarieven?",
+      "Hoe verloopt de demo?",
+      "Is het geschikt voor mijn club van 60 spelers?"
+    ]
   }
 }

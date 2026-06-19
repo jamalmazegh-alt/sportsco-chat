@@ -1340,5 +1340,25 @@
     "p2Body": "Progressively discover public profiles of players and coaches on Clubero, filtered by sport, club or region.",
     "p3Title": "Club-enriched profiles",
     "p3Body": "Profiles can be enriched and completed by Clubero clubs — stats, achievements, season history."
+  },
+  "chatWidget": {
+    "launcher": "A question?",
+    "ariaOpen": "Open assistant",
+    "ariaClose": "Close assistant",
+    "title": "Clubero Assistant",
+    "subtitle": "AI assistant · automatically generated answers",
+    "reset": "Reset",
+    "close": "Close",
+    "emptyTitle": "Hi 👋",
+    "emptyDescription": "I can explain Clubero, pricing, or book a demo.",
+    "demoCta": "Book a demo directly",
+    "thinking": "Thinking...",
+    "placeholder": "Ask your question...",
+    "suggestions": [
+      "What is Clubero, in one sentence?",
+      "What are your prices?",
+      "How does the demo work?",
+      "Is it suitable for my club of 60 players?"
+    ]
   }
 }
