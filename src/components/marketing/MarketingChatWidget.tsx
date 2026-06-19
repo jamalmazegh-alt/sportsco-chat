@@ -99,9 +99,9 @@ export function MarketingChatWidget() {
                 <MessageCircle className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-semibold leading-tight">Assistant Clubero</p>
+                <p className="text-sm font-semibold leading-tight">{t("chatWidget.title")}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  Assistant IA · réponses générées automatiquement
+                  {t("chatWidget.subtitle")}
                 </p>
               </div>
             </div>
@@ -111,7 +111,7 @@ export function MarketingChatWidget() {
                   variant="ghost"
                   size="icon-sm"
                   onClick={() => setMessages([])}
-                  aria-label="Réinitialiser"
+                  aria-label={t("chatWidget.reset")}
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>
@@ -120,7 +120,7 @@ export function MarketingChatWidget() {
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => setOpen(false)}
-                aria-label="Fermer"
+                aria-label={t("chatWidget.close")}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -132,11 +132,11 @@ export function MarketingChatWidget() {
               {messages.length === 0 ? (
                 <ConversationEmptyState
                   icon={<Sparkles className="h-7 w-7 text-primary" />}
-                  title="Bonjour 👋"
-                  description="Je peux vous expliquer Clubero, les tarifs, ou organiser une démo."
+                  title={t("chatWidget.emptyTitle")}
+                  description={t("chatWidget.emptyDescription")}
                 >
                   <div className="mt-4 grid w-full gap-2">
-                    {SUGGESTIONS.map((s) => (
+                    {suggestions.map((s: string) => (
                       <button
                         key={s}
                         type="button"
@@ -148,7 +148,7 @@ export function MarketingChatWidget() {
                     ))}
                     <Button asChild size="sm" className="mt-2 w-full">
                       <Link to="/demo" onClick={() => setOpen(false)}>
-                        Demander une démo directement
+                        {t("chatWidget.demoCta")}
                       </Link>
                     </Button>
                   </div>
