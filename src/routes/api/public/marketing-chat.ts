@@ -8,7 +8,17 @@ const MARKETING_CHAT_RATE_LIMIT_PER_HOUR = 20;
 const MAX_MESSAGE_CHARS = 2000;
 
 
-type ChatRequestBody = { messages?: unknown };
+type ChatRequestBody = { messages?: unknown; language?: unknown };
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  fr: "French",
+  en: "English",
+  de: "German",
+  es: "Spanish",
+  pt: "Portuguese",
+  it: "Italian",
+  nl: "Dutch",
+};
 
 const SYSTEM_PROMPT = `Tu es l'assistant virtuel du site vitrine de Clubero (https://www.clubero.app), une application web et mobile de gestion de club sportif amateur.
 
@@ -80,10 +90,12 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
-        const { messages } = (await request.json()) as ChatRequestBody;
+        const { messages, language } = (await request.json()) as ChatRequestBody;
         if (!Array.isArray(messages) || messages.length > 40) {
           return new Response("Invalid messages", { status: 400 });
         }
+        const langCode = typeof language === "string" ? language.slice(0, 5).toLowerCase() : "fr";
+        const langName = LANGUAGE_NAMES[langCode.slice(0, 2)] ?? "French";
 
         // Reject oversized prompts (LLM cost abuse).
         for (const m of messages as Array<{ content?: unknown; parts?: Array<{ text?: string }> }>) {
@@ -117,7 +129,7 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
         try {
           const result = streamText({
             model,
-            system: SYSTEM_PROMPT,
+            system: `${SYSTEM_PROMPT}\n\nIMPORTANT: The user's interface language is "${langName}" (code: ${langCode}). You MUST respond in ${langName}, regardless of the language used in previous messages or examples. Internal links (e.g. /demo, /pricing) stay as-is.`,
             stopWhen: stepCountIs(3),
             messages: await convertToModelMessages(messages as UIMessage[]),
           });
