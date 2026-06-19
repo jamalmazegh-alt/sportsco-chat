@@ -90,10 +90,12 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
-        const { messages } = (await request.json()) as ChatRequestBody;
+        const { messages, language } = (await request.json()) as ChatRequestBody;
         if (!Array.isArray(messages) || messages.length > 40) {
           return new Response("Invalid messages", { status: 400 });
         }
+        const langCode = typeof language === "string" ? language.slice(0, 5).toLowerCase() : "fr";
+        const langName = LANGUAGE_NAMES[langCode.slice(0, 2)] ?? "French";
 
         // Reject oversized prompts (LLM cost abuse).
         for (const m of messages as Array<{ content?: unknown; parts?: Array<{ text?: string }> }>) {
