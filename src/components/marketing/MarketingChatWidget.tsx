@@ -28,12 +28,6 @@ import { cn } from "@/lib/utils";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 import { VoiceInputButton } from "@/components/voice-input-button";
 
-const SUGGESTIONS = [
-  "C'est quoi Clubero, en 1 phrase ?",
-  "Quels sont vos tarifs ?",
-  "Comment se passe la démo ?",
-  "Est-ce adapté à mon club de 60 joueurs ?",
-];
 
 export function MarketingChatWidget() {
   const { i18n } = useTranslation();
