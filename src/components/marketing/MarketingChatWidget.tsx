@@ -72,7 +72,7 @@ export function MarketingChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((s) => !s)}
-        aria-label={open ? "Fermer l'assistant" : "Ouvrir l'assistant"}
+        aria-label={open ? t("chatWidget.ariaClose") : t("chatWidget.ariaOpen")}
         className={cn(
           "fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-xl shadow-primary/20 transition-all",
           "bg-[color:var(--brand-blue-deep,theme(colors.primary.DEFAULT))] text-white hover:scale-[1.03]",
@@ -80,7 +80,7 @@ export function MarketingChatWidget() {
         )}
       >
         <Sparkles className="h-4 w-4" />
-        <span className="text-sm font-medium">Une question ?</span>
+        <span className="text-sm font-medium">{t("chatWidget.launcher")}</span>
       </button>
 
       {/* Panel */}
