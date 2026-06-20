@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,8 +12,15 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId/timeline")({
+  // PR4-WS1: timeline cross-club lifetime — gated derrière `public_player_profiles`.
+  beforeLoad: ({ params }) => {
+    if (!isV2("public_player_profiles")) {
+      throw redirect({ to: "/players/$playerId", params: { playerId: params.playerId } });
+    }
+  },
   component: TimelineTab,
 });
 
