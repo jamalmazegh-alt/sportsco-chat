@@ -1,120 +1,98 @@
+# PR4 — Fermeture des canaux restants & waitlist V2
 
-# Refocus Bêta V1 — Plan d'exécution
+## Préalable bloquant à trancher (à valider)
 
-Objectif : masquer (jamais supprimer) tout ce qui relève de V2 derrière 4 feature flags, et aligner site vitrine ↔ app ↔ produit. Vie du club (mur, actus FB, covoiturage, messagerie, compétitions gratuites) reste pleinement visible.
+`src/config/features.ts` est client/SSR only. Les notifications, emails et triggers DB sont émis côté serveur (edge functions + triggers Postgres) et n'ont pas accès à ce module. Il faut une **source serveur** du flag.
 
-## 1. Source de vérité : flags
+**Recommandation (option pragmatique bêta)** : variables d'env Worker/Edge :
+- `SOCIAL_NETWORK_V2=false`
+- `PUBLIC_PLAYER_PROFILES=false`
+- `FUNDRAISING_V2=false`
+- `PAYMENTS_V2=false`
 
-Créer `src/config/features.ts` :
+Plus un petit helper `src/lib/features.server.ts` qui lit `process.env` et expose `isV2Server('payments_v2')`. Pour les **triggers DB** (qui ne lisent pas l'env Node), on ajoute une table `app_flags(key text pk, enabled bool)` lue par les fonctions SQL concernées via une fonction `public.is_v2(key text) returns bool stable security definer`. Une seule source applicative (`features.ts`), deux miroirs serveurs (`process.env` pour TS, `app_flags` pour SQL), à garder synchronisés via doc dans `feature-matrix.md`.
 
-```ts
-export const V2_FLAGS = {
-  social_network_v2: false,
-  public_player_profiles: false,
-  fundraising_v2: false,
-  payments_v2: false,
-} as const;
-export const isV2 = (f: keyof typeof V2_FLAGS) => V2_FLAGS[f];
-```
+**Décision attendue avant WS2/WS5.** Si validée → on l'implémente en début de PR4.
 
-Aucun code n'est supprimé. Tout gating passe par `isV2(...)`.
+## Périmètre
 
-## 2. Audit & matrice (livrable)
+6 chantiers (WS1→WS6) + i18n + DoD. On masque, on ne supprime pas. Flip de flag = réactivation totale.
 
-Avant de toucher au code, produire `docs/beta-v1/feature-matrix.md` : tableau Feature → État (Visible / Masqué / V2 / flag) — référence officielle. Sert de checklist pour l'audit des points d'entrée.
+### WS1 — Recherche globale (`src/components/global-search.tsx`)
+- Gater la branche `players` derrière `isV2('public_player_profiles')`.
+- Aucun résultat « club découverte » ni profil public.
+- Conserver intra-club (mes équipes / mes events / membres de mon club uniquement).
+- Garantir absence de lien `/p/$slug`, `/coach/$slug`, `/players/$id` (hors club courant).
 
-Points d'entrée à auditer systématiquement :
-- `src/components/bottom-nav.tsx`, `src/components/assistant-fab.tsx`
-- nav admin (`src/routes/_authenticated/admin/*`)
-- `src/routes/_authenticated/home.tsx` (dashboard, raccourcis, quick actions)
-- `src/routes/_authenticated/profile*.tsx`, `players/$playerId*`
-- `src/routes/_authenticated/payments*`, `_authenticated/follow-ups.tsx`, `following.tsx`
-- pages publiques `p.$slug.tsx`, `players.tsx`, `coach.$slug.tsx`
-- recherche globale (si présente) + sitemap `sitemap[.]xml.ts`
-- onboarding (`onboarding.tsx`, redirects)
-- notifications (`notifications.tsx`, émetteurs serveur)
-- vitrine : `features.tsx`, `pricing.tsx`, `demo.tsx`, `contact.tsx`, `fr.tournois`, `en.tournaments`, `fr.onboarding-club`, `en.club-onboarding`, marketing chat
-- composants `src/components/marketing/*`
+### WS2 — Notifications & emails (serveur)
+- Repérer émetteurs : `rg notifications|enqueue_email|notify` dans `src/routes/api/` + `supabase/functions/` + migrations triggers.
+- Gater l'insert/enqueue derrière `isV2Server(...)` ou `public.is_v2(...)` selon contexte.
+- Cibles : follows, receipts paiement, pass tournoi, rappels follow-ups, cagnottes.
+- Auditer templates email (`src/routes/lovable/email/transactional/*`) : aucun lien vers route masquée.
 
-## 3. Masquage groupe A — réseau social & profils publics
+### WS3 — Onboarding
+- Auditer `src/routes/_authenticated/` (étapes setup club / profil / paiements).
+- Retirer étapes "Configurer Stripe", "Profil public", "Suivre".
+- Renuméroter, par rôle (parent/joueur/coach/admin/orga).
 
-Flags : `social_network_v2`, `public_player_profiles`.
+### WS4 — Menus contextuels, avatars, réglages Stripe
+- Wrapper `Avatar` partagé : prop `linkToProfile` gatée par `isV2('public_player_profiles')`. Si off → rendre `<span>` non cliquable (ou mini-fiche club-scoped).
+- Audit `rg "to=\"/players|/p/\\$|/coach/\\$|payments|new-from-pass" src` → neutraliser chaque `<Link>`.
+- Menus kebab : retirer "Voir profil", "Suivre", "Mettre en relation".
+- Admin club : masquer entrée "Stripe / Paiements / Connecter" derrière `payments_v2`.
 
-- Nav : retirer entrées "Découvrir", "Réseau", "Following", "Players publics" du bottom-nav et menus.
-- Routes : ajouter `beforeLoad: () => { if (!isV2('social_network_v2')) throw redirect({ to: '/home' }); }` sur :
-  - `_authenticated/following.tsx`, `_authenticated/follow-ups.tsx`
-  - `players.tsx` (liste publique), `p.$slug.tsx`, `coach.$slug.tsx` → redirect `/` + meta `noindex`
-- Profil joueur : `players/$playerId.tsx` reste accessible aux membres du club (vue basique), mais désactiver onglets enrichis (achievements, seasons publiques, timeline publique partageable) derrière `public_player_profiles`.
-- Sitemap : exclure URLs de profils publics joueurs/coachs.
-- Notifications : filtrer côté UI les notifs pointant vers ces routes (passe-plat sans CTA).
+### WS5 — Waitlist « Être prévenu »
+- **Migration** : table `public.waitlist_interest` (sans policies select/insert anon/auth), GRANT service_role only.
+- **Server route** `src/routes/api/public/waitlist-interest.ts` (POST) :
+  - Zod validate `email`, `features[]`, `role?`, `marketing_consent`, honeypot.
+  - Rate-limit via `checkRateLimit` existant.
+  - Insert via `supabaseAdmin` (chargé dynamiquement).
+  - `consent_at = now()` si consent true, sinon null.
+- **Composant** dans section "À venir" de `src/routes/index.tsx` : multi-select features, select rôle, checkbox consent non pré-cochée. CTA "Être prévenu" uniquement.
+- i18n 7 langues (labels, options, consent).
+- Matrice : ajouter ligne "Capture liste d'attente V2 — Visible".
 
-## 4. Masquage groupe B — paiements & collectes
+### WS6 — Smoke test étendu (`tests/e2e/beta-v1-masking.e2e.ts`)
+Assertions :
+- Chaque route masquée → accès direct → URL finale = `/home` (redirect), pas 404/500.
+- Recherche globale d'un nom de joueur public seedé → 0 lien `/p/`, `/coach/`, `/players/`.
+- Bottom-nav + nav secondaire → aucune entrée masquée.
+- Onboarding 4 rôles → aucun lien masqué.
+- Clic avatar roster → pas de navigation vers `/p/` / `/coach/`.
+- `sitemap.xml` → ne contient ni `/players`, ni `/p/`, ni `/payments`.
+- Profils publics → `<meta name=robots content=noindex,nofollow>` avant redirect.
+- Waitlist → POST crée 1 ligne sans déblocage.
+- `data-testid` ajoutés sur avatar, nav items, étapes onboarding, search input.
 
-Flags : `payments_v2`, `fundraising_v2`.
+## i18n
+Namespace `marketing` (7 langues) : badge "À venir", labels formulaire waitlist, options features/rôles, consent, bouton. Aucune clé supprimée.
 
-- Nav : retirer item "Paiements" du bottom-nav (déjà conditionnel via `clubLocked`, mais ajouter masquage global).
-- Routes (redirect /home) :
-  - `_authenticated/payments.tsx`, `payments.family.tsx`, `payments.receipts.tsx`
-  - `t.$slug.pay.$registrationId.tsx` → message "Paiement indisponible en bêta", redirect vers page tournoi
-  - `tournaments.pass-success.tsx`, `tournaments.new-from-pass.tsx` → redirect
-- Admin : masquer sections billing/Stripe Connect/cotisations dans `_authenticated/admin/*` et `superadmin/billing.tsx`.
-- Tournois : forcer parcours d'inscription **gratuit**, même > 8 équipes ; retirer écrans Stripe Connect, packs payants, prix.
-- Wall/club : retirer CTA "Créer une collecte", "Cotisations".
-- Vitrine : retirer `pricing.tsx` du menu principal (laisser route avec teaser "à venir", pas de CTA achat) ; retirer toute mention "Connecter Stripe".
-- Serveur : webhooks Stripe (`api/public/stripe-webhook`, `webhooks/stripe`, fonctions tournament-payments) **restent câblés**. Pas de suppression.
+## Definition of Done
+- Flag serveur en place ; émission notif/email gatée serveur.
+- Recherche globale purgée.
+- Onboarding sans étape masquée (4 rôles).
+- Avatars/noms non cliquables (ou mini-fiche) ; Stripe nettoyé.
+- Zéro CTA résiduel (collecte/paiement/pass/suivre).
+- `waitlist_interest` + route publique (honeypot/rate-limit) ; RGPD OK ; matrice à jour.
+- Smoke test étendu vert.
+- i18n 7 langues à jour.
+- TypeScript vert ; aucun fichier supprimé ; flip flag = réactivation.
 
-## 5. Mur du club + actus Facebook (à valoriser)
+## Hors scope
+- Championnats/Ligues (V2 non développé).
+- Refonte exhaustive route-par-route au-delà de l'audit `rg`.
 
-- Renommer dans i18n (7 langues) toute formulation "réseau social" / "social feed" / "social network" liée à l'intégration FB → **"Actualités du club"** / "Club news". Garder les clés, modifier les valeurs.
-- Vérifier fallback FB : si fetch échoue, afficher bouton "Voir la page Facebook du club" (URL stockée) au lieu d'écran vide.
-- Confirmer champ `source` sur items du mur (extensible : facebook/manual/rss). Si absent, ajouter migration légère ; sinon documenter.
+## Ordre d'exécution
+0. **Décision flag serveur** (env + `app_flags` ?) ← bloque WS2/WS5
+1. WS1 (recherche)
+2. WS4 (avatars/menus/Stripe) — gros volume de grep, parallélisable
+3. WS3 (onboarding)
+4. WS2 (notifs/emails serveur)
+5. WS5 (waitlist, en parallèle vitrine)
+6. WS6 (smoke, en dernier)
+7. i18n 7 langues
+8. QA manuelle 6 rôles mobile+desktop
 
-## 6. Site vitrine — repositionnement 3 piliers
+---
 
-Refonte `src/routes/features.tsx` et composants marketing autour de :
-1. **Gestion du club** (matchs, entraînements, convocations, présences, documents, covoiturage)
-2. **Communication** (mur, actualités club, FB, messagerie)
-3. **Compétitions** (tournois, poules, phases finales, terrains, arbitres, classements)
-
-Section séparée **"Bientôt"** / "Roadmap" avec badges "À venir" pour :
-- Réseau social joueurs · LinkedIn du football · découverte de talents · marketplace · paiements & collectes · championnats/ligues.
-- CTA autorisé : "Être prévenu" (newsletter/liste d'attente). Aucun "Essayer", aucun lien vers feature masquée, aucun tunnel d'achat.
-
-Mettre à jour : `features.tsx`, `pricing.tsx` (teaser only, pas de CTA achat), homepage marketing, `fr.tournois`/`en.tournaments`, `fr.onboarding-club`/`en.club-onboarding`, marketing chat (prompt système : ne plus présenter V2 comme disponibles).
-
-Message cœur : *« La solution la plus simple pour gérer un club sportif, organiser des compétitions et centraliser la vie du club. »*
-
-## 7. i18n
-
-- Conserver toutes les clés. Modifier uniquement les valeurs marketing (réseau social → actualités du club ; pricing → "à venir").
-- 7 langues : fr, en, de, es, it, nl, pt. Patch via `scripts/i18n-patches/*.json` existants si pertinent.
-
-## 8. Tests
-
-- `.skip` (pas suppression) sur E2E des features masquées :
-  - `15-clubero-pack-purchase.e2e.ts`, `21-follows.e2e.ts`, `22-player-public-profile.e2e.ts`
-  - parties paiement de `16-tournament-lifecycle.e2e.ts`
-- Nouveau smoke : `tests/e2e/beta-v1-masking.e2e.ts` — vérifie redirects routes masquées, absence d'items de nav, absence CTA paiements.
-- RLS et unit tests inchangés.
-
-## 9. Definition of Done
-
-- [ ] `src/config/features.ts` créé, 4 flags `false`.
-- [ ] Matrice `docs/beta-v1/feature-matrix.md` livrée.
-- [ ] Routes V2 → redirect (jamais 404/500).
-- [ ] Nav, dashboard, recherche, notifications, deep links purgés.
-- [ ] Mur + actus FB OK avec fallback, libellés "Actualités du club".
-- [ ] Vitrine : 3 piliers + section "À venir" sans CTA app.
-- [ ] Tournois gratuits bout-en-bout.
-- [ ] E2E masqués `.skip`, smoke vert.
-- [ ] Flip d'un flag = réactivation immédiate, zéro refacto.
-
-## Notes d'exécution
-
-- Scope énorme : je propose de **livrer en 3 PR successives** :
-  1. **PR1 — Fondations** : `features.ts`, matrice, gating routes (redirects), masquage nav. C'est ce qui ferme la fuite.
-  2. **PR2 — Vitrine** : repositionnement 3 piliers + section "À venir" + marketing chat + i18n.
-  3. **PR3 — Tests & polish** : `.skip` E2E, smoke, audit final 6 rôles, fallback FB durci.
-- Avant de démarrer PR1, je vais lire en parallèle : `bottom-nav`, `home.tsx`, `features.tsx`, `pricing.tsx`, composants marketing wall/FB, routes paiements & follows pour confirmer les points exacts à gater.
-
-**Question avant exécution** : tu valides ce découpage en 3 PR ? Ou tu veux que je fasse tout en une seule passe (plus long, plus risqué) ?
+**Question avant exécution** : je pars sur l'option pragmatique (env Worker + table `app_flags` pour SQL), ou tu préfères tout centraliser dans `app_flags` (lecture client via RPC `public.is_v2`) ? Le 2e est plus propre mais ajoute 1 RPC + invalidation cache côté client.
