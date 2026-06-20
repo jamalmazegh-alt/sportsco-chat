@@ -426,26 +426,18 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
       const { enqueueTransactionalEmailServer } = await import(
         "@/lib/email/send.server"
       );
-      const { isV2Server } = await import("@/lib/features.server");
-      if (await isV2Server("payments_v2")) {
-        await enqueueTransactionalEmailServer({
-          templateName: "tournament-payment-request",
-          recipientEmail: reg.contact_email,
-          templateData: {
-            teamName: reg.team_name,
-            tournamentName: t.name,
-            amountLabel,
-            paymentUrl: link!,
-            expiresInDays: LINK_TTL_DAYS,
-          },
-          idempotencyKey: `tournament-payment-${reg.id}-${Date.now()}`,
-        });
-      } else {
-        console.info(
-          "[tournament-payments] payment-link email skipped — payments_v2 flag off",
-          { registrationId: reg.id },
-        );
-      }
+      await enqueueTransactionalEmailServer({
+        templateName: "tournament-payment-request",
+        recipientEmail: reg.contact_email,
+        templateData: {
+          teamName: reg.team_name,
+          tournamentName: t.name,
+          amountLabel,
+          paymentUrl: link!,
+          expiresInDays: LINK_TTL_DAYS,
+        },
+        idempotencyKey: `tournament-payment-${reg.id}-${Date.now()}`,
+      });
       await supabaseAdmin
         .from("tournament_registrations")
         .update({ payment_link_sent_via: "email", payment_link_sent_at: sentAt })
