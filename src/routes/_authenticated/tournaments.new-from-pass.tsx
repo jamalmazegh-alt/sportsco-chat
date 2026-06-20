@@ -19,6 +19,10 @@ import {
 } from "@/modules/tournaments/passes.functions";
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
+  // Bêta V1 : packs payants masqués derrière `payments_v2`.
+  beforeLoad: () => {
+    if (!isV2("payments_v2")) throw redirect({ to: "/tournaments", replace: true });
+  },
   component: NewFromPassPage,
   validateSearch: (s: Record<string, unknown>) => ({
     pass: typeof s.pass === "string" ? s.pass : undefined,

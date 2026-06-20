@@ -9,6 +9,12 @@ import { Button } from "@/components/ui/button";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/t/$slug/pay/$registrationId")({
+  // Bêta V1 : paiements tournoi masqués derrière `payments_v2`.
+  beforeLoad: ({ params }) => {
+    if (!isV2("payments_v2")) {
+      throw redirect({ to: "/t/$slug", params: { slug: params.slug }, replace: true });
+    }
+  },
   component: PayPage,
   head: ({ params }) => ({
     meta: [

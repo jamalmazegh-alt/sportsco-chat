@@ -39,6 +39,10 @@ import { toast } from "sonner";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/payments/family")({
+  // Bêta V1 : paiements masqués derrière `payments_v2`.
+  beforeLoad: () => {
+    if (!__isV2("payments_v2")) throw redirect({ to: "/home", replace: true });
+  },
   component: FamilyPortalPage,
   head: () => ({
     meta: [
