@@ -39,6 +39,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Service-role key: required for SSR pages/server fns that use
+          # supabaseAdmin (e.g. /tournament/$slug, /tournaments). Without it the
+          # app 500s on any server-rendered admin query — matches prod runtime.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           # Optional: when set, the live AI assistant test (14) can actually run.
