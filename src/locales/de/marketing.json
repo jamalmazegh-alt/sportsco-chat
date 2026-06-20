@@ -1422,7 +1422,9 @@
       "badge": "Wettkämpfe",
       "headline": "Organisieren Sie Ihr Turnier von A bis Z.",
       "body": "Gruppen, K.-o.-Runden, Plätze, Schiedsrichter, automatische Tabellen — alles wird in Clubero verwaltet. Am Spieltag ist Ihre Schaltzentrale in Ihrer Tasche.",
-      "img_alt": "Panoramablick auf ein mit Clubero organisiertes Amateurturnier"
+      "img_alt": "Panoramablick auf ein mit Clubero organisiertes Amateurturnier",
+      "cta_organize": "Mein Turnier organisieren",
+      "cta_learn_more": "Mehr erfahren"
     },
     "coming_soon": {
       "badge": "Demnächst",

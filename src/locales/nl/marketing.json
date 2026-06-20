@@ -1422,7 +1422,9 @@
       "badge": "Competities",
       "headline": "Organiseer uw toernooi van A tot Z.",
       "body": "Poules, finalefases, velden, scheidsrechters, automatische standen — alles wordt in Clubero geregeld. Op de wedstrijddag past uw controlekamer in uw broekzak.",
-      "img_alt": "Panoramisch zicht op een amateurtoernooi georganiseerd met Clubero"
+      "img_alt": "Panoramisch zicht op een amateurtoernooi georganiseerd met Clubero",
+      "cta_organize": "Mijn toernooi organiseren",
+      "cta_learn_more": "Meer weten"
     },
     "coming_soon": {
       "badge": "Binnenkort",

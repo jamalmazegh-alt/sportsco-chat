@@ -1422,7 +1422,9 @@
       "badge": "Compétitions",
       "headline": "Organisez votre tournoi de A à Z.",
       "body": "Poules, phases finales, terrains, arbitres, classements automatiques — tout est géré dans Clubero. Le Jour J, votre centre de contrôle est dans votre poche.",
-      "img_alt": "Vue panoramique d'un tournoi amateur organisé avec Clubero"
+      "img_alt": "Vue panoramique d'un tournoi amateur organisé avec Clubero",
+      "cta_organize": "Organiser mon tournoi",
+      "cta_learn_more": "En savoir plus"
     },
     "coming_soon": {
       "badge": "Bientôt",

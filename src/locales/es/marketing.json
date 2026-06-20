@@ -1422,7 +1422,9 @@
       "badge": "Competiciones",
       "headline": "Organice su torneo de la A a la Z.",
       "body": "Grupos, fases finales, campos, árbitros, clasificaciones automáticas — todo se gestiona en Clubero. El día D, su centro de control cabe en su bolsillo.",
-      "img_alt": "Vista panorámica de un torneo amateur organizado con Clubero"
+      "img_alt": "Vista panorámica de un torneo amateur organizado con Clubero",
+      "cta_organize": "Organizar mi torneo",
+      "cta_learn_more": "Saber más"
     },
     "coming_soon": {
       "badge": "Próximamente",
