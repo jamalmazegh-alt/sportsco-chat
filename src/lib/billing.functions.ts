@@ -2,7 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getStripe, getPriceId } from "./stripe.server";
+import {
+  getStripe,
+  getPriceId,
+  STRIPE_PRICE_MONTHLY,
+  STRIPE_PRICE_YEARLY,
+  LEGACY_STRIPE_PRICE_MONTHLY,
+  LEGACY_STRIPE_PRICE_YEARLY,
+} from "./stripe.server";
 import { notifySubscriptionAdmin } from "./subscription-notify.server";
 import { createLogger } from "@/lib/logger.server";
 
@@ -10,6 +17,33 @@ const log = createLogger("billing");
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
+}
+
+function stripeTsToIso(ts?: number | null): string | null {
+  return ts ? new Date(ts * 1000).toISOString() : null;
+}
+
+function planFromStripePriceId(priceId?: string | null): "monthly" | "yearly" | null {
+  if (!priceId) return null;
+  if (priceId === STRIPE_PRICE_MONTHLY || priceId === LEGACY_STRIPE_PRICE_MONTHLY) return "monthly";
+  if (priceId === STRIPE_PRICE_YEARLY || priceId === LEGACY_STRIPE_PRICE_YEARLY) return "yearly";
+  return null;
+}
+
+function serializeSubscription(sub: any) {
+  return sub
+    ? {
+        plan: sub.plan,
+        status: sub.status,
+        current_period_end: sub.current_period_end,
+        trial_end: sub.trial_end,
+        cancel_at_period_end: sub.cancel_at_period_end,
+        cancel_at: sub.cancel_at,
+        canceled_at: sub.canceled_at,
+        hasStripeCustomer: !!sub.stripe_customer_id,
+        hasStripeSubscription: !!sub.stripe_subscription_id,
+      }
+    : null;
 }
 
 /**
