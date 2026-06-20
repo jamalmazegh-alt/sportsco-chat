@@ -57,10 +57,6 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/settings/payments")({
-  // Bêta V1 : Stripe Connect / paiements club masqués derrière payments_v2.
-  beforeLoad: () => {
-    if (!isV2("payments_v2")) throw redirect({ to: "/admin", replace: true });
-  },
   component: PaymentsSettingsPage,
   validateSearch: searchSchema,
   head: () => ({
