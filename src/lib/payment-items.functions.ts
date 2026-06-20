@@ -504,6 +504,16 @@ async function notifyMembersOfNewPaymentItem(
 
   if (!obligations || obligations.length === 0) return;
 
+  const { isV2Server } = await import("@/lib/features.server");
+  const paymentEmailEnabled = await isV2Server("payments_v2");
+  if (!paymentEmailEnabled) {
+    console.info(
+      "[payment-items] initial notifications skipped — payments_v2 flag off",
+      { itemId, count: obligations.length },
+    );
+    return;
+  }
+
   const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
   const clubName = (item as any).clubs?.name ?? "Clubero";
   const dueLabel = frDate(item.due_date);
