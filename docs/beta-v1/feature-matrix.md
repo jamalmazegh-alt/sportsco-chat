@@ -76,6 +76,7 @@ Tous les masquages sont gérés via `src/config/features.ts` (`isV2(...)`).
 | Paiements & collectes | 🔮 | Teaser tarification autorisé, **pas** de parcours d'achat |
 | Championnats / Ligues (multi-journées) | 🔮 | Hors scope total — pas amorcer |
 | Page publique championnat enrichie (forme 5 matchs, stats, buteurs…) | 🔮 | Hors scope |
+| Capture liste d'attente V2 (vitrine) | ✅ | Section « À venir » de la home + POST `/api/public/waitlist`. Table `public.waitlist_interest` verrouillée (RLS on, 0 policy, écriture service-role uniquement). Honeypot + rate-limit 10/h/IP. CTA « Être prévenu » uniquement — zéro déblocage de feature. |
 
 ---
 
