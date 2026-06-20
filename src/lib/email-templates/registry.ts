@@ -71,4 +71,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'data-export-ready': dataExportReadyTemplate,
   'account-deleted': accountDeletedTemplate,
   'tournament-completed': tournamentCompletedTemplate,
+  'waitlist-confirmation': waitlistConfirmationTemplate,
+  'waitlist-admin-notification': waitlistAdminNotificationTemplate,
 }
