@@ -613,7 +613,7 @@ function PlayerProfile() {
         <Outlet />
       ) : (
       <>
-      {(isCoach || isSelf || isParentOfThisPlayer) && !minor && (
+      {SHOW_PUBLIC_PROFILE_FEATURES && (isCoach || isSelf || isParentOfThisPlayer) && !minor && (
         <PublicProfileCard
           playerId={player.id}
           enabled={!!(player as { public_profile_enabled?: boolean }).public_profile_enabled}
