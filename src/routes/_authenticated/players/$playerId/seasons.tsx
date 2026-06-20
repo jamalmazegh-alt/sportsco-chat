@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,8 +9,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AchievementBadge } from "@/components/player-journey/achievement-badge";
+import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId/seasons")({
+  // PR4-WS1: section enrichie cross-club — gated derrière `public_player_profiles`.
+  beforeLoad: ({ params }) => {
+    if (!isV2("public_player_profiles")) {
+      throw redirect({ to: "/players/$playerId", params: { playerId: params.playerId } });
+    }
+  },
   component: SeasonsTab,
 });
 
