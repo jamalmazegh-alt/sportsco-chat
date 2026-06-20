@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import {
   Users,
   ShieldAlert,
-  Palmtree,
   HeartPulse,
   CheckCircle2,
   Plus,
@@ -306,15 +305,7 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
             <ChevronRight className="h-3 w-3" />
           </Link>
         </Button>
-        <Button asChild size="sm" variant="outline">
-          <Link to="/players" className="inline-flex items-center justify-center gap-1">
-            <Palmtree className="h-3.5 w-3.5" />
-            <span className="truncate">
-              {t("widget.availability.viewAbsences", { defaultValue: "Voir les absences" })}
-            </span>
-            <ChevronRight className="h-3 w-3" />
-          </Link>
-        </Button>
+        {/* Bêta V1 : listing /players masqué (public_player_profiles off). Bouton retiré. */}
         <Button size="sm" variant="default" onClick={() => setSanctionOpen(true)}>
           <Plus className="h-4 w-4" />
           <span className="truncate">
