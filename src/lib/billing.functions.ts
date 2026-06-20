@@ -46,6 +46,10 @@ function serializeSubscription(sub: any) {
     : null;
 }
 
+function isManageableStripeStatus(status: string | null | undefined) {
+  return ["active", "trialing", "past_due", "incomplete"].includes(status ?? "");
+}
+
 /**
  * Create a Stripe Checkout session for a club subscription.
  * The user must be admin of the club. Includes a 30-day free trial.
@@ -105,6 +109,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     }
 
     const stripe = getStripe();
+    const origin = getOrigin();
 
     // Reuse customer or create new one
     let customerId = existingSub?.stripe_customer_id ?? undefined;
@@ -131,6 +136,37 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         );
     }
 
+    const existingStripeSubs = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 20,
+    });
+    const existingManageableSub = existingStripeSubs.data
+      .filter((sub) => isManageableStripeStatus(sub.status))
+      .sort((a, b) => b.created - a.created)[0];
+    if (existingManageableSub) {
+      const item = existingManageableSub.items.data[0];
+      const priceId = item?.price?.id ?? null;
+      await supabaseAdmin.from("subscriptions").upsert(
+        {
+          club_id: club.id,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: existingManageableSub.id,
+          stripe_price_id: priceId,
+          plan: planFromStripePriceId(priceId),
+          status: existingManageableSub.status,
+          current_period_start: stripeTsToIso(item?.current_period_start),
+          current_period_end: stripeTsToIso(item?.current_period_end),
+          trial_end: stripeTsToIso(existingManageableSub.trial_end),
+          cancel_at_period_end: existingManageableSub.cancel_at_period_end ?? false,
+          cancel_at: stripeTsToIso(existingManageableSub.cancel_at),
+          canceled_at: stripeTsToIso(existingManageableSub.canceled_at),
+        },
+        { onConflict: "club_id" },
+      );
+      return { url: `${origin}/admin/billing?billing=success` };
+    }
+
     // Honour remaining in-app trial: if trial_end is still in the future,
     // give Stripe the remaining days so the user isn't billed immediately.
     // Otherwise (trial expired or no trial), bill right away — no Stripe trial.
@@ -141,7 +177,6 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       if (remainingDays > 0) trialPeriodDays = Math.min(remainingDays, 30);
     }
 
-    const origin = getOrigin();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
@@ -472,9 +507,13 @@ export const listClubInvoices = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { customerId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
+    const { customerId, subscriptionId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
     const stripe = getStripe();
-    const invoices = await stripe.invoices.list({ customer: customerId, limit: 12 });
+    const invoices = await stripe.invoices.list(
+      subscriptionId
+        ? { customer: customerId, subscription: subscriptionId, limit: 12 }
+        : { customer: customerId, limit: 12 },
+    );
     return {
       invoices: invoices.data.map((inv) => ({
         id: inv.id,
