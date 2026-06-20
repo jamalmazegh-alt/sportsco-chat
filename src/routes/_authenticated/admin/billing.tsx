@@ -128,15 +128,13 @@ function BillingPage() {
   useEffect(() => {
     if (search.billing === "success") {
       const syncKey = activeClubId ? `success:${activeClubId}` : "success:no-club";
-      if (checkoutReturnSynced.current !== syncKey) {
-        checkoutReturnSynced.current = syncKey;
-        toast.success(t("billing.toastActivated"));
-      }
-      if (activeClubId && checkoutReturnSynced.current === syncKey) {
-        syncSubscription({ data: { clubId: activeClubId } })
-          .then(() => refetch())
-          .catch(() => refetch());
-      }
+      if (checkoutReturnSynced.current === syncKey) return;
+      checkoutReturnSynced.current = syncKey;
+      toast.success(t("billing.toastActivated"));
+      if (!activeClubId) return;
+      syncSubscription({ data: { clubId: activeClubId } })
+        .then(() => refetch())
+        .catch(() => refetch());
     } else if (search.billing === "canceled") {
       toast.info(t("billing.toastCanceledPayment"));
     } else if (search.card === "updated") {
