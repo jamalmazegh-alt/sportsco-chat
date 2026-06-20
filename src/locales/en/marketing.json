@@ -1389,5 +1389,46 @@
     "submitting": "Sending…",
     "success": "Thanks! We'll write as soon as it's ready.",
     "error": "Something went wrong. Please try again in a moment."
+  },
+  "landing": {
+    "hero": {
+      "headline": "The app your club won't be able to do without.",
+      "tagline": "The club of tomorrow starts today.",
+      "subtitle": "Organisation, communication and competitions brought together in a modern, intelligent platform built for amateur clubs.",
+      "cta_primary": "Try for free",
+      "cta_secondary": "Discover",
+      "img_alt": "Amateur club coach checking Clubero on the sideline at sunset"
+    },
+    "wizard": {
+      "badge": "In just a few clicks",
+      "headline": "Create an event in under 2 minutes.",
+      "body": "Match, training or one-off event — the Clubero wizard walks your staff through it step by step. Pre-filled info, automatic call-ups. Recurring or one-off, every event is created the same way.",
+      "img_alt_coach": "Calm coach managing his club with Clubero from the sideline",
+      "img_alt_screen": "Clubero screen — All set, event created in a few clicks"
+    },
+    "convocation": {
+      "badge": "Automatic call-ups",
+      "headline": "Your players called up in an instant.",
+      "body": "As soon as the event is created, every player gets their call-up on their phone. Availabilities, confirmations, reminders — Clubero handles it.",
+      "img_alt": "Player receiving their Clubero call-up in the changing room"
+    },
+    "communication": {
+      "badge": "Club life",
+      "headline": "The whole club on the same page.",
+      "body": "Club wall, news, documents, messaging — everything you need so directors, coaches and families stay informed, effortlessly.",
+      "img_alt": "Directors and coaches running their club together around a tablet"
+    },
+    "tournament": {
+      "badge": "Competitions",
+      "headline": "Run your tournament from A to Z.",
+      "body": "Groups, knockout rounds, pitches, referees, automatic standings — everything is handled inside Clubero. On match day, your control room is in your pocket.",
+      "img_alt": "Panoramic view of an amateur tournament run with Clubero"
+    },
+    "coming_soon": {
+      "badge": "Coming soon",
+      "headline": "The club of tomorrow starts today.",
+      "body": "Player network, public profiles, fundraising, multi-week leagues — the next generation of Clubero is coming. Be the first to know.",
+      "img_alt": "Clubero vision — a connected, well-run club"
+    }
   }
 }
