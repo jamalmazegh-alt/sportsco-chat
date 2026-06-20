@@ -110,15 +110,8 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           });
         }
 
-        // Beta V1 refocus — payments_v2 is masked. Skip the run quietly so
-        // pg_cron stays happy; flip the flag in `app_flags` to reactivate.
-        const { isV2Server } = await import("@/lib/features.server");
-        if (!(await isV2Server("payments_v2"))) {
-          return new Response(
-            JSON.stringify({ skipped: true, reason: "payments_v2 disabled" }),
-            { status: 200, headers: { "content-type": "application/json" } },
-          );
-        }
+
+
 
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
