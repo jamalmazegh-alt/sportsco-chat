@@ -20,6 +20,7 @@ import { InsightsSection } from "@/components/insights-section";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { HomeQuickCards } from "@/components/home-quick-cards";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
+import { isV2 } from "@/config/features";
 import { EventTypeBadge } from "@/lib/event-type-icon";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
@@ -186,7 +187,8 @@ function HomePage() {
 
   const { data: paymentData } = useQuery({
     queryKey: ["my-obligations-home", user?.id, activeClubId],
-    enabled: !!user && !!activeClubId,
+    // Bêta V1 : feature paiements masquée (`payments_v2`).
+    enabled: !!user && !!activeClubId && isV2("payments_v2"),
     staleTime: 60_000,
     queryFn: () => listMyObligationsFn({ data: {} }),
   });
