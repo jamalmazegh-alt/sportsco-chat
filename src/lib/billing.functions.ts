@@ -205,6 +205,82 @@ export const createPortalSession = createServerFn({ method: "POST" })
   });
 
 /**
+ * Best-effort recovery when the user returns from Checkout before the webhook
+ * has updated our database (or when Stripe webhook signing is misconfigured).
+ */
+export const syncClubSubscriptionFromStripe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: membership } = await supabase
+      .from("club_members")
+      .select("role")
+      .eq("club_id", data.clubId)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!membership || membership.role !== "admin") {
+      throw new Error("Only club admins can manage subscriptions");
+    }
+
+    const { data: existingSub } = await supabaseAdmin
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("club_id", data.clubId)
+      .maybeSingle();
+
+    if (!existingSub?.stripe_customer_id) return { subscription: null, synced: false };
+
+    const stripe = getStripe();
+    const subscriptions = await stripe.subscriptions.list({
+      customer: existingSub.stripe_customer_id,
+      status: "all",
+      limit: 10,
+      expand: ["data.customer"],
+    });
+    const fresh = subscriptions.data
+      .filter((sub) =>
+        ["active", "trialing", "past_due", "incomplete"].includes(sub.status) ||
+        sub.metadata?.club_id === data.clubId,
+      )
+      .sort((a, b) => b.created - a.created)[0];
+
+    if (!fresh) return { subscription: null, synced: false };
+
+    if (fresh.metadata?.club_id !== data.clubId) {
+      await stripe.subscriptions.update(fresh.id, {
+        metadata: { ...fresh.metadata, club_id: data.clubId },
+      });
+    }
+
+    const item = fresh.items.data[0];
+    const priceId = item?.price?.id ?? null;
+    const patch = {
+      club_id: data.clubId,
+      stripe_customer_id: existingSub.stripe_customer_id,
+      stripe_subscription_id: fresh.id,
+      stripe_price_id: priceId,
+      plan: planFromStripePriceId(priceId),
+      status: fresh.status,
+      current_period_start: stripeTsToIso(item?.current_period_start),
+      current_period_end: stripeTsToIso(item?.current_period_end),
+      trial_end: stripeTsToIso(fresh.trial_end),
+      cancel_at_period_end: fresh.cancel_at_period_end ?? false,
+      cancel_at: stripeTsToIso(fresh.cancel_at),
+      canceled_at: stripeTsToIso(fresh.canceled_at),
+    };
+
+    await supabaseAdmin.from("subscriptions").upsert(patch, { onConflict: "club_id" });
+
+    return {
+      subscription: serializeSubscription({ ...patch, hasStripeSubscription: true }),
+      synced: true,
+    };
+  });
+
+/**
  * Get the current subscription state for a club.
  */
 export const getClubSubscription = createServerFn({ method: "GET" })
