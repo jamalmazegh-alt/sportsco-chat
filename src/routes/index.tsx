@@ -263,6 +263,23 @@ function LandingTournament() {
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
           {t("landing.tournament.body")}
         </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Button asChild size="lg" className="h-12 px-6">
+            <Link to="/tournaments/start">
+              {t("landing.tournament.cta_organize")} <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Link>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="h-12 border-white/40 bg-white/10 px-6 text-white hover:bg-white/20 hover:text-white"
+          >
+            <Link to={i18n.language?.slice(0, 2) === "fr" ? "/fr/tournois" : "/en/tournaments"}>
+              {t("landing.tournament.cta_learn_more")}
+            </Link>
+          </Button>
+        </div>
       </div>
     </section>
   );
