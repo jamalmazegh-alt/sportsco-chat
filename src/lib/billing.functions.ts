@@ -301,7 +301,7 @@ export const getClubSubscription = createServerFn({ method: "GET" })
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
       .select(
-        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_subscription_id",
+        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_customer_id, stripe_subscription_id",
       )
       .eq("club_id", data.clubId)
       .maybeSingle();
