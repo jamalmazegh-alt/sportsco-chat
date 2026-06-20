@@ -138,7 +138,7 @@ function TournamentsList() {
           action={
             canManage ? (
               noClub ? (
-                hasPass && isV2("payments_v2") ? (
+                hasPass ? (
                   <Button size="sm" asChild>
                     <Link to="/tournaments/new-from-pass">
                       <Plus className="h-4 w-4" />
