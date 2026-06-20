@@ -32,9 +32,11 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
             status: auth.status,
           });
         }
-        // Find trialing subs whose trial_end is within the next 8 days OR just expired (last 24h)
+        // Find trialing subs whose trial_end is within the next 8 days OR expired recently.
+        // The 30-day lookback lets the fixed cron catch trials that were missed while
+        // the scheduler pointed at an obsolete URL, without resending already marked milestones.
         const horizon = new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString();
-        const lookback = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const lookback = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
         const { data: subs, error } = await supabaseAdmin
           .from("subscriptions")
