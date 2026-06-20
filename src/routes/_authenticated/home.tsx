@@ -253,7 +253,7 @@ function HomePage() {
         </div>
       </header>
 
-      {paymentSummary && (
+      {paymentSummary && isV2("payments_v2") && (
         <Link
           to="/payments"
           className="group flex items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-left shadow-sm transition-colors hover:bg-amber-500/15"

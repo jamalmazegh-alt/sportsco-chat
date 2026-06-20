@@ -59,6 +59,27 @@ export type Database = {
         }
         Relationships: []
       }
+      app_flags: {
+        Row: {
+          description: string | null
+          enabled: boolean
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          description?: string | null
+          enabled?: boolean
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -5020,6 +5041,7 @@ export type Database = {
         Args: { _match_id: string; _user_id: string }
         Returns: boolean
       }
+      is_v2: { Args: { _key: string }; Returns: boolean }
       list_public_players: {
         Args: {
           _club_id?: string

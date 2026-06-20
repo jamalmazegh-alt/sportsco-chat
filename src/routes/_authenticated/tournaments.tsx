@@ -17,6 +17,7 @@ import { TournamentCreateChooser } from "@/modules/tournaments/components/Tourna
 import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 import { TournamentUpgradeCard } from "@/modules/tournaments/components/TournamentUpgradeCard";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
+import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/tournaments")({
   component: TournamentsRoute,
@@ -137,7 +138,7 @@ function TournamentsList() {
           action={
             canManage ? (
               noClub ? (
-                hasPass ? (
+                hasPass && isV2("payments_v2") ? (
                   <Button size="sm" asChild>
                     <Link to="/tournaments/new-from-pass">
                       <Plus className="h-4 w-4" />
@@ -195,7 +196,7 @@ function TournamentsList() {
       {canManage && tournaments.length > 0 && (
         <div className="pt-2">
           {noClub ? (
-            hasPass ? (
+            hasPass && isV2("payments_v2") ? (
               <Button size="sm" variant="outline" className="w-full" asChild>
                 <Link to="/tournaments/new-from-pass">
                   <Plus className="h-4 w-4" />

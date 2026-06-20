@@ -11,6 +11,8 @@ Légende :
 
 Tous les masquages sont gérés via `src/config/features.ts` (`isV2(...)`).
 
+**Miroir serveur SQL** : la table `public.app_flags` + la fonction `public.is_v2(_key)` exposent les mêmes flags pour les triggers DB, les fonctions PL/pgSQL et les edge functions (utilisé en sous-PR (b) pour couper l'émission de notifs/emails côté serveur). `app_flags` et `features.ts` doivent rester alignés : tant que les deux sont à `false`, la feature est totalement masquée. Le flip se fait dans les deux sources simultanément (un `UPDATE public.app_flags SET enabled = true WHERE key = '<flag>'` + flip dans `features.ts` + redéploiement).
+
 ---
 
 ## 1. Vie du club (GARDÉ — à valoriser)
