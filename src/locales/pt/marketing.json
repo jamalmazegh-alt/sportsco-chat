@@ -1389,5 +1389,46 @@
     "submitting": "A enviar…",
     "success": "Obrigado! Escrevemos assim que estiver pronto.",
     "error": "Ocorreu um erro. Tente novamente daqui a um instante."
+  },
+  "landing": {
+    "hero": {
+      "headline": "A aplicação da qual o seu clube já não conseguirá prescindir.",
+      "tagline": "O clube de amanhã começa hoje.",
+      "subtitle": "Organização, comunicação e competições reunidas numa plataforma moderna e inteligente, pensada para os clubes amadores.",
+      "cta_primary": "Experimentar grátis",
+      "cta_secondary": "Descobrir",
+      "img_alt": "Treinador de um clube amador a consultar o Clubero à beira do campo ao pôr do sol"
+    },
+    "wizard": {
+      "badge": "Em poucos cliques",
+      "headline": "Crie um evento em menos de 2 minutos.",
+      "body": "Jogo, treino ou evento pontual — o assistente Clubero guia os seus dirigentes passo a passo. Informações pré-preenchidas, convocatória automática. Regular ou excecional, tudo se cria da mesma forma.",
+      "img_alt_coach": "Educador tranquilo a gerir o seu clube com o Clubero à beira do campo",
+      "img_alt_screen": "Ecrã Clubero — Tudo pronto, evento criado em poucos cliques"
+    },
+    "convocation": {
+      "badge": "Convocatórias automáticas",
+      "headline": "Os seus jogadores convocados num instante.",
+      "body": "Assim que o evento é criado, cada jogador recebe a sua convocatória no telemóvel. Disponibilidades, confirmações, lembretes — o Clubero trata disso.",
+      "img_alt": "Jogador a receber a sua convocatória Clubero no balneário"
+    },
+    "communication": {
+      "badge": "Vida do clube",
+      "headline": "Todo o clube em sintonia.",
+      "body": "Mural do clube, notícias, documentos, mensagens — tudo o que é preciso para que dirigentes, educadores e famílias estejam sempre informados, sem esforço.",
+      "img_alt": "Dirigentes e educadores a organizar o clube juntos à volta de um tablet"
+    },
+    "tournament": {
+      "badge": "Competições",
+      "headline": "Organize o seu torneio de A a Z.",
+      "body": "Grupos, fases finais, campos, árbitros, classificações automáticas — tudo é gerido no Clubero. No dia do jogo, o seu centro de comando está no seu bolso.",
+      "img_alt": "Vista panorâmica de um torneio amador organizado com o Clubero"
+    },
+    "coming_soon": {
+      "badge": "Brevemente",
+      "headline": "O clube de amanhã começa hoje.",
+      "body": "Rede de jogadores, perfis públicos, angariações, campeonatos com várias jornadas — a próxima geração do Clubero está a chegar. Sejam os primeiros a saber.",
+      "img_alt": "Visão Clubero — clube conectado e organizado"
+    }
   }
 }

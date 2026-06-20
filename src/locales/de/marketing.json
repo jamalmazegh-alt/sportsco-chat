@@ -1389,5 +1389,46 @@
     "submitting": "Senden…",
     "success": "Danke! Wir melden uns, sobald es so weit ist.",
     "error": "Ein Fehler ist aufgetreten. Bitte versuche es gleich noch einmal."
+  },
+  "landing": {
+    "hero": {
+      "headline": "Die App, ohne die Ihr Verein nicht mehr auskommt.",
+      "tagline": "Der Verein von morgen beginnt heute.",
+      "subtitle": "Organisation, Kommunikation und Wettkämpfe vereint in einer modernen, intelligenten Plattform für Amateurvereine.",
+      "cta_primary": "Kostenlos testen",
+      "cta_secondary": "Entdecken",
+      "img_alt": "Trainer eines Amateurvereins schaut Clubero am Spielfeldrand bei Sonnenuntergang an"
+    },
+    "wizard": {
+      "badge": "In wenigen Klicks",
+      "headline": "Erstellen Sie ein Ereignis in unter 2 Minuten.",
+      "body": "Spiel, Training oder einmaliges Event — der Clubero-Assistent führt Ihre Verantwortlichen Schritt für Schritt. Vorausgefüllte Daten, automatische Einberufung. Wiederkehrend oder einmalig — alles wird auf dieselbe Weise erstellt.",
+      "img_alt_coach": "Entspannter Trainer, der seinen Verein mit Clubero am Spielfeldrand führt",
+      "img_alt_screen": "Clubero-Bildschirm — alles bereit, Event in wenigen Klicks erstellt"
+    },
+    "convocation": {
+      "badge": "Automatische Einberufungen",
+      "headline": "Ihre Spieler im Handumdrehen einberufen.",
+      "body": "Sobald das Event erstellt ist, erhält jeder Spieler seine Einberufung auf dem Handy. Verfügbarkeiten, Bestätigungen, Erinnerungen — Clubero kümmert sich darum.",
+      "img_alt": "Spieler erhält seine Clubero-Einberufung in der Kabine"
+    },
+    "communication": {
+      "badge": "Vereinsleben",
+      "headline": "Der gesamte Verein auf einer Wellenlänge.",
+      "body": "Vereinspinnwand, News, Dokumente, Nachrichten — alles, damit Vorstand, Trainer und Familien mühelos informiert bleiben.",
+      "img_alt": "Vorstände und Trainer organisieren ihren Verein gemeinsam an einem Tablet"
+    },
+    "tournament": {
+      "badge": "Wettkämpfe",
+      "headline": "Organisieren Sie Ihr Turnier von A bis Z.",
+      "body": "Gruppen, K.-o.-Runden, Plätze, Schiedsrichter, automatische Tabellen — alles wird in Clubero verwaltet. Am Spieltag ist Ihre Schaltzentrale in Ihrer Tasche.",
+      "img_alt": "Panoramablick auf ein mit Clubero organisiertes Amateurturnier"
+    },
+    "coming_soon": {
+      "badge": "Demnächst",
+      "headline": "Der Verein von morgen beginnt heute.",
+      "body": "Spielernetzwerk, öffentliche Profile, Sammelaktionen, Meisterschaften über mehrere Spieltage — die nächste Clubero-Generation kommt. Seien Sie die Ersten, die es erfahren.",
+      "img_alt": "Clubero-Vision — vernetzter, gut organisierter Verein"
+    }
   }
 }

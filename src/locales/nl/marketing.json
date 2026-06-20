@@ -1389,5 +1389,46 @@
     "submitting": "Verzenden…",
     "success": "Bedankt! We laten het je weten zodra het klaar is.",
     "error": "Er is iets misgegaan. Probeer het zo opnieuw."
+  },
+  "landing": {
+    "hero": {
+      "headline": "De app waar uw club niet meer zonder kan.",
+      "tagline": "De club van morgen begint vandaag.",
+      "subtitle": "Organisatie, communicatie en competities samengebracht in een modern, intelligent platform voor amateurclubs.",
+      "cta_primary": "Gratis proberen",
+      "cta_secondary": "Ontdekken",
+      "img_alt": "Trainer van een amateurclub die Clubero raadpleegt langs de lijn bij zonsondergang"
+    },
+    "wizard": {
+      "badge": "In een paar klikken",
+      "headline": "Maak een evenement in minder dan 2 minuten.",
+      "body": "Wedstrijd, training of eenmalig evenement — de Clubero-wizard begeleidt uw bestuur stap voor stap. Voorgevulde gegevens, automatische oproep. Terugkerend of eenmalig, alles wordt op dezelfde manier aangemaakt.",
+      "img_alt_coach": "Rustige trainer die zijn club met Clubero beheert langs het veld",
+      "img_alt_screen": "Clubero-scherm — Alles klaar, evenement in een paar klikken aangemaakt"
+    },
+    "convocation": {
+      "badge": "Automatische oproepen",
+      "headline": "Uw spelers in een oogwenk opgeroepen.",
+      "body": "Zodra het evenement is aangemaakt, ontvangt elke speler zijn oproep op zijn telefoon. Beschikbaarheden, bevestigingen, herinneringen — Clubero regelt het.",
+      "img_alt": "Speler die zijn Clubero-oproep ontvangt in de kleedkamer"
+    },
+    "communication": {
+      "badge": "Clubleven",
+      "headline": "De hele club op één lijn.",
+      "body": "Clubmuur, nieuws, documenten, berichten — alles wat nodig is zodat bestuur, trainers en families altijd moeiteloos op de hoogte zijn.",
+      "img_alt": "Bestuur en trainers die hun club samen organiseren rond een tablet"
+    },
+    "tournament": {
+      "badge": "Competities",
+      "headline": "Organiseer uw toernooi van A tot Z.",
+      "body": "Poules, finalefases, velden, scheidsrechters, automatische standen — alles wordt in Clubero geregeld. Op de wedstrijddag past uw controlekamer in uw broekzak.",
+      "img_alt": "Panoramisch zicht op een amateurtoernooi georganiseerd met Clubero"
+    },
+    "coming_soon": {
+      "badge": "Binnenkort",
+      "headline": "De club van morgen begint vandaag.",
+      "body": "Spelersnetwerk, openbare profielen, inzamelingen, meerdaagse competities — de volgende generatie Clubero komt eraan. Wees de eerste die het weet.",
+      "img_alt": "Clubero-visie — verbonden en goed georganiseerde club"
+    }
   }
 }
