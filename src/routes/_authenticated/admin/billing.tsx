@@ -8,6 +8,7 @@ import {
   getClubSubscription,
   createCheckoutSession,
   createPortalSession,
+  syncClubSubscriptionFromStripe,
   cancelSubscriptionAtPeriodEnd,
   reactivateSubscription,
   listClubInvoices,
@@ -106,6 +107,7 @@ function BillingPage() {
   const fetchSub = useServerFn(getClubSubscription);
   const checkout = useServerFn(createCheckoutSession);
   const portal = useServerFn(createPortalSession);
+  const syncSubscription = useServerFn(syncClubSubscriptionFromStripe);
   const cancelSub = useServerFn(cancelSubscriptionAtPeriodEnd);
   const reactivate = useServerFn(reactivateSubscription);
   const fetchInvoices = useServerFn(listClubInvoices);
@@ -117,12 +119,17 @@ function BillingPage() {
   useEffect(() => {
     if (search.billing === "success") {
       toast.success(t("billing.toastActivated"));
+      if (activeClubId) {
+        syncSubscription({ data: { clubId: activeClubId } })
+          .then(() => refetch())
+          .catch(() => refetch());
+      }
     } else if (search.billing === "canceled") {
       toast.info(t("billing.toastCanceledPayment"));
     } else if (search.card === "updated") {
       toast.success(t("billing.toastCardUpdated"));
     }
-  }, [search.billing, search.card, t]);
+  }, [activeClubId, refetch, search.billing, search.card, syncSubscription, t]);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["club-subscription-full", activeClubId],
