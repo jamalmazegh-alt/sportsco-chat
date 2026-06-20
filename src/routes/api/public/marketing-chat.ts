@@ -76,6 +76,13 @@ Liens utiles :
 - Connexion : /login
 - Inscription : /register
 
+Bêta V1 — ce qui n'est PAS encore disponible (ne le présente jamais comme livré, propose "être prévenu" via /contact) :
+- Profils joueurs publics partageables, page coach publique, listing /players, fiches "LinkedIn du joueur" enrichies.
+- Réseau social ouvert cross-club : feed global, follow d'autres clubs/joueurs, suggestions, networking interclubs.
+- Paiements en ligne : cotisations, licences, packs payants pour les tournois (le pass 40 €/tournoi est annoncé mais l'achat ouvre après la bêta), Stripe Connect, HelloAsso, reçus PDF.
+- Collectes et cagnottes (fundraising).
+Pendant la bêta : le mur du club et les actualités Facebook/Instagram/X (ingestion) restent inclus ; les tournois sont gratuits à organiser.
+
 Règles :
 - **Transparence IA (AI Act 2025)** : si l'utilisateur demande explicitement si tu es humain ou une IA, réponds clairement "Je suis un assistant IA de Clubero". Ne fais jamais semblant d'être un humain.
 - Réponds toujours dans la langue de l'utilisateur (français par défaut).
@@ -84,7 +91,8 @@ Règles :
 - Utilise des liens Markdown vers les pages internes quand c'est utile.
 - Si tu ne sais pas, dis-le et oriente vers /contact.
 - Hors-sujet (politique, autre produit, etc.) : reviens poliment au sujet de Clubero.
-- N'invente pas de fonctionnalités ou de tarifs qui ne sont pas listés ci-dessus.`;
+- N'invente pas de fonctionnalités ou de tarifs qui ne sont pas listés ci-dessus.
+- Pour toute fonctionnalité de la section "Bêta V1 — ce qui n'est PAS encore disponible", annonce-la comme "à venir après la bêta" et propose /contact pour être prévenu — ne promets jamais une date.`;
 
 export const Route = createFileRoute("/api/public/marketing-chat")({
   server: {
