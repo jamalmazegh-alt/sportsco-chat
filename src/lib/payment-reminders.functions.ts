@@ -134,6 +134,9 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
     const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
     const clubName = (item as any).clubs?.name ?? "Clubero";
 
+    const { isV2Server } = await import("@/lib/features.server");
+    const paymentEmailEnabled = await isV2Server("payments_v2");
+
     let sent = 0;
     for (const o of (obligations ?? []) as any[]) {
       const paid = await paidCents(o.id);
