@@ -2,19 +2,17 @@
  * Server-side feature flag reader.
  *
  * Reads `public.app_flags` (canonical source of truth shared with SQL via
- * `public.is_v2(key)`) using the service-role client. Falls back to the
- * client `V2_FLAGS` defaults if the row is missing or the lookup fails —
- * any drift between `src/config/features.ts` and `app_flags` should be
- * resolved by updating the DB row (see `docs/beta-v1/feature-matrix.md`).
+ * `public.is_v2(key)`) using the service-role client. **Fail-closed**: if
+ * the row is missing or the DB call errors, returns `false` and does NOT
+ * cache — preventing a transient outage from re-enabling a masked feature.
  *
- * Cached in-memory per-isolate for 60 s to avoid hammering the DB from
- * loops (e.g. crons iterating clubs).
+ * Successful reads are cached in-memory per-isolate for 60 s.
  *
  * Server-only. Never imported from a route file or `*.functions.ts` at
  * module scope — load inside the handler with `await import(...)`.
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { V2_FLAGS, type V2Flag } from "@/config/features";
+import { type V2Flag } from "@/config/features";
 
 const TTL_MS = 60_000;
 type CacheEntry = { value: boolean; expiresAt: number };
@@ -25,19 +23,26 @@ export async function isV2Server(flag: V2Flag): Promise<boolean> {
   const hit = cache.get(flag);
   if (hit && hit.expiresAt > now) return hit.value;
 
-  let value: boolean = V2_FLAGS[flag];
+  // Fail-closed: if the DB lookup fails or the row is missing, default to
+  // `false` so a transient outage cannot accidentally re-enable a masked V2
+  // feature. Only successful reads are cached.
+  let resolved = false;
+  let value = false;
   try {
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("app_flags")
       .select("enabled")
       .eq("key", flag)
       .maybeSingle();
-    if (data && typeof data.enabled === "boolean") value = data.enabled;
+    if (!error && data && typeof data.enabled === "boolean") {
+      value = data.enabled;
+      resolved = true;
+    }
   } catch {
-    /* fall back to client default */
+    /* fail-closed — do not cache */
   }
 
-  cache.set(flag, { value, expiresAt: now + TTL_MS });
+  if (resolved) cache.set(flag, { value, expiresAt: now + TTL_MS });
   return value;
 }
 
