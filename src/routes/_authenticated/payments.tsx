@@ -23,13 +23,8 @@ import {
 import { Loader2, CreditCard, Wallet, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import i18nInstance from "@/lib/i18n";
-import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/payments")({
-  // Bêta V1 : paiements masqués derrière `payments_v2`.
-  beforeLoad: () => {
-    if (!isV2("payments_v2")) throw redirect({ to: "/home", replace: true });
-  },
   component: MyPaymentsPage,
   validateSearch: z.object({
     success: z.string().optional(),
