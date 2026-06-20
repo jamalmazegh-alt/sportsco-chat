@@ -4656,6 +4656,39 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist_interest: {
+        Row: {
+          consent_at: string | null
+          created_at: string
+          email: string
+          features: string[]
+          id: string
+          marketing_consent: boolean
+          role: string | null
+          source: string | null
+        }
+        Insert: {
+          consent_at?: string | null
+          created_at?: string
+          email: string
+          features: string[]
+          id?: string
+          marketing_consent?: boolean
+          role?: string | null
+          source?: string | null
+        }
+        Update: {
+          consent_at?: string | null
+          created_at?: string
+          email?: string
+          features?: string[]
+          id?: string
+          marketing_consent?: boolean
+          role?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       wall_comments: {
         Row: {
           author_user_id: string

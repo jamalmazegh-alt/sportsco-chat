@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { V2Waitlist } from "@/components/marketing/V2Waitlist";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -66,6 +67,7 @@ function Landing() {
       <V2ForWho />
       <V2Testimonials />
       <V2Pricing />
+      <V2Waitlist />
       <V2FinalCTA />
     </MarketingLayout>
   );
