@@ -296,7 +296,13 @@ function BillingPage() {
           </div>
         ) : null}
 
-        {isActive && (
+        {trialExpired && (
+          <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {t("billing.trialExpiredSubscribeHint")}
+          </div>
+        )}
+
+        {canManageSubscription && (
           <div className="grid gap-2 sm:grid-cols-2 pt-1">
             <Button
               onClick={onUpdateCard}
@@ -344,7 +350,7 @@ function BillingPage() {
           </div>
         )}
 
-        {isActive && (
+        {canManageSubscription && (
           <button
             onClick={openPortal}
             disabled={busy === "portal"}
@@ -362,7 +368,7 @@ function BillingPage() {
       </section>
 
       {/* Invoices */}
-      {isActive && invoicesData?.invoices && invoicesData.invoices.length > 0 && (
+      {canManageSubscription && invoicesData?.invoices && invoicesData.invoices.length > 0 && (
         <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
           <div className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-primary" />
@@ -424,7 +430,7 @@ function BillingPage() {
       )}
 
       {/* Plans (when not active) */}
-      {!isActive && (
+      {showPlans && (
         <section className="rounded-2xl border border-primary bg-card p-5 space-y-5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
