@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -9,12 +9,18 @@ import { Button } from "@/components/ui/button";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
+import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/following")({
+  // Bêta V1 : feature masquée derrière `social_network_v2`.
+  beforeLoad: () => {
+    if (!isV2("social_network_v2")) throw redirect({ to: "/home", replace: true });
+  },
   component: FollowingPage,
   head: () => ({
     meta: [
       { title: i18n.t("following.title", { defaultValue: "Mes abonnements", ns: "common" }) },
+      { name: "robots", content: "noindex" },
     ],
   }),
 });
