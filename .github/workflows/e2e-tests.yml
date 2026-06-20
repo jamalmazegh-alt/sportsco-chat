@@ -39,11 +39,18 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Service-role key: required for SSR pages/server fns that use
+          # supabaseAdmin (e.g. /tournament/$slug, /tournaments). Without it the
+          # app 500s on any server-rendered admin query — matches prod runtime.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           # Optional: when set, the live AI assistant test (14) can actually run.
           # When absent the test skips cleanly instead of hard-failing.
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+          # Cron secret: lets /api/public/hooks/payment-reminders authenticate
+          # so the beta-closure test can reach the payments_v2 {skipped} path.
+          PAYMENT_REMINDERS_SECRET: ${{ secrets.PAYMENT_REMINDERS_SECRET }}
         run: |
           bun run dev -- --host 127.0.0.1 --port 8080 &
           for i in $(seq 1 60); do
@@ -73,6 +80,9 @@ jobs:
           # Exposed so the runner can detect the key and skip test 14 cleanly
           # when it's absent (a live-AI test must not hard-fail without a key).
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
+          # Same cron secret as the app step, so the test can send a matching
+          # x-cron-secret header and assert the {skipped:true} response.
+          PAYMENT_REMINDERS_SECRET: ${{ secrets.PAYMENT_REMINDERS_SECRET }}
         run: bun run test:e2e
 
       - name: Upload Playwright report

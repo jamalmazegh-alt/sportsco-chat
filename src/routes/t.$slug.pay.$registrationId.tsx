@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/button";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/t/$slug/pay/$registrationId")({
-  // Bêta V1 : paiements tournoi masqués derrière `payments_v2`.
-  beforeLoad: ({ params }) => {
+  // Bêta V1 : paiements tournoi masqués derrière `payments_v2`. On renvoie vers
+  // la liste publique des tournois — jamais vers /t/$slug, dont le rendu SSR
+  // dépend du service-role et peut donc 500 (slug inexistant ou env sans clé).
+  beforeLoad: () => {
     if (!isV2("payments_v2")) {
-      throw redirect({ to: "/t/$slug", params: { slug: params.slug }, replace: true });
+      throw redirect({ to: "/tournaments", replace: true });
     }
   },
   component: PayPage,
