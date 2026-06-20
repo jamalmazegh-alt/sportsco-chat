@@ -368,6 +368,10 @@ function V2SocialClub() {
             <Network className="h-3.5 w-3.5" />
             {t("home.v2.social.kicker")}
           </div>
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+            <Clock className="h-3 w-3" />
+            {t("home.v2.social.soonBadge", { defaultValue: "Bientôt" })}
+          </div>
           <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
             {t("home.v2.social.title")}
           </h2>
@@ -386,7 +390,10 @@ function V2SocialClub() {
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-sm font-medium text-muted-foreground">
-          {t("home.v2.social.showcase")}
+          {t("home.v2.social.soonNote", {
+            defaultValue:
+              "Disponible après la bêta. Pendant la bêta : mur du club et actualités Facebook restent inclus.",
+          })}
         </p>
       </div>
     </section>
