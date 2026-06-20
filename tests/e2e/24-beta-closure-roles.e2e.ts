@@ -42,10 +42,10 @@ test.describe("Beta closure — role matrix (mobile, public surface)", () => {
   }
 
   for (const path of [
-    "/_authenticated/following",
-    "/_authenticated/follow-ups",
-    "/_authenticated/payments",
-    "/_authenticated/tournaments/new-from-pass",
+    "/following",
+    "/follow-ups",
+    "/payments",
+    "/tournaments/new-from-pass",
   ]) {
     test(`role-gated entry ${path} does not 404/500`, async ({ page }) => {
       const res = await page.goto(BASE + path, { waitUntil: "domcontentloaded" });
