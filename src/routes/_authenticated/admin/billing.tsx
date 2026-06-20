@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Navigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
@@ -8,6 +8,7 @@ import {
   getClubSubscription,
   createCheckoutSession,
   createPortalSession,
+  syncClubSubscriptionFromStripe,
   cancelSubscriptionAtPeriodEnd,
   reactivateSubscription,
   listClubInvoices,
@@ -106,6 +107,7 @@ function BillingPage() {
   const fetchSub = useServerFn(getClubSubscription);
   const checkout = useServerFn(createCheckoutSession);
   const portal = useServerFn(createPortalSession);
+  const syncSubscription = useServerFn(syncClubSubscriptionFromStripe);
   const cancelSub = useServerFn(cancelSubscriptionAtPeriodEnd);
   const reactivate = useServerFn(reactivateSubscription);
   const fetchInvoices = useServerFn(listClubInvoices);
@@ -113,16 +115,7 @@ function BillingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [updateCardOpen, setUpdateCardOpen] = useState(false);
-
-  useEffect(() => {
-    if (search.billing === "success") {
-      toast.success(t("billing.toastActivated"));
-    } else if (search.billing === "canceled") {
-      toast.info(t("billing.toastCanceledPayment"));
-    } else if (search.card === "updated") {
-      toast.success(t("billing.toastCardUpdated"));
-    }
-  }, [search.billing, search.card, t]);
+  const checkoutReturnSynced = useRef<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["club-subscription-full", activeClubId],
@@ -131,6 +124,23 @@ function BillingPage() {
     refetchOnWindowFocus: true,
     refetchOnMount: "always",
   });
+
+  useEffect(() => {
+    if (search.billing === "success") {
+      const syncKey = activeClubId ? `success:${activeClubId}` : "success:no-club";
+      if (checkoutReturnSynced.current === syncKey) return;
+      checkoutReturnSynced.current = syncKey;
+      toast.success(t("billing.toastActivated"));
+      if (!activeClubId) return;
+      syncSubscription({ data: { clubId: activeClubId } })
+        .then(() => refetch())
+        .catch(() => refetch());
+    } else if (search.billing === "canceled") {
+      toast.info(t("billing.toastCanceledPayment"));
+    } else if (search.card === "updated") {
+      toast.success(t("billing.toastCardUpdated"));
+    }
+  }, [activeClubId, refetch, search.billing, search.card, syncSubscription, t]);
 
   const sub = data?.subscription;
   const now = Date.now();

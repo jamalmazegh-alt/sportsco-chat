@@ -2,7 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getStripe, getPriceId } from "./stripe.server";
+import {
+  getStripe,
+  getPriceId,
+  STRIPE_PRICE_MONTHLY,
+  STRIPE_PRICE_YEARLY,
+  LEGACY_STRIPE_PRICE_MONTHLY,
+  LEGACY_STRIPE_PRICE_YEARLY,
+} from "./stripe.server";
 import { notifySubscriptionAdmin } from "./subscription-notify.server";
 import { createLogger } from "@/lib/logger.server";
 
@@ -10,6 +17,33 @@ const log = createLogger("billing");
 
 function getOrigin(): string {
   return process.env.APP_URL || "https://www.clubero.app";
+}
+
+function stripeTsToIso(ts?: number | null): string | null {
+  return ts ? new Date(ts * 1000).toISOString() : null;
+}
+
+function planFromStripePriceId(priceId?: string | null): "monthly" | "yearly" | null {
+  if (!priceId) return null;
+  if (priceId === STRIPE_PRICE_MONTHLY || priceId === LEGACY_STRIPE_PRICE_MONTHLY) return "monthly";
+  if (priceId === STRIPE_PRICE_YEARLY || priceId === LEGACY_STRIPE_PRICE_YEARLY) return "yearly";
+  return null;
+}
+
+function serializeSubscription(sub: any) {
+  return sub
+    ? {
+        plan: sub.plan,
+        status: sub.status,
+        current_period_end: sub.current_period_end,
+        trial_end: sub.trial_end,
+        cancel_at_period_end: sub.cancel_at_period_end,
+        cancel_at: sub.cancel_at,
+        canceled_at: sub.canceled_at,
+        hasStripeCustomer: !!sub.stripe_customer_id,
+        hasStripeSubscription: !!sub.stripe_subscription_id,
+      }
+    : null;
 }
 
 /**
@@ -123,7 +157,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       automatic_tax: { enabled: true },
       customer_update: { address: "auto", name: "auto" },
       allow_promotion_codes: true,
-      success_url: `${origin}/admin?billing=success`,
+      success_url: `${origin}/admin/billing?billing=success`,
       cancel_url: `${origin}/pricing?billing=canceled`,
       metadata: { club_id: club.id, plan: data.plan },
     });
@@ -171,6 +205,82 @@ export const createPortalSession = createServerFn({ method: "POST" })
   });
 
 /**
+ * Best-effort recovery when the user returns from Checkout before the webhook
+ * has updated our database (or when Stripe webhook signing is misconfigured).
+ */
+export const syncClubSubscriptionFromStripe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: membership } = await supabase
+      .from("club_members")
+      .select("role")
+      .eq("club_id", data.clubId)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (!membership || membership.role !== "admin") {
+      throw new Error("Only club admins can manage subscriptions");
+    }
+
+    const { data: existingSub } = await supabaseAdmin
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("club_id", data.clubId)
+      .maybeSingle();
+
+    if (!existingSub?.stripe_customer_id) return { subscription: null, synced: false };
+
+    const stripe = getStripe();
+    const subscriptions = await stripe.subscriptions.list({
+      customer: existingSub.stripe_customer_id,
+      status: "all",
+      limit: 10,
+      expand: ["data.customer"],
+    });
+    const fresh = subscriptions.data
+      .filter((sub) =>
+        ["active", "trialing", "past_due", "incomplete"].includes(sub.status) ||
+        sub.metadata?.club_id === data.clubId,
+      )
+      .sort((a, b) => b.created - a.created)[0];
+
+    if (!fresh) return { subscription: null, synced: false };
+
+    if (fresh.metadata?.club_id !== data.clubId) {
+      await stripe.subscriptions.update(fresh.id, {
+        metadata: { ...fresh.metadata, club_id: data.clubId },
+      });
+    }
+
+    const item = fresh.items.data[0];
+    const priceId = item?.price?.id ?? null;
+    const patch = {
+      club_id: data.clubId,
+      stripe_customer_id: existingSub.stripe_customer_id,
+      stripe_subscription_id: fresh.id,
+      stripe_price_id: priceId,
+      plan: planFromStripePriceId(priceId),
+      status: fresh.status,
+      current_period_start: stripeTsToIso(item?.current_period_start),
+      current_period_end: stripeTsToIso(item?.current_period_end),
+      trial_end: stripeTsToIso(fresh.trial_end),
+      cancel_at_period_end: fresh.cancel_at_period_end ?? false,
+      cancel_at: stripeTsToIso(fresh.cancel_at),
+      canceled_at: stripeTsToIso(fresh.canceled_at),
+    };
+
+    await supabaseAdmin.from("subscriptions").upsert(patch, { onConflict: "club_id" });
+
+    return {
+      subscription: serializeSubscription({ ...patch, hasStripeSubscription: true }),
+      synced: true,
+    };
+  });
+
+/**
  * Get the current subscription state for a club.
  */
 export const getClubSubscription = createServerFn({ method: "GET" })
@@ -191,25 +301,12 @@ export const getClubSubscription = createServerFn({ method: "GET" })
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
       .select(
-        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_subscription_id",
+        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_customer_id, stripe_subscription_id",
       )
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    return {
-      subscription: sub
-        ? {
-            plan: sub.plan,
-            status: sub.status,
-            current_period_end: sub.current_period_end,
-            trial_end: sub.trial_end,
-            cancel_at_period_end: sub.cancel_at_period_end,
-            cancel_at: sub.cancel_at,
-            canceled_at: sub.canceled_at,
-            hasStripeSubscription: !!sub.stripe_subscription_id,
-          }
-        : null,
-    };
+    return { subscription: serializeSubscription(sub) };
   });
 
 /**
