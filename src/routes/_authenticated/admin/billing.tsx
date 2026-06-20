@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Navigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
@@ -115,6 +115,7 @@ function BillingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [updateCardOpen, setUpdateCardOpen] = useState(false);
+  const checkoutReturnSynced = useRef<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["club-subscription-full", activeClubId],
@@ -126,8 +127,12 @@ function BillingPage() {
 
   useEffect(() => {
     if (search.billing === "success") {
-      toast.success(t("billing.toastActivated"));
-      if (activeClubId) {
+      const syncKey = activeClubId ? `success:${activeClubId}` : "success:no-club";
+      if (checkoutReturnSynced.current !== syncKey) {
+        checkoutReturnSynced.current = syncKey;
+        toast.success(t("billing.toastActivated"));
+      }
+      if (activeClubId && checkoutReturnSynced.current === syncKey) {
         syncSubscription({ data: { clubId: activeClubId } })
           .then(() => refetch())
           .catch(() => refetch());
