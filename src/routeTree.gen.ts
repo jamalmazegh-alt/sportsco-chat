@@ -78,6 +78,7 @@ import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/s
 import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicWaitlistRouteImport } from './routes/api/public/waitlist'
 import { Route as ApiPublicTournamentRosterRouteImport } from './routes/api/public/tournament-roster'
 import { Route as ApiPublicTournamentRegistrationRouteImport } from './routes/api/public/tournament-registration'
 import { Route as ApiPublicTournamentPaymentLinkRouteImport } from './routes/api/public/tournament-payment-link'
@@ -481,6 +482,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWaitlistRoute = ApiPublicWaitlistRouteImport.update({
+  id: '/api/public/waitlist',
+  path: '/api/public/waitlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTournamentRosterRoute =
   ApiPublicTournamentRosterRouteImport.update({
     id: '/api/public/tournament-roster',
@@ -859,6 +865,7 @@ export interface FileRoutesByFullPath {
   '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
+  '/api/public/waitlist': typeof ApiPublicWaitlistRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
@@ -977,6 +984,7 @@ export interface FileRoutesByTo {
   '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
+  '/api/public/waitlist': typeof ApiPublicWaitlistRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
@@ -1101,6 +1109,7 @@ export interface FileRoutesById {
   '/api/public/tournament-payment-link': typeof ApiPublicTournamentPaymentLinkRoute
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
+  '/api/public/waitlist': typeof ApiPublicWaitlistRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
@@ -1225,6 +1234,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
+    | '/api/public/waitlist'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
@@ -1343,6 +1353,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
+    | '/api/public/waitlist'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
@@ -1466,6 +1477,7 @@ export interface FileRouteTypes {
     | '/api/public/tournament-payment-link'
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
+    | '/api/public/waitlist'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
@@ -1559,6 +1571,7 @@ export interface RootRouteChildren {
   ApiPublicTournamentPaymentLinkRoute: typeof ApiPublicTournamentPaymentLinkRoute
   ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
   ApiPublicTournamentRosterRoute: typeof ApiPublicTournamentRosterRoute
+  ApiPublicWaitlistRoute: typeof ApiPublicWaitlistRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
@@ -2062,6 +2075,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/waitlist': {
+      id: '/api/public/waitlist'
+      path: '/api/public/waitlist'
+      fullPath: '/api/public/waitlist'
+      preLoaderRoute: typeof ApiPublicWaitlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/tournament-roster': {
@@ -2754,6 +2774,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTournamentPaymentLinkRoute: ApiPublicTournamentPaymentLinkRoute,
   ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
   ApiPublicTournamentRosterRoute: ApiPublicTournamentRosterRoute,
+  ApiPublicWaitlistRoute: ApiPublicWaitlistRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,
   TournamentSlugTvRoute: TournamentSlugTvRoute,
