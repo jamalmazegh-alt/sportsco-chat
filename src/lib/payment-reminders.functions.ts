@@ -166,29 +166,35 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
         if (existing) continue;
 
         try {
-          await enqueueTransactionalEmailServer({
-            templateName: "payment-reminder",
-            recipientEmail: r.email,
-            idempotencyKey: `pay-reminder-manual:${o.id}:${offset}:${r.email.toLowerCase()}`,
-            templateData: {
-              clubName,
-              playerName: pname,
-              itemTitle: item.title,
-              amountLabel: fmtMoney(o.amount_due_cents, item.currency),
-              remainingLabel:
-                remaining !== o.amount_due_cents
-                  ? fmtMoney(remaining, item.currency)
-                  : null,
-              dueDateLabel: frDate(item.due_date),
-              offsetDays: item.due_date
-                ? Math.round(
-                    (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) /
-                      86_400_000,
-                  )
-                : 0,
-              payUrl: `${baseUrl}/payments`,
-            },
-          });
+          if (paymentEmailEnabled) {
+            await enqueueTransactionalEmailServer({
+              templateName: "payment-reminder",
+              recipientEmail: r.email,
+              idempotencyKey: `pay-reminder-manual:${o.id}:${offset}:${r.email.toLowerCase()}`,
+              templateData: {
+                clubName,
+                playerName: pname,
+                itemTitle: item.title,
+                amountLabel: fmtMoney(o.amount_due_cents, item.currency),
+                remainingLabel:
+                  remaining !== o.amount_due_cents
+                    ? fmtMoney(remaining, item.currency)
+                    : null,
+                dueDateLabel: frDate(item.due_date),
+                offsetDays: item.due_date
+                  ? Math.round(
+                      (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) /
+                        86_400_000,
+                    )
+                  : 0,
+                payUrl: `${baseUrl}/payments`,
+              },
+            });
+          } else {
+            console.info(
+              "[manual-reminder] payment email skipped — payments_v2 flag off",
+            );
+          }
           await supabaseAdmin.from("payment_reminder_log").insert({
             club_id: item.club_id,
             obligation_id: o.id,
