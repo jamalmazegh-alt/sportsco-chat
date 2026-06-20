@@ -65,6 +65,7 @@ Tous les masquages sont gérés via `src/config/features.ts` (`isV2(...)`).
 | Tarification présentée comme achetable sur la vitrine | 🔒 | `payments_v2` |
 | Collectes / fundraising / cagnottes | 🔒 | `fundraising_v2` |
 | Webhooks/fonctions serveur Stripe | ✅ (serveur) | — | Câblés, injoignables UI |
+| Cron `payment-reminders` (envoi emails de rappel) | 🔒 | `payments_v2` | Cron répond `200 {skipped:true}` tant que `payments_v2=false` côté `app_flags` (lu via `isV2Server`) |
 
 ## 5. V2 — vitrine « À venir » uniquement
 
