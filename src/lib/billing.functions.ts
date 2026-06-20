@@ -157,7 +157,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       automatic_tax: { enabled: true },
       customer_update: { address: "auto", name: "auto" },
       allow_promotion_codes: true,
-      success_url: `${origin}/admin?billing=success`,
+      success_url: `${origin}/admin/billing?billing=success`,
       cancel_url: `${origin}/pricing?billing=canceled`,
       metadata: { club_id: club.id, plan: data.plan },
     });
