@@ -69,16 +69,42 @@ export const Route = createFileRoute("/api/public/waitlist")({
 
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+          const normalizedEmail = parsed.email.toLowerCase();
           await supabaseAdmin.from("waitlist_interest").insert({
-            email: parsed.email.toLowerCase(),
+            email: normalizedEmail,
             features: parsed.features,
             role: parsed.role ?? null,
             marketing_consent: parsed.marketing_consent,
             consent_at: parsed.marketing_consent ? new Date().toISOString() : null,
             source: parsed.source || "landing",
           });
-        } catch {
+
+          // Accusé de réception utilisateur
+          const acceptLang = request.headers.get("accept-language") ?? "";
+          const locale = acceptLang.slice(0, 2).toLowerCase();
+          await enqueueTransactionalEmailServer({
+            templateName: "waitlist-confirmation",
+            recipientEmail: normalizedEmail,
+            idempotencyKey: `waitlist-confirm-${normalizedEmail}-${parsed.features.join(",")}`,
+            templateData: { features: parsed.features, locale },
+          }).catch((err) => console.error("[waitlist] user confirmation enqueue failed:", err));
+
+          // Notification interne (hello@clubero.app — fixé dans le template)
+          await enqueueTransactionalEmailServer({
+            templateName: "waitlist-admin-notification",
+            idempotencyKey: `waitlist-admin-${normalizedEmail}-${Date.now()}`,
+            templateData: {
+              email: normalizedEmail,
+              features: parsed.features,
+              role: parsed.role ?? null,
+              marketing_consent: parsed.marketing_consent,
+              source: parsed.source || "landing",
+            },
+          }).catch((err) => console.error("[waitlist] admin notification enqueue failed:", err));
+        } catch (err) {
           // Swallow — never leak DB state. Response stays 200.
+          console.error("[waitlist] insert failed:", err);
         }
 
         return Response.json({ success: true });

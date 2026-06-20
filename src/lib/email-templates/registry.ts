@@ -42,6 +42,8 @@ import { template as absenceDeclaredTemplate } from './absence-declared'
 import { template as dataExportReadyTemplate } from './data-export-ready'
 import { template as accountDeletedTemplate } from './account-deleted'
 import { template as tournamentCompletedTemplate } from './tournament-completed'
+import { template as waitlistConfirmationTemplate } from './waitlist-confirmation'
+import { template as waitlistAdminNotificationTemplate } from './waitlist-admin-notification'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'inquiry-confirmation': inquiryConfirmationTemplate,
@@ -69,4 +71,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'data-export-ready': dataExportReadyTemplate,
   'account-deleted': accountDeletedTemplate,
   'tournament-completed': tournamentCompletedTemplate,
+  'waitlist-confirmation': waitlistConfirmationTemplate,
+  'waitlist-admin-notification': waitlistAdminNotificationTemplate,
 }
