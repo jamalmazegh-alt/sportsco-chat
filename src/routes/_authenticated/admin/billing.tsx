@@ -116,6 +116,14 @@ function BillingPage() {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [updateCardOpen, setUpdateCardOpen] = useState(false);
 
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["club-subscription-full", activeClubId],
+    enabled: !!activeClubId,
+    queryFn: () => fetchSub({ data: { clubId: activeClubId! } }),
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
+  });
+
   useEffect(() => {
     if (search.billing === "success") {
       toast.success(t("billing.toastActivated"));
@@ -130,14 +138,6 @@ function BillingPage() {
       toast.success(t("billing.toastCardUpdated"));
     }
   }, [activeClubId, refetch, search.billing, search.card, syncSubscription, t]);
-
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["club-subscription-full", activeClubId],
-    enabled: !!activeClubId,
-    queryFn: () => fetchSub({ data: { clubId: activeClubId! } }),
-    refetchOnWindowFocus: true,
-    refetchOnMount: "always",
-  });
 
   const sub = data?.subscription;
   const now = Date.now();
