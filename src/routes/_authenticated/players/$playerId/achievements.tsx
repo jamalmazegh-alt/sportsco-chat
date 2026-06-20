@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,8 +13,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AchievementBadge, ACHIEVEMENT_TYPES } from "@/components/player-journey/achievement-badge";
+import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/players/$playerId/achievements")({
+  // PR4-WS1: palmarès cross-club — gated derrière `public_player_profiles`.
+  beforeLoad: ({ params }) => {
+    if (!isV2("public_player_profiles")) {
+      throw redirect({ to: "/players/$playerId", params: { playerId: params.playerId } });
+    }
+  },
   component: AchievementsTab,
 });
 
