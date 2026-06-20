@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { verifyCronSecret } from "@/lib/cron-secret.server";
 
-const MILESTONES = [7, 3, 1, 0] as const;
+const MILESTONES = [0, 1, 3, 7] as const;
 
 function formatFrDate(iso: string) {
   return new Date(iso).toLocaleDateString("fr-FR", {
@@ -59,7 +59,8 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
           const days = daysUntil(trialEnd);
           const already = (sub.trial_reminders_sent ?? []) as number[];
 
-          // Pick the next milestone to send: largest milestone <= current days remaining, not yet sent
+          // Pick the closest due milestone not yet sent. For an expired trial,
+          // force milestone 0 so the email says the trial has ended.
           const milestone = MILESTONES.find((m) => days <= m && !already.includes(m));
           if (milestone === undefined) continue;
 
