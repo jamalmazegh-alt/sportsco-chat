@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   Users,
   ShieldAlert,
+  Palmtree,
   HeartPulse,
   CheckCircle2,
   Plus,
