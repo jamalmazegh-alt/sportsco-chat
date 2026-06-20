@@ -1360,5 +1360,34 @@
       "Hoe verloopt de demo?",
       "Is het geschikt voor mijn club van 60 spelers?"
     ]
+  },
+  "waitlist": {
+    "badge": "Binnenkort",
+    "title": "Wat eraan komt",
+    "subtitle": "Laat je e-mailadres achter en we waarschuwen je zodra een functie beschikbaar is. Geen verplichting, geen betaling.",
+    "emailLabel": "Jouw e-mail",
+    "featuresLabel": "Functies die je interesseren",
+    "features": {
+      "player_network": "Spelersnetwerk",
+      "public_profiles": "Openbare profielen",
+      "payments": "Betalingen en contributies",
+      "fundraising": "Fondsenwerving",
+      "championships": "Competities",
+      "championship_stats": "Uitgebreide competitiestatistieken"
+    },
+    "roleLabel": "Jouw rol",
+    "rolePlaceholder": "— Kies —",
+    "roles": {
+      "coach": "Coach",
+      "admin": "Clubbestuurder",
+      "tournament_organizer": "Toernooi-organisator",
+      "parent": "Ouder",
+      "player": "Speler"
+    },
+    "consent": "Ik ga akkoord met het ontvangen van Clubero-updates over toekomstige functies. Met één klik uitschrijven.",
+    "submit": "Houd me op de hoogte",
+    "submitting": "Verzenden…",
+    "success": "Bedankt! We laten het je weten zodra het klaar is.",
+    "error": "Er is iets misgegaan. Probeer het zo opnieuw."
   }
 }

@@ -1360,5 +1360,34 @@
       "How does the demo work?",
       "Is it suitable for my club of 60 players?"
     ]
+  },
+  "waitlist": {
+    "badge": "Coming soon",
+    "title": "What's next",
+    "subtitle": "Drop your email and we'll let you know as soon as a feature ships. No commitment, no payment.",
+    "emailLabel": "Your email",
+    "featuresLabel": "Features you're interested in",
+    "features": {
+      "player_network": "Player network",
+      "public_profiles": "Public profiles",
+      "payments": "Payments & dues",
+      "fundraising": "Fundraising",
+      "championships": "Championships",
+      "championship_stats": "Enriched championship stats"
+    },
+    "roleLabel": "Your role",
+    "rolePlaceholder": "— Select —",
+    "roles": {
+      "coach": "Coach",
+      "admin": "Club admin",
+      "tournament_organizer": "Tournament organizer",
+      "parent": "Parent",
+      "player": "Player"
+    },
+    "consent": "I agree to receive Clubero updates about upcoming features. One-click unsubscribe.",
+    "submit": "Notify me",
+    "submitting": "Sending…",
+    "success": "Thanks! We'll write as soon as it's ready.",
+    "error": "Something went wrong. Please try again in a moment."
   }
 }

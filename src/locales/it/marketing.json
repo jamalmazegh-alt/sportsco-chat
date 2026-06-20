@@ -1360,5 +1360,34 @@
       "Come funziona la demo?",
       "È adatto al mio club di 60 giocatori?"
     ]
+  },
+  "waitlist": {
+    "badge": "In arrivo",
+    "title": "Le prossime funzionalità",
+    "subtitle": "Lasciaci la tua email e ti avviseremo non appena una funzionalità sarà disponibile. Nessun impegno, nessun pagamento.",
+    "emailLabel": "La tua email",
+    "featuresLabel": "Funzionalità che ti interessano",
+    "features": {
+      "player_network": "Rete giocatori",
+      "public_profiles": "Profili pubblici",
+      "payments": "Pagamenti e quote",
+      "fundraising": "Raccolta fondi",
+      "championships": "Campionati",
+      "championship_stats": "Statistiche di campionato avanzate"
+    },
+    "roleLabel": "Il tuo ruolo",
+    "rolePlaceholder": "— Scegli —",
+    "roles": {
+      "coach": "Allenatore",
+      "admin": "Dirigente del club",
+      "tournament_organizer": "Organizzatore di tornei",
+      "parent": "Genitore",
+      "player": "Giocatore"
+    },
+    "consent": "Accetto di ricevere novità da Clubero sulle prossime funzionalità. Disiscrizione con un clic.",
+    "submit": "Avvisami",
+    "submitting": "Invio in corso…",
+    "success": "Grazie! Ti scriveremo non appena sarà pronto.",
+    "error": "Si è verificato un errore. Riprova tra un istante."
   }
 }
