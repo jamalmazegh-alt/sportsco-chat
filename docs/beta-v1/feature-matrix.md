@@ -87,3 +87,42 @@ Tous les masquages sont gérés via `src/config/features.ts` (`isV2(...)`).
 3. **Vitrine** : les features V2 sont autorisées uniquement en section « À venir » dédiée, étiquetées, sans CTA actif vers l'app, sans tunnel d'achat. CTA autorisé : « Être prévenu » / newsletter.
 4. **Couture clé** : Vie du club (mur + actus FB, club-scoped) ≠ Réseau social ouvert (cross-club, masqué). Ne pas les confondre.
 5. **Flip d'un flag** = réactivation immédiate, zéro refacto.
+
+---
+
+## PR4D — QA complémentaire (post-merge PR4)
+
+### Axe 1 — Rôles authentifiés (`tests/e2e/25-beta-closure-roles-auth.e2e.ts`)
+
+Matrice mobile 375 px exécutée après login programmatique pour chaque rôle
+disponible. Assertions par rôle : `/home` charge `< 400`, bottom-nav ⊂
+whitelist V1 (`/home`, `/events`, `/teams`, `/inbox`, `/profile`,
+`/tournaments`, `/admin`), aucune étiquette interdite (`Suivre`,
+`Following`, `Mettre en relation`, `Connecter Stripe`, `Payer`,
+`Cotisation`, `Acheter un pack`, `Profil public`, `Cagnotte`), onboarding
+checklist (si rendue) sans item V2.
+
+| Rôle | Fixture | Statut |
+|---|---|---|
+| Admin club | `E2E_ADMIN_*` (déjà seedé) | ✅ couvert |
+| Coach | `E2E_COACH_*` (déjà seedé) | ✅ couvert |
+| Joueur | `E2E_PLAYER_*` (déjà seedé) | ✅ couvert |
+| Parent | `E2E_PARENT_*` (déjà seedé) | ✅ couvert |
+| Organisateur tournoi | `E2E_TOURN_ORG_*` (à seeder) | ⏳ `test.skip` tant que creds absentes |
+| Staff tournoi | `E2E_TOURN_STAFF_*` (à seeder) | ⏳ `test.skip` tant que creds absentes |
+
+Les deux rôles optionnels passent automatiquement à `✅ couvert` dès que
+les variables d'environnement sont fournies — aucun code à modifier.
+
+### Axe 2 — Clôture `/players/$playerId` (sections enrichies cross-club)
+
+| Sous-route | Scope | Décision | Preuve |
+|---|---|---|---|
+| `/players/$playerId/seasons` | Cross-club (agrège `player_season_stats` toutes saisons + clubs) | 🔒 onglet masqué + `beforeLoad` redirect vers `/players/$playerId` | `src/routes/_authenticated/players/$playerId/seasons.tsx` L17-22 |
+| `/players/$playerId/achievements` | Palmarès partageable (achievement_type "confirmed" toutes saisons) | 🔒 onglet masqué + `beforeLoad` redirect | `src/routes/_authenticated/players/$playerId/achievements.tsx` L19-24 |
+| `/players/$playerId/timeline` | Lifetime cross-club (`player_timeline_events` toutes sources) | 🔒 onglet masqué + `beforeLoad` redirect | `src/routes/_authenticated/players/$playerId/timeline.tsx` L18-23 |
+| `/players/$playerId` (parent) | Fiche club-scoped | ✅ GARDÉ ; `<PublicProfileCard>` + tabs Saison/Palmarès/Timeline gardés derrière `isV2("public_player_profiles")` | `src/routes/_authenticated/players/$playerId.tsx` L35 (`SHOW_PUBLIC_PROFILE_FEATURES`) |
+
+Conclusion : les 3 sous-routes sont **fail-closed** (redirect serveur via
+`beforeLoad`) + **UI-gated** (tabs invisibles), aucune surface enrichie
+cross-club n'est atteignable tant que `public_player_profiles=false`.
