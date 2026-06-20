@@ -28,6 +28,11 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import i18n from "@/lib/i18n";
+import { isV2 } from "@/config/features";
+
+// PR4-WS1: profils publics enrichis (cross-club) sont gated derrière
+// `public_player_profiles`. Le profil joueur club-scoped reste accessible.
+const SHOW_PUBLIC_PROFILE_FEATURES = isV2("public_player_profiles");
 
 export const Route = createFileRoute("/_authenticated/players/$playerId")({
   component: PlayerProfile,
