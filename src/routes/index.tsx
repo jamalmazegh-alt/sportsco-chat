@@ -61,114 +61,236 @@ function Landing() {
     <MarketingLayout>
       <V2Hero />
       <V2Benefits />
-      <V2Tournaments />
-      <V2SocialClub />
-      <V2WhatsApp />
-      <V2ForWho />
-      <V2Testimonials />
-      <V2Pricing />
+      <LandingWizard />
+      <LandingConvocation />
+      <LandingCommunication />
+      <LandingTournament />
+      <LandingComingSoon />
       <V2Waitlist />
-      <V2FinalCTA />
     </MarketingLayout>
   );
 }
 
 // ============================================================
-//  LANDING V2 — Refonte conversion-first (déc. 2026)
+//  LANDING V2 — Refonte vitrine (juin 2026)
 // ============================================================
 
 function V2Hero() {
   const { t } = useTranslation("marketing");
-  const trust = [
-    t("home.v2.hero.trust1"),
-    t("home.v2.hero.trust2"),
-    t("home.v2.hero.trust3"),
-  ];
-  const audiences = [
-    { icon: Building2, label: t("home.v2.hero.audDirigeants") },
-    { icon: GraduationCap, label: t("home.v2.hero.audEducateurs") },
-    { icon: Heart, label: t("home.v2.hero.audParents") },
-    { icon: UserCircle2, label: t("home.v2.hero.audJoueurs") },
-  ];
   return (
-    <section className="relative overflow-hidden border-b border-border/60">
-      <div aria-hidden className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-primary/10 blur-[140px]" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,color-mix(in_oklab,var(--primary)_10%,transparent),transparent_60%)]" />
-      <div className="relative mx-auto max-w-7xl px-5 pt-20 pb-16 lg:px-8 lg:pt-28 lg:pb-24">
-        <div className="grid items-center gap-14 lg:grid-cols-[1.15fr_1fr]">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <Sparkles className="h-3.5 w-3.5" />
-              {t("home.v2.hero.kicker")}
-            </div>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-              {t("home.v2.hero.titleA")}{" "}
-              <span className="text-primary">{t("home.v2.hero.titleB")}</span>
-            </h1>
-            <p className="mt-5 text-xl font-semibold text-foreground/80">
-              {t("home.v2.hero.subtitle")}
-            </p>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-              {t("home.v2.hero.body")}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="h-12 px-6 text-base">
-                <Link to="/register">
-                  {t("home.v2.hero.ctaPrimary")} <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base">
-                <Link to="/demo">{t("home.v2.hero.ctaSecondary")}</Link>
-              </Button>
-            </div>
-            <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-              {trust.map((tr) => (
-                <li key={tr} className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span>{tr}</span>
-                </li>
-              ))}
-            </ul>
+    <section className="relative isolate overflow-hidden bg-slate-950 text-white">
+      <img
+        src="/images/landing/hero_clubero_image.jpg"
+        alt={t("landing.hero.img_alt")}
+        loading="eager"
+        decoding="async"
+        className="absolute inset-0 -z-10 h-full w-full object-cover object-right"
+      />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/85 to-transparent" />
+      <div className="mx-auto flex min-h-[90vh] max-w-7xl flex-col justify-center px-5 py-20 lg:px-8 lg:py-28">
+        <div className="max-w-2xl">
+          <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+            {t("landing.hero.headline")}
+          </h1>
+          <p className="mt-6 text-2xl font-semibold text-white/85 sm:text-3xl">
+            {t("landing.hero.tagline")}
+          </p>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
+            {t("landing.hero.subtitle")}
+          </p>
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <Button
+              asChild
+              size="lg"
+              className="h-12 rounded-full bg-emerald-500 px-7 text-base font-semibold text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-400"
+            >
+              <Link to="/register">
+                {t("landing.hero.cta_primary")} <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="h-12 rounded-full border-white/40 bg-transparent px-7 text-base font-semibold text-white hover:bg-white/10 hover:text-white"
+            >
+              <Link to="/features">{t("landing.hero.cta_secondary")}</Link>
+            </Button>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          {/* Hero illustration — ecosystem mock */}
-          <div className="relative">
-            <div aria-hidden className="absolute -inset-6 -z-10 rounded-[40px] bg-gradient-to-br from-primary/15 via-secondary/10 to-[color:var(--energy)]/15 blur-2xl" />
-            <div className="rounded-3xl border border-border bg-card p-6 shadow-2xl shadow-primary/10">
-              <div className="flex items-center justify-between border-b border-border pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <Layers className="h-4 w-4" />
-                  </div>
-                  <p className="font-display text-sm font-semibold">{t("home.v2.hero.mockTitle")}</p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                  {t("home.v2.hero.mockLive")}
-                </span>
-              </div>
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                {audiences.map((a) => {
-                  const Icon = a.icon;
-                  return (
-                    <div key={a.label} className="flex items-center gap-3 rounded-2xl border border-border bg-muted/30 p-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <p className="text-sm font-semibold">{a.label}</p>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="mt-4 rounded-2xl border border-primary/30 bg-primary/5 p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-                  {t("home.v2.hero.mockBadge")}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-foreground">
-                  {t("home.v2.hero.mockLine")}
-                </p>
-              </div>
+// ─── New illustrated landing sections ───────────────────────
+
+function SectionBadge({ children, tone = "primary" }: { children: React.ReactNode; tone?: "primary" | "emerald" | "amber" | "sky" | "violet" }) {
+  const tones: Record<string, string> = {
+    primary: "border-primary/30 bg-primary/10 text-primary",
+    emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    amber: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    sky: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400",
+    violet: "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-400",
+  };
+  return (
+    <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider ${tones[tone]}`}>
+      {children}
+    </span>
+  );
+}
+
+function LandingWizard() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="border-b border-border/60 py-20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <SectionBadge tone="amber">⚡ {t("landing.wizard.badge")}</SectionBadge>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {t("landing.wizard.headline")}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("landing.wizard.body")}
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+              <img
+                src="/images/landing/coach_clubero_image.jpg"
+                alt={t("landing.wizard.img_alt_coach")}
+                loading="lazy"
+                decoding="async"
+                className="h-72 w-full object-cover sm:h-96"
+              />
             </div>
+            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+              <img
+                src="/images/landing/wizard_clubero.jpg"
+                alt={t("landing.wizard.img_alt_screen")}
+                loading="lazy"
+                decoding="async"
+                className="h-72 w-full object-cover sm:h-96"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LandingConvocation() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="border-b border-border/60 bg-emerald-50/60 py-20 dark:bg-emerald-950/20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className="order-1">
+            <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+              <img
+                src="/images/landing/cpnvoque_clubero.jpg"
+                alt={t("landing.convocation.img_alt")}
+                loading="lazy"
+                decoding="async"
+                className="h-80 w-full object-cover sm:h-[28rem]"
+              />
+            </div>
+          </div>
+          <div className="order-2">
+            <SectionBadge tone="emerald">📲 {t("landing.convocation.badge")}</SectionBadge>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {t("landing.convocation.headline")}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("landing.convocation.body")}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LandingCommunication() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="border-b border-border/60 py-20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <SectionBadge tone="sky">💬 {t("landing.communication.badge")}</SectionBadge>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {t("landing.communication.headline")}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("landing.communication.body")}
+            </p>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+            <img
+              src="/images/landing/image_coach_et_jouers.jpg"
+              alt={t("landing.communication.img_alt")}
+              loading="lazy"
+              decoding="async"
+              className="h-80 w-full object-cover sm:h-[28rem]"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function LandingTournament() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="relative isolate overflow-hidden border-b border-border/60">
+      <img
+        src="/images/landing/image_tournoi.jpg"
+        alt={t("landing.tournament.img_alt")}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 -z-10 h-full w-full object-cover"
+      />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-slate-950/70" />
+      <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center px-5 py-20 text-center text-white lg:px-8 lg:py-28">
+        <SectionBadge tone="amber">🏆 {t("landing.tournament.badge")}</SectionBadge>
+        <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+          {t("landing.tournament.headline")}
+        </h2>
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
+          {t("landing.tournament.body")}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function LandingComingSoon() {
+  const { t } = useTranslation("marketing");
+  return (
+    <section className="border-b border-border/60 bg-gradient-to-br from-emerald-50/70 to-white py-20 dark:from-emerald-950/20 dark:to-background lg:py-28">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+            <img
+              src="/images/landing/croissance_clubero.jpg"
+              alt={t("landing.coming_soon.img_alt")}
+              loading="lazy"
+              decoding="async"
+              className="h-80 w-full object-cover sm:h-[28rem]"
+            />
+          </div>
+          <div>
+            <SectionBadge tone="violet">🔮 {t("landing.coming_soon.badge")}</SectionBadge>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {t("landing.coming_soon.headline")}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {t("landing.coming_soon.body")}
+            </p>
           </div>
         </div>
       </div>
