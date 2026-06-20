@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Trophy, History, CalendarDays, MapPin } from "lucide-react";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
 import { FollowButton } from "@/components/follow-button";
+import { isV2 } from "@/config/features";
 
 const SITE_URL = "https://www.clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
@@ -118,6 +119,10 @@ function buildMeta(slug: string, profile: PublicProfile | null) {
 }
 
 export const Route = createFileRoute("/p/$slug")({
+  // Bêta V1 : profils publics joueurs masqués derrière `public_player_profiles`.
+  beforeLoad: () => {
+    if (!isV2("public_player_profiles")) throw redirect({ to: "/", replace: true });
+  },
   component: PublicPlayerProfile,
   loader: ({ params, context }) =>
     context.queryClient.ensureQueryData(publicProfileQuery(params.slug)),
