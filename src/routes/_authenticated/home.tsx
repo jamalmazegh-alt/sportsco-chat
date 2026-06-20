@@ -187,8 +187,7 @@ function HomePage() {
 
   const { data: paymentData } = useQuery({
     queryKey: ["my-obligations-home", user?.id, activeClubId],
-    // Bêta V1 : feature paiements masquée (`payments_v2`).
-    enabled: !!user && !!activeClubId && isV2("payments_v2"),
+    enabled: !!user && !!activeClubId,
     staleTime: 60_000,
     queryFn: () => listMyObligationsFn({ data: {} }),
   });
