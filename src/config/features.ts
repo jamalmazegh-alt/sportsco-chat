@@ -32,15 +32,8 @@ export const V2_FLAGS = {
    */
   public_player_profiles: false,
 
-  /** Collectes, fundraising, cagnottes. */
+  /** Collectes et cagnottes uniquement. */
   fundraising_v2: false,
-
-  /**
-   * Cotisations, licences, packs payants tournois, Stripe Connect,
-   * tarification activée. Les webhooks/fonctions serveur Stripe
-   * restent câblés mais injoignables côté UI.
-   */
-  payments_v2: false,
 } as const;
 
 export type V2Flag = keyof typeof V2_FLAGS;
