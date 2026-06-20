@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
-import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
+import { useAuth, useMyRoles } from "@/lib/auth-context";
 import {
   getClubSubscription,
   createCheckoutSession,
@@ -58,6 +58,8 @@ export const Route = createFileRoute("/_authenticated/admin/billing")({
 
 function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | null }) {
   const { t, i18n } = useTranslation();
+  const trialTime = trialEnd ? new Date(trialEnd).getTime() : null;
+  const trialExpired = status === "trialing" && trialTime !== null && trialTime <= Date.now();
   const map: Record<string, { label: string; cls: string }> = {
     trialing: { label: t("billing.statusTrialing"), cls: "bg-primary/10 text-primary" },
     active: { label: t("billing.statusActive"), cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
@@ -68,13 +70,20 @@ function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | 
     unpaid: { label: t("billing.statusUnpaid"), cls: "bg-destructive/10 text-destructive" },
     paused: { label: t("billing.statusPaused"), cls: "bg-muted text-muted-foreground" },
   };
-  const s = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
+  const s = trialExpired
+    ? { label: t("billing.statusTrialExpired"), cls: "bg-destructive/10 text-destructive" }
+    : (map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" });
   const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${s.cls}`}>
       {s.label}
       {status === "trialing" && trialEnd && (
-        <> · {t("billing.untilDate", { date: new Date(trialEnd).toLocaleDateString(locale) })}</>
+        <>
+          {" · "}
+          {t(trialExpired ? "billing.endedOnDate" : "billing.untilDate", {
+            date: new Date(trialEnd).toLocaleDateString(locale),
+          })}
+        </>
       )}
     </span>
   );
@@ -83,7 +92,6 @@ function StatusBadge({ status, trialEnd }: { status: string; trialEnd: string | 
 function BillingPage() {
   const { t, i18n } = useTranslation();
   const { activeClubId } = useAuth();
-  const role = useActiveRole();
   const roles = useMyRoles();
   const search = useSearch({ from: "/_authenticated/admin/billing" });
   const locale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
@@ -125,11 +133,20 @@ function BillingPage() {
   });
 
   const sub = data?.subscription;
-  const isActive = sub && ["trialing", "active", "past_due"].includes(sub.status);
+  const now = Date.now();
+  const trialEndTime = sub?.trial_end ? new Date(sub.trial_end).getTime() : null;
+  const trialStillValid = sub?.status === "trialing" && trialEndTime !== null && trialEndTime > now;
+  const trialExpired = sub?.status === "trialing" && trialEndTime !== null && trialEndTime <= now;
+  const hasStripeSubscription = !!sub?.hasStripeSubscription;
+  const canManageSubscription =
+    !!sub &&
+    hasStripeSubscription &&
+    (["active", "past_due"].includes(sub.status) || trialStillValid);
+  const showPlans = !canManageSubscription;
 
   const { data: invoicesData } = useQuery({
     queryKey: ["club-invoices", activeClubId],
-    enabled: !!activeClubId && !!isActive,
+    enabled: !!activeClubId && canManageSubscription,
     queryFn: () => fetchInvoices({ data: { clubId: activeClubId! } }),
   });
 
