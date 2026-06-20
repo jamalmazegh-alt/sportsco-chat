@@ -53,7 +53,8 @@ async function readCapturedRedirects(page: Page): Promise<string[]> {
   });
 }
 
-test.describe("Clubero pack — page tarifs publique", () => {
+// Beta V1: payments_v2 masqué (voir docs/beta-v1/feature-matrix.md)
+test.describe.skip("Clubero pack — page tarifs publique", () => {
   // Use the published production URL: the preview deployment is gated by
   // Lovable's auth-bridge, which would redirect /pricing to a login page.
   const PUBLIC_PRICING_URL = "https://clubero.app/pricing";

@@ -14,7 +14,8 @@ import { createTestClub, type SeededClub } from "./_fixtures/club";
 
 const SKIP_RPC_ERROR = "column c.sport does not exist";
 
-test.describe("Player public profile", () => {
+// Beta V1: public_player_profiles masqué (voir docs/beta-v1/feature-matrix.md)
+test.describe.skip("Player public profile", () => {
   let club: SeededClub;
   let publicSlug: string;
 

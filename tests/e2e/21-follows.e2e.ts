@@ -12,7 +12,8 @@ import { admin, SUPABASE_URL, SUPABASE_ANON_KEY } from "./_fixtures/admin";
 import { clientFor } from "./_fixtures/auth";
 import { createTestClub, type SeededClub } from "./_fixtures/club";
 
-test.describe("Follows", () => {
+// Beta V1: social_network_v2 masqué (voir docs/beta-v1/feature-matrix.md)
+test.describe.skip("Follows", () => {
   let club: SeededClub;
 
   let coachClient: Awaited<ReturnType<typeof clientFor>>;
