@@ -540,6 +540,8 @@ function PlayerProfile() {
             <User className="h-3.5 w-3.5" />
             {t("players.tabProfile", { defaultValue: "Profil" })}
           </Link>
+          {SHOW_PUBLIC_PROFILE_FEATURES && (
+          <>
           <Link
             to="/players/$playerId/seasons"
             params={{ playerId }}
@@ -573,6 +575,8 @@ function PlayerProfile() {
             <History className="h-3.5 w-3.5" />
             {t("journey.tab.timeline", { defaultValue: "Timeline" })}
           </Link>
+          </>
+          )}
           <Link
             to="/players/$playerId/feedback"
             params={{ playerId }}
