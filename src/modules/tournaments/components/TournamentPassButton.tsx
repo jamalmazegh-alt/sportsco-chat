@@ -89,6 +89,36 @@ export function TournamentPassButton({
   const [busy, setBusy] = useState(false);
   const checkout = useServerFn(createTournamentPassCheckout);
   const resolvedLabel = label ?? t("pass.buyLabel");
+  const paymentsEnabled = isV2("payments_v2");
+
+  // Beta V1: paiements masqués — affiche un état "Bientôt" non-cliquable.
+  if (!paymentsEnabled) {
+    const soonLabel = t("pass.comingSoon", { defaultValue: "Bientôt — paiement à venir" });
+    if (inline) {
+      return (
+        <div className={className}>
+          <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-4 space-y-2">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted shrink-0">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold leading-tight">{t("pass.dialogTitle")}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{soonLabel}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <Button variant={variant} className={className} disabled>
+        <Clock className="h-4 w-4" />
+        {soonLabel}
+      </Button>
+    );
+  }
+
 
   async function startCheckout(emailToUse: string, qty: number) {
     if (busy) return;
