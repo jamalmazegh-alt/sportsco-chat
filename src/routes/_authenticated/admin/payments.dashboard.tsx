@@ -1,4 +1,5 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, redirect } from "@tanstack/react-router";
+import { isV2 } from "@/config/features";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -30,6 +31,12 @@ import { toast } from "sonner";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")({
+  // Bêta V1 : dashboard financier masqué tant que payments_v2 et fundraising_v2 sont off.
+  beforeLoad: () => {
+    if (!isV2("payments_v2") && !isV2("fundraising_v2")) {
+      throw redirect({ to: "/admin", replace: true });
+    }
+  },
   component: PaymentsDashboardPage,
   head: () => ({
     meta: [

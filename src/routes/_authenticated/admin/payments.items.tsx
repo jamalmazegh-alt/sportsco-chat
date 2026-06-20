@@ -1,4 +1,5 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, redirect } from "@tanstack/react-router";
+import { isV2 } from "@/config/features";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -54,6 +55,10 @@ import { CollectPaymentDialog } from "@/components/admin/CollectPaymentDialog";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/payments/items")({
+  // Bêta V1 : cotisations / cagnottes masquées derrière fundraising_v2.
+  beforeLoad: () => {
+    if (!isV2("fundraising_v2")) throw redirect({ to: "/admin", replace: true });
+  },
   component: PaymentItemsPage,
   validateSearch: z.object({ season: z.string().uuid().optional() }),
   head: () => ({

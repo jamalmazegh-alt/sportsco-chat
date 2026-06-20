@@ -1,4 +1,5 @@
-import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, redirect } from "@tanstack/react-router";
+import { isV2 } from "@/config/features";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -56,6 +57,10 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/settings/payments")({
+  // Bêta V1 : Stripe Connect / paiements club masqués derrière payments_v2.
+  beforeLoad: () => {
+    if (!isV2("payments_v2")) throw redirect({ to: "/admin", replace: true });
+  },
   component: PaymentsSettingsPage,
   validateSearch: searchSchema,
   head: () => ({
