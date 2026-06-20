@@ -59,12 +59,13 @@ function AdminSettingsPage() {
     );
   }
 
-  const items: Array<{
+  const allItems: Array<{
     to: string;
     icon: typeof CreditCard;
     title: string;
     hint: string;
     tone: string;
+    hidden?: boolean;
   }> = [
     {
       to: "/admin/billing",
@@ -81,6 +82,8 @@ function AdminSettingsPage() {
         defaultValue: "Encaissez les inscriptions tournoi via Stripe",
       }),
       tone: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
+      // Bêta V1 : Stripe/paiements club masqué derrière payments_v2.
+      hidden: !isV2("payments_v2"),
     },
     {
       to: "/admin/payments/items",
@@ -88,6 +91,8 @@ function AdminSettingsPage() {
       title: t("fundraising.menuTitle"),
       hint: t("fundraising.menuHint"),
       tone: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+      // Bêta V1 : cotisations/cagnottes masquées derrière fundraising_v2.
+      hidden: !isV2("fundraising_v2"),
     },
     {
       to: "/admin/payments/dashboard",
@@ -95,6 +100,7 @@ function AdminSettingsPage() {
       title: "Tableau de bord financier",
       hint: "KPIs, taux d'encaissement, exports CSV",
       tone: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
+      hidden: !isV2("payments_v2") && !isV2("fundraising_v2"),
     },
     {
       to: "/admin/settings/convocations",
