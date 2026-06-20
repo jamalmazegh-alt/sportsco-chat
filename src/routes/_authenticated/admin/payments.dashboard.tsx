@@ -31,9 +31,9 @@ import { toast } from "sonner";
 import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")({
-  // Bêta V1 : dashboard financier masqué tant que payments_v2 et fundraising_v2 sont off.
+  // Bêta V1 : dashboard financier visible tant que collectes/cagnottes ou paiements actifs.
   beforeLoad: () => {
-    if (!isV2("payments_v2") && !isV2("fundraising_v2")) {
+    if (!isV2("fundraising_v2")) {
       throw redirect({ to: "/admin", replace: true });
     }
   },
