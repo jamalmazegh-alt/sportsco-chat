@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { isV2 } from "@/config/features";
-import { getPublicTournament } from "@/modules/tournaments/tournaments-public.functions";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,22 +9,13 @@ import { Button } from "@/components/ui/button";
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/t/$slug/pay/$registrationId")({
-  // Bêta V1 : paiements tournoi masqués derrière `payments_v2`.
-  beforeLoad: async ({ params }) => {
-    if (isV2("payments_v2")) return;
-    // Flag masqué : on renvoie vers la page publique du tournoi, mais jamais
-    // une 500 sur un slug inexistant — on retombe sur la liste des tournois.
-    let tournament: unknown = null;
-    try {
-      tournament = await getPublicTournament({ data: { slug: params.slug } });
-    } catch {
-      tournament = null;
+  // Bêta V1 : paiements tournoi masqués derrière `payments_v2`. On renvoie vers
+  // la liste publique des tournois — jamais vers /t/$slug, dont le rendu SSR
+  // dépend du service-role et peut donc 500 (slug inexistant ou env sans clé).
+  beforeLoad: () => {
+    if (!isV2("payments_v2")) {
+      throw redirect({ to: "/tournaments", replace: true });
     }
-    throw redirect(
-      tournament
-        ? { to: "/t/$slug", params: { slug: params.slug }, replace: true }
-        : { to: "/tournaments", replace: true },
-    );
   },
   component: PayPage,
   head: ({ params }) => ({
