@@ -56,10 +56,16 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    // If already active/trialing on Stripe (has a subscription id), route to portal instead
+    const existingTrialStillValid =
+      existingSub?.status === "trialing" &&
+      existingSub.trial_end &&
+      new Date(existingSub.trial_end).getTime() > Date.now();
+
+    // If already active on Stripe, route to portal instead. Expired in-app
+    // trials without a Stripe subscription must still be able to subscribe.
     if (
       existingSub?.stripe_subscription_id &&
-      ["active", "trialing", "past_due"].includes(existingSub.status ?? "")
+      (["active", "past_due"].includes(existingSub.status ?? "") || existingTrialStillValid)
     ) {
       throw new Error("This club already has an active subscription");
     }
@@ -185,12 +191,25 @@ export const getClubSubscription = createServerFn({ method: "GET" })
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
       .select(
-        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at",
+        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_subscription_id",
       )
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    return { subscription: sub };
+    return {
+      subscription: sub
+        ? {
+            plan: sub.plan,
+            status: sub.status,
+            current_period_end: sub.current_period_end,
+            trial_end: sub.trial_end,
+            cancel_at_period_end: sub.cancel_at_period_end,
+            cancel_at: sub.cancel_at,
+            canceled_at: sub.canceled_at,
+            hasStripeSubscription: !!sub.stripe_subscription_id,
+          }
+        : null,
+    };
   });
 
 /**
