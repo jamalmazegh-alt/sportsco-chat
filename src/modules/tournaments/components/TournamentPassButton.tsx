@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
-import { Loader2, Trophy, Minus, Plus, Clock } from "lucide-react";
+import { Loader2, Trophy, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { createTournamentPassCheckout } from "@/modules/tournaments/passes.functions";
 import { useAuth } from "@/lib/auth-context";
-import { isV2 } from "@/config/features";
 
 interface TournamentPassButtonProps {
   className?: string;
