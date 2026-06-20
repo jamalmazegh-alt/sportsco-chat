@@ -185,12 +185,25 @@ export const getClubSubscription = createServerFn({ method: "GET" })
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
       .select(
-        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at",
+        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_subscription_id",
       )
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    return { subscription: sub };
+    return {
+      subscription: sub
+        ? {
+            plan: sub.plan,
+            status: sub.status,
+            current_period_end: sub.current_period_end,
+            trial_end: sub.trial_end,
+            cancel_at_period_end: sub.cancel_at_period_end,
+            cancel_at: sub.cancel_at,
+            canceled_at: sub.canceled_at,
+            hasStripeSubscription: !!sub.stripe_subscription_id,
+          }
+        : null,
+    };
   });
 
 /**
