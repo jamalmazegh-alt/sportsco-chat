@@ -578,30 +578,38 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
       const { enqueueTransactionalEmailServer } = await import(
         "@/lib/email/send.server"
       );
-      await enqueueTransactionalEmailServer({
-        templateName: "tournament-payment-request",
-        recipientEmail: data.contact_email,
-        templateData: {
-          teamName: data.team_name,
-          tournamentName: t.name,
-          amountLabel,
-          paymentUrl: link,
-          expiresInDays: LINK_TTL_DAYS,
-        },
-        idempotencyKey: `tournament-invite-payment-${reg.id}`,
-      });
-      await supabaseAdmin
-        .from("tournament_registrations")
-        .update({
-          payment_link_sent_via: "email",
-          payment_link_sent_at: new Date().toISOString(),
-        })
-        .eq("id", reg.id);
-      await logPaymentEvent(t.id, reg.id, "checkout_created", t.registration_fee, {
-        payment_link_sent: "email",
-        to: data.contact_email,
-        source: "invite",
-      });
+      const { isV2Server } = await import("@/lib/features.server");
+      if (await isV2Server("payments_v2")) {
+        await enqueueTransactionalEmailServer({
+          templateName: "tournament-payment-request",
+          recipientEmail: data.contact_email,
+          templateData: {
+            teamName: data.team_name,
+            tournamentName: t.name,
+            amountLabel,
+            paymentUrl: link,
+            expiresInDays: LINK_TTL_DAYS,
+          },
+          idempotencyKey: `tournament-invite-payment-${reg.id}`,
+        });
+        await supabaseAdmin
+          .from("tournament_registrations")
+          .update({
+            payment_link_sent_via: "email",
+            payment_link_sent_at: new Date().toISOString(),
+          })
+          .eq("id", reg.id);
+        await logPaymentEvent(t.id, reg.id, "checkout_created", t.registration_fee, {
+          payment_link_sent: "email",
+          to: data.contact_email,
+          source: "invite",
+        });
+      } else {
+        console.info(
+          "[invite team for payment] email skipped — payments_v2 flag off",
+          { registrationId: reg.id },
+        );
+      }
     } catch (e: any) {
       console.error("[invite team for payment] email failed", e);
       // Keep the registration even if email fails; admin can resend.
