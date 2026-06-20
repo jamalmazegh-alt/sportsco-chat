@@ -507,9 +507,13 @@ export const listClubInvoices = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { customerId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
+    const { customerId, subscriptionId } = await getAdminClubStripeIds(data.clubId, userId, supabase);
     const stripe = getStripe();
-    const invoices = await stripe.invoices.list({ customer: customerId, limit: 12 });
+    const invoices = await stripe.invoices.list(
+      subscriptionId
+        ? { customer: customerId, subscription: subscriptionId, limit: 12 }
+        : { customer: customerId, limit: 12 },
+    );
     return {
       invoices: invoices.data.map((inv) => ({
         id: inv.id,
