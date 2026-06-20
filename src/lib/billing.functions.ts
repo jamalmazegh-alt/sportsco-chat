@@ -306,20 +306,7 @@ export const getClubSubscription = createServerFn({ method: "GET" })
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    return {
-      subscription: sub
-        ? {
-            plan: sub.plan,
-            status: sub.status,
-            current_period_end: sub.current_period_end,
-            trial_end: sub.trial_end,
-            cancel_at_period_end: sub.cancel_at_period_end,
-            cancel_at: sub.cancel_at,
-            canceled_at: sub.canceled_at,
-            hasStripeSubscription: !!sub.stripe_subscription_id,
-          }
-        : null,
-    };
+    return { subscription: serializeSubscription(sub) };
   });
 
 /**
