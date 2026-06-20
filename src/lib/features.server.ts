@@ -25,19 +25,26 @@ export async function isV2Server(flag: V2Flag): Promise<boolean> {
   const hit = cache.get(flag);
   if (hit && hit.expiresAt > now) return hit.value;
 
-  let value: boolean = V2_FLAGS[flag];
+  // Fail-closed: if the DB lookup fails or the row is missing, default to
+  // `false` so a transient outage cannot accidentally re-enable a masked V2
+  // feature. Only successful reads are cached.
+  let resolved = false;
+  let value = false;
   try {
-    const { data } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("app_flags")
       .select("enabled")
       .eq("key", flag)
       .maybeSingle();
-    if (data && typeof data.enabled === "boolean") value = data.enabled;
+    if (!error && data && typeof data.enabled === "boolean") {
+      value = data.enabled;
+      resolved = true;
+    }
   } catch {
-    /* fall back to client default */
+    /* fail-closed — do not cache */
   }
 
-  cache.set(flag, { value, expiresAt: now + TTL_MS });
+  if (resolved) cache.set(flag, { value, expiresAt: now + TTL_MS });
   return value;
 }
 
