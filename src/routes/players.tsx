@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
+import { isV2 } from "@/config/features";
 
 const SITE_URL = "https://www.clubero.app";
 const PAGE_SIZE = 24;
@@ -43,24 +44,14 @@ type ListResponse = {
 };
 
 export const Route = createFileRoute("/players")({
+  // Bêta V1 : annuaire public masqué derrière `public_player_profiles`.
+  beforeLoad: () => {
+    if (!isV2("public_player_profiles")) throw redirect({ to: "/", replace: true });
+  },
   head: () => ({
     meta: [
-      { title: "Annuaire des joueurs publics — Clubero" },
-      {
-        name: "description",
-        content:
-          "Découvrez les profils publics des joueurs sur Clubero : palmarès, parcours, club. Recherchez par nom, sport ou club.",
-      },
-      { property: "og:title", content: "Annuaire des joueurs publics — Clubero" },
-      {
-        property: "og:description",
-        content:
-          "Profils publics de joueurs : palmarès, parcours, club. Recherche et filtres.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE_URL}/players` },
-      { name: "twitter:card", content: "summary_large_image" },
-      { rel: "canonical", href: `${SITE_URL}/players` } as any,
+      { title: "Clubero" },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: PublicPlayersDirectory,

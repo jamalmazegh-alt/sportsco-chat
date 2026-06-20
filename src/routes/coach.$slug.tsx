@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Trophy, MapPin, GraduationCap, History, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { cn } from "@/lib/utils";
 import { FollowButton } from "@/components/follow-button";
+import { isV2 } from "@/config/features";
 
 const SITE_URL = "https://www.clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
@@ -47,6 +48,10 @@ const coachQuery = (slug: string) =>
   });
 
 export const Route = createFileRoute("/coach/$slug")({
+  // Bêta V1 : profils publics coachs masqués derrière `public_player_profiles`.
+  beforeLoad: () => {
+    if (!isV2("public_player_profiles")) throw redirect({ to: "/", replace: true });
+  },
   loader: async ({ context, params }) => {
     await context.queryClient.ensureQueryData(coachQuery(params.slug));
     return null;
