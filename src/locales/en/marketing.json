@@ -1422,7 +1422,9 @@
       "badge": "Competitions",
       "headline": "Run your tournament from A to Z.",
       "body": "Groups, knockout rounds, pitches, referees, automatic standings — everything is handled inside Clubero. On match day, your control room is in your pocket.",
-      "img_alt": "Panoramic view of an amateur tournament run with Clubero"
+      "img_alt": "Panoramic view of an amateur tournament run with Clubero",
+      "cta_organize": "Organize my tournament",
+      "cta_learn_more": "Learn more"
     },
     "coming_soon": {
       "badge": "Coming soon",
