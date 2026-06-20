@@ -140,6 +140,7 @@ function AdminSettingsPage() {
       tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
     },
   ];
+  const items = allItems.filter((it) => !it.hidden);
 
   return (
     <div className="px-5 py-4 space-y-4">
