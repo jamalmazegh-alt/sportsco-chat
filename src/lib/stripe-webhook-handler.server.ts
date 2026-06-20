@@ -246,30 +246,18 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
               .eq("stripe_session_id", session.id)
               .eq("status", "pending");
             try {
-              const { isV2Server } = await import("@/lib/features.server");
-              if (await isV2Server("payments_v2")) {
-                await enqueueTransactionalEmailServer({
-                  templateName: "tournament-pass-purchased",
-                  idempotencyKey: `tournament-pass-${session.id}`,
-                  templateData: {
-                    buyerEmail,
-                    amount: totalCents,
-                    currency: session.currency ?? "eur",
-                    sessionId: session.id,
-                    paymentIntentId,
-                    quantity: qty,
-                  },
-                });
-              } else {
-                console.info(
-                  JSON.stringify({
-                    scope: "stripe-webhook",
-                    msg: "payment email skipped — payments_v2 flag off",
-                    template: "tournament-pass-purchased",
-                    sessionId: session.id,
-                  }),
-                );
-              }
+              await enqueueTransactionalEmailServer({
+                templateName: "tournament-pass-purchased",
+                idempotencyKey: `tournament-pass-${session.id}`,
+                templateData: {
+                  buyerEmail,
+                  amount: totalCents,
+                  currency: session.currency ?? "eur",
+                  sessionId: session.id,
+                  paymentIntentId,
+                  quantity: qty,
+                },
+              });
             } catch (e) {
               console.error("Failed to notify admin of tournament pass purchase", e);
             }

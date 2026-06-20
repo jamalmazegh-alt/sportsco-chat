@@ -204,39 +204,31 @@ async function maybeIssueReceipt(transactionId: string): Promise<void> {
           bank_transfer: "Virement bancaire",
           manual: "Manuel",
         } as Record<string, string>)[tx.method] ?? tx.method;
-      const { isV2Server } = await import("@/lib/features.server");
-      if (await isV2Server("payments_v2")) {
-        await enqueueTransactionalEmailServer({
-          templateName: "payment-receipt",
-          recipientEmail,
-          idempotencyKey: `receipt-${inserted.id}`,
-          templateData: {
-            clubName: club?.name ?? "Votre club",
-            payerName: payer
-              ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
-              : null,
-            playerName: player
-              ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
-              : null,
-            itemTitle: item?.title ?? "Paiement",
-            amountLabel: `${(tx.amount_gross_cents / 100).toFixed(2)} ${(tx.currency || "eur").toUpperCase()}`,
-            methodLabel,
-            receiptNumber: String(receiptNumber).padStart(6, "0"),
-            paidAt: new Date().toLocaleDateString("fr-FR", {
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            }),
-            downloadUrl: url,
-            method: tx.method,
-          },
-        });
-      } else {
-        log.info("payment email skipped — payments_v2 flag off", {
-          template: "payment-receipt",
-          receiptId: inserted.id,
-        });
-      }
+      await enqueueTransactionalEmailServer({
+        templateName: "payment-receipt",
+        recipientEmail,
+        idempotencyKey: `receipt-${inserted.id}`,
+        templateData: {
+          clubName: club?.name ?? "Votre club",
+          payerName: payer
+            ? `${payer.first_name ?? ""} ${payer.last_name ?? ""}`.trim() || null
+            : null,
+          playerName: player
+            ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
+            : null,
+          itemTitle: item?.title ?? "Paiement",
+          amountLabel: `${(tx.amount_gross_cents / 100).toFixed(2)} ${(tx.currency || "eur").toUpperCase()}`,
+          methodLabel,
+          receiptNumber: String(receiptNumber).padStart(6, "0"),
+          paidAt: new Date().toLocaleDateString("fr-FR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+          downloadUrl: url,
+          method: tx.method,
+        },
+      });
     }
   } catch (err) {
     log.error("Failed to generate/send receipt", {

@@ -187,8 +187,7 @@ function HomePage() {
 
   const { data: paymentData } = useQuery({
     queryKey: ["my-obligations-home", user?.id, activeClubId],
-    // Bêta V1 : feature paiements masquée (`payments_v2`).
-    enabled: !!user && !!activeClubId && isV2("payments_v2"),
+    enabled: !!user && !!activeClubId,
     staleTime: 60_000,
     queryFn: () => listMyObligationsFn({ data: {} }),
   });
@@ -253,7 +252,7 @@ function HomePage() {
         </div>
       </header>
 
-      {paymentSummary && isV2("payments_v2") && (
+      {paymentSummary && (
         <Link
           to="/payments"
           className="group flex items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-left shadow-sm transition-colors hover:bg-amber-500/15"

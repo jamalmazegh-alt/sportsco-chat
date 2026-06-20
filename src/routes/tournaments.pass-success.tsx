@@ -1,5 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { isV2 } from "@/config/features";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
@@ -7,10 +6,6 @@ import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 
 export const Route = createFileRoute("/tournaments/pass-success")({
-  // Bêta V1 : packs payants masqués derrière `payments_v2`.
-  beforeLoad: () => {
-    if (!isV2("payments_v2")) throw redirect({ to: "/", replace: true });
-  },
   component: PassSuccessPage,
   head: () => ({
     meta: [
