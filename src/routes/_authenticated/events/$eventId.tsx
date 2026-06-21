@@ -16,7 +16,7 @@ const pickEmailLocale = (...candidates: Array<string | null | undefined>): strin
 };
 import { fmt } from "@/lib/date-locale";
 import {
-  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle,
+  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle, Trophy, Timer, LayoutGrid,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import {
