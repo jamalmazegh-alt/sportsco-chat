@@ -202,6 +202,17 @@ export function WallFeed({ clubId }: { clubId: string }) {
         );
       }
     }
+    // Web Push fire-and-forget — membres du club, hors auteur (et hors mentions déjà notifiées)
+    if (data?.id) {
+      void (async () => {
+        try {
+          const { dispatchWallPostPush } = await import("@/lib/push-dispatch.functions");
+          await dispatchWallPostPush({ data: { postId: data.id } });
+        } catch (e) {
+          console.warn("[push] wall dispatch failed", e);
+        }
+      })();
+    }
     setBody("");
     setAtts([]);
   }
