@@ -400,6 +400,28 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     summary: t("eventWizard.hint.summary", { defaultValue: "Tout est prêt." }),
   };
 
+  // Short dramatic step titles (mockup style — "Où ?", "Contre qui ?"). The "?" / "!"
+  // is rendered as <em> with reduced opacity in the hero.
+  const stepTitles: Record<Step, { text: string; mark?: string }> = {
+    type: { text: t("eventWizard.qShort.type", { defaultValue: "Quel type" }), mark: "?" },
+    team: { text: t("eventWizard.qShort.team", { defaultValue: "Quelle équipe" }), mark: "?" },
+    when: { text: t("eventWizard.qShort.when", { defaultValue: "Quand" }), mark: "?" },
+    duration: { text: t("eventWizard.qShort.duration", { defaultValue: "Combien de temps" }), mark: "?" },
+    halves: { text: t("eventWizard.qShort.halves", { defaultValue: "Format" }), mark: "?" },
+    gameformat: { text: t("eventWizard.qShort.gameformat", { defaultValue: "Effectif" }), mark: "?" },
+    series: { text: t("eventWizard.qShort.series", { defaultValue: "Récurrence" }), mark: "?" },
+    homeaway: { text: t("eventWizard.qShort.homeaway", { defaultValue: "Domicile ou extérieur" }), mark: "?" },
+    meetingpoint: { text: t("eventWizard.qShort.meetingpoint", { defaultValue: "Point de RDV" }), mark: "?" },
+    meetingtime: { text: t("eventWizard.qShort.meetingtime", { defaultValue: "Heure de RDV" }), mark: "?" },
+    opponent: { text: t("eventWizard.qShort.opponent", { defaultValue: "Contre qui" }), mark: "?" },
+    official: { text: t("eventWizard.qShort.official", { defaultValue: "Officiel" }), mark: "?" },
+    location: { text: t("eventWizard.qShort.location", { defaultValue: "Où" }), mark: "?" },
+    convocation: { text: t("eventWizard.qShort.convocation", { defaultValue: "Convoquer auto" }), mark: "?" },
+    carpool: { text: t("eventWizard.qShort.carpool", { defaultValue: "Covoiturage" }), mark: "?" },
+    comment: { text: t("eventWizard.qShort.comment", { defaultValue: "Un message" }), mark: "?" },
+    summary: { text: t("eventWizard.qShort.summary", { defaultValue: "Tout est prêt" }), mark: "!" },
+  };
+
   // ---- Render ----
   return (
     <div className="flex flex-col h-full max-h-[88vh]">
