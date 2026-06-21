@@ -164,8 +164,11 @@ function StateBadge({
   const { t } = useTranslation();
   if (state === "live") {
     return (
-      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary">
-        <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+      <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary border border-primary/30">
+        <span className="relative inline-flex h-1.5 w-1.5">
+          <span className="live-dot absolute inset-0 rounded-full" />
+          <span className="relative h-1.5 w-1.5 rounded-full bg-primary" />
+        </span>
         {t("dashboard.tournamentsCard.live", { defaultValue: "En cours" })}
       </span>
     );
