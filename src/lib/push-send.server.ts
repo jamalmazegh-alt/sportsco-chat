@@ -161,7 +161,10 @@ async function encryptPayload(
 
   const uaKey = await crypto.subtle.importKey(
     "raw",
-    uaPublicKey.buffer.slice(uaPublicKey.byteOffset, uaPublicKey.byteOffset + uaPublicKey.byteLength) as ArrayBuffer,
+    uaPublicKey.buffer.slice(
+      uaPublicKey.byteOffset,
+      uaPublicKey.byteOffset + uaPublicKey.byteLength,
+    ) as ArrayBuffer,
     { name: "ECDH", namedCurve: "P-256" },
     false,
     [],
@@ -174,11 +177,7 @@ async function encryptPayload(
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
   // PRK_key = HKDF-Extract(auth_secret, ecdh_secret) then expand with "WebPush: info\0|ua_public|as_public"
-  const keyInfo = concatBytes(
-    new TextEncoder().encode("WebPush: info\0"),
-    uaPublicKey,
-    ephPubRaw,
-  );
+  const keyInfo = concatBytes(new TextEncoder().encode("WebPush: info\0"), uaPublicKey, ephPubRaw);
   const ikm = await hkdf(ecdhSecret, authSecret, keyInfo, 32);
 
   // CEK
@@ -192,9 +191,13 @@ async function encryptPayload(
   // Plaintext + 0x02 padding delimiter (single record)
   const padded = concatBytes(plaintext, new Uint8Array([0x02]));
 
-  const aesKey = await crypto.subtle.importKey("raw", cek.buffer.slice(cek.byteOffset, cek.byteOffset + cek.byteLength) as ArrayBuffer, { name: "AES-GCM" }, false, [
-    "encrypt",
-  ]);
+  const aesKey = await crypto.subtle.importKey(
+    "raw",
+    cek.buffer.slice(cek.byteOffset, cek.byteOffset + cek.byteLength) as ArrayBuffer,
+    { name: "AES-GCM" },
+    false,
+    ["encrypt"],
+  );
   const ciphertext = new Uint8Array(
     await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce.buffer.slice(nonce.byteOffset, nonce.byteOffset + nonce.byteLength) as ArrayBuffer }, aesKey, padded.buffer.slice(padded.byteOffset, padded.byteOffset + padded.byteLength) as ArrayBuffer),
   );
