@@ -10,6 +10,7 @@ import {
   Send,
   MessagesSquare,
   BellRing,
+  Bell,
   Palette,
   Wallet,
   ChevronRight,
