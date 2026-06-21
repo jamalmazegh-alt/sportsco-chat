@@ -116,7 +116,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
 
   return (
     <section>
-      <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em] mb-2.5 px-0.5">
+      <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em] mb-2.5 px-0.5">
         {t("dashboard.kpis.title")}
       </h2>
       <div className="grid grid-cols-3 gap-2.5">
@@ -125,7 +125,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
           return (
             <div
               key={i}
-              className="relative overflow-hidden rounded-[14px] border-[1.5px] border-[#e2e8f0] bg-white p-3 flex flex-col gap-1.5 min-h-[104px] shadow-[0_1px_2px_rgba(15,40,24,0.04)]"
+              className="relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-3 flex flex-col gap-1.5 min-h-[104px] shadow-[0_1px_2px_rgba(15,40,24,0.04)]"
             >
               <div
                 aria-hidden
@@ -144,7 +144,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
               >
                 {isLoading ? "…" : it.value}
               </p>
-              <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-[#64748b] leading-tight">
+              <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-muted-foreground leading-tight">
                 {it.label}
               </p>
             </div>
