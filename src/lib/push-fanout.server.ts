@@ -4,7 +4,7 @@
  * dispatchers and public webhook routes (token-protected).
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { sendPushToUserFireAndForget } from "./push-send.server";
+import { sendPushToUser, sendPushToUserFireAndForget } from "./push-send.server";
 import { getClubNotifSettings } from "./club-notif-settings.server";
 
 async function getTeamClubId(teamId: string | null | undefined): Promise<string | null> {
@@ -81,15 +81,19 @@ export async function fanoutConvocationResponse(
     targets.add(uid);
   }
 
-  for (const uid of targets) {
-    sendPushToUserFireAndForget(uid, {
+  let dispatched = 0;
+  await Promise.all(
+    Array.from(targets).map(async (uid) => {
+      const result = await sendPushToUser(uid, {
       title,
       body,
       url: `/events/${ev.id}`,
       tag: `response-${ev.id}-${uid}`,
-    });
-  }
-  return { dispatched: targets.size, eventId: ev.id };
+      });
+      if (result.sent > 0) dispatched++;
+    }),
+  );
+  return { dispatched, eventId: ev.id };
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,15 +149,19 @@ export async function fanoutConvocationComplete(
     const uid = (c as any).user_id as string | null;
     if (uid) targets.add(uid);
   }
-  for (const uid of targets) {
-    sendPushToUserFireAndForget(uid, {
+  let dispatched = 0;
+  await Promise.all(
+    Array.from(targets).map(async (uid) => {
+      const result = await sendPushToUser(uid, {
       title: "🎯 Toute l'équipe a répondu",
       body,
       url: `/events/${eventId}`,
       tag: `complete-${eventId}`,
-    });
-  }
-  return { dispatched: targets.size, complete: true };
+      });
+      if (result.sent > 0) dispatched++;
+    }),
+  );
+  return { dispatched, complete: true };
 }
 
 /* ------------------------------------------------------------------ */
