@@ -1791,7 +1791,7 @@ function EventDetail() {
           {event.type === "match" && (
             <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
               <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
-              {teams?.[0]?.sport ? t(`sports.${teams[0].sport}`, { defaultValue: teams[0].sport }) : t("events.types.match")}
+              {eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : t("events.types.match")}
             </div>
           )}
 
