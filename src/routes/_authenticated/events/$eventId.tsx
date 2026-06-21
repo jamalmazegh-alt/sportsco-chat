@@ -2246,32 +2246,6 @@ function EventDetail() {
                     </button>
                   )}
 
-                  {/* Separator "RAPPEL" */}
-                  <div className="flex items-center gap-3 pt-1.5 pb-0.5">
-                    <span className="h-px flex-1 bg-slate-200" />
-                    <span className="text-[10px] font-bold tracking-[0.14em] text-slate-400 uppercase">
-                      {t("events.commCard.reminderSeparator", { defaultValue: "Rappel" })}
-                    </span>
-                    <span className="h-px flex-1 bg-slate-200" />
-                  </div>
-
-                  {/* Reminder — dashed green */}
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(reminderMsg)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-dashed border-emerald-300 bg-emerald-50/30 px-4 py-3 hover:bg-emerald-50/60 hover:border-emerald-400 transition active:scale-[0.99]"
-                  >
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 ring-1 ring-emerald-200 shrink-0">
-                      <Bell className="h-4 w-4 text-[#1d7a45]" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-sm font-bold text-[#0f4a26]">{t("events.whatsappShare.reminder")}</span>
-                      <span className="block text-[11px] text-emerald-800/70 truncate">
-                        {lineupData ? t("events.whatsappShare.reminderHintWithLineup") : t("events.whatsappShare.reminderHint")}
-                      </span>
-                    </span>
-                  </a>
                 </>
               )}
             </div>
@@ -3148,6 +3122,18 @@ function EventDetail() {
                                         </Button>
                                       ))}
                                     </div>
+                                    {isPending && (
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-7 w-7 text-amber-600 hover:bg-amber-50"
+                                        onClick={() => remind(c.id)}
+                                        title={t("attendance.remind")}
+                                        aria-label={t("attendance.remind")}
+                                      >
+                                        <Bell className="h-3.5 w-3.5" />
+                                      </Button>
+                                    )}
                                     <Button
                                       size="icon"
                                       variant="ghost"
