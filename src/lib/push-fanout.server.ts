@@ -49,6 +49,11 @@ export async function fanoutConvocationResponse(
   const status = (conv as any).status as string;
   if (status === "pending") return { dispatched: 0, eventId: ev.id };
 
+  // Gate: convocation_coach_each_response (skip silently when OFF)
+  const clubId = await getTeamClubId(ev.team_id);
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.convocation_coach_each_response) return { dispatched: 0, eventId: ev.id };
+
   const player: any = (conv as any).players ?? {};
   const firstName = (player.first_name as string) || (player.last_name as string) || "Un joueur";
 
