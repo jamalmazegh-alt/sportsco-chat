@@ -157,7 +157,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
 
     const { data: post } = await supabaseAdmin
       .from("wall_posts")
-      .select("id, club_id, body, author_id, profiles:author_id(full_name, first_name)")
+      .select("id, club_id, body, author_user_id, profiles:author_user_id(full_name, first_name)")
       .eq("id", data.postId)
       .maybeSingle();
     if (!post) return { dispatched: 0 };
