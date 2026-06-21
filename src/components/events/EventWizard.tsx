@@ -1112,57 +1112,89 @@ function StepQuestion({ title, children }: { title: string; children: React.Reac
 }
 
 
+type DoorColor = "green" | "blue" | "red" | "amber" | "purple" | "pink";
+
+const DOOR_ICON_BG: Record<DoorColor, string> = {
+  green: "bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700",
+  blue: "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700",
+  red: "bg-gradient-to-br from-rose-100 to-rose-200 text-rose-700",
+  amber: "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-700",
+  purple: "bg-gradient-to-br from-violet-100 to-violet-200 text-violet-700",
+  pink: "bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700",
+};
+
 function DoorButton({
   icon,
   label,
+  subtitle,
   onClick,
   active,
+  color = "green",
 }: {
   icon: string;
   label: string;
+  subtitle?: string;
   onClick: () => void;
   active?: boolean;
+  color?: DoorColor;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "group relative w-full overflow-hidden flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200 active:scale-[0.99]",
+        "group relative w-full overflow-hidden flex items-center gap-3 rounded-2xl border-[1.5px] px-3 py-3 text-left transition-all duration-200 active:scale-[0.99]",
         active
-          ? "border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent shadow-[0_10px_28px_-14px_color-mix(in_oklab,var(--primary)_55%,transparent)]"
-          : "border-border bg-card hover:border-primary/40 hover:bg-muted/40",
+          ? "border-emerald-300 bg-gradient-to-br from-emerald-50 to-white shadow-[0_8px_24px_-12px_rgba(29,122,69,0.35)]"
+          : "border-muted bg-muted/40 hover:border-emerald-200 hover:bg-muted/60",
       )}
     >
-      {/* Left accent bar on active */}
+      {/* Left accent bar on active (mockup: 3px gradient green) */}
       <span
         aria-hidden
         className={cn(
-          "absolute left-0 top-0 bottom-0 w-[3px] rounded-r bg-gradient-to-b from-primary to-primary/70 transition-all duration-200",
+          "absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#1d7a45] to-[#2d9d5f] transition-all duration-200",
           active ? "opacity-100" : "opacity-0",
         )}
       />
       <span
         className={cn(
-          "relative h-10 w-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-all",
-          active
-            ? "bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/30"
-            : "bg-muted",
+          "relative h-9 w-9 rounded-xl flex items-center justify-center text-lg shrink-0 transition-all",
+          DOOR_ICON_BG[color],
         )}
       >
         {icon}
       </span>
-      <span className="relative font-semibold text-sm flex-1 leading-tight">{label}</span>
+      <span className="relative flex-1 min-w-0">
+        <span
+          className={cn(
+            "block font-bold text-[13px] leading-tight truncate",
+            active ? "text-emerald-900" : "text-foreground",
+          )}
+        >
+          {label}
+        </span>
+        {subtitle && (
+          <span
+            className={cn(
+              "block text-[11px] font-medium mt-0.5 truncate",
+              active ? "text-emerald-600" : "text-muted-foreground",
+            )}
+          >
+            {subtitle}
+          </span>
+        )}
+      </span>
       <span
         aria-hidden
         className={cn(
-          "relative shrink-0 h-5 w-5 rounded-full border flex items-center justify-center transition-all",
+          "relative shrink-0 h-[18px] w-[18px] rounded-full border-[1.5px] flex items-center justify-center transition-all",
           active
-            ? "bg-gradient-to-br from-primary to-primary/80 border-transparent text-primary-foreground scale-100"
-            : "bg-background border-border scale-90 opacity-60",
+            ? "bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] border-transparent text-white"
+            : "bg-background border-border opacity-70",
         )}
       >
-        {active && <Check className="h-3 w-3" strokeWidth={3} />}
+        {active && <Check className="h-2.5 w-2.5" strokeWidth={3.5} />}
       </span>
     </button>
   );
