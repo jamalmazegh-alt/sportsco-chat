@@ -487,13 +487,21 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           <StepQuestion title={t("eventWizard.q.type", { defaultValue: "Quel type d'événement ?" })}>
             {(
               [
-                ["training", "⚽", t("events.types.training")],
-                ["match", "🆚", t("events.types.match")],
-                ["meeting", "👥", t("events.types.meeting")],
-                ["other", "📌", t("events.types.other", { defaultValue: "Autre" })],
+                ["training", "⚽", t("events.types.training"), "Entraînement régulier", "green"],
+                ["match", "🆚", t("events.types.match"), "Match officiel ou amical", "red"],
+                ["meeting", "👥", t("events.types.meeting"), "Réunion club ou équipe", "blue"],
+                ["other", "📌", t("events.types.other", { defaultValue: "Autre" }), "Stage, tournoi, événement…", "amber"],
               ] as const
-            ).map(([v, e, l]) => (
-              <DoorButton key={v} icon={e} label={l} active={state.type === v} onClick={() => selectType(v)} />
+            ).map(([v, e, l, s, c]) => (
+              <DoorButton
+                key={v}
+                icon={e}
+                label={l}
+                subtitle={s}
+                color={c}
+                active={state.type === v}
+                onClick={() => selectType(v)}
+              />
             ))}
           </StepQuestion>
         )}
@@ -505,18 +513,25 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 {t("eventWizard.noTeams", { defaultValue: "Aucune équipe disponible." })}
               </p>
             ) : (
-              teams.map((tm) => (
-                <DoorButton
-                  key={tm.id}
-                  icon="👥"
-                  label={tm.name}
-                  active={state.teamId === tm.id}
-                  onClick={() => answer("teamId", tm.id)}
-                />
-              ))
+              teams.map((tm, i) => {
+                const palette: DoorColor[] = ["green", "blue", "purple", "amber", "red", "pink"];
+                return (
+                  <DoorButton
+                    key={tm.id}
+                    icon="👥"
+                    label={tm.name}
+                    subtitle={tm.sport ?? undefined}
+                    color={palette[i % palette.length]}
+                    active={state.teamId === tm.id}
+                    onClick={() => answer("teamId", tm.id)}
+                  />
+                );
+              })
             )}
           </StepQuestion>
         )}
+
+
 
         {current === "when" && (
           <StepQuestion title={t("eventWizard.q.when", { defaultValue: "Quand ?" })}>
