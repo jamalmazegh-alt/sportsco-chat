@@ -2144,7 +2144,7 @@ function EventDetail() {
         void mode;
         const convocCount = (convocations ?? []).length;
         return (
-          <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-slate-200 bg-white shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
+          <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-border bg-card shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
             {/* Header — green gradient */}
             <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-5 py-4 text-white">
               <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]" aria-hidden="true">
@@ -2254,7 +2254,7 @@ function EventDetail() {
                       type="button"
                       onClick={() => shareLineupAsImage(convocWithCompoMsg)}
                       disabled={sharingLineup}
-                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60 transition active:scale-[0.99]"
+                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60 transition active:scale-[0.99]"
                     >
                       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
                         {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" /> : (
@@ -2265,8 +2265,8 @@ function EventDetail() {
                         )}
                       </span>
                       <span className="flex-1 min-w-0">
-                        <span className="block text-sm font-bold text-slate-900">{t("events.whatsappShare.shareConvocWithLineup")}</span>
-                        <span className="block text-[11px] text-slate-500 truncate">{t("events.commCard.lineupHint", { defaultValue: "Inclut la composition en image" })}</span>
+                        <span className="block text-sm font-bold text-foreground">{t("events.whatsappShare.shareConvocWithLineup")}</span>
+                        <span className="block text-[11px] text-muted-foreground truncate">{t("events.commCard.lineupHint", { defaultValue: "Inclut la composition en image" })}</span>
                       </span>
                     </button>
                   )}
@@ -2276,14 +2276,14 @@ function EventDetail() {
                     <button
                       type="button"
                       onClick={() => setResendOpen(true)}
-                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
+                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
                     >
                       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
                         <Mail className="h-4 w-4 text-sky-700" />
                       </span>
                       <span className="flex-1 min-w-0">
-                        <span className="block text-sm font-bold text-slate-900">{t("events.commCard.emailTitle", { defaultValue: "Renvoyer par email" })}</span>
-                        <span className="block text-[11px] text-slate-500 truncate">{t("events.commCard.emailHint", { defaultValue: "Envoie à tous les joueurs" })}</span>
+                        <span className="block text-sm font-bold text-foreground">{t("events.commCard.emailTitle", { defaultValue: "Renvoyer par email" })}</span>
+                        <span className="block text-[11px] text-muted-foreground truncate">{t("events.commCard.emailHint", { defaultValue: "Envoie à tous les joueurs" })}</span>
                       </span>
                     </button>
                   )}
@@ -2764,7 +2764,7 @@ function EventDetail() {
 
       {/* === Unified Convocation card === */}
       {showConvocationSection && (
-        <section id="my-response" className="rounded-3xl border-[1.5px] border-slate-200 bg-white overflow-hidden scroll-mt-20 shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]">
+        <section id="my-response" className="rounded-3xl border-[1.5px] border-border bg-card overflow-hidden scroll-mt-20 shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]">
           {(() => {
             const totalP = counts.present + counts.uncertain + counts.absent + counts.pending;
             const respondedP = totalP - counts.pending;
@@ -2929,12 +2929,12 @@ function EventDetail() {
 
             // Simple header (not sent yet)
             return (
-              <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-slate-100">
+              <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/70">
                 <div className="min-w-0">
-                  <h2 className="text-base font-extrabold tracking-tight text-slate-900">
+                  <h2 className="text-base font-extrabold tracking-tight text-foreground">
                     {t("attendance.title", { defaultValue: "Présences" })}
                   </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {t("attendance.notSentYet", { defaultValue: "Pas encore envoyée" })}
                   </p>
                 </div>
@@ -2944,7 +2944,7 @@ function EventDetail() {
 
           {/* Coach: resend convocations */}
           {isCoach && event.status !== "cancelled" && event.convocations_sent && (
-            <div className="p-4 border-b border-slate-100">
+            <div className="p-4 border-b border-border/70">
               <Button
                 onClick={() => setResendOpen(true)}
                 variant={convocChanges.length > 0 ? "default" : "outline"}
@@ -2961,7 +2961,7 @@ function EventDetail() {
                   : t("events.resend.button", { defaultValue: "Resend call-up" })}
               </Button>
               {convocChanges.length > 0 && (
-                <p className="text-[11px] text-slate-500 mt-1.5 text-center">
+                <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
                   {t("events.resend.changesDetected", { defaultValue: "Changes were detected since the last send." })}
                 </p>
               )}
@@ -2983,23 +2983,23 @@ function EventDetail() {
 
           {/* My response — player's own convocation picker */}
           {visibleMyConvocs.length > 0 && (
-            <div className="px-4 py-4 space-y-4 border-b border-slate-100">
+            <div className="px-4 py-4 space-y-4 border-b border-border/70">
               {visibleMyConvocs.map((c: any) => {
                 const playerLabel = `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim();
                 return (
                   <div key={c.id}>
-                    <p className="text-sm font-semibold mb-2.5 text-slate-900">
+                    <p className="text-sm font-semibold mb-2.5 text-foreground">
                       {visibleMyConvocs.length > 1 ? (
                         <>
                           {t("attendance.respondPrompt")}
-                          <span className="text-slate-500 font-normal"> · {playerLabel}</span>
+                          <span className="text-muted-foreground font-normal"> · {playerLabel}</span>
                         </>
                       ) : (
                         t("attendance.respondPrompt")
                       )}
                     </p>
                     {responsesReadOnly ? (
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {event.responses_locked
                           ? t("attendance.responsesLocked")
                           : t("attendance.responsesClosedPast", {
@@ -3083,7 +3083,7 @@ function EventDetail() {
           {event.convocations_sent && (
             <>
               {convocations && convocations.length === 0 ? (
-                <div className="p-6 text-center text-sm text-slate-500">
+                <div className="p-6 text-center text-sm text-muted-foreground">
                   {t("attendance.noConvokedPlayers")}
                 </div>
               ) : (() => {
@@ -3092,7 +3092,7 @@ function EventDetail() {
                 return (
                   <>
                     <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                         {t("attendance.convokedPlayers", { defaultValue: "Joueurs convoqués" })}
                       </p>
                     </div>
@@ -3108,7 +3108,7 @@ function EventDetail() {
                         return (
                           <li
                             key={c.id}
-                            className="group rounded-2xl px-2 py-1.5 hover:bg-slate-50 transition-colors"
+                            className="group rounded-2xl px-2 py-1.5 hover:bg-muted/40 transition-colors"
                           >
                             <div className="flex flex-row items-center justify-between gap-2">
                               <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -3128,11 +3128,11 @@ function EventDetail() {
                                   )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-[13px] font-bold text-slate-900 truncate leading-tight">
+                                  <p className="text-[13px] font-bold text-foreground truncate leading-tight">
                                     {first} {last}
                                   </p>
                                   {(position || jersey) && (
-                                    <p className="text-[10px] text-slate-500 mt-0.5 truncate uppercase tracking-wide font-semibold">
+                                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate uppercase tracking-wide font-semibold">
                                       {[position, jersey ? `#${jersey}` : null].filter(Boolean).join(" · ")}
                                     </p>
                                   )}
@@ -3179,7 +3179,7 @@ function EventDetail() {
                                     <Button
                                       size="icon"
                                       variant="ghost"
-                                      className="h-7 w-7 text-slate-400"
+                                      className="h-7 w-7 text-muted-foreground/70"
                                       onClick={() => setDetailConvocId(c.id)}
                                       title={t("attendance.details")}
                                     >
@@ -3192,7 +3192,7 @@ function EventDetail() {
                               </div>
                             </div>
                             {c.comment && (isCoach || c.players?.user_id === user?.id) && (
-                              <p className="text-[11px] text-slate-500 italic truncate mt-1 pl-[44px]">"{c.comment}"</p>
+                              <p className="text-[11px] text-muted-foreground italic truncate mt-1 pl-[44px]">"{c.comment}"</p>
                             )}
                           </li>
 
@@ -3205,7 +3205,7 @@ function EventDetail() {
                       <button
                         type="button"
                         onClick={() => setPresencesExpanded((v) => !v)}
-                        className="w-full px-4 py-3 border-t border-slate-100 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
+                        className="w-full px-4 py-3 border-t border-border/70 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
                       >
                         {presencesExpanded
                           ? t("attendance.showLess", { defaultValue: "Réduire la liste" })
