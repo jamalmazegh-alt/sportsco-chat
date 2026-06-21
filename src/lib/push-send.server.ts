@@ -52,6 +52,12 @@ function concatBytes(...parts: Uint8Array[]): Uint8Array {
 /* -------------------------------------------------------------------------- */
 
 let cachedVapidKey: { priv: CryptoKey; pubB64u: string } | null = null;
+const cachedVapidJwtByAudience = new Map<
+  string,
+  { jwt: string; createdAt: number; expiresAt: number }
+>();
+const VAPID_JWT_TTL_SECONDS = 12 * 60 * 60;
+const VAPID_JWT_MIN_REUSE_SECONDS = 60 * 60;
 
 async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   if (cachedVapidKey) return cachedVapidKey;
@@ -139,8 +145,19 @@ function getVapidSubject(): string {
 async function buildVapidJwt(audience: string): Promise<string> {
   const { priv } = await loadVapidKey();
   const subject = getVapidSubject();
+  const now = Math.floor(Date.now() / 1000);
+  const cacheKey = `${audience}|${subject}`;
+  const cached = cachedVapidJwtByAudience.get(cacheKey);
+  if (
+    cached &&
+    now - cached.createdAt < VAPID_JWT_MIN_REUSE_SECONDS &&
+    cached.expiresAt - now > 60
+  ) {
+    return cached.jwt;
+  }
+
   const header = { typ: "JWT", alg: "ES256" };
-  const exp = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12h
+  const exp = now + VAPID_JWT_TTL_SECONDS; // Apple rejects JWTs expiring more than 24h ahead.
   const payload = { aud: audience, exp, sub: subject };
 
   const enc = new TextEncoder();
@@ -153,7 +170,10 @@ async function buildVapidJwt(audience: string): Promise<string> {
     enc.encode(signingInput),
   );
   // Web Crypto returns raw r||s (64 bytes for P-256) — already the JOSE format
-  return `${signingInput}.${b64uEncode(sig)}`;
+  const jwt = `${signingInput}.${b64uEncode(sig)}`;
+  // Apple explicitly asks senders not to refresh VAPID JWTs more than once per hour.
+  cachedVapidJwtByAudience.set(cacheKey, { jwt, createdAt: now, expiresAt: exp });
+  return jwt;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -293,13 +313,21 @@ async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<numb
       "Content-Type": "application/octet-stream",
       TTL: "86400",
       Authorization: `vapid t=${jwt}, k=${pubB64u}`,
+      "Crypto-Key": `p256ecdsa=${pubB64u}`,
     },
     body: body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer,
   });
 
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
-    console.warn("[push] provider rejected", res.status, detail.slice(0, 240));
+    const apnsId = res.headers.get("apns-id") || "";
+    const authHint = res.headers.get("www-authenticate") || "";
+    console.warn(
+      "[push] provider rejected",
+      res.status,
+      endpointUrl.host,
+      detail.slice(0, 240) || authHint || apnsId,
+    );
   }
 
   return res.status;
