@@ -271,6 +271,44 @@ export const startRegistrationCheckout = createServerFn({ method: "POST" })
     return result;
   });
 
+/**
+ * Self-heal: verify a Stripe Checkout session after redirect and mark the
+ * registration paid when the webhook was not delivered (e.g. www→apex redirect).
+ */
+export const confirmRegistrationSession = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z.object({ session_id: z.string().min(8).max(255) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getStripe } = await import("@/lib/stripe.server");
+    const stripe = getStripe();
+    const session = await stripe.checkout.sessions.retrieve(data.session_id);
+
+    if (session.metadata?.purpose !== "tournament_registration") {
+      throw new Response("Not a tournament registration checkout", { status: 400 });
+    }
+    if (session.payment_status !== "paid") {
+      return {
+        paid: false as const,
+        checkoutStatus: session.status,
+        paymentStatus: session.payment_status,
+        registrationId: session.metadata?.registration_id ?? null,
+      };
+    }
+
+    const { handleTournamentCheckoutCompleted } = await import(
+      "./tournament-payments.server"
+    );
+    await handleTournamentCheckoutCompleted(session, `self-heal-${session.id}`);
+
+    return {
+      paid: true as const,
+      registrationId: session.metadata?.registration_id ?? null,
+      checkoutStatus: session.status,
+      paymentStatus: session.payment_status,
+    };
+  });
+
 // ---------- Admin: create / refresh shareable payment link (7 days)
 
 const LINK_TTL_DAYS = 7;
