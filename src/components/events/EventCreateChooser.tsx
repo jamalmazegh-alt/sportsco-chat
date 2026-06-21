@@ -239,16 +239,31 @@ function DoorButton({
       type="button"
       onClick={onClick}
       className={
-        "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-all hover:border-primary " +
-        (primary ? "border-primary/40 bg-primary/5" : "border-border bg-card")
+        "group relative flex items-start gap-3 overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] " +
+        (primary
+          ? "border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent shadow-[0_12px_28px_-16px_color-mix(in_oklab,var(--primary)_55%,transparent)] hover:border-primary"
+          : "border-border bg-card hover:border-primary/40 hover:bg-muted/40")
       }
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      {primary && (
+        <span
+          aria-hidden
+          className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r bg-gradient-to-b from-primary to-primary/70"
+        />
+      )}
+      <div
+        className={
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105 " +
+          (primary
+            ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-[0_8px_20px_-8px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
+            : "bg-primary/10 text-primary")
+        }
+      >
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="font-semibold text-sm">{title}</div>
-        {hint && <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">{hint}</p>}
+        <div className="font-semibold text-sm leading-tight">{title}</div>
+        {hint && <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{hint}</p>}
       </div>
     </button>
   );
