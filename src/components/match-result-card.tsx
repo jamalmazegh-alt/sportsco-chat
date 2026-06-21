@@ -214,6 +214,17 @@ export function MatchResultCard({
     setEditing(false);
     qc.invalidateQueries({ queryKey: ["match-result", eventId] });
 
+    // Web Push fire-and-forget — notifie équipe + joueurs convoqués
+    void (async () => {
+      try {
+        const { dispatchScorePush } = await import("@/lib/push-dispatch.functions");
+        await dispatchScorePush({ data: { eventId } });
+      } catch (e) {
+        console.warn("[push] score dispatch failed", e);
+      }
+    })();
+
+
   }
 
   async function addGoal() {
