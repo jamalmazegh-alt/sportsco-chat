@@ -11,7 +11,7 @@ export function getStripe(): Stripe {
 }
 
 // Stripe price IDs are configurable via env so plan changes don't require a redeploy.
-// Defaults reflect the current Clubero pricing (49 €/mo, 490 €/an, 40 € one-time per tournament).
+// Defaults reflect the current Clubero pricing (49 €/mo, 490 €/an, 39 € one-time per tournament).
 export const STRIPE_PRICE_MONTHLY =
   process.env.STRIPE_PRICE_MONTHLY || "price_1TkgP94gdB9zofvaw3DcCtV5";
 export const STRIPE_PRICE_YEARLY =
