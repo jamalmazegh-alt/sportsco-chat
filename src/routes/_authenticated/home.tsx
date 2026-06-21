@@ -256,7 +256,7 @@ function HomePage() {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 truncate">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 dark:text-emerald-300 truncate">
               {club?.name}
             </p>
             <h1 className="text-[22px] font-black leading-tight text-foreground tracking-tight mt-0.5 truncate">
