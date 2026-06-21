@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { TrendingUp, Clock, CalendarClock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
 
 interface AdminKpisProps {
   clubId: string;
@@ -31,10 +30,9 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         .eq("club_id", clubId);
       const teamIds = (teams ?? []).map((t) => t.id);
       if (teamIds.length === 0) {
-        return { attendancePct: null, playersAlert: 0, upcoming7d: 0 };
+        return { attendancePct: null, pendingResponses: 0, upcoming7d: 0 };
       }
 
-      // Past 30d events for these teams
       const { data: pastEvents } = await supabase
         .from("events")
         .select("id")
@@ -43,7 +41,6 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         .lte("starts_at", nowIso);
       const pastEventIds = (pastEvents ?? []).map((e) => e.id);
 
-      // Attendance % over last 30d
       let attendancePct: number | null = null;
       if (pastEventIds.length > 0) {
         const { data: convocs } = await supabase
@@ -56,7 +53,6 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         attendancePct = replied > 0 ? Math.round((present / replied) * 100) : null;
       }
 
-      // Upcoming 7d events
       const { data: upcomingEvents } = await supabase
         .from("events")
         .select("id")
@@ -66,7 +62,6 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         .lte("starts_at", next7);
       const upcomingIds = (upcomingEvents ?? []).map((e) => e.id);
 
-      // Pending responses on upcoming events
       let pendingResponses = 0;
       if (upcomingIds.length > 0) {
         const { count } = await supabase
@@ -94,46 +89,62 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         data?.attendancePct == null
           ? t("dashboard.kpis.noData")
           : `${data.attendancePct}%`,
-      tone: "text-present",
-      bg: "bg-present/10 border-present/20",
+      bar: "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)",
+      iconBg: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)",
+      iconColor: "#0f4a26",
+      valueGradient: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
     },
     {
       icon: Clock,
       label: t("dashboard.kpis.pendingResponses", { defaultValue: "Réponses en attente" }),
       value: data?.pendingResponses ?? 0,
-      tone: "text-pending",
-      bg: "bg-pending/10 border-pending/20",
+      bar: "linear-gradient(90deg, #b45309 0%, #f59e0b 100%)",
+      iconBg: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+      iconColor: "#92400e",
+      valueGradient: "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)",
     },
     {
       icon: CalendarClock,
       label: t("dashboard.kpis.upcoming7d"),
       value: data?.upcoming7d ?? 0,
-      tone: "text-primary",
-      bg: "bg-primary/10 border-primary/20",
+      bar: "linear-gradient(90deg, #1e40af 0%, #3b82f6 100%)",
+      iconBg: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+      iconColor: "#1e40af",
+      valueGradient: "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)",
     },
   ];
 
   return (
     <section>
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+      <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em] mb-2.5 px-0.5">
         {t("dashboard.kpis.title")}
       </h2>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2.5">
         {items.map((it, i) => {
           const Icon = it.icon;
           return (
             <div
               key={i}
-              className={cn(
-                "rounded-2xl border p-3 flex flex-col items-start gap-1.5 min-h-[88px]",
-                it.bg,
-              )}
+              className="relative overflow-hidden rounded-[14px] border-[1.5px] border-[#e2e8f0] bg-white p-3 flex flex-col gap-1.5 min-h-[104px] shadow-[0_1px_2px_rgba(15,40,24,0.04)]"
             >
-              <Icon className={cn("h-4 w-4", it.tone)} />
-              <p className={cn("text-xl font-bold leading-none", it.tone)}>
+              <div
+                aria-hidden
+                className="absolute top-0 inset-x-0 h-[3px]"
+                style={{ background: it.bar }}
+              />
+              <div
+                className="h-8 w-8 rounded-[10px] flex items-center justify-center"
+                style={{ background: it.iconBg }}
+              >
+                <Icon className="h-4 w-4" style={{ color: it.iconColor }} strokeWidth={2.4} />
+              </div>
+              <p
+                className="text-[26px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+                style={{ backgroundImage: it.valueGradient }}
+              >
                 {isLoading ? "…" : it.value}
               </p>
-              <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground leading-tight">
+              <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-[#64748b] leading-tight">
                 {it.label}
               </p>
             </div>
