@@ -226,19 +226,16 @@ function HomePage() {
     <div className="px-5 pt-6 space-y-6 pb-4">
       {/* Club hero — Anime Premium pale green banner */}
       <header
-        className="relative overflow-hidden rounded-[20px] border-[1.5px] border-[#c8e6d2] p-5"
-        style={{
-          background: "linear-gradient(180deg, #e8f5ee 0%, #d4ead9 100%)",
-        }}
+        className="relative overflow-hidden rounded-[20px] border-[1.5px] border-[#c8e6d2] dark:border-emerald-900/50 p-5 bg-[linear-gradient(180deg,#e8f5ee_0%,#d4ead9_100%)] dark:bg-[linear-gradient(180deg,rgba(16,68,40,0.55)_0%,rgba(10,46,28,0.55)_100%)]"
       >
         <svg
           aria-hidden
-          className="absolute inset-0 h-full w-full opacity-[0.07] pointer-events-none"
+          className="absolute inset-0 h-full w-full opacity-[0.07] dark:opacity-[0.12] pointer-events-none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
             <pattern id="terrain-home" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="40" stroke="#0f4a26" strokeWidth="1" />
+              <line x1="0" y1="0" x2="0" y2="40" stroke="currentColor" strokeWidth="1" className="text-emerald-900 dark:text-emerald-300" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#terrain-home)" />
@@ -259,7 +256,7 @@ function HomePage() {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 truncate">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 dark:text-emerald-300 truncate">
               {club?.name}
             </p>
             <h1 className="text-[22px] font-black leading-tight text-foreground tracking-tight mt-0.5 truncate">
