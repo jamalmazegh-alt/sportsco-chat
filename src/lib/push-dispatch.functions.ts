@@ -219,13 +219,13 @@ const ResponseInput = z.object({
 export const dispatchConvocationResponsePush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ResponseInput.parse(input))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data }) => {
     const { fanoutConvocationResponse, fanoutConvocationComplete } = await import(
       "@/lib/push-fanout.server"
     );
-    const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId, {
-      excludeUserId: context.userId,
-    });
+    // No excludeUserId: targets are coaches only; even when a coach responds
+    // on behalf of a player, the coach still wants to see the confirmation.
+    const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId);
     let complete = 0;
     if (eventId) {
       const r = await fanoutConvocationComplete(eventId);
