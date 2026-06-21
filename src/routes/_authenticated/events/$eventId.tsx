@@ -1884,7 +1884,7 @@ function EventDetail() {
           )}
         </div>
 
-        {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
+        {event.type === "match" && isFootball && (
           <div className="px-4 pb-3" ref={lineupCardRef}>
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>
