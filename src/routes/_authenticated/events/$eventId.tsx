@@ -3122,6 +3122,18 @@ function EventDetail() {
                                         </Button>
                                       ))}
                                     </div>
+                                    {isPending && (
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-7 w-7 text-amber-600 hover:bg-amber-50"
+                                        onClick={() => remind(c.id)}
+                                        title={t("attendance.remind")}
+                                        aria-label={t("attendance.remind")}
+                                      >
+                                        <Bell className="h-3.5 w-3.5" />
+                                      </Button>
+                                    )}
                                     <Button
                                       size="icon"
                                       variant="ghost"
