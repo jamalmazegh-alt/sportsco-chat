@@ -3056,13 +3056,14 @@ function EventDetail() {
 
           {/* B. Relancer banner (pending only) */}
           {event.convocations_sent && isCoach && counts.pending > 0 && (
-            <div className="flex items-center justify-between gap-3 px-4 py-3 bg-amber-50/70 border-b border-amber-100">
+            <div className="flex items-center justify-between gap-3 px-4 py-3 bg-amber-50/70 dark:bg-amber-950/30 border-b border-amber-100 dark:border-amber-900/50">
               <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 ring-1 ring-amber-200 shrink-0">
-                  <Clock className="h-4 w-4 text-amber-600" />
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/50 ring-1 ring-amber-200 dark:ring-amber-800 shrink-0">
+                  <Clock className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-amber-900 truncate">
+                  <p className="text-xs font-bold text-amber-900 dark:text-amber-200 truncate">
+
                     {t("attendance.pendingCount", { count: counts.pending })}
                   </p>
                   <p className="text-[11px] text-amber-700/80 truncate">
