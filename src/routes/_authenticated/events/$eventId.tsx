@@ -1480,6 +1480,12 @@ function EventDetail() {
       // best-effort
     }
 
+    // Fire-and-forget Web Push (#5 event_reschedule)
+    try {
+      const { dispatchEventReschedulePush } = await import("@/lib/push-dispatch.functions");
+      void dispatchEventReschedulePush({ data: { eventId: event.id } });
+    } catch { /* noop */ }
+
     setRescheduleSubmitting(false);
     setRescheduleOpen(false);
     setRescheduleReason("");
