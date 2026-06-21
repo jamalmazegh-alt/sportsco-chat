@@ -234,3 +234,99 @@ export const confirmEntitlementSession = createServerFn({ method: "POST" })
       paymentStatus: session.payment_status,
     };
   });
+
+import { slugify, uniqueTournamentSlug } from "./lib/slug";
+import { defaultRulesForSport } from "./lib/rules";
+
+/**
+ * Create a personal tournament backed by an active entitlement (single or annual).
+ * - Double-checks `can_create_tournament` server-side (defense in depth).
+ * - Consumes one single entitlement (no-op for annual / superadmin).
+ */
+export const createTournamentFromEntitlement = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        name: z.string().min(2).max(120),
+        sport: z.string().min(1).max(40),
+        category: z.string().max(80).optional().nullable(),
+        starts_on: z.string(),
+        ends_on: z.string().optional().nullable(),
+        format: z.enum(["group", "knockout", "mixed"]),
+        num_teams: z.number().int().min(2).max(64),
+        location: z.string().max(200).optional().nullable(),
+      })
+      .refine((d) => !d.ends_on || d.ends_on >= d.starts_on, {
+        message: "End date must be on or after start date",
+        path: ["ends_on"],
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { userId } = context;
+
+    // Defense in depth: re-check server-side
+    const { data: canCreate } = await supabaseAdmin.rpc("can_create_tournament", {
+      _user_id: userId,
+    });
+    if (!canCreate) {
+      throw new Response(
+        "Aucun crédit tournoi disponible. Choisissez un plan.",
+        { status: 402 },
+      );
+    }
+
+    const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
+
+    let personalClubId: string | null = null;
+    try {
+      const { data: clubIdRow } = await supabaseAdmin.rpc(
+        "get_or_create_personal_club",
+        { _user_id: userId },
+      );
+      if (typeof clubIdRow === "string") personalClubId = clubIdRow;
+    } catch {
+      personalClubId = null;
+    }
+
+    const initialRules = defaultRulesForSport(data.sport);
+    const { data: tournament, error: tErr } = await supabaseAdmin
+      .from("tournaments")
+      .insert({
+        club_id: personalClubId,
+        name: data.name,
+        slug,
+        sport: data.sport,
+        category: data.category ?? null,
+        starts_on: data.starts_on,
+        ends_on: data.ends_on ?? null,
+        format: data.format,
+        num_teams: data.num_teams,
+        location: data.location ?? null,
+        created_by: userId,
+        status: "draft",
+        settings: initialRules as never,
+        points_win: initialRules.points.win,
+        points_draw: initialRules.points.draw,
+        points_loss: initialRules.points.loss,
+        tiebreakers: initialRules.tiebreakers,
+      })
+      .select("*")
+      .single();
+    if (tErr) throw new Response(tErr.message, { status: 400 });
+
+    // Consume one single entitlement if applicable (no-op for annual / superadmin).
+    // If this fails for any reason, we keep the tournament — defense-in-depth check above ensures eligibility.
+    try {
+      await supabaseAdmin.rpc("consume_single_entitlement", {
+        _user_id: userId,
+        _tournament_id: tournament.id,
+      });
+    } catch (e) {
+      console.warn("consume_single_entitlement failed (non-fatal)", e);
+    }
+
+    return { tournament };
+  });
