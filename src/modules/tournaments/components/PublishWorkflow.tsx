@@ -237,11 +237,16 @@ export function PublishWorkflow({
                       onClick={onStart}
                       disabled={busy || !canStart}
                       title={!canStart ? t("publishFlow.startBlockedNoMatches") : undefined}
-                      className="gap-2"
+                      className="gap-2 rounded-xl font-bold text-white border-0"
+                      style={{
+                        background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)",
+                        boxShadow: "0 4px 14px -4px rgba(29,122,69,0.55)",
+                      }}
                     >
                       <PlayCircle className="h-4 w-4" />
                       {t("publishFlow.ctaStart")}
                     </Button>
+
                     {!canStart && (
                       <p className="w-full text-xs text-destructive">
                         {t("publishFlow.startBlockedNoMatches")}
