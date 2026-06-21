@@ -89,9 +89,9 @@ export async function unsubscribeFromPush(): Promise<boolean> {
         body: JSON.stringify({ endpoint }),
       });
     }
-    } catch {
-      // Best effort: local unsubscribe already succeeded.
-    }
+  } catch {
+    // Best effort: local unsubscribe already succeeded.
+  }
   return true;
 }
 
