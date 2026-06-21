@@ -931,6 +931,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🤝"
               label={t("eventWizard.officialNo", { defaultValue: "Amical" })}
+              subtitle="Sans enjeu officiel"
+              color="green"
               active={state.competitionType === "friendly"}
               onClick={() => {
                 markTouched("official");
@@ -942,12 +944,13 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🏆"
               label={t("eventWizard.officialChampionship", { defaultValue: "Championnat" })}
+              subtitle="Compte au classement"
+              color="amber"
               active={state.competitionType === "championship"}
               onClick={() => {
                 markTouched("official");
                 patch("isOfficial", true);
                 patch("competitionType", "championship");
-                // Pre-fill competition name from team championship if available and empty
                 const fromTeam = selectedTeam?.championship;
                 if (!state.competitionName && fromTeam) patch("competitionName", fromTeam);
               }}
@@ -955,6 +958,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🥇"
               label={t("eventWizard.officialCup", { defaultValue: "Coupe" })}
+              subtitle="Match à élimination"
+              color="red"
               active={state.competitionType === "cup"}
               onClick={() => {
                 markTouched("official");
