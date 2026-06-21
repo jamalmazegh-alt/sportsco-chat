@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
 import { verifyCronSecret } from "@/lib/cron-secret.server";
+import { sendPushToUserFireAndForget } from "@/lib/push-send.server";
 
 
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
@@ -205,6 +206,21 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
               } catch (e) {
                 console.error("[event-reminders] enqueue failed", e);
               }
+            }
+
+            // Web Push parallèle à l'email — au joueur lui-même + chaque parent lié
+            const pushTargets = new Set<string>();
+            if (player.user_id) pushTargets.add(player.user_id);
+            for (const pp of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
+              if (pp.parent_user_id) pushTargets.add(pp.parent_user_id);
+            }
+            for (const uid of pushTargets) {
+              sendPushToUserFireAndForget(uid, {
+                title: "🔔 Rappel convocation",
+                body: `${playerName || "Tu"} n'as pas encore répondu — ${ev.title}`,
+                url: `/events/${ev.id}`,
+                tag: `conv-reminder-${conv.id}`,
+              });
             }
 
             await supabaseAdmin.from("reminders").insert({
