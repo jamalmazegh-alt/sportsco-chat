@@ -1102,27 +1102,42 @@ function DoorButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "group relative w-full overflow-hidden flex items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition-all duration-200",
+        "group relative w-full overflow-hidden flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200 active:scale-[0.99]",
         active
-          ? "border-primary bg-primary/10 shadow-[0_8px_24px_-12px_color-mix(in_oklab,var(--primary)_45%,transparent)]"
-          : "border-border bg-card hover:border-primary/50 hover:bg-muted/30",
+          ? "border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent shadow-[0_10px_28px_-14px_color-mix(in_oklab,var(--primary)_55%,transparent)]"
+          : "border-border bg-card hover:border-primary/40 hover:bg-muted/40",
       )}
     >
-      {active && (
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-speed-lines opacity-50 pointer-events-none"
-        />
-      )}
+      {/* Left accent bar on active */}
+      <span
+        aria-hidden
+        className={cn(
+          "absolute left-0 top-0 bottom-0 w-[3px] rounded-r bg-gradient-to-b from-primary to-primary/70 transition-all duration-200",
+          active ? "opacity-100" : "opacity-0",
+        )}
+      />
       <span
         className={cn(
-          "icon-halo relative h-9 w-9 rounded-lg flex items-center justify-center text-xl transition-colors shrink-0",
-          active ? "bg-primary/15" : "bg-muted",
+          "relative h-10 w-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-all",
+          active
+            ? "bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/30"
+            : "bg-muted",
         )}
       >
         {icon}
       </span>
-      <span className="relative font-medium text-sm flex-1">{label}</span>
+      <span className="relative font-semibold text-sm flex-1 leading-tight">{label}</span>
+      <span
+        aria-hidden
+        className={cn(
+          "relative shrink-0 h-5 w-5 rounded-full border flex items-center justify-center transition-all",
+          active
+            ? "bg-gradient-to-br from-primary to-primary/80 border-transparent text-primary-foreground scale-100"
+            : "bg-background border-border scale-90 opacity-60",
+        )}
+      >
+        {active && <Check className="h-3 w-3" strokeWidth={3} />}
+      </span>
     </button>
   );
 }
@@ -1133,12 +1148,114 @@ function Chip({ label, onClick }: { label: string; onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium hover:border-primary"
+      className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium transition-all hover:border-primary hover:bg-primary/5 active:scale-95"
     >
       {label}
     </button>
   );
 }
+
+/* ───────────── Premium gradient header ─────────────
+ * Apple-meets-Blue-Lock: green gradient, soft halo, diagonal accent and
+ * a per-step thematic Lucide glyph. Logic-free, purely presentational.
+ */
+const STEP_ICONS: Record<Step, LucideIcon> = {
+  type: Sparkles,
+  team: Users,
+  when: CalendarDays,
+  duration: Timer,
+  halves: Hourglass,
+  gameformat: Users,
+  series: Repeat,
+  homeaway: Home,
+  meetingpoint: MapPin,
+  meetingtime: Clock,
+  opponent: Shield,
+  official: Trophy,
+  location: MapPin,
+  convocation: Mail,
+  carpool: Car,
+  comment: MessageSquare,
+  summary: CheckCircle2,
+};
+
+function WizardHero({
+  step,
+  stepIndex,
+  totalSteps,
+  eyebrow,
+  hint,
+  progress,
+}: {
+  step: Step;
+  stepIndex: number;
+  totalSteps: number;
+  eyebrow: string;
+  hint: string;
+  progress: number;
+}) {
+  const Icon = STEP_ICONS[step] ?? Sparkles;
+  return (
+    <div className="relative overflow-hidden rounded-t-xl text-primary-foreground bg-gradient-primary">
+      {/* Decorative overlays */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-90"
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in oklab, var(--primary) 85%, black) 0%, var(--primary) 60%, color-mix(in oklab, var(--primary) 75%, white) 100%)",
+        }}
+      />
+      {/* Soft halo */}
+      <div
+        aria-hidden
+        className="absolute -top-10 -right-10 h-44 w-44 rounded-full blur-2xl"
+        style={{ background: "color-mix(in oklab, white 22%, transparent)" }}
+      />
+      {/* Diagonal accent */}
+      <svg
+        aria-hidden
+        viewBox="0 0 400 140"
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full"
+      >
+        <path d="M260 0 L400 0 L400 140 L320 140 Z" fill="rgba(255,255,255,0.06)" />
+        <line
+          x1="220"
+          y1="140"
+          x2="400"
+          y2="10"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="22"
+        />
+        <circle cx="350" cy="40" r="50" fill="rgba(255,255,255,0.05)" />
+      </svg>
+
+      <div className="relative z-10 px-4 pt-3 pb-3">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 opacity-90" />
+          <b className="text-[11px] uppercase tracking-[0.14em] opacity-80">{eyebrow}</b>
+          <span className="ml-auto rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide">
+            {stepIndex}/{totalSteps}
+          </span>
+        </div>
+
+        <div className="mt-1.5 flex items-start gap-2">
+          <p className="flex-1 text-[12.5px] leading-snug opacity-95 min-h-[28px]">{hint}</p>
+          <div
+            aria-hidden
+            className="shrink-0 h-9 w-9 rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(0,0,0,0.35)]"
+          >
+            <Icon className="h-4.5 w-4.5 text-white" strokeWidth={2.25} />
+          </div>
+        </div>
+
+        <WizardProgress step={progress} total={totalSteps} variant="onPrimary" className="mt-2.5" />
+      </div>
+    </div>
+  );
+}
+
 
 function LiveRecap({
   state,
