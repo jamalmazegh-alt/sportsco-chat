@@ -5,7 +5,8 @@ are intended for **external callers** (webhooks, cron, marketing forms).
 
 All endpoints live under `src/routes/api/public/`. Base URLs:
 
-- Production: `https://www.clubero.app`
+- Production: `https://clubero.app` (use **apex**, not `www` — Stripe webhooks
+  do not follow redirects)
 - Stable preview: `https://project--619b13f2-91ef-4dee-b96c-f49b38d86b39-dev.lovable.app`
 
 > Every public endpoint MUST authenticate the caller (signature, shared
@@ -18,6 +19,10 @@ All endpoints live under `src/routes/api/public/`. Base URLs:
 Stripe billing events. Verified with `STRIPE_WEBHOOK_SECRET` via
 `stripe.webhooks.constructEvent`. Handles `customer.subscription.*`,
 `invoice.payment_*`, `checkout.session.completed`.
+
+> **Important:** register the endpoint in the Stripe Dashboard as
+> `https://clubero.app/api/public/stripe-webhook` (no `www`). A `www` URL
+> that 307-redirects to apex causes Stripe to mark every delivery as failed.
 
 - **Auth**: Stripe signature header `stripe-signature`
 - **Body**: raw Stripe event JSON
