@@ -77,10 +77,12 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   const jwk: JsonWebKey = {
     kty: "EC",
     crv: "P-256",
+    alg: "ES256",
     d: b64uEncode(privBytes),
     x: b64uEncode(x),
     y: b64uEncode(y),
     ext: true,
+    key_ops: ["sign"],
   };
 
   const priv = await crypto.subtle.importKey(
@@ -93,7 +95,15 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
 
   const pub = await crypto.subtle.importKey(
     "jwk",
-    { kty: "EC", crv: "P-256", x: b64uEncode(x), y: b64uEncode(y), ext: true },
+    {
+      kty: "EC",
+      crv: "P-256",
+      alg: "ES256",
+      x: b64uEncode(x),
+      y: b64uEncode(y),
+      ext: true,
+      key_ops: ["verify"],
+    },
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["verify"],
