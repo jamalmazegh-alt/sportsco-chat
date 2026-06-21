@@ -1209,6 +1209,8 @@ function WizardHero({
   stepIndex,
   totalSteps,
   eyebrow,
+  title,
+  titleMark,
   hint,
   progress,
 }: {
@@ -1216,70 +1218,73 @@ function WizardHero({
   stepIndex: number;
   totalSteps: number;
   eyebrow: string;
+  title: string;
+  titleMark?: string;
   hint: string;
   progress: number;
 }) {
   const Icon = STEP_ICONS[step] ?? Sparkles;
   return (
-    <div className="relative overflow-hidden rounded-t-xl text-primary-foreground bg-gradient-primary">
-      {/* Decorative overlays */}
+    <div className="relative overflow-hidden rounded-t-xl text-primary-foreground">
+      {/* Deep green gradient base (mockup: #0f4a26 → #1d7a45) */}
       <div
         aria-hidden
-        className="absolute inset-0 opacity-90"
+        className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(135deg, color-mix(in oklab, var(--primary) 85%, black) 0%, var(--primary) 60%, color-mix(in oklab, var(--primary) 75%, white) 100%)",
+            "linear-gradient(135deg, color-mix(in oklab, var(--primary) 70%, black) 0%, var(--primary) 100%)",
         }}
       />
-      {/* Soft halo */}
-      <div
-        aria-hidden
-        className="absolute -top-10 -right-10 h-44 w-44 rounded-full blur-2xl"
-        style={{ background: "color-mix(in oklab, white 22%, transparent)" }}
-      />
-      {/* Diagonal accent */}
+      {/* Diagonal accent panel + light stripe + halo */}
       <svg
         aria-hidden
-        viewBox="0 0 400 140"
+        viewBox="0 0 400 160"
         preserveAspectRatio="none"
         className="absolute inset-0 h-full w-full"
       >
-        <path d="M260 0 L400 0 L400 140 L320 140 Z" fill="rgba(255,255,255,0.06)" />
+        <path d="M250 0 L400 0 L400 160 L310 160 Z" fill="rgba(255,255,255,0.05)" />
+        <ellipse cx="355" cy="55" rx="70" ry="55" fill="rgba(255,255,255,0.08)" />
         <line
           x1="220"
-          y1="140"
+          y1="160"
           x2="400"
-          y2="10"
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth="22"
+          y2="28"
+          stroke="rgba(255,255,255,0.05)"
+          strokeWidth="28"
         />
-        <circle cx="350" cy="40" r="50" fill="rgba(255,255,255,0.05)" />
       </svg>
 
       <div className="relative z-10 px-4 pt-3 pb-3">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 opacity-90" />
-          <b className="text-[11px] uppercase tracking-[0.14em] opacity-80">{eyebrow}</b>
-          <span className="ml-auto rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold tracking-wide">
-            {stepIndex}/{totalSteps}
+        <div className="flex items-center justify-between">
+          <b className="text-[10px] uppercase tracking-[0.16em] opacity-70 font-semibold">
+            {eyebrow}
+          </b>
+          <span className="rounded-full bg-white/12 px-2 py-0.5 text-[10px] font-semibold tracking-wide opacity-80">
+            {stepIndex} / {totalSteps}
           </span>
         </div>
 
-        <div className="mt-1.5 flex items-start gap-2">
-          <p className="flex-1 text-[12.5px] leading-snug opacity-95 min-h-[28px]">{hint}</p>
+        <div className="mt-1 flex items-end gap-2">
+          <h2 className="flex-1 text-[22px] font-extrabold leading-[1.1] tracking-[-0.5px]">
+            {title}
+            {titleMark && <em className="not-italic ml-1 opacity-60">{titleMark}</em>}
+          </h2>
           <div
             aria-hidden
-            className="shrink-0 h-9 w-9 rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(0,0,0,0.35)]"
+            className="shrink-0 h-10 w-10 rounded-xl bg-white/12 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(0,0,0,0.4)]"
           >
-            <Icon className="h-[18px] w-[18px] text-white" strokeWidth={2.25} />
+            <Icon className="h-[19px] w-[19px] text-white" strokeWidth={2.25} />
           </div>
         </div>
+
+        <p className="mt-1.5 text-[11.5px] leading-snug opacity-75 line-clamp-1">{hint}</p>
 
         <WizardProgress step={progress} total={totalSteps} variant="onPrimary" className="mt-2.5" />
       </div>
     </div>
   );
 }
+
 
 
 function LiveRecap({
