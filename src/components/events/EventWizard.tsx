@@ -396,17 +396,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </span>
         </div>
         <p className="mt-1 text-[12px] leading-snug opacity-90 min-h-[28px]">{hints[current]}</p>
-        <div className="mt-2 flex gap-1">
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "h-1 flex-1 rounded-full",
-                i <= state.step ? "bg-white" : "bg-white/25",
-              )}
-            />
-          ))}
-        </div>
+        <WizardProgress step={state.step} total={steps.length} variant="onPrimary" className="mt-2" />
+
       </div>
 
       {/* Live recap chips */}
