@@ -131,6 +131,21 @@ function RootComponent() {
     }
     // PWA: register service worker (guarded — refuses in Lovable preview/dev/iframe)
     registerServiceWorker();
+    // Reconcile push permission with our DB: if user revoked notifications in
+    // iOS Settings (or browser), clean up stale rows; if granted, re-upsert.
+    const runSync = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      syncPushSubscriptionState().catch(() => { /* noop */ });
+    };
+    runSync();
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", runSync);
+    }
+    return () => {
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", runSync);
+      }
+    };
   }, []);
 
   return (
