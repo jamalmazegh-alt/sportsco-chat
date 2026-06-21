@@ -187,6 +187,12 @@ function NotificationsSettingsPage() {
           checked={form.event_cancel}
           onChange={(v) => update("event_cancel", v)}
         />
+        <Toggle
+          label="Résultat de match notifié à l'équipe"
+          hint="Push aux joueurs et coaches quand un score est saisi."
+          checked={form.score_result}
+          onChange={(v) => update("score_result", v)}
+        />
       </Section>
 
       <Section title="Mur du club">
