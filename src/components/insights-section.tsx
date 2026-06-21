@@ -213,42 +213,49 @@ export function InsightsSection({ clubId }: { clubId: string }) {
   return (
     <section className="space-y-2.5">
       <div className="flex items-center justify-between px-0.5">
-        <div className="flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5 text-primary" />
-          <h2 className="text-xs font-semibold text-foreground uppercase tracking-[0.14em]">
+        <div className="flex items-center gap-2">
+          <div
+            className="h-7 w-7 rounded-[8px] flex items-center justify-center shadow-[0_2px_6px_rgba(15,74,38,0.2)]"
+            style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+          >
+            <Sparkles className="h-3.5 w-3.5 text-white" strokeWidth={2.4} />
+          </div>
+          <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em]">
             {t("insights.title")}
           </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary tabular-nums">
+          <span
+            className="text-[10px] font-black px-2 py-0.5 rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(15,74,38,0.25)]"
+            style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+          >
             {insights.length}
           </span>
-          <button
-            type="button"
-            onClick={() => refreshMutation.mutate()}
-            disabled={refreshDisabled}
-            title={
-              cooldownActive
-                ? t("coachInsightsAi.refreshLimited", { ns: "tournaments" })
-                : t("coachInsightsAi.refresh", { ns: "tournaments" })
-            }
-            aria-label={t("coachInsightsAi.refresh", { ns: "tournaments" })}
-            className={cn(
-              "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full transition-colors",
-              "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-            )}
-          >
-            <RefreshCw
-              className={cn("h-3 w-3", refreshMutation.isPending && "animate-spin")}
-            />
-            <span>
-              {refreshMutation.isPending
-                ? t("coachInsightsAi.refreshing", { ns: "tournaments" })
-                : t("coachInsightsAi.refresh", { ns: "tournaments" })}
-            </span>
-          </button>
         </div>
+        <button
+          type="button"
+          onClick={() => refreshMutation.mutate()}
+          disabled={refreshDisabled}
+          title={
+            cooldownActive
+              ? t("coachInsightsAi.refreshLimited", { ns: "tournaments" })
+              : t("coachInsightsAi.refresh", { ns: "tournaments" })
+          }
+          aria-label={t("coachInsightsAi.refresh", { ns: "tournaments" })}
+          className={cn(
+            "inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full transition-all",
+            "bg-white border-[1.5px] border-[#e2e8f0] text-[#0f4a26] hover:border-[#2d9d5f] hover:bg-[#f0f9f3]",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+          )}
+        >
+          <RefreshCw
+            className={cn("h-3 w-3", refreshMutation.isPending && "animate-spin")}
+            strokeWidth={2.4}
+          />
+          <span>
+            {refreshMutation.isPending
+              ? t("coachInsightsAi.refreshing", { ns: "tournaments" })
+              : t("coachInsightsAi.refresh", { ns: "tournaments" })}
+          </span>
+        </button>
       </div>
       <div className="space-y-2">
         {insights.map((ins) => {
@@ -262,52 +269,47 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           return (
             <div
               key={ins.id}
-              className={cn(
-                "group relative overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm transition-all",
-                "hover:shadow-md hover:border-border",
-                "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1",
-                tone.accent,
-              )}
+              className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(15,40,24,0.04)] transition-all hover:shadow-[0_4px_12px_rgba(15,40,24,0.08)] hover:border-[#cbd5e1]"
             >
-              <div className="flex items-start gap-3 pl-4 pr-2.5 py-3">
+              <div
+                aria-hidden
+                className="absolute left-0 top-0 bottom-0 w-1"
+                style={{ background: tone.bar }}
+              />
+              <div className="flex items-start gap-3 pl-4 pr-2 py-3">
                 <div
-                  className={cn(
-                    "h-9 w-9 shrink-0 rounded-lg flex items-center justify-center ring-1",
-                    tone.iconBg,
-                    tone.ring,
-                  )}
+                  className="h-10 w-10 shrink-0 rounded-[10px] flex items-center justify-center"
+                  style={{ background: tone.iconBg }}
                 >
-                  <Icon className={cn("h-4 w-4", tone.iconFg)} />
+                  <Icon className="h-4 w-4" style={{ color: tone.iconColor }} strokeWidth={2.4} />
                 </div>
                 <div className="min-w-0 flex-1 pt-0.5">
-                  <p
-                    className={cn(
-                      "text-[10px] font-bold uppercase tracking-wider mb-0.5",
-                      tone.label,
-                    )}
+                  <span
+                    className="inline-block text-[9px] font-black uppercase tracking-[0.12em] px-1.5 py-0.5 rounded-[4px] mb-1"
+                    style={{ background: tone.chipBg, color: tone.chipColor }}
                   >
                     {priorityLabel}
-                  </p>
-                  <p className="text-sm leading-snug text-foreground">{msg}</p>
+                  </span>
+                  <p className="text-[13px] leading-snug text-[#0f2818] font-medium">{msg}</p>
                   {label && (
                     <button
                       onClick={() => handleAction(ins)}
-                      className={cn(
-                        "mt-2 inline-flex items-center gap-0.5 text-xs font-semibold rounded-md px-2 py-1 -ml-2 transition-colors",
-                        "text-primary hover:bg-primary/10",
-                      )}
+                      className="mt-2 inline-flex items-center gap-0.5 text-[11px] font-bold rounded-[8px] px-2.5 py-1.5 -ml-1 text-white transition-all hover:shadow-[0_2px_6px_rgba(15,74,38,0.25)] active:scale-95"
+                      style={{
+                        background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                      }}
                     >
                       {label}
-                      <ChevronRight className="h-3 w-3" />
+                      <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
                     </button>
                   )}
                 </div>
                 <button
                   aria-label={t("insights.dismiss")}
                   onClick={() => setPendingDismiss(ins.id)}
-                  className="shrink-0 p-1.5 rounded-md text-muted-foreground/60 transition-all hover:bg-muted hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
+                  className="shrink-0 p-1.5 rounded-md text-[#94a3b8] transition-all hover:bg-[#f1f5f9] hover:text-[#0f2818] sm:opacity-40 sm:group-hover:opacity-100"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3.5 w-3.5" strokeWidth={2.4} />
                 </button>
               </div>
             </div>
