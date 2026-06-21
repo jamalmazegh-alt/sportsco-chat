@@ -1419,11 +1419,11 @@
       "img_alt": "Vorstände und Trainer organisieren ihren Verein gemeinsam an einem Tablet"
     },
     "tournament": {
-      "badge": "Wettkämpfe",
-      "headline": "Organisieren Sie Ihr Turnier von A bis Z.",
-      "body": "Gruppen, K.-o.-Runden, Plätze, Schiedsrichter, automatische Tabellen — alles wird in Clubero verwaltet. Am Spieltag ist Ihre Schaltzentrale in Ihrer Tasche.",
+      "badge": "Turnier in 30 Sekunden",
+      "headline": "Erstellen Sie Ihr Turnier in 30 Sekunden dank KI.",
+      "body": "Unser KI-Assistent konfiguriert Ihr Turnier in wenigen Fragen: Gruppen, K.-o.-Runden, Zeitplan, Plätze, Schiedsrichter. Am Spieltag ist Ihr Kontrollzentrum in Ihrer Tasche.",
       "img_alt": "Panoramablick auf ein mit Clubero organisiertes Amateurturnier",
-      "cta_organize": "Mein Turnier organisieren",
+      "cta_organize": "Mein Turnier in 30 s erstellen",
       "cta_learn_more": "Mehr erfahren"
     },
     "coming_soon": {

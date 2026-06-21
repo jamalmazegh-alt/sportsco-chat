@@ -1419,11 +1419,11 @@
       "img_alt": "Directors and coaches running their club together around a tablet"
     },
     "tournament": {
-      "badge": "Competitions",
-      "headline": "Run your tournament from A to Z.",
-      "body": "Groups, knockout rounds, pitches, referees, automatic standings — everything is handled inside Clubero. On match day, your control room is in your pocket.",
+      "badge": "30-second tournament",
+      "headline": "Spin up your tournament in 30 seconds with AI.",
+      "body": "Our AI assistant configures your tournament in a few questions: groups, knockout rounds, schedule, pitches, referees. On match day, your control room is in your pocket.",
       "img_alt": "Panoramic view of an amateur tournament run with Clubero",
-      "cta_organize": "Organize my tournament",
+      "cta_organize": "Create my tournament in 30 s",
       "cta_learn_more": "Learn more"
     },
     "coming_soon": {

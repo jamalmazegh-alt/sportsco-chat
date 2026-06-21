@@ -1419,11 +1419,11 @@
       "img_alt": "Dirigentes e educadores a organizar o clube juntos à volta de um tablet"
     },
     "tournament": {
-      "badge": "Competições",
-      "headline": "Organize o seu torneio de A a Z.",
-      "body": "Grupos, fases finais, campos, árbitros, classificações automáticas — tudo é gerido no Clubero. No dia do jogo, o seu centro de comando está no seu bolso.",
+      "badge": "Torneio em 30 segundos",
+      "headline": "Crie o seu torneio em 30 segundos graças à IA.",
+      "body": "O nosso assistente IA configura o seu torneio em algumas perguntas: grupos, fases finais, calendário, campos, árbitros. No dia do jogo, o seu centro de controlo está no seu bolso.",
       "img_alt": "Vista panorâmica de um torneio amador organizado com o Clubero",
-      "cta_organize": "Organizar o meu torneio",
+      "cta_organize": "Criar o meu torneio em 30 s",
       "cta_learn_more": "Saber mais"
     },
     "coming_soon": {
