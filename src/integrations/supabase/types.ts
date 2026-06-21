@@ -301,6 +301,7 @@ export type Database = {
           convocation_reminder: boolean
           event_cancel: boolean
           event_reschedule: boolean
+          score_result: boolean | null
           tournament_draw: boolean
           tournament_match_reminder: boolean
           updated_at: string
@@ -314,6 +315,7 @@ export type Database = {
           convocation_reminder?: boolean
           event_cancel?: boolean
           event_reschedule?: boolean
+          score_result?: boolean | null
           tournament_draw?: boolean
           tournament_match_reminder?: boolean
           updated_at?: string
@@ -327,6 +329,7 @@ export type Database = {
           convocation_reminder?: boolean
           event_cancel?: boolean
           event_reschedule?: boolean
+          score_result?: boolean | null
           tournament_draw?: boolean
           tournament_match_reminder?: boolean
           updated_at?: string
