@@ -1858,7 +1858,7 @@ function EventDetail() {
           {/* Primary action toolbar — Lineup / Feedback (edit moved to hero top) */}
           {teams && (isCoach || showFeedbackButton) && (
             <div className="mt-3 flex items-center gap-2 flex-wrap">
-              {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
+              {isCoach && event.type === "match" && isFootball && (
                 <Link
                   to="/events/$eventId/lineup"
                   params={{ eventId }}
