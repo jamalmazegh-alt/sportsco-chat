@@ -141,59 +141,88 @@ export function PublishWorkflow({
   const meta = bannerMeta(status, t);
 
   return (
-    <section className={cn("rounded-2xl border overflow-hidden", meta.borderClass, meta.bgClass)}>
-      {/* Stepper */}
-      <div className="px-4 pt-4 pb-3 flex items-center gap-2">
-        {STEPS.map((s, i) => {
-          const reached = i <= stepIndex;
-          const active = i === stepIndex;
-          return (
-            <div key={s} className="flex items-center gap-2 flex-1 min-w-0">
-              <div
-                className={cn(
-                  "h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors",
-                  active && "bg-primary text-primary-foreground ring-4 ring-primary/20",
-                  reached && !active && "bg-primary/80 text-primary-foreground",
-                  !reached && "bg-muted text-muted-foreground",
-                )}
-              >
-                {i + 1}
-              </div>
-              <span
-                className={cn(
-                  "text-xs font-medium truncate",
-                  active ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                {t(`publishFlow.step${capitalize(s)}` as any)}
-              </span>
-              {i < STEPS.length - 1 && (
+    <section
+      className={cn(
+        "rounded-[18px] border-[1.5px] overflow-hidden bg-white",
+        meta.borderClass,
+      )}
+      style={{ boxShadow: "0 4px 16px -6px rgba(29,122,69,0.12)" }}
+    >
+      {/* Stepper anime premium */}
+      <div
+        className="relative px-4 pt-4 pb-3 overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg,#0f4a26 0%,#1d7a45 60%,#2d9d5f 100%)",
+        }}
+      >
+        <svg
+          className="absolute inset-0 h-full w-full opacity-20 pointer-events-none"
+          viewBox="0 0 400 80"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <pattern id="pw-diag" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M0 20 L20 0" stroke="white" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="400" height="80" fill="url(#pw-diag)" />
+        </svg>
+        <div className="relative flex items-center gap-2">
+          {STEPS.map((s, i) => {
+            const reached = i <= stepIndex;
+            const active = i === stepIndex;
+            return (
+              <div key={s} className="flex items-center gap-2 flex-1 min-w-0">
                 <div
                   className={cn(
-                    "flex-1 h-0.5 rounded-full transition-colors",
-                    i < stepIndex ? "bg-primary/60" : "bg-muted",
+                    "h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 transition-all",
+                    active && "bg-white text-emerald-700 ring-4 ring-white/30 scale-110",
+                    reached && !active && "bg-white/90 text-emerald-700",
+                    !reached && "bg-white/15 text-white/60 ring-1 ring-white/20",
                   )}
-                />
-              )}
-            </div>
-          );
-        })}
+                >
+                  {reached && !active ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
+                </div>
+                <span
+                  className={cn(
+                    "text-[11px] font-bold truncate tracking-tight",
+                    active ? "text-white" : reached ? "text-white/90" : "text-white/55",
+                  )}
+                >
+                  {t(`publishFlow.step${capitalize(s)}` as any)}
+                </span>
+                {i < STEPS.length - 1 && (
+                  <div
+                    className={cn(
+                      "flex-1 h-[3px] rounded-full transition-colors",
+                      i < stepIndex ? "bg-white/80" : "bg-white/20",
+                    )}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
+
       {/* Banner body */}
-      <div className="px-5 pb-5">
+      <div className="px-5 pt-5 pb-5">
         <div className="flex items-start gap-4">
           <div
             className={cn(
-              "h-12 w-12 rounded-2xl flex items-center justify-center shrink-0",
+              "h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ring-[1.5px]",
               meta.iconBgClass,
+              meta.borderClass,
             )}
           >
             <meta.Icon className={cn("h-6 w-6", meta.iconClass)} />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold leading-tight">{meta.title}</h2>
-            <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
+            <h2 className="text-lg font-extrabold leading-tight tracking-tight">{meta.title}</h2>
+            <p className="text-sm text-slate-500 mt-1">{meta.subtitle}</p>
+
 
             {/* Fix D — the "Publier" action lives only in the Continue CTA
                 (publish_tournament step) to avoid two competing publish buttons.
@@ -208,11 +237,16 @@ export function PublishWorkflow({
                       onClick={onStart}
                       disabled={busy || !canStart}
                       title={!canStart ? t("publishFlow.startBlockedNoMatches") : undefined}
-                      className="gap-2"
+                      className="gap-2 rounded-xl font-bold text-white border-0"
+                      style={{
+                        background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)",
+                        boxShadow: "0 4px 14px -4px rgba(29,122,69,0.55)",
+                      }}
                     >
                       <PlayCircle className="h-4 w-4" />
                       {t("publishFlow.ctaStart")}
                     </Button>
+
                     {!canStart && (
                       <p className="w-full text-xs text-destructive">
                         {t("publishFlow.startBlockedNoMatches")}

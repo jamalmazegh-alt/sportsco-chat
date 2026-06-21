@@ -107,78 +107,126 @@ export function PoolEditorDialog({ open, onOpenChange, tournamentId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            {t("poolEditor.title", "Modifier les poules")}
-          </DialogTitle>
-          <DialogDescription>
-            {t(
-              "poolEditor.subtitle",
-              "Réassignez les équipes avant le début des matchs. Les fixtures seront régénérées.",
-            )}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-[20px] border-[1.5px]">
+        {/* Anime Premium hero header */}
+        <div
+          className="relative overflow-hidden px-5 pt-5 pb-4 text-white"
+          style={{
+            background: "linear-gradient(135deg,#0f4a26 0%,#1d7a45 55%,#2d9d5f 100%)",
+            boxShadow: "0 4px 16px -4px rgba(29,122,69,0.45)",
+          }}
+        >
+          <svg
+            className="absolute inset-0 h-full w-full opacity-25 pointer-events-none"
+            viewBox="0 0 400 120"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <pattern id="pe-diag" width="22" height="22" patternUnits="userSpaceOnUse">
+                <path d="M0 22 L22 0" stroke="white" strokeWidth="0.6" />
+              </pattern>
+            </defs>
+            <rect width="400" height="120" fill="url(#pe-diag)" />
+            <circle cx="340" cy="30" r="60" fill="white" opacity="0.15" />
+          </svg>
+          <DialogHeader className="relative space-y-1.5 text-left">
+            <DialogTitle className="flex items-center gap-2 text-white text-base font-extrabold tracking-tight">
+              <span className="h-8 w-8 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30">
+                <Users className="h-4 w-4 text-white" />
+              </span>
+              {t("poolEditor.title", "Modifier les poules")}
+            </DialogTitle>
+            <DialogDescription className="text-white/80 text-xs leading-relaxed">
+              {t(
+                "poolEditor.subtitle",
+                "Réassignez les équipes avant le début des matchs. Les fixtures seront régénérées.",
+              )}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : locked ? (
-          <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            {t(
-              "poolEditor.locked",
-              "Des matchs de poule ont déjà commencé : édition impossible.",
-            )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {(data?.groups ?? []).map((g) => (
-              <div key={g.id} className="rounded-lg border border-border p-3">
-                <div className="text-sm font-semibold mb-2">{g.name}</div>
-                <div className="space-y-2">
-                  {(grouped[g.id] ?? []).length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic">
-                      {t("poolEditor.empty", "Aucune équipe")}
-                    </p>
-                  ) : (
-                    grouped[g.id].map((tm) => (
-                      <div key={tm.id} className="flex items-center gap-2">
-                        <span className="flex-1 text-sm truncate">{tm.name}</span>
-                        <Select
-                          value={assignments[tm.id] ?? ""}
-                          onValueChange={(v) =>
-                            setAssignments((prev) => ({ ...prev, [tm.id]: v }))
-                          }
-                        >
-                          <SelectTrigger className="w-32 h-8">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {(data?.groups ?? []).map((gg) => (
-                              <SelectItem key={gg.id} value={gg.id}>
-                                {gg.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ))
-                  )}
+        <div className="px-5 pt-5 pb-2">
+          {isLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+            </div>
+          ) : locked ? (
+            <div className="rounded-2xl border-[1.5px] border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 font-medium">
+              {t(
+                "poolEditor.locked",
+                "Des matchs de poule ont déjà commencé : édition impossible.",
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {(data?.groups ?? []).map((g, idx) => (
+                <div
+                  key={g.id}
+                  className="rounded-2xl border-[1.5px] border-slate-200 overflow-hidden bg-white"
+                  style={{ boxShadow: "0 2px 8px -4px rgba(15,23,42,0.08)" }}
+                >
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 text-white text-xs font-extrabold tracking-tight"
+                    style={{ background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)" }}
+                  >
+                    <span className="h-5 w-5 rounded-md bg-white/20 flex items-center justify-center text-[10px] font-black">
+                      {String.fromCharCode(65 + idx)}
+                    </span>
+                    {g.name}
+                    <span className="ml-auto text-[10px] font-bold bg-white/15 px-1.5 py-0.5 rounded">
+                      {(grouped[g.id] ?? []).length} {t("poolEditor.teamsShort", "éq.")}
+                    </span>
+                  </div>
+                  <div className="p-3 space-y-2">
+                    {(grouped[g.id] ?? []).length === 0 ? (
+                      <p className="text-xs text-slate-400 italic text-center py-2">
+                        {t("poolEditor.empty", "Aucune équipe")}
+                      </p>
+                    ) : (
+                      grouped[g.id].map((tm) => (
+                        <div key={tm.id} className="flex items-center gap-2">
+                          <span className="flex-1 text-sm font-medium text-slate-700 truncate">
+                            {tm.name}
+                          </span>
+                          <Select
+                            value={assignments[tm.id] ?? ""}
+                            onValueChange={(v) =>
+                              setAssignments((prev) => ({ ...prev, [tm.id]: v }))
+                            }
+                          >
+                            <SelectTrigger className="w-28 h-8 rounded-lg border-[1.5px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(data?.groups ?? []).map((gg) => (
+                                <SelectItem key={gg.id} value={gg.id}>
+                                  {gg.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="px-5 pb-5 pt-3 gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl border-[1.5px]">
             {t("common.cancel", "Annuler")}
           </Button>
           <Button
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending || locked || isLoading}
+            className="rounded-xl font-bold text-white border-0"
+            style={{
+              background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)",
+              boxShadow: "0 4px 14px -4px rgba(29,122,69,0.55)",
+            }}
           >
             {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             {t("poolEditor.save", "Enregistrer & régénérer")}
