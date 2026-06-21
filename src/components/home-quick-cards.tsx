@@ -61,75 +61,100 @@ export function HomeQuickCards({ clubId, teams }: Props) {
   const teamsSummary = (teams ?? []).slice(0, 3).map((x) => x.name).join(" · ");
 
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="grid grid-cols-2 gap-2.5">
       {/* Teams card */}
       <Link
         to="/teams"
-        className="group relative overflow-hidden rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-all hover:border-accent/50 hover:shadow-[0_0_0_3px_color-mix(in_oklab,var(--accent)_12%,transparent)]"
+        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-[#e2e8f0] bg-white p-3.5 active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
       >
-        <div aria-hidden className="absolute inset-0 bg-speed-lines-accent opacity-60 pointer-events-none" />
-        <div aria-hidden className="absolute -top-8 -right-8 h-20 w-20 rounded-full bg-accent/20 blur-2xl pointer-events-none" />
+        <div
+          aria-hidden
+          className="absolute top-0 inset-x-0 h-[3px]"
+          style={{ background: "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)" }}
+        />
         <div className="relative">
-          <div className="icon-halo h-8 w-8 rounded-lg bg-accent flex items-center justify-center mb-2">
-            <Users className="h-4 w-4 text-accent-foreground" />
+          <div
+            className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2.5"
+            style={{ background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)" }}
+          >
+            <Users className="h-4 w-4 text-[#0f4a26]" strokeWidth={2.4} />
           </div>
-          <p className="text-2xl font-bold leading-none font-display tracking-tight">{teamsCount}</p>
-          <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+          <p
+            className="text-[26px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+            style={{ backgroundImage: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+          >
+            {teamsCount}
+          </p>
+          <p className="text-[10px] text-[#64748b] mt-1.5 uppercase tracking-[0.1em] font-bold">
             {t("nav.teams")}
           </p>
           {teamsSummary && (
-            <p className="text-[10px] text-muted-foreground mt-1 truncate">
+            <p className="text-[10px] text-[#94a3b8] mt-1 truncate font-medium">
               {teamsSummary}
             </p>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground absolute top-2.5 right-2.5 transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="h-4 w-4 text-[#94a3b8] absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
       </Link>
 
       {/* Tournaments card */}
       <Link
         to="/tournaments"
         className={cn(
-          "group relative overflow-hidden rounded-2xl border bg-card p-3 active:scale-[0.99] transition-all hover:border-primary/50",
-          state === "empty" && "border-dashed border-border",
-          state === "planned" && "border-border hover:shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
-          state === "live" &&
-            "border-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_15%,transparent)]",
-          state === "done" && "border-border opacity-90",
+          "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-white p-3.5 active:scale-[0.99] transition-all",
+          state === "empty" && "border-dashed border-[#cbd5e1] hover:border-[#0f4a26]",
+          state === "planned" && "border-[#e2e8f0] hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
+          state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
+          state === "done" && "border-[#e2e8f0] opacity-90",
         )}
       >
-        <div aria-hidden className="absolute inset-0 bg-speed-lines opacity-60 pointer-events-none" />
         <div
           aria-hidden
-          className={cn(
-            "absolute -top-8 -right-8 h-20 w-20 rounded-full blur-2xl pointer-events-none transition-opacity",
-            state === "live" ? "bg-primary/30" : "bg-primary/15 group-hover:bg-primary/25",
-          )}
+          className="absolute top-0 inset-x-0 h-[3px]"
+          style={{
+            background:
+              state === "live"
+                ? "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)"
+                : state === "planned"
+                  ? "linear-gradient(90deg, #b45309 0%, #f59e0b 100%)"
+                  : "linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%)",
+          }}
         />
         <div className="relative">
           <div
-            className={cn(
-              "icon-halo h-8 w-8 rounded-lg flex items-center justify-center mb-2",
-              state === "live" ? "bg-primary/15" : "bg-muted",
-            )}
+            className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2.5"
+            style={{
+              background:
+                state === "live"
+                  ? "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)"
+                  : state === "planned"
+                    ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)"
+                    : "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
+            }}
           >
             <Trophy
-              className={cn(
-                "h-4 w-4",
-                state === "live" ? "text-primary" : "text-muted-foreground",
-              )}
+              className="h-4 w-4"
+              strokeWidth={2.4}
+              style={{
+                color:
+                  state === "live"
+                    ? "#0f4a26"
+                    : state === "planned"
+                      ? "#92400e"
+                      : "#64748b",
+              }}
             />
           </div>
 
           {state === "empty" ? (
             <>
-              <p className="text-2xl font-bold leading-none text-muted-foreground font-display tracking-tight">0</p>
-              <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+              <p className="text-[26px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">0</p>
+              <p className="text-[10px] text-[#64748b] mt-1.5 uppercase tracking-[0.1em] font-bold">
                 {t("nav.tournaments")}
               </p>
               {canCreateTournament && (
-                <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
-                  <Plus className="h-3 w-3" />
+                <p className="text-[10px] font-bold text-[#0f4a26] mt-1.5 inline-flex items-center gap-0.5">
+                  <Plus className="h-3 w-3" strokeWidth={2.6} />
                   {t("dashboard.tournamentsCard.createCta", {
                     defaultValue: "Créer un tournoi",
                   })}
@@ -138,17 +163,27 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             </>
           ) : (
             <>
-              <p className="text-2xl font-bold leading-none font-display tracking-tight">
+              <p
+                className="text-[26px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    state === "live"
+                      ? "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)"
+                      : state === "planned"
+                        ? "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)"
+                        : "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
+                }}
+              >
                 {isLoading ? "…" : count}
               </p>
-              <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+              <p className="text-[10px] text-[#64748b] mt-1.5 uppercase tracking-[0.1em] font-bold">
                 {count > 1 ? t("nav.tournaments") : t("nav.tournament", { defaultValue: "Tournoi" })}
               </p>
               <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
             </>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground absolute top-2.5 right-2.5 transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="h-4 w-4 text-[#94a3b8] absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
       </Link>
     </div>
   );
@@ -164,10 +199,13 @@ function StateBadge({
   const { t } = useTranslation();
   if (state === "live") {
     return (
-      <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary border border-primary/30">
+      <span
+        className="mt-1.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.1em] text-white"
+        style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+      >
         <span className="relative inline-flex h-1.5 w-1.5">
-          <span className="live-dot absolute inset-0 rounded-full" />
-          <span className="relative h-1.5 w-1.5 rounded-full bg-primary" />
+          <span className="absolute inset-0 rounded-full bg-white/70 animate-ping" />
+          <span className="relative h-1.5 w-1.5 rounded-full bg-white" />
         </span>
         {t("dashboard.tournamentsCard.live", { defaultValue: "En cours" })}
       </span>
@@ -176,15 +214,15 @@ function StateBadge({
   if (state === "planned") {
     const label = startsOn ? fmt(new Date(startsOn), "d MMM") : t("dashboard.tournamentsCard.upcoming", { defaultValue: "À venir" });
     return (
-      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-amber-600 dark:text-amber-400">
-        <CalendarDays className="h-2.5 w-2.5" />
+      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#fef3c7] px-2 py-0.5 text-[9px] font-bold text-[#92400e]">
+        <CalendarDays className="h-2.5 w-2.5" strokeWidth={2.6} />
         {label}
       </span>
     );
   }
   return (
-    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-muted-foreground border border-border">
-      <Check className="h-2.5 w-2.5" />
+    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[9px] font-bold text-[#64748b]">
+      <Check className="h-2.5 w-2.5" strokeWidth={2.6} />
       {t("dashboard.tournamentsCard.done", { defaultValue: "Terminé" })}
     </span>
   );
