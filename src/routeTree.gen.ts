@@ -17,6 +17,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PreviewWidgetsRouteImport } from './routes/preview-widgets'
 import { Route as PlayersRouteImport } from './routes/players'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -79,6 +80,8 @@ import { Route as SuperadminSupportTicketsTicketIdRouteImport } from './routes/s
 import { Route as SuperadminOnboardingImportRouteImport } from './routes/superadmin/onboarding.import'
 import { Route as SuperadminClubsClubIdRouteImport } from './routes/superadmin/clubs.$clubId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
+import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPublicWaitlistRouteImport } from './routes/api/public/waitlist'
 import { Route as ApiPublicTournamentRosterRouteImport } from './routes/api/public/tournament-roster'
 import { Route as ApiPublicTournamentRegistrationRouteImport } from './routes/api/public/tournament-registration'
@@ -173,6 +176,11 @@ const PlayersRoute = PlayersRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -488,6 +496,16 @@ const SuperadminClubsClubIdRoute = SuperadminClubsClubIdRouteImport.update({
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushUnsubscribeRoute = ApiPushUnsubscribeRouteImport.update({
+  id: '/api/push/unsubscribe',
+  path: '/api/push/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
+  id: '/api/push/subscribe',
+  path: '/api/push/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicWaitlistRoute = ApiPublicWaitlistRouteImport.update({
@@ -822,6 +840,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/offline': typeof OfflineRoute
   '/onboarding': typeof OnboardingRoute
   '/players': typeof PlayersRoute
   '/preview-widgets': typeof PreviewWidgetsRoute
@@ -888,6 +907,8 @@ export interface FileRoutesByFullPath {
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/api/public/waitlist': typeof ApiPublicWaitlistRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
@@ -948,6 +969,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/offline': typeof OfflineRoute
   '/onboarding': typeof OnboardingRoute
   '/players': typeof PlayersRoute
   '/preview-widgets': typeof PreviewWidgetsRoute
@@ -1010,6 +1032,8 @@ export interface FileRoutesByTo {
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/api/public/waitlist': typeof ApiPublicWaitlistRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
@@ -1072,6 +1096,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/offline': typeof OfflineRoute
   '/onboarding': typeof OnboardingRoute
   '/players': typeof PlayersRoute
   '/preview-widgets': typeof PreviewWidgetsRoute
@@ -1138,6 +1163,8 @@ export interface FileRoutesById {
   '/api/public/tournament-registration': typeof ApiPublicTournamentRegistrationRoute
   '/api/public/tournament-roster': typeof ApiPublicTournamentRosterRoute
   '/api/public/waitlist': typeof ApiPublicWaitlistRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/superadmin/clubs/$clubId': typeof SuperadminClubsClubIdRoute
   '/superadmin/onboarding/import': typeof SuperadminOnboardingImportRoute
@@ -1200,6 +1227,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/notifications'
+    | '/offline'
     | '/onboarding'
     | '/players'
     | '/preview-widgets'
@@ -1266,6 +1294,8 @@ export interface FileRouteTypes {
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
     | '/api/public/waitlist'
+    | '/api/push/subscribe'
+    | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
@@ -1326,6 +1356,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/notifications'
+    | '/offline'
     | '/onboarding'
     | '/players'
     | '/preview-widgets'
@@ -1388,6 +1419,8 @@ export interface FileRouteTypes {
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
     | '/api/public/waitlist'
+    | '/api/push/subscribe'
+    | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
@@ -1449,6 +1482,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/notifications'
+    | '/offline'
     | '/onboarding'
     | '/players'
     | '/preview-widgets'
@@ -1515,6 +1549,8 @@ export interface FileRouteTypes {
     | '/api/public/tournament-registration'
     | '/api/public/tournament-roster'
     | '/api/public/waitlist'
+    | '/api/push/subscribe'
+    | '/api/push/unsubscribe'
     | '/lovable/email/suppression'
     | '/superadmin/clubs/$clubId'
     | '/superadmin/onboarding/import'
@@ -1577,6 +1613,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   NotificationsRoute: typeof NotificationsRoute
+  OfflineRoute: typeof OfflineRoute
   OnboardingRoute: typeof OnboardingRoute
   PlayersRoute: typeof PlayersRoute
   PreviewWidgetsRoute: typeof PreviewWidgetsRoute
@@ -1611,6 +1648,8 @@ export interface RootRouteChildren {
   ApiPublicTournamentRegistrationRoute: typeof ApiPublicTournamentRegistrationRoute
   ApiPublicTournamentRosterRoute: typeof ApiPublicTournamentRosterRoute
   ApiPublicWaitlistRoute: typeof ApiPublicWaitlistRoute
+  ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
+  ApiPushUnsubscribeRoute: typeof ApiPushUnsubscribeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   TournamentSlugRegisterRoute: typeof TournamentSlugRegisterRouteWithChildren
   TournamentSlugTvRoute: typeof TournamentSlugTvRoute
@@ -1687,6 +1726,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -2121,6 +2167,20 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/unsubscribe': {
+      id: '/api/push/unsubscribe'
+      path: '/api/push/unsubscribe'
+      fullPath: '/api/push/unsubscribe'
+      preLoaderRoute: typeof ApiPushUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/subscribe': {
+      id: '/api/push/subscribe'
+      path: '/api/push/subscribe'
+      fullPath: '/api/push/subscribe'
+      preLoaderRoute: typeof ApiPushSubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/waitlist': {
@@ -2820,6 +2880,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   NotificationsRoute: NotificationsRoute,
+  OfflineRoute: OfflineRoute,
   OnboardingRoute: OnboardingRoute,
   PlayersRoute: PlayersRoute,
   PreviewWidgetsRoute: PreviewWidgetsRoute,
@@ -2854,6 +2915,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTournamentRegistrationRoute: ApiPublicTournamentRegistrationRoute,
   ApiPublicTournamentRosterRoute: ApiPublicTournamentRosterRoute,
   ApiPublicWaitlistRoute: ApiPublicWaitlistRoute,
+  ApiPushSubscribeRoute: ApiPushSubscribeRoute,
+  ApiPushUnsubscribeRoute: ApiPushUnsubscribeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   TournamentSlugRegisterRoute: TournamentSlugRegisterRouteWithChildren,
   TournamentSlugTvRoute: TournamentSlugTvRoute,

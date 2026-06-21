@@ -16,6 +16,9 @@ import { initSentry } from "@/lib/sentry";
 import { CookieConsentBanner } from "@/components/cookie-consent";
 import { ClubThemeProvider } from "@/components/club-theme-provider";
 import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
+import { InstallBanner } from "@/components/pwa/InstallBanner";
+import { PushPermissionBanner } from "@/components/pwa/PushPermissionBanner";
+import { registerServiceWorker } from "@/lib/pwa";
 
 import appCss from "../styles.css?url";
 
@@ -58,6 +61,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/icons/apple-touch-icon.png" },
       { rel: "icon", type: "image/png", sizes: "192x192", href: "/icons/icon-192.png" },
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icons/icon-512.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -124,6 +128,8 @@ function RootComponent() {
         window.location.replace(`/tournaments/start?auth_error=${encodeURIComponent(code)}`);
       }
     }
+    // PWA: register service worker (guarded — refuses in Lovable preview/dev/iframe)
+    registerServiceWorker();
   }, []);
 
   return (
@@ -133,6 +139,8 @@ function RootComponent() {
           <Outlet />
           <Toaster position="top-center" />
           <CookieConsentBanner />
+          <InstallBanner />
+          <PushPermissionBanner />
         </ClubThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
