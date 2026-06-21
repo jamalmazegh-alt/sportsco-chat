@@ -439,8 +439,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
 
 
-      {/* Live recap chips */}
-      <LiveRecap state={state} teamName={selectedTeam?.name} title={title} seriesCount={seriesCount} t={t} />
+      {/* Live recap chips — hidden on small screens to match clean mockup */}
+      {false && <LiveRecap state={state} teamName={selectedTeam?.name} title={title} seriesCount={seriesCount} t={t} />}
 
       {/* Draft resume bar */}
       {hasDraftPrompt && (
