@@ -4,7 +4,7 @@
  * dispatchers and public webhook routes (token-protected).
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { sendPushToUser } from "./push-send.server";
+import { sendPushToUser, sendPushToUserFireAndForget } from "./push-send.server";
 import { getClubNotifSettings } from "./club-notif-settings.server";
 
 async function getTeamClubId(teamId: string | null | undefined): Promise<string | null> {
