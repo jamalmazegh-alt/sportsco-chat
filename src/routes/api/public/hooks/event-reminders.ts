@@ -211,7 +211,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             // Web Push parallèle à l'email — au joueur lui-même + chaque parent lié
             // Gate: convocation_reminder (l'email continue à partir si OFF)
             const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
-            const notifSettings = await getClubNotifSettings(club?.id ?? null);
+            const notifSettings = await getClubNotifSettings((ev.teams?.club_id as string | null) ?? null);
             if (notifSettings.convocation_reminder) {
               const pushTargets = new Set<string>();
               if (player.user_id) pushTargets.add(player.user_id);
