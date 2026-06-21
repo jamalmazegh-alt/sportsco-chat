@@ -28,6 +28,7 @@ import {
   Car,
   MessageSquare,
   Bus,
+  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -435,6 +436,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         titleMark={stepTitles[current].mark}
         hint={hints[current]}
         progress={state.step}
+        onClose={onClose}
       />
 
 
@@ -1276,6 +1278,7 @@ function WizardHero({
   titleMark,
   hint,
   progress,
+  onClose,
 }: {
   step: Step;
   stepIndex: number;
@@ -1285,6 +1288,7 @@ function WizardHero({
   titleMark?: string;
   hint: string;
   progress: number;
+  onClose: () => void;
 }) {
   const Icon = STEP_ICONS[step] ?? Sparkles;
   return (
@@ -1322,9 +1326,19 @@ function WizardHero({
           <b className="text-[10px] uppercase tracking-[0.16em] opacity-70 font-semibold">
             {eyebrow}
           </b>
-          <span className="rounded-full bg-white/12 px-2 py-0.5 text-[10px] font-semibold tracking-wide opacity-80">
-            {stepIndex} / {totalSteps}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-white/12 px-2 py-0.5 text-[10px] font-semibold tracking-wide opacity-80">
+              {stepIndex} / {totalSteps}
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30 backdrop-blur-sm transition hover:bg-white/30 hover:ring-white/50"
+              aria-label="Fermer"
+            >
+              <X className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+            </button>
+          </div>
         </div>
 
         <div className="mt-1 flex items-end gap-2">
