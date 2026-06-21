@@ -3,6 +3,7 @@ import { X, Download, Smartphone, Share2, Plus } from "lucide-react";
 import { isAndroid, isIOS, isInStandaloneMode } from "@/lib/pwa";
 
 const DISMISS_KEY = "clubero:pwa:install-dismissed-at";
+const INSTALLED_KEY = "pwa_installed";
 const DISMISS_DAYS = 7;
 
 interface BeforeInstallPromptEvent extends Event {
@@ -30,6 +31,7 @@ export function InstallBanner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isInStandaloneMode()) return;
+    if (localStorage.getItem(INSTALLED_KEY) === "true") return;
     if (recentlyDismissed()) return;
 
     const ios = isIOS();
@@ -42,8 +44,18 @@ export function InstallBanner() {
         setDeferred(e as BeforeInstallPromptEvent);
         setVisible(true);
       };
+      const onAppInstalled = () => {
+        try {
+          localStorage.setItem(INSTALLED_KEY, "true");
+        } catch {}
+        setVisible(false);
+      };
       window.addEventListener("beforeinstallprompt", onBeforeInstall);
-      return () => window.removeEventListener("beforeinstallprompt", onBeforeInstall);
+      window.addEventListener("appinstalled", onAppInstalled);
+      return () => {
+        window.removeEventListener("beforeinstallprompt", onBeforeInstall);
+        window.removeEventListener("appinstalled", onAppInstalled);
+      };
     }
 
     // iOS: no native event — show after 2s
@@ -151,7 +163,12 @@ export function InstallBanner() {
             </ol>
             <button
               type="button"
-              onClick={dismiss}
+              onClick={() => {
+                try {
+                  localStorage.setItem(INSTALLED_KEY, "true");
+                } catch {}
+                dismiss();
+              }}
               className="mt-5 w-full py-2.5 rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white font-semibold text-sm shadow-md hover:opacity-90 transition"
             >
               J'ai compris
