@@ -1315,6 +1315,12 @@ function EventDetail() {
       // best-effort
     }
 
+    // Fire-and-forget Web Push (#6 event_cancel)
+    try {
+      const { dispatchEventCancelPush } = await import("@/lib/push-dispatch.functions");
+      void dispatchEventCancelPush({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
+    } catch { /* noop */ }
+
     setCancelEventSubmitting(false);
     setCancelEventOpen(false);
     setCancelEventReason("");
@@ -1473,6 +1479,12 @@ function EventDetail() {
     } catch {
       // best-effort
     }
+
+    // Fire-and-forget Web Push (#5 event_reschedule)
+    try {
+      const { dispatchEventReschedulePush } = await import("@/lib/push-dispatch.functions");
+      void dispatchEventReschedulePush({ data: { eventId: event.id } });
+    } catch { /* noop */ }
 
     setRescheduleSubmitting(false);
     setRescheduleOpen(false);
