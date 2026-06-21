@@ -29,6 +29,7 @@ import {
   bulkAddTournamentTeams,
 } from "../tournaments.functions";
 import { TeamRosterDialog } from "./TeamRosterDialog";
+import { cn } from "@/lib/utils";
 
 interface TeamRow {
   id: string;
