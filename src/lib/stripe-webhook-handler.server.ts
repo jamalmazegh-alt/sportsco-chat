@@ -403,6 +403,10 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
       case "customer.subscription.created": {
         const sub = event.data.object as Stripe.Subscription;
         const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
+        if (isTournamentAnnualSub(fresh)) {
+          await upsertTournamentAnnualEntitlement(fresh);
+          break;
+        }
         const { resolvedClubId, previous } = await upsertSubscription(fresh);
         if (resolvedClubId && !previous?.stripe_subscription_id) {
           await notifyAdmin("created", fresh, resolvedClubId);
@@ -412,6 +416,10 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription;
         const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
+        if (isTournamentAnnualSub(fresh)) {
+          await upsertTournamentAnnualEntitlement(fresh);
+          break;
+        }
         const { resolvedClubId, previous } = await upsertSubscription(fresh);
         if (resolvedClubId && previous) {
           const wasScheduled =
@@ -429,6 +437,13 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
         const fresh = await stripe.subscriptions.retrieve(sub.id, { expand: ["customer"] });
+        if (isTournamentAnnualSub(fresh)) {
+          await supabaseAdmin
+            .from("tournament_entitlements")
+            .update({ status: "canceled", valid_until: new Date().toISOString() })
+            .eq("stripe_subscription_id", fresh.id);
+          break;
+        }
         const { resolvedClubId } = await upsertSubscription(fresh);
         if (resolvedClubId) await notifyAdmin("canceled", fresh, resolvedClubId);
         break;
@@ -436,9 +451,15 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
       case "customer.subscription.trial_will_end":
       case "customer.subscription.paused":
       case "customer.subscription.resumed": {
-        await upsertSubscription(event.data.object as Stripe.Subscription);
+        const sub = event.data.object as Stripe.Subscription;
+        if (isTournamentAnnualSub(sub)) {
+          await upsertTournamentAnnualEntitlement(sub);
+          break;
+        }
+        await upsertSubscription(sub);
         break;
       }
+
       case "invoice.payment_failed":
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as Stripe.Invoice;
