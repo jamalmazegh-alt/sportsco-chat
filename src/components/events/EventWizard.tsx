@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TimePicker } from "@/components/ui/time-picker";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
 import { cn } from "@/lib/utils";
+import { WizardProgress } from "@/components/wizard/wizard-primitives";
 import { createTrainingSeries } from "@/lib/training-series.functions";
 import { createEvent } from "@/lib/events/events.functions";
 import {
