@@ -212,11 +212,17 @@ export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ 
   const { data: m } = await supabaseAdmin
     .from("tournament_matches")
     .select(
-      "id, tournament_id, team_a_id, team_b_id, scheduled_at, field, tournaments:tournament_id(slug, name)",
+      "id, tournament_id, team_a_id, team_b_id, scheduled_at, field, tournaments:tournament_id(slug, name, club_id)",
     )
     .eq("id", matchId)
     .maybeSingle();
   if (!m) return { dispatched: 0 };
+
+  // Gate: tournament_match_reminder
+  const clubId = ((m as any).tournaments?.club_id as string | null) ?? null;
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.tournament_match_reminder) return { dispatched: 0 };
+
 
   const teamA = (m as any).team_a_id as string | null;
   const teamB = (m as any).team_b_id as string | null;
