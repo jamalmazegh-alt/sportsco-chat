@@ -83,9 +83,9 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           // Pending convocations only
           const { data: convs } = await supabaseAdmin
             .from("convocations")
-            .select("id, response_token, player_id")
+            .select("id, response_token, player_id, status")
             .eq("event_id", ev.id)
-            .eq("status", "pending");
+            .in("status", ["pending", "uncertain"]);
           if (!convs || convs.length === 0) continue;
 
           const convIds = convs.map((c: any) => c.id);
