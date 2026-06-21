@@ -1,21 +1,23 @@
 /**
  * Server-only — Web Push sender.
- * Imported lazily from server routes / server functions only.
+ * web-push is dynamically imported to keep it out of the client/SSR static graph.
  */
-import webpush from "web-push";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-let configured = false;
-function ensureConfigured() {
-  if (configured) return;
+let configured: any = null;
+async function getWebPush() {
+  if (configured) return configured;
   const subject = process.env.VAPID_SUBJECT;
   const pub = process.env.VAPID_PUBLIC_KEY;
   const priv = process.env.VAPID_PRIVATE_KEY;
   if (!subject || !pub || !priv) {
     throw new Error("VAPID env vars missing (VAPID_SUBJECT/PUBLIC_KEY/PRIVATE_KEY)");
   }
+  const mod = await import("web-push");
+  const webpush = (mod as any).default ?? mod;
   webpush.setVapidDetails(subject, pub, priv);
-  configured = true;
+  configured = webpush;
+  return webpush;
 }
 
 export interface PushPayload {
