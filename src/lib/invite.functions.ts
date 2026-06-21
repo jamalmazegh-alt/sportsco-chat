@@ -81,39 +81,39 @@ export const confirmInvitedUserEmail = createServerFn({ method: "POST" })
     const token = data.token.trim();
     const email = data.email.trim().toLowerCase();
 
+    // Only member invites with an email bound to them can confirm an email.
+    // Club invites are link-based (anyone with the link) and are NOT proof
+    // of email ownership — those must go through Supabase's standard
+    // email-confirmation flow.
     const { data: memberRows } = await supabaseAdmin.rpc(
       "get_member_invite_info",
       { _token: token },
     );
     const member = Array.isArray(memberRows) ? memberRows[0] : null;
-    let ok = false;
-    if (member && !member.used && !member.expired) {
-      if (!member.email || member.email.toLowerCase() === email) ok = true;
-    }
-    if (!ok) {
-      const { data: clubInvite } = await supabaseAdmin
-        .from("club_invites")
-        .select("expires_at, max_uses, uses_count")
-        .eq("token", token)
-        .maybeSingle();
-      if (clubInvite) {
-        const expired =
-          !!clubInvite.expires_at &&
-          new Date(clubInvite.expires_at).getTime() < Date.now();
-        const exhausted =
-          clubInvite.max_uses != null &&
-          clubInvite.uses_count >= clubInvite.max_uses;
-        ok = !expired && !exhausted;
-      }
-    }
+    const ok =
+      !!member &&
+      !member.used &&
+      !member.expired &&
+      !!member.email &&
+      member.email.toLowerCase() === email;
+
     if (!ok) throw new Response("Invalid invite", { status: 400 });
 
-    const { data: userList, error: listErr } =
-      await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    if (listErr) throw new Response(listErr.message, { status: 500 });
-    const user = userList.users.find(
-      (u) => (u.email ?? "").toLowerCase() === email,
-    );
+    // Paginate through users to find the exact email match (avoids the
+    // silent 200-user cap of a single listUsers page).
+    let user: { id: string; email_confirmed_at: string | null } | null = null;
+    for (let page = 1; page <= 50 && !user; page++) {
+      const { data: userList, error: listErr } =
+        await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
+      if (listErr) throw new Response(listErr.message, { status: 500 });
+      const found = userList.users.find(
+        (u) => (u.email ?? "").toLowerCase() === email,
+      );
+      if (found) {
+        user = { id: found.id, email_confirmed_at: found.email_confirmed_at ?? null };
+      }
+      if (userList.users.length < 200) break;
+    }
     if (!user) throw new Response("User not found", { status: 404 });
     if (!user.email_confirmed_at) {
       const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(
