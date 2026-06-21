@@ -320,16 +320,32 @@ function HomePage() {
 
       {/* Quick actions */}
       {isCoach && (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {user && activeClubId && (
             <>
-              <Button
-                className="w-full h-12 text-[15px] font-semibold shadow-sm"
+              <button
+                type="button"
                 onClick={() => setCreateOpen(true)}
+                className="group relative w-full overflow-hidden rounded-[14px] h-14 text-white font-black text-[15px] tracking-tight shadow-[0_4px_14px_rgba(15,74,38,0.3)] active:scale-[0.99] transition-all"
+                style={{
+                  background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+                }}
               >
-                <Plus className="h-4 w-4" />
-                {t("dashboard.createEvent")}
-              </Button>
+                <span
+                  aria-hidden
+                  className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)",
+                  }}
+                />
+                <span className="relative inline-flex items-center justify-center gap-2">
+                  <span className="h-7 w-7 rounded-full bg-white/20 ring-1 ring-white/30 flex items-center justify-center">
+                    <Plus className="h-4 w-4" strokeWidth={2.8} />
+                  </span>
+                  {t("dashboard.createEvent")}
+                </span>
+              </button>
               <EventCreateChooser
                 clubId={activeClubId}
                 teams={teams ?? []}
