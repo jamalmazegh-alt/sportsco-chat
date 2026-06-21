@@ -10,6 +10,18 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return out;
 }
 
+function arrayBufferToUrlBase64(buffer: ArrayBuffer | null | undefined): string {
+  if (!buffer) return "";
+  const bytes = new Uint8Array(buffer);
+  let raw = "";
+  for (let i = 0; i < bytes.byteLength; i++) raw += String.fromCharCode(bytes[i]);
+  return btoa(raw).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function subscriptionUsesCurrentVapidKey(sub: PushSubscription): boolean {
+  return arrayBufferToUrlBase64(sub.options.applicationServerKey) === VAPID_PUBLIC_KEY;
+}
+
 export async function subscribeToPush(): Promise<PushSubscription | null> {
   if (!isPushSupported()) return null;
 
@@ -19,6 +31,10 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
   const reg = await navigator.serviceWorker.ready;
 
   let sub = await reg.pushManager.getSubscription();
+  if (sub && !subscriptionUsesCurrentVapidKey(sub)) {
+    await sub.unsubscribe();
+    sub = null;
+  }
   if (!sub) {
     const key = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
     sub = await reg.pushManager.subscribe({
@@ -32,7 +48,7 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
   const token = sessionData.session?.access_token;
   if (!token) return null;
 
-  await fetch("/api/push/subscribe", {
+  const res = await fetch("/api/push/subscribe", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,6 +61,10 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
       user_agent: navigator.userAgent,
     }),
   });
+  if (!res.ok) {
+    console.warn("[push] server subscription failed", res.status, await res.text().catch(() => ""));
+    return null;
+  }
 
   return sub;
 }
