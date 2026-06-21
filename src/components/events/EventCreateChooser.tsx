@@ -98,7 +98,7 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
           reallyClose();
         }}
       >
-        <DialogContent className={mode === "wizard" ? "max-w-md p-0 overflow-hidden gap-0" : "max-w-md"}>
+        <DialogContent hideClose={mode === "wizard"} className={mode === "wizard" ? "max-w-md p-0 overflow-hidden gap-0" : "max-w-md"}>
           {mode === "chooser" && (
             <>
               <DialogHeader>
