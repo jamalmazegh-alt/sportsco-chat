@@ -87,7 +87,7 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
 
     const { data: result } = await supabaseAdmin
       .from("match_results")
-      .select("score_home, score_away")
+      .select("home_score, away_score")
       .eq("event_id", data.eventId)
       .maybeSingle();
     if (!result) return { dispatched: 0 };
@@ -95,8 +95,8 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
     const teamName = ((ev as any).teams?.name as string) || "Équipe";
     const opp = ((ev as any).opponent as string) || "Adversaire";
     const home = (ev as any).is_home !== false;
-    const sh = (result as any).score_home;
-    const sa = (result as any).score_away;
+    const sh = (result as any).home_score;
+    const sa = (result as any).away_score;
     const body = home
       ? `${teamName} ${sh}-${sa} ${opp}`
       : `${opp} ${sh}-${sa} ${teamName}`;
