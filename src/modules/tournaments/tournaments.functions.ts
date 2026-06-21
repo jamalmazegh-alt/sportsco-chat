@@ -2171,6 +2171,15 @@ export const applyTeamDraw = createServerFn({ method: "POST" })
         const { error: mErr } = await supabase.from("tournament_matches").insert(matchRows);
         if (mErr) throw mErr;
       }
+      // Push fan-out (#10) — fire-and-forget
+      void (async () => {
+        try {
+          const { fanoutTournamentDraw } = await import("@/lib/push-fanout.server");
+          await fanoutTournamentDraw(data.tournament_id);
+        } catch {
+          /* best-effort */
+        }
+      })();
       return { groups_created: groupsByIdx.length, matches_created: matchRows.length };
     }
 
