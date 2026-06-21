@@ -24,10 +24,17 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
 
     const { data: ev } = await supabaseAdmin
       .from("events")
-      .select("id, title, starts_at, type")
+      .select("id, title, starts_at, type, team_id, teams:team_id(club_id)")
       .eq("id", data.eventId)
       .maybeSingle();
     if (!ev) return { dispatched: 0 };
+
+    // Gate: convocation_on_create
+    const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+    const clubId = ((ev as any).teams?.club_id as string | null) ?? null;
+    const settings = await getClubNotifSettings(clubId);
+    if (!settings.convocation_on_create) return { dispatched: 0 };
+
 
     const [{ data: players }, { data: parents }] = await Promise.all([
       supabaseAdmin
