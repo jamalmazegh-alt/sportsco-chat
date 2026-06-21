@@ -180,7 +180,7 @@ function PricingPage() {
 
               <div className="mt-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display text-5xl font-bold">40 €</span>
+                  <span className="font-display text-5xl font-bold">39 €</span>
                   <span className="text-muted-foreground">{t("tournaments.pricing.per")}</span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
