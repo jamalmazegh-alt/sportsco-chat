@@ -123,6 +123,12 @@ export async function fanoutConvocationComplete(
     .maybeSingle();
   if (!ev || !(ev as any).team_id) return { dispatched: 0, complete: true };
 
+  // Gate: convocation_coach_complete
+  const clubId = await getTeamClubId((ev as any).team_id);
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.convocation_coach_complete) return { dispatched: 0, complete: true };
+
+
   const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
   const dateStr = (ev as any).starts_at ? fmtDate((ev as any).starts_at) : "";
 
