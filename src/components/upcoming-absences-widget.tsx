@@ -105,7 +105,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
       )}
     >
       {/* Header gradient */}
-      <div className="relative overflow-hidden p-4" style={{ background: headerBg }}>
+      <div className={cn("relative overflow-hidden p-4", headerBgClass)} style={headerBg ? { background: headerBg } : undefined}>
         <svg
           aria-hidden
           className="absolute inset-0 h-full w-full opacity-[0.12] pointer-events-none"
