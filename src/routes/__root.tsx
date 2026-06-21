@@ -19,6 +19,7 @@ import { applyClubTheme, readStoredTheme } from "@/lib/club-themes";
 import { InstallBanner } from "@/components/pwa/InstallBanner";
 import { PushPermissionBanner } from "@/components/pwa/PushPermissionBanner";
 import { registerServiceWorker } from "@/lib/pwa";
+import { syncPushSubscriptionState } from "@/lib/push-subscribe";
 
 import appCss from "../styles.css?url";
 
