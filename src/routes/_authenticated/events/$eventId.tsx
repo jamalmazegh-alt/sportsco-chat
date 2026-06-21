@@ -1789,9 +1789,21 @@ function EventDetail() {
 
           {/* Format pill (match only, with team sport game-format if any) */}
           {event.type === "match" && (
-            <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-              <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
-              {eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : t("events.types.match")}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
+                <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
+                {eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : t("events.types.match")}
+              </div>
+              {(() => {
+                const formatLine = event.description?.match(/^Format:\s*(.+?)(?:\n|$)/);
+                if (!formatLine) return null;
+                return (
+                  <span className="inline-flex items-center gap-1 rounded-lg border-[1.5px] border-emerald-200/70 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+                    <Clock className="h-3 w-3" />
+                    {formatLine[1].trim()}
+                  </span>
+                );
+              })()}
             </div>
           )}
 
