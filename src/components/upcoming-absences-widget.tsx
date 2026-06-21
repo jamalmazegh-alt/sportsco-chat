@@ -112,28 +112,28 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
         >
           <defs>
             <pattern id="abs-pat" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="30" stroke="#fff" strokeWidth="1" />
+              <line x1="0" y1="0" x2="0" y2="30" stroke={patternColor} strokeWidth="1" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#abs-pat)" />
         </svg>
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-[12px] bg-white/20 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center shrink-0">
+            <div className={cn("h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0", iconTileClass)}>
               {noAbsences ? (
-                <CheckCircle2 className="h-5 w-5 text-white" strokeWidth={2.4} />
+                <CheckCircle2 className={cn("h-5 w-5", iconColorClass)} strokeWidth={2.4} />
               ) : (
-                <Palmtree className="h-5 w-5 text-white" strokeWidth={2.4} />
+                <Palmtree className={cn("h-5 w-5", iconColorClass)} strokeWidth={2.4} />
               )}
             </div>
             <div className="min-w-0">
-              <h2 className="text-[15px] font-black text-white leading-tight truncate">
+              <h2 className={cn("text-[15px] font-black leading-tight truncate", headerTextClass)}>
                 {noAbsences
                   ? t("availability.noneUpcoming", { defaultValue: "Aucune absence à venir" })
                   : t("availability.upcomingWidget", { defaultValue: "Absences à venir" })}
               </h2>
               {!noAbsences && (
-                <p className="text-[11px] font-bold text-white/85 uppercase tracking-[0.1em] mt-0.5">
+                <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em] mt-0.5", headerSubTextClass)}>
                   {total} {total > 1 ? "joueurs" : "joueur"}
                 </p>
               )}
@@ -143,7 +143,10 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="shrink-0 text-[11px] font-bold inline-flex items-center gap-0.5 text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm ring-1 ring-white/30 px-2.5 py-1.5 rounded-full transition-all"
+              className={cn(
+                "shrink-0 text-[11px] font-bold inline-flex items-center gap-0.5 px-2.5 py-1.5 rounded-full transition-all",
+                declareBtnClass,
+              )}
             >
               {t("availability.declare", { defaultValue: "Déclarer" })}
               <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
