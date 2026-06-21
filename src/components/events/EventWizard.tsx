@@ -1089,15 +1089,31 @@ function DoorButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition-colors",
-        active ? "border-primary bg-primary/10" : "border-border bg-card hover:border-primary/50",
+        "group relative w-full overflow-hidden flex items-center gap-3 rounded-xl border-2 px-3 py-3 text-left transition-all duration-200",
+        active
+          ? "border-primary bg-primary/10 shadow-[0_8px_24px_-12px_color-mix(in_oklab,var(--primary)_45%,transparent)]"
+          : "border-border bg-card hover:border-primary/50 hover:bg-muted/30",
       )}
     >
-      <span className="text-xl">{icon}</span>
-      <span className="font-medium text-sm flex-1">{label}</span>
+      {active && (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-speed-lines opacity-50 pointer-events-none"
+        />
+      )}
+      <span
+        className={cn(
+          "icon-halo relative h-9 w-9 rounded-lg flex items-center justify-center text-xl transition-colors shrink-0",
+          active ? "bg-primary/15" : "bg-muted",
+        )}
+      >
+        {icon}
+      </span>
+      <span className="relative font-medium text-sm flex-1">{label}</span>
     </button>
   );
 }
+
 
 function Chip({ label, onClick }: { label: string; onClick: () => void }) {
   return (
