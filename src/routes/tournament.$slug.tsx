@@ -216,69 +216,84 @@ function PublicTournamentPage() {
       : null;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Editorial hero — clean light surface, navy ink, blue accent */}
-      <header className="relative overflow-hidden border-b border-border bg-gradient-to-b from-muted/50 via-background to-background">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Anime Premium hero — green gradient, trophy pattern, glassy pills */}
+      <header
+        className="relative overflow-hidden text-white"
+        style={{
+          background: "linear-gradient(135deg,#16a34a 0%,#15803d 60%,#14532d 100%)",
+        }}
+      >
         {tournament.cover_image_url && (
           <div
             aria-hidden
-            className="absolute inset-0 opacity-[0.07] bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay"
             style={{ backgroundImage: `url(${tournament.cover_image_url})` }}
           />
         )}
+        {/* Trophy pattern */}
+        <svg
+          aria-hidden
+          className="absolute inset-0 h-full w-full opacity-[0.08]"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern id="trophy-pattern-pub" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M30 12l3 6 6 1-4.5 4 1 6L30 26l-5.5 3 1-6L21 19l6-1z" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#trophy-pattern-pub)" />
+        </svg>
+        {/* halo */}
         <div
           aria-hidden
-          className="absolute -top-32 -right-32 h-80 w-80 rounded-full blur-3xl opacity-25"
-          style={{ background: accent ?? "hsl(var(--primary))" }}
+          className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-emerald-300/30 blur-3xl"
         />
-        <div className="relative max-w-3xl mx-auto px-5 pt-10 pb-7">
-          <div className="flex items-center gap-2 mb-5">
-            <span
-              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
-              style={
-                accent
-                  ? { background: `${accent}1A`, color: accent }
-                  : undefined
-              }
-            >
+        <div
+          aria-hidden
+          className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-emerald-500/20 blur-3xl"
+        />
+
+        <div className="relative max-w-3xl mx-auto px-5 pt-10 pb-8">
+          <div className="mb-5 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] backdrop-blur">
               <Sparkles className="h-3 w-3" />
               {t("public.hero.eyebrow")}
             </span>
             {tournament.status === "in_progress" && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]">
-                <Activity className="h-3 w-3" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white shadow-sm">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/80" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
+                </span>
                 {t(`public.hero.${statusBadgeKey}`)}
               </span>
             )}
             {tournament.status === "completed" && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted text-muted-foreground px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] backdrop-blur">
                 <Trophy className="h-3 w-3" />
                 {t(`public.hero.completedBadge`)}
               </span>
             )}
           </div>
-          <div className="flex items-start gap-5">
+          <div className="flex items-start gap-4 sm:gap-5">
             <div
-              className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl flex items-center justify-center shrink-0 ring-1 ring-border shadow-sm"
-              style={
-                accent
-                  ? { background: `linear-gradient(135deg, ${accent}22, ${accent}05)`, color: accent }
-                  : { background: "linear-gradient(135deg, hsl(var(--primary)/0.18), hsl(var(--primary)/0.04))", color: "hsl(var(--primary))" }
-              }
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/30 bg-white/15 text-white shadow-lg backdrop-blur-md sm:h-20 sm:w-20"
+              style={{ boxShadow: "0 8px 24px -8px rgba(0,0,0,.35)" }}
             >
-              <Trophy className="h-8 w-8 sm:h-10 sm:w-10" />
+              <Trophy className="h-8 w-8 sm:h-10 sm:w-10" strokeWidth={2.5} />
             </div>
             <div className="min-w-0 flex-1">
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-[1.05]">
+              <h1 className="text-3xl sm:text-4xl font-black tracking-tight leading-[1.05] text-white drop-shadow-sm">
                 {tournament.name}
               </h1>
               {heroSubline && (
-                <p className="text-sm text-muted-foreground mt-1.5 font-medium">
+                <p className="mt-1.5 text-sm font-semibold text-white/85">
                   {heroSubline}
                 </p>
               )}
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5">
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] font-medium text-white/85">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 backdrop-blur-sm">
                   <Calendar className="h-3.5 w-3.5" />
                   {tournament.starts_on}
                   {tournament.ends_on ? ` → ${tournament.ends_on}` : ""}
@@ -288,13 +303,13 @@ function PublicTournamentPage() {
                     href={googleMapsSearchUrl(tournament.location)!}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 hover:underline"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 backdrop-blur-sm hover:bg-white/20 transition"
                   >
                     <MapPin className="h-3.5 w-3.5" />
                     {tournament.location}
                   </a>
                 )}
-                <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 backdrop-blur-sm">
                   <Trophy className="h-3.5 w-3.5" />
                   {tournament.sport}
                   {tournament.category ? ` · ${tournament.category}` : ""}
@@ -324,16 +339,25 @@ function PublicTournamentPage() {
           {/* CTAs */}
           <div className="mt-5 flex flex-wrap gap-2">
             {registrationOpen && (
-              <Button asChild size="sm" className="h-10 px-4">
+              <Button
+                asChild
+                size="sm"
+                className="h-11 rounded-xl bg-white px-5 font-bold text-emerald-700 shadow-lg hover:-translate-y-0.5 hover:bg-white hover:shadow-xl transition-all"
+              >
                 <Link to="/tournament/$slug/register" params={{ slug }}>
-                  <UserPlus className="h-4 w-4" />
+                  <UserPlus className="h-4 w-4" strokeWidth={2.5} />
                   {t("public.register")}
                 </Link>
               </Button>
             )}
-            <Button asChild size="sm" variant="outline" className="h-10 px-4">
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="h-11 rounded-xl border-[1.5px] border-white/40 bg-white/10 px-5 font-bold text-white backdrop-blur hover:bg-white/20 hover:text-white transition-all"
+            >
               <Link to="/tournament/$slug/tv" params={{ slug }}>
-                <Tv className="h-4 w-4" />
+                <Tv className="h-4 w-4" strokeWidth={2.5} />
                 {t("public.tvSlideshow")}
               </Link>
             </Button>
@@ -363,8 +387,8 @@ function PublicTournamentPage() {
 
       <div className="max-w-3xl mx-auto px-5 mt-5">
 
-        <nav className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border -mx-5 px-5 py-2">
-          <div className="flex gap-1 overflow-x-auto">
+        <nav className="sticky top-0 z-10 -mx-5 border-b-[1.5px] border-slate-200 bg-white/95 px-5 py-2.5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/95">
+          <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((tabItem) => {
               const Icon = tabItem.icon;
               const active = tab === tabItem.id;
@@ -373,13 +397,22 @@ function PublicTournamentPage() {
                   key={tabItem.id}
                   onClick={() => setTab(tabItem.id)}
                   className={cn(
-                    "min-w-fit flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                    "inline-flex min-w-fit shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-bold transition-all",
                     active
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted/40",
+                      ? "text-white shadow-md"
+                      : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100",
                   )}
+                  style={
+                    active
+                      ? {
+                          background:
+                            "linear-gradient(135deg,#16a34a 0%,#15803d 100%)",
+                          boxShadow: "0 4px 12px -2px rgba(22,163,74,.4)",
+                        }
+                      : undefined
+                  }
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4" strokeWidth={2.5} />
                   {tabItem.label}
                 </button>
               );
@@ -684,20 +717,21 @@ function HeroStat({
   return (
     <div
       className={cn(
-        "rounded-xl border bg-card/60 backdrop-blur-sm px-3 py-2.5 flex flex-col justify-center min-h-[64px]",
-        accent ? "border-red-500/40" : "border-border",
+        "flex min-h-[68px] flex-col justify-center rounded-2xl border-[1.5px] px-3 py-2.5 backdrop-blur-md transition-all",
+        accent
+          ? "border-rose-400/60 bg-rose-500/15 shadow-[0_4px_16px_-4px_rgba(244,63,94,.4)]"
+          : "border-white/25 bg-white/10",
       )}
     >
       <p
         className={cn(
-          "font-extrabold tabular-nums leading-none",
-          hideValue ? "text-base sm:text-lg text-foreground" : "text-xl sm:text-2xl",
-          accent && "text-red-600 dark:text-red-400",
+          "font-black leading-none tabular-nums text-white drop-shadow-sm",
+          hideValue ? "text-base sm:text-lg" : "text-2xl sm:text-3xl",
         )}
       >
         {value}
       </p>
-      <p className="text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mt-1">
+      <p className="mt-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/80">
         {label}
       </p>
     </div>
@@ -788,19 +822,19 @@ function TeamsGrid({ teams }: { teams: any[] }) {
   const { t } = useTranslation("tournaments");
   if (teams.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-8">
+      <p className="py-8 text-center text-sm text-slate-500">
         {t("public.sections.noTeams")}
       </p>
     );
   }
   return (
-    <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {teams.map((teamItem) => (
         <li
           key={teamItem.id}
-          className="rounded-xl border border-border bg-card p-3 text-center"
+          className="group rounded-2xl border-[1.5px] border-slate-200 bg-white p-3 text-center transition-all hover:-translate-y-0.5 hover:border-emerald-500/40 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
         >
-          <div className="h-12 w-12 mx-auto rounded-lg bg-muted overflow-hidden flex items-center justify-center mb-2">
+          <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-emerald-50 to-slate-100 ring-1 ring-slate-200 dark:from-emerald-950/40 dark:to-slate-800 dark:ring-slate-700">
             {teamItem.logo_url ? (
               <img
                 src={teamItem.logo_url}
@@ -808,10 +842,12 @@ function TeamsGrid({ teams }: { teams: any[] }) {
                 className="h-full w-full object-cover"
               />
             ) : (
-              <Users className="h-5 w-5 text-muted-foreground" />
+              <Users className="h-5 w-5 text-emerald-600" strokeWidth={2.5} />
             )}
           </div>
-          <p className="text-sm font-medium truncate">{teamItem.name}</p>
+          <p className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">
+            {teamItem.name}
+          </p>
         </li>
       ))}
     </ul>
