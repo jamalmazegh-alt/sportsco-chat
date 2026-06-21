@@ -112,7 +112,11 @@ function getVapidSubject(): string {
   if (!raw) return fallback;
   const emailPattern = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/;
   if (/^mailto:/i.test(raw)) {
-    const email = raw.replace(/^mailto:/i, "").trim().replace(/^<|>$/g, "").trim();
+    const email = raw
+      .replace(/^mailto:/i, "")
+      .trim()
+      .replace(/^<|>$/g, "")
+      .trim();
     if (emailPattern.test(email)) return `mailto:${email}`;
     console.warn("[push] invalid VAPID_SUBJECT mailto, using fallback");
     return fallback;
