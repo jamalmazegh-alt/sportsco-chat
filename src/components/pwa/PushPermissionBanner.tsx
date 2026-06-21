@@ -26,6 +26,12 @@ export function PushPermissionBanner() {
   useEffect(() => {
     if (!session?.user) return;
     if (!isPushSupported()) return;
+
+    if (Notification.permission === "granted" && (isInStandaloneMode() || isAndroid())) {
+      subscribeToPush().catch((e) => console.warn("[push] background sync failed", e));
+      return;
+    }
+
     if (Notification.permission !== "default") return;
     if (recentlyDismissed()) return;
     // Show only inside installed PWA or on Android (iOS web push requires standalone)
@@ -38,7 +44,9 @@ export function PushPermissionBanner() {
   function dismiss() {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    } catch {}
+    } catch {
+      // Ignore storage failures, the banner can still be hidden in memory.
+    }
     setVisible(false);
   }
 
