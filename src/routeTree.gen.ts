@@ -115,6 +115,7 @@ import { Route as ApiPublicSocialSyncRouteImport } from './routes/api/public/soc
 import { Route as ApiPublicSocialCallbackRouteImport } from './routes/api/public/social/callback'
 import { Route as ApiPublicPushConvocationResponseRouteImport } from './routes/api/public/push/convocation-response'
 import { Route as ApiPublicHooksTrialRemindersRouteImport } from './routes/api/public/hooks/trial-reminders'
+import { Route as ApiPublicHooksTournamentMatchRemindersRouteImport } from './routes/api/public/hooks/tournament-match-reminders'
 import { Route as ApiPublicHooksPrivacyWorkerRouteImport } from './routes/api/public/hooks/privacy-worker'
 import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api/public/hooks/payment-reminders'
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
@@ -698,6 +699,12 @@ const ApiPublicHooksTrialRemindersRoute =
     path: '/api/public/hooks/trial-reminders',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksTournamentMatchRemindersRoute =
+  ApiPublicHooksTournamentMatchRemindersRouteImport.update({
+    id: '/api/public/hooks/tournament-match-reminders',
+    path: '/api/public/hooks/tournament-match-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPrivacyWorkerRoute =
   ApiPublicHooksPrivacyWorkerRouteImport.update({
     id: '/api/public/hooks/privacy-worker',
@@ -952,6 +959,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
+  '/api/public/hooks/tournament-match-reminders': typeof ApiPublicHooksTournamentMatchRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/push/convocation-response': typeof ApiPublicPushConvocationResponseRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
@@ -1078,6 +1086,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
+  '/api/public/hooks/tournament-match-reminders': typeof ApiPublicHooksTournamentMatchRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/push/convocation-response': typeof ApiPublicPushConvocationResponseRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
@@ -1210,6 +1219,7 @@ export interface FileRoutesById {
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
   '/api/public/hooks/payment-reminders': typeof ApiPublicHooksPaymentRemindersRoute
   '/api/public/hooks/privacy-worker': typeof ApiPublicHooksPrivacyWorkerRoute
+  '/api/public/hooks/tournament-match-reminders': typeof ApiPublicHooksTournamentMatchRemindersRoute
   '/api/public/hooks/trial-reminders': typeof ApiPublicHooksTrialRemindersRoute
   '/api/public/push/convocation-response': typeof ApiPublicPushConvocationResponseRoute
   '/api/public/social/callback': typeof ApiPublicSocialCallbackRoute
@@ -1342,6 +1352,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/privacy-worker'
+    | '/api/public/hooks/tournament-match-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/push/convocation-response'
     | '/api/public/social/callback'
@@ -1468,6 +1479,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/privacy-worker'
+    | '/api/public/hooks/tournament-match-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/push/convocation-response'
     | '/api/public/social/callback'
@@ -1599,6 +1611,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/event-reminders'
     | '/api/public/hooks/payment-reminders'
     | '/api/public/hooks/privacy-worker'
+    | '/api/public/hooks/tournament-match-reminders'
     | '/api/public/hooks/trial-reminders'
     | '/api/public/push/convocation-response'
     | '/api/public/social/callback'
@@ -1671,6 +1684,7 @@ export interface RootRouteChildren {
   ApiPublicHooksEventRemindersRoute: typeof ApiPublicHooksEventRemindersRoute
   ApiPublicHooksPaymentRemindersRoute: typeof ApiPublicHooksPaymentRemindersRoute
   ApiPublicHooksPrivacyWorkerRoute: typeof ApiPublicHooksPrivacyWorkerRoute
+  ApiPublicHooksTournamentMatchRemindersRoute: typeof ApiPublicHooksTournamentMatchRemindersRoute
   ApiPublicHooksTrialRemindersRoute: typeof ApiPublicHooksTrialRemindersRoute
   ApiPublicPushConvocationResponseRoute: typeof ApiPublicPushConvocationResponseRoute
   ApiPublicSocialCallbackRoute: typeof ApiPublicSocialCallbackRoute
@@ -2428,6 +2442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksTrialRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/tournament-match-reminders': {
+      id: '/api/public/hooks/tournament-match-reminders'
+      path: '/api/public/hooks/tournament-match-reminders'
+      fullPath: '/api/public/hooks/tournament-match-reminders'
+      preLoaderRoute: typeof ApiPublicHooksTournamentMatchRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/privacy-worker': {
       id: '/api/public/hooks/privacy-worker'
       path: '/api/public/hooks/privacy-worker'
@@ -2946,6 +2967,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksEventRemindersRoute: ApiPublicHooksEventRemindersRoute,
   ApiPublicHooksPaymentRemindersRoute: ApiPublicHooksPaymentRemindersRoute,
   ApiPublicHooksPrivacyWorkerRoute: ApiPublicHooksPrivacyWorkerRoute,
+  ApiPublicHooksTournamentMatchRemindersRoute:
+    ApiPublicHooksTournamentMatchRemindersRoute,
   ApiPublicHooksTrialRemindersRoute: ApiPublicHooksTrialRemindersRoute,
   ApiPublicPushConvocationResponseRoute: ApiPublicPushConvocationResponseRoute,
   ApiPublicSocialCallbackRoute: ApiPublicSocialCallbackRoute,
