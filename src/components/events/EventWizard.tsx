@@ -13,7 +13,23 @@ import {
   Settings2,
   CheckCircle2,
   Loader2,
+  Check,
+  Users,
+  CalendarDays,
+  Timer,
+  Hourglass,
+  Repeat,
+  Home,
+  MapPin,
+  Clock,
+  Shield,
+  Trophy,
+  Mail,
+  Car,
+  MessageSquare,
+  Bus,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
