@@ -264,10 +264,16 @@ export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ 
 export async function fanoutTournamentDraw(tournamentId: string): Promise<{ dispatched: number }> {
   const { data: t } = await supabaseAdmin
     .from("tournaments")
-    .select("id, name, slug")
+    .select("id, name, slug, club_id")
     .eq("id", tournamentId)
     .maybeSingle();
   if (!t) return { dispatched: 0 };
+
+  // Gate: tournament_draw
+  const clubId = ((t as any).club_id as string | null) ?? null;
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.tournament_draw) return { dispatched: 0 };
+
 
   const { data: tteams } = await supabaseAdmin
     .from("tournament_teams")
