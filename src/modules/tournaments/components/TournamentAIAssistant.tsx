@@ -361,7 +361,11 @@ export function TournamentAIAssistant({
     : t(`aiAssistant.headerHint.${currentStep}`, { defaultValue: "" });
 
   return (
-    <div className="relative flex min-h-[500px] flex-col rounded-2xl border border-border bg-card">
+    <div
+      className="relative flex min-h-[500px] flex-col rounded-2xl border border-border bg-card [--background:oklch(0.985_0.003_240)] [--foreground:oklch(0.22_0.13_262)] [--card:oklch(1_0_0)] [--card-foreground:oklch(0.22_0.13_262)] [--muted:oklch(0.96_0.01_240)] [--muted-foreground:oklch(0.46_0.05_262)] [--border:oklch(0.91_0.018_50)] [--input:oklch(0.91_0.018_50)] [--popover:oklch(1_0_0)] [--popover-foreground:oklch(0.22_0.13_262)] [--primary:oklch(0.55_0.18_149)] [--primary-foreground:oklch(1_0_0)] [--secondary:oklch(0.96_0.01_240)] [--secondary-foreground:oklch(0.22_0.13_262)] [--accent:oklch(0.96_0.01_240)] [--accent-foreground:oklch(0.22_0.13_262)]"
+      style={{ colorScheme: "light" }}
+    >
+
       {/* Persistent AI header — Lizard green gradient fix */}
       <div className="bg-gradient-to-br from-[hsl(149_55%_46%)] to-[hsl(149_50%_32%)] px-4 pt-3 pb-3 text-white rounded-t-2xl">
         <div className="flex items-center gap-2">
