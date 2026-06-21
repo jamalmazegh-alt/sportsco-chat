@@ -41,6 +41,7 @@ export const Route = createFileRoute("/api/push/unsubscribe")({
           .delete()
           .eq("user_id", userData.user.id);
         if (parsed.endpoint) q = q.eq("endpoint", parsed.endpoint);
+        if (parsed.keep_endpoint) q = q.neq("endpoint", parsed.keep_endpoint);
         await q;
         return Response.json({ ok: true });
       },
