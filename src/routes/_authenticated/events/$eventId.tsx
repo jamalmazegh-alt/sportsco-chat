@@ -2797,23 +2797,23 @@ function EventDetail() {
                           const active = c.status === s;
                           const inactiveTint =
                             s === "present"
-                              ? "border-emerald-200/60 bg-emerald-50/40 text-emerald-600 hover:bg-emerald-100/60 hover:border-emerald-400"
+                              ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white text-emerald-700 hover:border-emerald-400 hover:shadow-[0_6px_18px_-10px_rgba(16,185,129,0.45)]"
                               : s === "absent"
-                                ? "border-absent/25 bg-absent/5 text-absent hover:bg-absent/10 hover:border-absent/50"
-                                : "border-uncertain/30 bg-uncertain/5 text-uncertain-foreground hover:bg-uncertain/15 hover:border-uncertain/60";
+                                ? "border-rose-200 bg-gradient-to-br from-rose-50 to-white text-rose-600 hover:border-rose-400 hover:shadow-[0_6px_18px_-10px_rgba(244,63,94,0.4)]"
+                                : "border-amber-200 bg-gradient-to-br from-amber-50 to-white text-amber-700 hover:border-amber-400 hover:shadow-[0_6px_18px_-10px_rgba(245,158,11,0.4)]";
                           const activeTint =
                             s === "present"
-                              ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-500/20 ring-2 ring-emerald-500/30"
+                              ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white border-emerald-600 shadow-[0_10px_24px_-10px_rgba(16,185,129,0.6)] ring-2 ring-emerald-500/30"
                               : s === "absent"
-                                ? "bg-absent text-white border-absent shadow-md shadow-absent/20 ring-2 ring-absent/30"
-                                : "bg-uncertain text-uncertain-foreground border-uncertain shadow-md shadow-uncertain/20 ring-2 ring-uncertain/30";
+                                ? "bg-gradient-to-br from-rose-400 to-rose-600 text-white border-rose-600 shadow-[0_10px_24px_-10px_rgba(244,63,94,0.55)] ring-2 ring-rose-500/30"
+                                : "bg-gradient-to-br from-amber-300 to-amber-500 text-white border-amber-500 shadow-[0_10px_24px_-10px_rgba(245,158,11,0.55)] ring-2 ring-amber-400/30";
                           return (
                             <button
                               key={s}
                               type="button"
                               onClick={() => respond(c.id, s)}
                               className={cn(
-                                "group flex flex-col items-center justify-center gap-1.5 rounded-2xl py-4 border-2 font-medium transition-all duration-150 active:scale-[0.97]",
+                                "group flex flex-col items-center justify-center gap-1.5 rounded-2xl py-4 border-2 font-semibold transition-all duration-150 active:scale-[0.97]",
                                 active ? activeTint : inactiveTint,
                               )}
                             >
