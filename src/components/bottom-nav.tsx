@@ -43,7 +43,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-background/80 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_0_0_rgba(0,0,0,0.02)]"
+      className="fixed bottom-0 inset-x-0 z-40 border-t-[1.5px] border-[#e2e8f0] bg-white/90 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_8px_rgba(15,40,24,0.04)]"
       aria-label={t("nav.primary")}
     >
       <ul className="mx-auto flex max-w-xl items-stretch justify-around px-1">
@@ -55,39 +55,39 @@ export function BottomNav() {
               <Link
                 to={it.to}
                 className={cn(
-                  "group relative flex flex-col items-center gap-0.5 py-2 text-[10.5px] font-medium outline-none",
-                  "transition-colors duration-200",
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  "group relative flex flex-col items-center gap-0.5 py-2 text-[10.5px] font-bold outline-none transition-colors duration-200",
+                  active ? "text-[#0f4a26]" : "text-[#64748b] hover:text-[#0f2818]",
                 )}
               >
                 <span
                   className={cn(
-                    "relative flex h-8 w-12 items-center justify-center rounded-full transition-all duration-300 ease-out",
-                    active ? "bg-primary/12 scale-100" : "scale-95 group-hover:bg-muted/60"
+                    "relative flex h-9 w-14 items-center justify-center rounded-full transition-all duration-300 ease-out",
                   )}
+                  style={
+                    active
+                      ? {
+                          background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)",
+                          boxShadow: "0 2px 6px rgba(15,74,38,0.15)",
+                        }
+                      : undefined
+                  }
                 >
                   <Icon
                     className={cn(
                       "h-[18px] w-[18px] transition-transform duration-300",
-                      active ? "stroke-[2.4] scale-110" : "stroke-2"
+                      active ? "scale-110" : "",
                     )}
+                    strokeWidth={active ? 2.6 : 2.2}
                   />
                   {it.badge > 0 && (
-                    <span className="absolute top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center leading-none shadow-sm ring-2 ring-background animate-in zoom-in-50 duration-300">
+                    <span className="absolute top-0 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#dc2626] text-white text-[9px] font-black flex items-center justify-center leading-none ring-2 ring-white animate-in zoom-in-50 duration-300">
                       {it.badge > 9 ? "9+" : it.badge}
                     </span>
                   )}
                 </span>
-                <span className={cn("transition-all duration-200", active ? "font-semibold" : "")}>
+                <span className={cn("transition-all duration-200 tracking-tight", active && "font-black")}>
                   {it.label}
                 </span>
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute -bottom-0.5 h-0.5 w-6 rounded-full bg-primary transition-all duration-300",
-                    active ? "opacity-100 scale-100" : "opacity-0 scale-50"
-                  )}
-                />
               </Link>
             </li>
           );
