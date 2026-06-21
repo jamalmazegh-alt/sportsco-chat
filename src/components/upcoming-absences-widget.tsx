@@ -83,8 +83,18 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
 
   const noAbsences = total === 0 && !isLoading;
   const headerBg = noAbsences
-    ? "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)"
+    ? "linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%)"
     : "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)";
+  const headerTextClass = noAbsences ? "text-[#0f2818]" : "text-white";
+  const headerSubTextClass = noAbsences ? "text-[#64748b]" : "text-white/85";
+  const iconTileClass = noAbsences
+    ? "bg-white ring-1 ring-[#e2e8f0]"
+    : "bg-white/20 backdrop-blur-sm ring-1 ring-white/30";
+  const iconColorClass = noAbsences ? "text-[#2d9d5f]" : "text-white";
+  const patternColor = noAbsences ? "#0f2818" : "#fff";
+  const declareBtnClass = noAbsences
+    ? "text-[#0f4a26] bg-white ring-1 ring-[#e2e8f0] hover:bg-[#f0f9f3]"
+    : "text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm ring-1 ring-white/30";
 
   return (
     <section
