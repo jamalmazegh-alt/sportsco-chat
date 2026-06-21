@@ -78,6 +78,10 @@ function derSeq(...parts: Uint8Array[]): Uint8Array {
   return der(0x30, concatBytes(...parts));
 }
 
+function exactArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+}
+
 function buildP256Pkcs8PrivateKey(privBytes: Uint8Array, pubBytes: Uint8Array): Uint8Array {
   const ecPublicKeyOid = new Uint8Array([0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01]);
   const prime256v1Oid = new Uint8Array([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
@@ -111,12 +115,9 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   if (pubBytes.byteLength !== 65 || pubBytes[0] !== 0x04)
     throw new Error("Bad VAPID public key (must be 65-byte uncompressed P-256)");
 
-  const x = pubBytes.slice(1, 33);
-  const y = pubBytes.slice(33, 65);
-
   const priv = await crypto.subtle.importKey(
     "pkcs8",
-    buildP256Pkcs8PrivateKey(privBytes, pubBytes),
+    exactArrayBuffer(buildP256Pkcs8PrivateKey(privBytes, pubBytes)),
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["sign"],
@@ -124,7 +125,7 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
 
   const pub = await crypto.subtle.importKey(
     "spki",
-    buildP256SpkiPublicKey(pubBytes),
+    exactArrayBuffer(buildP256SpkiPublicKey(pubBytes)),
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["verify"],
