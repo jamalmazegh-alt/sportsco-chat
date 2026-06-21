@@ -5,6 +5,17 @@
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendPushToUserFireAndForget } from "./push-send.server";
+import { getClubNotifSettings } from "./club-notif-settings.server";
+
+async function getTeamClubId(teamId: string | null | undefined): Promise<string | null> {
+  if (!teamId) return null;
+  const { data } = await supabaseAdmin
+    .from("teams")
+    .select("club_id")
+    .eq("id", teamId)
+    .maybeSingle();
+  return ((data as any)?.club_id as string | null) ?? null;
+}
 
 const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
 function fmtDate(iso: string): string {
