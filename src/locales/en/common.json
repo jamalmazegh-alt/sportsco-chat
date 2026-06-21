@@ -1911,7 +1911,11 @@
       "location": "Where does it happen?",
       "convocation": "You'll be able to send invites right after.",
       "carpool": "Enable carpool for this trip?",
-      "summary": "All set — you can create."
+      "summary": "All set — you can create.",
+      "comment": "Anything to add? (optional)",
+      "gameformat": "How many players on the pitch?",
+      "halves": "Match time format.",
+      "meetingtime": "What time should players arrive?"
     },
     "q": {
       "type": "What kind of event?",
@@ -1925,7 +1929,11 @@
       "official": "Official or friendly?",
       "location": "Where?",
       "convocation": "Invite players?",
-      "carpool": "Enable carpool?"
+      "carpool": "Enable carpool?",
+      "comment": "Any message to add?",
+      "gameformat": "Game format?",
+      "halves": "Match format?",
+      "meetingtime": "Meeting time?"
     },
     "chip": {
       "tonight": "Tonight",
@@ -1941,12 +1949,17 @@
       "startsOn": "Start",
       "endsOn": "End",
       "preview_one": "Create {{count}} training",
-      "preview_other": "Create {{count}} trainings"
+      "preview_other": "Create {{count}} trainings",
+      "dayOfWeek": "Day of the week",
+      "time": "Time"
     },
     "meeting": {
       "stadium": "Usual stadium",
       "parking": "Club parking",
-      "custom": "Custom address"
+      "custom": "Custom address",
+      "address": "Address",
+      "addressPlaceholder": "Meeting point address",
+      "time": "Meeting time"
     },
     "convoc": {
       "all": "Whole team",
@@ -1966,6 +1979,35 @@
       "title": "Your event",
       "series_one": "series {{count}} session",
       "series_other": "series {{count}} sessions"
-    }
+    },
+    "commentHint": "Visible to all invited players.",
+    "commentPlaceholder": "A note for the team? (optional)",
+    "competitionName": "Competition name",
+    "competitionNamePlaceholder": "e.g. U15 D2 League",
+    "gameformatManual": "Other format",
+    "halvesManual": "Other format (e.g. 3x30)",
+    "meetingtimeHint": "What time should players arrive? (optional)",
+    "officialChampionship": "League",
+    "officialCup": "Cup",
+    "qShort": {
+      "type": "Which type",
+      "team": "Which team",
+      "when": "When",
+      "duration": "How long",
+      "halves": "Format",
+      "gameformat": "Squad size",
+      "series": "Recurrence",
+      "homeaway": "Home or away",
+      "meetingpoint": "Meeting point",
+      "meetingtime": "Meeting time",
+      "opponent": "Opponent",
+      "official": "Official",
+      "location": "Where",
+      "convocation": "Auto invite",
+      "carpool": "Carpool",
+      "comment": "A message",
+      "summary": "All set"
+    },
+    "skip": "Skip"
   }
 }

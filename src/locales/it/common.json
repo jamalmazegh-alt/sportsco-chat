@@ -1911,7 +1911,11 @@
       "location": "Dove si svolge?",
       "convocation": "Potrai inviare le convocazioni subito dopo.",
       "carpool": "Attivare il car pooling per questa trasferta?",
-      "summary": "Tutto pronto — puoi creare."
+      "summary": "Tutto pronto — puoi creare.",
+      "comment": "Vuoi aggiungere qualcosa? (facoltativo)",
+      "gameformat": "Quanti giocatori in campo?",
+      "halves": "Formato del tempo di gioco.",
+      "meetingtime": "A che ora devono presentarsi i giocatori?"
     },
     "q": {
       "type": "Che tipo di evento?",
@@ -1925,7 +1929,11 @@
       "official": "Ufficiale o amichevole?",
       "location": "Dove?",
       "convocation": "Convocare i giocatori?",
-      "carpool": "Attivare il car pooling?"
+      "carpool": "Attivare il car pooling?",
+      "comment": "Vuoi aggiungere un messaggio?",
+      "gameformat": "Formato di gioco?",
+      "halves": "Formato della partita?",
+      "meetingtime": "Ora del ritrovo?"
     },
     "chip": {
       "tonight": "Stasera",
@@ -1941,12 +1949,17 @@
       "startsOn": "Inizio",
       "endsOn": "Fine",
       "preview_one": "Crea {{count}} allenamento",
-      "preview_other": "Crea {{count}} allenamenti"
+      "preview_other": "Crea {{count}} allenamenti",
+      "dayOfWeek": "Giorno della settimana",
+      "time": "Ora"
     },
     "meeting": {
       "stadium": "Stadio abituale",
       "parking": "Parcheggio del club",
-      "custom": "Indirizzo personalizzato"
+      "custom": "Indirizzo personalizzato",
+      "address": "Indirizzo",
+      "addressPlaceholder": "Indirizzo del punto di ritrovo",
+      "time": "Ora del ritrovo"
     },
     "convoc": {
       "all": "Tutta la squadra",
@@ -1966,6 +1979,35 @@
       "title": "Il tuo evento",
       "series_one": "serie {{count}} sessione",
       "series_other": "serie {{count}} sessioni"
-    }
+    },
+    "commentHint": "Visibile a tutti i convocati.",
+    "commentPlaceholder": "Un messaggio per la squadra? (facoltativo)",
+    "competitionName": "Nome della competizione",
+    "competitionNamePlaceholder": "Es. Campionato U15 D2",
+    "gameformatManual": "Altro formato",
+    "halvesManual": "Altro formato (es. 3x30)",
+    "meetingtimeHint": "A che ora devono presentarsi i giocatori? (facoltativo)",
+    "officialChampionship": "Campionato",
+    "officialCup": "Coppa",
+    "qShort": {
+      "type": "Che tipo",
+      "team": "Quale squadra",
+      "when": "Quando",
+      "duration": "Quanto dura",
+      "halves": "Formato",
+      "gameformat": "Organico",
+      "series": "Ricorrenza",
+      "homeaway": "Casa o trasferta",
+      "meetingpoint": "Punto di ritrovo",
+      "meetingtime": "Ora del ritrovo",
+      "opponent": "Avversario",
+      "official": "Ufficiale",
+      "location": "Dove",
+      "convocation": "Convoca auto",
+      "carpool": "Carpooling",
+      "comment": "Un messaggio",
+      "summary": "Tutto pronto"
+    },
+    "skip": "Salta"
   }
 }
