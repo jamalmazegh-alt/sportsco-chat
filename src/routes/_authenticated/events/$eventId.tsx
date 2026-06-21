@@ -2087,74 +2087,97 @@ function EventDetail() {
           : buildConvocationMessage(base);
         const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
         const reminderMsg = buildReminderMessage({ ...base, respondents });
+        const modeLabel = mode === "whatsapp"
+          ? t("events.whatsappShare.modeWhatsappOnly")
+          : mode === "hybrid"
+            ? t("events.whatsappShare.modeHybrid")
+            : t("events.whatsappShare.modeQuickShare");
         return (
-          <div className="rounded-2xl border border-[#25D366]/30 bg-[#25D366]/5 p-3 space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <MessageCircle className="h-4 w-4 text-[#25D366]" />
-                <span>WhatsApp</span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                  {mode === "whatsapp" ? t("events.whatsappShare.modeWhatsappOnly") : mode === "hybrid" ? t("events.whatsappShare.modeHybrid") : t("events.whatsappShare.modeQuickShare")}
-                </span>
+          <div className="relative overflow-hidden rounded-3xl p-5 shadow-[0_12px_32px_-16px_rgba(29,122,69,0.45)] bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#25D366] text-white">
+            {/* diagonal pattern overlay */}
+            <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.08]" aria-hidden="true">
+              <defs>
+                <pattern id="wa-diag" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#wa-diag)" />
+            </svg>
+            {/* glow */}
+            <div className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
+
+            <div className="relative flex items-center justify-between gap-2 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25">
+                  <MessageCircle className="h-5 w-5 text-white" />
+                </div>
+                <div className="leading-tight">
+                  <div className="text-sm font-extrabold tracking-tight">WhatsApp</div>
+                  <div className="text-[10px] uppercase tracking-wider text-white/70 font-semibold">{modeLabel}</div>
+                </div>
               </div>
               {groupUrl && (
                 <a
                   href={groupUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-medium text-[#075E54] inline-flex items-center gap-1"
+                  className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20"
                 >
                   {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
                 </a>
               )}
             </div>
-            {isCancelled ? (
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
-              >
-                <MessageCircle className="h-4 w-4" />
-                {t("events.whatsappShare.shareCancellation")}
-              </a>
-            ) : (
-              <>
+
+            <div className="relative space-y-2">
+              {isCancelled ? (
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#25D366] text-white hover:bg-[#1ebe5b] text-sm font-medium"
+                  className="group relative overflow-hidden inline-flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-white text-[#0f4a26] hover:bg-white/95 text-sm font-bold shadow-[0_8px_20px_-8px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
                 >
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                   <MessageCircle className="h-4 w-4" />
-                  {t("events.whatsappShare.shareConvoc")}
+                  {t("events.whatsappShare.shareCancellation")}
                 </a>
-                {lineupData && (
-                  <button
-                    type="button"
-                    onClick={() => shareLineupAsImage(convocWithCompoMsg)}
-                    disabled={sharingLineup}
-                    className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md bg-[#075E54] text-white hover:bg-[#064a42] text-sm font-medium disabled:opacity-60"
+              ) : (
+                <>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative overflow-hidden inline-flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-white text-[#0f4a26] hover:bg-white/95 text-sm font-bold shadow-[0_8px_20px_-8px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
                   >
-                    {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
-                    {t("events.whatsappShare.shareConvocWithLineup")}
-                  </button>
-                )}
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(reminderMsg)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-md border border-input bg-background hover:bg-accent text-sm font-medium"
-                >
-                  <Bell className="h-4 w-4" />
-                  {t("events.whatsappShare.reminder")}
-                </a>
-                <p className="text-[11px] text-muted-foreground pl-1">
-                  {lineupData ? t("events.whatsappShare.reminderHintWithLineup") : t("events.whatsappShare.reminderHint")}
-                </p>
-
-              </>
-            )}
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-emerald-200/70 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
+                    <MessageCircle className="h-4 w-4" />
+                    {t("events.whatsappShare.shareConvoc")}
+                  </a>
+                  {lineupData && (
+                    <button
+                      type="button"
+                      onClick={() => shareLineupAsImage(convocWithCompoMsg)}
+                      disabled={sharingLineup}
+                      className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-2xl bg-[#0a3a1d]/60 hover:bg-[#0a3a1d]/80 text-white text-sm font-semibold ring-1 ring-white/15 disabled:opacity-60 transition active:scale-[0.99]"
+                    >
+                      {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                      {t("events.whatsappShare.shareConvocWithLineup")}
+                    </button>
+                  )}
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(reminderMsg)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-2xl bg-white/10 hover:bg-white/15 text-white text-sm font-semibold ring-1 ring-white/25 backdrop-blur-sm transition active:scale-[0.99]"
+                  >
+                    <Bell className="h-4 w-4" />
+                    {t("events.whatsappShare.reminder")}
+                  </a>
+                  <p className="text-[11px] text-white/75 pl-1">
+                    {lineupData ? t("events.whatsappShare.reminderHintWithLineup") : t("events.whatsappShare.reminderHint")}
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         );
       })()}
