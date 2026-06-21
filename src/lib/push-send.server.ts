@@ -115,34 +115,30 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   if (pubBytes.byteLength !== 65 || pubBytes[0] !== 0x04)
     throw new Error("Bad VAPID public key (must be 65-byte uncompressed P-256)");
 
+  const xB64u = b64uEncode(pubBytes.subarray(1, 33));
+  const yB64u = b64uEncode(pubBytes.subarray(33, 65));
+  const dB64u = b64uEncode(privBytes);
+
+  // JWK is the most portable format across Web Crypto runtimes (Node, workerd, browsers).
   const priv = await crypto.subtle.importKey(
-    "pkcs8",
-    exactArrayBuffer(buildP256Pkcs8PrivateKey(privBytes, pubBytes)),
+    "jwk",
+    {
+      kty: "EC",
+      crv: "P-256",
+      x: xB64u,
+      y: yB64u,
+      d: dB64u,
+      ext: true,
+    },
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["sign"],
   );
 
-  const pub = await crypto.subtle.importKey(
-    "spki",
-    exactArrayBuffer(buildP256SpkiPublicKey(pubBytes)),
-    { name: "ECDSA", namedCurve: "P-256" },
-    false,
-    ["verify"],
-  );
-  const probe = new TextEncoder().encode("vapid-key-check");
-  const probeSig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, priv, probe);
-  const keysMatch = await crypto.subtle.verify(
-    { name: "ECDSA", hash: "SHA-256" },
-    pub,
-    probeSig,
-    probe,
-  );
-  if (!keysMatch) throw new Error("VAPID private key does not match browser public key");
-
   cachedVapidKey = { priv, pubB64u: pubRaw };
   return cachedVapidKey;
 }
+
 
 function getVapidSubject(): string {
   const fallback = "mailto:contact@clubero.app";
@@ -394,8 +390,9 @@ export async function sendPushToUser(
         console.warn("[push] non-2xx status", status, "endpoint:", s.endpoint);
       }
     } catch (e) {
-      console.warn("[push] send threw", (e as Error).message);
+      console.warn("[push v3-jwk] send threw", (e as Error).message, "stack:", (e as Error).stack?.slice(0, 200));
     }
+
   }
 
   if (toPrune.length) {
