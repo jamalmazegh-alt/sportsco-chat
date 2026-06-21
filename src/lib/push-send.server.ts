@@ -36,8 +36,9 @@ export async function sendPushToUser(
   userId: string,
   payload: PushPayload,
 ): Promise<{ sent: number; pruned: number }> {
+  let webpush: any;
   try {
-    ensureConfigured();
+    webpush = await getWebPush();
   } catch (e) {
     console.warn("[push] not configured:", (e as Error).message);
     return { sent: 0, pruned: 0 };
