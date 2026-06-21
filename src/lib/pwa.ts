@@ -6,7 +6,7 @@
 
 // Public VAPID key — safe to expose (used by browser to subscribe).
 export const VAPID_PUBLIC_KEY =
-  "BBxRFLb5fDEvbsA55dEoHwyChwtqwdg0VuErJAPxAI791NHQ_0uZ_EwJshlrPt6oEBO448OhQm9sVLkRSU8B7sA";
+  "BD9wVpedWlJlmDD1IWxtFq9h4-K0Gm1b4RzNjsTYcFHAuNFyFAeX1wuvYBX9JlDfOeBb3oARKvBzaGYmKoZmZRk";
 
 const SW_PATH = "/sw.js";
 
