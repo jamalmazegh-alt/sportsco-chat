@@ -747,8 +747,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
         {current === "homeaway" && (
           <StepQuestion title={t("eventWizard.q.homeaway", { defaultValue: "Domicile ou extérieur ?" })}>
-            <DoorButton icon="🏠" label={t("eventWizard.home", { defaultValue: "Domicile" })} active={state.isHome === "home"} onClick={() => answer("isHome", "home")} />
-            <DoorButton icon="🚌" label={t("eventWizard.away", { defaultValue: "Extérieur" })} active={state.isHome === "away"} onClick={() => answer("isHome", "away")} />
+            <DoorButton icon="🏠" label={t("eventWizard.home", { defaultValue: "Domicile" })} subtitle="On reçoit" color="green" active={state.isHome === "home"} onClick={() => answer("isHome", "home")} />
+            <DoorButton icon="🚌" label={t("eventWizard.away", { defaultValue: "Extérieur" })} subtitle="On se déplace" color="blue" active={state.isHome === "away"} onClick={() => answer("isHome", "away")} />
           </StepQuestion>
         )}
 
