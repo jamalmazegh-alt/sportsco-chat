@@ -339,6 +339,9 @@ function EventDetail() {
   });
 
   const isCoach = isActiveCoach || !!canAccessFeedback;
+  const eventTeam = useMemo(() => (teams as any[] | undefined)?.find((t: any) => t.id === event?.team_id) ?? (teams as any[] | undefined)?.[0], [teams, event?.team_id]);
+  const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
+  const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
   const { data: convocations, refetch } = useQuery({
     queryKey: ["convocations", eventId],
@@ -1788,7 +1791,7 @@ function EventDetail() {
           {event.type === "match" && (
             <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
               <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
-              {teams?.[0]?.sport ? t(`sports.${teams[0].sport}`, { defaultValue: teams[0].sport }) : t("events.types.match")}
+              {eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : t("events.types.match")}
             </div>
           )}
 
@@ -1855,7 +1858,7 @@ function EventDetail() {
           {/* Primary action toolbar — Lineup / Feedback (edit moved to hero top) */}
           {teams && (isCoach || showFeedbackButton) && (
             <div className="mt-3 flex items-center gap-2 flex-wrap">
-              {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
+              {isCoach && event.type === "match" && isFootball && (
                 <Link
                   to="/events/$eventId/lineup"
                   params={{ eventId }}
@@ -1881,7 +1884,7 @@ function EventDetail() {
           )}
         </div>
 
-        {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
+        {event.type === "match" && isFootball && (
           <div className="px-4 pb-3" ref={lineupCardRef}>
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>
