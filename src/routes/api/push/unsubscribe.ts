@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const Body = z.object({
-  endpoint: z.string().url().max(2048),
+  endpoint: z.string().url().max(2048).optional(),
+  all_for_user: z.boolean().optional(),
 });
 
 export const Route = createFileRoute("/api/push/unsubscribe")({
@@ -29,12 +30,17 @@ export const Route = createFileRoute("/api/push/unsubscribe")({
           return new Response("Bad request", { status: 400 });
         }
 
+        if (!parsed.endpoint && !parsed.all_for_user) {
+          return new Response("Bad request", { status: 400 });
+        }
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin
+        let q = supabaseAdmin
           .from("push_subscriptions")
           .delete()
-          .eq("endpoint", parsed.endpoint)
           .eq("user_id", userData.user.id);
+        if (parsed.endpoint) q = q.eq("endpoint", parsed.endpoint);
+        await q;
         return Response.json({ ok: true });
       },
     },

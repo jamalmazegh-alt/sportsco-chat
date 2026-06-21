@@ -99,3 +99,70 @@ export async function currentPushPermission(): Promise<NotificationPermission | 
   if (!isPushSupported()) return "unsupported";
   return Notification.permission;
 }
+
+/**
+ * Reconcile the OS/browser push permission state with our DB.
+ *
+ * - If the user revoked permission in iOS Settings (or browser settings),
+ *   the local PushSubscription may still exist but `Notification.permission`
+ *   is "denied" → we delete every row for this user from `push_subscriptions`.
+ * - If permission is granted AND a PushSubscription exists locally but the
+ *   server doesn't know about it (or we just lost track), we re-upsert it.
+ * - If permission is "default" we do nothing (don't prompt silently).
+ *
+ * Safe to call on every app mount and on `visibilitychange`.
+ */
+export async function syncPushSubscriptionState(): Promise<void> {
+  if (!isPushSupported()) return;
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData.session?.access_token;
+  if (!token) return;
+
+  const permission = Notification.permission;
+  let reg: ServiceWorkerRegistration | null = null;
+  try {
+    reg = await navigator.serviceWorker.ready;
+  } catch {
+    return;
+  }
+  const sub = await reg.pushManager.getSubscription();
+
+  // Permission revoked at OS/browser level → clean DB + local sub.
+  if (permission === "denied") {
+    if (sub) {
+      try { await sub.unsubscribe(); } catch { /* noop */ }
+    }
+    try {
+      await fetch("/api/push/unsubscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ all_for_user: true }),
+      });
+    } catch { /* best effort */ }
+    return;
+  }
+
+  // Permission granted: ensure DB row exists and matches current endpoint.
+  if (permission === "granted" && sub) {
+    const json = sub.toJSON();
+    try {
+      await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          endpoint: sub.endpoint,
+          p256dh: json.keys?.p256dh,
+          auth: json.keys?.auth,
+          user_agent: navigator.userAgent,
+        }),
+      });
+    } catch { /* best effort */ }
+  }
+}
