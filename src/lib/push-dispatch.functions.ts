@@ -169,6 +169,12 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!post) return { dispatched: 0 };
 
+    // Gate: wall_new_post
+    const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+    const settings = await getClubNotifSettings((post as any).club_id as string | null);
+    if (!settings.wall_new_post) return { dispatched: 0 };
+
+
     const authorName =
       ((post as any).profiles?.first_name as string) ||
       ((post as any).profiles?.full_name as string)?.split(" ")[0] ||
