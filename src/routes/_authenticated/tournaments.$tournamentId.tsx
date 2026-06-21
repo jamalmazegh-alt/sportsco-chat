@@ -348,48 +348,130 @@ function TournamentDetailPage() {
 
   return (
     <div className="pb-24">
-      {/* ─── Header ─────────────────────────────────────────────────────── */}
-      <header className="px-5 pt-6 pb-3 space-y-3">
+      {/* ─── Hero (Anime Premium : dégradé vert + SVG coupe + pills) ───── */}
+      <header className="px-4 pt-4 space-y-4">
         <BackLink to="/tournaments" label={t("detail.back")} />
-        <div className="flex items-start gap-3">
-          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Trophy className="h-5 w-5 text-primary" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-semibold truncate">{tournament.name}</h1>
-            <p className="text-xs text-muted-foreground mt-0.5 truncate">
-              {tournament.sport} · {tournament.starts_on}
-              {tournament.location && googleMapsSearchUrl(tournament.location) ? (
-                <>
-                  {" · "}
-                  <a
-                    href={googleMapsSearchUrl(tournament.location)!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 hover:underline"
-                  >
-                    <MapPin className="h-3 w-3 shrink-0" />
-                    {tournament.location}
-                  </a>
-                </>
-              ) : tournament.location ? (
-                ` · ${tournament.location}`
-              ) : null}
-            </p>
-          </div>
-          {canManage && (
-            <TournamentSettingsMenu
-              tournament={tournament}
-              teams={teams}
-              matches={matches}
-              groups={groups}
-              publicUrl={publicUrl}
-              open={settingsOpen}
-              onOpenChange={setSettingsOpen}
-              initialTopic={settingsTopic}
-              initialFormatView={settingsFormatView}
+
+        <div
+          className="relative overflow-hidden rounded-[18px] text-white"
+          style={{
+            background: "linear-gradient(135deg, #0f4a26 0%, #1d7a45 60%, #2d9d5f 100%)",
+            boxShadow: "0 4px 16px rgba(29,122,69,0.18)",
+          }}
+        >
+          {/* SVG diagonal + halo + coupe + confettis stylisés */}
+          <svg
+            aria-hidden
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.22]"
+            viewBox="0 0 400 180"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <radialGradient id="tnhalo" cx="85%" cy="0%" r="65%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width="400" height="180" fill="url(#tnhalo)" />
+            <path
+              d="M -30 140 L 100 0 M 30 200 L 200 0 M 130 200 L 320 -10 M 240 200 L 420 0"
+              stroke="#ffffff"
+              strokeOpacity="0.22"
+              strokeWidth="1.3"
             />
+            <g transform="translate(320,40)" opacity="0.6">
+              <path
+                d="M0 6 h28 v8 a14 14 0 0 1 -28 0 z M 5 20 h18 v10 h-18 z M 8 30 h12 v4 h-12 z"
+                fill="#ffffff"
+              />
+              <path d="M -5 9 q -8 6 0 14" stroke="#ffffff" strokeWidth="1.6" fill="none" />
+              <path d="M 33 9 q 8 6 0 14" stroke="#ffffff" strokeWidth="1.6" fill="none" />
+            </g>
+            {/* confettis */}
+            <g fill="#ffffff" opacity="0.55">
+              <rect x="40" y="20" width="3" height="8" transform="rotate(20 40 20)" />
+              <rect x="80" y="60" width="3" height="8" transform="rotate(-25 80 60)" />
+              <rect x="160" y="30" width="3" height="8" transform="rotate(40 160 30)" />
+              <rect x="220" y="100" width="3" height="8" transform="rotate(-15 220 100)" />
+              <circle cx="120" cy="100" r="2" />
+              <circle cx="270" cy="50" r="2" />
+            </g>
+          </svg>
+
+          {/* Edit button top-right */}
+          {canManage && (
+            <div className="absolute right-3 top-3 z-10">
+              <TournamentSettingsMenu
+                tournament={tournament}
+                teams={teams}
+                matches={matches}
+                groups={groups}
+                publicUrl={publicUrl}
+                open={settingsOpen}
+                onOpenChange={setSettingsOpen}
+                initialTopic={settingsTopic}
+                initialFormatView={settingsFormatView}
+              />
+            </div>
           )}
+
+          <div className="relative p-5 pr-14">
+            <h1
+              className="text-[20px] font-extrabold leading-tight"
+              style={{ letterSpacing: "-0.3px" }}
+            >
+              {tournament.name}
+            </h1>
+
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/90">
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-amber-200" />
+                <span className="tabular-nums">{tournament.starts_on}</span>
+              </span>
+              {tournament.location && (
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-rose-200" />
+                  {googleMapsSearchUrl(tournament.location) ? (
+                    <a
+                      href={googleMapsSearchUrl(tournament.location)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="truncate max-w-[180px] hover:underline"
+                    >
+                      {tournament.location}
+                    </a>
+                  ) : (
+                    <span className="truncate max-w-[180px]">{tournament.location}</span>
+                  )}
+                </span>
+              )}
+            </div>
+
+            {/* Pills tags : sport · nb équipes · format */}
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {tournament.sport && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ring-1 ring-white/20 backdrop-blur">
+                  {tournament.sport}
+                </span>
+              )}
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
+                <Users className="h-3 w-3" />
+                {teams.length} {t("detail.teams", { defaultValue: "équipes" })}
+              </span>
+              {flights.length > 0 ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
+                  <GitBranch className="h-3 w-3" />
+                  Flights
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
+                  <GitBranch className="h-3 w-3" />
+                  Poules + Phases finales
+                </span>
+              )}
+              <StatusPillHero status={tournament.status} />
+            </div>
+          </div>
         </div>
 
         {/* Stepper — progress gauge, not a menu */}
