@@ -1007,21 +1007,31 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         {current === "convocation" && (
           <StepQuestion title={t("eventWizard.q.convocation", { defaultValue: "Convoquer les joueurs ?" })}>
             {([
-              ["all", "👥", t("eventWizard.convoc.all", { defaultValue: "Toute l'équipe" })],
-              ["selection", "✋", t("eventWizard.convoc.selection", { defaultValue: "Choisir les joueurs" })],
-              ["none", "⏸️", t("eventWizard.convoc.none", { defaultValue: "Pas maintenant" })],
-            ] as const).map(([v, e, l]) => (
-              <DoorButton key={v} icon={e} label={l} active={state.convocScope === v} onClick={() => answer("convocScope", v)} />
+              ["all", "👥", t("eventWizard.convoc.all", { defaultValue: "Toute l'équipe" }), "Tout le monde reçoit", "green"],
+              ["selection", "✋", t("eventWizard.convoc.selection", { defaultValue: "Choisir les joueurs" }), "Sélection manuelle", "amber"],
+              ["none", "⏸️", t("eventWizard.convoc.none", { defaultValue: "Pas maintenant" }), "Brouillon, à envoyer plus tard", "blue"],
+            ] as const).map(([v, e, l, s, c]) => (
+              <DoorButton key={v} icon={e} label={l} subtitle={s} color={c} active={state.convocScope === v} onClick={() => answer("convocScope", v)} />
             ))}
           </StepQuestion>
         )}
 
         {current === "carpool" && (
           <StepQuestion title={t("eventWizard.q.carpool", { defaultValue: "Activer le covoiturage ?" })}>
-            <div className="flex items-center justify-between rounded-xl border border-border bg-card px-3 py-3">
-              <span className="text-sm">
-                {t("eventWizard.carpoolLabel", { defaultValue: "Les parents proposent/réservent des places" })}
-              </span>
+            <div className={cn(
+              "flex items-center justify-between rounded-2xl border-[1.5px] px-3 py-3 transition-all",
+              state.carpoolEnabled
+                ? "border-emerald-300 bg-gradient-to-br from-emerald-50 to-white"
+                : "border-muted bg-muted/40",
+            )}>
+              <div className="flex-1 min-w-0 pr-3">
+                <div className={cn("text-[13px] font-bold", state.carpoolEnabled ? "text-emerald-900" : "text-foreground")}>
+                  {t("eventWizard.carpoolLabel", { defaultValue: "Activer le covoiturage" })}
+                </div>
+                <div className={cn("text-[11px] font-medium mt-0.5", state.carpoolEnabled ? "text-emerald-600" : "text-muted-foreground")}>
+                  Les familles s'organisent
+                </div>
+              </div>
               <Switch checked={!!state.carpoolEnabled} onCheckedChange={(v) => patch("carpoolEnabled", v)} />
             </div>
             <Button className="w-full mt-3" onClick={() => go(1)}>
