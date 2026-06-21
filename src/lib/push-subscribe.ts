@@ -126,13 +126,10 @@ export async function syncPushSubscriptionState(): Promise<void> {
   } catch {
     return;
   }
-  const sub = await reg.pushManager.getSubscription();
+  let sub = await reg.pushManager.getSubscription();
 
-  // Permission revoked at OS/browser level → clean DB + local sub.
-  // iOS PWA quirk: when the user disables notifications in Settings, the
-  // local PushSubscription becomes null but `Notification.permission` often
-  // stays "granted" — so we ALSO clean up when there's no local sub.
-  if (permission === "denied" || !sub) {
+  // Hard "denied" → clean local + DB and bail out.
+  if (permission === "denied") {
     if (sub) {
       try { await sub.unsubscribe(); } catch { /* noop */ }
     }
@@ -148,6 +145,36 @@ export async function syncPushSubscriptionState(): Promise<void> {
     } catch { /* best effort */ }
     return;
   }
+
+  // Permission granted but no local sub (iOS quirk after Settings toggle):
+  // try to silently re-create it. iOS allows pushManager.subscribe() without
+  // a user gesture when permission is already "granted".
+  if (permission === "granted" && !sub) {
+    try {
+      const key = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: key.buffer as ArrayBuffer,
+      });
+    } catch {
+      // Couldn't re-subscribe — clean DB so it reflects reality.
+      try {
+        await fetch("/api/push/unsubscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ all_for_user: true }),
+        });
+      } catch { /* best effort */ }
+      return;
+    }
+  }
+
+  // Permission "default" and no sub → nothing to do (don't silently prompt).
+  if (!sub) return;
+
 
   // Permission granted with a live sub: ensure DB has exactly this endpoint
   // for the current device. iOS rotates the endpoint on every re-enable,
