@@ -403,19 +403,16 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
   // ---- Render ----
   return (
     <div className="flex flex-col h-full max-h-[88vh]">
-      {/* Header guide (sticky) */}
-      <div className="rounded-t-xl bg-gradient-to-br from-primary to-primary/80 px-4 pt-3 pb-3 text-primary-foreground">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4" />
-          <b className="text-sm">{t("eventWizard.title", { defaultValue: "Nouvel événement" })}</b>
-          <span className="ml-auto text-[11px] opacity-80">
-            {Math.min(state.step + 1, steps.length)}/{steps.length}
-          </span>
-        </div>
-        <p className="mt-1 text-[12px] leading-snug opacity-90 min-h-[28px]">{hints[current]}</p>
-        <WizardProgress step={state.step} total={steps.length} variant="onPrimary" className="mt-2" />
+      {/* Premium gradient header — Apple meets Blue Lock */}
+      <WizardHero
+        step={current}
+        stepIndex={Math.min(state.step + 1, steps.length)}
+        totalSteps={steps.length}
+        eyebrow={t("eventWizard.title", { defaultValue: "Nouvel événement" })}
+        hint={hints[current]}
+        progress={state.step}
+      />
 
-      </div>
 
       {/* Live recap chips */}
       <LiveRecap state={state} teamName={selectedTeam?.name} title={title} seriesCount={seriesCount} t={t} />
