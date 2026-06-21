@@ -273,160 +273,184 @@ export function MatchResultCard({
 
   const isSoloKind = SOLO_STAT_KINDS.includes(kind);
 
+  const outcomePill =
+    outcome === "win"
+      ? { label: t("match.outcomeWin", { defaultValue: "Victoire" }), cls: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white ring-emerald-500/30" }
+      : outcome === "loss"
+      ? { label: t("match.outcomeLoss", { defaultValue: "Défaite" }), cls: "bg-rose-50 text-rose-600 ring-rose-200" }
+      : { label: t("match.outcomeDraw", { defaultValue: "Nul" }), cls: "bg-slate-100 text-slate-600 ring-slate-200" };
+
   return (
-    <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+    <section className="rounded-2xl border-[1.5px] border-slate-200 bg-white shadow-[0_2px_8px_-4px_rgba(15,23,42,0.06)] overflow-hidden">
       <ConfettiBurst trigger={celebrate} />
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Trophy className="h-4 w-4" /> {t("match.result")}
-        </h2>
+      {/* Header */}
+      <header className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-100">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60">
+            <Trophy className="h-4 w-4 text-[#1d7a45]" />
+          </div>
+          <h2 className="text-sm font-extrabold tracking-tight text-slate-900 truncate">
+            {t("match.result")}
+          </h2>
+        </div>
         {isCoach && !editing && (
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-8"
+          <button
+            type="button"
             onClick={() => setEditing(true)}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d7a45] hover:text-[#0f4a26] transition-colors"
           >
             <Pencil className="h-3.5 w-3.5" />
             {result ? t("common.edit") : t("match.enterScore")}
-          </Button>
+          </button>
+        )}
+      </header>
+
+      <div className="px-5 py-4 space-y-4">
+        {!editing && result && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-center gap-3">
+              <div className="text-center flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                  {teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
+                </p>
+                <p className="text-[28px] leading-none font-black tabular-nums text-slate-900 mt-1">{ourScore}</p>
+              </div>
+              <span
+                className="text-[28px] font-black tabular-nums bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] bg-clip-text text-transparent select-none"
+                aria-hidden="true"
+              >
+                —
+              </span>
+              <div className="text-center flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                  {opponent ?? t("events.opponent")}
+                </p>
+                <p className="text-[28px] leading-none font-black tabular-nums text-slate-900 mt-1">{theirScore}</p>
+              </div>
+            </div>
+            <div className="flex justify-center">
+              <span className={cn("inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wide ring-1", outcomePill.cls)}>
+                {outcomePill.label}
+              </span>
+            </div>
+            {cfg.setScoresEnabled && savedSets.length > 0 && (
+              <p className="text-center text-xs text-slate-500 tabular-nums">
+                {savedSets
+                  .map(([h, a]) => (ourSide === "home" ? `${h}-${a}` : `${a}-${h}`))
+                  .join(" · ")}
+              </p>
+            )}
+          </div>
+        )}
+
+        {!editing && !result && (
+          <p className="text-xs text-slate-400 italic">
+            {t("match.noResultYet", { defaultValue: "Pas de résultat enregistré pour l'instant." })}
+          </p>
+        )}
+
+        {editing && (
+          <div className="space-y-3">
+            {cfg.setScoresEnabled ? (
+              <SetScoresEditor
+                sets={sets}
+                onChange={setSets}
+                ourSide={ourSide}
+                teamName={teamName}
+                opponent={opponent}
+                t={t}
+              />
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                    {ourSide === "home"
+                      ? teamName ?? t("events.home")
+                      : opponent ?? t("events.home")}
+                  </Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={home}
+                    onChange={(e) => setHome(e.target.value)}
+                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-slate-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                    {ourSide === "home"
+                      ? opponent ?? t("events.away")
+                      : teamName ?? t("events.away")}
+                  </Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={away}
+                    onChange={(e) => setAway(e.target.value)}
+                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-slate-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">{t("match.notesOptional")}</Label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+                maxLength={500}
+                className="rounded-xl border-[1.5px] border-slate-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl border-[1.5px]"
+                onClick={() => {
+                  setEditing(false);
+                  if (result) {
+                    setHome(String(result.home_score));
+                    setAway(String(result.away_score));
+                    setNotes(result.notes ?? "");
+                    setSets(result.score_details?.sets ?? []);
+                  }
+                }}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                size="sm"
+                onClick={saveResult}
+                disabled={saving}
+                className="rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.6)] active:scale-[0.98] transition"
+              >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {t("common.save")}
+              </Button>
+            </div>
+          </div>
         )}
       </div>
 
-      {!editing && result && (
-        <div
-          className={cn(
-            "rounded-xl border p-4 space-y-2",
-            outcome === "win" && "bg-present/10 border-present/30",
-            outcome === "loss" && "bg-defeat/10 border-defeat/30",
-            outcome === "draw" && "bg-draw/10 border-draw/30"
-          )}
-        >
-          <div className="flex items-center justify-center gap-4">
-            <div className="text-center flex-1 min-w-0">
-              <p className="text-xs uppercase text-muted-foreground tracking-wider truncate">
-                {teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
-              </p>
-              <p className="text-3xl font-bold tabular-nums">{ourScore}</p>
-            </div>
-            <span className="text-2xl text-muted-foreground">—</span>
-            <div className="text-center flex-1 min-w-0">
-              <p className="text-xs uppercase text-muted-foreground tracking-wider truncate">
-                {opponent ?? t("events.opponent")}
-              </p>
-              <p className="text-3xl font-bold tabular-nums">{theirScore}</p>
-            </div>
-          </div>
-          {cfg.setScoresEnabled && savedSets.length > 0 && (
-            <p className="text-center text-xs text-muted-foreground tabular-nums">
-              {savedSets
-                .map(([h, a]) =>
-                  ourSide === "home" ? `${h}-${a}` : `${a}-${h}`
-                )
-                .join(" · ")}
-            </p>
-          )}
-        </div>
-      )}
-
-      {!editing && !result && isCoach && (
-        <p className="text-sm text-muted-foreground italic">
-          {t("match.noResultYet")}
-        </p>
-      )}
-
-      {editing && (
-        <div className="space-y-3">
-          {cfg.setScoresEnabled ? (
-            <SetScoresEditor
-              sets={sets}
-              onChange={setSets}
-              ourSide={ourSide}
-              teamName={teamName}
-              opponent={opponent}
-              t={t}
-            />
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs truncate">
-                  {ourSide === "home"
-                    ? teamName ?? t("events.home")
-                    : opponent ?? t("events.home")}
-                </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={home}
-                  onChange={(e) => setHome(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs truncate">
-                  {ourSide === "home"
-                    ? opponent ?? t("events.away")
-                    : teamName ?? t("events.away")}
-                </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={away}
-                  onChange={(e) => setAway(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-1.5">
-            <Label className="text-xs">{t("match.notesOptional")}</Label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={2}
-              maxLength={500}
-            />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setEditing(false);
-                if (result) {
-                  setHome(String(result.home_score));
-                  setAway(String(result.away_score));
-                  setNotes(result.notes ?? "");
-                  setSets(result.score_details?.sets ?? []);
-                }
-              }}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button size="sm" onClick={saveResult} disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              {t("common.save")}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Player events */}
+      {/* Player events ("Faits de match") */}
       {cfg.statKinds.length > 0 && (isCoach || result || (goals && goals.length > 0)) && (
-        <div className="space-y-2 pt-2 border-t border-border">
+        <div className="px-5 py-4 space-y-3 border-t border-slate-100">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {t("match.playerEvents")}
+            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500">
+              {t("match.playerEvents", { defaultValue: "Faits de match" })}
             </p>
             {isCoach && !showGoalForm && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-7 text-xs"
+              <button
+                type="button"
                 onClick={() => setShowGoalForm(true)}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d7a45] hover:text-[#0f4a26] transition-colors"
               >
-                <Plus className="h-3 w-3" /> {t("match.addEvent")}
-              </Button>
+                <Plus className="h-3.5 w-3.5" />
+                {t("match.addEvent", { defaultValue: "Ajouter" })}
+              </button>
             )}
           </div>
 
