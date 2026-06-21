@@ -224,31 +224,48 @@ function HomePage() {
 
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">
-      {/* Club hero — energetic gradient banner */}
-      <header className="relative overflow-hidden rounded-3xl border border-border bg-gradient-hero p-6 pb-7">
-        <div aria-hidden className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-[color:var(--energy)]/25 blur-3xl" />
-        <div aria-hidden className="absolute -bottom-20 -left-10 h-40 w-40 rounded-full bg-[color:var(--brand-blue)]/25 blur-3xl" />
-        <div className="relative flex flex-col items-center text-center">
+      {/* Club hero — Anime Premium pale green banner */}
+      <header
+        className="relative overflow-hidden rounded-[20px] border-[1.5px] border-[#c8e6d2] p-5"
+        style={{
+          background: "linear-gradient(180deg, #e8f5ee 0%, #d4ead9 100%)",
+        }}
+      >
+        <svg
+          aria-hidden
+          className="absolute inset-0 h-full w-full opacity-[0.07] pointer-events-none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern id="terrain-home" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="40" stroke="#0f4a26" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#terrain-home)" />
+        </svg>
+        <div className="relative flex items-center gap-4">
           {club?.logo_url ? (
-            <div className="relative">
-              <div aria-hidden className="absolute inset-0 rounded-3xl bg-gradient-primary blur-md opacity-40" />
-              <img
-                src={club.logo_url}
-                alt={club.name}
-                className="relative h-24 w-24 rounded-3xl object-cover border-2 border-card shadow-elevated bg-white"
-              />
-            </div>
+            <img
+              src={club.logo_url}
+              alt={club.name}
+              className="h-16 w-16 rounded-2xl object-cover bg-white shadow-[0_4px_12px_rgba(15,74,38,0.15)] ring-2 ring-white shrink-0"
+            />
           ) : (
-            <div className="h-24 w-24 rounded-3xl bg-gradient-primary flex items-center justify-center text-3xl font-bold text-white border-2 border-card shadow-elevated">
+            <div
+              className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-[0_4px_12px_rgba(15,74,38,0.25)] ring-2 ring-white shrink-0"
+              style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+            >
               {club?.name?.[0] ?? "C"}
             </div>
           )}
-          <p className="mt-3 text-[11px] uppercase tracking-[0.15em] text-[color:var(--energy)] font-bold">
-            {club?.name}
-          </p>
-          <h1 className="text-2xl font-bold mt-1 font-display tracking-tight">
-            {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
-          </h1>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 truncate">
+              {club?.name}
+            </p>
+            <h1 className="text-[22px] font-black leading-tight text-[#0f2818] tracking-tight mt-0.5 truncate">
+              {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
+            </h1>
+          </div>
         </div>
       </header>
 
