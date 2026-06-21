@@ -2765,12 +2765,12 @@ function EventDetail() {
                   </svg>
                   <div className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
 
-                  <div className="relative px-5 pt-4 pb-5">
+                  <div className="relative px-4 pt-3 pb-3.5">
                     {/* Title row + team badge + actions */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-start justify-between gap-3 mb-2.5">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h2 className="text-base font-extrabold tracking-tight">
+                          <h2 className="text-sm font-extrabold tracking-tight">
                             {t("attendance.title", { defaultValue: "Présences" })}
                           </h2>
                           {teamName && (
@@ -2794,7 +2794,7 @@ function EventDetail() {
                         <div className="flex items-center gap-1 shrink-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/15 hover:text-white">
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/15 hover:text-white">
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -2845,23 +2845,23 @@ function EventDetail() {
                     </div>
 
                     {/* Rate + responded */}
-                    <div className="flex items-end justify-between gap-3 mb-3">
+                    <div className="flex items-end justify-between gap-3 mb-2">
                       <div className="leading-none">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-[52px] font-black tabular-nums tracking-[-0.04em] leading-none">{rate}</span>
-                          <span className="text-2xl font-bold text-white/80">%</span>
+                          <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">{rate}</span>
+                          <span className="text-lg font-bold text-white/80">%</span>
                         </div>
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1.5">
+                        <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
                           {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
                         </p>
                       </div>
                       <div className="text-right leading-tight">
-                        <p className="text-sm font-bold tabular-nums">
+                        <p className="text-xs font-bold tabular-nums">
                           {respondedP}<span className="text-white/65 font-medium">/{totalP}</span>{" "}
                           <span className="text-white/85 font-semibold">{t("attendance.responded", { defaultValue: "réponses" })}</span>
                         </p>
                         {counts.pending > 0 && (
-                          <p className="text-[11px] text-white/70 mt-0.5">
+                          <p className="text-[10px] text-white/70 mt-0.5">
                             · {t("attendance.pendingShort", { defaultValue: "{{count}} en attente", count: counts.pending })}
                           </p>
                         )}
@@ -2882,25 +2882,26 @@ function EventDetail() {
                     </div>
 
                     {/* 4 stat blocks */}
-                    <div className="grid grid-cols-4 gap-2 mt-4">
+                    <div className="grid grid-cols-4 gap-1.5 mt-2.5">
                       {[
                         { key: "present", val: counts.present, label: t("attendance.present"), tone: "bg-emerald-300" },
                         { key: "uncertain", val: counts.uncertain, label: t("attendance.uncertain"), tone: "bg-amber-300" },
                         { key: "absent", val: counts.absent, label: t("attendance.absent"), tone: "bg-rose-300" },
                         { key: "pending", val: counts.pending, label: t("attendance.pending"), tone: "bg-white/60" },
                       ].map((b) => (
-                        <div key={b.key} className="rounded-2xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-2 py-2 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
+                        <div key={b.key} className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center">
+                          <div className="flex items-center justify-center gap-1">
                             <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
-                            <span className="text-base font-extrabold tabular-nums leading-none">{b.val}</span>
+                            <span className="text-sm font-extrabold tabular-nums leading-none">{b.val}</span>
                           </div>
-                          <p className="text-[10px] uppercase tracking-wider text-white/75 font-semibold mt-1 truncate">
+                          <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
                             {b.label}
                           </p>
                         </div>
                       ))}
                     </div>
                   </div>
+
                 </div>
               );
             }
