@@ -2087,11 +2087,7 @@ function EventDetail() {
           : buildConvocationMessage(base);
         const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
         const reminderMsg = buildReminderMessage({ ...base, respondents });
-        const modeLabel = mode === "whatsapp"
-          ? t("events.whatsappShare.modeWhatsappOnly")
-          : mode === "hybrid"
-            ? t("events.whatsappShare.modeHybrid")
-            : t("events.whatsappShare.modeQuickShare");
+        void mode;
         const convocCount = (convocations ?? []).length;
         return (
           <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-slate-200 bg-white shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
