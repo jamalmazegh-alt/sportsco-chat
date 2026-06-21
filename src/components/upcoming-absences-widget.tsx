@@ -81,82 +81,119 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
   const upcoming14 = rows.filter((r) => r.start_date <= in14days && r.end_date >= today);
   const reducedSquad = upcoming14.length >= 3;
 
+  const noAbsences = total === 0 && !isLoading;
+  const headerBg = noAbsences
+    ? "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)"
+    : "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)";
+
   return (
-    <section className={cn("rounded-2xl border border-border bg-card p-4", className)}>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div
-            className={cn(
-              "h-8 w-8 rounded-lg flex items-center justify-center",
-              total > 0 ? "bg-sky-500/10 text-sky-600" : "bg-emerald-500/10 text-emerald-600",
-            )}
-          >
-            {total > 0 ? <Palmtree className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+    <section
+      className={cn(
+        "relative overflow-hidden rounded-[16px] border-[1.5px] border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(15,40,24,0.04)]",
+        className,
+      )}
+    >
+      {/* Header gradient */}
+      <div className="relative overflow-hidden p-4" style={{ background: headerBg }}>
+        <svg
+          aria-hidden
+          className="absolute inset-0 h-full w-full opacity-[0.12] pointer-events-none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <pattern id="abs-pat" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="30" stroke="#fff" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#abs-pat)" />
+        </svg>
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-10 w-10 rounded-[12px] bg-white/20 backdrop-blur-sm ring-1 ring-white/30 flex items-center justify-center shrink-0">
+              {noAbsences ? (
+                <CheckCircle2 className="h-5 w-5 text-white" strokeWidth={2.4} />
+              ) : (
+                <Palmtree className="h-5 w-5 text-white" strokeWidth={2.4} />
+              )}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-[15px] font-black text-white leading-tight truncate">
+                {noAbsences
+                  ? t("availability.noneUpcoming", { defaultValue: "Aucune absence à venir" })
+                  : t("availability.upcomingWidget", { defaultValue: "Absences à venir" })}
+              </h2>
+              {!noAbsences && (
+                <p className="text-[11px] font-bold text-white/85 uppercase tracking-[0.1em] mt-0.5">
+                  {total} {total > 1 ? "joueurs" : "joueur"}
+                </p>
+              )}
+            </div>
           </div>
-          <h2 className="text-sm font-semibold">
-            {isLoading
-              ? t("availability.upcomingWidget", { defaultValue: "Absences à venir" })
-              : total > 0
-                ? t("availability.upcomingWidget", { defaultValue: "Absences à venir" })
-                : t("availability.noneUpcoming", { defaultValue: "Aucune absence à venir" })}
-          </h2>
+          {canDeclare && (
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="shrink-0 text-[11px] font-bold inline-flex items-center gap-0.5 text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm ring-1 ring-white/30 px-2.5 py-1.5 rounded-full transition-all"
+            >
+              {t("availability.declare", { defaultValue: "Déclarer" })}
+              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
+            </button>
+          )}
         </div>
-        {canDeclare && (
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            className="text-xs text-primary font-medium inline-flex items-center gap-0.5"
-          >
-            {t("availability.declare", { defaultValue: "Déclarer" })}
-            <ChevronRight className="h-3 w-3" />
-          </button>
-        )}
       </div>
 
-      {reducedSquad && (
-        <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
-          <AlertTriangle className="h-3.5 w-3.5" />
-          {t("availability.reducedSquad", {
-            n: upcoming14.length,
-            defaultValue: `⚠️ ${upcoming14.length} joueurs indisponibles dans les 14 prochains jours`,
-          })}
-        </div>
-      )}
+      {/* Body */}
+      {(reducedSquad || total > 0 || canDeclare) && (
+        <div className="p-3 space-y-2.5">
+          {reducedSquad && (
+            <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} />
+              {t("availability.reducedSquad", {
+                n: upcoming14.length,
+                defaultValue: `⚠️ ${upcoming14.length} joueurs indisponibles dans les 14 prochains jours`,
+              })}
+            </div>
+          )}
 
-      {total > 0 && (
-        <ul className="mt-3 space-y-1.5">
-          {top.map((r) => {
-            const name = r.player
-              ? `${r.player.first_name} ${r.player.last_name.charAt(0)}.`
-              : "—";
-            return (
-              <li
-                key={r.id}
-                className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background px-3 py-2 text-sm"
-              >
-                <Link
-                  to="/players/$playerId"
-                  params={{ playerId: r.player_id }}
-                  className="min-w-0 flex-1"
-                >
-                  <p className="font-medium truncate">{name}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    {formatRange(r.start_date, r.end_date)}
-                  </p>
-                </Link>
-                <UnavailableBadge reason={r.reason} />
-              </li>
-            );
-          })}
-        </ul>
-      )}
+          {total > 0 && (
+            <ul className="space-y-1.5">
+              {top.map((r) => {
+                const name = r.player
+                  ? `${r.player.first_name} ${r.player.last_name.charAt(0)}.`
+                  : "—";
+                return (
+                  <li
+                    key={r.id}
+                    className="flex items-center justify-between gap-2 rounded-[10px] border-[1.5px] border-[#e2e8f0] bg-white px-3 py-2 text-sm hover:border-[#cbd5e1] transition-colors"
+                  >
+                    <Link
+                      to="/players/$playerId"
+                      params={{ playerId: r.player_id }}
+                      className="min-w-0 flex-1"
+                    >
+                      <p className="font-bold text-[13px] text-[#0f2818] truncate">{name}</p>
+                      <p className="text-[11px] text-[#64748b] font-medium truncate">
+                        {formatRange(r.start_date, r.end_date)}
+                      </p>
+                    </Link>
+                    <UnavailableBadge reason={r.reason} />
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
-      {canDeclare && (
-        <div className="mt-3 flex items-center gap-2">
-          <Button size="sm" variant="outline" className="flex-1" onClick={() => setDrawerOpen(true)}>
-            <Plus className="h-4 w-4" />
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-          </Button>
+          {canDeclare && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full border-[1.5px] border-[#e2e8f0] hover:border-[#2d9d5f] hover:bg-[#f0f9f3] hover:text-[#0f4a26] font-bold rounded-[10px]"
+              onClick={() => setDrawerOpen(true)}
+            >
+              <Plus className="h-4 w-4" strokeWidth={2.4} />
+              {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            </Button>
+          )}
         </div>
       )}
 
