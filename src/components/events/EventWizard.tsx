@@ -1246,7 +1246,7 @@ function WizardHero({
             aria-hidden
             className="shrink-0 h-9 w-9 rounded-xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm flex items-center justify-center shadow-[0_6px_18px_-6px_rgba(0,0,0,0.35)]"
           >
-            <Icon className="h-4.5 w-4.5 text-white" strokeWidth={2.25} />
+            <Icon className="h-[18px] w-[18px] text-white" strokeWidth={2.25} />
           </div>
         </div>
 
