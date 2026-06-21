@@ -1105,11 +1105,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 function StepQuestion({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
-      <h3 className="text-base font-semibold">{title}</h3>
+      <h3 className="sr-only">{title}</h3>
       <div className="space-y-2">{children}</div>
     </div>
   );
 }
+
 
 function DoorButton({
   icon,
