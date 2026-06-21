@@ -211,14 +211,15 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
       title={t("wizard.title")}
     >
       <form onSubmit={onSubmit} className="space-y-5 mt-4 pb-6">
-        <Stepper step={step} total={4} />
+        <WizardProgress step={step} total={4} />
 
         {step === 0 && (
-          <div className="space-y-4">
-            <h3 className="font-medium flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-primary" />
-              {t("wizard.identity")}
-            </h3>
+          <WizardStepBody key="step-0">
+            <WizardStepHeading
+              icon={<Trophy className="h-4 w-4" />}
+              eyebrow={t("wizard.stepEyebrow", { defaultValue: `Étape 1 / 4` })}
+              title={t("wizard.identity")}
+            />
             <div className="space-y-1.5">
               <Label>{t("wizard.name")}</Label>
               <Input
@@ -259,13 +260,17 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
                 max={1}
               />
             </div>
-          </div>
+          </WizardStepBody>
         )}
 
 
         {step === 1 && (
-          <div className="space-y-4">
-            <h3 className="font-medium">{t("wizard.datesAndPlace")}</h3>
+          <WizardStepBody key="step-1">
+            <WizardStepHeading
+              icon={<CalendarRange className="h-4 w-4" />}
+              eyebrow={t("wizard.stepEyebrow2", { defaultValue: `Étape 2 / 4` })}
+              title={t("wizard.datesAndPlace")}
+            />
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>{t("wizard.start")}</Label>
@@ -305,27 +310,25 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
               </p>
 
             </div>
-          </div>
+          </WizardStepBody>
         )}
 
         {step === 2 && (
-          <div className="space-y-4">
-            <h3 className="font-medium">{t("wizard.format")}</h3>
+          <WizardStepBody key="step-2">
+            <WizardStepHeading
+              icon={<LayoutGrid className="h-4 w-4" />}
+              eyebrow={t("wizard.stepEyebrow3", { defaultValue: `Étape 3 / 4` })}
+              title={t("wizard.format")}
+            />
             <div className="grid grid-cols-1 gap-2">
               {formatOptions.map((f) => (
-                <button
-                  type="button"
+                <WizardOptionCard
                   key={f.v}
+                  active={format === f.v}
                   onClick={() => setFormat(f.v)}
-                  className={`text-left rounded-xl border p-3 transition-colors ${
-                    format === f.v
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card hover:bg-muted/40"
-                  }`}
-                >
-                  <div className="font-medium text-sm">{f.label}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{f.desc}</div>
-                </button>
+                  title={f.label}
+                  description={f.desc}
+                />
               ))}
             </div>
             <div className="space-y-1.5">
@@ -374,26 +377,33 @@ export function TournamentWizard({ clubId, open, onOpenChange, initialValues, as
                 </p>
               </div>
             )}
-          </div>
+          </WizardStepBody>
         )}
 
         {step === 3 && (
-          <div className="space-y-4">
-            <h3 className="font-medium">{t("wizard.summary")}</h3>
-            <dl className="rounded-xl border border-border bg-card divide-y divide-border text-sm">
-              <Row label={t("wizard.rowName")} value={name} />
-              <Row label={t("wizard.rowSport")} value={sport} />
-              {category && <Row label={t("wizard.rowCategory")} value={category} />}
-              <Row label={t("wizard.rowStart")} value={startsOn} />
-              {endsOn && <Row label={t("wizard.rowEnd")} value={endsOn} />}
-              <Row label={t("wizard.rowFormat")} value={format} />
-              <Row label={t("wizard.rowTeams")} value={String(numTeams)} />
-              {location && <Row label={t("wizard.rowPlace")} value={location} />}
+          <WizardStepBody key="step-3">
+            <WizardStepHeading
+              icon={<ListChecks className="h-4 w-4" />}
+              eyebrow={t("wizard.stepEyebrow4", { defaultValue: `Étape 4 / 4` })}
+              title={t("wizard.summary")}
+            />
+            <dl className="relative overflow-hidden rounded-xl border border-border bg-card divide-y divide-border text-sm">
+              <div aria-hidden className="absolute inset-0 bg-speed-lines opacity-40 pointer-events-none" />
+              <div className="relative">
+                <Row label={t("wizard.rowName")} value={name} />
+                <Row label={t("wizard.rowSport")} value={sport} />
+                {category && <Row label={t("wizard.rowCategory")} value={category} />}
+                <Row label={t("wizard.rowStart")} value={startsOn} />
+                {endsOn && <Row label={t("wizard.rowEnd")} value={endsOn} />}
+                <Row label={t("wizard.rowFormat")} value={format} />
+                <Row label={t("wizard.rowTeams")} value={String(numTeams)} />
+                {location && <Row label={t("wizard.rowPlace")} value={location} />}
+              </div>
             </dl>
             <p className="text-xs text-muted-foreground">
               {t("wizard.summaryHint")}
             </p>
-          </div>
+          </WizardStepBody>
         )}
 
         <div className="flex items-center justify-between gap-2 pt-2">
