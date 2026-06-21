@@ -1766,13 +1766,7 @@ function EventDetail() {
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="text-[15px] font-extrabold tracking-[-0.3px] leading-[1.25] text-foreground">
-                {event.type === "match" && event.opponent ? (
-                  <span className="inline-flex items-baseline gap-1.5 flex-wrap">
-                    <span>{teams?.[0]?.name ?? event.title}</span>
-                    <span className="text-muted-foreground font-medium text-xs">vs</span>
-                    <span>{event.opponent}</span>
-                  </span>
-                ) : event.title}
+                {event.title}
               </h1>
               <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <Clock className="h-3.5 w-3.5 text-[#1d7a45]" />
