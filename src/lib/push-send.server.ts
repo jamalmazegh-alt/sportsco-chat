@@ -88,9 +88,19 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   return cachedVapidKey;
 }
 
+function getVapidSubject(): string {
+  const fallback = "mailto:contact@clubero.app";
+  const raw = (process.env.VAPID_SUBJECT || "").trim();
+  if (!raw) return fallback;
+  if (/^(mailto:|https:\/\/)/i.test(raw)) return raw;
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return `mailto:${raw}`;
+  console.warn("[push] invalid VAPID_SUBJECT format, using fallback");
+  return fallback;
+}
+
 async function buildVapidJwt(audience: string): Promise<string> {
   const { priv } = await loadVapidKey();
-  const subject = process.env.VAPID_SUBJECT || "mailto:contact@clubero.app";
+  const subject = getVapidSubject();
   const header = { typ: "JWT", alg: "ES256" };
   const exp = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12h
   const payload = { aud: audience, exp, sub: subject };
@@ -118,11 +128,20 @@ async function hkdf(
   info: Uint8Array,
   length: number,
 ): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", ikm.buffer.slice(ikm.byteOffset, ikm.byteOffset + ikm.byteLength) as ArrayBuffer, "HKDF", false, [
-    "deriveBits",
-  ]);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    ikm.buffer.slice(ikm.byteOffset, ikm.byteOffset + ikm.byteLength) as ArrayBuffer,
+    "HKDF",
+    false,
+    ["deriveBits"],
+  );
   const bits = await crypto.subtle.deriveBits(
-    { name: "HKDF", hash: "SHA-256", salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer, info: info.buffer.slice(info.byteOffset, info.byteOffset + info.byteLength) as ArrayBuffer },
+    {
+      name: "HKDF",
+      hash: "SHA-256",
+      salt: salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer,
+      info: info.buffer.slice(info.byteOffset, info.byteOffset + info.byteLength) as ArrayBuffer,
+    },
     key,
     length * 8,
   );
@@ -142,7 +161,10 @@ async function encryptPayload(
 
   const uaKey = await crypto.subtle.importKey(
     "raw",
-    uaPublicKey.buffer.slice(uaPublicKey.byteOffset, uaPublicKey.byteOffset + uaPublicKey.byteLength) as ArrayBuffer,
+    uaPublicKey.buffer.slice(
+      uaPublicKey.byteOffset,
+      uaPublicKey.byteOffset + uaPublicKey.byteLength,
+    ) as ArrayBuffer,
     { name: "ECDH", namedCurve: "P-256" },
     false,
     [],
@@ -155,11 +177,7 @@ async function encryptPayload(
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
   // PRK_key = HKDF-Extract(auth_secret, ecdh_secret) then expand with "WebPush: info\0|ua_public|as_public"
-  const keyInfo = concatBytes(
-    new TextEncoder().encode("WebPush: info\0"),
-    uaPublicKey,
-    ephPubRaw,
-  );
+  const keyInfo = concatBytes(new TextEncoder().encode("WebPush: info\0"), uaPublicKey, ephPubRaw);
   const ikm = await hkdf(ecdhSecret, authSecret, keyInfo, 32);
 
   // CEK
@@ -173,11 +191,25 @@ async function encryptPayload(
   // Plaintext + 0x02 padding delimiter (single record)
   const padded = concatBytes(plaintext, new Uint8Array([0x02]));
 
-  const aesKey = await crypto.subtle.importKey("raw", cek.buffer.slice(cek.byteOffset, cek.byteOffset + cek.byteLength) as ArrayBuffer, { name: "AES-GCM" }, false, [
-    "encrypt",
-  ]);
+  const aesKey = await crypto.subtle.importKey(
+    "raw",
+    cek.buffer.slice(cek.byteOffset, cek.byteOffset + cek.byteLength) as ArrayBuffer,
+    { name: "AES-GCM" },
+    false,
+    ["encrypt"],
+  );
   const ciphertext = new Uint8Array(
-    await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce.buffer.slice(nonce.byteOffset, nonce.byteOffset + nonce.byteLength) as ArrayBuffer }, aesKey, padded.buffer.slice(padded.byteOffset, padded.byteOffset + padded.byteLength) as ArrayBuffer),
+    await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: nonce.buffer.slice(
+          nonce.byteOffset,
+          nonce.byteOffset + nonce.byteLength,
+        ) as ArrayBuffer,
+      },
+      aesKey,
+      padded.buffer.slice(padded.byteOffset, padded.byteOffset + padded.byteLength) as ArrayBuffer,
+    ),
   );
 
   // Build aes128gcm record:
@@ -221,11 +253,16 @@ async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<numb
     headers: {
       "Content-Encoding": "aes128gcm",
       "Content-Type": "application/octet-stream",
-      "TTL": "86400",
-      "Authorization": `vapid t=${jwt}, k=${pubB64u}`,
+      TTL: "86400",
+      Authorization: `vapid t=${jwt}, k=${pubB64u}`,
     },
     body: body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer,
   });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    console.warn("[push] provider rejected", res.status, detail.slice(0, 240));
+  }
 
   return res.status;
 }
