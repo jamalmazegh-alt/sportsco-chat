@@ -3087,15 +3087,12 @@ function EventDetail() {
                         return (
                           <li
                             key={c.id}
-                            className="group rounded-2xl px-2.5 py-2 hover:bg-slate-50 transition-colors"
+                            className="group rounded-2xl px-2 py-1.5 hover:bg-slate-50 transition-colors"
                           >
-                            <div className={cn(
-                              "flex gap-3",
-                              isCoach ? "flex-col sm:flex-row sm:items-center sm:justify-between" : "flex-row items-center justify-between"
-                            )}>
-                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="flex flex-row items-center justify-between gap-2">
+                              <div className="flex items-center gap-2.5 min-w-0 flex-1">
                                 <div className="relative shrink-0">
-                                  <div className={cn("h-10 w-10 rounded-full overflow-hidden flex items-center justify-center text-[13px] font-bold", avatarCls)}>
+                                  <div className={cn("h-9 w-9 rounded-full overflow-hidden flex items-center justify-center text-[12px] font-bold", avatarCls)}>
                                     {c.players?.photo_url ? (
                                       <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
                                     ) : (
@@ -3104,36 +3101,34 @@ function EventDetail() {
                                   </div>
                                   {isPending && (
                                     <span
-                                      className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
+                                      className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
                                       aria-label={t("attendance.pending")}
                                     />
                                   )}
                                 </div>
-                                <div className="min-w-0">
+                                <div className="min-w-0 flex-1">
                                   <p className="text-[13px] font-bold text-slate-900 truncate leading-tight">
                                     {first} {last}
                                   </p>
-                                  <p className="text-[10px] text-slate-500 mt-0.5 truncate uppercase tracking-wide font-semibold">
-                                    {[position, jersey ? `#${jersey}` : null].filter(Boolean).join(" · ") ||
-                                      (isPending ? t("attendance.pendingShortLabel", { defaultValue: "En attente de réponse" }) : "")}
-                                  </p>
-                                  {c.comment && (isCoach || c.players?.user_id === user?.id) && (
-                                    <p className="text-[11px] text-slate-500 italic truncate mt-0.5">"{c.comment}"</p>
+                                  {(position || jersey) && (
+                                    <p className="text-[10px] text-slate-500 mt-0.5 truncate uppercase tracking-wide font-semibold">
+                                      {[position, jersey ? `#${jersey}` : null].filter(Boolean).join(" · ")}
+                                    </p>
                                   )}
                                 </div>
                               </div>
-                              <div className={cn("flex items-center gap-1 shrink-0", isCoach ? "w-full sm:w-auto" : "w-auto")}>
+                              <div className="flex items-center gap-0.5 shrink-0">
                                 {isCoach ? (
                                   <>
-                                    <div className="grid flex-1 grid-cols-3 gap-1 rounded-xl border bg-background/80 p-1 sm:flex sm:flex-none sm:rounded-full sm:gap-0.5 sm:p-0.5">
+                                    <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
                                       {ATTENDANCE_ACTIONS.filter(a => a.status !== "pending").map(({ status, Icon, className }) => (
                                         <Button
                                           key={status}
                                           type="button"
-                                          size="sm"
+                                          size="icon"
                                           variant="ghost"
                                           className={cn(
-                                            "h-8 min-w-0 rounded-lg px-1.5 text-[11px] sm:h-7 sm:rounded-full sm:px-2",
+                                            "h-7 w-7 rounded-full",
                                             c.status === status
                                               ? status === "present" ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
                                                 : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
@@ -3144,16 +3139,10 @@ function EventDetail() {
                                           title={t(`attendance.${status}`)}
                                           aria-label={t(`attendance.${status}`)}
                                         >
-                                          <Icon className="h-4 w-4" />
-                                          <span className="truncate">{t(`attendance.${status}`)}</span>
+                                          <Icon className="h-3.5 w-3.5" />
                                         </Button>
                                       ))}
                                     </div>
-                                    {isPending && (
-                                      <Button size="icon" variant="ghost" className="h-7 w-7 text-amber-600" onClick={() => remind(c.id)} title={t("attendance.remind")}>
-                                        <Bell className="h-3.5 w-3.5" />
-                                      </Button>
-                                    )}
                                     <Button
                                       size="icon"
                                       variant="ghost"
@@ -3169,7 +3158,11 @@ function EventDetail() {
                                 )}
                               </div>
                             </div>
+                            {c.comment && (isCoach || c.players?.user_id === user?.id) && (
+                              <p className="text-[11px] text-slate-500 italic truncate mt-1 pl-[44px]">"{c.comment}"</p>
+                            )}
                           </li>
+
                         );
                       })}
                     </ul>
