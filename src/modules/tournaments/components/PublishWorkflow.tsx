@@ -208,19 +208,21 @@ export function PublishWorkflow({
 
 
       {/* Banner body */}
-      <div className="px-5 pb-5">
+      <div className="px-5 pt-5 pb-5">
         <div className="flex items-start gap-4">
           <div
             className={cn(
-              "h-12 w-12 rounded-2xl flex items-center justify-center shrink-0",
+              "h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ring-[1.5px]",
               meta.iconBgClass,
+              meta.borderClass,
             )}
           >
             <meta.Icon className={cn("h-6 w-6", meta.iconClass)} />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold leading-tight">{meta.title}</h2>
-            <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
+            <h2 className="text-lg font-extrabold leading-tight tracking-tight">{meta.title}</h2>
+            <p className="text-sm text-slate-500 mt-1">{meta.subtitle}</p>
+
 
             {/* Fix D — the "Publier" action lives only in the Continue CTA
                 (publish_tournament step) to avoid two competing publish buttons.
