@@ -199,7 +199,17 @@ async function encryptPayload(
     ["encrypt"],
   );
   const ciphertext = new Uint8Array(
-    await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce.buffer.slice(nonce.byteOffset, nonce.byteOffset + nonce.byteLength) as ArrayBuffer }, aesKey, padded.buffer.slice(padded.byteOffset, padded.byteOffset + padded.byteLength) as ArrayBuffer),
+    await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: nonce.buffer.slice(
+          nonce.byteOffset,
+          nonce.byteOffset + nonce.byteLength,
+        ) as ArrayBuffer,
+      },
+      aesKey,
+      padded.buffer.slice(padded.byteOffset, padded.byteOffset + padded.byteLength) as ArrayBuffer,
+    ),
   );
 
   // Build aes128gcm record:
@@ -243,8 +253,8 @@ async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<numb
     headers: {
       "Content-Encoding": "aes128gcm",
       "Content-Type": "application/octet-stream",
-      "TTL": "86400",
-      "Authorization": `vapid t=${jwt}, k=${pubB64u}`,
+      TTL: "86400",
+      Authorization: `vapid t=${jwt}, k=${pubB64u}`,
     },
     body: body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer,
   });
