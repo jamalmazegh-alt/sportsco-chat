@@ -857,6 +857,18 @@ function EventDetail() {
       if (notificationError) toast.error(notificationError.message);
     }
 
+    // Web Push fire-and-forget — parallèle à l'email, n'attend pas
+    void (async () => {
+      try {
+        const { dispatchConvocationPush } = await import("@/lib/push-dispatch.functions");
+        await dispatchConvocationPush({ data: { eventId: event.id, playerIds: toInsert } });
+      } catch (e) {
+        console.warn("[push] convocation dispatch failed", e);
+      }
+    })();
+
+
+
     // 1-tap email invitations to player + parents (best-effort, non-blocking)
     if (useEmail) try {
       const { data: playersInfo } = await supabase
