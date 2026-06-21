@@ -110,8 +110,24 @@ function getVapidSubject(): string {
   const fallback = "mailto:contact@clubero.app";
   const raw = (process.env.VAPID_SUBJECT || "").trim();
   if (!raw) return fallback;
-  if (/^(mailto:|https:\/\/)/i.test(raw)) return raw;
-  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return `mailto:${raw}`;
+  const emailPattern = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/;
+  if (/^mailto:/i.test(raw)) {
+    const email = raw.replace(/^mailto:/i, "").trim().replace(/^<|>$/g, "").trim();
+    if (emailPattern.test(email)) return `mailto:${email}`;
+    console.warn("[push] invalid VAPID_SUBJECT mailto, using fallback");
+    return fallback;
+  }
+  if (/^https:\/\//i.test(raw)) {
+    try {
+      const url = new URL(raw);
+      if (url.protocol === "https:") return url.toString();
+    } catch {
+      // fall through to fallback
+    }
+    console.warn("[push] invalid VAPID_SUBJECT url, using fallback");
+    return fallback;
+  }
+  if (emailPattern.test(raw)) return `mailto:${raw}`;
   console.warn("[push] invalid VAPID_SUBJECT format, using fallback");
   return fallback;
 }
