@@ -161,7 +161,11 @@ export function toEventPayloadInput(
 
   // Combine game format + user comment into description
   const descParts: string[] = [];
-  if (state.gameFormat) descParts.push(`Format: ${state.gameFormat}`);
+  if (state.gameFormat) {
+    descParts.push(
+      `Format: ${state.gameFormat}${state.halvesFormat ? ` · ${state.halvesFormat} min` : ""}`,
+    );
+  }
   if (state.description?.trim()) descParts.push(state.description.trim());
   const desc = descParts.length ? descParts.join("\n") : null;
 
