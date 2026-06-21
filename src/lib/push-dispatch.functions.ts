@@ -189,3 +189,43 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     }
     return { dispatched };
   });
+
+/* ------------------------------------------------------------------ */
+/* #7 — Convocation response push (authenticated caller)              */
+/* ------------------------------------------------------------------ */
+const ResponseInput = z.object({
+  convocationId: z.string().uuid(),
+});
+
+export const dispatchConvocationResponsePush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ResponseInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { fanoutConvocationResponse, fanoutConvocationComplete } = await import(
+      "@/lib/push-fanout.server"
+    );
+    const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId, {
+      excludeUserId: context.userId,
+    });
+    let complete = 0;
+    if (eventId) {
+      const r = await fanoutConvocationComplete(eventId);
+      complete = r.dispatched;
+    }
+    return { dispatched, complete };
+  });
+
+/* ------------------------------------------------------------------ */
+/* #10 — Tournament draw published                                     */
+/* ------------------------------------------------------------------ */
+const DrawInput = z.object({
+  tournament_id: z.string().uuid(),
+});
+
+export const dispatchTournamentDrawPush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => DrawInput.parse(input))
+  .handler(async ({ data }) => {
+    const { fanoutTournamentDraw } = await import("@/lib/push-fanout.server");
+    return fanoutTournamentDraw(data.tournament_id);
+  });

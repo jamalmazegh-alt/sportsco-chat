@@ -150,6 +150,12 @@ function RespondPage() {
       setError(rpcError.message || t("respond.submitError"));
       return;
     }
+    // Fire-and-forget push fan-out (coaches/admins + complete check)
+    void fetch("/api/public/push/convocation-response", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    }).catch(() => {});
     await load();
   }
 
