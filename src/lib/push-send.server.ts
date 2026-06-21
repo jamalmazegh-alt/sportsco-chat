@@ -390,8 +390,9 @@ export async function sendPushToUser(
         console.warn("[push] non-2xx status", status, "endpoint:", s.endpoint);
       }
     } catch (e) {
-      console.warn("[push] send threw", (e as Error).message);
+      console.warn("[push v3-jwk] send threw", (e as Error).message, "stack:", (e as Error).stack?.slice(0, 200));
     }
+
   }
 
   if (toPrune.length) {
