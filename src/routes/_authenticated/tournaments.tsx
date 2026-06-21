@@ -111,15 +111,15 @@ function StatusPill({ status, tone }: { status: string; tone: "live" | "upcoming
       ? "bg-emerald-500 text-white"
       : tone === "upcoming"
         ? "bg-sky-500 text-white"
-        : "bg-slate-200 text-slate-700";
+        : "bg-slate-200 text-muted-foreground";
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm ${styles}`}
     >
       {tone === "live" && (
         <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-card opacity-75" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-card" />
         </span>
       )}
       {label}
@@ -199,7 +199,7 @@ function TournamentsList() {
       >
         <TrophyPattern />
         <div className="relative flex items-center gap-3">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-card/15 ring-1 ring-white/25 backdrop-blur">
             <Trophy className="h-5 w-5" />
           </div>
           <div className="min-w-0">
@@ -228,7 +228,7 @@ function TournamentsList() {
         >
           <TrophyPattern />
           <div className="relative flex items-start gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/15 ring-1 ring-white/25">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card/15 ring-1 ring-white/25">
               <Sparkles className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
@@ -252,14 +252,14 @@ function TournamentsList() {
           </div>
           <div className="relative mt-4 flex flex-wrap gap-2">
             {canCreate ? (
-              <Button asChild size="sm" className="bg-white text-emerald-800 hover:bg-white/90">
+              <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
                 <Link to="/tournaments/new-from-pass">
                   <Zap className="h-4 w-4" />
                   Créer maintenant
                 </Link>
               </Button>
             ) : (
-              <Button asChild size="sm" className="bg-white text-emerald-800 hover:bg-white/90">
+              <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
                 <Link to="/tournaments/pricing">
                   <Trophy className="h-4 w-4" />
                   Voir les plans
@@ -271,7 +271,7 @@ function TournamentsList() {
                 asChild
                 size="sm"
                 variant="outline"
-                className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                className="border-white/40 bg-card/10 text-white hover:bg-card/20 hover:text-white"
               >
                 <Link to="/tournaments/pricing">Voir les plans</Link>
               </Button>
@@ -288,7 +288,7 @@ function TournamentsList() {
           {[0, 1].map((i) => (
             <div
               key={i}
-              className="h-32 animate-pulse rounded-[16px] border border-[#e2e8f0] bg-white"
+              className="h-32 animate-pulse rounded-[16px] border border-border bg-card"
               style={{ borderWidth: 1.5 }}
             />
           ))}
@@ -332,19 +332,19 @@ function TournamentsList() {
               <Link
                 to="/tournaments/$tournamentId"
                 params={{ tournamentId: trn.id }}
-                className="group block overflow-hidden rounded-[16px] border bg-white transition-transform active:scale-[0.99]"
+                className="group block overflow-hidden rounded-[16px] border bg-card transition-transform active:scale-[0.99]"
                 style={{ borderColor: "#e2e8f0", borderWidth: 1.5, boxShadow: CARD_SHADOW }}
               >
                 <CardHeaderStrip status={trn.status} />
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 p-4">
                   <div className="min-w-0">
                     <p
-                      className="truncate text-[15px] font-extrabold text-slate-900"
+                      className="truncate text-[15px] font-extrabold text-foreground"
                       style={{ letterSpacing: "-0.2px" }}
                     >
                       {trn.name}
                     </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] text-slate-600">
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5">
                         <span className="grid h-5 w-5 place-items-center rounded-md bg-emerald-50 text-emerald-700">
                           <Calendar className="h-3 w-3" />

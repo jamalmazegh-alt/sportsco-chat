@@ -146,7 +146,7 @@ export function TournamentSimulator({
 
         {/* Visual timeline */}
         <div className="mt-4">
-          <div className="flex h-3 w-full overflow-hidden rounded-full bg-white/15">
+          <div className="flex h-3 w-full overflow-hidden rounded-full bg-card/15">
             <div
               className="bg-emerald-300/90"
               style={{ width: `${phases.poolPct}%` }}

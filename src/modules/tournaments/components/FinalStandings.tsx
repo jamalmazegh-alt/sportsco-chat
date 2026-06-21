@@ -141,7 +141,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
 
   return (
     <section
-      className="relative overflow-hidden rounded-[18px] border-[1.5px] border-emerald-300/50 bg-white dark:bg-card"
+      className="relative overflow-hidden rounded-[18px] border-[1.5px] border-emerald-300/50 bg-card dark:bg-card"
       style={{ boxShadow: "0 4px 20px rgba(29,122,69,0.12)" }}
     >
       {/* Hero header — Anime Premium green */}
@@ -189,7 +189,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
           <Button
             size="sm"
             onClick={share}
-            className="h-8 bg-white/15 hover:bg-white/25 text-white ring-1 ring-white/30 backdrop-blur"
+            className="h-8 bg-card/15 hover:bg-card/25 text-white ring-1 ring-white/30 backdrop-blur"
           >
             <Share2 className="h-3.5 w-3.5 mr-1.5" />
             {t("finalStandings.share", { defaultValue: "Partager" })}
@@ -209,7 +209,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
               <PodiumStep
                 rank={2}
                 team={p.second}
-                icon={<Medal className="h-5 w-5 text-slate-500" strokeWidth={2.4} />}
+                icon={<Medal className="h-5 w-5 text-muted-foreground" strokeWidth={2.4} />}
                 heightClass="h-20"
                 gradient="linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)"
                 ringClass="ring-slate-300"
@@ -261,7 +261,7 @@ function PodiumStep({
       <div className="flex flex-col items-center gap-1 min-h-[3.5rem]">
         <div
           className={cn(
-            "flex items-center justify-center rounded-full bg-white ring-2 shadow-sm",
+            "flex items-center justify-center rounded-full bg-card ring-2 shadow-sm",
             ringClass,
             emphasis ? "h-11 w-11" : "h-9 w-9",
           )}

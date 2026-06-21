@@ -76,8 +76,8 @@ function Block({
   return (
     <section
       className={cn(
-        "rounded-[18px] border-[1.5px] bg-white overflow-hidden",
-        tone === "primary" ? "border-emerald-300" : "border-slate-200",
+        "rounded-[18px] border-[1.5px] bg-card overflow-hidden",
+        tone === "primary" ? "border-emerald-300" : "border-border",
       )}
       style={{ boxShadow: "0 4px 16px -6px rgba(29,122,69,0.10)" }}
     >
@@ -102,7 +102,7 @@ function Block({
         </svg>
         <div
           className={cn(
-            "relative h-9 w-9 rounded-xl flex items-center justify-center shrink-0 bg-white/15 backdrop-blur ring-1 ring-white/30",
+            "relative h-9 w-9 rounded-xl flex items-center justify-center shrink-0 bg-card/15 backdrop-blur ring-1 ring-white/30",
           )}
         >
           <span className="[&_svg]:text-white">{icon}</span>

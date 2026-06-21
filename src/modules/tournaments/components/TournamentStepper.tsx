@@ -31,18 +31,18 @@ export function TournamentStepper({ steps }: Props) {
 
   return (
     <div
-      className="rounded-2xl border-[1.5px] border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+      className="rounded-2xl border-[1.5px] border-border bg-card p-4 dark:border-slate-800 dark:bg-slate-900"
       style={{ boxShadow: "0 1px 2px rgba(15,23,42,.04)" }}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
           {t("controlCenter.progress", { defaultValue: "Progression" })}
         </span>
         <span className="text-[11px] font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
           {progress}%
         </span>
       </div>
-      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-muted dark:bg-slate-800">
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{ width: `${progress}%`, background: GREEN_GRADIENT }}
@@ -66,10 +66,10 @@ export function TournamentStepper({ steps }: Props) {
                     "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold transition-all",
                     done && "text-white shadow-sm",
                     current &&
-                      "bg-white text-emerald-700 ring-2 ring-emerald-500 dark:bg-slate-900 dark:text-emerald-400",
+                      "bg-card text-emerald-700 ring-2 ring-emerald-500 dark:bg-slate-900 dark:text-emerald-400",
                     !done &&
                       !current &&
-                      "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500",
+                      "bg-muted text-muted-foreground/70 dark:bg-slate-800 dark:text-muted-foreground",
                   )}
                   style={done ? { background: GREEN_GRADIENT } : undefined}
                 >
@@ -79,10 +79,10 @@ export function TournamentStepper({ steps }: Props) {
                   className={cn(
                     "whitespace-nowrap text-[11px] font-semibold",
                     current
-                      ? "text-slate-900 dark:text-slate-100"
+                      ? "text-foreground dark:text-slate-100"
                       : done
                         ? "text-emerald-700 dark:text-emerald-400"
-                        : "text-slate-400 dark:text-slate-500",
+                        : "text-muted-foreground/70 dark:text-muted-foreground",
                   )}
                 >
                   {label}

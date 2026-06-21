@@ -131,7 +131,7 @@ export function PoolEditorDialog({ open, onOpenChange, tournamentId }: Props) {
           </svg>
           <DialogHeader className="relative space-y-1.5 text-left">
             <DialogTitle className="flex items-center gap-2 text-white text-base font-extrabold tracking-tight">
-              <span className="h-8 w-8 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30">
+              <span className="h-8 w-8 rounded-xl bg-card/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30">
                 <Users className="h-4 w-4 text-white" />
               </span>
               {t("poolEditor.title", "Modifier les poules")}
@@ -162,30 +162,30 @@ export function PoolEditorDialog({ open, onOpenChange, tournamentId }: Props) {
               {(data?.groups ?? []).map((g, idx) => (
                 <div
                   key={g.id}
-                  className="rounded-2xl border-[1.5px] border-slate-200 overflow-hidden bg-white"
+                  className="rounded-2xl border-[1.5px] border-border overflow-hidden bg-card"
                   style={{ boxShadow: "0 2px 8px -4px rgba(15,23,42,0.08)" }}
                 >
                   <div
                     className="flex items-center gap-2 px-3 py-2 text-white text-xs font-extrabold tracking-tight"
                     style={{ background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)" }}
                   >
-                    <span className="h-5 w-5 rounded-md bg-white/20 flex items-center justify-center text-[10px] font-black">
+                    <span className="h-5 w-5 rounded-md bg-card/20 flex items-center justify-center text-[10px] font-black">
                       {String.fromCharCode(65 + idx)}
                     </span>
                     {g.name}
-                    <span className="ml-auto text-[10px] font-bold bg-white/15 px-1.5 py-0.5 rounded">
+                    <span className="ml-auto text-[10px] font-bold bg-card/15 px-1.5 py-0.5 rounded">
                       {(grouped[g.id] ?? []).length} {t("poolEditor.teamsShort", "éq.")}
                     </span>
                   </div>
                   <div className="p-3 space-y-2">
                     {(grouped[g.id] ?? []).length === 0 ? (
-                      <p className="text-xs text-slate-400 italic text-center py-2">
+                      <p className="text-xs text-muted-foreground/70 italic text-center py-2">
                         {t("poolEditor.empty", "Aucune équipe")}
                       </p>
                     ) : (
                       grouped[g.id].map((tm) => (
                         <div key={tm.id} className="flex items-center gap-2">
-                          <span className="flex-1 text-sm font-medium text-slate-700 truncate">
+                          <span className="flex-1 text-sm font-medium text-muted-foreground truncate">
                             {tm.name}
                           </span>
                           <Select

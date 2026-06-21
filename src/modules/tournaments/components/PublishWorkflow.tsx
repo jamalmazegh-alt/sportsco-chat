@@ -143,7 +143,7 @@ export function PublishWorkflow({
   return (
     <section
       className={cn(
-        "rounded-[18px] border-[1.5px] overflow-hidden bg-white",
+        "rounded-[18px] border-[1.5px] overflow-hidden bg-card",
         meta.borderClass,
       )}
       style={{ boxShadow: "0 4px 16px -6px rgba(29,122,69,0.12)" }}
@@ -177,9 +177,9 @@ export function PublishWorkflow({
                 <div
                   className={cn(
                     "h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 transition-all",
-                    active && "bg-white text-emerald-700 ring-4 ring-white/30 scale-110",
-                    reached && !active && "bg-white/90 text-emerald-700",
-                    !reached && "bg-white/15 text-white/60 ring-1 ring-white/20",
+                    active && "bg-card text-emerald-700 ring-4 ring-white/30 scale-110",
+                    reached && !active && "bg-card/90 text-emerald-700",
+                    !reached && "bg-card/15 text-white/60 ring-1 ring-white/20",
                   )}
                 >
                   {reached && !active ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
@@ -196,7 +196,7 @@ export function PublishWorkflow({
                   <div
                     className={cn(
                       "flex-1 h-[3px] rounded-full transition-colors",
-                      i < stepIndex ? "bg-white/80" : "bg-white/20",
+                      i < stepIndex ? "bg-card/80" : "bg-card/20",
                     )}
                   />
                 )}
@@ -221,7 +221,7 @@ export function PublishWorkflow({
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-extrabold leading-tight tracking-tight">{meta.title}</h2>
-            <p className="text-sm text-slate-500 mt-1">{meta.subtitle}</p>
+            <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
 
 
             {/* Fix D — the "Publier" action lives only in the Continue CTA
