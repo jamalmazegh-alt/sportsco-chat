@@ -65,76 +65,90 @@ export function HomeQuickCards({ clubId, teams }: Props) {
       {/* Teams card */}
       <Link
         to="/teams"
-        className="relative rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-transform"
+        className="group relative overflow-hidden rounded-2xl border border-border bg-card p-3 active:scale-[0.99] transition-all hover:border-accent/50 hover:shadow-[0_0_0_3px_color-mix(in_oklab,var(--accent)_12%,transparent)]"
       >
-        <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center mb-2">
-          <Users className="h-4 w-4 text-accent-foreground" />
-        </div>
-        <p className="text-2xl font-bold leading-none">{teamsCount}</p>
-        <p className="text-[11px] text-muted-foreground mt-1">
-          {t("nav.teams")}
-        </p>
-        {teamsSummary && (
-          <p className="text-[10px] text-muted-foreground mt-1 truncate">
-            {teamsSummary}
+        <div aria-hidden className="absolute inset-0 bg-speed-lines-accent opacity-60 pointer-events-none" />
+        <div aria-hidden className="absolute -top-8 -right-8 h-20 w-20 rounded-full bg-accent/20 blur-2xl pointer-events-none" />
+        <div className="relative">
+          <div className="icon-halo h-8 w-8 rounded-lg bg-accent flex items-center justify-center mb-2">
+            <Users className="h-4 w-4 text-accent-foreground" />
+          </div>
+          <p className="text-2xl font-bold leading-none font-display tracking-tight">{teamsCount}</p>
+          <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+            {t("nav.teams")}
           </p>
-        )}
-        <ChevronRight className="h-4 w-4 text-muted-foreground absolute top-2.5 right-2.5" />
+          {teamsSummary && (
+            <p className="text-[10px] text-muted-foreground mt-1 truncate">
+              {teamsSummary}
+            </p>
+          )}
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground absolute top-2.5 right-2.5 transition-transform group-hover:translate-x-0.5" />
       </Link>
 
       {/* Tournaments card */}
       <Link
         to="/tournaments"
         className={cn(
-          "relative rounded-2xl border bg-card p-3 active:scale-[0.99] transition-transform",
+          "group relative overflow-hidden rounded-2xl border bg-card p-3 active:scale-[0.99] transition-all hover:border-primary/50",
           state === "empty" && "border-dashed border-border",
-          state === "planned" && "border-border",
+          state === "planned" && "border-border hover:shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
           state === "live" &&
-            "border-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_10%,transparent)]",
+            "border-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_15%,transparent)]",
           state === "done" && "border-border opacity-90",
         )}
       >
+        <div aria-hidden className="absolute inset-0 bg-speed-lines opacity-60 pointer-events-none" />
         <div
+          aria-hidden
           className={cn(
-            "h-8 w-8 rounded-lg flex items-center justify-center mb-2",
-            state === "live" ? "bg-primary/10" : "bg-muted",
+            "absolute -top-8 -right-8 h-20 w-20 rounded-full blur-2xl pointer-events-none transition-opacity",
+            state === "live" ? "bg-primary/30" : "bg-primary/15 group-hover:bg-primary/25",
           )}
-        >
-          <Trophy
+        />
+        <div className="relative">
+          <div
             className={cn(
-              "h-4 w-4",
-              state === "live" ? "text-primary" : "text-muted-foreground",
+              "icon-halo h-8 w-8 rounded-lg flex items-center justify-center mb-2",
+              state === "live" ? "bg-primary/15" : "bg-muted",
             )}
-          />
-        </div>
+          >
+            <Trophy
+              className={cn(
+                "h-4 w-4",
+                state === "live" ? "text-primary" : "text-muted-foreground",
+              )}
+            />
+          </div>
 
-        {state === "empty" ? (
-          <>
-            <p className="text-2xl font-bold leading-none text-muted-foreground">0</p>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              {t("nav.tournaments")}
-            </p>
-            {canCreateTournament && (
-              <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
-                <Plus className="h-3 w-3" />
-                {t("dashboard.tournamentsCard.createCta", {
-                  defaultValue: "Créer un tournoi",
-                })}
+          {state === "empty" ? (
+            <>
+              <p className="text-2xl font-bold leading-none text-muted-foreground font-display tracking-tight">0</p>
+              <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+                {t("nav.tournaments")}
               </p>
-            )}
-          </>
-        ) : (
-          <>
-            <p className="text-2xl font-bold leading-none">
-              {isLoading ? "…" : count}
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              {count > 1 ? t("nav.tournaments") : t("nav.tournament", { defaultValue: "Tournoi" })}
-            </p>
-            <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
-          </>
-        )}
-        <ChevronRight className="h-4 w-4 text-muted-foreground absolute top-2.5 right-2.5" />
+              {canCreateTournament && (
+                <p className="text-[10px] font-semibold text-primary mt-1.5 inline-flex items-center gap-0.5">
+                  <Plus className="h-3 w-3" />
+                  {t("dashboard.tournamentsCard.createCta", {
+                    defaultValue: "Créer un tournoi",
+                  })}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-2xl font-bold leading-none font-display tracking-tight">
+                {isLoading ? "…" : count}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-semibold">
+                {count > 1 ? t("nav.tournaments") : t("nav.tournament", { defaultValue: "Tournoi" })}
+              </p>
+              <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
+            </>
+          )}
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground absolute top-2.5 right-2.5 transition-transform group-hover:translate-x-0.5" />
       </Link>
     </div>
   );
@@ -150,8 +164,11 @@ function StateBadge({
   const { t } = useTranslation();
   if (state === "live") {
     return (
-      <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary">
-        <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+      <span className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary border border-primary/30">
+        <span className="relative inline-flex h-1.5 w-1.5">
+          <span className="live-dot absolute inset-0 rounded-full" />
+          <span className="relative h-1.5 w-1.5 rounded-full bg-primary" />
+        </span>
         {t("dashboard.tournamentsCard.live", { defaultValue: "En cours" })}
       </span>
     );
