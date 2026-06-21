@@ -1911,7 +1911,11 @@
       "location": "Wo findet es statt?",
       "convocation": "Du kannst direkt danach einladen.",
       "carpool": "Fahrgemeinschaft für diese Fahrt aktivieren?",
-      "summary": "Alles bereit — du kannst erstellen."
+      "summary": "Alles bereit — du kannst erstellen.",
+      "comment": "Etwas hinzufügen? (optional)",
+      "gameformat": "Wie viele Spieler auf dem Feld?",
+      "halves": "Format der Spielzeit.",
+      "meetingtime": "Wann sollen die Spieler eintreffen?"
     },
     "q": {
       "type": "Welche Art von Veranstaltung?",
@@ -1925,7 +1929,11 @@
       "official": "Offiziell oder Freundschaft?",
       "location": "Wo?",
       "convocation": "Spieler einladen?",
-      "carpool": "Fahrgemeinschaft aktivieren?"
+      "carpool": "Fahrgemeinschaft aktivieren?",
+      "comment": "Eine Nachricht hinzufügen?",
+      "gameformat": "Spielformat?",
+      "halves": "Spielformat?",
+      "meetingtime": "Treffzeit?"
     },
     "chip": {
       "tonight": "Heute Abend",
@@ -1941,12 +1949,17 @@
       "startsOn": "Start",
       "endsOn": "Ende",
       "preview_one": "{{count}} Training erstellen",
-      "preview_other": "{{count}} Trainings erstellen"
+      "preview_other": "{{count}} Trainings erstellen",
+      "dayOfWeek": "Wochentag",
+      "time": "Uhrzeit"
     },
     "meeting": {
       "stadium": "Übliches Stadion",
       "parking": "Vereinsparkplatz",
-      "custom": "Eigene Adresse"
+      "custom": "Eigene Adresse",
+      "address": "Adresse",
+      "addressPlaceholder": "Adresse des Treffpunkts",
+      "time": "Treffzeit"
     },
     "convoc": {
       "all": "Ganzes Team",
@@ -1966,6 +1979,35 @@
       "title": "Deine Veranstaltung",
       "series_one": "Serie {{count}} Einheit",
       "series_other": "Serie {{count}} Einheiten"
-    }
+    },
+    "commentHint": "Für alle eingeladenen Spieler sichtbar.",
+    "commentPlaceholder": "Eine Notiz für das Team? (optional)",
+    "competitionName": "Wettbewerbsname",
+    "competitionNamePlaceholder": "z. B. U15 D2 Liga",
+    "gameformatManual": "Anderes Format",
+    "halvesManual": "Anderes Format (z. B. 3x30)",
+    "meetingtimeHint": "Wann sollen die Spieler eintreffen? (optional)",
+    "officialChampionship": "Liga",
+    "officialCup": "Pokal",
+    "qShort": {
+      "type": "Welcher Typ",
+      "team": "Welches Team",
+      "when": "Wann",
+      "duration": "Wie lange",
+      "halves": "Format",
+      "gameformat": "Mannschaftsstärke",
+      "series": "Wiederholung",
+      "homeaway": "Heim oder Auswärts",
+      "meetingpoint": "Treffpunkt",
+      "meetingtime": "Treffzeit",
+      "opponent": "Gegner",
+      "official": "Offiziell",
+      "location": "Wo",
+      "convocation": "Auto einladen",
+      "carpool": "Fahrgemeinschaft",
+      "comment": "Eine Nachricht",
+      "summary": "Alles bereit"
+    },
+    "skip": "Überspringen"
   }
 }

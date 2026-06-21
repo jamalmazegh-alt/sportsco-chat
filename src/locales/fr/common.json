@@ -1911,7 +1911,11 @@
       "location": "Où ça se passe ?",
       "convocation": "Tu pourras envoyer les convocations juste après.",
       "carpool": "Active le covoiturage pour ce déplacement ?",
-      "summary": "Tout est prêt — tu peux créer."
+      "summary": "Tout est prêt — tu peux créer.",
+      "comment": "Un commentaire à ajouter ? (facultatif)",
+      "gameformat": "Combien de joueurs sur le terrain ?",
+      "halves": "Format du temps de jeu.",
+      "meetingtime": "À quelle heure les joueurs doivent-ils se présenter ?"
     },
     "q": {
       "type": "Quel type d'événement ?",
@@ -1925,7 +1929,11 @@
       "official": "Officiel ou amical ?",
       "location": "Où ?",
       "convocation": "Convoquer les joueurs ?",
-      "carpool": "Activer le covoiturage ?"
+      "carpool": "Activer le covoiturage ?",
+      "comment": "Un message à ajouter ?",
+      "gameformat": "Format de jeu ?",
+      "halves": "Format du match ?",
+      "meetingtime": "Heure de rendez-vous ?"
     },
     "chip": {
       "tonight": "Ce soir",
@@ -1941,12 +1949,17 @@
       "startsOn": "Début",
       "endsOn": "Fin",
       "preview_one": "Créer {{count}} entraînement",
-      "preview_other": "Créer {{count}} entraînements"
+      "preview_other": "Créer {{count}} entraînements",
+      "dayOfWeek": "Jour de la semaine",
+      "time": "Heure"
     },
     "meeting": {
       "stadium": "Stade habituel",
       "parking": "Parking du club",
-      "custom": "Adresse personnalisée"
+      "custom": "Adresse personnalisée",
+      "address": "Adresse",
+      "addressPlaceholder": "Adresse du point de rendez-vous",
+      "time": "Heure de rendez-vous"
     },
     "convoc": {
       "all": "Toute l'équipe",
@@ -1966,6 +1979,35 @@
       "title": "Ton événement",
       "series_one": "série {{count}} séance",
       "series_other": "série {{count}} séances"
-    }
+    },
+    "commentHint": "Visible par tous les convoqués.",
+    "commentPlaceholder": "Un mot pour l'équipe ? (facultatif)",
+    "competitionName": "Nom de la compétition",
+    "competitionNamePlaceholder": "Ex. Championnat U15 D2",
+    "gameformatManual": "Autre format",
+    "halvesManual": "Autre format (ex. 3x30)",
+    "meetingtimeHint": "À quelle heure les joueurs doivent-ils se présenter ? (facultatif)",
+    "officialChampionship": "Championnat",
+    "officialCup": "Coupe",
+    "qShort": {
+      "type": "Quel type",
+      "team": "Quelle équipe",
+      "when": "Quand",
+      "duration": "Combien de temps",
+      "halves": "Format",
+      "gameformat": "Effectif",
+      "series": "Récurrence",
+      "homeaway": "Domicile ou extérieur",
+      "meetingpoint": "Point de RDV",
+      "meetingtime": "Heure de RDV",
+      "opponent": "Contre qui",
+      "official": "Officiel",
+      "location": "Où",
+      "convocation": "Convoquer auto",
+      "carpool": "Covoiturage",
+      "comment": "Un message",
+      "summary": "Tout est prêt"
+    },
+    "skip": "Passer"
   }
 }
