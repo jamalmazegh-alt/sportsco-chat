@@ -59,10 +59,50 @@ const cachedVapidJwtByAudience = new Map<
 const VAPID_JWT_TTL_SECONDS = 12 * 60 * 60;
 const VAPID_JWT_MIN_REUSE_SECONDS = 60 * 60;
 
+function derLength(length: number): Uint8Array {
+  if (length < 128) return new Uint8Array([length]);
+  const bytes: number[] = [];
+  let value = length;
+  while (value > 0) {
+    bytes.unshift(value & 0xff);
+    value >>= 8;
+  }
+  return new Uint8Array([0x80 | bytes.length, ...bytes]);
+}
+
+function der(tag: number, body: Uint8Array): Uint8Array {
+  return concatBytes(new Uint8Array([tag]), derLength(body.byteLength), body);
+}
+
+function derSeq(...parts: Uint8Array[]): Uint8Array {
+  return der(0x30, concatBytes(...parts));
+}
+
+function buildP256Pkcs8PrivateKey(privBytes: Uint8Array, pubBytes: Uint8Array): Uint8Array {
+  const ecPublicKeyOid = new Uint8Array([0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01]);
+  const prime256v1Oid = new Uint8Array([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
+  const algorithmIdentifier = derSeq(ecPublicKeyOid, prime256v1Oid);
+  const ecPrivateKey = derSeq(
+    der(0x02, new Uint8Array([0x01])),
+    der(0x04, privBytes),
+    der(0xa1, der(0x03, concatBytes(new Uint8Array([0x00]), pubBytes))),
+  );
+  return derSeq(der(0x02, new Uint8Array([0x00])), algorithmIdentifier, der(0x04, ecPrivateKey));
+}
+
+function buildP256SpkiPublicKey(pubBytes: Uint8Array): Uint8Array {
+  const ecPublicKeyOid = new Uint8Array([0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01]);
+  const prime256v1Oid = new Uint8Array([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
+  return derSeq(
+    derSeq(ecPublicKeyOid, prime256v1Oid),
+    der(0x03, concatBytes(new Uint8Array([0x00]), pubBytes)),
+  );
+}
+
 async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   if (cachedVapidKey) return cachedVapidKey;
-  const privRaw = process.env.VAPID_PRIVATE_KEY;
-  const pubRaw = VAPID_PUBLIC_KEY;
+  const privRaw = process.env.VAPID_PRIVATE_KEY?.trim();
+  const pubRaw = VAPID_PUBLIC_KEY.trim();
   if (!privRaw) throw new Error("VAPID private key missing");
 
   const privBytes = b64uDecode(privRaw); // 32-byte d
@@ -74,36 +114,17 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   const x = pubBytes.slice(1, 33);
   const y = pubBytes.slice(33, 65);
 
-  const jwk: JsonWebKey = {
-    kty: "EC",
-    crv: "P-256",
-    alg: "ES256",
-    d: b64uEncode(privBytes),
-    x: b64uEncode(x),
-    y: b64uEncode(y),
-    ext: true,
-    key_ops: ["sign"],
-  };
-
   const priv = await crypto.subtle.importKey(
-    "jwk",
-    jwk,
+    "pkcs8",
+    buildP256Pkcs8PrivateKey(privBytes, pubBytes),
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["sign"],
   );
 
   const pub = await crypto.subtle.importKey(
-    "jwk",
-    {
-      kty: "EC",
-      crv: "P-256",
-      alg: "ES256",
-      x: b64uEncode(x),
-      y: b64uEncode(y),
-      ext: true,
-      key_ops: ["verify"],
-    },
+    "spki",
+    buildP256SpkiPublicKey(pubBytes),
     { name: "ECDSA", namedCurve: "P-256" },
     false,
     ["verify"],
