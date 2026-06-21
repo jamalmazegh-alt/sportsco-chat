@@ -33,6 +33,7 @@ type Settings = {
   convocation_coach_complete: boolean;
   event_reschedule: boolean;
   event_cancel: boolean;
+  score_result: boolean;
   wall_new_post: boolean;
   tournament_match_reminder: boolean;
   tournament_draw: boolean;

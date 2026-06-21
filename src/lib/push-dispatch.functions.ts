@@ -87,10 +87,16 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
 
     const { data: ev } = await supabaseAdmin
       .from("events")
-      .select("id, title, team_id, opponent, is_home, teams:team_id(name)")
+      .select("id, title, team_id, opponent, is_home, teams:team_id(name, club_id)")
       .eq("id", data.eventId)
       .maybeSingle();
     if (!ev) return { dispatched: 0 };
+
+    // Gate: score_result
+    const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+    const clubId = ((ev as any).teams?.club_id as string | null) ?? null;
+    const settings = await getClubNotifSettings(clubId);
+    if (!settings.score_result) return { dispatched: 0 };
 
     const { data: result } = await supabaseAdmin
       .from("match_results")
