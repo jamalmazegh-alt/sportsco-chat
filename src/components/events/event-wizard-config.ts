@@ -214,7 +214,11 @@ export function toEventFormInitial(state: EventWizardState, title: string): Reco
   const startsIso = toIso(state.startDate, state.startTime);
   const endsIso = addMinutesIso(startsIso, state.durationMin);
   const descParts: string[] = [];
-  if (state.gameFormat) descParts.push(`Format: ${state.gameFormat}`);
+  if (state.gameFormat) {
+    descParts.push(
+      `Format: ${state.gameFormat}${state.halvesFormat ? ` · ${state.halvesFormat} min` : ""}`,
+    );
+  }
   if (state.description?.trim()) descParts.push(state.description.trim());
   return {
     team_id: state.teamId || "",
