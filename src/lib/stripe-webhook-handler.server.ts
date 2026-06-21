@@ -264,6 +264,46 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
           }
           break;
         }
+        if (session.mode === "payment" && session.metadata?.purpose === "tournament_single") {
+          const organizerId = session.metadata?.organizer_id;
+          if (!organizerId) {
+            console.warn("tournament_single without organizer_id", { id: session.id });
+            break;
+          }
+          const piId =
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : session.payment_intent?.id ?? null;
+          const customerId =
+            typeof session.customer === "string"
+              ? session.customer
+              : session.customer?.id ?? null;
+          const { data: existing } = await supabaseAdmin
+            .from("tournament_entitlements")
+            .select("id")
+            .eq("stripe_session_id", session.id)
+            .maybeSingle();
+          if (!existing) {
+            await supabaseAdmin.from("tournament_entitlements").insert({
+              organizer_id: organizerId,
+              plan: "single",
+              status: "active",
+              stripe_session_id: session.id,
+              stripe_payment_intent_id: piId,
+              stripe_customer_id: customerId,
+              valid_until: null,
+            });
+          }
+          break;
+        }
+        if (session.mode === "subscription" && session.metadata?.purpose === "tournament_annual") {
+          // The actual entitlement row is created/updated by the
+          // customer.subscription.created handler (which has full period info).
+          // Nothing to do here besides letting the upsertTournamentAnnualEntitlement
+          // helper run when the subscription event arrives.
+          break;
+
+        }
         if (session.subscription) {
           const subId =
             typeof session.subscription === "string"
