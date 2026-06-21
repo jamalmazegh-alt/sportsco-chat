@@ -109,7 +109,9 @@ export const confirmInvitedUserEmail = createServerFn({ method: "POST" })
       const found = userList.users.find(
         (u) => (u.email ?? "").toLowerCase() === email,
       );
-      if (found) user = found as typeof user;
+      if (found) {
+        user = { id: found.id, email_confirmed_at: found.email_confirmed_at ?? null };
+      }
       if (userList.users.length < 200) break;
     }
     if (!user) throw new Response("User not found", { status: 404 });
