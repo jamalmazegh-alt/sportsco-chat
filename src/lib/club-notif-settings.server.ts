@@ -64,6 +64,7 @@ export async function getClubNotifSettings(
           convocation_coach_complete: (data as any).convocation_coach_complete ?? true,
           event_reschedule: (data as any).event_reschedule ?? true,
           event_cancel: (data as any).event_cancel ?? true,
+          score_result: (data as any).score_result ?? true,
           wall_new_post: (data as any).wall_new_post ?? true,
           tournament_match_reminder: (data as any).tournament_match_reminder ?? true,
           tournament_draw: (data as any).tournament_draw ?? true,
