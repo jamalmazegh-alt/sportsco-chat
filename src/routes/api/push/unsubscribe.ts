@@ -4,6 +4,7 @@ import { z } from "zod";
 const Body = z.object({
   endpoint: z.string().url().max(2048).optional(),
   all_for_user: z.boolean().optional(),
+  keep_endpoint: z.string().url().max(2048).optional(),
 });
 
 export const Route = createFileRoute("/api/push/unsubscribe")({
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/api/push/unsubscribe")({
           .delete()
           .eq("user_id", userData.user.id);
         if (parsed.endpoint) q = q.eq("endpoint", parsed.endpoint);
+        if (parsed.keep_endpoint) q = q.neq("endpoint", parsed.keep_endpoint);
         await q;
         return Response.json({ ok: true });
       },
