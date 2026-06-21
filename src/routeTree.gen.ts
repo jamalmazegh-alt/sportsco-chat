@@ -86,7 +86,6 @@ import { Route as ApiPublicTournamentPaymentLinkRouteImport } from './routes/api
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
-import { Route as ApiPublicCheckStripeRouteImport } from './routes/api/public/check-stripe'
 import { Route as AuthenticatedTournamentsPricingRouteImport } from './routes/_authenticated/tournaments.pricing'
 import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './routes/_authenticated/tournaments.new-from-pass'
 import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
@@ -529,11 +528,6 @@ const ApiPublicInquiryRoute = ApiPublicInquiryRouteImport.update({
   path: '/api/public/inquiry',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicCheckStripeRoute = ApiPublicCheckStripeRouteImport.update({
-  id: '/api/public/check-stripe',
-  path: '/api/public/check-stripe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedTournamentsPricingRoute =
   AuthenticatedTournamentsPricingRouteImport.update({
     id: '/pricing',
@@ -887,7 +881,6 @@ export interface FileRoutesByFullPath {
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
-  '/api/public/check-stripe': typeof ApiPublicCheckStripeRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -1010,7 +1003,6 @@ export interface FileRoutesByTo {
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
-  '/api/public/check-stripe': typeof ApiPublicCheckStripeRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -1139,7 +1131,6 @@ export interface FileRoutesById {
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/_authenticated/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
   '/_authenticated/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
-  '/api/public/check-stripe': typeof ApiPublicCheckStripeRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
@@ -1268,7 +1259,6 @@ export interface FileRouteTypes {
     | '/tournaments/$tournamentId'
     | '/tournaments/new-from-pass'
     | '/tournaments/pricing'
-    | '/api/public/check-stripe'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1391,7 +1381,6 @@ export interface FileRouteTypes {
     | '/tournaments/$tournamentId'
     | '/tournaments/new-from-pass'
     | '/tournaments/pricing'
-    | '/api/public/check-stripe'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1519,7 +1508,6 @@ export interface FileRouteTypes {
     | '/_authenticated/tournaments/$tournamentId'
     | '/_authenticated/tournaments/new-from-pass'
     | '/_authenticated/tournaments/pricing'
-    | '/api/public/check-stripe'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
     | '/api/public/stripe-webhook'
@@ -1616,7 +1604,6 @@ export interface RootRouteChildren {
   TournamentsPassSuccessRoute: typeof TournamentsPassSuccessRoute
   TournamentsStartRoute: typeof TournamentsStartRoute
   WebhooksStripeRoute: typeof WebhooksStripeRoute
-  ApiPublicCheckStripeRoute: typeof ApiPublicCheckStripeRoute
   ApiPublicInquiryRoute: typeof ApiPublicInquiryRoute
   ApiPublicMarketingChatRoute: typeof ApiPublicMarketingChatRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
@@ -2183,13 +2170,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/inquiry'
       fullPath: '/api/public/inquiry'
       preLoaderRoute: typeof ApiPublicInquiryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/check-stripe': {
-      id: '/api/public/check-stripe'
-      path: '/api/public/check-stripe'
-      fullPath: '/api/public/check-stripe'
-      preLoaderRoute: typeof ApiPublicCheckStripeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/tournaments/pricing': {
@@ -2867,7 +2847,6 @@ const rootRouteChildren: RootRouteChildren = {
   TournamentsPassSuccessRoute: TournamentsPassSuccessRoute,
   TournamentsStartRoute: TournamentsStartRoute,
   WebhooksStripeRoute: WebhooksStripeRoute,
-  ApiPublicCheckStripeRoute: ApiPublicCheckStripeRoute,
   ApiPublicInquiryRoute: ApiPublicInquiryRoute,
   ApiPublicMarketingChatRoute: ApiPublicMarketingChatRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
