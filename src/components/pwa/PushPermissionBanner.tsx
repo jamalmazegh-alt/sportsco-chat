@@ -44,7 +44,9 @@ export function PushPermissionBanner() {
   function dismiss() {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    } catch {}
+    } catch {
+      // Ignore storage failures, the banner can still be hidden in memory.
+    }
     setVisible(false);
   }
 
