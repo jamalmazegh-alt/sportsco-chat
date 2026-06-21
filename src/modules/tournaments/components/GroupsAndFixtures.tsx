@@ -76,18 +76,43 @@ function Block({
   return (
     <section
       className={cn(
-        "rounded-2xl border bg-card overflow-hidden",
-        tone === "primary" ? "border-primary/30" : "border-border",
+        "rounded-[18px] border-[1.5px] bg-white overflow-hidden",
+        tone === "primary" ? "border-emerald-300" : "border-slate-200",
       )}
+      style={{ boxShadow: "0 4px 16px -6px rgba(29,122,69,0.10)" }}
     >
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-border/60 bg-muted/30">
-        <div className={cn("h-9 w-9 rounded-lg flex items-center justify-center shrink-0", iconBg)}>
-          {icon}
+      <header
+        className="relative flex items-center gap-3 px-4 py-3 overflow-hidden text-white"
+        style={{
+          background: "linear-gradient(135deg,#0f4a26 0%,#1d7a45 60%,#2d9d5f 100%)",
+        }}
+      >
+        <svg
+          className="absolute inset-0 h-full w-full opacity-20 pointer-events-none"
+          viewBox="0 0 400 60"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <pattern id={`gf-diag-${title.replace(/\W/g, "")}`} width="18" height="18" patternUnits="userSpaceOnUse">
+              <path d="M0 18 L18 0" stroke="white" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="400" height="60" fill={`url(#gf-diag-${title.replace(/\W/g, "")})`} />
+          <circle cx="370" cy="20" r="36" fill="white" opacity="0.12" />
+        </svg>
+        <div
+          className={cn(
+            "relative h-9 w-9 rounded-xl flex items-center justify-center shrink-0 bg-white/15 backdrop-blur ring-1 ring-white/30",
+          )}
+        >
+          <span className="[&_svg]:text-white">{icon}</span>
         </div>
-        <div className="min-w-0">
-          <h3 className="text-sm font-semibold leading-tight truncate">{title}</h3>
+        <div className="relative min-w-0">
+          <h3 className="text-sm font-extrabold leading-tight truncate tracking-tight text-white">
+            {title}
+          </h3>
           {subtitle && (
-            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{subtitle}</p>
+            <p className="text-[11px] text-white/80 mt-0.5 truncate">{subtitle}</p>
           )}
         </div>
       </header>
@@ -95,6 +120,7 @@ function Block({
     </section>
   );
 }
+
 
 function Stepper({
   label,
