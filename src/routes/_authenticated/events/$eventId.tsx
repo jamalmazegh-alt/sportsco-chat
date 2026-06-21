@@ -339,6 +339,9 @@ function EventDetail() {
   });
 
   const isCoach = isActiveCoach || !!canAccessFeedback;
+  const eventTeam = useMemo(() => (teams as any[] | undefined)?.find((t: any) => t.id === event?.team_id) ?? (teams as any[] | undefined)?.[0], [teams, event?.team_id]);
+  const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
+  const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
   const { data: convocations, refetch } = useQuery({
     queryKey: ["convocations", eventId],
