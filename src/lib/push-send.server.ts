@@ -88,9 +88,19 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   return cachedVapidKey;
 }
 
+function getVapidSubject(): string {
+  const fallback = "mailto:contact@clubero.app";
+  const raw = (process.env.VAPID_SUBJECT || "").trim();
+  if (!raw) return fallback;
+  if (/^(mailto:|https:\/\/)/i.test(raw)) return raw;
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return `mailto:${raw}`;
+  console.warn("[push] invalid VAPID_SUBJECT format, using fallback");
+  return fallback;
+}
+
 async function buildVapidJwt(audience: string): Promise<string> {
   const { priv } = await loadVapidKey();
-  const subject = process.env.VAPID_SUBJECT || "mailto:contact@clubero.app";
+  const subject = getVapidSubject();
   const header = { typ: "JWT", alg: "ES256" };
   const exp = Math.floor(Date.now() / 1000) + 12 * 60 * 60; // 12h
   const payload = { aud: audience, exp, sub: subject };
@@ -226,6 +236,11 @@ async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<numb
     },
     body: body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength) as ArrayBuffer,
   });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    console.warn("[push] provider rejected", res.status, detail.slice(0, 240));
+  }
 
   return res.status;
 }
