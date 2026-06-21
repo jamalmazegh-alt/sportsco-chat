@@ -83,17 +83,18 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
 
   const noAbsences = total === 0 && !isLoading;
   const headerBg = noAbsences
-    ? "linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%)"
+    ? undefined
     : "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)";
+  const headerBgClass = noAbsences ? "bg-muted/40" : "";
   const headerTextClass = noAbsences ? "text-foreground" : "text-white";
   const headerSubTextClass = noAbsences ? "text-muted-foreground" : "text-white/85";
   const iconTileClass = noAbsences
-    ? "bg-card ring-1 ring-[#e2e8f0]"
+    ? "bg-card ring-1 ring-border"
     : "bg-card/20 backdrop-blur-sm ring-1 ring-white/30";
   const iconColorClass = noAbsences ? "text-[#2d9d5f]" : "text-white";
-  const patternColor = noAbsences ? "#0f2818" : "#fff";
+  const patternColor = noAbsences ? "currentColor" : "#fff";
   const declareBtnClass = noAbsences
-    ? "text-foreground bg-card ring-1 ring-[#e2e8f0] hover:bg-[#f0f9f3]"
+    ? "text-foreground bg-card ring-1 ring-border hover:bg-muted"
     : "text-white bg-card/20 hover:bg-card/30 backdrop-blur-sm ring-1 ring-white/30";
 
   return (
@@ -104,7 +105,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
       )}
     >
       {/* Header gradient */}
-      <div className="relative overflow-hidden p-4" style={{ background: headerBg }}>
+      <div className={cn("relative overflow-hidden p-4", headerBgClass)} style={headerBg ? { background: headerBg } : undefined}>
         <svg
           aria-hidden
           className="absolute inset-0 h-full w-full opacity-[0.12] pointer-events-none"
