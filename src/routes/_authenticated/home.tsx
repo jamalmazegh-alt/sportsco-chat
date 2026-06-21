@@ -224,9 +224,9 @@ function HomePage() {
 
   return (
     <div className="px-5 pt-6 space-y-6 pb-4">
-      {/* Club hero — Anime Premium pale green banner */}
+      {/* Club hero */}
       <header
-        className="relative overflow-hidden rounded-[20px] border-[1.5px] border-[#c8e6d2] dark:border-emerald-900/50 p-5 bg-[linear-gradient(180deg,#e8f5ee_0%,#d4ead9_100%)] dark:bg-[linear-gradient(180deg,rgba(16,68,40,0.55)_0%,rgba(10,46,28,0.55)_100%)]"
+        className="relative overflow-hidden rounded-[20px] border-[1.5px] border-border bg-card p-5 shadow-sm"
       >
         <svg
           aria-hidden
@@ -235,7 +235,7 @@ function HomePage() {
         >
           <defs>
             <pattern id="terrain-home" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="40" stroke="currentColor" strokeWidth="1" className="text-emerald-900 dark:text-emerald-300" />
+              <line x1="0" y1="0" x2="0" y2="40" stroke="currentColor" strokeWidth="1" className="text-primary" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#terrain-home)" />
@@ -245,21 +245,21 @@ function HomePage() {
             <img
               src={club.logo_url}
               alt={club.name}
-              className="h-16 w-16 rounded-2xl object-cover bg-card shadow-[0_4px_12px_rgba(15,74,38,0.15)] ring-2 ring-white shrink-0"
+              className="h-16 w-16 shrink-0 rounded-2xl bg-card object-cover shadow-sm ring-2 ring-border"
             />
           ) : (
             <div
-              className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shadow-[0_4px_12px_rgba(15,74,38,0.25)] ring-2 ring-white shrink-0"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-black text-primary-foreground shadow-sm ring-2 ring-border"
               style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
             >
               {club?.name?.[0] ?? "C"}
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 dark:text-emerald-300 truncate">
+            <p className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
               {club?.name}
             </p>
-            <h1 className="text-[22px] font-black leading-tight text-foreground tracking-tight mt-0.5 truncate">
+            <h1 className="mt-0.5 truncate text-[22px] font-black leading-tight tracking-tight text-foreground">
               {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
             </h1>
           </div>
