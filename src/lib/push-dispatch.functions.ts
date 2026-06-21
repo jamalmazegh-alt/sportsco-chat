@@ -242,3 +242,130 @@ export const dispatchTournamentDrawPush = createServerFn({ method: "POST" })
     const { fanoutTournamentDraw } = await import("@/lib/push-fanout.server");
     return fanoutTournamentDraw(data.tournament_id);
   });
+
+/* ------------------------------------------------------------------ */
+/* #5 — Event rescheduled push                                        */
+/* ------------------------------------------------------------------ */
+const RescheduleInput = z.object({
+  eventId: z.string().uuid(),
+});
+
+export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => RescheduleInput.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+
+    const { data: ev } = await supabaseAdmin
+      .from("events")
+      .select("id, title, starts_at, type, team_id, convocations_sent, teams:team_id(club_id)")
+      .eq("id", data.eventId)
+      .maybeSingle();
+    if (!ev) return { dispatched: 0 };
+    // Only notify if convocations were already sent
+    if (!(ev as any).convocations_sent) return { dispatched: 0 };
+
+    const clubId = ((ev as any).teams?.club_id as string | null) ?? null;
+    const settings = await getClubNotifSettings(clubId);
+    if (!settings.event_reschedule) return { dispatched: 0 };
+
+    const { data: convs } = await supabaseAdmin
+      .from("convocations")
+      .select("player_id, players:player_id(user_id)")
+      .eq("event_id", data.eventId);
+    const playerIds = (convs ?? []).map((c: any) => c.player_id);
+
+    const targets = new Set<string>();
+    for (const c of convs ?? []) {
+      const uid = (c as any).players?.user_id;
+      if (uid) targets.add(uid);
+    }
+    if (playerIds.length > 0) {
+      const { data: parents } = await supabaseAdmin
+        .from("player_parents")
+        .select("parent_user_id")
+        .in("player_id", playerIds);
+      for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+    }
+
+    const dt = new Date((ev as any).starts_at);
+    const dateStr = dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
+    const dayTag = dt.toISOString().slice(0, 10);
+
+    for (const uid of targets) {
+      sendPushToUserFireAndForget(uid, {
+        title: "📅 Événement reporté",
+        body: `${typeLabel} déplacé au ${dateStr} à ${timeStr}`,
+        url: `/events/${data.eventId}`,
+        tag: `reschedule-${data.eventId}-${dayTag}`,
+      });
+    }
+    return { dispatched: targets.size };
+  });
+
+/* ------------------------------------------------------------------ */
+/* #6 — Event cancelled push                                          */
+/* ------------------------------------------------------------------ */
+const CancelInput = z.object({
+  eventId: z.string().uuid(),
+  previousStartsAt: z.string().optional(),
+});
+
+export const dispatchEventCancelPush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => CancelInput.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+
+    const { data: ev } = await supabaseAdmin
+      .from("events")
+      .select("id, title, starts_at, type, team_id, teams:team_id(club_id)")
+      .eq("id", data.eventId)
+      .maybeSingle();
+    if (!ev) return { dispatched: 0 };
+
+    const clubId = ((ev as any).teams?.club_id as string | null) ?? null;
+    const settings = await getClubNotifSettings(clubId);
+    if (!settings.event_cancel) return { dispatched: 0 };
+
+    const { data: convs } = await supabaseAdmin
+      .from("convocations")
+      .select("player_id, players:player_id(user_id)")
+      .eq("event_id", data.eventId);
+    const playerIds = (convs ?? []).map((c: any) => c.player_id);
+
+    const targets = new Set<string>();
+    for (const c of convs ?? []) {
+      const uid = (c as any).players?.user_id;
+      if (uid) targets.add(uid);
+    }
+    if (playerIds.length > 0) {
+      const { data: parents } = await supabaseAdmin
+        .from("player_parents")
+        .select("parent_user_id")
+        .in("player_id", playerIds);
+      for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+    }
+
+    const startIso = data.previousStartsAt || ((ev as any).starts_at as string);
+    const dt = new Date(startIso);
+    const dateStr = dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
+
+    for (const uid of targets) {
+      sendPushToUserFireAndForget(uid, {
+        title: "❌ Événement annulé",
+        body: `${typeLabel} du ${dateStr} à ${timeStr} est annulé`,
+        url: `/events/${data.eventId}`,
+        tag: `cancel-${data.eventId}`,
+      });
+    }
+    return { dispatched: targets.size };
+  });
