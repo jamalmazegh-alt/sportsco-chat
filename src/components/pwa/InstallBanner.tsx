@@ -141,7 +141,7 @@ export function InstallBanner() {
                   1
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5">
-                  Appuyez sur <Share2 className="inline h-4 w-4 text-blue-500" /> en bas de Safari
+                  Appuyez sur <Share2 className="inline h-4 w-4 text-blue-500" /> Partager en bas de Safari
                 </span>
               </li>
               <li className="flex gap-3 items-start">
@@ -149,7 +149,7 @@ export function InstallBanner() {
                   2
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5">
-                  Faites défiler et choisissez <Plus className="inline h-4 w-4" /> « Sur l'écran d'accueil »
+                  Choisissez <Plus className="inline h-4 w-4" /> « Sur l'écran d'accueil »
                 </span>
               </li>
               <li className="flex gap-3 items-start">
@@ -157,9 +157,10 @@ export function InstallBanner() {
                   3
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700">
-                  Appuyez sur « Ajouter »
+                  Appuyez sur « Ajouter » en haut à droite
                 </span>
               </li>
+
             </ol>
             <button
               type="button"
