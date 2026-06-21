@@ -106,6 +106,67 @@ async function upsertSubscription(sub: Stripe.Subscription) {
   return { resolvedClubId, previous };
 }
 
+/**
+ * Tournament annual entitlement: write subscription state into
+ * tournament_entitlements (NOT the club subscriptions table).
+ */
+async function upsertTournamentAnnualEntitlement(sub: Stripe.Subscription) {
+  const organizerId =
+    (sub.metadata?.organizer_id as string | undefined) ?? null;
+  if (!organizerId) {
+    console.warn("tournament_annual sub without organizer_id metadata", sub.id);
+    return;
+  }
+  const item = sub.items.data[0];
+  const validFrom = item?.current_period_start
+    ? new Date(item.current_period_start * 1000).toISOString()
+    : new Date().toISOString();
+  const validUntil = item?.current_period_end
+    ? new Date(item.current_period_end * 1000).toISOString()
+    : null;
+  const customerId =
+    typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null;
+  const status =
+    sub.status === "active" || sub.status === "trialing"
+      ? "active"
+      : sub.status === "canceled" || sub.status === "incomplete_expired"
+        ? "canceled"
+        : "expired";
+
+  const { data: existing } = await supabaseAdmin
+    .from("tournament_entitlements")
+    .select("id")
+    .eq("stripe_subscription_id", sub.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabaseAdmin
+      .from("tournament_entitlements")
+      .update({
+        status,
+        valid_from: validFrom,
+        valid_until: validUntil,
+        stripe_customer_id: customerId,
+      })
+      .eq("id", existing.id);
+  } else {
+    await supabaseAdmin.from("tournament_entitlements").insert({
+      organizer_id: organizerId,
+      plan: "annual",
+      status,
+      stripe_subscription_id: sub.id,
+      stripe_customer_id: customerId,
+      valid_from: validFrom,
+      valid_until: validUntil,
+    });
+  }
+}
+
+function isTournamentAnnualSub(sub: Stripe.Subscription): boolean {
+  return sub.metadata?.purpose === "tournament_annual";
+}
+
+
 /** Shared Stripe webhook POST handler (platform + Connect). */
 export async function handleStripeWebhookPost(request: Request): Promise<Response> {
   const signature = request.headers.get("stripe-signature");
