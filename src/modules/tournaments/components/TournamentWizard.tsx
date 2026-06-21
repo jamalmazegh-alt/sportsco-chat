@@ -11,7 +11,13 @@ import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { SportSelect } from "@/components/sport-select";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import { LocationAutocomplete } from "@/components/location-autocomplete";
-import { Loader2, ChevronRight, ChevronLeft, Trophy } from "lucide-react";
+import { Loader2, ChevronRight, ChevronLeft, Trophy, CalendarRange, LayoutGrid, ListChecks } from "lucide-react";
+import {
+  WizardProgress,
+  WizardStepHeading,
+  WizardOptionCard,
+  WizardStepBody,
+} from "@/components/wizard/wizard-primitives";
 import { toast } from "sonner";
 import { createTournament, updateTournament } from "../tournaments.functions";
 import {
