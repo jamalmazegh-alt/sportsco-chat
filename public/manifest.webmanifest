@@ -2,7 +2,7 @@
   "name": "Clubero — Team coordination",
   "short_name": "Clubero",
   "description": "Convocations, attendance and reminders for sports clubs — one tap.",
-  "start_url": "/",
+  "start_url": "/login",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
