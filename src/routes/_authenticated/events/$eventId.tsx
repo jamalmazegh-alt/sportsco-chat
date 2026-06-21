@@ -2403,14 +2403,15 @@ function EventDetail() {
             </DialogDescription>
           </DialogHeader>
           {convocChanges.length > 0 && (
-            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 space-y-2 max-h-64 overflow-auto">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">{t("events.resend.changesHeader", { defaultValue: "Changes" })}</p>
+            <div className="rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 p-3 space-y-2 max-h-64 overflow-auto">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-200">{t("events.resend.changesHeader", { defaultValue: "Changes" })}</p>
               {convocChanges.map((c) => (
                 <div key={c.field} className="text-sm">
-                  <span className="font-medium text-amber-900">{c.label} : </span>
+                  <span className="font-medium text-amber-900 dark:text-amber-200">{c.label} : </span>
                   <span className="text-muted-foreground line-through">{c.previous ?? "—"}</span>
                   {" → "}
-                  <span className="font-semibold text-emerald-700">{c.current ?? "—"}</span>
+                  <span className="font-semibold text-emerald-700 dark:text-emerald-300">{c.current ?? "—"}</span>
+
                 </div>
               ))}
             </div>
