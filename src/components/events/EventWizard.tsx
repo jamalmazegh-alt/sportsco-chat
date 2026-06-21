@@ -431,9 +431,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         stepIndex={Math.min(state.step + 1, steps.length)}
         totalSteps={steps.length}
         eyebrow={t("eventWizard.title", { defaultValue: "Nouvel événement" })}
+        title={stepTitles[current].text}
+        titleMark={stepTitles[current].mark}
         hint={hints[current]}
         progress={state.step}
       />
+
 
 
       {/* Live recap chips */}
