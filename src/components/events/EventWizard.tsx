@@ -436,6 +436,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         titleMark={stepTitles[current].mark}
         hint={hints[current]}
         progress={state.step}
+        onClose={onClose}
       />
 
 
