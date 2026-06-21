@@ -1112,11 +1112,20 @@ function EventDetail() {
         ...((parents ?? []).map((p) => p.parent_user_id).filter(Boolean)),
       ])
     );
-    await supabase.from("reminders").insert({
-      convocation_id: convocationId,
-      channel: "in_app",
-      sent_by: user.id,
-    });
+
+    // Email + Web Push (fire-and-forget, inserts the reminders row + handles cooldown server-side too)
+    try {
+      const { sendManualConvocationReminder } = await import(
+        "@/lib/convocation-reminder.functions"
+      );
+      void sendManualConvocationReminder({ data: { convocationId } }).catch((e) => {
+        console.error("[remind] email/push dispatch failed", e);
+      });
+    } catch (e) {
+      console.error("[remind] dispatch import failed", e);
+    }
+
+    // In-app notifications (cloche) — parallèle à l'email/push
     if (recipients.length > 0 && event) {
       await supabase.from("notifications").insert(
         recipients.map((uid) => ({
