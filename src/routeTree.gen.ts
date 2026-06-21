@@ -87,6 +87,7 @@ import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/
 import { Route as ApiPublicMarketingChatRouteImport } from './routes/api/public/marketing-chat'
 import { Route as ApiPublicInquiryRouteImport } from './routes/api/public/inquiry'
 import { Route as ApiPublicCheckStripeRouteImport } from './routes/api/public/check-stripe'
+import { Route as AuthenticatedTournamentsPricingRouteImport } from './routes/_authenticated/tournaments.pricing'
 import { Route as AuthenticatedTournamentsNewFromPassRouteImport } from './routes/_authenticated/tournaments.new-from-pass'
 import { Route as AuthenticatedTournamentsTournamentIdRouteImport } from './routes/_authenticated/tournaments.$tournamentId'
 import { Route as AuthenticatedTeamsTeamIdRouteImport } from './routes/_authenticated/teams/$teamId'
@@ -116,6 +117,7 @@ import { Route as ApiPublicHooksPaymentRemindersRouteImport } from './routes/api
 import { Route as ApiPublicHooksEventRemindersRouteImport } from './routes/api/public/hooks/event-reminders'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksCoachInsightsRouteImport } from './routes/api/public/hooks/coach-insights'
+import { Route as AuthenticatedTournamentsPricingSuccessRouteImport } from './routes/_authenticated/tournaments.pricing.success'
 import { Route as AuthenticatedPlayersPlayerIdTimelineRouteImport } from './routes/_authenticated/players/$playerId/timeline'
 import { Route as AuthenticatedPlayersPlayerIdSeasonsRouteImport } from './routes/_authenticated/players/$playerId/seasons'
 import { Route as AuthenticatedPlayersPlayerIdFeedbackRouteImport } from './routes/_authenticated/players/$playerId/feedback'
@@ -532,6 +534,12 @@ const ApiPublicCheckStripeRoute = ApiPublicCheckStripeRouteImport.update({
   path: '/api/public/check-stripe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTournamentsPricingRoute =
+  AuthenticatedTournamentsPricingRouteImport.update({
+    id: '/pricing',
+    path: '/pricing',
+    getParentRoute: () => AuthenticatedTournamentsRoute,
+  } as any)
 const AuthenticatedTournamentsNewFromPassRoute =
   AuthenticatedTournamentsNewFromPassRouteImport.update({
     id: '/new-from-pass',
@@ -700,6 +708,12 @@ const ApiPublicHooksCoachInsightsRoute =
     id: '/api/public/hooks/coach-insights',
     path: '/api/public/hooks/coach-insights',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedTournamentsPricingSuccessRoute =
+  AuthenticatedTournamentsPricingSuccessRouteImport.update({
+    id: '/success',
+    path: '/success',
+    getParentRoute: () => AuthenticatedTournamentsPricingRoute,
   } as any)
 const AuthenticatedPlayersPlayerIdTimelineRoute =
   AuthenticatedPlayersPlayerIdTimelineRouteImport.update({
@@ -872,6 +886,7 @@ export interface FileRoutesByFullPath {
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
+  '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
   '/api/public/check-stripe': typeof ApiPublicCheckStripeRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
@@ -910,6 +925,7 @@ export interface FileRoutesByFullPath {
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -993,6 +1009,7 @@ export interface FileRoutesByTo {
   '/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
+  '/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
   '/api/public/check-stripe': typeof ApiPublicCheckStripeRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
@@ -1031,6 +1048,7 @@ export interface FileRoutesByTo {
   '/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -1120,6 +1138,7 @@ export interface FileRoutesById {
   '/_authenticated/teams/$teamId': typeof AuthenticatedTeamsTeamIdRoute
   '/_authenticated/tournaments/$tournamentId': typeof AuthenticatedTournamentsTournamentIdRoute
   '/_authenticated/tournaments/new-from-pass': typeof AuthenticatedTournamentsNewFromPassRoute
+  '/_authenticated/tournaments/pricing': typeof AuthenticatedTournamentsPricingRouteWithChildren
   '/api/public/check-stripe': typeof ApiPublicCheckStripeRoute
   '/api/public/inquiry': typeof ApiPublicInquiryRoute
   '/api/public/marketing-chat': typeof ApiPublicMarketingChatRoute
@@ -1158,6 +1177,7 @@ export interface FileRoutesById {
   '/_authenticated/players/$playerId/feedback': typeof AuthenticatedPlayersPlayerIdFeedbackRoute
   '/_authenticated/players/$playerId/seasons': typeof AuthenticatedPlayersPlayerIdSeasonsRoute
   '/_authenticated/players/$playerId/timeline': typeof AuthenticatedPlayersPlayerIdTimelineRoute
+  '/_authenticated/tournaments/pricing/success': typeof AuthenticatedTournamentsPricingSuccessRoute
   '/api/public/hooks/coach-insights': typeof ApiPublicHooksCoachInsightsRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/event-reminders': typeof ApiPublicHooksEventRemindersRoute
@@ -1247,6 +1267,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
     | '/tournaments/new-from-pass'
+    | '/tournaments/pricing'
     | '/api/public/check-stripe'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
@@ -1285,6 +1306,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
+    | '/tournaments/pricing/success'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1368,6 +1390,7 @@ export interface FileRouteTypes {
     | '/teams/$teamId'
     | '/tournaments/$tournamentId'
     | '/tournaments/new-from-pass'
+    | '/tournaments/pricing'
     | '/api/public/check-stripe'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
@@ -1406,6 +1429,7 @@ export interface FileRouteTypes {
     | '/players/$playerId/feedback'
     | '/players/$playerId/seasons'
     | '/players/$playerId/timeline'
+    | '/tournaments/pricing/success'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -1494,6 +1518,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teams/$teamId'
     | '/_authenticated/tournaments/$tournamentId'
     | '/_authenticated/tournaments/new-from-pass'
+    | '/_authenticated/tournaments/pricing'
     | '/api/public/check-stripe'
     | '/api/public/inquiry'
     | '/api/public/marketing-chat'
@@ -1532,6 +1557,7 @@ export interface FileRouteTypes {
     | '/_authenticated/players/$playerId/feedback'
     | '/_authenticated/players/$playerId/seasons'
     | '/_authenticated/players/$playerId/timeline'
+    | '/_authenticated/tournaments/pricing/success'
     | '/api/public/hooks/coach-insights'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/event-reminders'
@@ -2166,6 +2192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCheckStripeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tournaments/pricing': {
+      id: '/_authenticated/tournaments/pricing'
+      path: '/pricing'
+      fullPath: '/tournaments/pricing'
+      preLoaderRoute: typeof AuthenticatedTournamentsPricingRouteImport
+      parentRoute: typeof AuthenticatedTournamentsRoute
+    }
     '/_authenticated/tournaments/new-from-pass': {
       id: '/_authenticated/tournaments/new-from-pass'
       path: '/new-from-pass'
@@ -2368,6 +2401,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/hooks/coach-insights'
       preLoaderRoute: typeof ApiPublicHooksCoachInsightsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tournaments/pricing/success': {
+      id: '/_authenticated/tournaments/pricing/success'
+      path: '/success'
+      fullPath: '/tournaments/pricing/success'
+      preLoaderRoute: typeof AuthenticatedTournamentsPricingSuccessRouteImport
+      parentRoute: typeof AuthenticatedTournamentsPricingRoute
     }
     '/_authenticated/players/$playerId/timeline': {
       id: '/_authenticated/players/$playerId/timeline'
@@ -2613,9 +2653,25 @@ const AuthenticatedTeamsRouteChildren: AuthenticatedTeamsRouteChildren = {
 const AuthenticatedTeamsRouteWithChildren =
   AuthenticatedTeamsRoute._addFileChildren(AuthenticatedTeamsRouteChildren)
 
+interface AuthenticatedTournamentsPricingRouteChildren {
+  AuthenticatedTournamentsPricingSuccessRoute: typeof AuthenticatedTournamentsPricingSuccessRoute
+}
+
+const AuthenticatedTournamentsPricingRouteChildren: AuthenticatedTournamentsPricingRouteChildren =
+  {
+    AuthenticatedTournamentsPricingSuccessRoute:
+      AuthenticatedTournamentsPricingSuccessRoute,
+  }
+
+const AuthenticatedTournamentsPricingRouteWithChildren =
+  AuthenticatedTournamentsPricingRoute._addFileChildren(
+    AuthenticatedTournamentsPricingRouteChildren,
+  )
+
 interface AuthenticatedTournamentsRouteChildren {
   AuthenticatedTournamentsTournamentIdRoute: typeof AuthenticatedTournamentsTournamentIdRoute
   AuthenticatedTournamentsNewFromPassRoute: typeof AuthenticatedTournamentsNewFromPassRoute
+  AuthenticatedTournamentsPricingRoute: typeof AuthenticatedTournamentsPricingRouteWithChildren
 }
 
 const AuthenticatedTournamentsRouteChildren: AuthenticatedTournamentsRouteChildren =
@@ -2624,6 +2680,8 @@ const AuthenticatedTournamentsRouteChildren: AuthenticatedTournamentsRouteChildr
       AuthenticatedTournamentsTournamentIdRoute,
     AuthenticatedTournamentsNewFromPassRoute:
       AuthenticatedTournamentsNewFromPassRoute,
+    AuthenticatedTournamentsPricingRoute:
+      AuthenticatedTournamentsPricingRouteWithChildren,
   }
 
 const AuthenticatedTournamentsRouteWithChildren =
