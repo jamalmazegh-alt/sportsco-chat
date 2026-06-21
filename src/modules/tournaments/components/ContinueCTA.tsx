@@ -47,6 +47,8 @@ const LABEL_DEFAULT: Record<ContinueAction["kind"], string> = {
   all_done: "Tout est terminé",
 };
 
+const GREEN_GRADIENT = "linear-gradient(135deg,#16a34a 0%,#15803d 100%)";
+
 interface Props {
   action: ContinueAction;
   onAction: (action: ContinueAction) => void;
@@ -68,44 +70,75 @@ export function ContinueCTA({ action, onAction, variant = "sticky", disabled }: 
         onClick={() => onAction(action)}
         disabled={disabled || isDone}
         className={cn(
-          "group w-full text-left rounded-2xl border p-4 flex items-center gap-3 transition-all",
+          "group relative w-full overflow-hidden rounded-2xl border-[1.5px] p-4 text-left transition-all",
           isDone
-            ? "border-emerald-300/40 bg-emerald-50/50 dark:bg-emerald-950/20"
-            : "border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent hover:border-primary hover:shadow-sm",
+            ? "border-emerald-200 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/30"
+            : "border-emerald-500/30 hover:-translate-y-0.5 hover:border-emerald-500/60",
         )}
+        style={
+          isDone
+            ? undefined
+            : {
+                background:
+                  "linear-gradient(135deg,rgba(22,163,74,.08) 0%,rgba(21,128,61,.04) 60%,transparent 100%)",
+                boxShadow: "0 4px 16px -4px rgba(22,163,74,.18)",
+              }
+        }
       >
-        <div
-          className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl shrink-0",
-            isDone ? "bg-emerald-500/15 text-emerald-600" : "bg-primary text-primary-foreground",
-          )}
-        >
-          <Icon className="h-5 w-5" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {t("controlCenter.nextAction", { defaultValue: "Prochaine action" })}
-          </div>
-          <div className="text-base font-semibold truncate">{label}</div>
-        </div>
+        {/* shimmer accent */}
         {!isDone && (
-          <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full opacity-40 blur-2xl"
+            style={{ background: GREEN_GRADIENT }}
+          />
         )}
+        <div className="relative flex items-center gap-3">
+          <div
+            className={cn(
+              "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white shadow-md",
+              isDone && "bg-emerald-500",
+            )}
+            style={
+              !isDone
+                ? { background: GREEN_GRADIENT, boxShadow: "0 4px 12px rgba(22,163,74,.35)" }
+                : undefined
+            }
+          >
+            <Icon className="h-5 w-5" strokeWidth={2.5} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+              {t("controlCenter.nextAction", { defaultValue: "Prochaine action" })}
+            </div>
+            <div className="truncate text-base font-bold text-slate-900 dark:text-slate-50">
+              {label}
+            </div>
+          </div>
+          {!isDone && (
+            <ChevronRight className="h-5 w-5 text-emerald-600 transition-transform group-hover:translate-x-1" />
+          )}
+        </div>
       </button>
     );
   }
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 z-30 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-2 bg-gradient-to-t from-background via-background/95 to-transparent">
+    <div className="sticky bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-white via-white/95 to-transparent px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-2 dark:from-slate-950 dark:via-slate-950/95">
       <Button
         type="button"
         onClick={() => onAction(action)}
         disabled={disabled || isDone}
-        className="w-full h-12 text-base font-semibold shadow-lg"
+        className="h-12 w-full rounded-xl text-base font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-60"
+        style={
+          isDone
+            ? undefined
+            : { background: GREEN_GRADIENT, boxShadow: "0 8px 24px -6px rgba(22,163,74,.45)" }
+        }
       >
-        <Icon className="h-5 w-5" />
+        <Icon className="h-5 w-5" strokeWidth={2.5} />
         {label}
-        {!isDone && <ChevronRight className="h-4 w-4 ml-auto" />}
+        {!isDone && <ChevronRight className="ml-auto h-4 w-4" />}
       </Button>
     </div>
   );

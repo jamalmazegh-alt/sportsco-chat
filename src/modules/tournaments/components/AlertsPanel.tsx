@@ -14,10 +14,34 @@ const ICONS = {
   finals_not_generated: Trophy,
 } as const;
 
-const SEV_STYLES: Record<CockpitAlert["severity"], string> = {
-  high: "border-rose-300/60 bg-rose-50 dark:bg-rose-950/20 text-rose-900 dark:text-rose-200",
-  medium: "border-amber-300/60 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200",
-  low: "border-border bg-muted/40 text-foreground",
+const SEV_STYLES: Record<
+  CockpitAlert["severity"],
+  { border: string; bg: string; iconBg: string; iconColor: string; text: string; dot: string }
+> = {
+  high: {
+    border: "border-rose-300/70 dark:border-rose-900/60",
+    bg: "bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/30 dark:to-slate-900",
+    iconBg: "bg-rose-500",
+    iconColor: "text-white",
+    text: "text-rose-950 dark:text-rose-100",
+    dot: "bg-rose-500",
+  },
+  medium: {
+    border: "border-amber-300/70 dark:border-amber-900/60",
+    bg: "bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-slate-900",
+    iconBg: "bg-amber-500",
+    iconColor: "text-white",
+    text: "text-amber-950 dark:text-amber-100",
+    dot: "bg-amber-500",
+  },
+  low: {
+    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-white dark:bg-slate-900",
+    iconBg: "bg-slate-100 dark:bg-slate-800",
+    iconColor: "text-slate-600 dark:text-slate-300",
+    text: "text-slate-900 dark:text-slate-100",
+    dot: "bg-slate-400",
+  },
 };
 
 export function AlertsPanel({ alerts, onAlertClick }: Props) {
@@ -27,11 +51,14 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
   return (
     <section
       aria-label={t("cockpit.alerts.heading", { defaultValue: "Alertes" })}
-      className="space-y-2"
+      className="space-y-2.5"
     >
       <header className="flex items-center gap-2 px-1">
-        <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="relative flex h-5 w-5 items-center justify-center">
+          <span className="absolute inset-0 animate-ping rounded-full bg-amber-400/40" />
+          <AlertTriangle className="relative h-4 w-4 text-amber-600" strokeWidth={2.5} />
+        </div>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
           {t("cockpit.alerts.title", {
             defaultValue: "{{count}} chose à régler",
             defaultValue_plural: "{{count}} choses à régler",
@@ -39,9 +66,10 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
           })}
         </h3>
       </header>
-      <ul className="space-y-1.5">
+      <ul className="space-y-2">
         {alerts.map((a) => {
           const Icon = ICONS[a.kind];
+          const styles = SEV_STYLES[a.severity];
           const interactive = !!onAlertClick;
           return (
             <li key={a.id}>
@@ -50,14 +78,30 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
                 onClick={interactive ? () => onAlertClick!(a) : undefined}
                 disabled={!interactive}
                 className={cn(
-                  "w-full flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left",
-                  SEV_STYLES[a.severity],
-                  interactive && "hover:brightness-95 transition",
+                  "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border-[1.5px] px-3 py-3 text-left transition-all",
+                  styles.border,
+                  styles.bg,
+                  interactive && "hover:-translate-y-0.5 hover:shadow-md",
                 )}
               >
-                <Icon className="h-4 w-4 shrink-0" />
-                <div className="flex-1 min-w-0 text-sm font-medium">{alertLabel(a, t)}</div>
-                {interactive && <ChevronRight className="h-4 w-4 shrink-0 opacity-60" />}
+                <span
+                  aria-hidden
+                  className={cn("absolute left-0 top-0 h-full w-1", styles.dot)}
+                />
+                <div
+                  className={cn(
+                    "ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                    styles.iconBg,
+                  )}
+                >
+                  <Icon className={cn("h-4 w-4", styles.iconColor)} strokeWidth={2.5} />
+                </div>
+                <div className={cn("flex-1 min-w-0 text-sm font-semibold", styles.text)}>
+                  {alertLabel(a, t)}
+                </div>
+                {interactive && (
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" />
+                )}
               </button>
             </li>
           );
