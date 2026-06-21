@@ -392,60 +392,109 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
       </div>
 
       {teams.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          <Users className="h-6 w-6 mx-auto mb-2 opacity-60" />
-          {t("teams.empty")}
+        <div
+          className="rounded-2xl border-[1.5px] border-dashed border-slate-200 p-8 text-center bg-gradient-to-br from-white to-slate-50"
+        >
+          <div
+            className="h-12 w-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white"
+            style={{ background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)" }}
+          >
+            <Users className="h-6 w-6" />
+          </div>
+          <p className="text-sm font-semibold text-slate-700">{t("teams.empty")}</p>
         </div>
       ) : (
         <ul className="space-y-2">
-          {teams.map((tm) => (
-            <li
-              key={tm.id}
-              className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
-            >
-              <div className="h-10 w-10 rounded-lg bg-muted shrink-0 overflow-hidden flex items-center justify-center">
-                {tm.logo_url ? (
-                  <img src={tm.logo_url} alt={tm.name} className="h-full w-full object-cover" />
-                ) : (
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium truncate text-sm">{tm.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {tm.seed ? t("teams.row.seed", { n: tm.seed }) : t("teams.row.noSeed")}
-                  {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
-                </p>
-              </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setRosterTeam(tm)}
-                title={t("teams.row.players")}
+          {teams.map((tm, idx) => {
+            const palettes = [
+              "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)",
+              "linear-gradient(135deg,#0ea5e9 0%,#38bdf8 100%)",
+              "linear-gradient(135deg,#f59e0b 0%,#f97316 100%)",
+              "linear-gradient(135deg,#8b5cf6 0%,#a78bfa 100%)",
+              "linear-gradient(135deg,#ec4899 0%,#f472b6 100%)",
+              "linear-gradient(135deg,#14b8a6 0%,#2dd4bf 100%)",
+            ];
+            const initials = tm.name
+              .split(/\s+/)
+              .map((p) => p[0])
+              .filter(Boolean)
+              .slice(0, 2)
+              .join("")
+              .toUpperCase();
+            return (
+              <li
+                key={tm.id}
+                className="flex items-center gap-3 rounded-2xl border-[1.5px] border-slate-200 bg-white p-3 transition-all hover:-translate-y-0.5 hover:border-emerald-300"
+                style={{ boxShadow: "0 2px 8px -4px rgba(15,23,42,0.06)" }}
               >
-                <UsersRound className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditing(tm)}
-                title={t("teams.row.edit")}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setTeamToDelete(tm)}
-                disabled={remove.isPending}
-                title={t("teams.row.delete")}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </li>
-          ))}
+                <div
+                  className="h-11 w-11 rounded-xl shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-sm tracking-tight"
+                  style={!tm.logo_url ? { background: palettes[idx % palettes.length] } : undefined}
+                >
+                  {tm.logo_url ? (
+                    <img src={tm.logo_url} alt={tm.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <span>{initials || "?"}</span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold truncate text-sm text-slate-800 tracking-tight">
+                    {tm.name}
+                  </p>
+                  <p className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+                    {tm.seed ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 font-bold">
+                        #{tm.seed}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400">{t("teams.row.noSeed")}</span>
+                    )}
+                    <span
+                      className={cn(
+                        "inline-flex items-center px-1.5 py-0.5 rounded-md font-semibold",
+                        tm.team_id
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-slate-100 text-slate-600",
+                      )}
+                    >
+                      {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
+                    </span>
+                  </p>
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setRosterTeam(tm)}
+                  title={t("teams.row.players")}
+                  className="rounded-lg hover:bg-emerald-50 hover:text-emerald-700"
+                >
+                  <UsersRound className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setEditing(tm)}
+                  title={t("teams.row.edit")}
+                  className="rounded-lg hover:bg-slate-100"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setTeamToDelete(tm)}
+                  disabled={remove.isPending}
+                  title={t("teams.row.delete")}
+                  className="rounded-lg hover:bg-rose-50"
+                >
+                  <Trash2 className="h-4 w-4 text-rose-500" />
+                </Button>
+              </li>
+            );
+          })}
         </ul>
       )}
+
 
       {editing && (
         <EditTeamDialog
