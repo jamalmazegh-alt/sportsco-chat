@@ -1315,6 +1315,12 @@ function EventDetail() {
       // best-effort
     }
 
+    // Fire-and-forget Web Push (#6 event_cancel)
+    try {
+      const { dispatchEventCancelPush } = await import("@/lib/push-dispatch.functions");
+      void dispatchEventCancelPush({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
+    } catch { /* noop */ }
+
     setCancelEventSubmitting(false);
     setCancelEventOpen(false);
     setCancelEventReason("");
