@@ -280,6 +280,8 @@ function EventDetail() {
   const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
   const [resendOpen, setResendOpen] = useState(false);
   const [resendSubmitting, setResendSubmitting] = useState(false);
+  // UI-only: truncate the convoked players list to 4 with an inline "show more" footer (passe 3c).
+  const [presencesExpanded, setPresencesExpanded] = useState(false);
 
   const { data: event, refetch: refetchEvent } = useQuery({
     queryKey: ["event", eventId],
