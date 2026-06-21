@@ -292,6 +292,56 @@ export type Database = {
           },
         ]
       }
+      club_notification_settings: {
+        Row: {
+          club_id: string
+          convocation_coach_complete: boolean
+          convocation_coach_each_response: boolean
+          convocation_on_create: boolean
+          convocation_reminder: boolean
+          event_cancel: boolean
+          event_reschedule: boolean
+          tournament_draw: boolean
+          tournament_match_reminder: boolean
+          updated_at: string
+          wall_new_post: boolean
+        }
+        Insert: {
+          club_id: string
+          convocation_coach_complete?: boolean
+          convocation_coach_each_response?: boolean
+          convocation_on_create?: boolean
+          convocation_reminder?: boolean
+          event_cancel?: boolean
+          event_reschedule?: boolean
+          tournament_draw?: boolean
+          tournament_match_reminder?: boolean
+          updated_at?: string
+          wall_new_post?: boolean
+        }
+        Update: {
+          club_id?: string
+          convocation_coach_complete?: boolean
+          convocation_coach_each_response?: boolean
+          convocation_on_create?: boolean
+          convocation_reminder?: boolean
+          event_cancel?: boolean
+          event_reschedule?: boolean
+          tournament_draw?: boolean
+          tournament_match_reminder?: boolean
+          updated_at?: string
+          wall_new_post?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_notification_settings_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: true
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       club_payment_settings: {
         Row: {
           club_id: string

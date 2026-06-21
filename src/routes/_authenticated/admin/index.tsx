@@ -10,6 +10,7 @@ import {
   Send,
   MessagesSquare,
   BellRing,
+  Bell,
   Palette,
   Wallet,
   ChevronRight,
@@ -127,6 +128,13 @@ function AdminSettingsPage() {
       title: t("admin.hubReminders"),
       hint: t("admin.hubRemindersHint"),
       tone: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    },
+    {
+      to: "/admin/settings/notifications",
+      icon: Bell,
+      title: "Notifications push",
+      hint: "Choisissez les notifications envoyées à vos membres",
+      tone: "bg-green-500/10 text-green-600 dark:text-green-400",
     },
     {
       to: "/admin/settings/branding",

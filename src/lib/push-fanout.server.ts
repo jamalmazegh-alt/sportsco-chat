@@ -5,6 +5,17 @@
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendPushToUserFireAndForget } from "./push-send.server";
+import { getClubNotifSettings } from "./club-notif-settings.server";
+
+async function getTeamClubId(teamId: string | null | undefined): Promise<string | null> {
+  if (!teamId) return null;
+  const { data } = await supabaseAdmin
+    .from("teams")
+    .select("club_id")
+    .eq("id", teamId)
+    .maybeSingle();
+  return ((data as any)?.club_id as string | null) ?? null;
+}
 
 const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
 function fmtDate(iso: string): string {
@@ -37,6 +48,11 @@ export async function fanoutConvocationResponse(
 
   const status = (conv as any).status as string;
   if (status === "pending") return { dispatched: 0, eventId: ev.id };
+
+  // Gate: convocation_coach_each_response (skip silently when OFF)
+  const clubId = await getTeamClubId(ev.team_id);
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.convocation_coach_each_response) return { dispatched: 0, eventId: ev.id };
 
   const player: any = (conv as any).players ?? {};
   const firstName = (player.first_name as string) || (player.last_name as string) || "Un joueur";
@@ -106,6 +122,12 @@ export async function fanoutConvocationComplete(
     .eq("id", eventId)
     .maybeSingle();
   if (!ev || !(ev as any).team_id) return { dispatched: 0, complete: true };
+
+  // Gate: convocation_coach_complete
+  const clubId = await getTeamClubId((ev as any).team_id);
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.convocation_coach_complete) return { dispatched: 0, complete: true };
+
 
   const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
   const dateStr = (ev as any).starts_at ? fmtDate((ev as any).starts_at) : "";
@@ -190,11 +212,17 @@ export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ 
   const { data: m } = await supabaseAdmin
     .from("tournament_matches")
     .select(
-      "id, tournament_id, team_a_id, team_b_id, scheduled_at, field, tournaments:tournament_id(slug, name)",
+      "id, tournament_id, team_a_id, team_b_id, scheduled_at, field, tournaments:tournament_id(slug, name, club_id)",
     )
     .eq("id", matchId)
     .maybeSingle();
   if (!m) return { dispatched: 0 };
+
+  // Gate: tournament_match_reminder
+  const clubId = ((m as any).tournaments?.club_id as string | null) ?? null;
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.tournament_match_reminder) return { dispatched: 0 };
+
 
   const teamA = (m as any).team_a_id as string | null;
   const teamB = (m as any).team_b_id as string | null;
@@ -236,10 +264,16 @@ export async function fanoutTournamentMatchReminder(matchId: string): Promise<{ 
 export async function fanoutTournamentDraw(tournamentId: string): Promise<{ dispatched: number }> {
   const { data: t } = await supabaseAdmin
     .from("tournaments")
-    .select("id, name, slug")
+    .select("id, name, slug, club_id")
     .eq("id", tournamentId)
     .maybeSingle();
   if (!t) return { dispatched: 0 };
+
+  // Gate: tournament_draw
+  const clubId = ((t as any).club_id as string | null) ?? null;
+  const settings = await getClubNotifSettings(clubId);
+  if (!settings.tournament_draw) return { dispatched: 0 };
+
 
   const { data: tteams } = await supabaseAdmin
     .from("tournament_teams")

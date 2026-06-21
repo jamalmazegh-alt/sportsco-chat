@@ -133,6 +133,7 @@ import { Route as AuthenticatedAdminUsersUserIdRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminSettingsSocialRouteImport } from './routes/_authenticated/admin/settings.social'
 import { Route as AuthenticatedAdminSettingsRemindersRouteImport } from './routes/_authenticated/admin/settings.reminders'
 import { Route as AuthenticatedAdminSettingsPaymentsRouteImport } from './routes/_authenticated/admin/settings.payments'
+import { Route as AuthenticatedAdminSettingsNotificationsRouteImport } from './routes/_authenticated/admin/settings.notifications'
 import { Route as AuthenticatedAdminSettingsConvocationsRouteImport } from './routes/_authenticated/admin/settings.convocations'
 import { Route as AuthenticatedAdminSettingsCommunicationsRouteImport } from './routes/_authenticated/admin/settings.communications'
 import { Route as AuthenticatedAdminSettingsBrandingRouteImport } from './routes/_authenticated/admin/settings.branding'
@@ -807,6 +808,12 @@ const AuthenticatedAdminSettingsPaymentsRoute =
     path: '/settings/payments',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSettingsNotificationsRoute =
+  AuthenticatedAdminSettingsNotificationsRouteImport.update({
+    id: '/settings/notifications',
+    path: '/settings/notifications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSettingsConvocationsRoute =
   AuthenticatedAdminSettingsConvocationsRouteImport.update({
     id: '/settings/convocations',
@@ -942,6 +949,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
+  '/admin/settings/notifications': typeof AuthenticatedAdminSettingsNotificationsRoute
   '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
   '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
@@ -1069,6 +1077,7 @@ export interface FileRoutesByTo {
   '/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
   '/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
+  '/admin/settings/notifications': typeof AuthenticatedAdminSettingsNotificationsRoute
   '/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
   '/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
@@ -1202,6 +1211,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings/branding': typeof AuthenticatedAdminSettingsBrandingRoute
   '/_authenticated/admin/settings/communications': typeof AuthenticatedAdminSettingsCommunicationsRoute
   '/_authenticated/admin/settings/convocations': typeof AuthenticatedAdminSettingsConvocationsRoute
+  '/_authenticated/admin/settings/notifications': typeof AuthenticatedAdminSettingsNotificationsRoute
   '/_authenticated/admin/settings/payments': typeof AuthenticatedAdminSettingsPaymentsRoute
   '/_authenticated/admin/settings/reminders': typeof AuthenticatedAdminSettingsRemindersRoute
   '/_authenticated/admin/settings/social': typeof AuthenticatedAdminSettingsSocialRoute
@@ -1335,6 +1345,7 @@ export interface FileRouteTypes {
     | '/admin/settings/branding'
     | '/admin/settings/communications'
     | '/admin/settings/convocations'
+    | '/admin/settings/notifications'
     | '/admin/settings/payments'
     | '/admin/settings/reminders'
     | '/admin/settings/social'
@@ -1462,6 +1473,7 @@ export interface FileRouteTypes {
     | '/admin/settings/branding'
     | '/admin/settings/communications'
     | '/admin/settings/convocations'
+    | '/admin/settings/notifications'
     | '/admin/settings/payments'
     | '/admin/settings/reminders'
     | '/admin/settings/social'
@@ -1594,6 +1606,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings/branding'
     | '/_authenticated/admin/settings/communications'
     | '/_authenticated/admin/settings/convocations'
+    | '/_authenticated/admin/settings/notifications'
     | '/_authenticated/admin/settings/payments'
     | '/_authenticated/admin/settings/reminders'
     | '/_authenticated/admin/settings/social'
@@ -2568,6 +2581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsPaymentsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings/notifications': {
+      id: '/_authenticated/admin/settings/notifications'
+      path: '/settings/notifications'
+      fullPath: '/admin/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/settings/convocations': {
       id: '/_authenticated/admin/settings/convocations'
       path: '/settings/convocations'
@@ -2621,6 +2641,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminSettingsBrandingRoute: typeof AuthenticatedAdminSettingsBrandingRoute
   AuthenticatedAdminSettingsCommunicationsRoute: typeof AuthenticatedAdminSettingsCommunicationsRoute
   AuthenticatedAdminSettingsConvocationsRoute: typeof AuthenticatedAdminSettingsConvocationsRoute
+  AuthenticatedAdminSettingsNotificationsRoute: typeof AuthenticatedAdminSettingsNotificationsRoute
   AuthenticatedAdminSettingsPaymentsRoute: typeof AuthenticatedAdminSettingsPaymentsRoute
   AuthenticatedAdminSettingsRemindersRoute: typeof AuthenticatedAdminSettingsRemindersRoute
   AuthenticatedAdminSettingsSocialRoute: typeof AuthenticatedAdminSettingsSocialRoute
@@ -2640,6 +2661,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminSettingsCommunicationsRoute,
   AuthenticatedAdminSettingsConvocationsRoute:
     AuthenticatedAdminSettingsConvocationsRoute,
+  AuthenticatedAdminSettingsNotificationsRoute:
+    AuthenticatedAdminSettingsNotificationsRoute,
   AuthenticatedAdminSettingsPaymentsRoute:
     AuthenticatedAdminSettingsPaymentsRoute,
   AuthenticatedAdminSettingsRemindersRoute:

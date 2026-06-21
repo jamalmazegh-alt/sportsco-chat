@@ -209,19 +209,25 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             }
 
             // Web Push parallèle à l'email — au joueur lui-même + chaque parent lié
-            const pushTargets = new Set<string>();
-            if (player.user_id) pushTargets.add(player.user_id);
-            for (const pp of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
-              if (pp.parent_user_id) pushTargets.add(pp.parent_user_id);
+            // Gate: convocation_reminder (l'email continue à partir si OFF)
+            const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
+            const notifSettings = await getClubNotifSettings((ev.teams?.club_id as string | null) ?? null);
+            if (notifSettings.convocation_reminder) {
+              const pushTargets = new Set<string>();
+              if (player.user_id) pushTargets.add(player.user_id);
+              for (const pp of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
+                if (pp.parent_user_id) pushTargets.add(pp.parent_user_id);
+              }
+              for (const uid of pushTargets) {
+                sendPushToUserFireAndForget(uid, {
+                  title: "🔔 Rappel convocation",
+                  body: `${playerName || "Tu"} n'as pas encore répondu — ${ev.title}`,
+                  url: `/events/${ev.id}`,
+                  tag: `conv-reminder-${conv.id}`,
+                });
+              }
             }
-            for (const uid of pushTargets) {
-              sendPushToUserFireAndForget(uid, {
-                title: "🔔 Rappel convocation",
-                body: `${playerName || "Tu"} n'as pas encore répondu — ${ev.title}`,
-                url: `/events/${ev.id}`,
-                tag: `conv-reminder-${conv.id}`,
-              });
-            }
+
 
             await supabaseAdmin.from("reminders").insert({
               convocation_id: conv.id,
