@@ -19,6 +19,13 @@ export const STRIPE_PRICE_YEARLY =
 export const STRIPE_PRICE_TOURNAMENT =
   process.env.STRIPE_PRICE_TOURNAMENT || "price_1TkgW74gdB9zofvaYtUz87v4";
 
+/** New tournament billing — 2 plans. Set these env vars to your Stripe price IDs. */
+export const STRIPE_PRICE_TOURNAMENT_SINGLE =
+  process.env.STRIPE_PRICE_TOURNAMENT_SINGLE || "";
+export const STRIPE_PRICE_TOURNAMENT_ANNUAL =
+  process.env.STRIPE_PRICE_TOURNAMENT_ANNUAL || "";
+
+
 // Legacy price IDs (kept for back-compat: existing subscribers on the 39 €/390 € plan).
 export const LEGACY_STRIPE_PRICE_MONTHLY = "price_1TXT6NH9mBVlmKXfZBVjgvnb";
 export const LEGACY_STRIPE_PRICE_YEARLY = "price_1TXT6NH9mBVlmKXfZxGQJz3R";

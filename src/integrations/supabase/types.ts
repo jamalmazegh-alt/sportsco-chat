@@ -3596,6 +3596,62 @@ export type Database = {
           },
         ]
       }
+      tournament_entitlements: {
+        Row: {
+          created_at: string
+          id: string
+          organizer_id: string
+          plan: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          stripe_subscription_id: string | null
+          tournament_id: string | null
+          updated_at: string
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organizer_id: string
+          plan: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organizer_id?: string
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_entitlements_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_flights: {
         Row: {
           color: string | null
@@ -4842,6 +4898,7 @@ export type Database = {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
       }
+      can_create_tournament: { Args: { _user_id: string }; Returns: boolean }
       can_edit_player_journey: {
         Args: { _player_id: string; _user_id: string }
         Returns: boolean
@@ -4900,6 +4957,10 @@ export type Database = {
         }[]
       }
       compute_season_label: { Args: { _dt: string }; Returns: string }
+      consume_single_entitlement: {
+        Args: { _tournament_id: string; _user_id: string }
+        Returns: boolean
+      }
       convert_personal_club_to_real: {
         Args: { _club_id: string; _new_name?: string }
         Returns: string

@@ -7,17 +7,15 @@ import i18n from "@/lib/i18n";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
-import { Plus, Trophy, ChevronRight, Calendar } from "lucide-react";
+import { Plus, Trophy, ChevronRight, Calendar, Sparkles, Zap } from "lucide-react";
 import {
   listMyTournaments,
   listMyPersonalTournaments,
 } from "@/modules/tournaments/tournaments.functions";
-import { listMyAvailablePasses } from "@/modules/tournaments/passes.functions";
+import { listMyTournamentEntitlements } from "@/modules/tournaments/entitlements.functions";
 import { TournamentCreateChooser } from "@/modules/tournaments/components/TournamentCreateChooser";
-import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 import { TournamentUpgradeCard } from "@/modules/tournaments/components/TournamentUpgradeCard";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
-import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/tournaments")({
   component: TournamentsRoute,
@@ -41,9 +39,6 @@ function TournamentsList() {
   const role = useActiveRole();
   const roles = useMyRoles();
   const { tournamentOnly } = useTournamentOnlyMode();
-  // Treat tournament-only organizers (incl. those whose only club is the
-  // auto-created "personal" club) as no-club for tournament management UI:
-  // they must use the pass-based creation flow.
   const noClub = memberships.length === 0 || tournamentOnly;
   const canManage = roles.includes("admin") || (role as string) === "dirigeant" || noClub;
   const [open, setOpen] = useState(false);
@@ -62,17 +57,18 @@ function TournamentsList() {
         : clubFn({ data: { club_id: activeClubId! } }),
   });
 
-
-  // For tournament-only organizers: check available passes to decide whether
-  // to show "Create" or "Buy a pass" CTAs.
-  const passesFn = useServerFn(listMyAvailablePasses);
-  const passesQ = useQuery({
-    queryKey: ["my-tournament-passes"],
-    enabled: tournamentOnly || noClub,
-    queryFn: () => passesFn({ data: undefined as never }),
+  // Entitlements drive the "can the user start a new tournament?" decision
+  // for organisers without a club. Club admins keep their existing flow
+  // (gated by club SaaS subscription).
+  const entFn = useServerFn(listMyTournamentEntitlements);
+  const entQ = useQuery({
+    queryKey: ["my-tournament-entitlements"],
+    enabled: noClub,
+    queryFn: () => entFn({ data: undefined as never }),
   });
-  const availablePasses = passesQ.data?.passes ?? [];
-  const hasPass = availablePasses.length > 0;
+  const canCreate = !!entQ.data?.canCreate;
+  const hasAnnual = !!entQ.data?.activeAnnual;
+  const singlesLeft = entQ.data?.unusedSingles?.length ?? 0;
 
   const tournaments = q.data?.tournaments ?? [];
 
@@ -93,28 +89,71 @@ function TournamentsList() {
         />
       )}
 
-
       {noClub && (
         <div className="space-y-3">
-          <div className="rounded-2xl border border-border bg-card p-4 text-sm">
-            <p className="font-medium">{t("list.organizerModeTitle")}</p>
-            <p className="mt-1 text-muted-foreground">
-              {t("list.organizerModeBody")}
-            </p>
-            <p className="mt-3 flex items-center gap-2 text-sm">
-              <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
-                {availablePasses.length}
-              </span>
-              <span className={availablePasses.length > 0 ? "text-primary font-medium" : "text-muted-foreground"}>
-                {availablePasses.length > 1
-                  ? t("list.passAvailable_other")
-                  : availablePasses.length === 1
-                    ? t("list.passAvailable_one")
-                    : t("list.noPassAvailable")}
-              </span>
-            </p>
+          <div
+            className="rounded-2xl p-4 text-white shadow-lg"
+            style={{
+              background:
+                "linear-gradient(135deg, #0f4a26 0%, #1d7a45 60%, #2d9d5f 100%)",
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-wider text-white/80">
+                  Organisateur
+                </p>
+                <p className="font-display text-lg font-bold">
+                  Créez votre tournoi en 30 s avec l'IA
+                </p>
+                <p className="mt-1 text-sm text-white/85">
+                  {hasAnnual
+                    ? "Pass Annuel actif — création illimitée."
+                    : singlesLeft > 0
+                      ? `${singlesLeft} crédit${singlesLeft > 1 ? "s" : ""} tournoi disponible${singlesLeft > 1 ? "s" : ""}.`
+                      : "Choisissez un plan — à partir de 39 €."}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {canCreate ? (
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-white text-emerald-800 hover:bg-white/90"
+                >
+                  <Link to="/tournaments/new-from-pass">
+                    <Zap className="h-4 w-4" />
+                    Créer maintenant
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-white text-emerald-800 hover:bg-white/90"
+                >
+                  <Link to="/tournaments/pricing">
+                    <Trophy className="h-4 w-4" />
+                    Voir les plans
+                  </Link>
+                </Button>
+              )}
+              {!hasAnnual && canCreate && (
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                >
+                  <Link to="/tournaments/pricing">Voir les plans</Link>
+                </Button>
+              )}
+            </div>
           </div>
-          <TournamentPassButton inline />
         </div>
       )}
 
@@ -138,14 +177,21 @@ function TournamentsList() {
           action={
             canManage ? (
               noClub ? (
-                hasPass ? (
+                canCreate ? (
                   <Button size="sm" asChild>
                     <Link to="/tournaments/new-from-pass">
                       <Plus className="h-4 w-4" />
                       {t("list.create")}
                     </Link>
                   </Button>
-                ) : null
+                ) : (
+                  <Button size="sm" asChild>
+                    <Link to="/tournaments/pricing">
+                      <Trophy className="h-4 w-4" />
+                      Voir les plans
+                    </Link>
+                  </Button>
+                )
               ) : (
                 <Button size="sm" onClick={() => setOpen(true)}>
                   <Plus className="h-4 w-4" />
@@ -196,14 +242,21 @@ function TournamentsList() {
       {canManage && tournaments.length > 0 && (
         <div className="pt-2">
           {noClub ? (
-            hasPass ? (
+            canCreate ? (
               <Button size="sm" variant="outline" className="w-full" asChild>
                 <Link to="/tournaments/new-from-pass">
                   <Plus className="h-4 w-4" />
                   {t("list.create")}
                 </Link>
               </Button>
-            ) : null
+            ) : (
+              <Button size="sm" variant="outline" className="w-full" asChild>
+                <Link to="/tournaments/pricing">
+                  <Trophy className="h-4 w-4" />
+                  Acheter un crédit tournoi
+                </Link>
+              </Button>
+            )
           ) : (
             activeClubId && (
               <Button size="sm" variant="outline" className="w-full" onClick={() => setOpen(true)}>
@@ -214,7 +267,6 @@ function TournamentsList() {
           )}
         </div>
       )}
-
     </div>
   );
 }

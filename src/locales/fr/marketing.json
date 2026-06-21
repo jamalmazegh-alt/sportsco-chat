@@ -1419,13 +1419,14 @@
       "img_alt": "Dirigeants et éducateurs organisant leur club ensemble autour d'une tablette"
     },
     "tournament": {
-      "badge": "Compétitions",
-      "headline": "Organisez votre tournoi de A à Z.",
-      "body": "Poules, phases finales, terrains, arbitres, classements automatiques — tout est géré dans Clubero. Le Jour J, votre centre de contrôle est dans votre poche.",
+      "badge": "Tournoi en 30 secondes",
+      "headline": "Créez votre tournoi en 30 secondes grâce à l'IA.",
+      "body": "Notre assistant IA configure votre tournoi en quelques questions : poules, phases finales, planning, terrains, arbitres. Le Jour J, votre centre de contrôle est dans votre poche.",
       "img_alt": "Vue panoramique d'un tournoi amateur organisé avec Clubero",
-      "cta_organize": "Organiser mon tournoi",
+      "cta_organize": "Créer mon tournoi en 30 s",
       "cta_learn_more": "En savoir plus"
     },
+
     "coming_soon": {
       "badge": "Bientôt",
       "headline": "Le club de demain commence aujourd'hui.",

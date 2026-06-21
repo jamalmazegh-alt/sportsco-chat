@@ -1,24 +1,23 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Loader2, Trophy, AlertCircle, RefreshCw } from "lucide-react";
+import { Loader2, Trophy, AlertCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SportSelect } from "@/components/sport-select";
-import { TournamentPassButton } from "@/modules/tournaments/components/TournamentPassButton";
 import i18nInstance from "@/lib/i18n";
 import {
-  listMyAvailablePasses,
-  createTournamentFromPass,
-  confirmPassSession,
-} from "@/modules/tournaments/passes.functions";
+  listMyTournamentEntitlements,
+  createTournamentFromEntitlement,
+  confirmEntitlementSession,
+} from "@/modules/tournaments/entitlements.functions";
 
 export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass")({
-  component: NewFromPassPage,
+  component: NewTournamentPage,
   validateSearch: (s: Record<string, unknown>) => ({
     pass: typeof s.pass === "string" ? s.pass : undefined,
     session_id: typeof s.session_id === "string" ? s.session_id : undefined,
@@ -30,73 +29,35 @@ export const Route = createFileRoute("/_authenticated/tournaments/new-from-pass"
 
 type Format = "group" | "knockout" | "mixed";
 
-function NewFromPassPage() {
+function NewTournamentPage() {
   const { t } = useTranslation("tournaments");
   const navigate = useNavigate();
   const search = Route.useSearch();
   const justPaid = search.pass === "success";
   const sessionId = search.session_id;
-  const listFn = useServerFn(listMyAvailablePasses);
-  const createFn = useServerFn(createTournamentFromPass);
-  const confirmFn = useServerFn(confirmPassSession);
-  const [pollStartedAt] = useState(() => Date.now());
-  const [waitedTooLong, setWaitedTooLong] = useState(false);
-  const [manualConfirming, setManualConfirming] = useState(false);
-  const [paymentNotCompleted, setPaymentNotCompleted] = useState(false);
+  const listFn = useServerFn(listMyTournamentEntitlements);
+  const createFn = useServerFn(createTournamentFromEntitlement);
+  const confirmFn = useServerFn(confirmEntitlementSession);
 
-  const passesQ = useQuery({
-    queryKey: ["my-tournament-passes"],
+  const entQ = useQuery({
+    queryKey: ["my-tournament-entitlements"],
     queryFn: () => listFn({ data: undefined as never }),
-    // After Stripe redirect, poll until the webhook (or our self-heal call)
-    // marks the pass as paid.
     refetchInterval: (q) => {
-      const data = q.state.data as { passes?: unknown[] } | undefined;
+      const data = q.state.data as { canCreate?: boolean } | undefined;
       if (!justPaid) return false;
-      if (data?.passes && data.passes.length > 0) return false;
-      return 2000;
+      if (data?.canCreate) return false;
+      return 2500;
     },
   });
 
-  // Self-heal: ask Stripe directly whether the session is paid, in case the
-  // webhook is delayed or failed. Re-tries every 4s for ~30s.
-  useEffect(() => {
-    if (!justPaid || !sessionId) return;
-    let cancelled = false;
-    let attempts = 0;
-    async function tick() {
-      attempts += 1;
-      try {
-        const res = await confirmFn({ data: { session_id: sessionId! } });
-        if (!cancelled && res.paid) {
-          await passesQ.refetch();
-        } else if (!cancelled && res.checkoutStatus === "open" && res.paymentStatus === "unpaid") {
-          setPaymentNotCompleted(true);
-        }
-      } catch {
-        /* ignore — webhook may still resolve it */
-      }
-      if (cancelled) return;
-      if ((passesQ.data?.passes?.length ?? 0) > 0) return;
-      if (attempts >= 8) {
-        setWaitedTooLong(true);
-        return;
-      }
-      setTimeout(tick, 4000);
+  // Self-heal after Stripe redirect
+  useState(() => {
+    if (justPaid && sessionId) {
+      confirmFn({ data: { session_id: sessionId } })
+        .then(() => entQ.refetch())
+        .catch(() => {});
     }
-    tick();
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [justPaid, sessionId]);
-
-  // Surface "still waiting" message after 20s even without session_id.
-  useEffect(() => {
-    if (!justPaid) return;
-    const t = setTimeout(() => setWaitedTooLong(true), 20000);
-    return () => clearTimeout(t);
-  }, [justPaid, pollStartedAt]);
-
+  });
 
   const [name, setName] = useState("");
   const [sport, setSport] = useState("football");
@@ -108,10 +69,9 @@ function NewFromPassPage() {
   const [numTeams, setNumTeams] = useState(8);
 
   const create = useMutation({
-    mutationFn: (passId: string) =>
+    mutationFn: () =>
       createFn({
         data: {
-          pass_id: passId,
           name: name.trim(),
           sport,
           category: category || null,
@@ -132,44 +92,16 @@ function NewFromPassPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const passes = passesQ.data?.passes ?? [];
-  const pass = passes[0];
-
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!pass) return;
     if (!name.trim() || !startsOn) {
       toast.error(t("newFromPass.missingFields"));
       return;
     }
-    create.mutate(pass.id);
+    create.mutate();
   }
 
-  async function refreshPaymentStatus() {
-    if (manualConfirming) return;
-    setManualConfirming(true);
-    try {
-      if (sessionId) {
-        const res = await confirmFn({ data: { session_id: sessionId } });
-        if (res.paid) {
-          setPaymentNotCompleted(false);
-          toast.success(t("newFromPass.paymentConfirmed", { defaultValue: "Paiement confirmé" }));
-        } else if (res.checkoutStatus === "open" && res.paymentStatus === "unpaid") {
-          setPaymentNotCompleted(true);
-          toast.info(t("newFromPass.paymentNotCompletedTitle", { defaultValue: "Paiement non finalisé" }));
-        } else {
-          toast.info(t("newFromPass.paymentStillPending", { defaultValue: "Paiement encore en attente" }));
-        }
-      }
-      await passesQ.refetch();
-    } catch (err: any) {
-      toast.error(err?.message ?? t("newFromPass.refreshError", { defaultValue: "Validation impossible pour le moment" }));
-    } finally {
-      setManualConfirming(false);
-    }
-  }
-
-  if (passesQ.isLoading) {
+  if (entQ.isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -177,7 +109,11 @@ function NewFromPassPage() {
     );
   }
 
-  if (!pass && justPaid) {
+  const canCreate = entQ.data?.canCreate;
+  const hasAnnual = !!entQ.data?.activeAnnual;
+  const singlesLeft = entQ.data?.unusedSingles?.length ?? 0;
+
+  if (!canCreate && justPaid) {
     return (
       <div className="mx-auto max-w-xl px-5 py-16 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
@@ -189,51 +125,31 @@ function NewFromPassPage() {
         <p className="mt-3 text-sm text-muted-foreground">
           {t("newFromPass.validatingBody")}
         </p>
-        {waitedTooLong && (
-          <div className="mt-8 space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {paymentNotCompleted
-                ? t("newFromPass.paymentNotCompletedBody", {
-                    defaultValue:
-                      "Stripe indique que ce paiement n'est pas finalisé. Si vous avez quitté la page de paiement avant la confirmation, relancez l'achat du pass.",
-                  })
-                : t("newFromPass.stillWaitingBody", {
-                    defaultValue:
-                      "Cela prend plus de temps que prévu. Si votre paiement a bien été effectué, rafraîchissez la page — votre pass apparaîtra dès qu'il sera confirmé.",
-                  })}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refreshPaymentStatus}
-              disabled={manualConfirming}
-            >
-              <RefreshCw className={manualConfirming ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
-              {t("newFromPass.refresh", { defaultValue: "Rafraîchir" })}
-            </Button>
-          </div>
-        )}
       </div>
     );
   }
 
-  if (!pass) {
+  if (!canCreate) {
     return (
       <div className="mx-auto max-w-xl px-5 py-16 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <AlertCircle className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-bold">{t("newFromPass.noPassTitle")}</h1>
+        <h1 className="mt-5 font-display text-2xl font-bold">
+          Aucun crédit tournoi disponible
+        </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          {t("newFromPass.noPassBody")}
+          Choisissez un plan pour démarrer votre tournoi en 30 secondes avec l'IA.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
-          <TournamentPassButton
-            variant="default"
-            label={t("newFromPass.buyPass")}
-          />
+          <Button asChild className="h-11">
+            <Link to="/tournaments/pricing">
+              <Trophy className="h-4 w-4" />
+              Voir les plans
+            </Link>
+          </Button>
           <Button asChild variant="ghost" size="sm">
-            <Link to="/tournaments">{t("newFromPass.backToTournaments")}</Link>
+            <Link to="/tournaments">Retour aux tournois</Link>
           </Button>
         </div>
       </div>
@@ -243,13 +159,19 @@ function NewFromPassPage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-10">
       <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10">
-          <Trophy className="h-5 w-5 text-primary" />
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-100">
+          {hasAnnual ? (
+            <Sparkles className="h-5 w-5 text-emerald-700" />
+          ) : (
+            <Trophy className="h-5 w-5 text-emerald-700" />
+          )}
         </div>
         <div>
-          <h1 className="font-display text-2xl font-bold">{t("newFromPass.heading")}</h1>
+          <h1 className="font-display text-2xl font-bold">Nouveau tournoi</h1>
           <p className="text-sm text-muted-foreground">
-            {t("newFromPass.passValidatedFor", { email: pass.email })}
+            {hasAnnual
+              ? "Pass Annuel actif — création illimitée"
+              : `${singlesLeft} crédit${singlesLeft > 1 ? "s" : ""} tournoi disponible${singlesLeft > 1 ? "s" : ""}`}
           </p>
         </div>
       </div>
@@ -341,9 +263,11 @@ function NewFromPassPage() {
           </div>
         </div>
 
-        <div className="rounded-lg bg-muted/40 p-4 text-xs text-muted-foreground">
-          {t("newFromPass.consumeHint")}
-        </div>
+        {!hasAnnual && (
+          <div className="rounded-lg bg-muted/40 p-4 text-xs text-muted-foreground">
+            Ce tournoi consommera 1 de vos crédits.
+          </div>
+        )}
 
         <Button type="submit" disabled={create.isPending} className="w-full h-11">
           {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
