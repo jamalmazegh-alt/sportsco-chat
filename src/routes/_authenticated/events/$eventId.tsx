@@ -1798,8 +1798,9 @@ function EventDetail() {
         <div className="bg-card px-4 pt-3.5 pb-3">
           <div className="flex items-center gap-3 mb-2.5">
             {/* Date box — green gradient */}
-            <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100 px-2.5 py-1.5 text-center leading-none">
-              <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600">
+            <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 px-2.5 py-1.5 text-center leading-none">
+              <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
+
                 {fmt(event.starts_at, "MMM")}
               </div>
               <div className="text-2xl font-black text-foreground mt-0.5 tabular-nums">
