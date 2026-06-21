@@ -1931,25 +1931,23 @@ function EventDetail() {
 
       {/* Coach: secondary lifecycle actions */}
       {isCoach && event.status !== "cancelled" && (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
             onClick={openReschedule}
-            className="flex-1 h-9 text-muted-foreground hover:text-foreground border border-border/60 hover:bg-muted/60"
+            className="flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-border bg-card px-3 py-2.5 text-xs font-semibold text-foreground/80 hover:bg-muted/60 hover:border-border transition-all active:scale-[0.98]"
           >
-            <CalendarClock className="h-4 w-4" />
+            <CalendarClock className="h-4 w-4 text-muted-foreground" />
             {t("events.reschedule")}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
+          </button>
+          <button
+            type="button"
             onClick={() => setCancelEventOpen(true)}
-            className="flex-1 h-9 text-destructive/80 hover:text-destructive border border-destructive/20 hover:bg-destructive/10"
+            className="flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-semibold text-rose-500 hover:bg-rose-100 hover:border-rose-300 transition-all active:scale-[0.98]"
           >
             <Ban className="h-4 w-4" />
             {t("events.cancelEvent")}
-          </Button>
+          </button>
         </div>
       )}
 
