@@ -7,6 +7,7 @@
  * Refs: RFC 8030, RFC 8188, RFC 8291, RFC 8292.
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { VAPID_PUBLIC_KEY } from "@/lib/pwa";
 
 export interface PushPayload {
   title: string;
@@ -55,8 +56,8 @@ let cachedVapidKey: { priv: CryptoKey; pubB64u: string } | null = null;
 async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   if (cachedVapidKey) return cachedVapidKey;
   const privRaw = process.env.VAPID_PRIVATE_KEY;
-  const pubRaw = process.env.VAPID_PUBLIC_KEY;
-  if (!privRaw || !pubRaw) throw new Error("VAPID keys missing");
+  const pubRaw = VAPID_PUBLIC_KEY;
+  if (!privRaw) throw new Error("VAPID private key missing");
 
   const privBytes = b64uDecode(privRaw); // 32-byte d
   const pubBytes = b64uDecode(pubRaw); // 65-byte uncompressed (0x04 || x || y)
@@ -83,6 +84,23 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
     false,
     ["sign"],
   );
+
+  const pub = await crypto.subtle.importKey(
+    "jwk",
+    { kty: "EC", crv: "P-256", x: b64uEncode(x), y: b64uEncode(y), ext: true },
+    { name: "ECDSA", namedCurve: "P-256" },
+    false,
+    ["verify"],
+  );
+  const probe = new TextEncoder().encode("vapid-key-check");
+  const probeSig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, priv, probe);
+  const keysMatch = await crypto.subtle.verify(
+    { name: "ECDSA", hash: "SHA-256" },
+    pub,
+    probeSig,
+    probe,
+  );
+  if (!keysMatch) throw new Error("VAPID private key does not match browser public key");
 
   cachedVapidKey = { priv, pubB64u: pubRaw };
   return cachedVapidKey;
