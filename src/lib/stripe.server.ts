@@ -17,7 +17,7 @@ export const STRIPE_PRICE_MONTHLY =
 export const STRIPE_PRICE_YEARLY =
   process.env.STRIPE_PRICE_YEARLY || "price_1TkgP94gdB9zofvad2PK3rum";
 export const STRIPE_PRICE_TOURNAMENT =
-  process.env.STRIPE_PRICE_TOURNAMENT || "price_1TZluTH9mBVlmKXfzr1vFIaK";
+  process.env.STRIPE_PRICE_TOURNAMENT || "price_1TkgW74gdB9zofvaYtUz87v4";
 
 // Legacy price IDs (kept for back-compat: existing subscribers on the 39 €/390 € plan).
 export const LEGACY_STRIPE_PRICE_MONTHLY = "price_1TXT6NH9mBVlmKXfZBVjgvnb";
