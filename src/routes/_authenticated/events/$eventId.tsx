@@ -2215,7 +2215,12 @@ function EventDetail() {
                       className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60 transition active:scale-[0.99]"
                     >
                       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
-                        {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" /> : <ClipboardList className="h-4 w-4 text-[#1d7a45]" />}
+                        {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" /> : (
+                          <svg viewBox="0 0 32 32" className="h-5 w-5" fill="#25D366" aria-hidden="true">
+                            <path d="M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708zM16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262z" />
+                            <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16z" />
+                          </svg>
+                        )}
                       </span>
                       <span className="flex-1 min-w-0">
                         <span className="block text-sm font-bold text-slate-900">{t("events.whatsappShare.shareConvocWithLineup")}</span>
