@@ -129,7 +129,10 @@ export async function syncPushSubscriptionState(): Promise<void> {
   const sub = await reg.pushManager.getSubscription();
 
   // Permission revoked at OS/browser level → clean DB + local sub.
-  if (permission === "denied") {
+  // iOS PWA quirk: when the user disables notifications in Settings, the
+  // local PushSubscription becomes null but `Notification.permission` often
+  // stays "granted" — so we ALSO clean up when there's no local sub.
+  if (permission === "denied" || !sub) {
     if (sub) {
       try { await sub.unsubscribe(); } catch { /* noop */ }
     }
@@ -146,10 +149,23 @@ export async function syncPushSubscriptionState(): Promise<void> {
     return;
   }
 
-  // Permission granted: ensure DB row exists and matches current endpoint.
+  // Permission granted with a live sub: ensure DB has exactly this endpoint
+  // for the current device. iOS rotates the endpoint on every re-enable,
+  // so we delete any stale rows for this user_agent first, then upsert.
   if (permission === "granted" && sub) {
     const json = sub.toJSON();
     try {
+      // 1) wipe any previous rows for this user (stale endpoints from
+      //    earlier toggle cycles or other devices we no longer use).
+      await fetch("/api/push/unsubscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ all_for_user: true, keep_endpoint: sub.endpoint }),
+      });
+      // 2) (re)insert the current one.
       await fetch("/api/push/subscribe", {
         method: "POST",
         headers: {
