@@ -12,17 +12,39 @@ const InputSchema = z.object({
   token: z.string().min(16).max(128).regex(/^[a-f0-9-]+$/i),
 });
 
+function tokenFromReferer(request: Request): string | null {
+  const referer = request.headers.get("referer");
+  if (!referer) return null;
+  try {
+    const url = new URL(referer);
+    const [, route, rawToken] = url.pathname.split("/");
+    return route === "r" && rawToken ? decodeURIComponent(rawToken) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const Route = createFileRoute("/api/public/push/convocation-response")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        let body: unknown;
-        try {
-          body = await request.json();
-        } catch {
-          return new Response("Invalid body", { status: 400 });
+        const rawBody = await request.text().catch(() => "");
+        let body: unknown = null;
+        if (rawBody.trim()) {
+          try {
+            body = JSON.parse(rawBody);
+          } catch {
+            body = rawBody.trim();
+          }
         }
-        const parsed = InputSchema.safeParse(body);
+        const token =
+          (typeof body === "string" ? body : null) ||
+          ((body as { token?: unknown } | null)?.token as string | undefined) ||
+          ((body as { response_token?: unknown } | null)?.response_token as string | undefined) ||
+          ((body as { responseToken?: unknown } | null)?.responseToken as string | undefined) ||
+          new URL(request.url).searchParams.get("token") ||
+          tokenFromReferer(request);
+        const parsed = InputSchema.safeParse({ token });
         if (!parsed.success) {
           return new Response("Invalid input", { status: 400 });
         }
