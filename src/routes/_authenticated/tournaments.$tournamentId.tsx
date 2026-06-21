@@ -804,6 +804,37 @@ function Counter({
   );
 }
 
+function StatusPillHero({ status }: { status: string }) {
+  const { t } = useTranslation("tournaments");
+  const label = t(`status.${status}`, { defaultValue: status });
+  const tone =
+    status === "in_progress" || status === "live"
+      ? "live"
+      : status === "completed" || status === "finished"
+        ? "done"
+        : "upcoming";
+  const styles =
+    tone === "live"
+      ? "bg-emerald-400 text-emerald-950"
+      : tone === "done"
+        ? "bg-white/30 text-white"
+        : "bg-sky-300 text-sky-950";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em] ${styles}`}
+    >
+      {tone === "live" && (
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-700 opacity-75" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-700" />
+        </span>
+      )}
+      {label}
+    </span>
+  );
+}
+
+
 function Section({
   id,
   icon: Icon,
