@@ -2184,20 +2184,22 @@ function EventDetail() {
                     </button>
                   )}
 
-                  {/* Email — reuses existing "resend" flow (which sends transactional emails) */}
-                  <button
-                    type="button"
-                    onClick={() => setResendOpen(true)}
-                    className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
-                  >
-                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
-                      <Mail className="h-4 w-4 text-sky-700" />
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-sm font-bold text-slate-900">{t("events.commCard.emailTitle", { defaultValue: "Renvoyer par email" })}</span>
-                      <span className="block text-[11px] text-slate-500 truncate">{t("events.commCard.emailHint", { defaultValue: "Envoie à tous les joueurs" })}</span>
-                    </span>
-                  </button>
+                  {/* Email — only after convocations have been generated */}
+                  {event.convocations_sent && (
+                    <button
+                      type="button"
+                      onClick={() => setResendOpen(true)}
+                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
+                    >
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
+                        <Mail className="h-4 w-4 text-sky-700" />
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-sm font-bold text-slate-900">{t("events.commCard.emailTitle", { defaultValue: "Renvoyer par email" })}</span>
+                        <span className="block text-[11px] text-slate-500 truncate">{t("events.commCard.emailHint", { defaultValue: "Envoie à tous les joueurs" })}</span>
+                      </span>
+                    </button>
+                  )}
 
                   {/* Separator "RAPPEL" */}
                   <div className="flex items-center gap-3 pt-1.5 pb-0.5">
