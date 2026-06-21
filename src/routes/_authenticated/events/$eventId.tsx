@@ -1998,7 +1998,7 @@ function EventDetail() {
           <button
             type="button"
             onClick={() => setCancelEventOpen(true)}
-            className="flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-semibold text-rose-500 hover:bg-rose-100 hover:border-rose-300 transition-all active:scale-[0.98]"
+            className="flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 px-3 py-2.5 text-xs font-semibold text-rose-500 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 hover:border-rose-300 transition-all active:scale-[0.98]"
           >
             <Ban className="h-4 w-4" />
             {t("events.cancelEvent")}
