@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Users, Trophy, ChevronRight, Plus, CalendarDays, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_preview-widgets")({
+export const Route = createFileRoute("/preview-widgets")({
   component: PreviewWidgets,
 });
 
