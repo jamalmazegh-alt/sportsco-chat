@@ -15,6 +15,7 @@ export type ClubNotifSettings = {
   convocation_coach_complete: boolean;
   event_reschedule: boolean;
   event_cancel: boolean;
+  score_result: boolean;
   wall_new_post: boolean;
   tournament_match_reminder: boolean;
   tournament_draw: boolean;
@@ -27,6 +28,7 @@ export const DEFAULT_CLUB_NOTIF_SETTINGS: ClubNotifSettings = {
   convocation_coach_complete: true,
   event_reschedule: true,
   event_cancel: true,
+  score_result: true,
   wall_new_post: true,
   tournament_match_reminder: true,
   tournament_draw: true,
@@ -48,7 +50,7 @@ export async function getClubNotifSettings(
     const { data } = await supabaseAdmin
       .from("club_notification_settings")
       .select(
-        "convocation_on_create, convocation_reminder, convocation_coach_each_response, convocation_coach_complete, event_reschedule, event_cancel, wall_new_post, tournament_match_reminder, tournament_draw",
+        "convocation_on_create, convocation_reminder, convocation_coach_each_response, convocation_coach_complete, event_reschedule, event_cancel, score_result, wall_new_post, tournament_match_reminder, tournament_draw",
       )
       .eq("club_id", clubId)
       .maybeSingle();
@@ -62,6 +64,7 @@ export async function getClubNotifSettings(
           convocation_coach_complete: (data as any).convocation_coach_complete ?? true,
           event_reschedule: (data as any).event_reschedule ?? true,
           event_cancel: (data as any).event_cancel ?? true,
+          score_result: (data as any).score_result ?? true,
           wall_new_post: (data as any).wall_new_post ?? true,
           tournament_match_reminder: (data as any).tournament_match_reminder ?? true,
           tournament_draw: (data as any).tournament_draw ?? true,

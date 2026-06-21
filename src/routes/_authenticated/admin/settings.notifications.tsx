@@ -33,6 +33,7 @@ type Settings = {
   convocation_coach_complete: boolean;
   event_reschedule: boolean;
   event_cancel: boolean;
+  score_result: boolean;
   wall_new_post: boolean;
   tournament_match_reminder: boolean;
   tournament_draw: boolean;
@@ -45,6 +46,7 @@ const DEFAULTS: Omit<Settings, "club_id"> = {
   convocation_coach_complete: true,
   event_reschedule: true,
   event_cancel: true,
+  score_result: true,
   wall_new_post: true,
   tournament_match_reminder: true,
   tournament_draw: true,
@@ -105,6 +107,7 @@ function NotificationsSettingsPage() {
           convocation_coach_complete: next.convocation_coach_complete,
           event_reschedule: next.event_reschedule,
           event_cancel: next.event_cancel,
+          score_result: next.score_result,
           wall_new_post: next.wall_new_post,
           tournament_match_reminder: next.tournament_match_reminder,
           tournament_draw: next.tournament_draw,
@@ -183,6 +186,12 @@ function NotificationsSettingsPage() {
           hint="Push quand un événement est annulé."
           checked={form.event_cancel}
           onChange={(v) => update("event_cancel", v)}
+        />
+        <Toggle
+          label="Résultat de match notifié à l'équipe"
+          hint="Push aux joueurs et coaches quand un score est saisi."
+          checked={form.score_result}
+          onChange={(v) => update("score_result", v)}
         />
       </Section>
 
