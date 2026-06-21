@@ -248,7 +248,7 @@ function HomePage() {
             <img
               src={club.logo_url}
               alt={club.name}
-              className="h-16 w-16 rounded-2xl object-cover bg-white shadow-[0_4px_12px_rgba(15,74,38,0.15)] ring-2 ring-white shrink-0"
+              className="h-16 w-16 rounded-2xl object-cover bg-card shadow-[0_4px_12px_rgba(15,74,38,0.15)] ring-2 ring-white shrink-0"
             />
           ) : (
             <div
@@ -262,7 +262,7 @@ function HomePage() {
             <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-[#1d7a45]/80 truncate">
               {club?.name}
             </p>
-            <h1 className="text-[22px] font-black leading-tight text-[#0f2818] tracking-tight mt-0.5 truncate">
+            <h1 className="text-[22px] font-black leading-tight text-foreground tracking-tight mt-0.5 truncate">
               {t("dashboard.greeting", { name: user?.user_metadata?.full_name?.split(" ")[0] ?? "" })}
             </h1>
           </div>
@@ -340,7 +340,7 @@ function HomePage() {
                   }}
                 />
                 <span className="relative inline-flex items-center justify-center gap-2">
-                  <span className="h-7 w-7 rounded-full bg-white/20 ring-1 ring-white/30 flex items-center justify-center">
+                  <span className="h-7 w-7 rounded-full bg-card/20 ring-1 ring-white/30 flex items-center justify-center">
                     <Plus className="h-4 w-4" strokeWidth={2.8} />
                   </span>
                   {t("dashboard.createEvent")}
@@ -473,18 +473,18 @@ function HomePage() {
         return (
         <section>
           <div className="flex items-center justify-between mb-2.5 px-0.5">
-            <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em]">
+            <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
               {headerLabel}
             </h2>
-            <Link to="/events" className="text-[11px] text-[#0f4a26] font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
+            <Link to="/events" className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
               {t("dashboard.viewAll")}
               <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
             </Link>
           </div>
           {playerHomeEvents.length === 0 ? (
-            <div className="rounded-[14px] border-[1.5px] border-dashed border-[#cbd5e1] bg-white p-8 text-center">
-              <Calendar className="mx-auto h-8 w-8 text-[#94a3b8] mb-2" />
-              <p className="text-sm text-[#64748b] font-medium">{t("dashboard.noUpcoming")}</p>
+            <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
+              <p className="text-sm text-muted-foreground font-medium">{t("dashboard.noUpcoming")}</p>
             </div>
           ) : (
             <ul className="space-y-2">
@@ -501,8 +501,8 @@ function HomePage() {
                         actionRequired
                           ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
                           : isFirst
-                            ? "border-[#0f4a26] bg-white shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
-                            : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1]",
+                            ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                            : "border-border bg-card hover:border-border",
                       )}
                     >
                       {isFirst && (
@@ -517,14 +517,14 @@ function HomePage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p className={cn("font-bold truncate text-[#0f2818]", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
+                            <p className={cn("font-bold truncate text-foreground", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
                             {actionRequired && (
                               <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-[#f59e0b] text-white shrink-0">
                                 {t("dashboard.actionRequired")}
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-[#64748b] font-medium mt-1 flex items-center gap-1.5 flex-wrap">
+                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />
                             <span>{formatWhen(new Date(e.starts_at))}</span>
                             {e.player && <span>· {e.player.first_name}</span>}
@@ -539,7 +539,7 @@ function HomePage() {
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           {e.convocation && <AttendancePill status={e.convocation.status} />}
-                          <ChevronRight className={cn(isFirst ? "h-5 w-5 text-[#0f4a26]" : "h-4 w-4 text-[#94a3b8]")} strokeWidth={2.4} />
+                          <ChevronRight className={cn(isFirst ? "h-5 w-5 text-foreground" : "h-4 w-4 text-muted-foreground/70")} strokeWidth={2.4} />
                         </div>
                       </div>
                     </Link>
@@ -557,18 +557,18 @@ function HomePage() {
       {isCoach && (
         <section>
           <div className="flex items-center justify-between mb-2.5 px-0.5">
-            <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em]">
+            <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
               {t("dashboard.nextEvent")}
             </h2>
-            <Link to="/events" className="text-[11px] text-[#0f4a26] font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
+            <Link to="/events" className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
               {t("dashboard.viewAll")}
               <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
             </Link>
           </div>
           {!upcoming || upcoming.length === 0 ? (
-            <div className="rounded-[14px] border-[1.5px] border-dashed border-[#cbd5e1] bg-white p-8 text-center">
-              <Calendar className="mx-auto h-8 w-8 text-[#94a3b8] mb-2" />
-              <p className="text-sm text-[#64748b] font-medium">{t("dashboard.noUpcoming")}</p>
+            <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
+              <p className="text-sm text-muted-foreground font-medium">{t("dashboard.noUpcoming")}</p>
             </div>
           ) : (
             <ul className="space-y-2">
@@ -582,8 +582,8 @@ function HomePage() {
                       className={cn(
                         "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
                         isFirst
-                          ? "border-[#0f4a26] bg-white shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
-                          : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1]",
+                          ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                          : "border-border bg-card hover:border-border",
                       )}
                     >
                       {isFirst && (
@@ -598,9 +598,9 @@ function HomePage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 min-w-0 flex-wrap">
                             <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p className={cn("font-bold truncate text-[#0f2818]", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
+                            <p className={cn("font-bold truncate text-foreground", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
                           </div>
-                          <p className="text-[11px] text-[#64748b] font-medium mt-1 flex items-center gap-1.5">
+                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5">
                             <Calendar className="h-3 w-3" strokeWidth={2.4} />
                             {formatWhen(new Date(e.starts_at))}
                             {e.location && (
@@ -612,7 +612,7 @@ function HomePage() {
                             )}
                           </p>
                         </div>
-                        <ChevronRight className={cn("shrink-0", isFirst ? "h-5 w-5 text-[#0f4a26]" : "h-4 w-4 text-[#94a3b8]")} strokeWidth={2.4} />
+                        <ChevronRight className={cn("shrink-0", isFirst ? "h-5 w-5 text-foreground" : "h-4 w-4 text-muted-foreground/70")} strokeWidth={2.4} />
                       </div>
                     </Link>
                   </li>

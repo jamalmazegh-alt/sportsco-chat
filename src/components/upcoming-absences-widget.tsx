@@ -85,21 +85,21 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
   const headerBg = noAbsences
     ? "linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%)"
     : "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)";
-  const headerTextClass = noAbsences ? "text-[#0f2818]" : "text-white";
-  const headerSubTextClass = noAbsences ? "text-[#64748b]" : "text-white/85";
+  const headerTextClass = noAbsences ? "text-foreground" : "text-white";
+  const headerSubTextClass = noAbsences ? "text-muted-foreground" : "text-white/85";
   const iconTileClass = noAbsences
-    ? "bg-white ring-1 ring-[#e2e8f0]"
-    : "bg-white/20 backdrop-blur-sm ring-1 ring-white/30";
+    ? "bg-card ring-1 ring-[#e2e8f0]"
+    : "bg-card/20 backdrop-blur-sm ring-1 ring-white/30";
   const iconColorClass = noAbsences ? "text-[#2d9d5f]" : "text-white";
   const patternColor = noAbsences ? "#0f2818" : "#fff";
   const declareBtnClass = noAbsences
-    ? "text-[#0f4a26] bg-white ring-1 ring-[#e2e8f0] hover:bg-[#f0f9f3]"
-    : "text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm ring-1 ring-white/30";
+    ? "text-foreground bg-card ring-1 ring-[#e2e8f0] hover:bg-[#f0f9f3]"
+    : "text-white bg-card/20 hover:bg-card/30 backdrop-blur-sm ring-1 ring-white/30";
 
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-[16px] border-[1.5px] border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(15,40,24,0.04)]",
+        "relative overflow-hidden rounded-[16px] border-[1.5px] border-border bg-card shadow-[0_1px_2px_rgba(15,40,24,0.04)]",
         className,
       )}
     >
@@ -177,15 +177,15 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
                 return (
                   <li
                     key={r.id}
-                    className="flex items-center justify-between gap-2 rounded-[10px] border-[1.5px] border-[#e2e8f0] bg-white px-3 py-2 text-sm hover:border-[#cbd5e1] transition-colors"
+                    className="flex items-center justify-between gap-2 rounded-[10px] border-[1.5px] border-border bg-card px-3 py-2 text-sm hover:border-border transition-colors"
                   >
                     <Link
                       to="/players/$playerId"
                       params={{ playerId: r.player_id }}
                       className="min-w-0 flex-1"
                     >
-                      <p className="font-bold text-[13px] text-[#0f2818] truncate">{name}</p>
-                      <p className="text-[11px] text-[#64748b] font-medium truncate">
+                      <p className="font-bold text-[13px] text-foreground truncate">{name}</p>
+                      <p className="text-[11px] text-muted-foreground font-medium truncate">
                         {formatRange(r.start_date, r.end_date)}
                       </p>
                     </Link>
@@ -200,7 +200,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
             <Button
               size="sm"
               variant="outline"
-              className="w-full border-[1.5px] border-[#e2e8f0] hover:border-[#2d9d5f] hover:bg-[#f0f9f3] hover:text-[#0f4a26] font-bold rounded-[10px]"
+              className="w-full border-[1.5px] border-border hover:border-[#2d9d5f] hover:bg-[#f0f9f3] hover:text-foreground font-bold rounded-[10px]"
               onClick={() => setDrawerOpen(true)}
             >
               <Plus className="h-4 w-4" strokeWidth={2.4} />

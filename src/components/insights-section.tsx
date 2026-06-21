@@ -78,7 +78,7 @@ const PRIORITY_TONE: Record<
     iconColor: "#0f4a26",
     chipBg: "#d4ead9",
     chipColor: "#0f4a26",
-    label: "text-[#0f4a26]",
+    label: "text-foreground",
   },
 };
 
@@ -220,7 +220,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           >
             <Sparkles className="h-3.5 w-3.5 text-white" strokeWidth={2.4} />
           </div>
-          <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em]">
+          <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
             {t("insights.title")}
           </h2>
           <span
@@ -242,7 +242,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           aria-label={t("coachInsightsAi.refresh", { ns: "tournaments" })}
           className={cn(
             "inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full transition-all",
-            "bg-white border-[1.5px] border-[#e2e8f0] text-[#0f4a26] hover:border-[#2d9d5f] hover:bg-[#f0f9f3]",
+            "bg-card border-[1.5px] border-border text-foreground hover:border-[#2d9d5f] hover:bg-[#f0f9f3]",
             "disabled:opacity-50 disabled:cursor-not-allowed",
           )}
         >
@@ -269,7 +269,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
           return (
             <div
               key={ins.id}
-              className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(15,40,24,0.04)] transition-all hover:shadow-[0_4px_12px_rgba(15,40,24,0.08)] hover:border-[#cbd5e1]"
+              className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card shadow-[0_1px_2px_rgba(15,40,24,0.04)] transition-all hover:shadow-[0_4px_12px_rgba(15,40,24,0.08)] hover:border-border"
             >
               <div
                 aria-hidden
@@ -290,7 +290,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
                   >
                     {priorityLabel}
                   </span>
-                  <p className="text-[13px] leading-snug text-[#0f2818] font-medium">{msg}</p>
+                  <p className="text-[13px] leading-snug text-foreground font-medium">{msg}</p>
                   {label && (
                     <button
                       onClick={() => handleAction(ins)}
@@ -307,7 +307,7 @@ export function InsightsSection({ clubId }: { clubId: string }) {
                 <button
                   aria-label={t("insights.dismiss")}
                   onClick={() => setPendingDismiss(ins.id)}
-                  className="shrink-0 p-1.5 rounded-md text-[#94a3b8] transition-all hover:bg-[#f1f5f9] hover:text-[#0f2818] sm:opacity-40 sm:group-hover:opacity-100"
+                  className="shrink-0 p-1.5 rounded-md text-muted-foreground/70 transition-all hover:bg-muted hover:text-foreground sm:opacity-40 sm:group-hover:opacity-100"
                 >
                   <X className="h-3.5 w-3.5" strokeWidth={2.4} />
                 </button>

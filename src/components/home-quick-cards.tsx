@@ -65,7 +65,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
       {/* Teams card */}
       <Link
         to="/teams"
-        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-[#e2e8f0] bg-white p-3.5 active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
+        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-3.5 active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
       >
         <div
           aria-hidden
@@ -77,7 +77,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2.5"
             style={{ background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)" }}
           >
-            <Users className="h-4 w-4 text-[#0f4a26]" strokeWidth={2.4} />
+            <Users className="h-4 w-4 text-foreground" strokeWidth={2.4} />
           </div>
           <p
             className="text-[26px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
@@ -85,27 +85,27 @@ export function HomeQuickCards({ clubId, teams }: Props) {
           >
             {teamsCount}
           </p>
-          <p className="text-[10px] text-[#64748b] mt-1.5 uppercase tracking-[0.1em] font-bold">
+          <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.1em] font-bold">
             {t("nav.teams")}
           </p>
           {teamsSummary && (
-            <p className="text-[10px] text-[#94a3b8] mt-1 truncate font-medium">
+            <p className="text-[10px] text-muted-foreground/70 mt-1 truncate font-medium">
               {teamsSummary}
             </p>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-[#94a3b8] absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
+        <ChevronRight className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
       </Link>
 
       {/* Tournaments card */}
       <Link
         to="/tournaments"
         className={cn(
-          "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-white p-3.5 active:scale-[0.99] transition-all",
-          state === "empty" && "border-dashed border-[#cbd5e1] hover:border-[#0f4a26]",
-          state === "planned" && "border-[#e2e8f0] hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
+          "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-3.5 active:scale-[0.99] transition-all",
+          state === "empty" && "border-dashed border-border hover:border-[#0f4a26]",
+          state === "planned" && "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
           state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
-          state === "done" && "border-[#e2e8f0] opacity-90",
+          state === "done" && "border-border opacity-90",
         )}
       >
         <div
@@ -149,11 +149,11 @@ export function HomeQuickCards({ clubId, teams }: Props) {
           {state === "empty" ? (
             <>
               <p className="text-[26px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">0</p>
-              <p className="text-[10px] text-[#64748b] mt-1.5 uppercase tracking-[0.1em] font-bold">
+              <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.1em] font-bold">
                 {t("nav.tournaments")}
               </p>
               {canCreateTournament && (
-                <p className="text-[10px] font-bold text-[#0f4a26] mt-1.5 inline-flex items-center gap-0.5">
+                <p className="text-[10px] font-bold text-foreground mt-1.5 inline-flex items-center gap-0.5">
                   <Plus className="h-3 w-3" strokeWidth={2.6} />
                   {t("dashboard.tournamentsCard.createCta", {
                     defaultValue: "Créer un tournoi",
@@ -176,14 +176,14 @@ export function HomeQuickCards({ clubId, teams }: Props) {
               >
                 {isLoading ? "…" : count}
               </p>
-              <p className="text-[10px] text-[#64748b] mt-1.5 uppercase tracking-[0.1em] font-bold">
+              <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.1em] font-bold">
                 {count > 1 ? t("nav.tournaments") : t("nav.tournament", { defaultValue: "Tournoi" })}
               </p>
               <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
             </>
           )}
         </div>
-        <ChevronRight className="h-4 w-4 text-[#94a3b8] absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
+        <ChevronRight className="h-4 w-4 text-muted-foreground/70 absolute top-3 right-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.4} />
       </Link>
     </div>
   );
@@ -204,8 +204,8 @@ function StateBadge({
         style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
       >
         <span className="relative inline-flex h-1.5 w-1.5">
-          <span className="absolute inset-0 rounded-full bg-white/70 animate-ping" />
-          <span className="relative h-1.5 w-1.5 rounded-full bg-white" />
+          <span className="absolute inset-0 rounded-full bg-card/70 animate-ping" />
+          <span className="relative h-1.5 w-1.5 rounded-full bg-card" />
         </span>
         {t("dashboard.tournamentsCard.live", { defaultValue: "En cours" })}
       </span>
@@ -221,7 +221,7 @@ function StateBadge({
     );
   }
   return (
-    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[9px] font-bold text-[#64748b]">
+    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[9px] font-bold text-muted-foreground">
       <Check className="h-2.5 w-2.5" strokeWidth={2.6} />
       {t("dashboard.tournamentsCard.done", { defaultValue: "Terminé" })}
     </span>
