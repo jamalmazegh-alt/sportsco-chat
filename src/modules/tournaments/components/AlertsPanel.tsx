@@ -35,11 +35,11 @@ const SEV_STYLES: Record<
     dot: "bg-amber-500",
   },
   low: {
-    border: "border-slate-200 dark:border-slate-800",
-    bg: "bg-white dark:bg-slate-900",
-    iconBg: "bg-slate-100 dark:bg-slate-800",
-    iconColor: "text-slate-600 dark:text-slate-300",
-    text: "text-slate-900 dark:text-slate-100",
+    border: "border-border dark:border-slate-800",
+    bg: "bg-card dark:bg-slate-900",
+    iconBg: "bg-muted dark:bg-slate-800",
+    iconColor: "text-muted-foreground dark:text-slate-300",
+    text: "text-foreground dark:text-slate-100",
     dot: "bg-slate-400",
   },
 };
@@ -58,7 +58,7 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
           <span className="absolute inset-0 animate-ping rounded-full bg-amber-400/40" />
           <AlertTriangle className="relative h-4 w-4 text-amber-600" strokeWidth={2.5} />
         </div>
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-slate-300">
           {t("cockpit.alerts.title", {
             defaultValue: "{{count}} chose à régler",
             defaultValue_plural: "{{count}} choses à régler",
@@ -100,7 +100,7 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
                   {alertLabel(a, t)}
                 </div>
                 {interactive && (
-                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" />
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/70 transition-transform group-hover:translate-x-0.5" />
                 )}
               </button>
             </li>

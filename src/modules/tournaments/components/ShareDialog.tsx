@@ -66,7 +66,7 @@ export function ShareDialog({ url, title, trigger }: Props) {
         <div className="space-y-4">
           <div
             ref={wrapRef}
-            className="flex items-center justify-center rounded-lg bg-white p-4 border border-border"
+            className="flex items-center justify-center rounded-lg bg-card p-4 border border-border"
           >
             <QRCodeCanvas
               value={url}

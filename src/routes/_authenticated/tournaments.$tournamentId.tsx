@@ -450,21 +450,21 @@ function TournamentDetailPage() {
             {/* Pills tags : sport · nb équipes · format */}
             <div className="mt-3 flex flex-wrap gap-1.5">
               {tournament.sport && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ring-1 ring-white/20 backdrop-blur">
+                <span className="inline-flex items-center gap-1 rounded-full bg-card/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider ring-1 ring-white/20 backdrop-blur">
                   {tournament.sport}
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
+              <span className="inline-flex items-center gap-1 rounded-full bg-card/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
                 <Users className="h-3 w-3" />
                 {teams.length} {t("detail.teams", { defaultValue: "équipes" })}
               </span>
               {flights.length > 0 ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
+                <span className="inline-flex items-center gap-1 rounded-full bg-card/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
                   <GitBranch className="h-3 w-3" />
                   Flights
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
+                <span className="inline-flex items-center gap-1 rounded-full bg-card/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
                   <GitBranch className="h-3 w-3" />
                   Poules + Phases finales
                 </span>
@@ -817,7 +817,7 @@ function StatusPillHero({ status }: { status: string }) {
     tone === "live"
       ? "bg-emerald-400 text-emerald-950"
       : tone === "done"
-        ? "bg-white/30 text-white"
+        ? "bg-card/30 text-white"
         : "bg-sky-300 text-sky-950";
   return (
     <span

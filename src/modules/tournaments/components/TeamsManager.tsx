@@ -394,7 +394,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
       {teams.length === 0 ? (
         <div
-          className="rounded-2xl border-[1.5px] border-dashed border-slate-200 p-8 text-center bg-gradient-to-br from-white to-slate-50"
+          className="rounded-2xl border-[1.5px] border-dashed border-border p-8 text-center bg-gradient-to-br from-white to-slate-50"
         >
           <div
             className="h-12 w-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white"
@@ -402,7 +402,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
           >
             <Users className="h-6 w-6" />
           </div>
-          <p className="text-sm font-semibold text-slate-700">{t("teams.empty")}</p>
+          <p className="text-sm font-semibold text-muted-foreground">{t("teams.empty")}</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -425,7 +425,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
             return (
               <li
                 key={tm.id}
-                className="flex items-center gap-3 rounded-2xl border-[1.5px] border-slate-200 bg-white p-3 transition-all hover:-translate-y-0.5 hover:border-emerald-300"
+                className="flex items-center gap-3 rounded-2xl border-[1.5px] border-border bg-card p-3 transition-all hover:-translate-y-0.5 hover:border-emerald-300"
                 style={{ boxShadow: "0 2px 8px -4px rgba(15,23,42,0.06)" }}
               >
                 <div
@@ -439,23 +439,23 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold truncate text-sm text-slate-800 tracking-tight">
+                  <p className="font-bold truncate text-sm text-foreground tracking-tight">
                     {tm.name}
                   </p>
-                  <p className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+                  <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
                     {tm.seed ? (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 font-bold">
                         #{tm.seed}
                       </span>
                     ) : (
-                      <span className="text-slate-400">{t("teams.row.noSeed")}</span>
+                      <span className="text-muted-foreground/70">{t("teams.row.noSeed")}</span>
                     )}
                     <span
                       className={cn(
                         "inline-flex items-center px-1.5 py-0.5 rounded-md font-semibold",
                         tm.team_id
                           ? "bg-emerald-50 text-emerald-700"
-                          : "bg-slate-100 text-slate-600",
+                          : "bg-muted text-muted-foreground",
                       )}
                     >
                       {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
@@ -476,7 +476,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                   variant="ghost"
                   onClick={() => setEditing(tm)}
                   title={t("teams.row.edit")}
-                  className="rounded-lg hover:bg-slate-100"
+                  className="rounded-lg hover:bg-muted"
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>

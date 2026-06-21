@@ -63,7 +63,7 @@ export function StandingsView({ tournamentId }: Props) {
               />
             </svg>
             <h3 className="relative font-extrabold text-[14px] tracking-tight">{group.name}</h3>
-            <span className="relative inline-flex items-center gap-1 rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+            <span className="relative inline-flex items-center gap-1 rounded-full bg-card/15 ring-1 ring-white/25 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
               <Crown className="h-2.5 w-2.5" />
               {t("standings.qualifiers", { count: group.qualifiers_count })}
             </span>

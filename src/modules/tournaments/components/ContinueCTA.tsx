@@ -111,7 +111,7 @@ export function ContinueCTA({ action, onAction, variant = "sticky", disabled }: 
             <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
               {t("controlCenter.nextAction", { defaultValue: "Prochaine action" })}
             </div>
-            <div className="truncate text-base font-bold text-slate-900 dark:text-slate-50">
+            <div className="truncate text-base font-bold text-foreground dark:text-slate-50">
               {label}
             </div>
           </div>
