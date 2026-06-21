@@ -16,7 +16,7 @@ const pickEmailLocale = (...candidates: Array<string | null | undefined>): strin
 };
 import { fmt } from "@/lib/date-locale";
 import {
-  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle, Trophy, Timer, LayoutGrid,
+  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle, Trophy, Timer, LayoutGrid, Mail,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import {
@@ -2087,94 +2087,147 @@ function EventDetail() {
           : buildConvocationMessage(base);
         const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
         const reminderMsg = buildReminderMessage({ ...base, respondents });
-        const modeLabel = mode === "whatsapp"
-          ? t("events.whatsappShare.modeWhatsappOnly")
-          : mode === "hybrid"
-            ? t("events.whatsappShare.modeHybrid")
-            : t("events.whatsappShare.modeQuickShare");
+        void mode;
+        const convocCount = (convocations ?? []).length;
         return (
-          <div className="relative overflow-hidden rounded-3xl p-5 shadow-[0_12px_32px_-16px_rgba(29,122,69,0.45)] bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#25D366] text-white">
-            {/* diagonal pattern overlay */}
-            <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.08]" aria-hidden="true">
-              <defs>
-                <pattern id="wa-diag" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                  <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#wa-diag)" />
-            </svg>
-            {/* glow */}
-            <div className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
-
-            <div className="relative flex items-center justify-between gap-2 mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25">
-                  <MessageCircle className="h-5 w-5 text-white" />
+          <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-slate-200 bg-white shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
+            {/* Header — green gradient */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-5 py-4 text-white">
+              <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]" aria-hidden="true">
+                <defs>
+                  <pattern id="comm-diag" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#comm-diag)" />
+              </svg>
+              <div className="pointer-events-none absolute -top-14 -right-14 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
+              <div className="relative flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shrink-0">
+                    <Send className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="min-w-0 leading-tight">
+                    <div className="text-base font-extrabold tracking-tight">
+                      {t("events.commCard.title", { defaultValue: "Partager la convocation" })}
+                    </div>
+                    <div className="text-[11px] text-white/75 font-medium mt-0.5">
+                      {t("events.commCard.subtitle", { defaultValue: "{{count}} joueurs convoqués", count: convocCount })}
+                    </div>
+                  </div>
                 </div>
-                <div className="leading-tight">
-                  <div className="text-sm font-extrabold tracking-tight">WhatsApp</div>
-                  <div className="text-[10px] uppercase tracking-wider text-white/70 font-semibold">{modeLabel}</div>
-                </div>
+                {groupUrl && (
+                  <a
+                    href={groupUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20 shrink-0"
+                  >
+                    {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
               </div>
-              {groupUrl && (
-                <a
-                  href={groupUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20"
-                >
-                  {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
             </div>
 
-            <div className="relative space-y-2">
+            {/* Actions */}
+            <div className="p-4 space-y-2.5">
               {isCancelled ? (
                 <a
                   href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative overflow-hidden inline-flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-white text-[#0f4a26] hover:bg-white/95 text-sm font-bold shadow-[0_8px_20px_-8px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
+                  className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
                 >
-                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
-                  <MessageCircle className="h-4 w-4" />
-                  {t("events.whatsappShare.shareCancellation")}
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
+                  <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
+                    <MessageCircle className="h-4 w-4" />
+                  </span>
+                  <span className="relative flex-1 text-left">
+                    <span className="block text-sm font-bold">{t("events.whatsappShare.shareCancellation")}</span>
+                    <span className="block text-[11px] text-white/80">{t("events.commCard.cancelledHint", { defaultValue: "Lien d'annulation" })}</span>
+                  </span>
                 </a>
               ) : (
                 <>
+                  {/* WhatsApp — primary */}
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative overflow-hidden inline-flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-white text-[#0f4a26] hover:bg-white/95 text-sm font-bold shadow-[0_8px_20px_-8px_rgba(0,0,0,0.25)] active:scale-[0.99] transition"
+                    className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
                   >
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-emerald-200/70 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
-                    <MessageCircle className="h-4 w-4" />
-                    {t("events.whatsappShare.shareConvoc")}
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
+                    <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
+                      <MessageCircle className="h-4 w-4" />
+                    </span>
+                    <span className="relative flex-1 text-left min-w-0">
+                      <span className="block text-sm font-bold">{t("events.whatsappShare.shareConvoc")}</span>
+                      <span className="block text-[11px] text-white/80 truncate">{t("events.commCard.whatsappHint", { defaultValue: "Lien de convocation" })}</span>
+                    </span>
+                    <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
+                      {t("events.commCard.fast", { defaultValue: "Rapide" })}
+                    </span>
                   </a>
+
+                  {/* Optional: share convocation + lineup as image (existing handler) */}
                   {lineupData && (
                     <button
                       type="button"
                       onClick={() => shareLineupAsImage(convocWithCompoMsg)}
                       disabled={sharingLineup}
-                      className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-2xl bg-[#0a3a1d]/60 hover:bg-[#0a3a1d]/80 text-white text-sm font-semibold ring-1 ring-white/15 disabled:opacity-60 transition active:scale-[0.99]"
+                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60 transition active:scale-[0.99]"
                     >
-                      {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
-                      {t("events.whatsappShare.shareConvocWithLineup")}
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
+                        {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" /> : <ClipboardList className="h-4 w-4 text-[#1d7a45]" />}
+                      </span>
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-sm font-bold text-slate-900">{t("events.whatsappShare.shareConvocWithLineup")}</span>
+                        <span className="block text-[11px] text-slate-500 truncate">{t("events.commCard.lineupHint", { defaultValue: "Inclut la composition en image" })}</span>
+                      </span>
                     </button>
                   )}
+
+                  {/* Email — reuses existing "resend" flow (which sends transactional emails) */}
+                  <button
+                    type="button"
+                    onClick={() => setResendOpen(true)}
+                    className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-slate-200 bg-white px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
+                  >
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
+                      <Mail className="h-4 w-4 text-sky-700" />
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-bold text-slate-900">{t("events.commCard.emailTitle", { defaultValue: "Renvoyer par email" })}</span>
+                      <span className="block text-[11px] text-slate-500 truncate">{t("events.commCard.emailHint", { defaultValue: "Envoie à tous les joueurs" })}</span>
+                    </span>
+                  </button>
+
+                  {/* Separator "RAPPEL" */}
+                  <div className="flex items-center gap-3 pt-1.5 pb-0.5">
+                    <span className="h-px flex-1 bg-slate-200" />
+                    <span className="text-[10px] font-bold tracking-[0.14em] text-slate-400 uppercase">
+                      {t("events.commCard.reminderSeparator", { defaultValue: "Rappel" })}
+                    </span>
+                    <span className="h-px flex-1 bg-slate-200" />
+                  </div>
+
+                  {/* Reminder — dashed green */}
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(reminderMsg)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-2xl bg-white/10 hover:bg-white/15 text-white text-sm font-semibold ring-1 ring-white/25 backdrop-blur-sm transition active:scale-[0.99]"
+                    className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-dashed border-emerald-300 bg-emerald-50/30 px-4 py-3 hover:bg-emerald-50/60 hover:border-emerald-400 transition active:scale-[0.99]"
                   >
-                    <Bell className="h-4 w-4" />
-                    {t("events.whatsappShare.reminder")}
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 ring-1 ring-emerald-200 shrink-0">
+                      <Bell className="h-4 w-4 text-[#1d7a45]" />
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-bold text-[#0f4a26]">{t("events.whatsappShare.reminder")}</span>
+                      <span className="block text-[11px] text-emerald-800/70 truncate">
+                        {lineupData ? t("events.whatsappShare.reminderHintWithLineup") : t("events.whatsappShare.reminderHint")}
+                      </span>
+                    </span>
                   </a>
-                  <p className="text-[11px] text-white/75 pl-1">
-                    {lineupData ? t("events.whatsappShare.reminderHintWithLineup") : t("events.whatsappShare.reminderHint")}
-                  </p>
                 </>
               )}
             </div>
