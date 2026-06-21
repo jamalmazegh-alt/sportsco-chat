@@ -1695,200 +1695,203 @@ function EventDetail() {
       <BackLink to="/events" />
 
 
-      <div
-        className={cn(
-          "relative rounded-2xl border bg-card shadow-sm overflow-hidden",
-          "transition-shadow hover:shadow-md",
-          event.type === "match"
-            ? "border-primary/30"
-            : "border-border"
-        )}
-      >
-        {event.type === "match" && (
-          <>
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/8 via-card to-card"
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -top-20 -right-20 h-48 w-48 rounded-full bg-primary/15 blur-3xl"
-            />
-          </>
-        )}
-
-        {/* Header: badges */}
-        <div className="relative px-5 pt-5">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/12 px-2 py-0.5 rounded-full ring-1 ring-primary/20">
-              {t(`events.types.${event.type}`)}
-            </span>
-            {event.type === "match" && event.competition_type && (
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground/70 bg-muted px-2 py-0.5 rounded-full">
-                {t(`events.competitionTypes.${event.competition_type}`)}
-                {event.competition_name ? ` · ${event.competition_name}` : ""}
-              </span>
-            )}
-            {event.type === "match" && event.is_home !== null && (
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-foreground/70 bg-muted px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                {event.is_home ? <Home className="h-2.5 w-2.5" /> : <Plane className="h-2.5 w-2.5" />}
-                {t(event.is_home ? "events.home" : "events.away")}
-              </span>
-            )}
+      {/* ═════════ HERO — Anime Premium ═════════ */}
+      <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(29,122,69,0.12),0_1px_4px_rgba(0,0,0,0.05)] border border-border bg-card">
+        {/* Top gradient band with diagonal SVG accent + thematic glyph */}
+        <div className="relative h-[88px] overflow-hidden">
+          <svg viewBox="0 0 400 88" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full">
+            <defs>
+              <linearGradient id={`evt-hero-${eventId}`} x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#0f4a26" />
+                <stop offset="100%" stopColor="#1d7a45" />
+              </linearGradient>
+            </defs>
+            <rect width="400" height="88" fill={`url(#evt-hero-${eventId})`} />
+            <path d="M250 0 L400 0 L400 88 L320 88 Z" fill="rgba(255,255,255,0.05)" />
+            <ellipse cx="360" cy="30" rx="65" ry="48" fill="rgba(45,157,95,0.2)" />
+            <line x1="225" y1="88" x2="400" y2="10" stroke="rgba(255,255,255,0.05)" strokeWidth="28" />
+          </svg>
+          {/* Thematic glyph — Trophy for match, Timer for training/other */}
+          <div aria-hidden className="absolute top-3 right-12 z-[1] text-white/25">
+            {event.type === "match" ? <Trophy className="h-10 w-10" strokeWidth={1.5} /> : <Timer className="h-10 w-10" strokeWidth={1.5} />}
           </div>
-        </div>
-
-        {/* Hero: date block + title */}
-        <div className="relative px-5 pt-4 flex items-start gap-4">
-          <div
-            className={cn(
-              "shrink-0 flex flex-col items-center justify-center w-16 rounded-xl border text-center py-2 leading-none",
-              event.type === "match"
-                ? "border-primary/30 bg-primary/10 text-primary"
-                : "border-border bg-muted/40 text-foreground"
-            )}
-          >
-            <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">
-              {fmt(event.starts_at, "MMM")}
-            </div>
-            <div className="text-2xl font-bold tabular-nums mt-0.5">
-              {fmt(event.starts_at, "d")}
-            </div>
-            <div className="text-[10px] font-medium uppercase tracking-wider opacity-70 mt-0.5">
-              {fmt(event.starts_at, "EEE")}
-            </div>
-          </div>
-          <div className="min-w-0 flex-1">
-            <h1 className={cn(
-              "font-bold tracking-tight leading-tight",
-              event.type === "match" ? "text-2xl" : "text-xl"
-            )}>
-              {event.type === "match" && event.opponent ? (
-                <span className="inline-flex items-baseline gap-2 flex-wrap">
-                  <span>{teams?.[0]?.name ?? event.title}</span>
-                  <span className="text-muted-foreground text-base font-medium">vs</span>
-                  <span>{event.opponent}</span>
+          <div className="relative z-[2] flex items-start justify-between gap-2 px-4 pt-3">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white bg-white/22 border border-white/30 px-2 py-[3px] rounded-full">
+                {t(`events.types.${event.type}`)}
+              </span>
+              {event.type === "match" && event.competition_type && (
+                <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white/90 bg-white/12 px-2 py-[3px] rounded-full">
+                  {t(`events.competitionTypes.${event.competition_type}`)}
+                  {event.competition_name ? ` · ${event.competition_name}` : ""}
                 </span>
-              ) : event.title}
-            </h1>
-            <p className="mt-1.5 text-sm text-muted-foreground inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              <span className="font-medium text-foreground">{fmt(event.starts_at, "HH:mm")}</span>
-              {event.ends_at && <span>→ {fmt(event.ends_at, "HH:mm")}</span>}
-              {event.convocation_time && (
-                <span className="text-muted-foreground/80">· {t("events.convocationTime")} {fmt(event.convocation_time, "HH:mm")}</span>
               )}
-            </p>
+              {event.type === "match" && event.is_home !== null && (
+                <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white/90 bg-white/15 px-2 py-[3px] rounded-full inline-flex items-center gap-1">
+                  {event.is_home ? <Home className="h-2.5 w-2.5" /> : <Plane className="h-2.5 w-2.5" />}
+                  {t(event.is_home ? "events.home" : "events.away")}
+                </span>
+              )}
+            </div>
+            {isCoach && (
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                aria-label={t("common.edit", { defaultValue: "Modifier" })}
+                className="shrink-0 h-7 w-7 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center transition-colors"
+              >
+                <Pencil className="h-3 w-3 text-white" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Info rows */}
-        <div className="relative px-5 pt-4 space-y-2.5 text-sm text-muted-foreground">
-          {event.location && (
-            <div className="flex items-start gap-2.5">
-              <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
-              <div className="flex-1 min-w-0">
-                <p className="text-foreground">{event.location}</p>
-                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+        {/* White body */}
+        <div className="bg-card px-4 pt-3.5 pb-3">
+          <div className="flex items-center gap-3 mb-2.5">
+            {/* Date box — green gradient */}
+            <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100 px-2.5 py-1.5 text-center leading-none">
+              <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600">
+                {fmt(event.starts_at, "MMM")}
+              </div>
+              <div className="text-2xl font-black text-foreground mt-0.5 tabular-nums">
+                {fmt(event.starts_at, "d")}
+              </div>
+              <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
+                {fmt(event.starts_at, "EEE")}
+              </div>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-[15px] font-extrabold tracking-[-0.3px] leading-[1.25] text-foreground">
+                {event.type === "match" && event.opponent ? (
+                  <span className="inline-flex items-baseline gap-1.5 flex-wrap">
+                    <span>{teams?.[0]?.name ?? event.title}</span>
+                    <span className="text-muted-foreground font-medium text-xs">vs</span>
+                    <span>{event.opponent}</span>
+                  </span>
+                ) : event.title}
+              </h1>
+              <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <Clock className="h-3.5 w-3.5 text-[#1d7a45]" />
+                <span className="text-foreground">{fmt(event.starts_at, "HH:mm")}</span>
+                {event.ends_at && (
+                  <>
+                    <span className="text-muted-foreground/60">→</span>
+                    <span>{fmt(event.ends_at, "HH:mm")}</span>
+                  </>
+                )}
+                {event.convocation_time && (
+                  <span className="text-muted-foreground/80">· {t("events.convocationTime")} {fmt(event.convocation_time, "HH:mm")}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Format pill (match only, with team sport game-format if any) */}
+          {event.type === "match" && (
+            <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
+              <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
+              {teams?.[0]?.sport ? t(`sports.${teams[0].sport}`, { defaultValue: teams[0].sport }) : t("events.types.match")}
+            </div>
+          )}
+
+          {/* Info rows */}
+          <div className="mt-3 space-y-2.5 text-sm text-muted-foreground">
+            {event.location && (
+              <div className="flex items-start gap-2.5">
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground">{event.location}</p>
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                    <a
+                      href={
+                        event.location_url ??
+                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                    >
+                      {t("events.openInMaps")} <ExternalLink className="h-3 w-3" />
+                    </a>
+                    <a
+                      href={`https://www.waze.com/ul?q=${encodeURIComponent(event.location)}&navigate=yes`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                    >
+                      {t("events.openInWaze")} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+            {event.type === "match" && event.is_home === false && event.meeting_point && (
+              <div className="flex items-start gap-2.5">
+                <Plane className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground">
+                    <span className="font-medium">{t("events.meetingPoint")}:</span> {event.meeting_point}
+                  </p>
                   <a
-                    href={
-                      event.location_url ??
-                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
-                    }
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                    className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                   >
-                    {t("events.openInMaps")} <ExternalLink className="h-3 w-3" />
-                  </a>
-                  <a
-                    href={`https://www.waze.com/ul?q=${encodeURIComponent(event.location)}&navigate=yes`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
-                  >
-                    {t("events.openInWaze")} <ExternalLink className="h-3 w-3" />
+                    {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               </div>
-            </div>
-          )}
-          {event.type === "match" && event.is_home === false && event.meeting_point && (
-            <div className="flex items-start gap-2.5">
-              <Plane className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
-              <div className="flex-1 min-w-0">
-                <p className="text-foreground">
-                  <span className="font-medium">{t("events.meetingPoint")}:</span> {event.meeting_point}
-                </p>
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            )}
+            {event.description && (
+              <p className="text-foreground/90 leading-relaxed pt-1">{event.description}</p>
+            )}
+            {(() => {
+              const list = (event.attachments as unknown as Attachment[] | null) ?? [];
+              return list.length > 0 ? (
+                <div className="pt-1"><AttachmentList items={list} /></div>
+              ) : null;
+            })()}
+          </div>
+
+          {/* Primary action toolbar — Lineup / Feedback (edit moved to hero top) */}
+          {teams && (isCoach || showFeedbackButton) && (
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
+                <Link
+                  to="/events/$eventId/lineup"
+                  params={{ eventId }}
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-9 gap-1.5 flex-1 min-w-[7rem]")}
+                  title={t("lineup.title", { defaultValue: "Composition" })}
                 >
-                  {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
+                  <CircleDot className="h-4 w-4" />
+                  <span>{t("lineup.title", { defaultValue: "Composition" })}</span>
+                </Link>
+              )}
+              {showFeedbackButton && (
+                <Link
+                  to="/events/$eventId/feedback"
+                  params={{ eventId }}
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-9 gap-1.5 flex-1 min-w-[7rem]")}
+                  title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
+                </Link>
+              )}
             </div>
           )}
-          {event.description && (
-            <p className="text-foreground/90 leading-relaxed pt-1">{event.description}</p>
-          )}
-          {(() => {
-            const list = (event.attachments as unknown as Attachment[] | null) ?? [];
-            return list.length > 0 ? (
-              <div className="pt-1"><AttachmentList items={list} /></div>
-            ) : null;
-          })()}
         </div>
 
-        {/* Primary action toolbar */}
-        {teams && (isCoach || showFeedbackButton) && (
-          <div className="relative px-5 pt-4 flex items-center gap-2 flex-wrap">
-            {isCoach && event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
-              <Link
-                to="/events/$eventId/lineup"
-                params={{ eventId }}
-                className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-9 gap-1.5 flex-1 min-w-[7rem]")}
-                title={t("lineup.title", { defaultValue: "Composition" })}
-              >
-                <CircleDot className="h-4 w-4" />
-                <span>{t("lineup.title", { defaultValue: "Composition" })}</span>
-              </Link>
-            )}
-            {showFeedbackButton && (
-              <Link
-                to="/events/$eventId/feedback"
-                params={{ eventId }}
-                className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-9 gap-1.5 flex-1 min-w-[7rem]")}
-                title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}
-              >
-                <ClipboardList className="h-4 w-4" />
-                <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
-              </Link>
-            )}
-            {isCoach && (
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-9 w-9 shrink-0 border border-border/60 hover:bg-primary/10 hover:border-primary/30"
-                onClick={() => setEditOpen(true)}
-                aria-label={t("common.edit", { defaultValue: "Modifier" })}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        )}
-
         {event.type === "match" && (() => { const s = (teams?.[0]?.sport ?? "").toString().toLowerCase().trim(); return s === "football" || s === "foot" || s === "soccer"; })() && (
-          <div className="relative px-5 pt-4" ref={lineupCardRef}>
+          <div className="px-4 pb-3" ref={lineupCardRef}>
             <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
           </div>
         )}
 
         {event.status === "cancelled" && (
-          <div className="relative mx-5 mt-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
+          <div className="mx-4 mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
             <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
               <Ban className="h-4 w-4" />
               {t("events.eventCancelled")}
@@ -1906,9 +1909,6 @@ function EventDetail() {
             )}
           </div>
         )}
-
-        {/* bottom spacer */}
-        <div className="relative h-5" />
       </div>
 
       {isCoach && teams && (
