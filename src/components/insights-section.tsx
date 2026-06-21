@@ -47,28 +47,38 @@ const TYPE_ICON = {
 
 const PRIORITY_TONE: Record<
   InsightRow["priority"],
-  { iconBg: string; iconFg: string; accent: string; ring: string; label: string }
+  {
+    bar: string;
+    iconBg: string;
+    iconColor: string;
+    chipBg: string;
+    chipColor: string;
+    label: string;
+  }
 > = {
   high: {
-    iconBg: "bg-destructive/10",
-    iconFg: "text-destructive",
-    accent: "before:bg-destructive",
-    ring: "ring-destructive/15",
-    label: "text-destructive",
+    bar: "linear-gradient(180deg, #dc2626 0%, #f87171 100%)",
+    iconBg: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+    iconColor: "#b91c1c",
+    chipBg: "#fee2e2",
+    chipColor: "#b91c1c",
+    label: "text-[#b91c1c]",
   },
   medium: {
-    iconBg: "bg-pending/10",
-    iconFg: "text-pending",
-    accent: "before:bg-pending",
-    ring: "ring-pending/15",
-    label: "text-pending",
+    bar: "linear-gradient(180deg, #b45309 0%, #f59e0b 100%)",
+    iconBg: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+    iconColor: "#92400e",
+    chipBg: "#fef3c7",
+    chipColor: "#92400e",
+    label: "text-[#92400e]",
   },
   low: {
-    iconBg: "bg-primary/10",
-    iconFg: "text-primary",
-    accent: "before:bg-primary",
-    ring: "ring-primary/15",
-    label: "text-primary",
+    bar: "linear-gradient(180deg, #0f4a26 0%, #2d9d5f 100%)",
+    iconBg: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)",
+    iconColor: "#0f4a26",
+    chipBg: "#d4ead9",
+    chipColor: "#0f4a26",
+    label: "text-[#0f4a26]",
   },
 };
 
