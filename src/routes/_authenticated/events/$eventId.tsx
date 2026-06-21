@@ -620,11 +620,20 @@ function EventDetail() {
     }
     refetch();
     if (status === "absent" || status === "uncertain") {
-      // fire-and-forget
+      // fire-and-forget email
       notifyCoachesOfResponse(convocationId, status, reason && reason.trim() ? reason.trim() : null).catch(
         () => {}
       );
     }
+    // Push notification (#7 response + #8 complete) — fire-and-forget, all statuses
+    void (async () => {
+      try {
+        const { dispatchConvocationResponsePush } = await import("@/lib/push-dispatch.functions");
+        await dispatchConvocationResponsePush({ data: { convocationId } });
+      } catch {
+        /* best-effort */
+      }
+    })();
     return true;
   }
 
