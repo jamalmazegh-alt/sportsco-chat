@@ -2846,43 +2846,52 @@ function EventDetail() {
                 const pct = (n: number) => (total === 0 ? 0 : (n / total) * 100);
                 return (
                   <div className="px-4 pt-4">
-                    <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-muted/40 p-4 shadow-sm">
-                      <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/5 blur-2xl pointer-events-none" />
-                      <div className="relative flex items-end justify-between gap-3 mb-3">
+                    <div className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-white via-white to-emerald-50/60 p-5 shadow-[0_12px_28px_-16px_rgba(29,122,69,0.25)]">
+                      <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.05]" aria-hidden="true">
+                        <defs>
+                          <pattern id="stats-diag" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                            <line x1="0" y1="0" x2="0" y2="14" stroke="#0f4a26" strokeWidth="1" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#stats-diag)" />
+                      </svg>
+                      <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-emerald-300/25 blur-3xl pointer-events-none" />
+
+                      <div className="relative flex items-end justify-between gap-3 mb-4">
                         <div>
-                          <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-700/80 font-bold">
                             {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
                           </p>
-                          <div className="flex items-baseline gap-1.5 mt-1">
-                            <span className="text-4xl font-bold tabular-nums leading-none tracking-tight">{rate}</span>
-                            <span className="text-lg font-semibold text-muted-foreground">%</span>
+                          <div className="flex items-baseline gap-1.5 mt-1.5">
+                            <span className="text-5xl font-extrabold tabular-nums leading-none tracking-[-0.04em] bg-gradient-to-br from-[#0f4a26] to-[#1d7a45] bg-clip-text text-transparent">
+                              {rate}
+                            </span>
+                            <span className="text-2xl font-bold text-emerald-600/70">%</span>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold tabular-nums leading-tight">
-                            {responded}<span className="text-muted-foreground font-normal">/{total}</span>
+                          <p className="text-base font-bold tabular-nums leading-tight text-foreground">
+                            {responded}<span className="text-muted-foreground font-medium">/{total}</span>
                           </p>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5 font-semibold">
                             {t("attendance.responded", { defaultValue: "réponses" })}
                           </p>
                         </div>
                       </div>
 
-                      {/* Segmented progress bar */}
-                      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-muted/60 flex">
+                      <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted/50 ring-1 ring-inset ring-black/[0.04] flex">
                         {counts.present > 0 && (
-                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-emerald-500 transition-all" />
+                          <div style={{ width: `${pct(counts.present)}%` }} className="bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all" />
                         )}
                         {counts.uncertain > 0 && (
-                          <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-uncertain transition-all" />
+                          <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-gradient-to-r from-amber-300 to-amber-500 transition-all" />
                         )}
                         {counts.absent > 0 && (
-                          <div style={{ width: `${pct(counts.absent)}%` }} className="bg-absent transition-all" />
+                          <div style={{ width: `${pct(counts.absent)}%` }} className="bg-gradient-to-r from-rose-400 to-rose-500 transition-all" />
                         )}
                       </div>
 
-                      {/* Chips */}
-                      <div className="flex flex-wrap gap-1.5 mt-3">
+                      <div className="flex flex-wrap gap-1.5 mt-3.5">
                         <StatChip dotCls="bg-emerald-500" label={t("attendance.present")} value={counts.present} />
                         <StatChip dotCls="bg-uncertain" label={t("attendance.uncertain")} value={counts.uncertain} />
                         <StatChip dotCls="bg-absent" label={t("attendance.absent")} value={counts.absent} />
@@ -2894,13 +2903,18 @@ function EventDetail() {
               })()}
 
               {isCoach && counts.pending > 0 && (
-                <div className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl border border-pending/40 bg-pending/10 px-3 py-2.5">
-                  <p className="text-xs font-medium text-pending-foreground">
+                <div className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50/70 to-white px-4 py-3">
+                  <p className="text-xs font-semibold text-foreground">
                     {t("attendance.pendingCount", { count: counts.pending })}
                   </p>
-                  <Button size="sm" className="h-8" onClick={remindAllPending}>
+                  <button
+                    type="button"
+                    onClick={remindAllPending}
+                    className="group relative overflow-hidden inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-gradient-to-br from-[#0f4a26] to-[#1d7a45] text-white text-xs font-bold shadow-[0_6px_16px_-6px_rgba(29,122,69,0.55)] active:scale-[0.98] transition"
+                  >
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                     <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
-                  </Button>
+                  </button>
                 </div>
               )}
 
