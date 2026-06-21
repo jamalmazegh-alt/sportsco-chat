@@ -472,18 +472,19 @@ function HomePage() {
             : t("dashboard.childrenConvocations");
         return (
         <section>
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-2.5 px-0.5">
+            <h2 className="text-[11px] font-bold text-[#0f2818] uppercase tracking-[0.14em]">
               {headerLabel}
             </h2>
-            <Link to="/events" className="text-xs text-primary font-medium">
+            <Link to="/events" className="text-[11px] text-[#0f4a26] font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
               {t("dashboard.viewAll")}
+              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
             </Link>
           </div>
           {playerHomeEvents.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-              <Calendar className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">{t("dashboard.noUpcoming")}</p>
+            <div className="rounded-[14px] border-[1.5px] border-dashed border-[#cbd5e1] bg-white p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-[#94a3b8] mb-2" />
+              <p className="text-sm text-[#64748b] font-medium">{t("dashboard.noUpcoming")}</p>
             </div>
           ) : (
             <ul className="space-y-2">
@@ -496,45 +497,50 @@ function HomePage() {
                       to="/events/$eventId"
                       params={{ eventId: e.id }}
                       className={cn(
-                        "flex items-center justify-between rounded-2xl border active:scale-[0.99] transition-transform",
+                        "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
                         actionRequired
-                          ? "border-pending/40 bg-pending/5 ring-1 ring-pending/30 p-4"
+                          ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
                           : isFirst
-                            ? "border-primary/30 bg-gradient-to-br from-primary/5 via-card to-card p-5 shadow-sm ring-1 ring-primary/10"
-                            : "border-border bg-card p-4",
+                            ? "border-[#0f4a26] bg-white shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                            : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1]",
                       )}
                     >
-                      <div className="min-w-0">
-                        {isFirst && (
-                          <p className="text-[10px] uppercase tracking-[0.15em] text-primary font-bold mb-1">
-                            {t("dashboard.nextEvent")}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                          <p className={cn("font-medium truncate", isFirst && "text-lg font-semibold")}>{e.title}</p>
-                          {actionRequired && (
-                            <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-pending text-pending-foreground shrink-0">
-                              {t("dashboard.actionRequired")}
-                            </span>
-                          )}
+                      {isFirst && (
+                        <div
+                          className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
+                          style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+                        >
+                          ★ {t("dashboard.nextEvent")}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
-                          <Calendar className="h-3 w-3" />
-                          <span>{formatWhen(new Date(e.starts_at))}</span>
-                          {e.player && <span>· {e.player.first_name}</span>}
-                          {e.team_name && <span>· {e.team_name}</span>}
-                          {e.location && (
-                            <>
-                              <MapPin className="h-3 w-3" />
-                              <span className="truncate">{e.location}</span>
-                            </>
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {e.convocation && <AttendancePill status={e.convocation.status} />}
-                        <ChevronRight className={cn("text-muted-foreground", isFirst ? "h-5 w-5 text-primary" : "h-4 w-4")} />
+                      )}
+                      <div className={cn("flex items-center justify-between gap-3", isFirst ? "p-4" : "p-3.5")}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
+                            <p className={cn("font-bold truncate text-[#0f2818]", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
+                            {actionRequired && (
+                              <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-[#f59e0b] text-white shrink-0">
+                                {t("dashboard.actionRequired")}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-[#64748b] font-medium mt-1 flex items-center gap-1.5 flex-wrap">
+                            <Calendar className="h-3 w-3" strokeWidth={2.4} />
+                            <span>{formatWhen(new Date(e.starts_at))}</span>
+                            {e.player && <span>· {e.player.first_name}</span>}
+                            {e.team_name && <span>· {e.team_name}</span>}
+                            {e.location && (
+                              <>
+                                <MapPin className="h-3 w-3" strokeWidth={2.4} />
+                                <span className="truncate">{e.location}</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {e.convocation && <AttendancePill status={e.convocation.status} />}
+                          <ChevronRight className={cn(isFirst ? "h-5 w-5 text-[#0f4a26]" : "h-4 w-4 text-[#94a3b8]")} strokeWidth={2.4} />
+                        </div>
                       </div>
                     </Link>
                   </li>
@@ -545,6 +551,7 @@ function HomePage() {
         </section>
         );
       })()}
+
 
       {/* For coaches/admins: upcoming events for all teams */}
       {isCoach && (
