@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import {
   Plus,
@@ -33,6 +34,7 @@ import {
   type StatKind,
 } from "@/lib/sport-config";
 import { ConfettiBurst } from "@/components/confetti-burst";
+import { dispatchScorePush } from "@/lib/push-dispatch.functions";
 
 
 type Goal = {
@@ -74,6 +76,7 @@ export function MatchResultCard({
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const dispatchScorePushFn = useServerFn(dispatchScorePush);
   const cfg = getSportConfig(sport);
 
   const [editing, setEditing] = useState(false);
@@ -217,8 +220,7 @@ export function MatchResultCard({
     // Web Push fire-and-forget — notifie équipe + joueurs convoqués
     void (async () => {
       try {
-        const { dispatchScorePush } = await import("@/lib/push-dispatch.functions");
-        await dispatchScorePush({ data: { eventId } });
+        await dispatchScorePushFn({ data: { eventId } });
       } catch (e) {
         console.warn("[push] score dispatch failed", e);
       }

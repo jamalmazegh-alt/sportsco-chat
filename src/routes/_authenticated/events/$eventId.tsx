@@ -55,6 +55,7 @@ import { cn } from "@/lib/utils";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
+import { dispatchConvocationPush, dispatchConvocationResponsePush, dispatchEventCancelPush, dispatchEventReschedulePush } from "@/lib/push-dispatch.functions";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -192,6 +193,10 @@ function EventDetail() {
   const isActiveCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
+  const dispatchConvocationPushFn = useServerFn(dispatchConvocationPush);
+  const dispatchConvocationResponsePushFn = useServerFn(dispatchConvocationResponsePush);
+  const dispatchEventCancelPushFn = useServerFn(dispatchEventCancelPush);
+  const dispatchEventReschedulePushFn = useServerFn(dispatchEventReschedulePush);
   const [sending, setSending] = useState(false);
   const [confirmSendSuspendedOpen, setConfirmSendSuspendedOpen] = useState(false);
   const [sharingLineup, setSharingLineup] = useState(false);
@@ -628,8 +633,7 @@ function EventDetail() {
     // Push notification (#7 response + #8 complete) — fire-and-forget, all statuses
     void (async () => {
       try {
-        const { dispatchConvocationResponsePush } = await import("@/lib/push-dispatch.functions");
-        await dispatchConvocationResponsePush({ data: { convocationId } });
+        await dispatchConvocationResponsePushFn({ data: { convocationId } });
       } catch {
         /* best-effort */
       }
@@ -869,8 +873,7 @@ function EventDetail() {
     // Web Push fire-and-forget — parallèle à l'email, n'attend pas
     void (async () => {
       try {
-        const { dispatchConvocationPush } = await import("@/lib/push-dispatch.functions");
-        await dispatchConvocationPush({ data: { eventId: event.id, playerIds: toInsert } });
+        await dispatchConvocationPushFn({ data: { eventId: event.id, playerIds: toInsert } });
       } catch (e) {
         console.warn("[push] convocation dispatch failed", e);
       }
@@ -1326,8 +1329,7 @@ function EventDetail() {
 
     // Fire-and-forget Web Push (#6 event_cancel)
     try {
-      const { dispatchEventCancelPush } = await import("@/lib/push-dispatch.functions");
-      void dispatchEventCancelPush({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
+      void dispatchEventCancelPushFn({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
     } catch { /* noop */ }
 
     setCancelEventSubmitting(false);
@@ -1491,8 +1493,7 @@ function EventDetail() {
 
     // Fire-and-forget Web Push (#5 event_reschedule)
     try {
-      const { dispatchEventReschedulePush } = await import("@/lib/push-dispatch.functions");
-      void dispatchEventReschedulePush({ data: { eventId: event.id } });
+      void dispatchEventReschedulePushFn({ data: { eventId: event.id } });
     } catch { /* noop */ }
 
     setRescheduleSubmitting(false);
