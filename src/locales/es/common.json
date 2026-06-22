@@ -224,7 +224,12 @@
     "resetSentTitle": "Revisa tu bandeja de entrada",
     "resetSentTo": "Hemos enviado un enlace de restablecimiento a",
     "resetSentHint": "¿No lo recibiste? Revisa la carpeta de spam o inténtalo de nuevo en un minuto.",
-    "useDifferentEmail": "Usar otra dirección"
+    "useDifferentEmail": "Usar otra dirección",
+    "weakPasswordPwned": "Esta contraseña es demasiado común o ha sido filtrada en una brecha de datos. Elige otra.",
+    "emailAlreadyRegistered": "Ya existe una cuenta con este correo.",
+    "tooManyRequests": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+    "invalidEmail": "Correo electrónico no válido.",
+    "signupError": "No se pudo crear la cuenta. Inténtalo de nuevo."
   },
   "common": {
     "save": "Guardar",

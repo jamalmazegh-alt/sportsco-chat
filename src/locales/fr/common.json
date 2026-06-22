@@ -224,7 +224,12 @@
     "resetSentTitle": "Vérifiez votre boîte mail",
     "resetSentTo": "Nous avons envoyé un lien de réinitialisation à",
     "resetSentHint": "Pas reçu ? Vérifiez vos spams ou réessayez dans une minute.",
-    "useDifferentEmail": "Utiliser une autre adresse"
+    "useDifferentEmail": "Utiliser une autre adresse",
+    "weakPasswordPwned": "Ce mot de passe est trop courant ou a été compromis dans une fuite de données. Choisissez-en un autre.",
+    "emailAlreadyRegistered": "Un compte existe déjà avec cette adresse e-mail.",
+    "tooManyRequests": "Trop de tentatives. Réessayez dans quelques minutes.",
+    "invalidEmail": "Adresse e-mail invalide.",
+    "signupError": "Impossible de créer le compte. Réessayez."
   },
   "common": {
     "save": "Enregistrer",

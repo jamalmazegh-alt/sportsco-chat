@@ -224,7 +224,12 @@
     "resetSentTitle": "Check your inbox",
     "resetSentTo": "We sent a password reset link to",
     "resetSentHint": "Didn't get it? Check your spam folder, or try again in a minute.",
-    "useDifferentEmail": "Use a different email"
+    "useDifferentEmail": "Use a different email",
+    "weakPasswordPwned": "This password is too common or has appeared in a data breach. Please choose another one.",
+    "emailAlreadyRegistered": "An account already exists with this email.",
+    "tooManyRequests": "Too many attempts. Please try again in a few minutes.",
+    "invalidEmail": "Invalid email address.",
+    "signupError": "Could not create the account. Please try again."
   },
   "common": {
     "save": "Save",

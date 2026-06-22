@@ -224,7 +224,12 @@
     "resetSentTitle": "Überprüfe dein Postfach",
     "resetSentTo": "Wir haben einen Zurücksetzungslink gesendet an",
     "resetSentHint": "Nicht erhalten? Überprüfe den Spam-Ordner oder versuche es in einer Minute erneut.",
-    "useDifferentEmail": "Andere Adresse verwenden"
+    "useDifferentEmail": "Andere Adresse verwenden",
+    "weakPasswordPwned": "Dieses Passwort ist zu häufig oder wurde in einem Datenleck gefunden. Bitte wählen Sie ein anderes.",
+    "emailAlreadyRegistered": "Ein Konto mit dieser E-Mail-Adresse existiert bereits.",
+    "tooManyRequests": "Zu viele Versuche. Bitte in einigen Minuten erneut versuchen.",
+    "invalidEmail": "Ungültige E-Mail-Adresse.",
+    "signupError": "Konto konnte nicht erstellt werden. Bitte erneut versuchen."
   },
   "common": {
     "save": "Speichern",
