@@ -1259,28 +1259,28 @@
     "pricing": [
       {
         "name": "Turnier",
-        "price": "40 €",
+        "price": "39 €",
         "per": "pro Turnier",
-        "desc": "Organisation eines einmaligen Turniers.",
+        "desc": "Ein einzelnes Turnier organisieren.",
         "cta": "Turnier erstellen"
       },
       {
-        "name": "Liga / Meisterschaft",
-        "price": "199 €",
-        "per": "pro Saison",
-        "desc": "Komplette Verwaltung einer Saison.",
-        "cta": "En parler"
+        "name": "1-Jahres-Pass",
+        "price": "149 €",
+        "per": "pro Jahr",
+        "desc": "Unbegrenzte Turniere für 12 Monate.",
+        "cta": "Turnier erstellen"
       },
       {
         "name": "Clubero Club",
         "price": "49 €",
         "per": "/ Monat",
-        "desc": "Unbegrenzte Turniere inklusive.",
-        "cta": "Clubero Club ansehen",
+        "desc": "Unbegrenzte Turniere im Vereinsabo enthalten.",
+        "cta": "Turnier erstellen",
         "highlight": true
       }
     ],
-    "pricingNote": "Unbegrenzte Turniere inklusive mit Clubero Club.",
+    "pricingNote": "Alle Pläne enthalten die komplette Organisation: Anmeldungen, Zahlungen, Planung und Kommunikation.",
     "finalTitle": "Bereit, deine Turniere zu modernisieren?",
     "finalBody": "Starte ein Turnier in wenigen Minuten oder erlebe Clubero in Aktion mit unserem Team.",
     "finalPrimary": "Turnier erstellen",
