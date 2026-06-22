@@ -108,9 +108,11 @@ export const revokeBillingExemption = createServerFn({ method: "POST" })
       .update({
         exempt_from_billing: false,
         exempt_reason: null,
+        exempt_until: null,
         exempt_granted_at: null,
         exempt_granted_by: null,
       })
+
       .eq("club_id", data.clubId);
 
     await logAudit({
