@@ -60,7 +60,7 @@ export async function getClubNotifSettings(
           convocation_on_create: (data as any).convocation_on_create ?? true,
           convocation_reminder: (data as any).convocation_reminder ?? true,
           convocation_coach_each_response:
-            (data as any).convocation_coach_each_response ?? false,
+            (data as any).convocation_coach_each_response ?? true,
           convocation_coach_complete: (data as any).convocation_coach_complete ?? true,
           event_reschedule: (data as any).event_reschedule ?? true,
           event_cancel: (data as any).event_cancel ?? true,
