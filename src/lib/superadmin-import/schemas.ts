@@ -41,6 +41,7 @@ export const PLAYER_FIELDS: FieldDef[] = [
   { key: "nom_joueur", label: "Nom joueur", required: true },
   { key: "date_naissance", label: "Date de naissance", required: true, validate: isIsoDate },
   { key: "numero_maillot", label: "N° maillot", required: false },
+  { key: "numero_licence", label: "N° licence", required: false },
   { key: "poste", label: "Poste", required: false },
   { key: "email_contact", label: "Email contact", required: false, validate: isEmail },
   { key: "prenom_parent_1", label: "Prénom parent 1", required: false },
