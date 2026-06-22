@@ -1,5 +1,26 @@
 import { useEffect, useState } from "react";
-import { X, Download, Smartphone, Share2, Plus } from "lucide-react";
+import { X, Download, Smartphone } from "lucide-react";
+
+// iOS Share icon (square with up arrow), matches the system "Partager" glyph
+function IOSShareIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3v12" />
+      <path d="M8 7l4-4 4 4" />
+      <path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1" />
+    </svg>
+  );
+}
+
+// iOS "Add" icon (rounded square containing a plus), matches "Sur l'écran d'accueil" glyph
+function IOSAddIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+      <path d="M12 8v8M8 12h8" />
+    </svg>
+  );
+}
 import { isAndroid, isIOS, isInStandaloneMode } from "@/lib/pwa";
 
 const DISMISS_KEY = "clubero:pwa:install-dismissed-at";
@@ -140,16 +161,25 @@ export function InstallBanner() {
                 <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                   1
                 </span>
-                <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5">
-                  Appuyez sur <Share2 className="inline h-4 w-4 text-blue-500" /> Partager en bas de Safari
+                <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
+                  Appuyez sur
+                  <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
+                    <IOSShareIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">Partager</span>
+                  </span>
+                  en bas de Safari
                 </span>
               </li>
               <li className="flex gap-3 items-start">
                 <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                   2
                 </span>
-                <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5">
-                  Choisissez <Plus className="inline h-4 w-4" /> « Sur l'écran d'accueil »
+                <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
+                  Choisissez
+                  <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
+                    <IOSAddIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                  </span>
                 </span>
               </li>
               <li className="flex gap-3 items-start">
