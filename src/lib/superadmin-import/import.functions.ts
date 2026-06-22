@@ -588,9 +588,7 @@ export const runImport = createServerFn({ method: "POST" })
 
 
 
-            // Map role : assistant_coach/manager → enum app_role
-            const roleEnum =
-              r.role === "manager" ? "dirigeant" : "coach";
+            const roleEnum = roleEnumPre;
             await supabaseAdmin.from("club_members").upsert(
               {
                 club_id: data.clubId,
