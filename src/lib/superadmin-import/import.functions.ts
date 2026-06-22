@@ -387,6 +387,7 @@ export const runImport = createServerFn({ method: "POST" })
                 last_name: titleCase(r.nom_joueur!),
                 birth_date: r.date_naissance,
                 jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
+                license_number: r.numero_licence || null,
                 position: r.poste || null,
                 email: r.email_contact?.toLowerCase() || null,
               })
