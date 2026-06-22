@@ -279,40 +279,66 @@ async function findOrCreateProfileByEmail(email: string, fullName: string): Prom
   return null;
 }
 
-async function inviteUserByEmail(
-  email: string,
-  firstName: string,
-  lastName: string,
-  context?: {
-    clubName?: string;
-    inviteRole?: string;
-    playerName?: string;
-    inviterName?: string;
-  },
-): Promise<string | null> {
+/**
+ * Crée un member_invites + envoie l'email player-invite (template Clubero).
+ * Renvoie le token créé, ou null en cas d'échec.
+ */
+async function createInviteAndEmail(params: {
+  clubId: string;
+  clubName?: string;
+  clubLogoUrl?: string;
+  teamId?: string | null;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string | null;
+  role: "coach" | "dirigeant" | "parent" | "player";
+  parentForPlayerId?: string | null;
+  createdBy: string;
+  roleLabel?: string;
+  playerName?: string;
+}): Promise<string | null> {
   try {
-    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: `${firstName} ${lastName}`.trim(),
-        // Contexte lu par le template auth InviteEmail via user_metadata
-        club_name: context?.clubName,
-        invite_role: context?.inviteRole,
-        player_name: context?.playerName,
-        inviter_name: context?.inviterName,
-      },
-    });
-    if (error) {
-      log.warn("invite failed", { email, error: error.message });
+    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+    const { error: invErr } = await supabaseAdmin.from("member_invites").insert({
+      club_id: params.clubId,
+      team_id: params.teamId ?? null,
+      role: params.role as never,
+      email: params.email.toLowerCase(),
+      first_name: params.firstName || null,
+      last_name: params.lastName || null,
+      phone: params.phone || null,
+      parent_for_player_id: params.parentForPlayerId ?? null,
+      token,
+      created_by: params.createdBy,
+    } as never);
+    if (invErr) {
+      log.warn("member_invites insert failed", { email: params.email, error: invErr.message });
       return null;
     }
-    return data.user?.id ?? null;
+
+    const inviteUrl = `https://clubero.app/register?invite=${encodeURIComponent(token)}`;
+    const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+    await enqueueTransactionalEmailServer({
+      templateName: "player-invite",
+      recipientEmail: params.email,
+      idempotencyKey: `import-invite-${token}`,
+      templateData: {
+        firstName: params.firstName || undefined,
+        clubName: params.clubName,
+        clubLogoUrl: params.clubLogoUrl,
+        inviteUrl,
+        roleLabel: params.roleLabel ?? params.role,
+        playerName: params.playerName,
+      },
+    });
+    return token;
   } catch (e) {
-    log.warn("invite threw", { email, error: String(e) });
+    log.warn("invite+email failed", { email: params.email, error: String(e) });
     return null;
   }
 }
+
 
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
