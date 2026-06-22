@@ -546,32 +546,47 @@ export const runImport = createServerFn({ method: "POST" })
             const firstName = titleCase(r.prenom!);
             const lastName = titleCase(r.nom!);
 
-            let userId = await findOrCreateProfileByEmail(email, `${firstName} ${lastName}`);
-            if (!userId && data.sendInvitations) {
-              userId = await inviteUserByEmail(email, firstName, lastName, {
-                clubName,
-                inviteRole: r.role || "coach",
-              });
-              if (userId) invitationsSent++;
-            }
+            const roleEnumPre = r.role === "manager" ? "dirigeant" : "coach";
+            const userId = await findOrCreateProfileByEmail(email, `${firstName} ${lastName}`);
 
             if (!userId) {
-              // Pas d'invitation demandée → on enregistre l'invite offline
-              const token = crypto.randomUUID().replace(/-/g, "");
-              await supabaseAdmin.from("member_invites").insert({
-                club_id: data.clubId,
-                team_id: teamId,
-                role: "coach" as never,
-                email,
-                first_name: firstName,
-                last_name: lastName,
-                phone: r.telephone || null,
-                token,
-                created_by: context.userId,
-              });
+              // Pas d'utilisateur existant → invitation member_invites + email
+              const token = data.sendInvitations
+                ? await createInviteAndEmail({
+                    clubId: data.clubId,
+                    clubName,
+                    clubLogoUrl,
+                    teamId,
+                    email,
+                    firstName,
+                    lastName,
+                    phone: r.telephone,
+                    role: roleEnumPre as "coach" | "dirigeant",
+                    createdBy: context.userId,
+                    roleLabel: r.role || "coach",
+                  })
+                : null;
+              if (token) invitationsSent++;
+              else {
+                // Pas d'envoi → on enregistre l'invite offline pour récupération ultérieure
+                const offlineToken = crypto.randomUUID().replace(/-/g, "");
+                await supabaseAdmin.from("member_invites").insert({
+                  club_id: data.clubId,
+                  team_id: teamId,
+                  role: roleEnumPre as never,
+                  email,
+                  first_name: firstName,
+                  last_name: lastName,
+                  phone: r.telephone || null,
+                  token: offlineToken,
+                  created_by: context.userId,
+                });
+              }
               coachesAdded++;
               continue;
             }
+
+
 
             // Map role : assistant_coach/manager → enum app_role
             const roleEnum =
