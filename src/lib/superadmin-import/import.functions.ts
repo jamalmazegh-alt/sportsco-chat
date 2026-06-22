@@ -370,10 +370,11 @@ export const runImport = createServerFn({ method: "POST" })
     // Contexte club pour personnaliser les invitations email
     const { data: clubRow } = await supabaseAdmin
       .from("clubs")
-      .select("name")
+      .select("name, logo_url")
       .eq("id", data.clubId)
       .maybeSingle();
     const clubName = clubRow?.name ?? undefined;
+    const clubLogoUrl = clubRow?.logo_url ?? undefined;
 
 
 
