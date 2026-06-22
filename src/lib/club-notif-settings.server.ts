@@ -24,7 +24,7 @@ export type ClubNotifSettings = {
 export const DEFAULT_CLUB_NOTIF_SETTINGS: ClubNotifSettings = {
   convocation_on_create: true,
   convocation_reminder: true,
-  convocation_coach_each_response: false,
+  convocation_coach_each_response: true,
   convocation_coach_complete: true,
   event_reschedule: true,
   event_cancel: true,
