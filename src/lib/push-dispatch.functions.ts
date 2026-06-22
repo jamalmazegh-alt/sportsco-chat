@@ -422,13 +422,18 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
       headline = (ev as any).title || "Événement";
     }
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: "❌ Événement annulé",
         body: `${headline} du ${dateStr} à ${timeStr} est annulé`,
         url: `/events/${data.eventId}`,
         tag: `cancel-${data.eventId}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e: unknown) => {
+        console.warn("[push] cancel send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
+    return { dispatched: targets.size, sent };
   });
