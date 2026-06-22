@@ -24,7 +24,16 @@
     "privacy": "Política de privacidad",
     "legalNotice": "Aviso legal",
     "rights": "© {{year}} Clubero. Todos los derechos reservados.",
-    "tagline2": "Diseñado para clubes, entrenadores, padres y jugadores."
+    "tagline2": "Diseñado para clubes, entrenadores, padres y jugadores.",
+    "banner": {
+      "line1": "La app de la que tu club",
+      "accent": "no podrá",
+      "line2": "prescindir.",
+      "sub": "El club del mañana empieza",
+      "subAccent": "hoy.",
+      "follow": "Síguenos",
+      "contact": "Contacto"
+    }
   },
   "home": {
     "badge": "La plataforma para clubes deportivos amateur",

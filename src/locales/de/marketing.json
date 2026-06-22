@@ -24,7 +24,16 @@
     "privacy": "Datenschutzrichtlinie",
     "legalNotice": "Impressum",
     "rights": "© {{year}} Clubero. Alle Rechte vorbehalten.",
-    "tagline2": "Gedacht für Vereine, Trainer, Eltern und Spieler."
+    "tagline2": "Gedacht für Vereine, Trainer, Eltern und Spieler.",
+    "banner": {
+      "line1": "Die App, auf die Ihr Verein",
+      "accent": "nicht mehr",
+      "line2": "verzichten kann.",
+      "sub": "Der Verein von morgen beginnt",
+      "subAccent": "heute.",
+      "follow": "Folgen Sie uns",
+      "contact": "Kontakt"
+    }
   },
   "home": {
     "badge": "Die Plattform für Amateursportvereine",
