@@ -170,13 +170,13 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
         body,
         url: `/events/${data.eventId}`,
         tag: `score-${data.eventId}`,
-      }).catch((e) => {
+      }).catch((e: unknown) => {
         console.warn("[push] score send failed", uid, (e as Error).message);
         return { sent: 0, pruned: 0 };
       }),
     );
     const results = await Promise.all(sends);
-    const sent = results.reduce((t, r) => t + r.sent, 0);
+    const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
     return { dispatched: targets.size, sent };
   });
 
