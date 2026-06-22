@@ -36,6 +36,7 @@ export const grantBillingExemption = createServerFn({ method: "POST" })
       .object({
         clubId: z.string().uuid(),
         reason: exemptReasonSchema,
+        exemptUntil: z.string().datetime().nullable().optional(),
       })
       .parse(input),
   )
@@ -55,16 +56,13 @@ export const grantBillingExemption = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId)
       .maybeSingle();
 
-    if (existing?.exempt_from_billing === true) {
-      return { ok: true, alreadyExempt: true };
-    }
-
     const now = new Date().toISOString();
     await supabaseAdmin.from("subscriptions").upsert(
       {
         club_id: data.clubId,
         exempt_from_billing: true,
         exempt_reason: data.reason,
+        exempt_until: data.exemptUntil ?? null,
         exempt_granted_at: now,
         exempt_granted_by: context.userId,
         status: existing?.status ?? "canceled",
@@ -74,13 +72,20 @@ export const grantBillingExemption = createServerFn({ method: "POST" })
 
     await logAudit({
       actor: context.userId,
-      action: "billing_exemption_granted",
+      action: existing?.exempt_from_billing
+        ? "billing_exemption_updated"
+        : "billing_exemption_granted",
       clubId: data.clubId,
-      metadata: { reason: data.reason, club_name: club.name },
+      metadata: {
+        reason: data.reason,
+        exempt_until: data.exemptUntil ?? null,
+        club_name: club.name,
+      },
     });
 
-    return { ok: true, alreadyExempt: false };
+    return { ok: true, alreadyExempt: existing?.exempt_from_billing === true };
   });
+
 
 export const revokeBillingExemption = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
