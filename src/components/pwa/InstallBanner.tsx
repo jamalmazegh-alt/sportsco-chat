@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { X, Download, Smartphone } from "lucide-react";
 
+// iOS "More" icon (three horizontal dots), matches Safari bottom-bar menu button
+function IOSMoreIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  );
+}
+
 // iOS Share icon (square with up arrow), matches the system "Partager" glyph
 function IOSShareIcon({ className }: { className?: string }) {
   return (
