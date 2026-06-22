@@ -344,15 +344,20 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
     }
     const dayTag = dt.toISOString().slice(0, 10);
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: "📅 Événement reporté",
         body: `${headline} déplacé au ${dateStr} à ${timeStr}`,
         url: `/events/${data.eventId}`,
         tag: `reschedule-${data.eventId}-${dayTag}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e: unknown) => {
+        console.warn("[push] reschedule send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
+    return { dispatched: targets.size, sent };
   });
 
 /* ------------------------------------------------------------------ */
