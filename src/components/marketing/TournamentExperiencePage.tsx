@@ -551,7 +551,7 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
                   variant={tier.highlight ? "default" : "outline"}
                   className="mt-6 h-11"
                 >
-                  <Link to={tier.highlight ? "/pricing" : "/tournaments/start"}>
+                  <Link to="/tournaments/start">
                     {tier.cta}
                   </Link>
                 </Button>
