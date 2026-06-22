@@ -24,7 +24,16 @@
     "privacy": "Privacy policy",
     "legalNotice": "Legal notice",
     "rights": "© {{year}} Clubero. All rights reserved.",
-    "tagline2": "Built for clubs, coaches, parents and players."
+    "tagline2": "Built for clubs, coaches, parents and players.",
+    "banner": {
+      "line1": "The app your club",
+      "accent": "won't be able",
+      "line2": "to live without.",
+      "sub": "The club of tomorrow starts",
+      "subAccent": "today.",
+      "follow": "Follow us",
+      "contact": "Contact us"
+    }
   },
   "home": {
     "badge": "The platform for amateur sports clubs",

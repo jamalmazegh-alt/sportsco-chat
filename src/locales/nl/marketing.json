@@ -24,7 +24,16 @@
     "privacy": "Privacybeleid",
     "legalNotice": "Colofon",
     "rights": "© {{year}} Clubero. Alle rechten voorbehouden.",
-    "tagline2": "Ontworpen voor clubs, coaches, ouders en spelers."
+    "tagline2": "Ontworpen voor clubs, coaches, ouders en spelers.",
+    "banner": {
+      "line1": "De app waar je club",
+      "accent": "niet meer",
+      "line2": "zonder kan.",
+      "sub": "De club van morgen begint",
+      "subAccent": "vandaag.",
+      "follow": "Volg ons",
+      "contact": "Contact"
+    }
   },
   "home": {
     "badge": "Het platform voor amateur sportclubs",

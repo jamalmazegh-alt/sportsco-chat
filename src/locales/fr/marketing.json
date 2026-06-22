@@ -24,7 +24,16 @@
     "privacy": "Politique de confidentialité",
     "legalNotice": "Mentions légales",
     "rights": "© {{year}} Clubero. Tous droits réservés.",
-    "tagline2": "Pensé pour les clubs, coachs, parents et joueurs."
+    "tagline2": "Pensé pour les clubs, coachs, parents et joueurs.",
+    "banner": {
+      "line1": "L'application dont",
+      "accent": "votre club",
+      "line2": "ne pourra plus se passer.",
+      "sub": "Le club de demain commence",
+      "subAccent": "aujourd'hui.",
+      "follow": "Suivez-nous",
+      "contact": "Nous contacter"
+    }
   },
   "home": {
     "badge": "La plateforme des clubs sportifs amateurs",
@@ -1426,7 +1435,6 @@
       "cta_organize": "Créer mon tournoi en 30 s",
       "cta_learn_more": "En savoir plus"
     },
-
     "coming_soon": {
       "badge": "Bientôt",
       "headline": "Le club de demain commence aujourd'hui.",

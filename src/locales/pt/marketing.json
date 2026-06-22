@@ -24,7 +24,16 @@
     "privacy": "Política de Privacidade",
     "legalNotice": "Aviso Legal",
     "rights": "© {{year}} Clubero. Todos os direitos reservados.",
-    "tagline2": "Concebido para clubes, treinadores, encarregados de educação e jogadores."
+    "tagline2": "Concebido para clubes, treinadores, encarregados de educação e jogadores.",
+    "banner": {
+      "line1": "A app que o seu clube",
+      "accent": "não vai conseguir",
+      "line2": "dispensar.",
+      "sub": "O clube de amanhã começa",
+      "subAccent": "hoje.",
+      "follow": "Siga-nos",
+      "contact": "Contacto"
+    }
   },
   "home": {
     "badge": "A plataforma para Clubes desportivos amadores",

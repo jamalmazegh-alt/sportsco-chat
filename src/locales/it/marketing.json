@@ -24,7 +24,16 @@
     "privacy": "Informativa sulla privacy",
     "legalNotice": "Informazioni legali",
     "rights": "© {{year}} Clubero. Tutti i diritti riservati.",
-    "tagline2": "Pensato per club, allenatori, genitori e giocatori."
+    "tagline2": "Pensato per club, allenatori, genitori e giocatori.",
+    "banner": {
+      "line1": "L'app di cui il tuo club",
+      "accent": "non potrà più",
+      "line2": "fare a meno.",
+      "sub": "Il club di domani inizia",
+      "subAccent": "oggi.",
+      "follow": "Seguici",
+      "contact": "Contattaci"
+    }
   },
   "home": {
     "badge": "La piattaforma per le società sportive dilettantistiche",
