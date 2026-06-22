@@ -240,10 +240,11 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     const results = await Promise.all(sends);
     const sent = results.reduce((t, r) => t + r.sent, 0);
     const pruned = results.reduce((t, r) => t + r.pruned, 0);
-    console.log("[push] wall dispatched", {
+    console.log("[push] wall dispatched v2", {
       postId: (post as any).id,
       clubId: (post as any).club_id,
       targets: targets.length,
+      targetIds: targets,
       sent,
       pruned,
     });
