@@ -162,19 +162,27 @@ export function ClubOnboardingPage({ locale }: { locale: "fr" | "en" }) {
 
           <ol className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, i) => {
-              const Icon = STEP_ICONS[i] ?? Send;
+              const illustration = STEP_ILLUSTRATIONS[i];
               return (
                 <li
                   key={step.t}
-                  className="relative rounded-3xl border border-border bg-card p-6"
+                  className="relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-6"
                 >
+                  <div className="relative -mx-6 -mt-6 mb-5 flex h-[200px] items-center justify-center overflow-hidden bg-gradient-to-b from-[color:var(--brand-blue-soft)]/40 to-background">
+                    <img
+                      src={illustration}
+                      alt={step.t}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
                   <div className="flex items-center gap-3">
                     <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                       {i + 1}
                     </span>
-                    <Icon className="h-5 w-5 text-[color:var(--brand-blue-deep)]" />
                   </div>
-                  <h3 className="mt-5 font-display text-lg font-semibold">{step.t}</h3>
+                  <h3 className="mt-4 font-display text-lg font-semibold">{step.t}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.b}</p>
                 </li>
               );
