@@ -533,6 +533,14 @@ export const runImport = createServerFn({ method: "POST" })
               user_id: userId,
               role: roleEnum as never,
             });
+            if (r.numero_licence) {
+              await supabaseAdmin
+                .from("coach_profiles")
+                .upsert(
+                  { user_id: userId, license_number: r.numero_licence } as never,
+                  { onConflict: "user_id" } as never,
+                );
+            }
             coachesAdded++;
           } catch (e) {
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
