@@ -1,39 +1,84 @@
 import * as React from 'react'
-import { BrandedEmail, pickLocale, type Locale } from './_layout'
+
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Link,
+  Preview,
+  Text,
+} from '@react-email/components'
 
 interface SignupEmailProps {
   siteName: string
-  siteUrl?: string
-  recipient?: string
+  siteUrl: string
+  recipient: string
   confirmationUrl: string
-  locale?: string
 }
 
-export const SignupEmail = ({ confirmationUrl, locale }: SignupEmailProps) => {
-  const l: Locale = pickLocale(locale)
-  const t = COPY[l]
-  return (
-    <BrandedEmail
-      locale={l}
-      preview={t.preview}
-      heading={t.heading}
-      intro={t.intro}
-      ctaLabel={t.cta}
-      ctaUrl={confirmationUrl}
-      footer={t.footer}
-      signOff={t.signOff}
-    />
-  )
-}
+export const SignupEmail = ({
+  siteName,
+  siteUrl,
+  recipient,
+  confirmationUrl,
+}: SignupEmailProps) => (
+  <Html lang="en" dir="ltr">
+    <Head />
+    <Preview>Confirm your email for {siteName}</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Heading style={h1}>Confirm your email</Heading>
+        <Text style={text}>
+          Thanks for signing up for{' '}
+          <Link href={siteUrl} style={link}>
+            <strong>{siteName}</strong>
+          </Link>
+          !
+        </Text>
+        <Text style={text}>
+          Please confirm your email address (
+          <Link href={`mailto:${recipient}`} style={link}>
+            {recipient}
+          </Link>
+          ) by clicking the button below:
+        </Text>
+        <Button style={button} href={confirmationUrl}>
+          Verify Email
+        </Button>
+        <Text style={footer}>
+          If you didn't create an account, you can safely ignore this email.
+        </Text>
+      </Container>
+    </Body>
+  </Html>
+)
 
 export default SignupEmail
 
-const COPY: Record<Locale, { preview: string; heading: string; intro: string; cta: string; footer: string; signOff: string }> = {
-  fr: { preview: 'Confirmez votre adresse e-mail Clubero', heading: 'Bienvenue sur Clubero', intro: "Merci de vous être inscrit. Confirmez votre adresse e-mail pour activer votre compte.", cta: 'Confirmer mon e-mail', footer: "Si vous n'êtes pas à l'origine de cette inscription, ignorez simplement cet e-mail.", signOff: "L'équipe Clubero" },
-  en: { preview: 'Confirm your Clubero email', heading: 'Welcome to Clubero', intro: 'Thanks for signing up. Confirm your email address to activate your account.', cta: 'Confirm my email', footer: "If you didn't sign up, you can safely ignore this email.", signOff: 'The Clubero team' },
-  es: { preview: 'Confirma tu correo de Clubero', heading: 'Bienvenido a Clubero', intro: 'Gracias por registrarte. Confirma tu correo para activar tu cuenta.', cta: 'Confirmar mi correo', footer: 'Si no te registraste, ignora este correo.', signOff: 'El equipo de Clubero' },
-  de: { preview: 'Bestätigen Sie Ihre Clubero-E-Mail', heading: 'Willkommen bei Clubero', intro: 'Danke für Ihre Anmeldung. Bestätigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu aktivieren.', cta: 'E-Mail bestätigen', footer: 'Wenn Sie sich nicht registriert haben, ignorieren Sie diese E-Mail.', signOff: 'Das Clubero-Team' },
-  it: { preview: 'Conferma la tua email Clubero', heading: 'Benvenuto su Clubero', intro: 'Grazie per esserti registrato. Conferma la tua email per attivare il tuo account.', cta: 'Conferma email', footer: 'Se non ti sei registrato, ignora questa email.', signOff: 'Il team Clubero' },
-  nl: { preview: 'Bevestig je Clubero e-mail', heading: 'Welkom bij Clubero', intro: 'Bedankt voor je registratie. Bevestig je e-mailadres om je account te activeren.', cta: 'E-mail bevestigen', footer: 'Als je je niet hebt aangemeld, kun je deze e-mail negeren.', signOff: 'Het Clubero-team' },
-  pt: { preview: 'Confirme o seu e-mail Clubero', heading: 'Bem-vindo ao Clubero', intro: 'Obrigado por se registar. Confirme o seu e-mail para ativar a sua conta.', cta: 'Confirmar e-mail', footer: 'Se não se registou, ignore este e-mail.', signOff: 'A equipa Clubero' },
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
+  fontWeight: 'bold' as const,
+  color: '#000000',
+  margin: '0 0 20px',
 }
+const text = {
+  fontSize: '14px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
+}
+const link = { color: 'inherit', textDecoration: 'underline' }
+const button = {
+  backgroundColor: '#000000',
+  color: '#ffffff',
+  fontSize: '14px',
+  borderRadius: '8px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+}
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }

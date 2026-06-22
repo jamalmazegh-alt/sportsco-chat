@@ -3194,6 +3194,10 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           current_period_start: string | null
+          exempt_from_billing: boolean
+          exempt_granted_at: string | null
+          exempt_granted_by: string | null
+          exempt_reason: string | null
           id: string
           plan: Database["public"]["Enums"]["subscription_plan"] | null
           status: Database["public"]["Enums"]["subscription_status"]
@@ -3203,10 +3207,6 @@ export type Database = {
           trial_end: string | null
           trial_reminders_sent: number[]
           updated_at: string
-          exempt_from_billing: boolean
-          exempt_reason: string | null
-          exempt_granted_at: string | null
-          exempt_granted_by: string | null
         }
         Insert: {
           cancel_at?: string | null
@@ -3216,6 +3216,10 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          exempt_from_billing?: boolean
+          exempt_granted_at?: string | null
+          exempt_granted_by?: string | null
+          exempt_reason?: string | null
           id?: string
           plan?: Database["public"]["Enums"]["subscription_plan"] | null
           status?: Database["public"]["Enums"]["subscription_status"]
@@ -3225,10 +3229,6 @@ export type Database = {
           trial_end?: string | null
           trial_reminders_sent?: number[]
           updated_at?: string
-          exempt_from_billing?: boolean
-          exempt_reason?: string | null
-          exempt_granted_at?: string | null
-          exempt_granted_by?: string | null
         }
         Update: {
           cancel_at?: string | null
@@ -3238,6 +3238,10 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string | null
+          exempt_from_billing?: boolean
+          exempt_granted_at?: string | null
+          exempt_granted_by?: string | null
+          exempt_reason?: string | null
           id?: string
           plan?: Database["public"]["Enums"]["subscription_plan"] | null
           status?: Database["public"]["Enums"]["subscription_status"]
@@ -3247,10 +3251,6 @@ export type Database = {
           trial_end?: string | null
           trial_reminders_sent?: number[]
           updated_at?: string
-          exempt_from_billing?: boolean
-          exempt_reason?: string | null
-          exempt_granted_at?: string | null
-          exempt_granted_by?: string | null
         }
         Relationships: [
           {

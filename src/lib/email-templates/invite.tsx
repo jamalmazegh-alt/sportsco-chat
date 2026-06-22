@@ -1,38 +1,77 @@
 import * as React from 'react'
-import { BrandedEmail, pickLocale, type Locale } from './_layout'
+
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Link,
+  Preview,
+  Text,
+} from '@react-email/components'
 
 interface InviteEmailProps {
-  siteName?: string
-  siteUrl?: string
+  siteName: string
+  siteUrl: string
   confirmationUrl: string
-  locale?: string
 }
 
-export const InviteEmail = ({ confirmationUrl, locale }: InviteEmailProps) => {
-  const l: Locale = pickLocale(locale)
-  const t = COPY[l]
-  return (
-    <BrandedEmail
-      locale={l}
-      preview={t.preview}
-      heading={t.heading}
-      intro={t.intro}
-      ctaLabel={t.cta}
-      ctaUrl={confirmationUrl}
-      footer={t.footer}
-      signOff={t.signOff}
-    />
-  )
-}
+export const InviteEmail = ({
+  siteName,
+  siteUrl,
+  confirmationUrl,
+}: InviteEmailProps) => (
+  <Html lang="en" dir="ltr">
+    <Head />
+    <Preview>You've been invited to join {siteName}</Preview>
+    <Body style={main}>
+      <Container style={container}>
+        <Heading style={h1}>You've been invited</Heading>
+        <Text style={text}>
+          You've been invited to join{' '}
+          <Link href={siteUrl} style={link}>
+            <strong>{siteName}</strong>
+          </Link>
+          . Click the button below to accept the invitation and create your
+          account.
+        </Text>
+        <Button style={button} href={confirmationUrl}>
+          Accept Invitation
+        </Button>
+        <Text style={footer}>
+          If you weren't expecting this invitation, you can safely ignore this
+          email.
+        </Text>
+      </Container>
+    </Body>
+  </Html>
+)
 
 export default InviteEmail
 
-const COPY: Record<Locale, { preview: string; heading: string; intro: string; cta: string; footer: string; signOff: string }> = {
-  fr: { preview: 'Vous êtes invité sur Clubero', heading: 'Vous êtes invité', intro: 'Vous avez été invité à rejoindre Clubero. Cliquez ci-dessous pour accepter et créer votre compte.', cta: "Accepter l'invitation", footer: "Si vous n'attendiez pas cette invitation, ignorez cet e-mail.", signOff: "L'équipe Clubero" },
-  en: { preview: "You're invited to Clubero", heading: "You're invited", intro: "You've been invited to join Clubero. Click below to accept and create your account.", cta: 'Accept invitation', footer: "If you weren't expecting this, ignore this email.", signOff: 'The Clubero team' },
-  es: { preview: 'Te invitan a Clubero', heading: 'Estás invitado', intro: 'Te han invitado a unirte a Clubero. Haz clic para aceptar y crear tu cuenta.', cta: 'Aceptar invitación', footer: 'Si no esperabas esta invitación, ignora este correo.', signOff: 'El equipo de Clubero' },
-  de: { preview: 'Sie sind zu Clubero eingeladen', heading: 'Sie sind eingeladen', intro: 'Sie wurden eingeladen, Clubero beizutreten. Klicken Sie, um anzunehmen und Ihr Konto zu erstellen.', cta: 'Einladung annehmen', footer: 'Wenn Sie diese Einladung nicht erwartet haben, ignorieren Sie diese E-Mail.', signOff: 'Das Clubero-Team' },
-  it: { preview: 'Sei invitato su Clubero', heading: 'Sei invitato', intro: 'Sei stato invitato a unirti a Clubero. Fai clic per accettare e creare il tuo account.', cta: 'Accetta invito', footer: 'Se non aspettavi questo invito, ignora questa email.', signOff: 'Il team Clubero' },
-  nl: { preview: 'Je bent uitgenodigd voor Clubero', heading: 'Je bent uitgenodigd', intro: 'Je bent uitgenodigd om lid te worden van Clubero. Klik om te accepteren en je account aan te maken.', cta: 'Uitnodiging accepteren', footer: 'Als je deze uitnodiging niet verwachtte, negeer deze e-mail.', signOff: 'Het Clubero-team' },
-  pt: { preview: 'Está convidado para o Clubero', heading: 'Está convidado', intro: 'Foi convidado a juntar-se ao Clubero. Clique para aceitar e criar a sua conta.', cta: 'Aceitar convite', footer: 'Se não esperava este convite, ignore este e-mail.', signOff: 'A equipa Clubero' },
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
+  fontWeight: 'bold' as const,
+  color: '#000000',
+  margin: '0 0 20px',
 }
+const text = {
+  fontSize: '14px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
+}
+const link = { color: 'inherit', textDecoration: 'underline' }
+const button = {
+  backgroundColor: '#000000',
+  color: '#ffffff',
+  fontSize: '14px',
+  borderRadius: '8px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+}
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
