@@ -282,7 +282,7 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
 
     const { data: ev } = await supabaseAdmin
       .from("events")
-      .select("id, title, starts_at, type, team_id, convocations_sent, teams:team_id(club_id)")
+      .select("id, title, starts_at, type, team_id, opponent, is_home, convocations_sent, teams:team_id(name, club_id)")
       .eq("id", data.eventId)
       .maybeSingle();
     if (!ev) return { dispatched: 0 };
@@ -315,13 +315,23 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
     const dt = new Date((ev as any).starts_at);
     const dateStr = dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
     const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-    const typeLabel = (ev as any).type === "match" ? "Match" : (ev as any).title || "Événement";
+    const isMatch = (ev as any).type === "match";
+    const teamName = ((ev as any).teams?.name as string | null) ?? null;
+    const opponent = ((ev as any).opponent as string | null) ?? null;
+    let headline: string;
+    if (isMatch && opponent) {
+      headline = teamName ? `${teamName} vs ${opponent}` : `Match vs ${opponent}`;
+    } else if (isMatch) {
+      headline = teamName ? `Match ${teamName}` : "Match";
+    } else {
+      headline = (ev as any).title || "Événement";
+    }
     const dayTag = dt.toISOString().slice(0, 10);
 
     for (const uid of targets) {
       sendPushToUserFireAndForget(uid, {
         title: "📅 Événement reporté",
-        body: `${typeLabel} déplacé au ${dateStr} à ${timeStr}`,
+        body: `${headline} déplacé au ${dateStr} à ${timeStr}`,
         url: `/events/${data.eventId}`,
         tag: `reschedule-${data.eventId}-${dayTag}`,
       });
