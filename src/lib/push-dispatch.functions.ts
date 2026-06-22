@@ -293,7 +293,7 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
   .inputValidator((input) => RescheduleInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
 
     const { data: ev } = await supabaseAdmin
