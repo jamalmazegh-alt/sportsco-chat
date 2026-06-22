@@ -37,6 +37,13 @@ const IMPORT_ICONS = [
 
 const STEP_ICONS = [Send, Sparkles, Settings2, CheckCircle2];
 
+const STEP_ILLUSTRATIONS = [
+  "/images/onboarding/onboarding-step-1.webp",
+  "/images/onboarding/onboarding-step-2.webp",
+  "/images/onboarding/onboarding-step-3.webp",
+  "/images/onboarding/onboarding-step-4.webp",
+];
+
 const HUMAN_ICONS = [LifeBuoy, HandHeart, Wand2, MessageCircle];
 
 export function ClubOnboardingPage({ locale }: { locale: "fr" | "en" }) {
