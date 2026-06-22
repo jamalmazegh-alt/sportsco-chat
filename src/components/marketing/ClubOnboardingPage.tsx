@@ -35,7 +35,6 @@ const IMPORT_ICONS = [
   ImageIcon,
 ];
 
-const STEP_ICONS = [Send, Sparkles, Settings2, CheckCircle2];
 
 const STEP_ILLUSTRATIONS = [
   "/images/onboarding/onboarding-step-1.webp",
