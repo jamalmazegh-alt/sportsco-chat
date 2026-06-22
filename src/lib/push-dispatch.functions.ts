@@ -104,7 +104,7 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
   .inputValidator((input) => ScoreInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
 
     const { data: ev } = await supabaseAdmin
       .from("events")
