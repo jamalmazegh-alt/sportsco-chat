@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { listAllClubs } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Loader2, Search } from "lucide-react";
+import { BillingExemptionActions } from "@/components/superadmin/BillingExemptionActions";
+import { EXEMPT_REASON_LABELS, type ExemptReason } from "@/lib/has-paid-access";
 
 export const Route = createFileRoute("/superadmin/clubs/")({
   component: SuperAdminClubs,
@@ -21,6 +23,8 @@ type Club = {
     status: string;
     trial_end: string | null;
     current_period_end: string | null;
+    exempt_from_billing?: boolean | null;
+    exempt_reason?: string | null;
   } | null;
 };
 
@@ -50,6 +54,9 @@ function SuperAdminClubs() {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const reload = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   useEffect(() => {
     setLoading(true);
@@ -70,7 +77,7 @@ function SuperAdminClubs() {
         .finally(() => setLoading(false));
     }, 250);
     return () => clearTimeout(t);
-  }, [search, includePersonal, includeSystem]);
+  }, [search, includePersonal, includeSystem, refreshKey]);
 
   return (
     <div className="p-6 md:p-8 max-w-7xl">
@@ -123,13 +130,14 @@ function SuperAdminClubs() {
               <th className="text-left font-medium px-3 py-2">Club</th>
               <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Members</th>
               <th className="text-left font-medium px-3 py-2">Subscription</th>
-              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Created</th>
+              <th className="text-right font-medium px-3 py-2">Exemption</th>
+              <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Created</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
                   <Loader2 className="h-4 w-4 inline animate-spin mr-2" />
                   Loading…
                 </td>
@@ -137,7 +145,7 @@ function SuperAdminClubs() {
             )}
             {!loading && clubs.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
                   No clubs found.
                 </td>
               </tr>
@@ -147,6 +155,7 @@ function SuperAdminClubs() {
                 const badge = statusBadge(c.subscription);
                 const isTest =
                   c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
+                const isExempt = c.subscription?.exempt_from_billing === true;
                 return (
                   <tr key={c.id} className="border-t border-border hover:bg-muted/20">
                     <td className="px-3 py-2">
@@ -180,13 +189,30 @@ function SuperAdminClubs() {
                       {c.member_count}
                     </td>
                     <td className="px-3 py-2">
-                      <span
-                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs ${TONE[badge.tone]}`}
-                      >
-                        {badge.label}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span
+                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs ${TONE[badge.tone]}`}
+                        >
+                          {badge.label}
+                        </span>
+                        {isExempt && c.subscription?.exempt_reason && (
+                          <span className="text-[10px] text-muted-foreground hidden sm:inline">
+                            {EXEMPT_REASON_LABELS[c.subscription.exempt_reason as ExemptReason] ??
+                              c.subscription.exempt_reason}
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-3 py-2 hidden md:table-cell text-muted-foreground">
+                    <td className="px-3 py-2 text-right">
+                      <BillingExemptionActions
+                        clubId={c.id}
+                        clubName={c.name}
+                        subscription={c.subscription}
+                        onUpdated={reload}
+                        compact
+                      />
+                    </td>
+                    <td className="px-3 py-2 hidden lg:table-cell text-muted-foreground">
                       {new Date(c.created_at).toLocaleDateString()}
                     </td>
                   </tr>
