@@ -164,15 +164,20 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
       for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
     }
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: "🏆 Résultat",
         body,
         url: `/events/${data.eventId}`,
         tag: `score-${data.eventId}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e) => {
+        console.warn("[push] score send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t, r) => t + r.sent, 0);
+    return { dispatched: targets.size, sent };
   });
 
 /* ------------------------------------------------------------------ */
