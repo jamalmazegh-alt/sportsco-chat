@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Mail } from "lucide-react";
+import coachBg from "@/assets/coach-anime-bg.jpg";
 
 const SOCIALS = [
   {
