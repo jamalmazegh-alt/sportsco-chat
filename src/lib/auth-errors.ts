@@ -4,7 +4,6 @@ type SupabaseAuthError = {
   message?: string;
   code?: string;
   status?: number;
-  // @ts-expect-error supabase weak_password reasons
   reasons?: string[];
 };
 
