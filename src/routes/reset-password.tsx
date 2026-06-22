@@ -55,7 +55,7 @@ function ResetPasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(localizeAuthError(error, t));
       return;
     }
     toast.success(t("auth.passwordUpdated"));
