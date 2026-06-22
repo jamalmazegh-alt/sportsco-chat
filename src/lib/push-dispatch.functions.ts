@@ -104,7 +104,7 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
   .inputValidator((input) => ScoreInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
 
     const { data: ev } = await supabaseAdmin
       .from("events")
@@ -164,15 +164,20 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
       for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
     }
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: "🏆 Résultat",
         body,
         url: `/events/${data.eventId}`,
         tag: `score-${data.eventId}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e: unknown) => {
+        console.warn("[push] score send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
+    return { dispatched: targets.size, sent };
   });
 
 /* ------------------------------------------------------------------ */
@@ -187,7 +192,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
   .inputValidator((input) => WallInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
 
     const { data: post } = await supabaseAdmin
       .from("wall_posts")
@@ -215,19 +220,25 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       .select("user_id")
       .eq("club_id", (post as any).club_id);
 
-    let dispatched = 0;
+    const targets: string[] = [];
     for (const m of members ?? []) {
       const uid = (m as any).user_id;
       if (!uid || uid === context.userId) continue; // skip author
-      sendPushToUserFireAndForget(uid, {
+      targets.push(uid);
+    }
+    const sends = targets.map((uid) =>
+      sendPushToUser(uid, {
         title: `💬 ${authorName}`,
         body: trimmed,
         url: "/home",
         tag: `wall-${(post as any).id}`,
-      });
-      dispatched++;
-    }
-    return { dispatched };
+      }).catch((e: unknown) => {
+        console.warn("[push] wall send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    await Promise.all(sends);
+    return { dispatched: targets.length };
   });
 
 /* ------------------------------------------------------------------ */
@@ -282,7 +293,7 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
   .inputValidator((input) => RescheduleInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
 
     const { data: ev } = await supabaseAdmin
@@ -333,15 +344,20 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
     }
     const dayTag = dt.toISOString().slice(0, 10);
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: "📅 Événement reporté",
         body: `${headline} déplacé au ${dateStr} à ${timeStr}`,
         url: `/events/${data.eventId}`,
         tag: `reschedule-${data.eventId}-${dayTag}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e: unknown) => {
+        console.warn("[push] reschedule send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
+    return { dispatched: targets.size, sent };
   });
 
 /* ------------------------------------------------------------------ */
@@ -357,7 +373,7 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
   .inputValidator((input) => CancelInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
 
     const { data: ev } = await supabaseAdmin
@@ -406,13 +422,18 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
       headline = (ev as any).title || "Événement";
     }
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: "❌ Événement annulé",
         body: `${headline} du ${dateStr} à ${timeStr} est annulé`,
         url: `/events/${data.eventId}`,
         tag: `cancel-${data.eventId}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e: unknown) => {
+        console.warn("[push] cancel send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t: number, r: { sent: number }) => t + r.sent, 0);
+    return { dispatched: targets.size, sent };
   });
