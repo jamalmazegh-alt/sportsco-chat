@@ -161,10 +161,11 @@ export const getClubBillingAudit = createServerFn({ method: "POST" })
     );
 
     return (logs ?? []).map((l) => ({
-      id: l.id,
-      action: l.action,
-      created_at: l.created_at,
+      id: l.id as string,
+      action: l.action as string,
+      created_at: l.created_at as string,
       actor_name: l.actor_user_id ? (nameById.get(l.actor_user_id) ?? l.actor_user_id.slice(0, 8)) : "—",
-      metadata: l.metadata as Record<string, unknown> | null,
+      metadata: (l.metadata ?? null) as Record<string, string | number | boolean | null> | null,
     }));
+
   });
