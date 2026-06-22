@@ -1,90 +1,42 @@
 import * as React from 'react'
-
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from '@react-email/components'
+import { Text } from '@react-email/components'
+import { BrandedEmail, pickLocale, type Locale } from './_layout'
 
 interface EmailChangeEmailProps {
-  siteName: string
-  // oldEmail is the user's current address (HookData.OldEmail). For the
-  // NEW-recipient half of a secure email_change fanout, `email` equals the
-  // recipient (NEW), so the "from" line must render oldEmail to read
-  // "from OLD to NEW" instead of "from NEW to NEW".
+  siteName?: string
   oldEmail: string
-  email: string
+  email?: string
   newEmail: string
   confirmationUrl: string
+  locale?: string
 }
 
-export const EmailChangeEmail = ({
-  siteName,
-  oldEmail,
-  newEmail,
-  confirmationUrl,
-}: EmailChangeEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
-    <Preview>Confirm your email change for {siteName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Heading style={h1}>Confirm your email change</Heading>
-        <Text style={text}>
-          You requested to change your email address for {siteName} from{' '}
-          <Link href={`mailto:${oldEmail}`} style={link}>
-            {oldEmail}
-          </Link>{' '}
-          to{' '}
-          <Link href={`mailto:${newEmail}`} style={link}>
-            {newEmail}
-          </Link>
-          .
-        </Text>
-        <Text style={text}>
-          Click the button below to confirm this change:
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Confirm Email Change
-        </Button>
-        <Text style={footer}>
-          If you didn't request this change, please secure your account
-          immediately.
-        </Text>
-      </Container>
-    </Body>
-  </Html>
-)
+export const EmailChangeEmail = ({ oldEmail, newEmail, confirmationUrl, locale }: EmailChangeEmailProps) => {
+  const l: Locale = pickLocale(locale)
+  const t = COPY[l]
+  return (
+    <BrandedEmail
+      locale={l}
+      preview={t.preview}
+      heading={t.heading}
+      intro={t.intro(oldEmail, newEmail)}
+      ctaLabel={t.cta}
+      ctaUrl={confirmationUrl}
+      body={<Text style={{ fontSize: '14px', color: '#3A4A3A', lineHeight: 1.6 }}>{t.note}</Text>}
+      footer={t.footer}
+      signOff={t.signOff}
+    />
+  )
+}
 
 export default EmailChangeEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
+const COPY: Record<Locale, { preview: string; heading: string; intro: (a: string, b: string) => string; note: string; cta: string; footer: string; signOff: string }> = {
+  fr: { preview: 'Confirmez votre changement d’e-mail Clubero', heading: 'Confirmer le changement d’e-mail', intro: (o, n) => `Vous avez demandé à modifier votre adresse e-mail de ${o} vers ${n}.`, note: 'Cliquez sur le bouton ci-dessous pour confirmer ce changement.', cta: 'Confirmer le changement', footer: "Si vous n'avez pas demandé ce changement, contactez-nous immédiatement.", signOff: "L'équipe Clubero" },
+  en: { preview: 'Confirm your Clubero email change', heading: 'Confirm email change', intro: (o, n) => `You requested to change your email address from ${o} to ${n}.`, note: 'Click the button below to confirm this change.', cta: 'Confirm change', footer: "If you didn't request this, contact us immediately.", signOff: 'The Clubero team' },
+  es: { preview: 'Confirma el cambio de correo Clubero', heading: 'Confirmar cambio de correo', intro: (o, n) => `Solicitaste cambiar tu correo de ${o} a ${n}.`, note: 'Haz clic en el botón para confirmar este cambio.', cta: 'Confirmar cambio', footer: 'Si no solicitaste este cambio, contáctanos de inmediato.', signOff: 'El equipo de Clubero' },
+  de: { preview: 'E-Mail-Änderung bei Clubero bestätigen', heading: 'E-Mail-Änderung bestätigen', intro: (o, n) => `Sie haben beantragt, Ihre E-Mail-Adresse von ${o} auf ${n} zu ändern.`, note: 'Klicken Sie auf die Schaltfläche, um diese Änderung zu bestätigen.', cta: 'Änderung bestätigen', footer: 'Wenn Sie das nicht angefordert haben, kontaktieren Sie uns sofort.', signOff: 'Das Clubero-Team' },
+  it: { preview: 'Conferma il cambio email Clubero', heading: 'Conferma cambio email', intro: (o, n) => `Hai richiesto di cambiare la tua email da ${o} a ${n}.`, note: 'Fai clic sul pulsante per confermare il cambio.', cta: 'Conferma cambio', footer: 'Se non hai richiesto questo cambio, contattaci subito.', signOff: 'Il team Clubero' },
+  nl: { preview: 'Bevestig je Clubero e-mailwijziging', heading: 'E-mailwijziging bevestigen', intro: (o, n) => `Je hebt verzocht je e-mailadres te wijzigen van ${o} naar ${n}.`, note: 'Klik op de knop om deze wijziging te bevestigen.', cta: 'Wijziging bevestigen', footer: 'Als je dit niet hebt aangevraagd, neem direct contact met ons op.', signOff: 'Het Clubero-team' },
+  pt: { preview: 'Confirme a alteração de e-mail Clubero', heading: 'Confirmar alteração de e-mail', intro: (o, n) => `Solicitou alterar o seu e-mail de ${o} para ${n}.`, note: 'Clique no botão para confirmar esta alteração.', cta: 'Confirmar alteração', footer: 'Se não solicitou esta alteração, contacte-nos imediatamente.', signOff: 'A equipa Clubero' },
 }
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const link = { color: 'inherit', textDecoration: 'underline' }
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
