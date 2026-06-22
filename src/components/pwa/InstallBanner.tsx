@@ -134,7 +134,7 @@ export function InstallBanner() {
                 ? "Installez l'app pour activer les notifications"
                 : "Recevez vos convocations en temps réel"}
             </p>
-            <div className="mt-2.5 flex items-center gap-2">
+            <div className="mt-2.5 flex items-center gap-2 flex-wrap">
               <button
                 type="button"
                 onClick={install}
@@ -142,6 +142,18 @@ export function InstallBanner() {
               >
                 <Download className="h-3.5 w-3.5" />
                 Installer
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    localStorage.setItem(INSTALLED_KEY, "true");
+                  } catch {}
+                  setVisible(false);
+                }}
+                className="text-xs text-gray-600 hover:text-gray-900 underline underline-offset-2"
+              >
+                Déjà installée
               </button>
             </div>
           </div>
