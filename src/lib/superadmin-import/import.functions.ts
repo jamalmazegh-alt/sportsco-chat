@@ -279,40 +279,66 @@ async function findOrCreateProfileByEmail(email: string, fullName: string): Prom
   return null;
 }
 
-async function inviteUserByEmail(
-  email: string,
-  firstName: string,
-  lastName: string,
-  context?: {
-    clubName?: string;
-    inviteRole?: string;
-    playerName?: string;
-    inviterName?: string;
-  },
-): Promise<string | null> {
+/**
+ * Crée un member_invites + envoie l'email player-invite (template Clubero).
+ * Renvoie le token créé, ou null en cas d'échec.
+ */
+async function createInviteAndEmail(params: {
+  clubId: string;
+  clubName?: string;
+  clubLogoUrl?: string;
+  teamId?: string | null;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string | null;
+  role: "coach" | "dirigeant" | "parent" | "player";
+  parentForPlayerId?: string | null;
+  createdBy: string;
+  roleLabel?: string;
+  playerName?: string;
+}): Promise<string | null> {
   try {
-    const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: `${firstName} ${lastName}`.trim(),
-        // Contexte lu par le template auth InviteEmail via user_metadata
-        club_name: context?.clubName,
-        invite_role: context?.inviteRole,
-        player_name: context?.playerName,
-        inviter_name: context?.inviterName,
-      },
-    });
-    if (error) {
-      log.warn("invite failed", { email, error: error.message });
+    const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+    const { error: invErr } = await supabaseAdmin.from("member_invites").insert({
+      club_id: params.clubId,
+      team_id: params.teamId ?? null,
+      role: params.role as never,
+      email: params.email.toLowerCase(),
+      first_name: params.firstName || null,
+      last_name: params.lastName || null,
+      phone: params.phone || null,
+      parent_for_player_id: params.parentForPlayerId ?? null,
+      token,
+      created_by: params.createdBy,
+    } as never);
+    if (invErr) {
+      log.warn("member_invites insert failed", { email: params.email, error: invErr.message });
       return null;
     }
-    return data.user?.id ?? null;
+
+    const inviteUrl = `https://clubero.app/register?invite=${encodeURIComponent(token)}`;
+    const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
+    await enqueueTransactionalEmailServer({
+      templateName: "player-invite",
+      recipientEmail: params.email,
+      idempotencyKey: `import-invite-${token}`,
+      templateData: {
+        firstName: params.firstName || undefined,
+        clubName: params.clubName,
+        clubLogoUrl: params.clubLogoUrl,
+        inviteUrl,
+        roleLabel: params.roleLabel ?? params.role,
+        playerName: params.playerName,
+      },
+    });
+    return token;
   } catch (e) {
-    log.warn("invite threw", { email, error: String(e) });
+    log.warn("invite+email failed", { email: params.email, error: String(e) });
     return null;
   }
 }
+
 
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -344,10 +370,11 @@ export const runImport = createServerFn({ method: "POST" })
     // Contexte club pour personnaliser les invitations email
     const { data: clubRow } = await supabaseAdmin
       .from("clubs")
-      .select("name")
+      .select("name, logo_url")
       .eq("id", data.clubId)
       .maybeSingle();
     const clubName = clubRow?.name ?? undefined;
+    const clubLogoUrl = clubRow?.logo_url ?? undefined;
 
 
 
@@ -388,7 +415,8 @@ export const runImport = createServerFn({ method: "POST" })
                 birth_date: r.date_naissance,
                 jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
                 license_number: r.numero_licence || null,
-                position: r.poste || null,
+                preferred_position: r.poste || null,
+                phone: r.telephone_joueur || null,
                 email: r.email_contact?.toLowerCase() || null,
               })
               .select("id")
@@ -401,6 +429,25 @@ export const runImport = createServerFn({ method: "POST" })
               player_id: player.id,
               role: "player" as never,
             });
+
+            const playerFullName = `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
+
+            // Invitation joueur (si email fourni et option activée)
+            if (r.email_contact && data.sendInvitations) {
+              const token = await createInviteAndEmail({
+                clubId: data.clubId,
+                clubName,
+                clubLogoUrl,
+                teamId,
+                email: r.email_contact,
+                firstName: titleCase(r.prenom_joueur!),
+                lastName: titleCase(r.nom_joueur!),
+                role: "player",
+                createdBy: context.userId,
+                roleLabel: "joueur",
+              });
+              if (token) invitationsSent++;
+            }
 
             // Parents
             for (const idx of [1, 2] as const) {
@@ -415,14 +462,6 @@ export const runImport = createServerFn({ method: "POST" })
               let parentUserId = parentCache.get(email) ?? null;
               if (!parentUserId) {
                 parentUserId = await findOrCreateProfileByEmail(email, fullName);
-                if (!parentUserId && data.sendInvitations) {
-                  parentUserId = await inviteUserByEmail(email, firstName, lastName, {
-                    clubName,
-                    inviteRole: "parent",
-                    playerName: `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim(),
-                  });
-                  if (parentUserId) invitationsSent++;
-                }
                 if (parentUserId) parentCache.set(email, parentUserId);
               }
 
@@ -448,9 +487,27 @@ export const runImport = createServerFn({ method: "POST" })
                     },
                     { onConflict: "club_id,user_id" } as never,
                   );
+              } else if (data.sendInvitations) {
+                // Parent inconnu → invitation par email avec template Clubero
+                const token = await createInviteAndEmail({
+                  clubId: data.clubId,
+                  clubName,
+                  clubLogoUrl,
+                  email,
+                  firstName,
+                  lastName,
+                  phone,
+                  role: "parent",
+                  parentForPlayerId: player.id,
+                  createdBy: context.userId,
+                  roleLabel: "parent",
+                  playerName: playerFullName,
+                });
+                if (token) invitationsSent++;
               }
               void lien; // lien_parent stocké via player_parents.full_name si besoin futur
             }
+
           } catch (e) {
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
@@ -489,36 +546,49 @@ export const runImport = createServerFn({ method: "POST" })
             const firstName = titleCase(r.prenom!);
             const lastName = titleCase(r.nom!);
 
-            let userId = await findOrCreateProfileByEmail(email, `${firstName} ${lastName}`);
-            if (!userId && data.sendInvitations) {
-              userId = await inviteUserByEmail(email, firstName, lastName, {
-                clubName,
-                inviteRole: r.role || "coach",
-              });
-              if (userId) invitationsSent++;
-            }
+            const roleEnumPre = r.role === "manager" ? "dirigeant" : "coach";
+            const userId = await findOrCreateProfileByEmail(email, `${firstName} ${lastName}`);
 
             if (!userId) {
-              // Pas d'invitation demandée → on enregistre l'invite offline
-              const token = crypto.randomUUID().replace(/-/g, "");
-              await supabaseAdmin.from("member_invites").insert({
-                club_id: data.clubId,
-                team_id: teamId,
-                role: "coach" as never,
-                email,
-                first_name: firstName,
-                last_name: lastName,
-                phone: r.telephone || null,
-                token,
-                created_by: context.userId,
-              });
+              // Pas d'utilisateur existant → invitation member_invites + email
+              const token = data.sendInvitations
+                ? await createInviteAndEmail({
+                    clubId: data.clubId,
+                    clubName,
+                    clubLogoUrl,
+                    teamId,
+                    email,
+                    firstName,
+                    lastName,
+                    phone: r.telephone,
+                    role: roleEnumPre as "coach" | "dirigeant",
+                    createdBy: context.userId,
+                    roleLabel: r.role || "coach",
+                  })
+                : null;
+              if (token) invitationsSent++;
+              else {
+                // Pas d'envoi → on enregistre l'invite offline pour récupération ultérieure
+                const offlineToken = crypto.randomUUID().replace(/-/g, "");
+                await supabaseAdmin.from("member_invites").insert({
+                  club_id: data.clubId,
+                  team_id: teamId,
+                  role: roleEnumPre as never,
+                  email,
+                  first_name: firstName,
+                  last_name: lastName,
+                  phone: r.telephone || null,
+                  token: offlineToken,
+                  created_by: context.userId,
+                });
+              }
               coachesAdded++;
               continue;
             }
 
-            // Map role : assistant_coach/manager → enum app_role
-            const roleEnum =
-              r.role === "manager" ? "dirigeant" : "coach";
+
+
+            const roleEnum = roleEnumPre;
             await supabaseAdmin.from("club_members").upsert(
               {
                 club_id: data.clubId,
