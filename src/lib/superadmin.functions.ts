@@ -118,7 +118,7 @@ export const listAllClubs = createServerFn({ method: "POST" })
       ? await supabaseAdmin
           .from("subscriptions")
           .select(
-            "club_id, status, plan, trial_end, current_period_end, cancel_at_period_end",
+            "club_id, status, plan, trial_end, current_period_end, cancel_at_period_end, exempt_from_billing, exempt_reason",
           )
           .in("club_id", clubIds)
       : { data: [] as never[] };
