@@ -66,6 +66,7 @@ export const COACH_FIELDS: FieldDef[] = [
   { key: "nom", label: "Nom", required: true },
   { key: "email", label: "Email", required: true, validate: isEmail },
   { key: "telephone", label: "Téléphone", required: false },
+  { key: "numero_licence", label: "N° licence", required: false },
   { key: "role", label: "Rôle", required: true, validate: inSet(["coach", "assistant_coach", "manager"]) },
 ];
 
