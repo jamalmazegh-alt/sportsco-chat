@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { X, Download, Smartphone } from "lucide-react";
 
+// iOS "More" icon (three horizontal dots), matches Safari bottom-bar menu button
+function IOSMoreIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  );
+}
+
 // iOS Share icon (square with up arrow), matches the system "Partager" glyph
 function IOSShareIcon({ className }: { className?: string }) {
   return (
@@ -162,10 +173,10 @@ export function InstallBanner() {
                   1
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
-                  Appuyez sur
+                  Appuyez sur les
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
-                    <IOSShareIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">Partager</span>
+                    <IOSMoreIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">3 petits points</span>
                   </span>
                   en bas de Safari
                 </span>
@@ -177,8 +188,8 @@ export function InstallBanner() {
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
                   Choisissez
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
-                    <IOSAddIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                    <IOSShareIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">Partager</span>
                   </span>
                 </span>
               </li>
@@ -186,11 +197,15 @@ export function InstallBanner() {
                 <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                   3
                 </span>
-                <span className="flex-1 pt-0.5 text-gray-700">
-                  Appuyez sur « Ajouter » en haut à droite
+                <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
+                  Choisissez
+                  <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
+                    <IOSAddIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                  </span>
+                  puis appuyez sur « Ajouter »
                 </span>
               </li>
-
             </ol>
             <button
               type="button"
