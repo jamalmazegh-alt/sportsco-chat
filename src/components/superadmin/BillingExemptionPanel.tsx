@@ -56,8 +56,9 @@ type AuditEntry = {
   action: string;
   created_at: string;
   actor_name: string;
-  metadata: Record<string, unknown> | null;
+  metadata: Record<string, string | number | boolean | null> | null;
 };
+
 
 const ACTION_LABEL: Record<string, string> = {
   billing_exemption_granted: "Exemption accordée",
