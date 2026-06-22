@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge, subTone, roleTone, Avatar, trialCountdown, formatMoney } from "@/lib/superadmin/ui";
+import { BillingExemptionPanel } from "@/components/superadmin/BillingExemptionPanel";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
   component: ClubDetail,
@@ -135,6 +136,15 @@ function ClubDetail() {
           value={`${whatsapp_configured_count}/${teams.length}`}
         />
       </section>
+
+      <div className="mb-6">
+        <BillingExemptionPanel
+          clubId={clubId}
+          clubName={club.name}
+          subscription={subscription as any}
+          onUpdated={refresh}
+        />
+      </div>
 
       {/* ============== Financials ============== */}
       <section className="mb-6">
