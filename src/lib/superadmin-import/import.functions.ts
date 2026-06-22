@@ -415,7 +415,8 @@ export const runImport = createServerFn({ method: "POST" })
                 birth_date: r.date_naissance,
                 jersey_number: r.numero_maillot ? parseInt(r.numero_maillot, 10) : null,
                 license_number: r.numero_licence || null,
-                position: r.poste || null,
+                preferred_position: r.poste || null,
+                phone: r.telephone_joueur || null,
                 email: r.email_contact?.toLowerCase() || null,
               })
               .select("id")
@@ -428,6 +429,25 @@ export const runImport = createServerFn({ method: "POST" })
               player_id: player.id,
               role: "player" as never,
             });
+
+            const playerFullName = `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
+
+            // Invitation joueur (si email fourni et option activée)
+            if (r.email_contact && data.sendInvitations) {
+              const token = await createInviteAndEmail({
+                clubId: data.clubId,
+                clubName,
+                clubLogoUrl,
+                teamId,
+                email: r.email_contact,
+                firstName: titleCase(r.prenom_joueur!),
+                lastName: titleCase(r.nom_joueur!),
+                role: "player",
+                createdBy: context.userId,
+                roleLabel: "joueur",
+              });
+              if (token) invitationsSent++;
+            }
 
             // Parents
             for (const idx of [1, 2] as const) {
@@ -442,14 +462,6 @@ export const runImport = createServerFn({ method: "POST" })
               let parentUserId = parentCache.get(email) ?? null;
               if (!parentUserId) {
                 parentUserId = await findOrCreateProfileByEmail(email, fullName);
-                if (!parentUserId && data.sendInvitations) {
-                  parentUserId = await inviteUserByEmail(email, firstName, lastName, {
-                    clubName,
-                    inviteRole: "parent",
-                    playerName: `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim(),
-                  });
-                  if (parentUserId) invitationsSent++;
-                }
                 if (parentUserId) parentCache.set(email, parentUserId);
               }
 
@@ -475,9 +487,27 @@ export const runImport = createServerFn({ method: "POST" })
                     },
                     { onConflict: "club_id,user_id" } as never,
                   );
+              } else if (data.sendInvitations) {
+                // Parent inconnu → invitation par email avec template Clubero
+                const token = await createInviteAndEmail({
+                  clubId: data.clubId,
+                  clubName,
+                  clubLogoUrl,
+                  email,
+                  firstName,
+                  lastName,
+                  phone,
+                  role: "parent",
+                  parentForPlayerId: player.id,
+                  createdBy: context.userId,
+                  roleLabel: "parent",
+                  playerName: playerFullName,
+                });
+                if (token) invitationsSent++;
               }
               void lien; // lien_parent stocké via player_parents.full_name si besoin futur
             }
+
           } catch (e) {
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
