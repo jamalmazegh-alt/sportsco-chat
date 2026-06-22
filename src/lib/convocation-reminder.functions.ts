@@ -56,7 +56,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)))"
+        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)))"
       )
       .eq("id", data.convocationId)
       .maybeSingle();
@@ -231,10 +231,28 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       for (const pp of parents ?? []) {
         if ((pp as any).parent_user_id) pushTargets.add((pp as any).parent_user_id);
       }
+      const isMatch = ev.type === "match";
+      const teamName = (ev.teams?.name as string | null) ?? null;
+      const opponent = (ev.opponent as string | null) ?? null;
+      const isHome = ev.is_home as boolean | null | undefined;
+      const startDt = new Date(ev.starts_at);
+      const timeStr = startDt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+      let headline: string;
+      if (isMatch && opponent) {
+        headline = teamName ? `${teamName} vs ${opponent}` : `vs ${opponent}`;
+      } else if (isMatch) {
+        headline = teamName ? `Match ${teamName}` : "Match";
+      } else {
+        headline = ev.title || "Événement";
+      }
+      const venueBit = isMatch
+        ? (isHome === true ? " · Domicile" : isHome === false ? " · Extérieur" : "")
+        : (ev.location ? ` · ${ev.location}` : "");
+      const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
       for (const uid of pushTargets) {
         sendPushToUserFireAndForget(uid, {
           title: "🔔 Rappel convocation",
-          body: `${playerName || "Tu"} n'as pas encore répondu — ${ev.title}`,
+          body: reminderBody,
           url: `/events/${ev.id}`,
           tag: `conv-reminder-${(conv as any).id}`,
         });
