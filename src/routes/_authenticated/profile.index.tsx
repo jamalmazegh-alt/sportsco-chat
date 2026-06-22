@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useTheme, type ThemeMode } from "@/lib/use-theme";
 import { cn } from "@/lib/utils";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 import { isV2 } from "@/config/features";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
