@@ -728,6 +728,7 @@ export type Database = {
           current_club_id: string | null
           followers_count: number | null
           id: string
+          license_number: string | null
           looking_for_club: boolean | null
           philosophy: string | null
           profile_visibility: string | null
@@ -744,6 +745,7 @@ export type Database = {
           current_club_id?: string | null
           followers_count?: number | null
           id?: string
+          license_number?: string | null
           looking_for_club?: boolean | null
           philosophy?: string | null
           profile_visibility?: string | null
@@ -760,6 +762,7 @@ export type Database = {
           current_club_id?: string | null
           followers_count?: number | null
           id?: string
+          license_number?: string | null
           looking_for_club?: boolean | null
           philosophy?: string | null
           profile_visibility?: string | null
