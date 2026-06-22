@@ -3198,6 +3198,7 @@ export type Database = {
           exempt_granted_at: string | null
           exempt_granted_by: string | null
           exempt_reason: string | null
+          exempt_until: string | null
           id: string
           plan: Database["public"]["Enums"]["subscription_plan"] | null
           status: Database["public"]["Enums"]["subscription_status"]
@@ -3220,6 +3221,7 @@ export type Database = {
           exempt_granted_at?: string | null
           exempt_granted_by?: string | null
           exempt_reason?: string | null
+          exempt_until?: string | null
           id?: string
           plan?: Database["public"]["Enums"]["subscription_plan"] | null
           status?: Database["public"]["Enums"]["subscription_status"]
@@ -3242,6 +3244,7 @@ export type Database = {
           exempt_granted_at?: string | null
           exempt_granted_by?: string | null
           exempt_reason?: string | null
+          exempt_until?: string | null
           id?: string
           plan?: Database["public"]["Enums"]["subscription_plan"] | null
           status?: Database["public"]["Enums"]["subscription_status"]
