@@ -1,0 +1,1 @@
+ALTER TABLE public.coach_profiles ADD COLUMN IF NOT EXISTS license_number text;
