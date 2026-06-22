@@ -3203,6 +3203,10 @@ export type Database = {
           trial_end: string | null
           trial_reminders_sent: number[]
           updated_at: string
+          exempt_from_billing: boolean
+          exempt_reason: string | null
+          exempt_granted_at: string | null
+          exempt_granted_by: string | null
         }
         Insert: {
           cancel_at?: string | null
@@ -3221,6 +3225,10 @@ export type Database = {
           trial_end?: string | null
           trial_reminders_sent?: number[]
           updated_at?: string
+          exempt_from_billing?: boolean
+          exempt_reason?: string | null
+          exempt_granted_at?: string | null
+          exempt_granted_by?: string | null
         }
         Update: {
           cancel_at?: string | null
@@ -3239,6 +3247,10 @@ export type Database = {
           trial_end?: string | null
           trial_reminders_sent?: number[]
           updated_at?: string
+          exempt_from_billing?: boolean
+          exempt_reason?: string | null
+          exempt_granted_at?: string | null
+          exempt_granted_by?: string | null
         }
         Relationships: [
           {

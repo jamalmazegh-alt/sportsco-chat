@@ -35,9 +35,11 @@ import {
   FileText,
   XCircle,
   RotateCcw,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { EXEMPT_REASON_LABELS, type ExemptReason } from "@/lib/has-paid-access";
 
 const searchSchema = z.object({
   billing: z.enum(["success", "canceled"]).optional(),
@@ -143,6 +145,7 @@ function BillingPage() {
   }, [activeClubId, refetch, search.billing, search.card, syncSubscription, t]);
 
   const sub = data?.subscription;
+  const isExempt = sub?.exempt_from_billing === true;
   const now = Date.now();
   const trialEndTime = sub?.trial_end ? new Date(sub.trial_end).getTime() : null;
   const trialStillValid = sub?.status === "trialing" && trialEndTime !== null && trialEndTime > now;
@@ -152,7 +155,7 @@ function BillingPage() {
     !!sub &&
     hasStripeSubscription &&
     (["active", "past_due"].includes(sub.status) || trialStillValid);
-  const showPlans = !canManageSubscription;
+  const showPlans = !isExempt && !canManageSubscription;
 
   const { data: invoicesData } = useQuery({
     queryKey: ["club-invoices", activeClubId],
@@ -272,6 +275,36 @@ function BillingPage() {
         <p className="text-sm text-muted-foreground mt-1">{t("billing.subtitle")}</p>
       </div>
 
+      {isExempt && (
+        <section
+          className="rounded-2xl p-5 space-y-2 border-[1.5px] border-[#86efac]"
+          style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #f8fffe 100%)" }}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className="h-11 w-11 shrink-0 rounded-xl flex items-center justify-center text-white shadow-md"
+              style={{ background: "linear-gradient(135deg, #1d7a45 0%, #2d9d5f 100%)" }}
+            >
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-extrabold text-gray-900">✅ Accès offert</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Votre club bénéficie d&apos;un accès gratuit à toutes les fonctionnalités Clubero.
+              </p>
+              {sub?.exempt_reason && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Raison :{" "}
+                  {EXEMPT_REASON_LABELS[sub.exempt_reason as ExemptReason] ?? sub.exempt_reason}
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!isExempt && (
+      <>
       {/* Current status */}
       <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -529,6 +562,9 @@ function BillingPage() {
             ))}
           </ul>
         </section>
+      )}
+
+      </>
       )}
 
       <UpdateCardDialog

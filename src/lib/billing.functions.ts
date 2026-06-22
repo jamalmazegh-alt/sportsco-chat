@@ -12,6 +12,7 @@ import {
 } from "./stripe.server";
 import { notifySubscriptionAdmin } from "./subscription-notify.server";
 import { createLogger } from "@/lib/logger.server";
+import { hasPaidAccessFromSubscription } from "@/lib/has-paid-access";
 
 const log = createLogger("billing");
 
@@ -42,6 +43,10 @@ function serializeSubscription(sub: any) {
         canceled_at: sub.canceled_at,
         hasStripeCustomer: !!sub.stripe_customer_id,
         hasStripeSubscription: !!sub.stripe_subscription_id,
+        exempt_from_billing: sub.exempt_from_billing === true,
+        exempt_reason: sub.exempt_reason ?? null,
+        exempt_granted_at: sub.exempt_granted_at ?? null,
+        hasPaidAccess: hasPaidAccessFromSubscription(sub),
       }
     : null;
 }
@@ -90,9 +95,17 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 
     const { data: existingSub } = await supabaseAdmin
       .from("subscriptions")
-      .select("stripe_customer_id, stripe_subscription_id, status, trial_end")
+      .select(
+        "stripe_customer_id, stripe_subscription_id, status, trial_end, exempt_from_billing",
+      )
       .eq("club_id", data.clubId)
       .maybeSingle();
+
+    if (existingSub?.exempt_from_billing === true) {
+      throw new Error(
+        "Ce club bénéficie déjà d'un accès offert — aucun abonnement Stripe requis.",
+      );
+    }
 
     const existingTrialStillValid =
       existingSub?.status === "trialing" &&
@@ -336,7 +349,7 @@ export const getClubSubscription = createServerFn({ method: "GET" })
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
       .select(
-        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_customer_id, stripe_subscription_id",
+        "plan, status, current_period_end, trial_end, cancel_at_period_end, cancel_at, canceled_at, stripe_customer_id, stripe_subscription_id, exempt_from_billing, exempt_reason, exempt_granted_at",
       )
       .eq("club_id", data.clubId)
       .maybeSingle();
