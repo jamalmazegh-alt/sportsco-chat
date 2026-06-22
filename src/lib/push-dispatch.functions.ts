@@ -192,7 +192,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
   .inputValidator((input) => WallInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
 
     const { data: post } = await supabaseAdmin
       .from("wall_posts")
