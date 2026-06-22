@@ -20,7 +20,7 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
   .inputValidator((input) => ConvocationInput.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
+    const { sendPushToUser } = await import("@/lib/push-send.server");
 
     const { data: ev } = await supabaseAdmin
       .from("events")
@@ -76,15 +76,20 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
       ? (isHome === true ? " · Domicile" : isHome === false ? " · Extérieur" : "")
       : (location ? ` · ${location}` : "");
 
-    for (const uid of targets) {
-      sendPushToUserFireAndForget(uid, {
+    const sends = Array.from(targets).map((uid) =>
+      sendPushToUser(uid, {
         title: isMatch ? "⚽ Convocation match" : "📣 Convocation",
         body: `${headline} — ${dateStr} à ${timeStr}${venueBit}`,
         url: `/events/${data.eventId}`,
         tag: `conv-new-${data.eventId}-${uid}`,
-      });
-    }
-    return { dispatched: targets.size };
+      }).catch((e) => {
+        console.warn("[push] convocation send failed", uid, (e as Error).message);
+        return { sent: 0, pruned: 0 };
+      }),
+    );
+    const results = await Promise.all(sends);
+    const sent = results.reduce((total, result) => total + result.sent, 0);
+    return { dispatched: targets.size, sent };
   });
 
 /* ------------------------------------------------------------------ */
