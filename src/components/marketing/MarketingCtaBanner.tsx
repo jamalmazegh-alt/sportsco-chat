@@ -26,14 +26,31 @@ export function MarketingCtaBanner() {
 
   return (
     <section className="relative overflow-hidden bg-[#070D1B] text-white">
+      {/* Anime coach background */}
+      <img
+        src={coachBg}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width={1536}
+        height={1024}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-70"
+      />
+      {/* Readability overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(7,13,27,0.92) 0%, rgba(7,13,27,0.78) 45%, rgba(7,13,27,0.55) 100%)",
+        }}
+      />
       {/* Glow accents */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 -top-24 h-[520px] w-[520px] rounded-full opacity-50 blur-3xl"
+        <div className="absolute -left-32 -top-24 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
              style={{ background: "radial-gradient(circle, rgba(46,107,255,.55), transparent 65%)" }} />
-        <div className="absolute -right-32 top-1/3 h-[440px] w-[440px] rounded-full opacity-50 blur-3xl"
+        <div className="absolute -right-32 top-1/3 h-[440px] w-[440px] rounded-full opacity-30 blur-3xl"
              style={{ background: "radial-gradient(circle, rgba(56,189,248,.45), transparent 65%)" }} />
-        <div className="absolute inset-0 opacity-[0.07]"
-             style={{ background: "repeating-linear-gradient(112deg,transparent 0 38px,rgba(120,170,255,.9) 38px 40px)" }} />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
