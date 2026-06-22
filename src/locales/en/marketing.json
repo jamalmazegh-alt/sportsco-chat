@@ -1259,28 +1259,28 @@
     "pricing": [
       {
         "name": "Tournament",
-        "price": "€40",
+        "price": "39 €",
         "per": "per tournament",
-        "desc": "Run a one-off tournament.",
+        "desc": "Run a single tournament.",
         "cta": "Create a tournament"
       },
       {
-        "name": "League / championship",
-        "price": "€199",
-        "per": "per season",
-        "desc": "Full season management.",
-        "cta": "Get in touch"
+        "name": "1-year Pass",
+        "price": "149 €",
+        "per": "per year",
+        "desc": "Unlimited tournaments for 12 months.",
+        "cta": "Create a tournament"
       },
       {
         "name": "Clubero Club",
-        "price": "€49",
+        "price": "49 €",
         "per": "/ month",
-        "desc": "Unlimited tournaments included.",
-        "cta": "See Clubero Club",
+        "desc": "Unlimited tournaments included with your club plan.",
+        "cta": "Create a tournament",
         "highlight": true
       }
     ],
-    "pricingNote": "Unlimited tournaments included with Clubero Club.",
+    "pricingNote": "Every plan includes full organization: registrations, payments, scheduling and communication.",
     "finalTitle": "Ready to modernize your tournaments?",
     "finalBody": "Launch a tournament in minutes, or see Clubero in action with our team.",
     "finalPrimary": "Create a tournament",

@@ -1259,28 +1259,28 @@
     "pricing": [
       {
         "name": "Torneo",
-        "price": "40 €",
-        "per": "per Torneo",
-        "desc": "Organizzazione di un Torneo singolo.",
-        "cta": "Crea un Torneo"
+        "price": "39 €",
+        "per": "per torneo",
+        "desc": "Organizza un singolo torneo.",
+        "cta": "Crea un torneo"
       },
       {
-        "name": "Campionato",
-        "price": "199 €",
-        "per": "per stagione",
-        "desc": "Gestione completa di una stagione.",
-        "cta": "Contattaci"
+        "name": "Pass 1 anno",
+        "price": "149 €",
+        "per": "all'anno",
+        "desc": "Tornei illimitati per 12 mesi.",
+        "cta": "Crea un torneo"
       },
       {
         "name": "Clubero Club",
         "price": "49 €",
-        "per": "/ Mese",
-        "desc": "Tornei illimitati inclusi.",
-        "cta": "Scopri Clubero Club",
+        "per": "/ mese",
+        "desc": "Tornei illimitati inclusi nell'abbonamento club.",
+        "cta": "Crea un torneo",
         "highlight": true
       }
     ],
-    "pricingNote": "Tornei illimitati inclusi con Clubero Club.",
+    "pricingNote": "Tutti i piani includono l'organizzazione completa: iscrizioni, pagamenti, pianificazione e comunicazione.",
     "finalTitle": "Pronto a modernizzare i tuoi Tornei?",
     "finalBody": "Inizia un Torneo in pochi minuti o scopri Clubero in azione con il nostro Team.",
     "finalPrimary": "Crea un Torneo",

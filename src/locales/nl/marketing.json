@@ -1259,28 +1259,28 @@
     "pricing": [
       {
         "name": "Toernooi",
-        "price": "€ 40",
-        "per": "per Toernooi",
-        "desc": "Organisatie van een eenmalig Toernooi.",
-        "cta": "Toernooi aanmaken"
+        "price": "39 €",
+        "per": "per toernooi",
+        "desc": "Organiseer een eenmalig toernooi.",
+        "cta": "Maak een toernooi"
       },
       {
-        "name": "Liga / Kampioenschap",
-        "price": "€ 199",
-        "per": "per seizoen",
-        "desc": "Compleet beheer van een seizoen.",
-        "cta": "Neem contact op"
+        "name": "1-jaar Pas",
+        "price": "149 €",
+        "per": "per jaar",
+        "desc": "Onbeperkte toernooien gedurende 12 maanden.",
+        "cta": "Maak een toernooi"
       },
       {
         "name": "Clubero Club",
-        "price": "€ 49",
+        "price": "49 €",
         "per": "/ maand",
-        "desc": "Onbeperkte Toernooien inbegrepen.",
-        "cta": "Bekijk Clubero Club",
+        "desc": "Onbeperkte toernooien inbegrepen bij je clubabonnement.",
+        "cta": "Maak een toernooi",
         "highlight": true
       }
     ],
-    "pricingNote": "Onbeperkte Toernooien inbegrepen met Clubero Club.",
+    "pricingNote": "Alle plannen bevatten volledige organisatie: inschrijvingen, betalingen, planning en communicatie.",
     "finalTitle": "Klaar om je Toernooien te moderniseren?",
     "finalBody": "Start binnen enkele minuten een Toernooi of ervaar Clubero in actie met ons Team.",
     "finalPrimary": "Toernooi aanmaken",
