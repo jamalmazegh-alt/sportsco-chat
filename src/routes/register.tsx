@@ -124,7 +124,7 @@ function RegisterPage() {
     });
     if (error) {
       setBusy(false);
-      toast.error(error.message);
+      toast.error(localizeAuthError(error, t));
       return;
     }
     // If session is immediately available (auto-confirm), redeem invite + go home.
