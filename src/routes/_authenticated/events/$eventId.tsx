@@ -55,7 +55,7 @@ import { cn } from "@/lib/utils";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
-import { dispatchConvocationPush, dispatchConvocationResponsePush } from "@/lib/push-dispatch.functions";
+import { dispatchConvocationPush, dispatchConvocationResponsePush, dispatchEventCancelPush, dispatchEventReschedulePush } from "@/lib/push-dispatch.functions";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -195,6 +195,8 @@ function EventDetail() {
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const dispatchConvocationPushFn = useServerFn(dispatchConvocationPush);
   const dispatchConvocationResponsePushFn = useServerFn(dispatchConvocationResponsePush);
+  const dispatchEventCancelPushFn = useServerFn(dispatchEventCancelPush);
+  const dispatchEventReschedulePushFn = useServerFn(dispatchEventReschedulePush);
   const [sending, setSending] = useState(false);
   const [confirmSendSuspendedOpen, setConfirmSendSuspendedOpen] = useState(false);
   const [sharingLineup, setSharingLineup] = useState(false);
@@ -1327,8 +1329,7 @@ function EventDetail() {
 
     // Fire-and-forget Web Push (#6 event_cancel)
     try {
-      const { dispatchEventCancelPush } = await import("@/lib/push-dispatch.functions");
-      void dispatchEventCancelPush({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
+      void dispatchEventCancelPushFn({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
     } catch { /* noop */ }
 
     setCancelEventSubmitting(false);
@@ -1492,8 +1493,7 @@ function EventDetail() {
 
     // Fire-and-forget Web Push (#5 event_reschedule)
     try {
-      const { dispatchEventReschedulePush } = await import("@/lib/push-dispatch.functions");
-      void dispatchEventReschedulePush({ data: { eventId: event.id } });
+      void dispatchEventReschedulePushFn({ data: { eventId: event.id } });
     } catch { /* noop */ }
 
     setRescheduleSubmitting(false);

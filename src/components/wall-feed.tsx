@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { AttachmentPicker, AttachmentList, type Attachment } from "@/components/
 import { MentionInput, RenderWithMentions, parseMentions } from "@/components/mention-input";
 import { WallFeedSkeleton } from "@/components/skeletons";
 import { cn } from "@/lib/utils";
+import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
@@ -41,6 +43,7 @@ const SOURCE_META: Record<Exclude<PostSource, "clubero">, { label: string; cls: 
 
 export function WallFeed({ clubId }: { clubId: string }) {
   const { t } = useTranslation();
+  const dispatchWallPostPushFn = useServerFn(dispatchWallPostPush);
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -206,8 +209,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if (data?.id) {
       void (async () => {
         try {
-          const { dispatchWallPostPush } = await import("@/lib/push-dispatch.functions");
-          await dispatchWallPostPush({ data: { postId: data.id } });
+          await dispatchWallPostPushFn({ data: { postId: data.id } });
         } catch (e) {
           console.warn("[push] wall dispatch failed", e);
         }
