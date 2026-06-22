@@ -191,20 +191,29 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => WallInput.parse(input))
   .handler(async ({ data, context }) => {
+    console.log("[push] wall handler START", { postId: data.postId, userId: context.userId });
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendPushToUser } = await import("@/lib/push-send.server");
 
-    const { data: post } = await supabaseAdmin
+    const { data: post, error: postErr } = await supabaseAdmin
       .from("wall_posts")
       .select("id, club_id, body, author_user_id, profiles:author_user_id(full_name, first_name)")
       .eq("id", data.postId)
       .maybeSingle();
-    if (!post) return { dispatched: 0 };
+    if (postErr) console.warn("[push] wall post fetch error", postErr.message);
+    if (!post) {
+      console.log("[push] wall BAIL no post", { postId: data.postId });
+      return { dispatched: 0 };
+    }
 
     // Gate: wall_new_post
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
     const settings = await getClubNotifSettings((post as any).club_id as string | null);
-    if (!settings.wall_new_post) return { dispatched: 0 };
+    console.log("[push] wall settings", { clubId: (post as any).club_id, wall_new_post: settings.wall_new_post });
+    if (!settings.wall_new_post) {
+      console.log("[push] wall BAIL settings disabled");
+      return { dispatched: 0 };
+    }
 
 
     const authorName =
@@ -215,10 +224,11 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     const raw = ((post as any).body as string) || "";
     const trimmed = raw.length > 60 ? `${raw.slice(0, 57).trim()}…` : raw;
 
-    const { data: members } = await supabaseAdmin
+    const { data: members, error: memErr } = await supabaseAdmin
       .from("club_members")
       .select("user_id")
       .eq("club_id", (post as any).club_id);
+    if (memErr) console.warn("[push] wall members fetch error", memErr.message);
 
     const targets: string[] = [];
     for (const m of members ?? []) {
@@ -226,6 +236,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       if (!uid || uid === context.userId) continue; // skip author
       targets.push(uid);
     }
+    console.log("[push] wall targets computed", { count: targets.length, authorUid: context.userId, memberCount: (members ?? []).length });
     const sends = targets.map((uid) =>
       sendPushToUser(uid, {
         title: `💬 ${authorName}`,
@@ -240,7 +251,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     const results = await Promise.all(sends);
     const sent = results.reduce((t, r) => t + r.sent, 0);
     const pruned = results.reduce((t, r) => t + r.pruned, 0);
-    console.log("[push] wall dispatched v2", {
+    console.log("[push] wall dispatched v3", {
       postId: (post as any).id,
       clubId: (post as any).club_id,
       targets: targets.length,
@@ -250,6 +261,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     });
     return { dispatched: targets.length, sent, pruned };
   });
+
 
 /* ------------------------------------------------------------------ */
 /* #7 — Convocation response push (authenticated caller)              */
