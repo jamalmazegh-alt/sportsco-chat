@@ -57,11 +57,87 @@ function detectTemplateType(headers: string[], selectedType: ImportType): { type
   return selected.ratio >= 0.8 ? selected : matches[0];
 }
 
+const FIELD_DOCS: Record<string, { desc: string; example: string; options?: string }> = {
+  equipe: { desc: "Nom de l'équipe. Sera créée si elle n'existe pas.", example: "U13 Masculin A" },
+  sport: { desc: "Sport pratiqué par l'équipe.", example: "Football", options: "Football, Basketball, Handball, Volleyball, Rugby, Hockey, Tennis, etc." },
+  categorie: { desc: "Catégorie d'âge.", example: "U13", options: "U7, U9, U11, U13, U15, U17, U19, Senior, Vétéran" },
+  genre: { desc: "Genre de l'équipe.", example: "Masculin", options: "Masculin, Féminin, Mixte" },
+  saison: { desc: "Saison sportive (format AAAA-AAAA). Saison en cours si vide.", example: "2025-2026" },
+  prenom_joueur: { desc: "Prénom du joueur.", example: "Jean" },
+  nom_joueur: { desc: "Nom de famille du joueur.", example: "Dupont" },
+  date_naissance: { desc: "Date de naissance. Formats acceptés : YYYY-MM-DD ou JJ/MM/AAAA.", example: "2012-05-14" },
+  numero_maillot: { desc: "Numéro de maillot (nombre entier). Optionnel.", example: "10" },
+  numero_licence: { desc: "Numéro de licence fédérale. Optionnel.", example: "123456789" },
+  poste: { desc: "Poste/rôle sur le terrain. Texte libre.", example: "Attaquant" },
+  email_contact: { desc: "Email de contact principal du joueur. Optionnel.", example: "joueur@example.com" },
+  prenom_parent_1: { desc: "Prénom du parent 1.", example: "Marie" },
+  nom_parent_1: { desc: "Nom du parent 1.", example: "Dupont" },
+  email_parent_1: { desc: "Email du parent 1. Une invitation sera envoyée si activée.", example: "marie.dupont@example.com" },
+  telephone_parent_1: { desc: "Téléphone du parent 1.", example: "+33 6 12 34 56 78" },
+  lien_parent_1: { desc: "Lien de parenté.", example: "Mère", options: "Père, Mère, Tuteur" },
+  prenom_parent_2: { desc: "Prénom du parent 2. Optionnel.", example: "Paul" },
+  nom_parent_2: { desc: "Nom du parent 2. Optionnel.", example: "Dupont" },
+  email_parent_2: { desc: "Email du parent 2. Optionnel.", example: "paul.dupont@example.com" },
+  telephone_parent_2: { desc: "Téléphone du parent 2.", example: "+33 6 98 76 54 32" },
+  lien_parent_2: { desc: "Lien de parenté du parent 2.", example: "Père", options: "Père, Mère, Tuteur" },
+  prenom: { desc: "Prénom de l'entraîneur.", example: "Pierre" },
+  nom: { desc: "Nom de l'entraîneur.", example: "Martin" },
+  email: { desc: "Email de l'entraîneur. Obligatoire — une invitation sera envoyée si activée.", example: "pierre.martin@example.com" },
+  telephone: { desc: "Téléphone de l'entraîneur. Optionnel.", example: "+33 6 11 22 33 44" },
+  role: { desc: "Rôle dans l'équipe.", example: "coach", options: "coach, assistant_coach, manager" },
+  type: { desc: "Type d'événement.", example: "Entraînement", options: "Entraînement, Match, Tournoi, Réunion" },
+  titre: { desc: "Titre court de l'événement. Optionnel.", example: "Match de championnat" },
+  date_debut: { desc: "Date de début. Format YYYY-MM-DD ou JJ/MM/AAAA.", example: "2026-09-15" },
+  heure_debut: { desc: "Heure de début. Format HH:MM (24h).", example: "18:30" },
+  heure_fin: { desc: "Heure de fin. Format HH:MM. Optionnel.", example: "20:00" },
+  lieu: { desc: "Lieu / adresse. Texte libre.", example: "Stade Municipal" },
+  adversaire: { desc: "Nom de l'équipe adverse (matchs). Optionnel.", example: "FC Voisins" },
+  domicile: { desc: "Domicile ou extérieur.", example: "Domicile", options: "Domicile, Extérieur" },
+  recurrence_jours: { desc: "Jours de récurrence séparés par virgules. Optionnel.", example: "Mardi, Jeudi", options: "Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche" },
+  recurrence_fin: { desc: "Date de fin de récurrence. Format YYYY-MM-DD.", example: "2027-06-30" },
+};
+
+const TYPE_INTRO: Record<ImportType, string> = {
+  players: "Ce fichier permet d'importer en masse les joueurs et leurs parents dans un club Clubero. Une ligne = un joueur.",
+  coaches: "Ce fichier permet d'importer en masse les entraîneurs d'un club Clubero. Une ligne = un entraîneur.",
+  planning: "Ce fichier permet d'importer en masse les événements (entraînements, matchs) d'un club Clubero. Une ligne = un événement.",
+};
+
 function downloadTemplate(type: ImportType) {
   const fields = getFields(type);
-  const ws = XLSX.utils.aoa_to_sheet([fields.map((f) => f.key + (f.required ? "*" : ""))]);
+
+  // Sheet 1 — Données : en-têtes + ligne d'exemple
+  const headers = fields.map((f) => f.key + (f.required ? "*" : ""));
+  const example = fields.map((f) => FIELD_DOCS[f.key]?.example ?? "");
+  const wsData = XLSX.utils.aoa_to_sheet([headers, example]);
+  wsData["!cols"] = headers.map((h) => ({ wch: Math.min(28, Math.max(14, h.length + 4)) }));
+
+  // Sheet 2 — Instructions : ignorée à l'import (on ne lit que la 1ère feuille)
+  const instr: (string | number)[][] = [
+    [TYPE_INTRO[type]],
+    [""],
+    ["⚠️ Cette feuille est uniquement informative — elle est ignorée à l'import."],
+    ["⚠️ Supprimez la ligne d'exemple (ligne 2 de l'onglet Données) avant d'importer."],
+    ["⚠️ Le suffixe * indique un champ obligatoire."],
+    [""],
+    ["Colonne", "Obligatoire", "Description", "Exemple", "Valeurs autorisées"],
+    ...fields.map((f) => {
+      const doc = FIELD_DOCS[f.key];
+      return [
+        f.key,
+        f.required ? "Oui" : "Non",
+        doc?.desc ?? f.label,
+        doc?.example ?? "",
+        doc?.options ?? "",
+      ];
+    }),
+  ];
+  const wsInstr = XLSX.utils.aoa_to_sheet(instr);
+  wsInstr["!cols"] = [{ wch: 24 }, { wch: 12 }, { wch: 55 }, { wch: 28 }, { wch: 50 }];
+
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.utils.book_append_sheet(wb, wsData, "Données");
+  XLSX.utils.book_append_sheet(wb, wsInstr, "Instructions");
   XLSX.writeFile(wb, `clubero-template-${type}.xlsx`);
 }
 
