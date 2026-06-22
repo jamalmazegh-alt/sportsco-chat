@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { localizeAuthError } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/reset-password")({
   component: ResetPasswordPage,
@@ -54,7 +55,7 @@ function ResetPasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(localizeAuthError(error, t));
       return;
     }
     toast.success(t("auth.passwordUpdated"));

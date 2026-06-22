@@ -224,7 +224,12 @@
     "resetSentTitle": "Verifique a sua caixa de entrada",
     "resetSentTo": "Enviámos um link de redefinição para",
     "resetSentHint": "Não recebeu? Verifique a pasta de spam ou tente novamente dentro de um minuto.",
-    "useDifferentEmail": "Usar outro e-mail"
+    "useDifferentEmail": "Usar outro e-mail",
+    "weakPasswordPwned": "Esta palavra-passe é demasiado comum ou apareceu numa fuga de dados. Escolha outra.",
+    "emailAlreadyRegistered": "Já existe uma conta com este e-mail.",
+    "tooManyRequests": "Demasiadas tentativas. Tente novamente dentro de alguns minutos.",
+    "invalidEmail": "Endereço de e-mail inválido.",
+    "signupError": "Não foi possível criar a conta. Tente novamente."
   },
   "common": {
     "save": "Guardar",

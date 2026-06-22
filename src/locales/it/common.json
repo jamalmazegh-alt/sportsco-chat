@@ -224,7 +224,12 @@
     "resetSentTitle": "Controlla la tua casella di posta",
     "resetSentTo": "Abbiamo inviato un link di reimpostazione a",
     "resetSentHint": "Non l'hai ricevuto? Controlla la cartella spam o riprova tra un minuto.",
-    "useDifferentEmail": "Usa un'altra email"
+    "useDifferentEmail": "Usa un'altra email",
+    "weakPasswordPwned": "Questa password è troppo comune o è stata compromessa in una violazione di dati. Scegline un'altra.",
+    "emailAlreadyRegistered": "Esiste già un account con questa email.",
+    "tooManyRequests": "Troppi tentativi. Riprova tra qualche minuto.",
+    "invalidEmail": "Indirizzo email non valido.",
+    "signupError": "Impossibile creare l'account. Riprova."
   },
   "common": {
     "save": "Salva",

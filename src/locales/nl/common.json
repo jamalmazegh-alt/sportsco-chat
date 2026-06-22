@@ -224,7 +224,12 @@
     "resetSentTitle": "Controleer je inbox",
     "resetSentTo": "We hebben een resetlink verzonden naar",
     "resetSentHint": "Niet ontvangen? Controleer de spammap of probeer het over een minuut opnieuw.",
-    "useDifferentEmail": "Ander adres gebruiken"
+    "useDifferentEmail": "Ander adres gebruiken",
+    "weakPasswordPwned": "Dit wachtwoord is te algemeen of is uitgelekt in een datalek. Kies een ander wachtwoord.",
+    "emailAlreadyRegistered": "Er bestaat al een account met dit e-mailadres.",
+    "tooManyRequests": "Te veel pogingen. Probeer het over enkele minuten opnieuw.",
+    "invalidEmail": "Ongeldig e-mailadres.",
+    "signupError": "Account kon niet worden aangemaakt. Probeer opnieuw."
   },
   "common": {
     "save": "Opslaan",
