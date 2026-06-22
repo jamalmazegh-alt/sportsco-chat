@@ -173,10 +173,10 @@ export function InstallBanner() {
                   1
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
-                  Appuyez sur
+                  Appuyez sur les
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
-                    <IOSShareIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">Partager</span>
+                    <IOSMoreIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">3 petits points</span>
                   </span>
                   en bas de Safari
                 </span>
@@ -188,8 +188,8 @@ export function InstallBanner() {
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
                   Choisissez
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
-                    <IOSAddIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                    <IOSShareIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">Partager</span>
                   </span>
                 </span>
               </li>
@@ -197,11 +197,15 @@ export function InstallBanner() {
                 <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                   3
                 </span>
-                <span className="flex-1 pt-0.5 text-gray-700">
-                  Appuyez sur « Ajouter » en haut à droite
+                <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
+                  Choisissez
+                  <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
+                    <IOSAddIcon className="h-4 w-4" />
+                    <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                  </span>
+                  puis appuyez sur « Ajouter »
                 </span>
               </li>
-
             </ol>
             <button
               type="button"
