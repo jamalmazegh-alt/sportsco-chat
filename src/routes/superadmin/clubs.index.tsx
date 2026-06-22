@@ -4,13 +4,23 @@ import { listAllClubs } from "@/lib/superadmin.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Search } from "lucide-react";
-import { BillingExemptionActions } from "@/components/superadmin/BillingExemptionActions";
-import { EXEMPT_REASON_LABELS, type ExemptReason } from "@/lib/has-paid-access";
+import { Loader2, Search, ShieldCheck } from "lucide-react";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
 
 export const Route = createFileRoute("/superadmin/clubs/")({
   component: SuperAdminClubs,
 });
+
+type Subscription = {
+  status: string;
+  trial_end: string | null;
+  current_period_end: string | null;
+  exempt_from_billing?: boolean | null;
+  exempt_reason?: string | null;
+  exempt_until?: string | null;
+};
 
 type Club = {
   id: string;
@@ -19,33 +29,58 @@ type Club = {
   member_count: number;
   archived_at: string | null;
   is_personal: boolean;
-  subscription: {
-    status: string;
-    trial_end: string | null;
-    current_period_end: string | null;
-    exempt_from_billing?: boolean | null;
-    exempt_reason?: string | null;
-  } | null;
+  subscription: Subscription | null;
 };
 
-function statusBadge(sub: Club["subscription"]) {
-  if (!sub) return { label: "no sub", tone: "muted" };
-  const map: Record<string, { label: string; tone: string }> = {
-    trialing: { label: "trial", tone: "info" },
-    active: { label: "active", tone: "success" },
-    past_due: { label: "past due", tone: "warn" },
-    canceled: { label: "canceled", tone: "muted" },
-    incomplete: { label: "incomplete", tone: "warn" },
+type BillingPill = {
+  label: string;
+  emoji: string;
+  cls: string;
+};
+
+function billingPill(sub: Subscription | null): BillingPill {
+  if (sub && isBillingExempt(sub)) {
+    return {
+      label: "Exempté",
+      emoji: "🛡️",
+      cls: "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]",
+    };
+  }
+  if (!sub) {
+    return {
+      label: "Aucun abonnement",
+      emoji: "—",
+      cls: "bg-[#f8fafc] text-[#94a3b8] border-[#e2e8f0]",
+    };
+  }
+  const s = sub.status;
+  if (s === "active" || s === "trialing") {
+    return {
+      label: s === "trialing" ? "Essai" : "Actif",
+      emoji: "✅",
+      cls: "bg-[#f0fdf4] text-[#16a34a] border-[#86efac]",
+    };
+  }
+  if (s === "past_due" || s === "incomplete") {
+    return {
+      label: s === "past_due" ? "Impayé" : "Incomplet",
+      emoji: "⚠️",
+      cls: "bg-[#fffbeb] text-[#d97706] border-[#fde68a]",
+    };
+  }
+  if (s === "canceled") {
+    return {
+      label: "Inactif",
+      emoji: "⚠️",
+      cls: "bg-[#fff5f5] text-[#ef4444] border-[#fecaca]",
+    };
+  }
+  return {
+    label: s,
+    emoji: "—",
+    cls: "bg-[#f8fafc] text-[#94a3b8] border-[#e2e8f0]",
   };
-  return map[sub.status] ?? { label: sub.status, tone: "muted" };
 }
-
-const TONE: Record<string, string> = {
-  success: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
-  info: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
-  warn: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
-  muted: "bg-muted text-muted-foreground border-border",
-};
 
 function SuperAdminClubs() {
   const [search, setSearch] = useState("");
@@ -54,9 +89,10 @@ function SuperAdminClubs() {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey] = useState(0);
 
-  const reload = useCallback(() => setRefreshKey((k) => k + 1), []);
+  const reload = useCallback(() => {}, []);
+  void reload;
 
   useEffect(() => {
     setLoading(true);
@@ -80,7 +116,7 @@ function SuperAdminClubs() {
   }, [search, includePersonal, includeSystem, refreshKey]);
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl">
       <header className="mb-5 flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl font-semibold">Clubs</h1>
@@ -116,103 +152,110 @@ function SuperAdminClubs() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name…"
+              placeholder="Rechercher un club…"
               className="pl-9 h-9"
             />
           </div>
         </div>
       </header>
 
-      <div className="rounded-lg border border-border overflow-hidden bg-card">
+      {/* Desktop table */}
+      <div className="hidden md:block rounded-lg border border-border overflow-hidden bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
               <th className="text-left font-medium px-3 py-2">Club</th>
-              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Members</th>
-              <th className="text-left font-medium px-3 py-2">Subscription</th>
-              <th className="text-right font-medium px-3 py-2">Exemption</th>
-              <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Created</th>
+              <th className="text-left font-medium px-3 py-2">Membres</th>
+              <th className="text-left font-medium px-3 py-2">Facturation</th>
+              <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Créé le</th>
             </tr>
           </thead>
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
                   <Loader2 className="h-4 w-4 inline animate-spin mr-2" />
-                  Loading…
+                  Chargement…
                 </td>
               </tr>
             )}
             {!loading && clubs.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
-                  No clubs found.
+                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                  Aucun club trouvé.
                 </td>
               </tr>
             )}
             {!loading &&
               clubs.map((c) => {
-                const badge = statusBadge(c.subscription);
+                const pill = billingPill(c.subscription);
                 const isTest =
                   c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
-                const isExempt = c.subscription?.exempt_from_billing === true;
+                const exempt = c.subscription && isBillingExempt(c.subscription);
                 return (
-                  <tr key={c.id} className="border-t border-border hover:bg-muted/20">
-                    <td className="px-3 py-2">
+                  <tr
+                    key={c.id}
+                    className="border-t border-border hover:bg-muted/30 cursor-pointer transition-colors"
+                  >
+                    <td className="px-3 py-2.5">
                       <Link
                         to="/superadmin/clubs/$clubId"
                         params={{ clubId: c.id }}
-                        className="font-medium hover:underline"
+                        className="font-medium hover:underline block"
                       >
                         {c.name}
                       </Link>
-                      {c.is_personal && (
-                        <span className="ml-2 inline-flex items-center rounded-full bg-pink-500/10 text-pink-700 dark:text-pink-400 px-2 py-0.5 text-[10px]">
-                          orga libre
-                        </span>
-                      )}
-                      {isTest && (
-                        <span className="ml-2 inline-flex items-center rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px]">
-                          test
-                        </span>
-                      )}
-                      {c.archived_at && (
-                        <span className="ml-2 inline-flex items-center rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[10px]">
-                          archived
-                        </span>
-                      )}
-                      <div className="text-[10px] font-mono text-muted-foreground/70">
-                        {c.id.slice(0, 8)}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 hidden md:table-cell tabular-nums">
-                      {c.member_count}
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span
-                          className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs ${TONE[badge.tone]}`}
-                        >
-                          {badge.label}
-                        </span>
-                        {isExempt && c.subscription?.exempt_reason && (
-                          <span className="text-[10px] text-muted-foreground hidden sm:inline">
-                            {EXEMPT_REASON_LABELS[c.subscription.exempt_reason as ExemptReason] ??
-                              c.subscription.exempt_reason}
+                      <div className="flex items-center gap-1 mt-0.5">
+                        {c.is_personal && (
+                          <span className="inline-flex items-center rounded-full bg-pink-500/10 text-pink-700 dark:text-pink-400 px-2 py-0.5 text-[10px]">
+                            orga libre
                           </span>
                         )}
+                        {isTest && (
+                          <span className="inline-flex items-center rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px]">
+                            test
+                          </span>
+                        )}
+                        {c.archived_at && (
+                          <span className="inline-flex items-center rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 text-[10px]">
+                            archivé
+                          </span>
+                        )}
+                        <span className="text-[10px] font-mono text-muted-foreground/70 ml-1">
+                          {c.id.slice(0, 8)}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-right">
-                      <BillingExemptionActions
-                        clubId={c.id}
-                        clubName={c.name}
-                        subscription={c.subscription}
-                        onUpdated={reload}
-                        compact
-                      />
+                    <td className="px-3 py-2.5 tabular-nums">{c.member_count}</td>
+                    <td className="px-3 py-2.5">
+                      <Link
+                        to="/superadmin/clubs/$clubId"
+                        params={{ clubId: c.id }}
+                        className="block"
+                      >
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${pill.cls}`}
+                        >
+                          <span>{pill.emoji}</span>
+                          {pill.label}
+                        </span>
+                        {exempt && c.subscription?.exempt_reason && (
+                          <div className="text-[10px] text-muted-foreground mt-0.5">
+                            {EXEMPT_REASON_LABELS[c.subscription.exempt_reason as ExemptReason] ??
+                              c.subscription.exempt_reason}
+                            {c.subscription.exempt_until && (
+                              <>
+                                {" · jusqu'au "}
+                                {format(new Date(c.subscription.exempt_until), "d MMM yyyy", {
+                                  locale: fr,
+                                })}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </Link>
                     </td>
-                    <td className="px-3 py-2 hidden lg:table-cell text-muted-foreground">
+                    <td className="px-3 py-2.5 hidden lg:table-cell text-muted-foreground">
                       {new Date(c.created_at).toLocaleDateString()}
                     </td>
                   </tr>
@@ -220,6 +263,66 @@ function SuperAdminClubs() {
               })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile card list */}
+      <div className="md:hidden space-y-2">
+        {loading && (
+          <div className="text-center text-sm text-muted-foreground py-8">
+            <Loader2 className="h-4 w-4 inline animate-spin mr-2" /> Chargement…
+          </div>
+        )}
+        {!loading && clubs.length === 0 && (
+          <div className="text-center text-sm text-muted-foreground py-8">
+            Aucun club trouvé.
+          </div>
+        )}
+        {!loading &&
+          clubs.map((c) => {
+            const pill = billingPill(c.subscription);
+            const exempt = c.subscription && isBillingExempt(c.subscription);
+            return (
+              <Link
+                key={c.id}
+                to="/superadmin/clubs/$clubId"
+                params={{ clubId: c.id }}
+                className="block rounded-xl border border-border bg-card p-3 active:bg-muted/40"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold truncate flex items-center gap-1.5">
+                      {c.name}
+                      {exempt && <ShieldCheck className="h-3.5 w-3.5 text-[#2563eb]" />}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {c.member_count} membre{c.member_count > 1 ? "s" : ""} ·{" "}
+                      {new Date(c.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium shrink-0 ${pill.cls}`}
+                  >
+                    <span>{pill.emoji}</span>
+                    {pill.label}
+                  </span>
+                </div>
+                {exempt && c.subscription?.exempt_reason && (
+                  <div className="text-[10px] text-muted-foreground mt-1.5 pt-1.5 border-t border-border">
+                    {EXEMPT_REASON_LABELS[c.subscription.exempt_reason as ExemptReason] ??
+                      c.subscription.exempt_reason}
+                    {c.subscription.exempt_until && (
+                      <>
+                        {" · jusqu'au "}
+                        {format(new Date(c.subscription.exempt_until), "d MMM yyyy", {
+                          locale: fr,
+                        })}
+                      </>
+                    )}
+                  </div>
+                )}
+              </Link>
+            );
+          })}
       </div>
     </div>
   );

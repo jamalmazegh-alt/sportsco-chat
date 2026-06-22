@@ -12,12 +12,16 @@ export type SubscriptionAccessFields = {
   trial_end?: string | null;
   current_period_end?: string | null;
   exempt_from_billing?: boolean | null;
+  exempt_until?: string | null;
 };
 
 export function isBillingExempt(
   sub: SubscriptionAccessFields | null | undefined,
+  nowMs: number = Date.now(),
 ): boolean {
-  return sub?.exempt_from_billing === true;
+  if (sub?.exempt_from_billing !== true) return false;
+  if (!sub.exempt_until) return true;
+  return new Date(sub.exempt_until).getTime() > nowMs;
 }
 
 function isActiveStripeSubscription(
@@ -44,6 +48,6 @@ export function hasPaidAccessFromSubscription(
   nowMs: number = Date.now(),
 ): boolean {
   if (!sub) return false;
-  if (isBillingExempt(sub)) return true;
+  if (isBillingExempt(sub, nowMs)) return true;
   return isActiveStripeSubscription(sub, nowMs);
 }
