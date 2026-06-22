@@ -230,15 +230,24 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       sendPushToUser(uid, {
         title: `💬 ${authorName}`,
         body: trimmed,
-        url: "/home",
+        url: "/inbox",
         tag: `wall-${(post as any).id}`,
       }).catch((e: unknown) => {
         console.warn("[push] wall send failed", uid, (e as Error).message);
         return { sent: 0, pruned: 0 };
       }),
     );
-    await Promise.all(sends);
-    return { dispatched: targets.length };
+    const results = await Promise.all(sends);
+    const sent = results.reduce((t, r) => t + r.sent, 0);
+    const pruned = results.reduce((t, r) => t + r.pruned, 0);
+    console.log("[push] wall dispatched", {
+      postId: (post as any).id,
+      clubId: (post as any).club_id,
+      targets: targets.length,
+      sent,
+      pruned,
+    });
+    return { dispatched: targets.length, sent, pruned };
   });
 
 /* ------------------------------------------------------------------ */
