@@ -94,6 +94,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
       iconBg: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)",
       iconColor: "#0f4a26",
       valueGradient: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)",
+      to: "/stats" as const,
     },
     {
       icon: Clock,
@@ -103,6 +104,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
       iconBg: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
       iconColor: "#92400e",
       valueGradient: "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)",
+      to: "/follow-ups" as const,
     },
     {
       icon: CalendarClock,
@@ -112,6 +114,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
       iconBg: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
       iconColor: "#1e40af",
       valueGradient: "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)",
+      to: "/events" as const,
     },
   ];
 
