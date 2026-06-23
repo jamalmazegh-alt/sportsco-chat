@@ -99,8 +99,7 @@ export function UrgencyCenter({ className }: Props) {
     );
   }
 
-  // 4. settled · failed = ∅ · items = ∅ → SuccessBanner
-  if (!hasFailures && items.length === 0) {
+  if (surface === "empty") {
     return (
       <section
         className={cn(
