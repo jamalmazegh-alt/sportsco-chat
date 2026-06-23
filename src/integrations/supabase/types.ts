@@ -5391,6 +5391,10 @@ export type Database = {
         Args: { _email: string; _user_id: string }
         Returns: boolean
       }
+      user_in_wall_audience: {
+        Args: { _audience_team_ids: string[]; _club_id: string; _user: string }
+        Returns: boolean
+      }
       user_in_wall_post_audience: {
         Args: { _post_id: string; _user: string }
         Returns: boolean
