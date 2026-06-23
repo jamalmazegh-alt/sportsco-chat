@@ -940,7 +940,8 @@ function TeamDetail() {
               </>
             );
             return (
-              <>
+              <Fragment key={p.id}>
+
                 {isMine && idx === 0 && (
                   <li key={`hdr-mine-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-1">
                     {t("teams.myProfile", { defaultValue: "Mon profil" })}
