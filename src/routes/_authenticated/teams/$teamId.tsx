@@ -841,10 +841,23 @@ function TeamDetail() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {players.map((p: any) => {
+          {(() => {
+            const list = [...(players ?? [])] as any[];
+            if (!isCoach && myPlayerIds && myPlayerIds.size > 0) {
+              list.sort((a, b) => {
+                const am = myPlayerIds.has(a.id) ? 0 : 1;
+                const bm = myPlayerIds.has(b.id) ? 0 : 1;
+                return am - bm;
+              });
+            }
+            return list;
+          })().map((p: any, idx: number) => {
+            const isMine = !isCoach && myPlayerIds?.has(p.id);
+            const isFirstOther = !isCoach && myPlayerIds && myPlayerIds.size > 0 && !isMine && idx === myPlayerIds.size;
             const canInvite = !p.user_id && (p.email || p.phone);
             const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
             const linked = !!p.user_id;
+
             const checked = selectedIds.has(p.id);
             const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
             const susp = activeSuspensionsByPlayer?.get(p.id);
