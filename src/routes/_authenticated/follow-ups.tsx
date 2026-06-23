@@ -11,7 +11,7 @@ import { fmt } from "@/lib/date-locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
-import { isV2 } from "@/config/features";
+
 
 export const Route = createFileRoute("/_authenticated/follow-ups")({
   component: FollowUpsPage,
