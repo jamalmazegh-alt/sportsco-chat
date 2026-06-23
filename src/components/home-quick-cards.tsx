@@ -65,7 +65,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
       {/* Teams card */}
       <Link
         to="/teams"
-        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-3.5 active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
+        className="group relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all hover:border-[#2d9d5f] hover:shadow-[0_4px_12px_rgba(15,74,38,0.1)]"
       >
         <div
           aria-hidden
@@ -74,18 +74,18 @@ export function HomeQuickCards({ clubId, teams }: Props) {
         />
         <div className="relative">
           <div
-            className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2.5"
+            className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
             style={{ background: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)" }}
           >
             <Users className="h-4 w-4 text-foreground" strokeWidth={2.4} />
           </div>
           <p
-            className="text-[26px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+            className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
             style={{ backgroundImage: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
           >
             {teamsCount}
           </p>
-          <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.1em] font-bold">
+          <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
             {t("nav.teams")}
           </p>
           {teamsSummary && (
@@ -101,7 +101,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
       <Link
         to="/tournaments"
         className={cn(
-          "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-3.5 active:scale-[0.99] transition-all",
+          "group relative overflow-hidden rounded-[14px] border-[1.5px] bg-card p-[11px] min-h-[88px] active:scale-[0.99] transition-all",
           state === "empty" && "border-dashed border-border hover:border-[#0f4a26]",
           state === "planned" && "border-border hover:border-[#f59e0b] hover:shadow-[0_4px_12px_rgba(245,158,11,0.12)]",
           state === "live" && "border-[#0f4a26] shadow-[0_4px_12px_rgba(15,74,38,0.18)]",
@@ -122,7 +122,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
         />
         <div className="relative">
           <div
-            className="h-9 w-9 rounded-[10px] flex items-center justify-center mb-2.5"
+            className="h-[26px] w-[26px] rounded-[8px] flex items-center justify-center mb-2"
             style={{
               background:
                 state === "live"
@@ -148,8 +148,8 @@ export function HomeQuickCards({ clubId, teams }: Props) {
 
           {state === "empty" ? (
             <>
-              <p className="text-[26px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">0</p>
-              <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.1em] font-bold">
+              <p className="text-[24px] font-black leading-none text-[#cbd5e1] tabular-nums tracking-tight">0</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
                 {t("nav.tournaments")}
               </p>
               {canCreateTournament && (
@@ -164,7 +164,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
           ) : (
             <>
               <p
-                className="text-[26px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
+                className="text-[24px] font-black leading-none tabular-nums tracking-tight bg-clip-text text-transparent"
                 style={{
                   backgroundImage:
                     state === "live"
@@ -176,7 +176,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
               >
                 {isLoading ? "…" : count}
               </p>
-              <p className="text-[10px] text-muted-foreground mt-1.5 uppercase tracking-[0.1em] font-bold">
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
                 {count > 1 ? t("nav.tournaments") : t("nav.tournament", { defaultValue: "Tournoi" })}
               </p>
               <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
