@@ -127,9 +127,10 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
         {items.map((it, i) => {
           const Icon = it.icon;
           return (
-            <div
+            <Link
               key={i}
-              className="relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-3 flex flex-col gap-1.5 min-h-[104px] shadow-[0_1px_2px_rgba(15,40,24,0.04)]"
+              to={it.to}
+              className="relative overflow-hidden rounded-[14px] border-[1.5px] border-border bg-card p-3 flex flex-col gap-1.5 min-h-[104px] shadow-[0_1px_2px_rgba(15,40,24,0.04)] active:scale-[0.98] transition-transform hover:bg-accent/30"
             >
               <div
                 aria-hidden
@@ -151,7 +152,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
               <p className="text-[10px] uppercase tracking-[0.1em] font-bold text-muted-foreground leading-tight">
                 {it.label}
               </p>
-            </div>
+            </Link>
           );
         })}
       </div>
