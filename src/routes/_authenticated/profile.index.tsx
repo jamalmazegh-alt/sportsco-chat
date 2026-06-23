@@ -171,118 +171,56 @@ function ProfilePage() {
     }
   }
 
+  const displayName =
+    [profile?.first_name, profile?.last_name].filter(Boolean).join(" ").trim() ||
+    profile?.full_name ||
+    user?.email ||
+    "";
+
   return (
     <div className="px-5 pt-8 space-y-6 pb-6">
-      <div className="flex items-start gap-4">
-        <div className="h-14 w-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 ring-1 ring-primary/20 flex items-center justify-center shrink-0">
-          <span className="text-lg font-semibold text-primary">
-            {(profile?.full_name ?? user?.email ?? "?")
-              .split(" ")
-              .map((s) => s[0])
-              .filter(Boolean)
-              .slice(0, 2)
-              .join("")
-              .toUpperCase()}
+      <div className="rounded-2xl border border-border bg-card p-5 flex flex-col items-center text-center gap-3">
+        <div className="h-24 w-24 rounded-2xl bg-muted flex items-center justify-center overflow-hidden ring-1 ring-border">
+          {club?.logo_url ? (
+            <img src={club.logo_url} alt={club?.name ?? ""} className="h-full w-full object-cover bg-white" />
+          ) : (
+            <Camera className="h-8 w-8 text-muted-foreground" />
+          )}
+        </div>
+        {club?.name && (
+          <p className="text-sm font-medium text-muted-foreground truncate max-w-full">{club.name}</p>
+        )}
+        {displayName && (
+          <h1 className="text-2xl font-semibold leading-tight truncate max-w-full">{displayName}</h1>
+        )}
+        {role && (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
+            {t(`roles.${role}`, { defaultValue: role })}
           </span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-semibold leading-tight">{t("profile.title")}</h1>
-          {profile?.full_name && (
-            <p className="text-sm font-medium text-foreground mt-1 truncate">{profile.full_name}</p>
-          )}
-          {role && (
-            <div className="mt-2">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
-                {t(`roles.${role}`, { defaultValue: role })}
-              </span>
-            </div>
-          )}
-        </div>
+        )}
+        {club && canManageLogo && (
+          <label className="mt-1 flex items-center justify-center gap-2 w-full h-10 rounded-xl border border-dashed border-primary/40 bg-primary/5 text-sm text-primary font-medium cursor-pointer hover:bg-primary/10 transition-colors">
+            {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+            {uploadingLogo
+              ? t("common.loading", { defaultValue: "Chargement..." })
+              : club.logo_url
+                ? t("club.changeLogo")
+                : t("club.uploadLogo")}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={uploadingLogo}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onUploadClubLogo(f);
+              }}
+            />
+          </label>
+        )}
       </div>
 
       {isAdmin && (
-        <Link
-          to={tournamentOnly ? "/admin/settings/payments" : "/admin"}
-          className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 active:scale-[0.99] transition-all hover:border-primary/40 hover:shadow-sm"
-        >
-          <div className="h-11 w-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground">
-              {t("nav.manageClub", { defaultValue: "Gérer le club" })}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {t("nav.manageClubSubtitle", { defaultValue: "Paramètres, membres, abonnement" })}
-            </p>
-          </div>
-          <ChevronRight className="h-4 w-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-      )}
-
-      {user?.email && (
-        <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Mail className="h-5 w-5 text-primary" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
-              {t("profile.email", { defaultValue: "Adresse email" })}
-            </p>
-            <a
-              href={`mailto:${user.email}`}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors break-all"
-            >
-              {user.email}
-            </a>
-          </div>
-        </div>
-      )}
-
-      {club && (
-        <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center overflow-hidden ring-1 ring-border shrink-0">
-              {club.logo_url ? (
-                <img src={club.logo_url} alt={club.name} className="h-full w-full object-cover bg-white" />
-              ) : (
-                <Camera className="h-7 w-7 text-muted-foreground" />
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
-                {t("club.logo")}
-              </p>
-              <p className="font-semibold truncate mt-0.5">{club.name}</p>
-              {role && (
-                <span className="inline-flex items-center mt-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
-                  {t(`roles.${role}`, { defaultValue: role })}
-                </span>
-              )}
-            </div>
-          </div>
-          {canManageLogo && (
-            <label className="flex items-center justify-center gap-2 w-full h-10 rounded-xl border border-dashed border-primary/40 bg-primary/5 text-sm text-primary font-medium cursor-pointer hover:bg-primary/10 transition-colors">
-              {uploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-              {uploadingLogo
-                ? t("common.loading", { defaultValue: "Chargement..." })
-                : club.logo_url
-                  ? t("club.changeLogo")
-                  : t("club.uploadLogo")}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                disabled={uploadingLogo}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) onUploadClubLogo(f);
-                }}
-              />
-            </label>
-          )}
-        </div>
-      )}
 
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
