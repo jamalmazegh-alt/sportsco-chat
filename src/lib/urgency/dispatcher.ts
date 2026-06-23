@@ -28,8 +28,7 @@ export async function dispatchUrgencyAction(
       ctx.navigate(`/events/${action.eventId}`);
       return;
     case "open-player":
-      ctx.navigate(`/players/${action.playerId}`);
-      return;
+      throw new Error("open-player dispatched without handler (no live source emits it yet)");
     case "remind-one":
       if (!ctx.remindOne) {
         throw new Error("remind-one dispatched without handler (no live source emits it yet)");
