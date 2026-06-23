@@ -253,6 +253,19 @@ export function WallFeed({ clubId }: { clubId: string }) {
       attachments: atts as unknown as never,
       audience_team_ids: audienceForInsert as unknown as never,
     };
+
+    // Pre-flight: confirm the JWT subject matches user.id and that the active
+    // club is actually one we're a member of. Either mismatch is the only way
+    // the wall_posts_insert policy can return 42501 for a non-trigger reason.
+    const { data: sess } = await supabase.auth.getSession();
+    const jwtSub = sess.session?.user?.id ?? null;
+    const { data: memberRow } = await supabase
+      .from("club_members")
+      .select("club_id, role, roles")
+      .eq("user_id", user.id)
+      .eq("club_id", clubId)
+      .maybeSingle();
+
     const { data, error } = await supabase
       .from("wall_posts")
       .insert(insertPayload)
@@ -260,9 +273,6 @@ export function WallFeed({ clubId }: { clubId: string }) {
       .single();
     setPosting(false);
     if (error) {
-      // Diagnostic surface — the bare PG message ("new row violates row-level
-      // security policy") is opaque. Log full context + show code/hint so we
-      // can tell apart membership gap, audience trigger, and JWT-loss cases.
       // eslint-disable-next-line no-console
       console.error("[wall_posts.insert] failed", {
         code: (error as any).code,
@@ -271,10 +281,27 @@ export function WallFeed({ clubId }: { clubId: string }) {
         hint: (error as any).hint,
         payload: { ...insertPayload, body: `<${insertPayload.body.length} chars>` },
         userId: user.id,
+        jwtSub,
+        jwtMatchesUser: jwtSub === user.id,
+        hasSession: !!sess.session,
+        clubMembershipRow: memberRow,
         roles,
       });
       const code = (error as any).code as string | undefined;
-      if (code === "42501" || /row-level security/i.test(error.message)) {
+      const isRls = code === "42501" || /row-level security/i.test(error.message);
+      if (isRls && !sess.session) {
+        toast.error(
+          t("wall.errorNoSession", {
+            defaultValue: "Ta session a expiré. Reconnecte-toi puis recommence.",
+          }),
+        );
+      } else if (isRls && !memberRow) {
+        toast.error(
+          t("wall.errorNotMember", {
+            defaultValue: "Tu n'es plus membre de ce club. Change de club actif puis recommence.",
+          }),
+        );
+      } else if (isRls) {
         toast.error(
           t("wall.errorNoPermission", {
             defaultValue:
