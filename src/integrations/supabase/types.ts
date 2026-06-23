@@ -3061,6 +3061,33 @@ export type Database = {
         }
         Relationships: []
       }
+      push_dispatch_log: {
+        Row: {
+          dispatched_at: string
+          id: string
+          kind: string
+          ref_id: string
+          sent_count: number
+          targets_count: number
+        }
+        Insert: {
+          dispatched_at?: string
+          id?: string
+          kind: string
+          ref_id: string
+          sent_count?: number
+          targets_count?: number
+        }
+        Update: {
+          dispatched_at?: string
+          id?: string
+          kind?: string
+          ref_id?: string
+          sent_count?: number
+          targets_count?: number
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
