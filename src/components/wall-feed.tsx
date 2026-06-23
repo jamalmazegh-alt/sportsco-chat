@@ -491,6 +491,50 @@ function AudiencePicker({
   );
 }
 
+// Reusable audience badge — used on each post in the feed.
+// Mirrors push scopeLabel logic; "Tout le club" is the only translated label,
+// team names are data (not translated). Deleted/unknown teams are filtered out;
+// if none survive, we surface a discreet "Audience restreinte" hint so admins
+// understand why the post is now narrower than originally targeted.
+function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string, Team> }) {
+  const { t } = useTranslation();
+  if (post.audience_team_ids === null) {
+    return (
+      <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30">
+        {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
+      </span>
+    );
+  }
+  const live = post.audience_team_ids
+    .map((id) => teamsById.get(id))
+    .filter((x): x is Team => !!x);
+  if (live.length === 0) {
+    return (
+      <span
+        className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-muted text-muted-foreground border-border"
+        title={t("wall.scope.restrictedTitle", { defaultValue: "Toutes les équipes ciblées ont été supprimées — visible des admins uniquement." })}
+      >
+        {t("wall.scope.restricted", { defaultValue: "Audience restreinte" })}
+      </span>
+    );
+  }
+  let label: string;
+  if (live.length === 1) label = live[0].name;
+  else if (live.length === 2) label = `${live[0].name} + ${live[1].name}`;
+  else label = t("wall.scope.plusOthers", { defaultValue: "{{first}} + {{n}} autres", first: live[0].name, n: live.length - 1 });
+  const tooltip = live.map((tt) => tt.name).join(" · ");
+  return (
+    <span
+      className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30"
+      title={tooltip}
+    >
+      {label}
+    </span>
+  );
+}
+
+
+
 
 function WallGrouped({
   posts,
