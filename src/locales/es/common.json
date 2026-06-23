@@ -402,7 +402,7 @@
     },
     "kpis": {
       "title": "Resumen",
-      "attendance30d": "Asistencia 30D",
+      "attendance30d": "Tasa de asistencia (30d)",
       "playersAlert": "Jugadores en alerta",
       "playersAlertHint": "≥ 3 ausencias en 30D",
       "upcoming7d": "Próximo (7D)",

@@ -402,7 +402,7 @@
     },
     "kpis": {
       "title": "Overview",
-      "attendance30d": "Attendance 30d",
+      "attendance30d": "Attendance rate (30d)",
       "playersAlert": "Players in alert",
       "playersAlertHint": "≥ 3 absences in 30d",
       "upcoming7d": "Upcoming (7d)",

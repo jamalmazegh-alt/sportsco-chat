@@ -402,7 +402,7 @@
     },
     "kpis": {
       "title": "Panoramica",
-      "attendance30d": "Presenze 30 giorni",
+      "attendance30d": "Tasso di presenza (30g)",
       "playersAlert": "Giocatori in allerta",
       "playersAlertHint": "≥ 3 assenze in 30 giorni",
       "upcoming7d": "Prossimi (7 giorni)",
