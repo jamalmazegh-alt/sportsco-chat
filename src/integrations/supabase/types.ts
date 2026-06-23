@@ -3064,24 +3064,30 @@ export type Database = {
       push_dispatch_log: {
         Row: {
           dispatched_at: string
+          first_opened_at: string | null
           id: string
           kind: string
+          opened_count: number
           ref_id: string
           sent_count: number
           targets_count: number
         }
         Insert: {
           dispatched_at?: string
+          first_opened_at?: string | null
           id?: string
           kind: string
+          opened_count?: number
           ref_id: string
           sent_count?: number
           targets_count?: number
         }
         Update: {
           dispatched_at?: string
+          first_opened_at?: string | null
           id?: string
           kind?: string
+          opened_count?: number
           ref_id?: string
           sent_count?: number
           targets_count?: number

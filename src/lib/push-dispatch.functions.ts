@@ -187,11 +187,23 @@ const WallInput = z.object({
   postId: z.string().uuid(),
 });
 
+/**
+ * Minor-protection threshold for wall push notifications.
+ * Players whose account is linked to a player record younger than this
+ * age — OR whose birth_date is unknown — are excluded from push fanout.
+ * Tutors/parents (independent club_members) are unaffected.
+ *
+ * Documented constant rather than a magic number: the legal/cultural
+ * threshold varies by country and club; configurability per-club will
+ * land when a real need surfaces.
+ */
+const MINOR_PUSH_THRESHOLD_YEARS = 16;
+
 export const dispatchWallPostPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => WallInput.parse(input))
   .handler(async ({ data, context }) => {
-    console.log("[push] wall handler START v4", { postId: data.postId, userId: context.userId });
+    console.log("[push] wall handler START v5", { postId: data.postId, userId: context.userId });
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendPushToUser } = await import("@/lib/push-send.server");
 
@@ -269,27 +281,34 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       });
     }
 
-    // 4) Minor protection — if a candidate is a player <16, drop them.
-    //    Tutors/parents are independent club_members and remain in the set.
-    const { data: minorPlayers } = await supabaseAdmin
+    // 4) Minor protection — fail-safe.
+    //    Fetch EVERY player account among candidates (incl. null birth_date)
+    //    and exclude when:
+    //      - age < MINOR_PUSH_THRESHOLD_YEARS, OR
+    //      - birth_date is unknown (we fail closed on the protective side).
+    //    Tutors/parents are independent club_members and remain in the set
+    //    even when their child is excluded.
+    const { data: playerAccounts } = await supabaseAdmin
       .from("players")
       .select("user_id, birth_date")
-      .in("user_id", allIds)
-      .not("birth_date", "is", null);
+      .in("user_id", allIds);
     const now = Date.now();
-    const minorUserIds = new Set<string>();
-    for (const p of minorPlayers ?? []) {
+    const excludedAsMinor = new Set<string>();
+    for (const p of playerAccounts ?? []) {
       const uid = (p as any).user_id as string | null;
       const dob = (p as any).birth_date as string | null;
-      if (!uid || !dob) continue;
-      const ageMs = now - new Date(dob).getTime();
-      const ageYears = ageMs / (365.25 * 24 * 3600 * 1000);
-      if (ageYears < 16) minorUserIds.add(uid);
+      if (!uid) continue;
+      if (!dob) {
+        excludedAsMinor.add(uid); // age unknown → exclude
+        continue;
+      }
+      const ageYears = (now - new Date(dob).getTime()) / (365.25 * 24 * 3600 * 1000);
+      if (ageYears < MINOR_PUSH_THRESHOLD_YEARS) excludedAsMinor.add(uid);
     }
 
     const targets: string[] = [];
     for (const uid of allIds) {
-      if (minorUserIds.has(uid)) continue;
+      if (excludedAsMinor.has(uid)) continue;
       const pref = prefByUser.get(uid);
       if (pref && pref.pushOn === false) continue;
       targets.push(uid);
@@ -306,15 +325,17 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       pt: { title: "Nova mensagem no mural", body: (a, c) => `${a} publicou em ${c}` },
     };
 
-    // 6) Send. Tag is per-club so the OS groups posts from the same club.
-    //    URL goes to /inbox where RLS re-verifies access at open time.
+    // 6) Send. Tag is per-club because the wall data model is club-scoped
+    //    (a club has a single wall — no team-scoped collapsing applies).
+    //    Deep link goes to the specific post; the inbox re-verifies access
+    //    via RLS before rendering and emits the `opened` analytics event.
     const sends = targets.map((uid) => {
       const lang = prefByUser.get(uid)?.lang || "fr";
       const t = I18N[lang] || I18N.fr;
       return sendPushToUser(uid, {
         title: t.title,
         body: t.body(authorName, clubName),
-        url: "/inbox",
+        url: `/inbox?post=${data.postId}&from=push`,
         tag: `wall-club-${clubId}`,
       }).catch((e: unknown) => {
         console.warn("[push] wall send failed", uid, (e as Error).message);
@@ -332,16 +353,69 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       .eq("kind", "wall_post")
       .eq("ref_id", data.postId);
 
-    console.log("[push] wall dispatched v4", {
+    console.log("[push] wall dispatched v5", {
       postId: (post as any).id,
       clubId,
       candidates: candidates.size,
-      minorsExcluded: minorUserIds.size,
+      excludedAsMinor: excludedAsMinor.size,
       targets: targets.length,
       sent,
       pruned,
     });
     return { dispatched: targets.length, sent, pruned };
+  });
+
+/* ------------------------------------------------------------------ */
+/* Wall post push — opened analytics                                   */
+/* ------------------------------------------------------------------ */
+const WallOpenedInput = z.object({
+  postId: z.string().uuid(),
+});
+
+export const trackWallPostPushOpened = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => WallOpenedInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Re-check access via RLS as the calling user before counting the open.
+    // If the user can no longer SELECT the post (removed from club, deleted),
+    // we do not record the event and the caller falls back to the wall.
+    const { data: visible } = await context.supabase
+      .from("wall_posts")
+      .select("id")
+      .eq("id", data.postId)
+      .maybeSingle();
+    if (!visible) {
+      console.log("[push] wall_post_push_opened DENIED", { postId: data.postId, userId: context.userId });
+      return { tracked: false, reason: "no_access" as const };
+    }
+
+    // Increment opened_count; set first_opened_at once. Best-effort read/update
+    // (race-tolerant — analytics counters, not billing).
+    const { data: row } = await supabaseAdmin
+      .from("push_dispatch_log")
+      .select("opened_count, first_opened_at")
+      .eq("kind", "wall_post")
+      .eq("ref_id", data.postId)
+      .maybeSingle();
+    if (row) {
+      await supabaseAdmin
+        .from("push_dispatch_log")
+        .update({
+          opened_count: ((row as any).opened_count ?? 0) + 1,
+          first_opened_at: (row as any).first_opened_at ?? new Date().toISOString(),
+        })
+        .eq("kind", "wall_post")
+        .eq("ref_id", data.postId);
+    }
+
+    console.log("[analytics] wall_post_push_opened", {
+      postId: data.postId,
+      userId: context.userId,
+      at: new Date().toISOString(),
+    });
+    return { tracked: true };
   });
 
 
