@@ -17,12 +17,13 @@ export function SupportFab() {
       to="/support"
       aria-label={t("fab", { defaultValue: "Support" })}
       className={cn(
-        "fixed left-4 z-30 h-12 w-12 rounded-full bg-secondary text-secondary-foreground shadow-lg",
+        "fixed right-4 z-30 h-10 w-10 rounded-full bg-secondary text-secondary-foreground shadow-lg",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
-        "bottom-[calc(env(safe-area-inset-bottom)+76px)]"
+        // Stacked above the primary assistant FAB: 104 + 48 (primary h-12) + 11 (gap) = 163px
+        "bottom-[calc(env(safe-area-inset-bottom)+163px)]"
       )}
     >
-      <LifeBuoy className="h-5 w-5" />
+      <LifeBuoy className="h-4 w-4" />
     </Link>
   );
 }
