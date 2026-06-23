@@ -41,11 +41,10 @@ describe("dispatchUrgencyAction", () => {
     ).rejects.toThrow(/remind-one/);
   });
 
-  it("open-player → navigate /players/P1 (handler câblé via ctx.navigate)", async () => {
-    // Note : aucune source live n'émet open-player aujourd'hui, mais le
-    // dispatcher le route déjà via navigate — on documente le contrat.
+  it("open-player → throw explicite (handler non câblé, pas de no-op silencieux)", async () => {
     const c = ctx();
-    await dispatchUrgencyAction({ kind: "open-player", playerId: "P1" }, c);
-    expect(c.navigate).toHaveBeenCalledWith("/players/P1");
+    await expect(
+      dispatchUrgencyAction({ kind: "open-player", playerId: "P1" }, c),
+    ).rejects.toThrow(/open-player/);
   });
 });
