@@ -218,7 +218,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
 
     const { data: post } = await supabaseAdmin
       .from("wall_posts")
-      .select("id, club_id, author_user_id, deleted_at")
+      .select("id, club_id, author_user_id, deleted_at, audience_team_ids, audience_type")
       .eq("id", data.postId)
       .maybeSingle();
     if (!post || (post as any).deleted_at) {
@@ -229,6 +229,8 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     // Gate: wall_new_post (per-club admin setting)
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
     const clubId = (post as any).club_id as string;
+    const audienceTeamIds = ((post as any).audience_team_ids as string[] | null) ?? null;
+    const audienceType = ((post as any).audience_type as string) || "club";
     const settings = await getClubNotifSettings(clubId);
     if (!settings.wall_new_post) {
       console.log("[push] wall BAIL settings disabled");
@@ -250,17 +252,91 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       "Un membre";
     const clubName = ((club as any)?.name as string) || "votre club";
 
-    // 2) Candidate recipients = club members minus author.
-    const { data: members } = await supabaseAdmin
-      .from("club_members")
-      .select("user_id")
-      .eq("club_id", clubId);
+    // 2) Candidate recipients — derived from the post audience.
+    //    Same logic as the SELECT RLS policy (user_in_wall_post_audience):
+    //    admins/dirigeants always; club-wide → all club members; team-scoped →
+    //    union of team staff/coaches, players, and their tutors over teams
+    //    that still exist.
     const candidates = new Set<string>();
-    for (const m of members ?? []) {
+
+    // Always: club admins + dirigeants (defense-in-depth, even on team-scoped posts).
+    const { data: privMembers } = await supabaseAdmin
+      .from("club_members")
+      .select("user_id, role")
+      .eq("club_id", clubId)
+      .in("role", ["admin", "dirigeant"]);
+    for (const m of privMembers ?? []) {
       const uid = (m as any).user_id as string | null;
-      if (!uid || uid === context.userId) continue;
-      candidates.add(uid);
+      if (uid) candidates.add(uid);
     }
+
+    // Resolve existing (non-deleted) teams of this audience, scoped to the club.
+    const liveTeams: { id: string; name: string }[] = [];
+    if (audienceTeamIds && audienceTeamIds.length > 0) {
+      const { data: teamsRows } = await supabaseAdmin
+        .from("teams")
+        .select("id, name, club_id, deleted_at")
+        .in("id", audienceTeamIds)
+        .eq("club_id", clubId)
+        .is("deleted_at", null);
+      for (const t of teamsRows ?? []) {
+        liveTeams.push({ id: (t as any).id, name: (t as any).name });
+      }
+    }
+
+    if (audienceTeamIds === null) {
+      // Club-wide: every club member.
+      const { data: members } = await supabaseAdmin
+        .from("club_members")
+        .select("user_id")
+        .eq("club_id", clubId);
+      for (const m of members ?? []) {
+        const uid = (m as any).user_id as string | null;
+        if (uid) candidates.add(uid);
+      }
+    } else if (liveTeams.length > 0) {
+      const teamIds = liveTeams.map((t) => t.id);
+      // Staff / coaches with a direct user_id row on these teams.
+      const { data: staffRows } = await supabaseAdmin
+        .from("team_members")
+        .select("user_id, player_id")
+        .in("team_id", teamIds);
+      const playerIdSet = new Set<string>();
+      for (const r of staffRows ?? []) {
+        const uid = (r as any).user_id as string | null;
+        const pid = (r as any).player_id as string | null;
+        if (uid) candidates.add(uid);
+        if (pid) playerIdSet.add(pid);
+      }
+      if (playerIdSet.size > 0) {
+        const playerIds = Array.from(playerIdSet);
+        // Player accounts.
+        const { data: playerRows } = await supabaseAdmin
+          .from("players")
+          .select("id, user_id")
+          .in("id", playerIds);
+        for (const p of playerRows ?? []) {
+          const uid = (p as any).user_id as string | null;
+          if (uid) candidates.add(uid);
+        }
+        // Tutors / parents.
+        const { data: parentRows } = await supabaseAdmin
+          .from("player_parents")
+          .select("parent_user_id")
+          .in("player_id", playerIds);
+        for (const pr of parentRows ?? []) {
+          const uid = (pr as any).parent_user_id as string | null;
+          if (uid) candidates.add(uid);
+        }
+      }
+    }
+    // If audienceTeamIds is non-null but liveTeams is empty (all targeted
+    // teams deleted), the audience collapses to admins/dirigeants only —
+    // exactly matching the RLS policy.
+
+    // Exclude the author.
+    candidates.delete(context.userId);
+
     if (candidates.size === 0) {
       return { dispatched: 0, sent: 0 };
     }
@@ -281,13 +357,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       });
     }
 
-    // 4) Minor protection — fail-safe.
-    //    Fetch EVERY player account among candidates (incl. null birth_date)
-    //    and exclude when:
-    //      - age < MINOR_PUSH_THRESHOLD_YEARS, OR
-    //      - birth_date is unknown (we fail closed on the protective side).
-    //    Tutors/parents are independent club_members and remain in the set
-    //    even when their child is excluded.
+    // 4) Minor protection — fail-safe (unchanged).
     const { data: playerAccounts } = await supabaseAdmin
       .from("players")
       .select("user_id, birth_date")
@@ -299,7 +369,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       const dob = (p as any).birth_date as string | null;
       if (!uid) continue;
       if (!dob) {
-        excludedAsMinor.add(uid); // age unknown → exclude
+        excludedAsMinor.add(uid);
         continue;
       }
       const ageYears = (now - new Date(dob).getTime()) / (365.25 * 24 * 3600 * 1000);
@@ -315,28 +385,60 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     }
 
     // 5) Localized copy (recipient language). Payload carries NO post content.
-    const I18N: Record<string, { title: string; body: (a: string, c: string) => string }> = {
-      fr: { title: "Nouveau message sur le mur", body: (a, c) => `${a} a publié dans ${c}` },
-      en: { title: "New post on the wall", body: (a, c) => `${a} posted in ${c}` },
-      de: { title: "Neuer Beitrag an der Pinnwand", body: (a, c) => `${a} hat in ${c} gepostet` },
-      es: { title: "Nuevo mensaje en el muro", body: (a, c) => `${a} publicó en ${c}` },
-      it: { title: "Nuovo messaggio sulla bacheca", body: (a, c) => `${a} ha pubblicato in ${c}` },
-      nl: { title: "Nieuw bericht op de muur", body: (a, c) => `${a} heeft gepost in ${c}` },
-      pt: { title: "Nova mensagem no mural", body: (a, c) => `${a} publicou em ${c}` },
+    //    scopeLabel: only "tout le club" is localized; team names are data.
+    const ALL_CLUB: Record<string, string> = {
+      fr: "tout le club",
+      en: "the whole club",
+      de: "den ganzen Verein",
+      es: "todo el club",
+      it: "tutto il club",
+      nl: "de hele club",
+      pt: "todo o clube",
+    };
+    const OTHERS: Record<string, (n: number) => string> = {
+      fr: (n) => `+ ${n} autres`,
+      en: (n) => `+ ${n} others`,
+      de: (n) => `+ ${n} weitere`,
+      es: (n) => `+ ${n} más`,
+      it: (n) => `+ ${n} altre`,
+      nl: (n) => `+ ${n} andere`,
+      pt: (n) => `+ ${n} outras`,
+    };
+    function scopeLabel(lang: string): string {
+      if (audienceTeamIds === null) return ALL_CLUB[lang] || ALL_CLUB.fr;
+      if (liveTeams.length === 0) return ALL_CLUB[lang] || ALL_CLUB.fr; // fallback (admin-only audience)
+      if (liveTeams.length === 1) return liveTeams[0].name;
+      if (liveTeams.length === 2) return `${liveTeams[0].name} + ${liveTeams[1].name}`;
+      const others = (OTHERS[lang] || OTHERS.fr)(liveTeams.length - 1);
+      return `${liveTeams[0].name} ${others}`;
+    }
+
+    const I18N: Record<string, { title: string; body: (a: string, s: string) => string }> = {
+      fr: { title: "Nouveau message sur le mur", body: (a, s) => `${a} a publié dans ${s}` },
+      en: { title: "New post on the wall", body: (a, s) => `${a} posted in ${s}` },
+      de: { title: "Neuer Beitrag an der Pinnwand", body: (a, s) => `${a} hat in ${s} gepostet` },
+      es: { title: "Nuevo mensaje en el muro", body: (a, s) => `${a} publicó en ${s}` },
+      it: { title: "Nuovo messaggio sulla bacheca", body: (a, s) => `${a} ha pubblicato in ${s}` },
+      nl: { title: "Nieuw bericht op de muur", body: (a, s) => `${a} heeft in ${s} gepost` },
+      pt: { title: "Nova mensagem no mural", body: (a, s) => `${a} publicou em ${s}` },
     };
 
-    // 6) Send. Tag is per-club because the wall data model is club-scoped
-    //    (a club has a single wall — no team-scoped collapsing applies).
-    //    Deep link goes to the specific post; the inbox re-verifies access
-    //    via RLS before rendering and emits the `opened` analytics event.
+    // 6) Send.
+    //    Tag: team-scoped (1 team) → wall-team-${teamId};
+    //         club or multi_team → wall-club-${clubId} (broad slot).
+    const collapseTag =
+      audienceType === "team" && liveTeams.length === 1
+        ? `wall-team-${liveTeams[0].id}`
+        : `wall-club-${clubId}`;
+
     const sends = targets.map((uid) => {
       const lang = prefByUser.get(uid)?.lang || "fr";
       const t = I18N[lang] || I18N.fr;
       return sendPushToUser(uid, {
         title: t.title,
-        body: t.body(authorName, clubName),
+        body: t.body(authorName, scopeLabel(lang)),
         url: `/inbox?post=${data.postId}&from=push`,
-        tag: `wall-club-${clubId}`,
+        tag: collapseTag,
       }).catch((e: unknown) => {
         console.warn("[push] wall send failed", uid, (e as Error).message);
         return { sent: 0, pruned: 0 };
@@ -346,16 +448,18 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     const sent = results.reduce((t, r) => t + r.sent, 0);
     const pruned = results.reduce((t, r) => t + r.pruned, 0);
 
-    // Update log with counts (best-effort).
     await supabaseAdmin
       .from("push_dispatch_log")
       .update({ targets_count: targets.length, sent_count: sent })
       .eq("kind", "wall_post")
       .eq("ref_id", data.postId);
 
-    console.log("[push] wall dispatched v5", {
+    console.log("[push] wall dispatched v6", {
       postId: (post as any).id,
       clubId,
+      audienceType,
+      audienceTeamIds,
+      liveTeams: liveTeams.length,
       candidates: candidates.size,
       excludedAsMinor: excludedAsMinor.size,
       targets: targets.length,
@@ -364,6 +468,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     });
     return { dispatched: targets.length, sent, pruned };
   });
+
 
 /* ------------------------------------------------------------------ */
 /* Wall post push — opened analytics                                   */
