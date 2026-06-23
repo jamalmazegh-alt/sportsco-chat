@@ -218,6 +218,52 @@ export const Route = createFileRoute("/api/chat")({
             },
           }),
 
+          getMyPerformanceStats: tool({
+            description:
+              "Statistiques de performance (matchs) de l'utilisateur ou de ses enfants : buts, passes décisives, cartons jaunes/rouges/blancs, essais, points, fautes, pénalités, csc. Renvoie un total par joueur, tous matchs confondus. À utiliser quand l'utilisateur demande \"mes buts\", \"mes stats\", \"combien de cartons\", \"combien de passes\", etc.",
+            inputSchema: z.object({}),
+            execute: async () => {
+              const playerIds = await getMyPlayerIds();
+              if (playerIds.length === 0) {
+                return {
+                  players: [],
+                  note:
+                    "Aucun joueur n'est associé à ce compte (ni en tant que joueur, ni en tant que parent). Il n'y a donc pas de statistiques de performance à afficher.",
+                };
+              }
+              const { data: players } = await supabase
+                .from("players")
+                .select("id, first_name, last_name")
+                .in("id", playerIds);
+              const [{ data: scored }, { data: assisted }] = await Promise.all([
+                supabase.from("event_goals").select("scorer_player_id, kind").in("scorer_player_id", playerIds),
+                supabase.from("event_goals").select("assist_player_id").in("assist_player_id", playerIds),
+              ]);
+              const byPlayer = new Map<string, Record<string, number>>();
+              for (const g of scored ?? []) {
+                const pid = (g as any).scorer_player_id as string;
+                const k = ((g as any).kind ?? "goal") as string;
+                const m = byPlayer.get(pid) ?? {};
+                m[k] = (m[k] ?? 0) + 1;
+                byPlayer.set(pid, m);
+              }
+              for (const a of assisted ?? []) {
+                const pid = (a as any).assist_player_id as string;
+                if (!pid) continue;
+                const m = byPlayer.get(pid) ?? {};
+                m.assist = (m.assist ?? 0) + 1;
+                byPlayer.set(pid, m);
+              }
+              return {
+                players: (players ?? []).map((p) => ({
+                  name: `${p.first_name} ${p.last_name}`,
+                  totals: byPlayer.get(p.id) ?? {},
+                })),
+              };
+            },
+          }),
+
+
           getMyTeams: tool({
             description: "Liste les équipes auxquelles l'utilisateur (ou ses enfants) appartient.",
             inputSchema: z.object({}),
