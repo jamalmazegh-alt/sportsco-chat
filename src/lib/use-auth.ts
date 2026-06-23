@@ -117,21 +117,41 @@ export function useAuthState(): AuthState {
   }, [setActiveClubId]);
 
   useEffect(() => {
-    // Set up listener BEFORE getSession
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    let cancelled = false;
+
+    // 1) Subscribe FIRST so we don't miss any event during restore.
+    //    Filter to identity transitions only — TOKEN_REFRESHED fires hourly
+    //    and on tab focus; INITIAL_SESSION is handled by getSession() below.
+    //    Reacting to every event causes spurious setSession(null) and
+    //    bounces the user to /login on app resume.
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (
+        event !== "SIGNED_IN" &&
+        event !== "SIGNED_OUT" &&
+        event !== "USER_UPDATED" &&
+        event !== "TOKEN_REFRESHED"
+      ) {
+        return;
+      }
+      // TOKEN_REFRESHED can deliver a fresh session; never treat it as sign-out.
+      if (event === "TOKEN_REFRESHED" && !newSession) return;
       setSession(newSession);
       if (newSession) {
-        // defer to avoid deadlocks
         setTimeout(() => {
           redeemPendingInvite(newSession).finally(() => refreshMemberships());
         }, 0);
-      } else {
+      } else if (event === "SIGNED_OUT") {
         setMemberships([]);
         setActiveClubId(null);
       }
     });
 
+    // 2) Restore persisted session from storage. getSession() awaits the
+    //    supabase-js init promise, so this resolves with the localStorage
+    //    value once available. We only flip `loading` to false AFTER this
+    //    completes so route guards don't redirect to /login during restore.
     supabase.auth.getSession().then(async ({ data }) => {
+      if (cancelled) return;
       setSession(data.session);
       if (data.session) {
         await refreshMemberships();
@@ -139,9 +159,13 @@ export function useAuthState(): AuthState {
       setLoading(false);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
