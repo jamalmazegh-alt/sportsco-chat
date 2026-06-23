@@ -537,7 +537,6 @@ function PlayerProfile() {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            <User className="h-3.5 w-3.5" />
             {t("players.tabProfile", { defaultValue: "Profil" })}
           </Link>
           {SHOW_PUBLIC_PROFILE_FEATURES && (
