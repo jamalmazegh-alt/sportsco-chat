@@ -18,6 +18,8 @@ import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
+type AudienceType = "club" | "team" | "multi_team";
+type Team = { id: string; name: string };
 type Post = {
   id: string;
   club_id: string;
@@ -30,10 +32,13 @@ type Post = {
   external_id: string | null;
   external_url: string | null;
   external_media_url: string | null;
+  audience_team_ids: string[] | null;
+  audience_type: AudienceType;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
 };
+
 
 const SOURCE_META: Record<Exclude<PostSource, "clubero">, { label: string; cls: string }> = {
   instagram: { label: "Instagram", cls: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30" },
