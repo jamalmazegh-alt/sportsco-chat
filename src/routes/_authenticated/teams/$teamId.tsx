@@ -940,7 +940,19 @@ function TeamDetail() {
               </>
             );
             return (
+              <>
+                {isMine && idx === 0 && (
+                  <li key={`hdr-mine-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-1">
+                    {t("teams.myProfile", { defaultValue: "Mon profil" })}
+                  </li>
+                )}
+                {isFirstOther && (
+                  <li key={`hdr-others-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-3">
+                    {t("teams.myTeammates", { defaultValue: "Mes coéquipiers" })}
+                  </li>
+                )}
               <li key={p.id}>
+
                 {selectMode ? (
                   <button
                     type="button"
