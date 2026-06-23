@@ -246,19 +246,46 @@ export function WallFeed({ clubId }: { clubId: string }) {
     }
 
     setPosting(true);
+    const insertPayload = {
+      club_id: clubId,
+      author_user_id: user.id,
+      body: body.trim(),
+      attachments: atts as unknown as never,
+      audience_team_ids: audienceForInsert as unknown as never,
+    };
     const { data, error } = await supabase
       .from("wall_posts")
-      .insert({
-        club_id: clubId,
-        author_user_id: user.id,
-        body: body.trim(),
-        attachments: atts as unknown as never,
-        audience_team_ids: audienceForInsert as unknown as never,
-      })
+      .insert(insertPayload)
       .select("id")
       .single();
     setPosting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      // Diagnostic surface — the bare PG message ("new row violates row-level
+      // security policy") is opaque. Log full context + show code/hint so we
+      // can tell apart membership gap, audience trigger, and JWT-loss cases.
+      // eslint-disable-next-line no-console
+      console.error("[wall_posts.insert] failed", {
+        code: (error as any).code,
+        message: error.message,
+        details: (error as any).details,
+        hint: (error as any).hint,
+        payload: { ...insertPayload, body: `<${insertPayload.body.length} chars>` },
+        userId: user.id,
+        roles,
+      });
+      const code = (error as any).code as string | undefined;
+      if (code === "42501" || /row-level security/i.test(error.message)) {
+        toast.error(
+          t("wall.errorNoPermission", {
+            defaultValue:
+              "Tu n'as pas les droits pour publier ici. Vérifie ton club actif et l'équipe sélectionnée.",
+          }),
+        );
+      } else {
+        toast.error(error.message);
+      }
+      return;
+    }
     const mentioned = parseMentions(body);
     if (mentioned.length && data?.id) {
       await notifyMentioned(mentioned, `/inbox#${data.id}`, body.trim());
