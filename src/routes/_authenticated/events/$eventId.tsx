@@ -2752,7 +2752,7 @@ function EventDetail() {
           })}
         </div>
       )}
-      {event.type === "match" && event.status !== "cancelled" && new Date(event.ends_at ?? event.starts_at) <= new Date() && (
+      {event.type === "match" && event.status !== "cancelled" && (isCoach || new Date(event.ends_at ?? event.starts_at) <= new Date()) && (
         <MatchResultCard
           eventId={event.id}
           teamId={event.team_id}
