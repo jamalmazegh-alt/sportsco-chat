@@ -232,10 +232,29 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
   async function submitPost() {
     if ((!body.trim() && atts.length === 0) || !user) return;
+
+    // Resolve final audience for the insert.
+    //   null         → "Tout le club"
+    //   [] (forced)  → coach must pick at least one team
+    //   [ids]        → team-scoped (1 or many)
+    const isPriv = roles.includes("admin") || roles.includes("dirigeant");
+    const audienceForInsert: string[] | null =
+      audience === null ? null : audience.length === 0 ? null : audience;
+    if (!isPriv && audienceForInsert === null && audience !== null) {
+      toast.error(t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe ou « Tout le club »." }));
+      return;
+    }
+
     setPosting(true);
     const { data, error } = await supabase
       .from("wall_posts")
-      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never })
+      .insert({
+        club_id: clubId,
+        author_user_id: user.id,
+        body: body.trim(),
+        attachments: atts as unknown as never,
+        audience_team_ids: audienceForInsert as unknown as never,
+      })
       .select("id")
       .single();
     setPosting(false);
@@ -246,13 +265,54 @@ export function WallFeed({ clubId }: { clubId: string }) {
     }
     if (data?.id) {
       const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
-      const { data: members } = await supabase
-        .from("club_members")
-        .select("user_id")
-        .eq("club_id", clubId);
-      const recipients = (members ?? [])
-        .map((m) => m.user_id)
-        .filter((uid) => uid !== user.id && !mentioned.includes(uid));
+
+      // Recipient set for in-app notifications must mirror the post audience
+      // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
+      const recipientSet = new Set<string>();
+      if (audienceForInsert === null) {
+        const { data: members } = await supabase
+          .from("club_members").select("user_id").eq("club_id", clubId);
+        for (const m of members ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+      } else {
+        // Admins/dirigeants always see every post.
+        const { data: priv } = await supabase
+          .from("club_members").select("user_id, role").eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        const { data: tm } = await supabase
+          .from("team_members").select("user_id, player_id").in("team_id", audienceForInsert);
+        const playerIds: string[] = [];
+        for (const r of tm ?? []) {
+          const uid = (r as any).user_id as string | null;
+          const pid = (r as any).player_id as string | null;
+          if (uid) recipientSet.add(uid);
+          if (pid) playerIds.push(pid);
+        }
+        if (playerIds.length) {
+          const { data: pls } = await supabase
+            .from("players").select("user_id").in("id", playerIds);
+          for (const p of pls ?? []) {
+            const uid = (p as any).user_id as string | null;
+            if (uid) recipientSet.add(uid);
+          }
+          const { data: parents } = await supabase
+            .from("player_parents").select("parent_user_id").in("player_id", playerIds);
+          for (const pr of parents ?? []) {
+            const uid = (pr as any).parent_user_id as string | null;
+            if (uid) recipientSet.add(uid);
+          }
+        }
+      }
+      recipientSet.delete(user.id);
+      for (const m of mentioned) recipientSet.delete(m);
+
+      const recipients = Array.from(recipientSet);
       if (recipients.length) {
         const snippet = body.trim() || t("wall.newAttachment", { defaultValue: "Nouvelle pièce jointe" });
         await supabase.from("notifications").insert(
@@ -266,7 +326,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         );
       }
     }
-    // Web Push fire-and-forget — membres du club, hors auteur (et hors mentions déjà notifiées)
+    // Web Push fire-and-forget (server re-derives audience from the post).
     if (data?.id) {
       void (async () => {
         try {
@@ -278,7 +338,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
     }
     setBody("");
     setAtts([]);
+    // Reset audience to the per-role default for the next post.
+    if (isPriv) setAudience(null);
+    else if (targetableTeams.length === 1) setAudience([targetableTeams[0].id]);
+    else setAudience([]);
   }
+
 
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
