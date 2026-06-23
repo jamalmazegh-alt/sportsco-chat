@@ -24,7 +24,7 @@ import { isV2 } from "@/config/features";
 import { EventTypeBadge } from "@/lib/event-type-icon";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
-import { UpcomingAbsencesWidget } from "@/components/upcoming-absences-widget";
+import { UrgencyCenter } from "@/components/urgency-center";
 
 export const Route = createFileRoute("/_authenticated/home")({
   component: HomePage,
@@ -302,8 +302,9 @@ function HomePage() {
         />
       )}
 
-      {/* Urgency: absences requiring attention (coaches/admins) */}
-      {isCoach && activeClubId && <UpcomingAbsencesWidget clubId={activeClubId} />}
+      {/* Centre d'urgence : convocations sans réponse J-1/J-2/J-3 + effectif réduit.
+          UpcomingAbsencesWidget reste sur la page équipe (info détail, pas urgence). */}
+      {activeClubId && <UrgencyCenter />}
 
       {/* Next event(s) for coaches/admins */}
       {isCoach && (
