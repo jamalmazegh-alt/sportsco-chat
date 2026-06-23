@@ -290,20 +290,20 @@ export function MatchResultCard({
     outcome === "win"
       ? { label: t("match.outcomeWin", { defaultValue: "Victoire" }), cls: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white ring-emerald-500/30" }
       : outcome === "loss"
-      ? { label: t("match.outcomeLoss", { defaultValue: "Défaite" }), cls: "bg-rose-50 text-rose-600 ring-rose-200" }
-      : { label: t("match.outcomeDraw", { defaultValue: "Nul" }), cls: "bg-slate-100 text-slate-600 ring-slate-200" };
+      ? { label: t("match.outcomeLoss", { defaultValue: "Défaite" }), cls: "bg-rose-500/15 text-rose-500 ring-rose-500/30" }
+      : { label: t("match.outcomeDraw", { defaultValue: "Nul" }), cls: "bg-muted text-muted-foreground ring-border" };
 
   return (
-    <section className="rounded-2xl border-[1.5px] border-slate-200 bg-white shadow-[0_2px_8px_-4px_rgba(15,23,42,0.06)] overflow-hidden">
+    <section className="rounded-2xl border-[1.5px] border-border bg-card text-card-foreground shadow-sm overflow-hidden">
       <ConfettiBurst trigger={celebrate} />
 
       {/* Header */}
-      <header className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-100">
+      <header className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-border">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60">
             <Trophy className="h-4 w-4 text-[#1d7a45]" />
           </div>
-          <h2 className="text-sm font-extrabold tracking-tight text-slate-900 truncate">
+          <h2 className="text-sm font-extrabold tracking-tight text-foreground truncate">
             {t("match.result")}
           </h2>
         </div>
@@ -324,10 +324,10 @@ export function MatchResultCard({
           <div className="space-y-3">
             <div className="flex items-center justify-center gap-3">
               <div className="text-center flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                   {teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
                 </p>
-                <p className="text-[28px] leading-none font-black tabular-nums text-slate-900 mt-1">{ourScore}</p>
+                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">{ourScore}</p>
               </div>
               <span
                 className="text-[28px] font-black tabular-nums bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] bg-clip-text text-transparent select-none"
@@ -336,10 +336,10 @@ export function MatchResultCard({
                 —
               </span>
               <div className="text-center flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                   {opponent ?? t("events.opponent")}
                 </p>
-                <p className="text-[28px] leading-none font-black tabular-nums text-slate-900 mt-1">{theirScore}</p>
+                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">{theirScore}</p>
               </div>
             </div>
             <div className="flex justify-center">
@@ -348,7 +348,7 @@ export function MatchResultCard({
               </span>
             </div>
             {cfg.setScoresEnabled && savedSets.length > 0 && (
-              <p className="text-center text-xs text-slate-500 tabular-nums">
+              <p className="text-center text-xs text-muted-foreground tabular-nums">
                 {savedSets
                   .map(([h, a]) => (ourSide === "home" ? `${h}-${a}` : `${a}-${h}`))
                   .join(" · ")}
@@ -358,7 +358,7 @@ export function MatchResultCard({
         )}
 
         {!editing && !result && (
-          <p className="text-xs text-slate-400 italic">
+          <p className="text-xs text-muted-foreground italic">
             {t("match.noResultYet", { defaultValue: "Pas de résultat enregistré pour l'instant." })}
           </p>
         )}
@@ -377,7 +377,7 @@ export function MatchResultCard({
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                     {ourSide === "home"
                       ? teamName ?? t("events.home")
                       : opponent ?? t("events.home")}
@@ -387,11 +387,11 @@ export function MatchResultCard({
                     min={0}
                     value={home}
                     onChange={(e) => setHome(e.target.value)}
-                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-slate-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold truncate">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                     {ourSide === "home"
                       ? opponent ?? t("events.away")
                       : teamName ?? t("events.away")}
@@ -401,20 +401,20 @@ export function MatchResultCard({
                     min={0}
                     value={away}
                     onChange={(e) => setAway(e.target.value)}
-                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-slate-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                    className="h-14 text-center text-3xl font-black tabular-nums rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
                   />
                 </div>
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">{t("match.notesOptional")}</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("match.notesOptional")}</Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 maxLength={500}
-                className="rounded-xl border-[1.5px] border-slate-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
+                className="rounded-xl border-[1.5px] border-input focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20"
               />
             </div>
             <div className="flex justify-end gap-2">
@@ -450,9 +450,9 @@ export function MatchResultCard({
 
       {/* Player events ("Faits de match") */}
       {cfg.statKinds.length > 0 && (isCoach || result || (goals && goals.length > 0)) && (
-        <div className="px-5 py-4 space-y-3 border-t border-slate-100">
+        <div className="px-5 py-4 space-y-3 border-t border-border">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-500">
+            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
               {t("match.playerEvents", { defaultValue: "Faits de match" })}
             </p>
             {isCoach && !showGoalForm && (

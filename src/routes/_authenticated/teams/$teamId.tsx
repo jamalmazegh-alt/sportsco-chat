@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { Fragment, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -155,6 +155,30 @@ function TeamDetail() {
       return set;
     },
   });
+
+  // Players linked to the current user (as player or parent) — pinned at top
+  // when the viewer is not a coach.
+  const { data: myPlayerIds } = useQuery({
+    queryKey: ["team-my-player-ids", teamId, user?.id],
+    enabled: !!user && !isCoach && !!players && players.length > 0,
+    queryFn: async () => {
+      const set = new Set<string>();
+      for (const p of (players ?? []) as any[]) {
+        if (p.user_id && p.user_id === user!.id) set.add(p.id);
+      }
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length > 0) {
+        const { data } = await supabase
+          .from("player_parents")
+          .select("player_id")
+          .eq("parent_user_id", user!.id)
+          .in("player_id", ids);
+        (data ?? []).forEach((r: any) => set.add(r.player_id));
+      }
+      return set;
+    },
+  });
+
 
   // Selection state for bulk invitations
   const [selectMode, setSelectMode] = useState(false);
@@ -591,7 +615,7 @@ function TeamDetail() {
         </Sheet>
       )}
 
-      {isCoach && <CollapsibleTeamStats teamId={teamId} />}
+      <CollapsibleTeamStats teamId={teamId} defaultOpen={!isCoach} />
 
       {isCoach && team?.club_id && (
         <UpcomingAbsencesWidget clubId={team.club_id} />
@@ -817,12 +841,32 @@ function TeamDetail() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {players.map((p: any) => {
+          {(() => {
+            const list = [...(players ?? [])] as any[];
+            if (!isCoach && myPlayerIds && myPlayerIds.size > 0) {
+              list.sort((a, b) => {
+                const am = myPlayerIds.has(a.id) ? 0 : 1;
+                const bm = myPlayerIds.has(b.id) ? 0 : 1;
+                return am - bm;
+              });
+            }
+            return list;
+          })().map((p: any, idx: number) => {
+            const isMine = !isCoach && myPlayerIds?.has(p.id);
+            const isFirstOther = !isCoach && myPlayerIds && myPlayerIds.size > 0 && !isMine && idx === myPlayerIds.size;
             const canInvite = !p.user_id && (p.email || p.phone);
             const hasPendingInvite = pendingInvitePlayerIds?.has(p.id) ?? false;
             const linked = !!p.user_id;
+
             const checked = selectedIds.has(p.id);
-            const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const rowClass = cn(
+              "flex items-center gap-3 rounded-2xl border bg-card p-3",
+              isMine
+                ? "border-primary/40 ring-1 ring-primary/20 shadow-sm p-4"
+                : "border-border",
+              !isCoach && myPlayerIds && myPlayerIds.size > 0 && !isMine && "py-2 px-3 opacity-95",
+            );
+
             const susp = activeSuspensionsByPlayer?.get(p.id);
             const absenceReason = activeAbsencesByPlayer?.get(p.id);
             const inner = (
@@ -896,7 +940,20 @@ function TeamDetail() {
               </>
             );
             return (
+              <Fragment key={p.id}>
+
+                {isMine && idx === 0 && (
+                  <li key={`hdr-mine-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-1">
+                    {t("teams.myProfile", { defaultValue: "Mon profil" })}
+                  </li>
+                )}
+                {isFirstOther && (
+                  <li key={`hdr-others-${p.id}`} className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-3">
+                    {t("teams.myTeammates", { defaultValue: "Mes coéquipiers" })}
+                  </li>
+                )}
               <li key={p.id}>
+
                 {selectMode ? (
                   <button
                     type="button"
@@ -950,7 +1007,10 @@ function TeamDetail() {
                   return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
                 })()}
               </li>
+              </Fragment>
             );
+
+
           })}
         </ul>
       )}
@@ -1007,9 +1067,10 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
   );
 }
 
-function CollapsibleTeamStats({ teamId }: { teamId: string }) {
+function CollapsibleTeamStats({ teamId, defaultOpen = false }: { teamId: string; defaultOpen?: boolean }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <button
