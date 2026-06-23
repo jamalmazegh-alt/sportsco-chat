@@ -1006,7 +1006,9 @@ function TeamDetail() {
                   return <SwipeableRow actions={actions}>{rowContent}</SwipeableRow>;
                 })()}
               </li>
+              </>
             );
+
           })}
         </ul>
       )}
