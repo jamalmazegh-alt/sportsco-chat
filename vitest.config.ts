@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
-    include: ["src/tests/unit/**/*.test.ts", "tests/has-paid-access.test.ts"],
+    include: ["src/tests/unit/**/*.test.ts", "src/lib/**/*.test.ts", "tests/has-paid-access.test.ts"],
     exclude: ["tests/e2e/**", "tests/rls/**", "node_modules/**", "dist/**"],
     coverage: {
       reporter: ["text", "json", "html"],
