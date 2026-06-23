@@ -370,6 +370,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
   }
 
   const canPost = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const teamsById = useMemo(() => {
+    const m = new Map<string, Team>();
+    for (const tt of allTeams) m.set(tt.id, tt);
+    return m;
+  }, [allTeams]);
+  const audienceMissing =
+    canPost &&
+    !(roles.includes("admin") || roles.includes("dirigeant")) &&
+    audience !== null && audience.length === 0;
 
   return (
     <div className="space-y-4">
@@ -382,9 +391,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
             placeholder={t("wall.placeholder")}
             rows={3}
           />
+          <AudiencePicker
+            teams={targetableTeams}
+            value={audience}
+            onChange={setAudience}
+            canPickClubWide={roles.includes("admin") || roles.includes("dirigeant") || targetableTeams.length === allTeams.length}
+          />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
-          <div className="flex justify-end">
-            <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0)}>
+          <div className="flex items-center justify-between gap-2">
+            {audienceMissing ? (
+              <p className="text-xs text-destructive">
+                {t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe." })}
+              </p>
+            ) : <span />}
+            <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0) || audienceMissing}>
               {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
             </Button>
           </div>
@@ -398,12 +418,79 @@ export function WallFeed({ clubId }: { clubId: string }) {
         commentsEnabled={commentsEnabled}
         canPin={canPost}
         memberCount={memberCount}
+        teamsById={teamsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
     </div>
   );
 }
+
+// Inline audience picker — "À : Tout le club | U13 | U15 …"
+function AudiencePicker({
+  teams,
+  value,
+  onChange,
+  canPickClubWide,
+}: {
+  teams: Team[];
+  value: string[] | null;
+  onChange: (next: string[] | null) => void;
+  canPickClubWide: boolean;
+}) {
+  const { t } = useTranslation();
+  const isClubWide = value === null;
+  function toggleTeam(id: string) {
+    if (value === null) { onChange([id]); return; }
+    if (value.includes(id)) {
+      const next = value.filter((x) => x !== id);
+      onChange(next);
+    } else {
+      onChange([...value, id]);
+    }
+  }
+  if (teams.length === 0 && !canPickClubWide) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="text-xs font-medium text-muted-foreground mr-1">
+        {t("wall.audienceTo", { defaultValue: "À :" })}
+      </span>
+      {canPickClubWide && (
+        <button
+          type="button"
+          onClick={() => onChange(null)}
+          className={cn(
+            "text-xs px-2.5 py-1 rounded-full border transition-colors",
+            isClubWide
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-background text-foreground border-border hover:bg-accent",
+          )}
+        >
+          {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
+        </button>
+      )}
+      {teams.map((tt) => {
+        const active = !isClubWide && (value ?? []).includes(tt.id);
+        return (
+          <button
+            key={tt.id}
+            type="button"
+            onClick={() => toggleTeam(tt.id)}
+            className={cn(
+              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              active
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-accent",
+            )}
+          >
+            {tt.name}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 
 function WallGrouped({
   posts,
