@@ -1007,9 +1007,10 @@ function TeamImage({ team, isCoach, onUploaded }: { team: any; isCoach: boolean;
   );
 }
 
-function CollapsibleTeamStats({ teamId }: { teamId: string }) {
+function CollapsibleTeamStats({ teamId, defaultOpen = false }: { teamId: string; defaultOpen?: boolean }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
     <div className="rounded-2xl border border-border bg-card overflow-hidden">
       <button
