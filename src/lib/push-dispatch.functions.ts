@@ -197,7 +197,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
 
     const { data: post, error: postErr } = await supabaseAdmin
       .from("wall_posts")
-      .select("id, club_id, body, author_user_id, profiles:author_user_id(full_name, first_name)")
+      .select("id, club_id, body, author_user_id")
       .eq("id", data.postId)
       .maybeSingle();
     if (postErr) console.warn("[push] wall post fetch error", postErr.message);
@@ -215,10 +215,14 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       return { dispatched: 0 };
     }
 
-
+    const { data: author } = await supabaseAdmin
+      .from("profiles")
+      .select("full_name, first_name")
+      .eq("id", (post as any).author_user_id)
+      .maybeSingle();
     const authorName =
-      ((post as any).profiles?.first_name as string) ||
-      ((post as any).profiles?.full_name as string)?.split(" ")[0] ||
+      ((author as any)?.first_name as string) ||
+      ((author as any)?.full_name as string)?.split(" ")[0] ||
       "Un membre";
 
     const raw = ((post as any).body as string) || "";
