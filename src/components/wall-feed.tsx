@@ -18,6 +18,8 @@ import { dispatchWallPostPush } from "@/lib/push-dispatch.functions";
 type Profile = { id: string; full_name: string | null; avatar_url: string | null };
 type Comment = { id: string; post_id: string; author_user_id: string; body: string; created_at: string; author?: Profile | null };
 type PostSource = "clubero" | "instagram" | "facebook" | "twitter";
+type AudienceType = "club" | "team" | "multi_team";
+type Team = { id: string; name: string };
 type Post = {
   id: string;
   club_id: string;
@@ -30,10 +32,13 @@ type Post = {
   external_id: string | null;
   external_url: string | null;
   external_media_url: string | null;
+  audience_team_ids: string[] | null;
+  audience_type: AudienceType;
   author?: Profile | null;
   comments?: Comment[];
   reads?: { user_id: string; read_at: string }[];
 };
+
 
 const SOURCE_META: Record<Exclude<PostSource, "clubero">, { label: string; cls: string }> = {
   instagram: { label: "Instagram", cls: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30" },
@@ -54,6 +59,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [memberCount, setMemberCount] = useState(0);
+  // Targetable teams for the audience picker; computed from club teams + user rights.
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
+  const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
+  // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
+  const [audience, setAudience] = useState<string[] | null>(null);
 
   async function load() {
     setLoading(true);
@@ -63,12 +73,13 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url")
+      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type")
       .eq("club_id", clubId)
       .is("deleted_at", null)
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
+
     // Dedupe by id (realtime + initial fetch sometimes overlap)
     const seen = new Set<string>();
     const ps = ((rawPosts ?? []) as Post[]).filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true)));
@@ -153,6 +164,56 @@ export function WallFeed({ clubId }: { clubId: string }) {
     // eslint-disable-next-line
   }, [clubId]);
 
+  // Load club teams + compute targetable subset for the audience picker.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data: teamRows } = await supabase
+        .from("teams")
+        .select("id, name")
+        .eq("club_id", clubId)
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
+      if (cancelled) return;
+      const all = (teamRows ?? []) as Team[];
+      setAllTeams(all);
+
+      const isPriv = roles.includes("admin") || roles.includes("dirigeant");
+      let targetable: Team[] = [];
+      if (isPriv || roles.includes("coach")) {
+        // Club-wide coach / admin / dirigeant → every team is targetable.
+        targetable = all;
+      } else {
+        // Team-level staff only → keep teams where the user has a non-player role.
+        const { data: tm } = await supabase
+          .from("team_members")
+          .select("team_id")
+          .eq("user_id", user.id)
+          .in("team_id", all.map((t) => t.id));
+        const allowed = new Set((tm ?? []).map((r) => (r as any).team_id as string));
+        targetable = all.filter((t) => allowed.has(t.id));
+      }
+      if (cancelled) return;
+      setTargetableTeams(targetable);
+
+      // Preselection rules (nuancées) :
+      // - admin / dirigeant → club-wide (null).
+      // - coach with exactly one targetable team → preselect that team.
+      // - coach with several teams → leave empty (force an explicit choice).
+      if (isPriv) {
+        setAudience(null);
+      } else if (targetable.length === 1) {
+        setAudience([targetable[0].id]);
+      } else {
+        setAudience([]);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line
+  }, [clubId, user?.id, roles.join("|")]);
+
+
   async function notifyMentioned(ids: string[], link: string, snippet: string) {
     if (!user || ids.length === 0) return;
     const recipients = ids.filter((id) => id !== user.id);
@@ -171,10 +232,29 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
   async function submitPost() {
     if ((!body.trim() && atts.length === 0) || !user) return;
+
+    // Resolve final audience for the insert.
+    //   null         → "Tout le club"
+    //   [] (forced)  → coach must pick at least one team
+    //   [ids]        → team-scoped (1 or many)
+    const isPriv = roles.includes("admin") || roles.includes("dirigeant");
+    const audienceForInsert: string[] | null =
+      audience === null ? null : audience.length === 0 ? null : audience;
+    if (!isPriv && audienceForInsert === null && audience !== null) {
+      toast.error(t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe ou « Tout le club »." }));
+      return;
+    }
+
     setPosting(true);
     const { data, error } = await supabase
       .from("wall_posts")
-      .insert({ club_id: clubId, author_user_id: user.id, body: body.trim(), attachments: atts as unknown as never })
+      .insert({
+        club_id: clubId,
+        author_user_id: user.id,
+        body: body.trim(),
+        attachments: atts as unknown as never,
+        audience_team_ids: audienceForInsert as unknown as never,
+      })
       .select("id")
       .single();
     setPosting(false);
@@ -185,13 +265,54 @@ export function WallFeed({ clubId }: { clubId: string }) {
     }
     if (data?.id) {
       const authorName = (await supabase.from("profiles").select("full_name").eq("id", user.id).single()).data?.full_name ?? "—";
-      const { data: members } = await supabase
-        .from("club_members")
-        .select("user_id")
-        .eq("club_id", clubId);
-      const recipients = (members ?? [])
-        .map((m) => m.user_id)
-        .filter((uid) => uid !== user.id && !mentioned.includes(uid));
+
+      // Recipient set for in-app notifications must mirror the post audience
+      // (same rule as push dispatch / RLS) — never notify someone who can't see the post.
+      const recipientSet = new Set<string>();
+      if (audienceForInsert === null) {
+        const { data: members } = await supabase
+          .from("club_members").select("user_id").eq("club_id", clubId);
+        for (const m of members ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+      } else {
+        // Admins/dirigeants always see every post.
+        const { data: priv } = await supabase
+          .from("club_members").select("user_id, role").eq("club_id", clubId)
+          .in("role", ["admin", "dirigeant"]);
+        for (const m of priv ?? []) {
+          const uid = (m as any).user_id as string | null;
+          if (uid) recipientSet.add(uid);
+        }
+        const { data: tm } = await supabase
+          .from("team_members").select("user_id, player_id").in("team_id", audienceForInsert);
+        const playerIds: string[] = [];
+        for (const r of tm ?? []) {
+          const uid = (r as any).user_id as string | null;
+          const pid = (r as any).player_id as string | null;
+          if (uid) recipientSet.add(uid);
+          if (pid) playerIds.push(pid);
+        }
+        if (playerIds.length) {
+          const { data: pls } = await supabase
+            .from("players").select("user_id").in("id", playerIds);
+          for (const p of pls ?? []) {
+            const uid = (p as any).user_id as string | null;
+            if (uid) recipientSet.add(uid);
+          }
+          const { data: parents } = await supabase
+            .from("player_parents").select("parent_user_id").in("player_id", playerIds);
+          for (const pr of parents ?? []) {
+            const uid = (pr as any).parent_user_id as string | null;
+            if (uid) recipientSet.add(uid);
+          }
+        }
+      }
+      recipientSet.delete(user.id);
+      for (const m of mentioned) recipientSet.delete(m);
+
+      const recipients = Array.from(recipientSet);
       if (recipients.length) {
         const snippet = body.trim() || t("wall.newAttachment", { defaultValue: "Nouvelle pièce jointe" });
         await supabase.from("notifications").insert(
@@ -205,7 +326,7 @@ export function WallFeed({ clubId }: { clubId: string }) {
         );
       }
     }
-    // Web Push fire-and-forget — membres du club, hors auteur (et hors mentions déjà notifiées)
+    // Web Push fire-and-forget (server re-derives audience from the post).
     if (data?.id) {
       void (async () => {
         try {
@@ -217,7 +338,12 @@ export function WallFeed({ clubId }: { clubId: string }) {
     }
     setBody("");
     setAtts([]);
+    // Reset audience to the per-role default for the next post.
+    if (isPriv) setAudience(null);
+    else if (targetableTeams.length === 1) setAudience([targetableTeams[0].id]);
+    else setAudience([]);
   }
+
 
   async function deletePost(id: string) {
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "wall_post", _id: id });
@@ -244,6 +370,15 @@ export function WallFeed({ clubId }: { clubId: string }) {
   }
 
   const canPost = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const teamsById = useMemo(() => {
+    const m = new Map<string, Team>();
+    for (const tt of allTeams) m.set(tt.id, tt);
+    return m;
+  }, [allTeams]);
+  const audienceMissing =
+    canPost &&
+    !(roles.includes("admin") || roles.includes("dirigeant")) &&
+    audience !== null && audience.length === 0;
 
   return (
     <div className="space-y-4">
@@ -256,9 +391,20 @@ export function WallFeed({ clubId }: { clubId: string }) {
             placeholder={t("wall.placeholder")}
             rows={3}
           />
+          <AudiencePicker
+            teams={targetableTeams}
+            value={audience}
+            onChange={setAudience}
+            canPickClubWide={roles.includes("admin") || roles.includes("dirigeant") || targetableTeams.length === allTeams.length}
+          />
           <AttachmentPicker value={atts} onChange={setAtts} prefix="wall" />
-          <div className="flex justify-end">
-            <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0)}>
+          <div className="flex items-center justify-between gap-2">
+            {audienceMissing ? (
+              <p className="text-xs text-destructive">
+                {t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe." })}
+              </p>
+            ) : <span />}
+            <Button onClick={submitPost} disabled={posting || (!body.trim() && atts.length === 0) || audienceMissing}>
               {posting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Send className="h-4 w-4 mr-1.5" />{t("wall.post")}</>}
             </Button>
           </div>
@@ -272,12 +418,123 @@ export function WallFeed({ clubId }: { clubId: string }) {
         commentsEnabled={commentsEnabled}
         canPin={canPost}
         memberCount={memberCount}
+        teamsById={teamsById}
         onDelete={deletePost}
         onTogglePin={togglePin}
       />
     </div>
   );
 }
+
+// Inline audience picker — "À : Tout le club | U13 | U15 …"
+function AudiencePicker({
+  teams,
+  value,
+  onChange,
+  canPickClubWide,
+}: {
+  teams: Team[];
+  value: string[] | null;
+  onChange: (next: string[] | null) => void;
+  canPickClubWide: boolean;
+}) {
+  const { t } = useTranslation();
+  const isClubWide = value === null;
+  function toggleTeam(id: string) {
+    if (value === null) { onChange([id]); return; }
+    if (value.includes(id)) {
+      const next = value.filter((x) => x !== id);
+      onChange(next);
+    } else {
+      onChange([...value, id]);
+    }
+  }
+  if (teams.length === 0 && !canPickClubWide) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="text-xs font-medium text-muted-foreground mr-1">
+        {t("wall.audienceTo", { defaultValue: "À :" })}
+      </span>
+      {canPickClubWide && (
+        <button
+          type="button"
+          onClick={() => onChange(null)}
+          className={cn(
+            "text-xs px-2.5 py-1 rounded-full border transition-colors",
+            isClubWide
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-background text-foreground border-border hover:bg-accent",
+          )}
+        >
+          {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
+        </button>
+      )}
+      {teams.map((tt) => {
+        const active = !isClubWide && (value ?? []).includes(tt.id);
+        return (
+          <button
+            key={tt.id}
+            type="button"
+            onClick={() => toggleTeam(tt.id)}
+            className={cn(
+              "text-xs px-2.5 py-1 rounded-full border transition-colors",
+              active
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-background text-foreground border-border hover:bg-accent",
+            )}
+          >
+            {tt.name}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// Reusable audience badge — used on each post in the feed.
+// Mirrors push scopeLabel logic; "Tout le club" is the only translated label,
+// team names are data (not translated). Deleted/unknown teams are filtered out;
+// if none survive, we surface a discreet "Audience restreinte" hint so admins
+// understand why the post is now narrower than originally targeted.
+function AudienceBadge({ post, teamsById }: { post: Post; teamsById: Map<string, Team> }) {
+  const { t } = useTranslation();
+  if (post.audience_team_ids === null) {
+    return (
+      <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30">
+        {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
+      </span>
+    );
+  }
+  const live = post.audience_team_ids
+    .map((id) => teamsById.get(id))
+    .filter((x): x is Team => !!x);
+  if (live.length === 0) {
+    return (
+      <span
+        className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-muted text-muted-foreground border-border"
+        title={t("wall.scope.restrictedTitle", { defaultValue: "Toutes les équipes ciblées ont été supprimées — visible des admins uniquement." })}
+      >
+        {t("wall.scope.restricted", { defaultValue: "Audience restreinte" })}
+      </span>
+    );
+  }
+  let label: string;
+  if (live.length === 1) label = live[0].name;
+  else if (live.length === 2) label = `${live[0].name} + ${live[1].name}`;
+  else label = t("wall.scope.plusOthers", { defaultValue: "{{first}} + {{n}} autres", first: live[0].name, n: live.length - 1 });
+  const tooltip = live.map((tt) => tt.name).join(" · ");
+  return (
+    <span
+      className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30"
+      title={tooltip}
+    >
+      {label}
+    </span>
+  );
+}
+
+
+
 
 function WallGrouped({
   posts,
@@ -286,6 +543,7 @@ function WallGrouped({
   commentsEnabled,
   canPin,
   memberCount,
+  teamsById,
   onDelete,
   onTogglePin,
 }: {
@@ -295,9 +553,11 @@ function WallGrouped({
   commentsEnabled: boolean;
   canPin: boolean;
   memberCount: number;
+  teamsById: Map<string, Team>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
+
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
@@ -363,7 +623,9 @@ function WallGrouped({
                   {sourceMeta.label}
                 </span>
               )}
+              <AudienceBadge post={p} teamsById={teamsById} />
             </div>
+
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
               {canPin && !isExternal && (
                 <button

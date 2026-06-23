@@ -1136,7 +1136,15 @@
     "commentPlaceholder": "Schrijf een antwoord…",
     "empty": "Nog geen berichten. Wees de eerste!",
     "noClub": "Word lid van een Club of maak er een aan om het prikbord te zien.",
-    "mentionTitle": "{{name}} heeft je genoemd"
+    "mentionTitle": "{{name}} heeft je genoemd",
+    "scope": {
+      "allClub": "Hele club",
+      "restricted": "Beperkt publiek",
+      "restrictedTitle": "Alle gerichte teams zijn verwijderd — alleen zichtbaar voor admins.",
+      "plusOthers": "{{first}} + {{n}} andere"
+    },
+    "audienceTo": "Aan:",
+    "audienceRequired": "Kies minstens één team."
   },
   "chat": {
     "title": "Evenementchat",

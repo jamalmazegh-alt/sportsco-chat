@@ -4941,6 +4941,8 @@ export type Database = {
       wall_posts: {
         Row: {
           attachments: Json
+          audience_team_ids: string[] | null
+          audience_type: string
           author_user_id: string | null
           body: string
           club_id: string
@@ -4955,6 +4957,8 @@ export type Database = {
         }
         Insert: {
           attachments?: Json
+          audience_team_ids?: string[] | null
+          audience_type?: string
           author_user_id?: string | null
           body: string
           club_id: string
@@ -4969,6 +4973,8 @@ export type Database = {
         }
         Update: {
           attachments?: Json
+          audience_team_ids?: string[] | null
+          audience_type?: string
           author_user_id?: string | null
           body?: string
           club_id?: string
@@ -5383,6 +5389,10 @@ export type Database = {
       }
       user_can_email_recipient: {
         Args: { _email: string; _user_id: string }
+        Returns: boolean
+      }
+      user_in_wall_post_audience: {
+        Args: { _post_id: string; _user: string }
         Returns: boolean
       }
       users_share_club: { Args: { _a: string; _b: string }; Returns: boolean }

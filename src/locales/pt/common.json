@@ -1136,7 +1136,15 @@
     "commentPlaceholder": "Escreva uma resposta…",
     "empty": "Ainda não há publicações. Seja o primeiro!",
     "noClub": "Junte-se a um clube ou crie um para ver o mural.",
-    "mentionTitle": "{{name}} mencionou-o"
+    "mentionTitle": "{{name}} mencionou-o",
+    "scope": {
+      "allClub": "Todo o clube",
+      "restricted": "Público restrito",
+      "restrictedTitle": "Todas as equipas selecionadas foram apagadas — visível apenas para admins.",
+      "plusOthers": "{{first}} + {{n}} outras"
+    },
+    "audienceTo": "Para:",
+    "audienceRequired": "Escolha pelo menos uma equipa."
   },
   "chat": {
     "title": "Chat do Evento",
