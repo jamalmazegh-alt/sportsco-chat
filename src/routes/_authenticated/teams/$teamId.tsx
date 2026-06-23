@@ -591,7 +591,7 @@ function TeamDetail() {
         </Sheet>
       )}
 
-      {isCoach && <CollapsibleTeamStats teamId={teamId} />}
+      <CollapsibleTeamStats teamId={teamId} defaultOpen={!isCoach} />
 
       {isCoach && team?.club_id && (
         <UpcomingAbsencesWidget clubId={team.club_id} />
