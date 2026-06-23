@@ -552,8 +552,9 @@ function HomePage() {
           ) : (
             <ul className="space-y-2">
               {playerHomeEvents.map((e: any, idx: number) => {
-                const actionRequired = e.convocation?.status === "pending";
-                const isFirst = idx === 0 && !actionRequired;
+                const isCancelled = e.status === "cancelled";
+                const actionRequired = !isCancelled && e.convocation?.status === "pending";
+                const isFirst = idx === 0 && !actionRequired && !isCancelled;
                 return (
                   <li key={e.id}>
                     <Link
@@ -561,11 +562,13 @@ function HomePage() {
                       params={{ eventId: e.id }}
                       className={cn(
                         "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
-                        actionRequired
-                          ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
-                          : isFirst
-                            ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
-                            : "border-border bg-card hover:border-border",
+                        isCancelled
+                          ? "border-red-400/70 bg-red-50/40 dark:bg-red-950/20"
+                          : actionRequired
+                            ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
+                            : isFirst
+                              ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                              : "border-border bg-card hover:border-border",
                       )}
                     >
                       {isFirst && (
@@ -580,8 +583,16 @@ function HomePage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p className={cn("font-bold truncate text-foreground", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
-                            {actionRequired && (
+                            <p className={cn(
+                              "font-bold truncate text-foreground",
+                              isFirst ? "text-[15px]" : "text-sm",
+                              isCancelled && "line-through text-red-700 dark:text-red-300",
+                            )}>{e.title}</p>
+                            {isCancelled ? (
+                              <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
+                                {t("events.status.cancelled", { defaultValue: "Annulé" })}
+                              </span>
+                            ) : actionRequired && (
                               <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-[#f59e0b] text-white shrink-0">
                                 {t("dashboard.actionRequired")}
                               </span>
