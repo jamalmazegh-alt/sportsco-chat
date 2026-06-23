@@ -14,11 +14,8 @@ import i18n from "@/lib/i18n";
 import { isV2 } from "@/config/features";
 
 export const Route = createFileRoute("/_authenticated/follow-ups")({
-  // Bêta V1 : feature masquée derrière `social_network_v2`.
-  beforeLoad: () => {
-    if (!isV2("social_network_v2")) throw redirect({ to: "/home", replace: true });
-  },
   component: FollowUpsPage,
+
   head: () => ({
     meta: [
       { title: i18n.t("meta.followUps.title") },
