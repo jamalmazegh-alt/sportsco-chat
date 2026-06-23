@@ -263,7 +263,8 @@
     "remove": "Entfernen",
     "clear": "Leeren",
     "listen": "Anhören",
-    "stop": "Stoppen"
+    "stop": "Stoppen",
+    "errorOccurred": "Ein Fehler ist aufgetreten"
   },
   "notFound": {
     "code": "404",
@@ -2022,5 +2023,30 @@
       "summary": "Alles bereit"
     },
     "skip": "Überspringen"
+  },
+  "urgency": {
+    "empty": {
+      "title": "Alles unter Kontrolle",
+      "subtitle": "Keine dringende Aktion"
+    },
+    "error": {
+      "title": "Notfallzentrum nicht verfügbar",
+      "hint": "Signale konnten nicht geladen werden. Bitte gleich erneut versuchen."
+    },
+    "partialError": "Einige Quellen sind nicht verfügbar, die Liste kann unvollständig sein.",
+    "cta": {
+      "respond": "Antworten",
+      "open": "Öffnen"
+    },
+    "coach": {
+      "convocationSilence_one": "{{count}} ohne Antwort",
+      "convocationSilence_other": "{{count}} ohne Antwort",
+      "reducedSquadTitle": "Reduzierter Kader",
+      "reducedSquadSubtitle_one": "{{count}} Spieler in 14 Tagen nicht verfügbar",
+      "reducedSquadSubtitle_other": "{{count}} Spieler in 14 Tagen nicht verfügbar"
+    },
+    "self": {
+      "convocationSilence": "Du hast nicht geantwortet"
+    }
   }
 }

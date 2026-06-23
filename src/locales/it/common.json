@@ -263,7 +263,8 @@
     "remove": "Rimuovi",
     "clear": "Cancella",
     "listen": "Ascolta",
-    "stop": "Ferma"
+    "stop": "Ferma",
+    "errorOccurred": "Si è verificato un errore"
   },
   "notFound": {
     "code": "404",
@@ -2022,5 +2023,30 @@
       "summary": "Tutto pronto"
     },
     "skip": "Salta"
+  },
+  "urgency": {
+    "empty": {
+      "title": "Tutto sotto controllo",
+      "subtitle": "Nessuna azione urgente"
+    },
+    "error": {
+      "title": "Centro emergenze non disponibile",
+      "hint": "Impossibile caricare i segnali. Riprova tra un istante."
+    },
+    "partialError": "Alcune fonti non sono disponibili, l'elenco potrebbe essere incompleto.",
+    "cta": {
+      "respond": "Rispondi",
+      "open": "Apri"
+    },
+    "coach": {
+      "convocationSilence_one": "{{count}} senza risposta",
+      "convocationSilence_other": "{{count}} senza risposta",
+      "reducedSquadTitle": "Rosa ridotta",
+      "reducedSquadSubtitle_one": "{{count}} giocatore non disponibile in 14g",
+      "reducedSquadSubtitle_other": "{{count}} giocatori non disponibili in 14g"
+    },
+    "self": {
+      "convocationSilence": "Non hai risposto"
+    }
   }
 }
