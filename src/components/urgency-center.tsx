@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { useUrgencies } from "@/lib/urgency/use-urgencies";
 import { dispatchUrgencyAction } from "@/lib/urgency/dispatcher";
+import { selectSurfaceState } from "@/lib/urgency/pure";
 import { remindAllForEvent } from "@/lib/urgency/remind";
 import type { UrgencyAction, UrgencyItem, UrgencySeverity } from "@/lib/urgency/types";
 
@@ -52,9 +53,10 @@ export function UrgencyCenter({ className }: Props) {
   const { items, status } = useUrgencies();
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
 
-  // Lattice de surface (cf. types.ts).
-  // 1. pending → skeleton (jamais SuccessBanner)
-  if (status.phase === "pending") {
+  const surface = selectSurfaceState(status, items.length);
+  const hasFailures = status.failedSources.length > 0;
+
+  if (surface === "pending") {
     return (
       <section className={cn("space-y-2", className)}>
         <Skeleton className="h-20 w-full rounded-[16px]" />
@@ -63,10 +65,7 @@ export function UrgencyCenter({ className }: Props) {
     );
   }
 
-  const hasFailures = status.failedSources.length > 0;
-
-  // 2. settled · failed ≠ ∅ · items = ∅ → bandeau erreur + retry
-  if (hasFailures && items.length === 0) {
+  if (surface === "error") {
     return (
       <section
         className={cn(
