@@ -1136,7 +1136,15 @@
     "commentPlaceholder": "Write a reply…",
     "empty": "No posts yet. Be the first to share!",
     "noClub": "Join or create a club to see the wall.",
-    "mentionTitle": "{{name}} mentioned you"
+    "mentionTitle": "{{name}} mentioned you",
+    "scope": {
+      "allClub": "Whole club",
+      "restricted": "Restricted audience",
+      "restrictedTitle": "All targeted teams have been deleted — visible to admins only.",
+      "plusOthers": "{{first}} + {{n}} more"
+    },
+    "audienceTo": "To:",
+    "audienceRequired": "Pick at least one team."
   },
   "chat": {
     "title": "Event chat",

@@ -1136,7 +1136,15 @@
     "commentPlaceholder": "Écrire une réponse…",
     "empty": "Aucune publication. Soyez le premier !",
     "noClub": "Rejoignez ou créez un club pour voir le mur.",
-    "mentionTitle": "{{name}} vous a mentionné"
+    "mentionTitle": "{{name}} vous a mentionné",
+    "scope": {
+      "allClub": "Tout le club",
+      "restricted": "Audience restreinte",
+      "restrictedTitle": "Toutes les équipes ciblées ont été supprimées — visible des admins uniquement.",
+      "plusOthers": "{{first}} + {{n}} autres"
+    },
+    "audienceTo": "À :",
+    "audienceRequired": "Choisissez au moins une équipe."
   },
   "chat": {
     "title": "Chat de l'événement",

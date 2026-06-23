@@ -1136,7 +1136,15 @@
     "commentPlaceholder": "Scrivi una risposta…",
     "empty": "Ancora nessun post. Sii il primo!",
     "noClub": "Unisciti a un Club o creane uno per vedere la bacheca.",
-    "mentionTitle": "{{name}} ti ha menzionato"
+    "mentionTitle": "{{name}} ti ha menzionato",
+    "scope": {
+      "allClub": "Tutto il club",
+      "restricted": "Pubblico ristretto",
+      "restrictedTitle": "Tutte le squadre selezionate sono state eliminate — visibile solo agli admin.",
+      "plusOthers": "{{first}} + {{n}} altre"
+    },
+    "audienceTo": "A:",
+    "audienceRequired": "Scegli almeno una squadra."
   },
   "chat": {
     "title": "Chat evento",

@@ -1136,7 +1136,15 @@
     "commentPlaceholder": "Eine Antwort schreiben…",
     "empty": "Noch keine Beiträge. Sei der Erste!",
     "noClub": "Tritt einem Verein bei oder erstelle einen, um die Pinnwand zu sehen.",
-    "mentionTitle": "{{name}} hat dich erwähnt"
+    "mentionTitle": "{{name}} hat dich erwähnt",
+    "scope": {
+      "allClub": "Ganzer Verein",
+      "restricted": "Eingeschränkte Sichtbarkeit",
+      "restrictedTitle": "Alle gezielten Teams wurden gelöscht — nur für Admins sichtbar.",
+      "plusOthers": "{{first}} + {{n}} weitere"
+    },
+    "audienceTo": "An:",
+    "audienceRequired": "Wähle mindestens ein Team."
   },
   "chat": {
     "title": "Event-Chat",
