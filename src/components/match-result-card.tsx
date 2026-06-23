@@ -291,7 +291,7 @@ export function MatchResultCard({
       ? { label: t("match.outcomeWin", { defaultValue: "Victoire" }), cls: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white ring-emerald-500/30" }
       : outcome === "loss"
       ? { label: t("match.outcomeLoss", { defaultValue: "Défaite" }), cls: "bg-rose-500/15 text-rose-500 ring-rose-500/30" }
-      : { label: t("match.outcomeDraw", { defaultValue: "Nul" }), cls: "bg-slate-100 text-foreground ring-slate-200" };
+      : { label: t("match.outcomeDraw", { defaultValue: "Nul" }), cls: "bg-muted text-muted-foreground ring-border" };
 
   return (
     <section className="rounded-2xl border-[1.5px] border-border bg-card text-card-foreground shadow-sm overflow-hidden">
