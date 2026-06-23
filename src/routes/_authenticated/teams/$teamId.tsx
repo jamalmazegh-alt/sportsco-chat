@@ -156,6 +156,30 @@ function TeamDetail() {
     },
   });
 
+  // Players linked to the current user (as player or parent) — pinned at top
+  // when the viewer is not a coach.
+  const { data: myPlayerIds } = useQuery({
+    queryKey: ["team-my-player-ids", teamId, user?.id],
+    enabled: !!user && !isCoach && !!players && players.length > 0,
+    queryFn: async () => {
+      const set = new Set<string>();
+      for (const p of (players ?? []) as any[]) {
+        if (p.user_id && p.user_id === user!.id) set.add(p.id);
+      }
+      const ids = (players ?? []).map((p: any) => p.id);
+      if (ids.length > 0) {
+        const { data } = await supabase
+          .from("player_parents")
+          .select("player_id")
+          .eq("parent_user_id", user!.id)
+          .in("player_id", ids);
+        (data ?? []).forEach((r: any) => set.add(r.player_id));
+      }
+      return set;
+    },
+  });
+
+
   // Selection state for bulk invitations
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
