@@ -59,6 +59,11 @@ export function WallFeed({ clubId }: { clubId: string }) {
   const [loading, setLoading] = useState(true);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [memberCount, setMemberCount] = useState(0);
+  // Targetable teams for the audience picker; computed from club teams + user rights.
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
+  const [targetableTeams, setTargetableTeams] = useState<Team[]>([]);
+  // null = "Tout le club"; [] = nothing selected yet (forces explicit choice for multi-team coaches).
+  const [audience, setAudience] = useState<string[] | null>(null);
 
   async function load() {
     setLoading(true);
@@ -68,12 +73,13 @@ export function WallFeed({ clubId }: { clubId: string }) {
 
     const { data: rawPosts } = await supabase
       .from("wall_posts")
-      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url")
+      .select("id, club_id, author_user_id, body, created_at, is_pinned, attachments, source, external_id, external_url, external_media_url, audience_team_ids, audience_type")
       .eq("club_id", clubId)
       .is("deleted_at", null)
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(50);
+
     // Dedupe by id (realtime + initial fetch sometimes overlap)
     const seen = new Set<string>();
     const ps = ((rawPosts ?? []) as Post[]).filter((p) => (seen.has(p.id) ? false : (seen.add(p.id), true)));
