@@ -101,7 +101,7 @@ function AuthLayout() {
     // the bottom nav, no club onboarding screen, consent gate, or wizard.
     if (isTournamentOrganizer) {
       return (
-        <div className="min-h-screen bg-background pb-[120px]">
+        <div className="min-h-screen bg-background pb-[164px]">
           <div className="mx-auto max-w-xl">
             <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
               <Outlet />
@@ -127,7 +127,7 @@ function AuthLayout() {
   return (
     <ConsentGate>
 
-      <div className="min-h-screen bg-background pb-[120px]">
+      <div className="min-h-screen bg-background pb-[164px]">
         <div className="mx-auto max-w-xl">
           <div className="sticky top-0 z-30 -mx-px border-b border-border/40 bg-background/75 backdrop-blur-xl">
             <div className="relative flex items-center justify-center px-3 py-3">
@@ -157,7 +157,7 @@ function AuthLayout() {
 function LockedClubShell({ children }: { children: ReactNode }) {
   return (
     <ConsentGate>
-      <div className="min-h-screen bg-background pb-[120px]">
+      <div className="min-h-screen bg-background pb-[164px]">
         <div className="mx-auto max-w-xl">{children}</div>
         <SupportFab />
         <AssistantFab />

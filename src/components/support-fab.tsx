@@ -17,10 +17,10 @@ export function SupportFab() {
       to="/support"
       aria-label={t("fab", { defaultValue: "Support" })}
       className={cn(
-        "fixed right-4 z-30 h-10 w-10 rounded-full bg-secondary text-secondary-foreground shadow-lg",
+        "fixed left-4 z-30 h-10 w-10 rounded-full bg-secondary text-secondary-foreground shadow-lg",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
-        // Stacked above the primary assistant FAB: 104 + 48 (primary h-12) + 11 (gap) = 163px
-        "bottom-[calc(env(safe-area-inset-bottom)+163px)]"
+        // Mirrors the primary FAB bottom (104) on the opposite side; top = 104 + 40 = 144.
+        "bottom-[calc(env(safe-area-inset-bottom)+104px)]"
       )}
     >
       <LifeBuoy className="h-4 w-4" />
