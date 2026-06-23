@@ -335,6 +335,7 @@ function WallGrouped({
     return (
       <li
         key={p.id}
+        id={`wall-post-${p.id}`}
         className={cn(
           "group flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden",
           "transition-all duration-200 hover:shadow-md hover:-translate-y-px",
