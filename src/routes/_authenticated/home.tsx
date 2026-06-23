@@ -293,14 +293,6 @@ function HomePage() {
         </Link>
       )}
 
-      {/* Insights (admins/coaches) */}
-      {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
-
-
-
-
-
-
       {/* Onboarding checklist (admins) */}
       {isAdmin && activeClubId && (
         <OnboardingChecklist
@@ -310,12 +302,84 @@ function HomePage() {
         />
       )}
 
-      {/* KPIs strip (admins/coaches) */}
-      {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
-
+      {/* Urgency: absences requiring attention (coaches/admins) */}
       {isCoach && activeClubId && <UpcomingAbsencesWidget clubId={activeClubId} />}
 
-      {/* Quick actions */}
+      {/* Next event(s) for coaches/admins */}
+      {isCoach && (
+        <section>
+          <div className="flex items-center justify-between mb-2.5 px-0.5">
+            <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
+              {t("dashboard.nextEvent")}
+            </h2>
+            <Link to="/events" className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
+              {t("dashboard.viewAll")}
+              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
+            </Link>
+          </div>
+          {!upcoming || upcoming.length === 0 ? (
+            <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
+              <p className="text-sm text-muted-foreground font-medium">{t("dashboard.noUpcoming")}</p>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {upcoming.map((e, idx) => {
+                const isFirst = idx === 0;
+                return (
+                  <li key={e.id}>
+                    <Link
+                      to="/events/$eventId"
+                      params={{ eventId: e.id }}
+                      className={cn(
+                        "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
+                        isFirst
+                          ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
+                          : "border-border bg-card hover:border-border",
+                      )}
+                    >
+                      {isFirst && (
+                        <div
+                          className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
+                          style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
+                        >
+                          ★ {t("dashboard.nextEvent")}
+                        </div>
+                      )}
+                      <div className={cn("flex items-center justify-between gap-3", isFirst ? "p-4" : "p-3.5")}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                            <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
+                            <p className={cn("font-bold truncate text-foreground", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5">
+                            <Calendar className="h-3 w-3" strokeWidth={2.4} />
+                            {formatWhen(new Date(e.starts_at))}
+                            {e.location && (
+                              <>
+                                <span>·</span>
+                                <MapPin className="h-3 w-3" strokeWidth={2.4} />
+                                <span className="truncate">{e.location}</span>
+                              </>
+                            )}
+                          </p>
+                        </div>
+                        <ChevronRight className={cn("shrink-0", isFirst ? "h-5 w-5 text-foreground" : "h-4 w-4 text-muted-foreground/70")} strokeWidth={2.4} />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {/* Stats: insights + KPIs (admins/coaches) */}
+      {isCoach && activeClubId && <InsightsSection clubId={activeClubId} />}
+      {isCoach && activeClubId && <AdminKpis clubId={activeClubId} />}
+
+      {/* Primary CTA + duo (quick cards) */}
       {isCoach && (
         <div className="space-y-3">
           {user && activeClubId && (
@@ -361,6 +425,7 @@ function HomePage() {
           )}
         </div>
       )}
+
 
       {/* For players/parents: quick absence declaration */}
       {!isCoach && myTeams && myTeams.length > 0 && (
@@ -549,76 +614,6 @@ function HomePage() {
         );
       })()}
 
-
-      {/* For coaches/admins: upcoming events for all teams */}
-      {isCoach && (
-        <section>
-          <div className="flex items-center justify-between mb-2.5 px-0.5">
-            <h2 className="text-[11px] font-bold text-foreground uppercase tracking-[0.14em]">
-              {t("dashboard.nextEvent")}
-            </h2>
-            <Link to="/events" className="text-[11px] text-foreground font-bold inline-flex items-center gap-0.5 hover:text-[#2d9d5f] transition-colors">
-              {t("dashboard.viewAll")}
-              <ChevronRight className="h-3 w-3" strokeWidth={2.6} />
-            </Link>
-          </div>
-          {!upcoming || upcoming.length === 0 ? (
-            <div className="rounded-[14px] border-[1.5px] border-dashed border-border bg-card p-8 text-center">
-              <Calendar className="mx-auto h-8 w-8 text-muted-foreground/70 mb-2" />
-              <p className="text-sm text-muted-foreground font-medium">{t("dashboard.noUpcoming")}</p>
-            </div>
-          ) : (
-            <ul className="space-y-2">
-              {upcoming.map((e, idx) => {
-                const isFirst = idx === 0;
-                return (
-                  <li key={e.id}>
-                    <Link
-                      to="/events/$eventId"
-                      params={{ eventId: e.id }}
-                      className={cn(
-                        "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
-                        isFirst
-                          ? "border-[#0f4a26] bg-card shadow-[0_4px_14px_rgba(15,74,38,0.18)]"
-                          : "border-border bg-card hover:border-border",
-                      )}
-                    >
-                      {isFirst && (
-                        <div
-                          className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
-                          style={{ background: "linear-gradient(135deg, #0f4a26 0%, #2d9d5f 100%)" }}
-                        >
-                          ★ {t("dashboard.nextEvent")}
-                        </div>
-                      )}
-                      <div className={cn("flex items-center justify-between gap-3", isFirst ? "p-4" : "p-3.5")}>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                            <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p className={cn("font-bold truncate text-foreground", isFirst ? "text-[15px]" : "text-sm")}>{e.title}</p>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5">
-                            <Calendar className="h-3 w-3" strokeWidth={2.4} />
-                            {formatWhen(new Date(e.starts_at))}
-                            {e.location && (
-                              <>
-                                <span>·</span>
-                                <MapPin className="h-3 w-3" strokeWidth={2.4} />
-                                <span className="truncate">{e.location}</span>
-                              </>
-                            )}
-                          </p>
-                        </div>
-                        <ChevronRight className={cn("shrink-0", isFirst ? "h-5 w-5 text-foreground" : "h-4 w-4 text-muted-foreground/70")} strokeWidth={2.4} />
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-      )}
     </div>
   );
 }

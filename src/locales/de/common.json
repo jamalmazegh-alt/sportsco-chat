@@ -402,7 +402,7 @@
     },
     "kpis": {
       "title": "Überblick",
-      "attendance30d": "Anwesenheit 30T",
+      "attendance30d": "Anwesenheitsquote (30T)",
       "playersAlert": "Spieler im Alarm",
       "playersAlertHint": "≥ 3 Abwesenheiten in 30T",
       "upcoming7d": "Bevorstehend (7T)",

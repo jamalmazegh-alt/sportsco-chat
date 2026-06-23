@@ -402,7 +402,7 @@
     },
     "kpis": {
       "title": "Overzicht",
-      "attendance30d": "Aanwezigheid 30D",
+      "attendance30d": "Aanwezigheidsgraad (30d)",
       "playersAlert": "Spelers in alarm",
       "playersAlertHint": "≥ 3 afwezigheden in 30D",
       "upcoming7d": "Aankomend (7D)",
