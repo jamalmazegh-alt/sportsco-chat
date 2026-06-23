@@ -625,7 +625,11 @@ function PlayerProfile() {
           {t("players.details")}
         </h2>
 
-        {canSeePrivate && (
+{(() => {
+          const canUploadPhoto =
+            isCoach || isParentOfThisPlayer || (isSelf && !minor);
+          if (!canUploadPhoto) return null;
+          return (
         <div className="space-y-1.5">
           <Label>{t("players.photo")}</Label>
           <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
@@ -642,7 +646,6 @@ function PlayerProfile() {
               accept="image/*"
               className="hidden"
               onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
-              disabled={!isCoach}
             />
           </label>
           {minor && player.media_consent_status !== "granted" && (
@@ -652,7 +655,8 @@ function PlayerProfile() {
             </p>
           )}
         </div>
-        )}
+          );
+        })()}
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
