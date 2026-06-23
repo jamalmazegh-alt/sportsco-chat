@@ -263,7 +263,8 @@
     "remove": "Retirer",
     "clear": "Effacer",
     "listen": "Écouter",
-    "stop": "Arrêter"
+    "stop": "Arrêter",
+    "errorOccurred": "Une erreur est survenue"
   },
   "notFound": {
     "code": "404",
@@ -2022,5 +2023,30 @@
       "summary": "Tout est prêt"
     },
     "skip": "Passer"
+  },
+  "urgency": {
+    "empty": {
+      "title": "Tout est sous contrôle",
+      "subtitle": "Aucune action urgente"
+    },
+    "error": {
+      "title": "Centre d'urgence indisponible",
+      "hint": "Impossible de charger les signaux. Réessaie dans un instant."
+    },
+    "partialError": "Certaines sources sont indisponibles, la liste peut être incomplète.",
+    "cta": {
+      "respond": "Répondre",
+      "open": "Ouvrir"
+    },
+    "coach": {
+      "convocationSilence_one": "{{count}} sans réponse",
+      "convocationSilence_other": "{{count}} sans réponse",
+      "reducedSquadTitle": "Effectif réduit",
+      "reducedSquadSubtitle_one": "{{count}} joueur indisponible sur 14j",
+      "reducedSquadSubtitle_other": "{{count}} joueurs indisponibles sur 14j"
+    },
+    "self": {
+      "convocationSilence": "Tu n'as pas répondu"
+    }
   }
 }

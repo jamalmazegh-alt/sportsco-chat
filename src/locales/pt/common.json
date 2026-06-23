@@ -263,7 +263,8 @@
     "remove": "Remover",
     "clear": "Limpar",
     "listen": "Ouvir",
-    "stop": "Parar"
+    "stop": "Parar",
+    "errorOccurred": "Ocorreu um erro"
   },
   "notFound": {
     "code": "404",
@@ -2022,5 +2023,30 @@
       "summary": "Tudo pronto"
     },
     "skip": "Saltar"
+  },
+  "urgency": {
+    "empty": {
+      "title": "Tudo sob controlo",
+      "subtitle": "Nenhuma ação urgente"
+    },
+    "error": {
+      "title": "Centro de urgências indisponível",
+      "hint": "Não foi possível carregar os sinais. Tenta novamente daqui a pouco."
+    },
+    "partialError": "Algumas fontes estão indisponíveis, a lista pode estar incompleta.",
+    "cta": {
+      "respond": "Responder",
+      "open": "Abrir"
+    },
+    "coach": {
+      "convocationSilence_one": "{{count}} sem resposta",
+      "convocationSilence_other": "{{count}} sem resposta",
+      "reducedSquadTitle": "Plantel reduzido",
+      "reducedSquadSubtitle_one": "{{count}} jogador indisponível em 14d",
+      "reducedSquadSubtitle_other": "{{count}} jogadores indisponíveis em 14d"
+    },
+    "self": {
+      "convocationSilence": "Não respondeste"
+    }
   }
 }

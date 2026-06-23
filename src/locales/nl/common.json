@@ -263,7 +263,8 @@
     "remove": "Verwijderen",
     "clear": "Wissen",
     "listen": "Luisteren",
-    "stop": "Stoppen"
+    "stop": "Stoppen",
+    "errorOccurred": "Er is een fout opgetreden"
   },
   "notFound": {
     "code": "404",
@@ -2022,5 +2023,30 @@
       "summary": "Alles klaar"
     },
     "skip": "Overslaan"
+  },
+  "urgency": {
+    "empty": {
+      "title": "Alles onder controle",
+      "subtitle": "Geen dringende actie"
+    },
+    "error": {
+      "title": "Urgentiecentrum niet beschikbaar",
+      "hint": "Signalen konden niet worden geladen. Probeer het zo opnieuw."
+    },
+    "partialError": "Sommige bronnen zijn niet beschikbaar, de lijst kan onvolledig zijn.",
+    "cta": {
+      "respond": "Reageren",
+      "open": "Openen"
+    },
+    "coach": {
+      "convocationSilence_one": "{{count}} zonder reactie",
+      "convocationSilence_other": "{{count}} zonder reactie",
+      "reducedSquadTitle": "Beperkte selectie",
+      "reducedSquadSubtitle_one": "{{count}} speler niet beschikbaar in 14d",
+      "reducedSquadSubtitle_other": "{{count}} spelers niet beschikbaar in 14d"
+    },
+    "self": {
+      "convocationSilence": "Je hebt niet geantwoord"
+    }
   }
 }

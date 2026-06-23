@@ -263,7 +263,8 @@
     "remove": "Remove",
     "clear": "Clear",
     "listen": "Listen",
-    "stop": "Stop"
+    "stop": "Stop",
+    "errorOccurred": "An error occurred"
   },
   "notFound": {
     "code": "404",
@@ -2022,5 +2023,30 @@
       "summary": "All set"
     },
     "skip": "Skip"
+  },
+  "urgency": {
+    "empty": {
+      "title": "All under control",
+      "subtitle": "No urgent action"
+    },
+    "error": {
+      "title": "Urgency center unavailable",
+      "hint": "Couldn't load signals. Try again in a moment."
+    },
+    "partialError": "Some sources are unavailable, the list may be incomplete.",
+    "cta": {
+      "respond": "Respond",
+      "open": "Open"
+    },
+    "coach": {
+      "convocationSilence_one": "{{count}} no response",
+      "convocationSilence_other": "{{count}} no response",
+      "reducedSquadTitle": "Reduced squad",
+      "reducedSquadSubtitle_one": "{{count}} player unavailable in 14d",
+      "reducedSquadSubtitle_other": "{{count}} players unavailable in 14d"
+    },
+    "self": {
+      "convocationSilence": "You haven't replied"
+    }
   }
 }
