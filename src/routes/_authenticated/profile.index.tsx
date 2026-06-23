@@ -221,9 +221,46 @@ function ProfilePage() {
       </div>
 
       {isAdmin && (
+        <Link
+          to={tournamentOnly ? "/admin/settings/payments" : "/admin"}
+          className="group flex items-center gap-3 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-4 active:scale-[0.99] transition-all hover:border-primary/40 hover:shadow-sm"
+        >
+          <div className="h-11 w-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-foreground">
+              {t("nav.manageClub", { defaultValue: "Gérer le club" })}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {t("nav.manageClubSubtitle", { defaultValue: "Paramètres, membres, abonnement" })}
+            </p>
+          </div>
+          <ChevronRight className="h-4 w-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      )}
 
+      {user?.email && (
+        <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Mail className="h-5 w-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+              {t("profile.email", { defaultValue: "Adresse email" })}
+            </p>
+            <a
+              href={`mailto:${user.email}`}
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors break-all"
+            >
+              {user.email}
+            </a>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+
         <div className="space-y-1.5">
           <Label>{t("profile.preferredLanguage")}</Label>
           <LanguageSwitcher
