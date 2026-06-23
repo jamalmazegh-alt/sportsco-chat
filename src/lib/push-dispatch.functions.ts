@@ -191,80 +191,160 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => WallInput.parse(input))
   .handler(async ({ data, context }) => {
-    console.log("[push] wall handler START", { postId: data.postId, userId: context.userId });
+    console.log("[push] wall handler START v4", { postId: data.postId, userId: context.userId });
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendPushToUser } = await import("@/lib/push-send.server");
 
-    const { data: post, error: postErr } = await supabaseAdmin
+    // 1) Idempotence — atomic insert; on conflict skip the whole dispatch.
+    const { error: dedupErr } = await supabaseAdmin
+      .from("push_dispatch_log")
+      .insert({ kind: "wall_post", ref_id: data.postId });
+    if (dedupErr) {
+      console.log("[push] wall BAIL already dispatched", { postId: data.postId, code: dedupErr.code });
+      return { dispatched: 0, deduped: true };
+    }
+
+    const { data: post } = await supabaseAdmin
       .from("wall_posts")
-      .select("id, club_id, body, author_user_id")
+      .select("id, club_id, author_user_id, deleted_at")
       .eq("id", data.postId)
       .maybeSingle();
-    if (postErr) console.warn("[push] wall post fetch error", postErr.message);
-    if (!post) {
-      console.log("[push] wall BAIL no post", { postId: data.postId });
+    if (!post || (post as any).deleted_at) {
+      console.log("[push] wall BAIL no post or deleted");
       return { dispatched: 0 };
     }
 
-    // Gate: wall_new_post
+    // Gate: wall_new_post (per-club admin setting)
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
-    const settings = await getClubNotifSettings((post as any).club_id as string | null);
-    console.log("[push] wall settings", { clubId: (post as any).club_id, wall_new_post: settings.wall_new_post });
+    const clubId = (post as any).club_id as string;
+    const settings = await getClubNotifSettings(clubId);
     if (!settings.wall_new_post) {
       console.log("[push] wall BAIL settings disabled");
       return { dispatched: 0 };
     }
 
-    const { data: author } = await supabaseAdmin
-      .from("profiles")
-      .select("full_name, first_name")
-      .eq("id", (post as any).author_user_id)
-      .maybeSingle();
+    // Resolve author display name + club name (used in body, NOT post content).
+    const [{ data: author }, { data: club }] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select("full_name, first_name, last_name")
+        .eq("id", (post as any).author_user_id)
+        .maybeSingle(),
+      supabaseAdmin.from("clubs").select("name").eq("id", clubId).maybeSingle(),
+    ]);
     const authorName =
-      ((author as any)?.first_name as string) ||
-      ((author as any)?.full_name as string)?.split(" ")[0] ||
+      ([(author as any)?.first_name, (author as any)?.last_name].filter(Boolean).join(" ").trim()) ||
+      ((author as any)?.full_name as string) ||
       "Un membre";
+    const clubName = ((club as any)?.name as string) || "votre club";
 
-    const raw = ((post as any).body as string) || "";
-    const trimmed = raw.length > 60 ? `${raw.slice(0, 57).trim()}…` : raw;
-
-    const { data: members, error: memErr } = await supabaseAdmin
+    // 2) Candidate recipients = club members minus author.
+    const { data: members } = await supabaseAdmin
       .from("club_members")
       .select("user_id")
-      .eq("club_id", (post as any).club_id);
-    if (memErr) console.warn("[push] wall members fetch error", memErr.message);
+      .eq("club_id", clubId);
+    const candidates = new Set<string>();
+    for (const m of members ?? []) {
+      const uid = (m as any).user_id as string | null;
+      if (!uid || uid === context.userId) continue;
+      candidates.add(uid);
+    }
+    if (candidates.size === 0) {
+      return { dispatched: 0, sent: 0 };
+    }
+
+    const allIds = Array.from(candidates);
+
+    // 3) Privacy / consent filter: drop users who turned push OFF,
+    //    fetch their preferred language in the same query.
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("id, preferred_language, notifications_push")
+      .in("id", allIds);
+    const prefByUser = new Map<string, { lang: string; pushOn: boolean }>();
+    for (const p of profiles ?? []) {
+      prefByUser.set((p as any).id, {
+        lang: ((p as any).preferred_language as string) || "fr",
+        pushOn: (p as any).notifications_push !== false,
+      });
+    }
+
+    // 4) Minor protection — if a candidate is a player <16, drop them.
+    //    Tutors/parents are independent club_members and remain in the set.
+    const { data: minorPlayers } = await supabaseAdmin
+      .from("players")
+      .select("user_id, birth_date")
+      .in("user_id", allIds)
+      .not("birth_date", "is", null);
+    const now = Date.now();
+    const minorUserIds = new Set<string>();
+    for (const p of minorPlayers ?? []) {
+      const uid = (p as any).user_id as string | null;
+      const dob = (p as any).birth_date as string | null;
+      if (!uid || !dob) continue;
+      const ageMs = now - new Date(dob).getTime();
+      const ageYears = ageMs / (365.25 * 24 * 3600 * 1000);
+      if (ageYears < 16) minorUserIds.add(uid);
+    }
 
     const targets: string[] = [];
-    for (const m of members ?? []) {
-      const uid = (m as any).user_id;
-      if (!uid || uid === context.userId) continue; // skip author
+    for (const uid of allIds) {
+      if (minorUserIds.has(uid)) continue;
+      const pref = prefByUser.get(uid);
+      if (pref && pref.pushOn === false) continue;
       targets.push(uid);
     }
-    console.log("[push] wall targets computed", { count: targets.length, authorUid: context.userId, memberCount: (members ?? []).length });
-    const sends = targets.map((uid) =>
-      sendPushToUser(uid, {
-        title: `💬 ${authorName}`,
-        body: trimmed,
+
+    // 5) Localized copy (recipient language). Payload carries NO post content.
+    const I18N: Record<string, { title: string; body: (a: string, c: string) => string }> = {
+      fr: { title: "Nouveau message sur le mur", body: (a, c) => `${a} a publié dans ${c}` },
+      en: { title: "New post on the wall", body: (a, c) => `${a} posted in ${c}` },
+      de: { title: "Neuer Beitrag an der Pinnwand", body: (a, c) => `${a} hat in ${c} gepostet` },
+      es: { title: "Nuevo mensaje en el muro", body: (a, c) => `${a} publicó en ${c}` },
+      it: { title: "Nuovo messaggio sulla bacheca", body: (a, c) => `${a} ha pubblicato in ${c}` },
+      nl: { title: "Nieuw bericht op de muur", body: (a, c) => `${a} heeft gepost in ${c}` },
+      pt: { title: "Nova mensagem no mural", body: (a, c) => `${a} publicou em ${c}` },
+    };
+
+    // 6) Send. Tag is per-club so the OS groups posts from the same club.
+    //    URL goes to /inbox where RLS re-verifies access at open time.
+    const sends = targets.map((uid) => {
+      const lang = prefByUser.get(uid)?.lang || "fr";
+      const t = I18N[lang] || I18N.fr;
+      return sendPushToUser(uid, {
+        title: t.title,
+        body: t.body(authorName, clubName),
         url: "/inbox",
-        tag: `wall-${(post as any).id}`,
+        tag: `wall-club-${clubId}`,
       }).catch((e: unknown) => {
         console.warn("[push] wall send failed", uid, (e as Error).message);
         return { sent: 0, pruned: 0 };
-      }),
-    );
+      });
+    });
     const results = await Promise.all(sends);
     const sent = results.reduce((t, r) => t + r.sent, 0);
     const pruned = results.reduce((t, r) => t + r.pruned, 0);
-    console.log("[push] wall dispatched v3", {
+
+    // Update log with counts (best-effort).
+    await supabaseAdmin
+      .from("push_dispatch_log")
+      .update({ targets_count: targets.length, sent_count: sent })
+      .eq("kind", "wall_post")
+      .eq("ref_id", data.postId);
+
+    console.log("[push] wall dispatched v4", {
       postId: (post as any).id,
-      clubId: (post as any).club_id,
+      clubId,
+      candidates: candidates.size,
+      minorsExcluded: minorUserIds.size,
       targets: targets.length,
-      targetIds: targets,
       sent,
       pruned,
     });
     return { dispatched: targets.length, sent, pruned };
   });
+
+
 
 
 /* ------------------------------------------------------------------ */
