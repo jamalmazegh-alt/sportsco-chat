@@ -365,16 +365,17 @@ export function WallFeed({ clubId }: { clubId: string }) {
     if (error) toast.error(error.message);
   }
 
-  if (loading) {
-    return <WallFeedSkeleton />;
-  }
-
-  const canPost = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const teamsById = useMemo(() => {
     const m = new Map<string, Team>();
     for (const tt of allTeams) m.set(tt.id, tt);
     return m;
   }, [allTeams]);
+
+  if (loading) {
+    return <WallFeedSkeleton />;
+  }
+
+  const canPost = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const audienceMissing =
     canPost &&
     !(roles.includes("admin") || roles.includes("dirigeant")) &&
