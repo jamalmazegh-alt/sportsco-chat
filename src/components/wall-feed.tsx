@@ -579,7 +579,9 @@ function WallGrouped({
                   {sourceMeta.label}
                 </span>
               )}
+              <AudienceBadge post={p} teamsById={teamsById} />
             </div>
+
             <div className="flex items-center gap-1 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
               {canPin && !isExternal && (
                 <button
