@@ -859,7 +859,14 @@ function TeamDetail() {
             const linked = !!p.user_id;
 
             const checked = selectedIds.has(p.id);
-            const rowClass = "flex items-center gap-3 rounded-2xl border border-border bg-card p-3";
+            const rowClass = cn(
+              "flex items-center gap-3 rounded-2xl border bg-card p-3",
+              isMine
+                ? "border-primary/40 ring-1 ring-primary/20 shadow-sm p-4"
+                : "border-border",
+              !isCoach && myPlayerIds && myPlayerIds.size > 0 && !isMine && "py-2 px-3 opacity-95",
+            );
+
             const susp = activeSuspensionsByPlayer?.get(p.id);
             const absenceReason = activeAbsencesByPlayer?.get(p.id);
             const inner = (
