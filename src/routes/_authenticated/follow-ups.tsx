@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,14 +11,11 @@ import { fmt } from "@/lib/date-locale";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import i18n from "@/lib/i18n";
-import { isV2 } from "@/config/features";
+
 
 export const Route = createFileRoute("/_authenticated/follow-ups")({
-  // Bêta V1 : feature masquée derrière `social_network_v2`.
-  beforeLoad: () => {
-    if (!isV2("social_network_v2")) throw redirect({ to: "/home", replace: true });
-  },
   component: FollowUpsPage,
+
   head: () => ({
     meta: [
       { title: i18n.t("meta.followUps.title") },
