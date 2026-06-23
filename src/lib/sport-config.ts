@@ -133,7 +133,8 @@ const FALLBACK: SportConfig = {
 
 export function getSportConfig(sport: string | null | undefined): SportConfig {
   if (!sport) return FOOTBALL; // sensible default
-  return CONFIGS[sport] ?? FALLBACK;
+  const key = sport.toString().trim().toLowerCase().replace(/[\s-]+/g, "_");
+  return CONFIGS[key] ?? FALLBACK;
 }
 
 // Stat kinds that target a single player (no assist), used to hide the assist
