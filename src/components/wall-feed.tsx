@@ -164,6 +164,56 @@ export function WallFeed({ clubId }: { clubId: string }) {
     // eslint-disable-next-line
   }, [clubId]);
 
+  // Load club teams + compute targetable subset for the audience picker.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data: teamRows } = await supabase
+        .from("teams")
+        .select("id, name")
+        .eq("club_id", clubId)
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
+      if (cancelled) return;
+      const all = (teamRows ?? []) as Team[];
+      setAllTeams(all);
+
+      const isPriv = roles.includes("admin") || roles.includes("dirigeant");
+      let targetable: Team[] = [];
+      if (isPriv || roles.includes("coach")) {
+        // Club-wide coach / admin / dirigeant → every team is targetable.
+        targetable = all;
+      } else {
+        // Team-level staff only → keep teams where the user has a non-player role.
+        const { data: tm } = await supabase
+          .from("team_members")
+          .select("team_id")
+          .eq("user_id", user.id)
+          .in("team_id", all.map((t) => t.id));
+        const allowed = new Set((tm ?? []).map((r) => (r as any).team_id as string));
+        targetable = all.filter((t) => allowed.has(t.id));
+      }
+      if (cancelled) return;
+      setTargetableTeams(targetable);
+
+      // Preselection rules (nuancées) :
+      // - admin / dirigeant → club-wide (null).
+      // - coach with exactly one targetable team → preselect that team.
+      // - coach with several teams → leave empty (force an explicit choice).
+      if (isPriv) {
+        setAudience(null);
+      } else if (targetable.length === 1) {
+        setAudience([targetable[0].id]);
+      } else {
+        setAudience([]);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line
+  }, [clubId, user?.id, roles.join("|")]);
+
+
   async function notifyMentioned(ids: string[], link: string, snippet: string) {
     if (!user || ids.length === 0) return;
     const recipients = ids.filter((id) => id !== user.id);
