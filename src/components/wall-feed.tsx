@@ -499,6 +499,7 @@ function WallGrouped({
   commentsEnabled,
   canPin,
   memberCount,
+  teamsById,
   onDelete,
   onTogglePin,
 }: {
@@ -508,9 +509,11 @@ function WallGrouped({
   commentsEnabled: boolean;
   canPin: boolean;
   memberCount: number;
+  teamsById: Map<string, Team>;
   onDelete: (id: string) => void;
   onTogglePin: (id: string, next: boolean) => void;
 }) {
+
   const { t } = useTranslation();
   const pinned = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const rest = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
