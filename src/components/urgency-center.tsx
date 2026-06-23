@@ -1,0 +1,219 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import {
+  AlertTriangle,
+  Bell,
+  BellRing,
+  CheckCircle2,
+  ChevronRight,
+  Loader2,
+  Users,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
+import { useUrgencies } from "@/lib/urgency/use-urgencies";
+import { dispatchUrgencyAction } from "@/lib/urgency/dispatcher";
+import { remindAllForEvent } from "@/lib/urgency/remind";
+import type { UrgencyAction, UrgencyItem, UrgencySeverity } from "@/lib/urgency/types";
+
+interface Props {
+  className?: string;
+}
+
+const SEV_RING: Record<UrgencySeverity, string> = {
+  critical: "border-[#dc2626]",
+  high: "border-[#f59e0b]",
+  medium: "border-[#fcd34d]",
+};
+
+const SEV_TILE: Record<UrgencySeverity, string> = {
+  critical: "bg-[#fef2f2] text-[#dc2626]",
+  high: "bg-[#fffbeb] text-[#92400e]",
+  medium: "bg-[#fefce8] text-[#854d0e]",
+};
+
+function ActionIcon({ kind }: { kind: UrgencyAction["kind"] }) {
+  if (kind === "remind-all" || kind === "remind-one")
+    return <BellRing className="h-3.5 w-3.5" strokeWidth={2.4} />;
+  if (kind === "respond") return <Bell className="h-3.5 w-3.5" strokeWidth={2.4} />;
+  return <ChevronRight className="h-3.5 w-3.5" strokeWidth={2.4} />;
+}
+
+export function UrgencyCenter({ className }: Props) {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { items, status } = useUrgencies();
+  const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
+
+  // Lattice de surface (cf. types.ts).
+  // 1. pending → skeleton (jamais SuccessBanner)
+  if (status.phase === "pending") {
+    return (
+      <section className={cn("space-y-2", className)}>
+        <Skeleton className="h-20 w-full rounded-[16px]" />
+        <Skeleton className="h-16 w-full rounded-[16px]" />
+      </section>
+    );
+  }
+
+  const hasFailures = status.failedSources.length > 0;
+
+  // 2. settled · failed ≠ ∅ · items = ∅ → bandeau erreur + retry
+  if (hasFailures && items.length === 0) {
+    return (
+      <section
+        className={cn(
+          "rounded-[16px] border-[1.5px] border-[#fecaca] bg-[#fef2f2] p-4",
+          className,
+        )}
+      >
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-[#dc2626] shrink-0 mt-0.5" strokeWidth={2.4} />
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-bold text-[#7f1d1d]">
+              {t("urgency.error.title", { defaultValue: "Centre d'urgence indisponible" })}
+            </p>
+            <p className="text-[11px] text-[#991b1b] mt-0.5">
+              {t("urgency.error.hint", {
+                defaultValue: "Impossible de charger les signaux. Réessaie dans un instant.",
+              })}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              qc.invalidateQueries({ queryKey: ["urgency"], exact: false })
+            }
+          >
+            {t("common.retry", { defaultValue: "Réessayer" })}
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  // 4. settled · failed = ∅ · items = ∅ → SuccessBanner
+  if (!hasFailures && items.length === 0) {
+    return (
+      <section
+        className={cn(
+          "relative overflow-hidden rounded-[16px] border-[1.5px] border-border bg-card p-4",
+          className,
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-[12px] bg-[#f0f9f3] ring-1 ring-[#bbf7d0] flex items-center justify-center shrink-0">
+            <CheckCircle2 className="h-5 w-5 text-[#2d9d5f]" strokeWidth={2.4} />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-[15px] font-black text-foreground leading-tight">
+              {t("urgency.empty.title", { defaultValue: "Tout est sous contrôle" })}
+            </h2>
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mt-0.5">
+              {t("urgency.empty.subtitle", { defaultValue: "Aucune action urgente" })}
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // 3 & 5. items présents — liste, avec liseré si erreur partielle.
+  async function handleAction(item: UrgencyItem) {
+    setBusyIds((s) => new Set(s).add(item.id));
+    try {
+      await dispatchUrgencyAction(item.primaryAction, {
+        navigate: (to) => navigate({ to } as never),
+        remindAll: async (eventId) => {
+          if (!user) return;
+          const sent = await remindAllForEvent(
+            eventId,
+            user.id,
+            t("attendance.respondPrompt"),
+            item.title,
+          );
+          if (sent > 0)
+            toast.success(t("attendance.remindAllSent", { count: sent }));
+          else toast.info(t("attendance.alreadyRemindedRecently"));
+          qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
+        },
+      });
+    } catch (e) {
+      toast.error(t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }));
+    } finally {
+      setBusyIds((s) => {
+        const n = new Set(s);
+        n.delete(item.id);
+        return n;
+      });
+    }
+  }
+
+  return (
+    <section className={cn("space-y-2", className)}>
+      {hasFailures && (
+        <div className="flex items-center gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} />
+          {t("urgency.partialError", {
+            defaultValue: "Certaines sources sont indisponibles, la liste peut être incomplète.",
+          })}
+        </div>
+      )}
+      <ul className="space-y-2">
+        {items.map((item) => {
+          const busy = busyIds.has(item.id);
+          return (
+            <li
+              key={item.id}
+              className={cn(
+                "rounded-[14px] border-[1.5px] bg-card p-3 flex items-center gap-3",
+                SEV_RING[item.severity],
+              )}
+            >
+              <div
+                className={cn(
+                  "h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0",
+                  SEV_TILE[item.severity],
+                )}
+              >
+                <Users className="h-5 w-5" strokeWidth={2.4} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold text-foreground truncate">{item.title}</p>
+                <p className="text-[11px] text-muted-foreground font-medium truncate">
+                  {item.subtitle}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleAction(item)}
+                disabled={busy}
+                className="shrink-0"
+              >
+                {busy ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ActionIcon kind={item.primaryAction.kind} />
+                )}
+                {item.primaryAction.kind === "remind-all"
+                  ? t("attendance.remindAll", { defaultValue: "Tout relancer" })
+                  : item.primaryAction.kind === "respond"
+                    ? t("urgency.cta.respond", { defaultValue: "Répondre" })
+                    : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+              </Button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
