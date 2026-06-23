@@ -391,29 +391,24 @@ export const trackWallPostPushOpened = createServerFn({ method: "POST" })
       return { tracked: false, reason: "no_access" as const };
     }
 
-    // Increment opened_count atomically; set first_opened_at once.
-    await supabaseAdmin.rpc("increment_wall_push_opened", { _post_id: data.postId }).then(
-      () => undefined,
-      async () => {
-        // RPC not present (older DB) — fall back to a best-effort update.
-        const { data: row } = await supabaseAdmin
-          .from("push_dispatch_log")
-          .select("opened_count, first_opened_at")
-          .eq("kind", "wall_post")
-          .eq("ref_id", data.postId)
-          .maybeSingle();
-        if (row) {
-          await supabaseAdmin
-            .from("push_dispatch_log")
-            .update({
-              opened_count: ((row as any).opened_count ?? 0) + 1,
-              first_opened_at: (row as any).first_opened_at ?? new Date().toISOString(),
-            })
-            .eq("kind", "wall_post")
-            .eq("ref_id", data.postId);
-        }
-      },
-    );
+    // Increment opened_count; set first_opened_at once. Best-effort read/update
+    // (race-tolerant — analytics counters, not billing).
+    const { data: row } = await supabaseAdmin
+      .from("push_dispatch_log")
+      .select("opened_count, first_opened_at")
+      .eq("kind", "wall_post")
+      .eq("ref_id", data.postId)
+      .maybeSingle();
+    if (row) {
+      await supabaseAdmin
+        .from("push_dispatch_log")
+        .update({
+          opened_count: ((row as any).opened_count ?? 0) + 1,
+          first_opened_at: (row as any).first_opened_at ?? new Date().toISOString(),
+        })
+        .eq("kind", "wall_post")
+        .eq("ref_id", data.postId);
+    }
 
     console.log("[analytics] wall_post_push_opened", {
       postId: data.postId,
