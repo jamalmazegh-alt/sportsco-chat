@@ -180,22 +180,16 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       return { url: `${origin}/admin/billing?billing=success` };
     }
 
-    // Honour remaining in-app trial: if trial_end is still in the future,
-    // give Stripe the remaining days so the user isn't billed immediately.
-    // Otherwise (trial expired or no trial), bill right away — no Stripe trial.
-    let trialPeriodDays: number | undefined = undefined;
-    if (existingSub?.trial_end) {
-      const remainingMs = new Date(existingSub.trial_end).getTime() - Date.now();
-      const remainingDays = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
-      if (remainingDays > 0) trialPeriodDays = Math.min(remainingDays, 30);
-    }
-
+    // When an admin explicitly subscribes (even during the in-app trial),
+    // billing starts immediately so the subscription screen reflects the
+    // change (status → active, plan → chosen plan, next renewal in 1y/1m).
+    // The in-app trial is a "try before you commit" — clicking Subscribe
+    // is the commit step.
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: getPriceId(data.plan), quantity: 1 }],
       subscription_data: {
-        ...(trialPeriodDays ? { trial_period_days: trialPeriodDays } : {}),
         metadata: { club_id: club.id, plan: data.plan },
       },
       // VAT multi-pays : Stripe collecte l'adresse de facturation, calcule
