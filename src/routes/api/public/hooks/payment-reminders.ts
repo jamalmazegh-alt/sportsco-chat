@@ -234,6 +234,13 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
+        } catch (e: any) {
+          console.error("[payment-reminders] unexpected failure", e);
+          return new Response(
+            JSON.stringify({ processed: 0, sent: 0, warning: e?.message ?? String(e) }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          );
+        }
       },
     },
   },
