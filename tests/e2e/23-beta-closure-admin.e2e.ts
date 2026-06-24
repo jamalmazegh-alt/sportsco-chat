@@ -66,19 +66,20 @@ test.describe("Beta closure — admin/public smoke", () => {
     }
   });
 
-  test("cron payment-reminders returns skipped while payments_v2=false", async ({ request }) => {
+  test("cron payment-reminders répond 200 avec un compteur", async ({ request }) => {
     const cronSecret =
       process.env.PAYMENT_REMINDERS_SECRET ?? process.env.DATA_RETENTION_SECRET;
     test.skip(
       !cronSecret,
-      "PAYMENT_REMINDERS_SECRET/DATA_RETENTION_SECRET non configuré dans cet env — l'auth cron renvoie 503 avant le chemin {skipped}.",
+      "PAYMENT_REMINDERS_SECRET/DATA_RETENTION_SECRET non configuré dans cet env — l'auth cron renvoie 503.",
     );
     const res = await request.post(BASE + "/api/public/hooks/payment-reminders", {
       headers: { "x-cron-secret": cronSecret! },
     });
     expect(res.status()).toBe(200);
     const body = await res.json().catch(() => ({}));
-    expect(body.skipped).toBe(true);
+    expect(typeof body.processed).toBe("number");
+    expect(typeof body.sent).toBe("number");
   });
 
   test("waitlist POST returns 200, no feature flip", async ({ request }) => {

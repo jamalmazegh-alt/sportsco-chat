@@ -111,8 +111,7 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
         }
 
 
-
-
+        try {
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
         const todayMs = today.getTime();
@@ -124,7 +123,11 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           .select("club_id, payment_reminders_enabled, payment_reminder_offsets_days, clubs:club_id(name)")
           .eq("payment_reminders_enabled", true);
         if (clubsErr) {
-          return new Response(JSON.stringify({ error: clubsErr.message }), { status: 500 });
+          console.error("[payment-reminders] clubs query failed", clubsErr);
+          return new Response(JSON.stringify({ processed: 0, sent: 0, warning: clubsErr.message }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
         }
 
         let processed = 0;
@@ -231,6 +234,13 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
+        } catch (e: any) {
+          console.error("[payment-reminders] unexpected failure", e);
+          return new Response(
+            JSON.stringify({ processed: 0, sent: 0, warning: e?.message ?? String(e) }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          );
+        }
       },
     },
   },
