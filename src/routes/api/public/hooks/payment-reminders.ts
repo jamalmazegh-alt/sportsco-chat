@@ -110,8 +110,6 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           });
         }
 
-
-        try {
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
         const todayMs = today.getTime();
@@ -123,12 +121,10 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           .select("club_id, payment_reminders_enabled, payment_reminder_offsets_days, clubs:club_id(name)")
           .eq("payment_reminders_enabled", true);
         if (clubsErr) {
-          console.error("[payment-reminders] clubs query failed", clubsErr);
-          return new Response(JSON.stringify({ processed: 0, sent: 0, warning: clubsErr.message }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          });
+          // Let it surface as a 500 — masking real DB errors behind 200 hides regressions.
+          throw new Error(`clubs query failed: ${clubsErr.message}`);
         }
+
 
         let processed = 0;
         let sent = 0;
