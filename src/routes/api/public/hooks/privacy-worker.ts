@@ -1,17 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 /**
  * Cron-triggered worker that processes pending data export requests.
- * Auth: standard Supabase anon `apikey` header (set by pg_cron).
+ * Auth: dedicated shared secret (PRIVACY_WORKER_SECRET), NOT the public anon key.
  */
 export const Route = createFileRoute("/api/public/hooks/privacy-worker")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey") || request.headers.get("Authorization")?.replace("Bearer ", "");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
-        if (!expected || apikey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
+        const auth = verifyCronSecret(request, {
+          primaryEnv: "PRIVACY_WORKER_SECRET",
+          legacyEnv: "DATA_RETENTION_SECRET",
+          headerNames: ["x-privacy-worker-secret", "x-cron-secret"],
+        });
+        if (!auth.ok) {
+          return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {
+            status: auth.status,
+          });
         }
         const { processAllPendingExports } = await import("@/lib/privacy-worker.server");
         try {
