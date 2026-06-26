@@ -5234,6 +5234,10 @@ export type Database = {
         Returns: boolean
       }
       has_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      increment_rate_limit: {
+        Args: { _ip: string; _limit: number; _route: string; _window: string }
+        Returns: boolean
+      }
       is_club_member: {
         Args: { _club_id: string; _user_id: string }
         Returns: boolean
