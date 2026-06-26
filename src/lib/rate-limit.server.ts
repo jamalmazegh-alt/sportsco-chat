@@ -2,24 +2,26 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 /**
  * Best-effort fixed-window per-IP rate limiter backed by `public_rate_limits`.
- *
- * - Window granularity: 1 hour (UTC, truncated to the hour).
- * - Storage: one row per (ip, route, window_start). Counter incremented in place.
- * - Fail-open: if the DB call errors, we let the request through rather than
- *   block legitimate traffic on a transient backend issue.
+ * - Trusts cf-connecting-ip first (set by Cloudflare, not client-spoofable).
+ * - Increment is atomic via the increment_rate_limit() RPC.
+ * - Fail-open on DB error.
  */
 
 export function getClientIp(request: Request): string {
+  // cf-connecting-ip is set by Cloudflare and cannot be spoofed by the client.
+  // x-forwarded-for IS client-controllable, so it must be the LAST resort.
+  const cf = request.headers.get("cf-connecting-ip");
+  if (cf) return cf.trim();
+
+  const real = request.headers.get("x-real-ip");
+  if (real) return real.trim();
+
   const xff = request.headers.get("x-forwarded-for");
   if (xff) {
     const first = xff.split(",")[0]?.trim();
     if (first) return first;
   }
-  return (
-    request.headers.get("cf-connecting-ip") ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
+  return "unknown";
 }
 
 function currentHourBucket(): string {
@@ -39,33 +41,20 @@ export async function checkRateLimit(
 ): Promise<boolean> {
   const windowStart = currentHourBucket();
   try {
-    // Upsert (no-op on conflict) to make sure the row exists, then increment.
-    await supabaseAdmin
-      .from("public_rate_limits")
-      .upsert(
-        { ip, route, window_start: windowStart, count: 0 },
-        { onConflict: "ip,route,window_start", ignoreDuplicates: true },
-      );
-
-    const { data: row } = await supabaseAdmin
-      .from("public_rate_limits")
-      .select("count")
-      .eq("ip", ip)
-      .eq("route", route)
-      .eq("window_start", windowStart)
-      .maybeSingle();
-
-    const current = row?.count ?? 0;
-    if (current >= limit) return false;
-
-    await supabaseAdmin
-      .from("public_rate_limits")
-      .update({ count: current + 1 })
-      .eq("ip", ip)
-      .eq("route", route)
-      .eq("window_start", windowStart);
-
-    return true;
+    const { data, error } = await supabaseAdmin.rpc("increment_rate_limit" as any, {
+      _ip: ip,
+      _route: route,
+      _window: windowStart,
+      _limit: limit,
+    });
+    if (error) {
+      console.warn("[rate-limit] rpc failed, allowing request", {
+        route,
+        err: error.message,
+      });
+      return true;
+    }
+    return data === true;
   } catch (err) {
     console.warn("[rate-limit] check failed, allowing request", {
       route,
