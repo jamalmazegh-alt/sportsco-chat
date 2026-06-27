@@ -162,9 +162,7 @@ export const listAllClubs = createServerFn({ method: "POST" })
       items: (clubs ?? []).map((c) => {
         const p = c.created_by ? profileById.get(c.created_by) : null;
         const contactName =
-          p?.full_name ||
-          [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() ||
-          null;
+          p?.full_name || [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() || null;
         return {
           ...c,
           subscription: subByClub.get(c.id) ?? null,

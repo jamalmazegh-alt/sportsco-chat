@@ -84,7 +84,8 @@ function parseCsv(text: string): ParsedRow[] {
     firstParts.forEach((p, idx) => {
       const norm = p.replace(/\s+/g, "_");
       headerMap![norm] = idx;
-      if (norm === "prenom" || norm === "prénom" || norm === "firstname") headerMap!.first_name = idx;
+      if (norm === "prenom" || norm === "prénom" || norm === "firstname")
+        headerMap!.first_name = idx;
       if (norm === "nom" || norm === "lastname") headerMap!.last_name = idx;
       if (norm === "numero" || norm === "numéro" || norm === "n°") headerMap!.jersey = idx;
       if (norm === "poste") headerMap!.position = idx;
@@ -202,8 +203,7 @@ export function ImportPlayersCsvDialog({
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       const minor = isMinor(r.birth_date);
-      const hasParent =
-        (r.parent_first || r.parent_last) && (r.parent_email || r.parent_phone);
+      const hasParent = (r.parent_first || r.parent_last) && (r.parent_email || r.parent_phone);
       if (minor && !hasParent) {
         failed++;
         errors.push(`${r.first_name} ${r.last_name}: parent requis (mineur)`);
@@ -271,8 +271,7 @@ export function ImportPlayersCsvDialog({
         t("players.import.failed", {
           defaultValue: "{{failed}} ligne(s) en erreur",
           failed,
-        }) +
-          (errors.length ? ` — ${errors.slice(0, 3).join(" · ")}` : ""),
+        }) + (errors.length ? ` — ${errors.slice(0, 3).join(" · ")}` : ""),
       );
     }
     if (inserted > 0) {
@@ -327,7 +326,11 @@ export function ImportPlayersCsvDialog({
           </p>
         )}
         <Button type="submit" className="w-full" disabled={busy || !text.trim()}>
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.import.submit", { defaultValue: "Importer" })}
+          {busy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            t("players.import.submit", { defaultValue: "Importer" })
+          )}
         </Button>
       </form>
     </ResponsiveFormDialog>
