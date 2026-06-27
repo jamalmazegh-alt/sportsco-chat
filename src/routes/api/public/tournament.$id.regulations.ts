@@ -716,7 +716,7 @@ function formatShortDate(d: Date, lang: Lang): string {
 
 // ───────────────────────────── Logo helpers ─────────────────────────────
 
-async function fetchImage(
+export async function fetchImage(
   url: string,
 ): Promise<{ bytes: ArrayBuffer; kind: "png" | "jpg" } | null> {
   try {

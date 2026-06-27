@@ -1673,7 +1673,9 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
       return { document: row };
     }
 
-    const { buildRegulationsPdf } = await import("@/routes/api/public/tournament.$id.regulations");
+    const { buildRegulationsPdf, fetchImage } = await import(
+      "@/routes/api/public/tournament.$id.regulations"
+    );
     let logoBytes: ArrayBuffer | null = null;
     try {
       const origin = process.env.APP_URL || "https://www.clubero.app";
@@ -1682,6 +1684,23 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
     } catch {
       logoBytes = null;
     }
+
+    // Club + tournament logos (best-effort).
+    let clubLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null;
+    let tournamentLogo: { bytes: ArrayBuffer; kind: "png" | "jpg" } | null = null;
+    if (tournament.club_id) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: club } = await supabaseAdmin
+        .from("clubs")
+        .select("logo_url")
+        .eq("id", tournament.club_id)
+        .maybeSingle();
+      if (club?.logo_url) clubLogo = await fetchImage(club.logo_url);
+    }
+    if (tournament.cover_image_url) {
+      tournamentLogo = await fetchImage(tournament.cover_image_url);
+    }
+
     const bytes = await buildRegulationsPdf(
       {
         id: tournament.id,
@@ -1703,6 +1722,8 @@ export const generateRulesPdf = createServerFn({ method: "POST" })
       rules,
       lang,
       logoBytes,
+      clubLogo,
+      tournamentLogo,
     );
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
