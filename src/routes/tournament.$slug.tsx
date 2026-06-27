@@ -165,6 +165,7 @@ function PublicTournamentPage() {
   const opens = parseLocalish(rules.registration.opensAt);
   const closes = parseLocalish(rules.registration.closesAt);
   const registrationOpen =
+    tournament.status === "published" &&
     rules.registration.enabled &&
     (opens === null || now >= opens) &&
     (closes === null || now <= closes);
