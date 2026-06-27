@@ -232,7 +232,7 @@ export const listMyPersonalTournaments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { supabase, userId } = context;
+    const { userId, claims } = context;
     // Personal organizers own tournaments either:
     //   - directly (club_id IS NULL, legacy), or
     //   - via their auto-created "personal" club (clubs.is_personal = true).
@@ -243,19 +243,58 @@ export const listMyPersonalTournaments = createServerFn({ method: "POST" })
       .eq("is_personal", true);
     const personalClubIds = (personalClubs ?? []).map((c) => c.id);
 
-    let q = supabase
+    // Tournaments where the user is a collaborator (referee, co-organizer…),
+    // either already accepted (user_id set) or pending by email match.
+    const email = ((claims as any)?.email as string | undefined)?.toLowerCase() ?? null;
+    const [collabByUser, collabByEmail] = await Promise.all([
+      supabaseAdmin
+        .from("tournament_collaborators")
+        .select("tournament_id")
+        .is("revoked_at", null)
+        .eq("user_id", userId),
+      email
+        ? supabaseAdmin
+            .from("tournament_collaborators")
+            .select("tournament_id")
+            .is("revoked_at", null)
+            .ilike("email", email)
+        : Promise.resolve({ data: [] as { tournament_id: string }[] }),
+    ]);
+    const collabTournamentIds = Array.from(
+      new Set([
+        ...((collabByUser.data ?? []).map((r: any) => r.tournament_id) as string[]),
+        ...((collabByEmail.data ?? []).map((r: any) => r.tournament_id) as string[]),
+      ]),
+    );
+
+    let ownQ = supabaseAdmin
       .from("tournaments")
       .select("*")
       .eq("created_by", userId)
       .is("archived_at", null);
     if (personalClubIds.length > 0) {
-      q = q.or(`club_id.is.null,club_id.in.(${personalClubIds.join(",")})`);
+      ownQ = ownQ.or(`club_id.is.null,club_id.in.(${personalClubIds.join(",")})`);
     } else {
-      q = q.is("club_id", null);
+      ownQ = ownQ.is("club_id", null);
     }
-    const { data: rows, error } = await q.order("starts_on", { ascending: false });
-    if (error) throw error;
-    return { tournaments: rows ?? [] };
+    const ownRes = await ownQ.order("starts_on", { ascending: false });
+    if (ownRes.error) throw ownRes.error;
+
+    let collabRows: any[] = [];
+    if (collabTournamentIds.length > 0) {
+      const cRes = await supabaseAdmin
+        .from("tournaments")
+        .select("*")
+        .in("id", collabTournamentIds)
+        .is("archived_at", null)
+        .order("starts_on", { ascending: false });
+      if (cRes.error) throw cRes.error;
+      collabRows = cRes.data ?? [];
+    }
+
+    const map = new Map<string, any>();
+    for (const r of [...(ownRes.data ?? []), ...collabRows]) map.set(r.id, r);
+    return { tournaments: Array.from(map.values()) };
   });
 
 export const getTournament = createServerFn({ method: "POST" })
