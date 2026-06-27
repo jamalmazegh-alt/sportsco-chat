@@ -130,19 +130,27 @@ export const createTournament = createServerFn({ method: "POST" })
       throw new Response("Forbidden — admin/dirigeant required", { status: 403 });
     }
 
-    // Personal (auto-created) clubs are paywalled per-tournament: organizers
-    // must use the pass-based creation flow (createTournamentFromPass), not
-    // this direct club-admin path.
+    // Personal (auto-created) clubs are paywalled per-tournament. Instead of
+    // forcing the legacy `/tournaments/new-from-pass` form, we accept the
+    // create here as long as the user has an active entitlement (single pass
+    // or annual). The entitlement is consumed after a successful insert.
     const { data: clubRow } = await supabaseAdmin
       .from("clubs")
       .select("is_personal")
       .eq("id", data.club_id)
       .maybeSingle();
-    if (clubRow?.is_personal) {
-      throw new Response("Personal organizer clubs must create tournaments via a paid pass", {
-        status: 403,
+    const isPersonal = !!clubRow?.is_personal;
+    if (isPersonal) {
+      const { data: canCreate } = await supabaseAdmin.rpc("can_create_tournament", {
+        _user_id: userId,
       });
+      if (!canCreate) {
+        throw new Response("Aucun crédit tournoi disponible. Choisissez un plan.", {
+          status: 402,
+        });
+      }
     }
+
 
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
     const initialRules = defaultRulesForSport(data.sport);
@@ -174,8 +182,21 @@ export const createTournament = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Response(error.message, { status: 400 });
+
+    // For personal-club tournaments, consume one single entitlement (no-op for annual / superadmin).
+    if (isPersonal && row) {
+      try {
+        await supabaseAdmin.rpc("consume_single_entitlement", {
+          _user_id: userId,
+          _tournament_id: row.id,
+        });
+      } catch (e) {
+        console.warn("consume_single_entitlement failed (non-fatal)", e);
+      }
+    }
     return { tournament: row };
   });
+
 
 export const listMyTournaments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

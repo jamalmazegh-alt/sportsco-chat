@@ -22,7 +22,11 @@ import {
   listMyTournaments,
   listMyPersonalTournaments,
 } from "@/modules/tournaments/tournaments.functions";
-import { listMyTournamentEntitlements } from "@/modules/tournaments/entitlements.functions";
+import {
+  listMyTournamentEntitlements,
+  ensurePersonalClubId,
+} from "@/modules/tournaments/entitlements.functions";
+
 import { TournamentCreateChooser } from "@/modules/tournaments/components/TournamentCreateChooser";
 import { TournamentUpgradeCard } from "@/modules/tournaments/components/TournamentUpgradeCard";
 import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
@@ -137,7 +141,8 @@ function ShimmerButton({
   return (
     <Button
       asChild={asChild}
-      className={`relative overflow-hidden border-0 text-white shadow-md transition-transform active:scale-[0.98] ${className}`}
+      size="lg"
+      className={`relative h-12 overflow-hidden rounded-2xl border-0 px-5 text-[15px] font-bold text-white ring-1 ring-emerald-300/40 shadow-[0_10px_30px_-12px_rgba(16,122,69,0.55)] transition-all hover:shadow-[0_14px_36px_-12px_rgba(16,122,69,0.7)] active:scale-[0.98] ${className}`}
       style={{ background: GREEN_GRADIENT }}
       {...rest}
     >
@@ -145,13 +150,14 @@ function ShimmerButton({
         {children}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-[1] translate-x-[-120%] bg-gradient-to-r from-transparent via-white/35 to-transparent"
+          className="pointer-events-none absolute inset-0 -z-[1] translate-x-[-120%] bg-gradient-to-r from-transparent via-white/40 to-transparent"
           style={{ animation: "tournament-shimmer 2.6s ease-in-out infinite" }}
         />
       </span>
     </Button>
   );
 }
+
 
 function TournamentsList() {
   const { t } = useTranslation("tournaments");
@@ -185,7 +191,24 @@ function TournamentsList() {
   const hasAnnual = !!entQ.data?.activeAnnual;
   const singlesLeft = entQ.data?.unusedSingles?.length ?? 0;
 
+  // Pass-only users have no real club. Pre-resolve their personal club id so
+  // the unified TournamentCreateChooser/Wizard can run for them too.
+  const personalClubFn = useServerFn(ensurePersonalClubId);
+  const personalClubQ = useQuery({
+    queryKey: ["personal-club-id"],
+    enabled: noClub && canCreate,
+    queryFn: () => personalClubFn({ data: undefined as never }),
+    staleTime: 5 * 60 * 1000,
+  });
+  const effectiveClubId = noClub ? personalClubQ.data?.clubId ?? null : activeClubId;
+
+  function openCreate() {
+    if (noClub && !canCreate) return;
+    setOpen(true);
+  }
+
   const tournaments = q.data?.tournaments ?? [];
+
 
   return (
     <div className="space-y-5 px-4 pb-24 pt-5">
@@ -216,9 +239,10 @@ function TournamentsList() {
         </div>
       </div>
 
-      {canManage && !noClub && activeClubId && (
-        <TournamentCreateChooser clubId={activeClubId} open={open} onOpenChange={setOpen} />
+      {canManage && effectiveClubId && (
+        <TournamentCreateChooser clubId={effectiveClubId} open={open} onOpenChange={setOpen} />
       )}
+
 
       {/* ─── Bandeau organisateur "30s avec l'IA" ─────────────────── */}
       {noClub && (
@@ -252,11 +276,14 @@ function TournamentsList() {
           </div>
           <div className="relative mt-4 flex flex-wrap gap-2">
             {canCreate ? (
-              <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
-                <Link to="/tournaments/new-from-pass">
-                  <Zap className="h-4 w-4" />
-                  Créer maintenant
-                </Link>
+              <Button
+                size="sm"
+                className="bg-card text-emerald-800 hover:bg-card/90"
+                onClick={openCreate}
+                disabled={!effectiveClubId}
+              >
+                <Zap className="h-4 w-4" />
+                Créer maintenant
               </Button>
             ) : (
               <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
@@ -266,6 +293,7 @@ function TournamentsList() {
                 </Link>
               </Button>
             )}
+
             {!hasAnnual && canCreate && (
               <Button
                 asChild
@@ -302,11 +330,9 @@ function TournamentsList() {
             canManage ? (
               noClub ? (
                 canCreate ? (
-                  <ShimmerButton asChild>
-                    <Link to="/tournaments/new-from-pass">
-                      <Plus className="h-4 w-4" />
-                      {t("list.create")}
-                    </Link>
+                  <ShimmerButton onClick={openCreate} disabled={!effectiveClubId}>
+                    <Plus className="h-4 w-4" />
+                    {t("list.create")}
                   </ShimmerButton>
                 ) : (
                   <ShimmerButton asChild>
@@ -325,6 +351,7 @@ function TournamentsList() {
             ) : null
           }
         />
+
       ) : (
         <ul className="space-y-3">
           {tournaments.map((trn: any) => (
@@ -392,11 +419,13 @@ function TournamentsList() {
         <div className="pt-1">
           {noClub ? (
             canCreate ? (
-              <ShimmerButton asChild className="w-full">
-                <Link to="/tournaments/new-from-pass">
-                  <Plus className="h-4 w-4" />
-                  {t("list.create")}
-                </Link>
+              <ShimmerButton
+                onClick={openCreate}
+                disabled={!effectiveClubId}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4" />
+                {t("list.create")}
               </ShimmerButton>
             ) : (
               <ShimmerButton asChild className="w-full">
@@ -414,6 +443,7 @@ function TournamentsList() {
               </ShimmerButton>
             )
           )}
+
         </div>
       )}
     </div>

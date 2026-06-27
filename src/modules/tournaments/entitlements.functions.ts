@@ -330,3 +330,22 @@ export const createTournamentFromEntitlement = createServerFn({ method: "POST" }
 
     return { tournament };
   });
+
+/**
+ * Ensure the signed-in user has a personal organizer club, returning its id.
+ * Used by the unified TournamentCreateChooser to feed `clubId` to the wizard
+ * for pass-only users (no real club).
+ */
+export const ensurePersonalClubId = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { userId } = context;
+    const { data, error } = await supabaseAdmin.rpc("get_or_create_personal_club", {
+      _user_id: userId,
+    });
+    if (error) throw new Response(error.message, { status: 500 });
+    if (typeof data !== "string") throw new Response("Could not resolve personal club", { status: 500 });
+    return { clubId: data };
+  });
+
