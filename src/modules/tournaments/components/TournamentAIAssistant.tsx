@@ -285,6 +285,10 @@ export function TournamentAIAssistant({
     patch({ paid, registrationFeeCents: paid ? config.registrationFeeCents : 0 });
     advance();
   }
+  function selectPublicRegistration(v: boolean) {
+    patch({ publicRegistration: v });
+    advance();
+  }
   function confirmPaidAmount() {
     const euros = parseFloat(paidAmount.replace(",", "."));
     if (!Number.isFinite(euros) || euros <= 0) {
