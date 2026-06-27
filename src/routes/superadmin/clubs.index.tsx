@@ -337,6 +337,36 @@ function SuperAdminClubs() {
                     {pill.label}
                   </span>
                 </div>
+                {(c.contact_name || c.contact_email || c.contact_phone) && (
+                  <div className="mt-2 pt-2 border-t border-border space-y-1 text-[11px]">
+                    {c.contact_name && (
+                      <div className="flex items-center gap-1.5 font-medium">
+                        <User2 className="h-3 w-3 text-muted-foreground" />
+                        {c.contact_name}
+                      </div>
+                    )}
+                    {c.contact_email && (
+                      <a
+                        href={`mailto:${c.contact_email}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1.5 text-muted-foreground hover:underline"
+                      >
+                        <Mail className="h-3 w-3" />
+                        {c.contact_email}
+                      </a>
+                    )}
+                    {c.contact_phone && (
+                      <a
+                        href={`tel:${c.contact_phone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1.5 text-muted-foreground hover:underline"
+                      >
+                        <Phone className="h-3 w-3" />
+                        {c.contact_phone}
+                      </a>
+                    )}
+                  </div>
+                )}
                 {exempt && c.subscription?.exempt_reason && (
                   <div className="text-[10px] text-muted-foreground mt-1.5 pt-1.5 border-t border-border">
                     {EXEMPT_REASON_LABELS[c.subscription.exempt_reason as ExemptReason] ??
