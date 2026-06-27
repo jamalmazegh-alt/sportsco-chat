@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { toCsv, downloadCsv } from "@/lib/csv";
+import { ImportPlayersCsvDialog } from "@/components/import-players-csv-dialog";
 import { SwipeableRow } from "@/components/swipeable-row";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
