@@ -122,6 +122,40 @@ function TournamentDetailPage() {
       ),
   });
 
+  async function onUploadLogo(file: File) {
+    if (!user) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t("common.fileTooLarge", { defaultValue: "Fichier trop volumineux (max 5 Mo)" }));
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error(t("common.invalidImage", { defaultValue: "Format d'image non supporté" }));
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `${user.id}/tournament-cover/${Date.now()}-${safe}`;
+      const { error: upErr } = await supabase.storage.from("attachments").upload(path, file, {
+        contentType: file.type || "image/jpeg",
+        upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("attachments").getPublicUrl(path);
+      await updateFn({
+        data: { tournament_id: tournamentId, patch: { cover_image_url: pub.publicUrl } },
+      });
+      toast.success(t("detail.logoUpdated", { defaultValue: "Logo mis à jour" }));
+      qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
+    } catch (e) {
+      toast.error(
+        (e as { message?: string })?.message ?? t("common.error", { defaultValue: "Erreur" }),
+      );
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
+
   // Score-entry auto-open id (consumed once by MatchesList)
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
 
