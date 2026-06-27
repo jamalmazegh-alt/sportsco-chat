@@ -10,8 +10,8 @@ export const Route = createFileRoute("/api/public/hooks/privacy-worker")({
     handlers: {
       POST: async ({ request }) => {
         const auth = verifyCronSecret(request, {
-          primaryEnv: "PRIVACY_WORKER_SECRET",
-          legacyEnv: "DATA_RETENTION_SECRET",
+          primaryEnv: "PRIVACY_WORKER_CRON_TOKEN",
+          legacyEnv: "PRIVACY_WORKER_SECRET",
           headerNames: ["x-privacy-worker-secret", "x-cron-secret"],
         });
         if (!auth.ok) {
