@@ -47,8 +47,7 @@ const I18N = {
     yes: "Oui",
     no: "Non",
     validation: "Validation des matchs",
-    requireValidation:
-      "Seuls les matchs validés par l'organisateur comptent au classement.",
+    requireValidation: "Seuls les matchs validés par l'organisateur comptent au classement.",
     noValidation: "Les matchs en statut « terminé » comptent immédiatement.",
     generated: "Document généré le",
     page: "Page",
@@ -86,8 +85,7 @@ const I18N = {
     yes: "Yes",
     no: "No",
     validation: "Match validation",
-    requireValidation:
-      "Only matches validated by the organizer count in the standings.",
+    requireValidation: "Only matches validated by the organizer count in the standings.",
     noValidation: "Matches marked as completed count immediately.",
     generated: "Document generated on",
     page: "Page",
@@ -126,16 +124,16 @@ export async function buildRulesPdf(
   if (tournament.sport) metaLines.push([t.sport, capitalize(tournament.sport)]);
   if (tournament.category) metaLines.push([t.category, tournament.category]);
   if (tournament.starts_on) {
-    const dates = tournament.ends_on && tournament.ends_on !== tournament.starts_on
-      ? `${formatDate(tournament.starts_on, rules.language)} – ${formatDate(tournament.ends_on, rules.language)}`
-      : formatDate(tournament.starts_on, rules.language);
+    const dates =
+      tournament.ends_on && tournament.ends_on !== tournament.starts_on
+        ? `${formatDate(tournament.starts_on, rules.language)} – ${formatDate(tournament.ends_on, rules.language)}`
+        : formatDate(tournament.starts_on, rules.language);
     metaLines.push([t.dates, dates]);
   }
   if (tournament.location) metaLines.push([t.location, tournament.location]);
   if (tournament.format) metaLines.push([t.format, capitalize(tournament.format)]);
   if (tournament.num_teams) metaLines.push([t.teams, String(tournament.num_teams)]);
-  if (rules.branding.organizerName)
-    metaLines.push([t.organizer, rules.branding.organizerName]);
+  if (rules.branding.organizerName) metaLines.push([t.organizer, rules.branding.organizerName]);
   drawKeyValues(ctx, metaLines);
   ctx.y -= 10;
 
@@ -155,11 +153,7 @@ export async function buildRulesPdf(
   section(ctx, t.tiebreakers);
   const tbLabels = rules.tiebreakers.map((k, i) => {
     const meta = ALL_TIEBREAKERS.find((m) => m.key === k);
-    const label = meta
-      ? rules.language === "fr"
-        ? meta.labelFr
-        : meta.labelEn
-      : k;
+    const label = meta ? (rules.language === "fr" ? meta.labelFr : meta.labelEn) : k;
     return `${i + 1}. ${label}`;
   });
   drawList(ctx, tbLabels);

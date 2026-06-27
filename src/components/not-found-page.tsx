@@ -22,8 +22,7 @@ export function NotFoundPage() {
           </h1>
           <p className="text-sm text-muted-foreground">
             {t("notFound.subtitle", {
-              defaultValue:
-                "La page que vous cherchez n'existe pas ou a été déplacée.",
+              defaultValue: "La page que vous cherchez n'existe pas ou a été déplacée.",
             })}
           </p>
         </div>

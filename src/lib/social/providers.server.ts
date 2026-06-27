@@ -37,11 +37,7 @@ export const instagram = {
   getAuthUrl(state: string, redirectUri: string): string {
     const appId = process.env.INSTAGRAM_APP_ID;
     if (!appId) throw new Error("INSTAGRAM_APP_ID missing");
-    const scope = [
-      "instagram_basic",
-      "pages_show_list",
-      "pages_read_engagement",
-    ].join(",");
+    const scope = ["instagram_basic", "pages_show_list", "pages_read_engagement"].join(",");
     const url = new URL("https://www.facebook.com/v19.0/dialog/oauth");
     url.searchParams.set("client_id", appId);
     url.searchParams.set("redirect_uri", redirectUri);
@@ -88,9 +84,7 @@ export const instagram = {
     return {
       accessToken: ll.access_token,
       refreshToken: null,
-      expiresAt: ll.expires_in
-        ? new Date(Date.now() + ll.expires_in * 1000).toISOString()
-        : null,
+      expiresAt: ll.expires_in ? new Date(Date.now() + ll.expires_in * 1000).toISOString() : null,
       accountId: page.instagram_business_account.id,
       accountName: ig.username ? `@${ig.username}` : page.name,
     };
@@ -119,7 +113,7 @@ export const instagram = {
       external_id: m.id,
       external_url: m.permalink,
       external_media_url:
-        m.media_type === "VIDEO" ? m.thumbnail_url ?? m.media_url ?? null : m.media_url ?? null,
+        m.media_type === "VIDEO" ? (m.thumbnail_url ?? m.media_url ?? null) : (m.media_url ?? null),
       body: truncate(m.caption ?? ""),
       created_at: m.timestamp,
     }));
@@ -179,10 +173,7 @@ export const facebook = {
     };
   },
 
-  async fetchRecentPosts(
-    accessToken: string,
-    accountId: string,
-  ): Promise<ExternalPost[]> {
+  async fetchRecentPosts(accessToken: string, accountId: string): Promise<ExternalPost[]> {
     const url = `${IG_GRAPH}/${accountId}/posts?fields=id,message,full_picture,permalink_url,created_time&limit=30&access_token=${accessToken}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`FB posts fetch failed: ${await res.text()}`);
@@ -269,11 +260,9 @@ export const twitter = {
     return {
       accessToken: tok.access_token,
       refreshToken: tok.refresh_token ?? null,
-      expiresAt: tok.expires_in
-        ? new Date(Date.now() + tok.expires_in * 1000).toISOString()
-        : null,
+      expiresAt: tok.expires_in ? new Date(Date.now() + tok.expires_in * 1000).toISOString() : null,
       accountId: me.data?.id ?? null,
-      accountName: me.data?.username ? `@${me.data.username}` : me.data?.name ?? null,
+      accountName: me.data?.username ? `@${me.data.username}` : (me.data?.name ?? null),
     };
   },
 
@@ -302,9 +291,7 @@ export const twitter = {
     return {
       accessToken: tok.access_token,
       refreshToken: tok.refresh_token ?? refreshToken,
-      expiresAt: tok.expires_in
-        ? new Date(Date.now() + tok.expires_in * 1000).toISOString()
-        : null,
+      expiresAt: tok.expires_in ? new Date(Date.now() + tok.expires_in * 1000).toISOString() : null,
     };
   },
 
@@ -320,7 +307,12 @@ export const twitter = {
         attachments?: { media_keys?: string[] };
       }>;
       includes?: {
-        media?: Array<{ media_key: string; url?: string; preview_image_url?: string; type: string }>;
+        media?: Array<{
+          media_key: string;
+          url?: string;
+          preview_image_url?: string;
+          type: string;
+        }>;
       };
     };
     const mediaMap = new Map<string, string>();
@@ -333,7 +325,7 @@ export const twitter = {
       return {
         external_id: t.id,
         external_url: `https://x.com/i/web/status/${t.id}`,
-        external_media_url: key ? mediaMap.get(key) ?? null : null,
+        external_media_url: key ? (mediaMap.get(key) ?? null) : null,
         body: truncate(t.text),
         created_at: t.created_at,
       };

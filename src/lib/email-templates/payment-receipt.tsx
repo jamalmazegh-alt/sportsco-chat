@@ -19,14 +19,17 @@ interface Props {
 
 const PaymentReceiptEmail = (p: Props) => {
   const isEn = p.locale === "en";
-  const helloAssoNote = p.method === "helloasso"
-    ? (isEn
+  const helloAssoNote =
+    p.method === "helloasso"
+      ? isEn
         ? "Payment processed outside Clubero via HelloAsso."
-        : "Paiement traité hors de Clubero via HelloAsso.")
-    : null;
+        : "Paiement traité hors de Clubero via HelloAsso."
+      : null;
   return (
     <EmailShell preview={`Reçu de paiement — ${p.itemTitle}`} locale={isEn ? "en" : "fr"}>
-      <Heading style={h1}>{isEn ? "Thank you for your payment" : "Merci pour votre paiement"}</Heading>
+      <Heading style={h1}>
+        {isEn ? "Thank you for your payment" : "Merci pour votre paiement"}
+      </Heading>
       <Text style={lead}>
         {isEn
           ? `${p.clubName} confirms receipt of your payment.`
@@ -40,15 +43,15 @@ const PaymentReceiptEmail = (p: Props) => {
         {p.paidAt && <Row k={isEn ? "Date" : "Date"} v={p.paidAt} />}
         <Row k={isEn ? "Receipt #" : "N° de reçu"} v={p.receiptNumber} />
       </Section>
-      {helloAssoNote && (
-        <Text style={muted}>{helloAssoNote}</Text>
-      )}
+      {helloAssoNote && <Text style={muted}>{helloAssoNote}</Text>}
       {p.downloadUrl && (
         <Section style={{ textAlign: "center", margin: "24px 0" }}>
           <Button href={p.downloadUrl} style={btn}>
             {isEn ? "Download receipt (PDF)" : "Télécharger le reçu (PDF)"}
           </Button>
-          <Text style={muted}>{isEn ? "The link expires in a few minutes." : "Le lien expire après quelques minutes."}</Text>
+          <Text style={muted}>
+            {isEn ? "The link expires in a few minutes." : "Le lien expire après quelques minutes."}
+          </Text>
         </Section>
       )}
       <Text style={muted}>
@@ -86,9 +89,22 @@ export const template = {
 
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 12px" };
 const lead = { fontSize: "14px", color: "#334155", margin: "0 0 18px", lineHeight: "1.55" };
-const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px 18px" };
+const card = {
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  borderRadius: "10px",
+  padding: "14px 18px",
+};
 const row = { fontSize: "13px", color: "#0f172a", margin: "4px 0", lineHeight: "1.6" };
 const key = { color: "#64748b", marginRight: "6px" };
 const val = { fontWeight: "bold" as const };
-const btn = { background: "#0f172a", color: "#ffffff", padding: "12px 22px", borderRadius: "8px", textDecoration: "none", fontWeight: 600, fontSize: "14px" };
+const btn = {
+  background: "#0f172a",
+  color: "#ffffff",
+  padding: "12px 22px",
+  borderRadius: "8px",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: "14px",
+};
 const muted = { fontSize: "12px", color: "#64748b", margin: "10px 0 0", lineHeight: "1.5" };

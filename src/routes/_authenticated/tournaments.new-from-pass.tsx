@@ -119,12 +119,8 @@ function NewTournamentPage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
           <Loader2 className="h-7 w-7 animate-spin text-primary" />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-bold">
-          {t("newFromPass.validatingTitle")}
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          {t("newFromPass.validatingBody")}
-        </p>
+        <h1 className="mt-5 font-display text-2xl font-bold">{t("newFromPass.validatingTitle")}</h1>
+        <p className="mt-3 text-sm text-muted-foreground">{t("newFromPass.validatingBody")}</p>
       </div>
     );
   }
@@ -135,9 +131,7 @@ function NewTournamentPage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <AlertCircle className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-bold">
-          Aucun crédit tournoi disponible
-        </h1>
+        <h1 className="mt-5 font-display text-2xl font-bold">Aucun crédit tournoi disponible</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           Choisissez un plan pour démarrer votre tournoi en 30 secondes avec l'IA.
         </p>

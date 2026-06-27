@@ -21,7 +21,14 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import { StatusBadge, subTone, roleTone, Avatar, trialCountdown, formatMoney } from "@/lib/superadmin/ui";
+import {
+  StatusBadge,
+  subTone,
+  roleTone,
+  Avatar,
+  trialCountdown,
+  formatMoney,
+} from "@/lib/superadmin/ui";
 import { BillingExemptionPanel } from "@/components/superadmin/BillingExemptionPanel";
 
 export const Route = createFileRoute("/superadmin/clubs/$clubId")({
@@ -71,7 +78,15 @@ function ClubDetail() {
       </div>
     );
 
-  const { club, subscription, teams, members, recent_events, recent_convocations, whatsapp_configured_count } = data;
+  const {
+    club,
+    subscription,
+    teams,
+    members,
+    recent_events,
+    recent_convocations,
+    whatsapp_configured_count,
+  } = data;
   if (!club) return <div className="p-8 text-sm">Club not found.</div>;
   const archived = Boolean((club as { archived_at?: string | null }).archived_at);
   const sub = subTone(subscription?.status);
@@ -119,17 +134,29 @@ function ClubDetail() {
           onClick={() => runArchive(!archived)}
         >
           {archived ? (
-            <><ArchiveRestore className="h-4 w-4 mr-1.5" /> Restore</>
+            <>
+              <ArchiveRestore className="h-4 w-4 mr-1.5" /> Restore
+            </>
           ) : (
-            <><Archive className="h-4 w-4 mr-1.5" /> Archive</>
+            <>
+              <Archive className="h-4 w-4 mr-1.5" /> Archive
+            </>
           )}
         </Button>
       </header>
 
       <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <KPI icon={<Users className="h-4 w-4" />} label="Members" value={members.length} />
-        <KPI icon={<Trophy className="h-4 w-4" />} label="Teams" value={`${activeTeams.length}/${teams.length}`} />
-        <KPI icon={<Calendar className="h-4 w-4" />} label="Recent events" value={recent_events.length} />
+        <KPI
+          icon={<Trophy className="h-4 w-4" />}
+          label="Teams"
+          value={`${activeTeams.length}/${teams.length}`}
+        />
+        <KPI
+          icon={<Calendar className="h-4 w-4" />}
+          label="Recent events"
+          value={recent_events.length}
+        />
         <KPI
           icon={<MessageCircle className="h-4 w-4" />}
           label="WhatsApp teams"
@@ -212,7 +239,9 @@ function ClubDetail() {
                           <td className="px-3 py-2 text-muted-foreground">
                             {new Date(inv.created * 1000).toLocaleDateString()}
                           </td>
-                          <td className="px-3 py-2 font-mono text-xs">{inv.number ?? inv.id.slice(0, 10)}</td>
+                          <td className="px-3 py-2 font-mono text-xs">
+                            {inv.number ?? inv.id.slice(0, 10)}
+                          </td>
                           <td className="px-3 py-2">
                             <StatusBadge
                               tone={
@@ -260,7 +289,9 @@ function ClubDetail() {
         <Card title="Subscription">
           {subscription ? (
             <dl className="text-sm space-y-1.5">
-              <Row label="Status"><StatusBadge tone={sub.tone}>{sub.label}</StatusBadge></Row>
+              <Row label="Status">
+                <StatusBadge tone={sub.tone}>{sub.label}</StatusBadge>
+              </Row>
               <Row label="Plan">{subscription.plan ?? "—"}</Row>
               <Row label="Trial end">
                 {subscription.trial_end ? (
@@ -268,16 +299,22 @@ function ClubDetail() {
                     {new Date(subscription.trial_end).toLocaleDateString()}
                     {trial && <span className="text-xs text-muted-foreground">({trial})</span>}
                   </span>
-                ) : "—"}
+                ) : (
+                  "—"
+                )}
               </Row>
-              <Row label="Period end">{subscription.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString() : "—"}</Row>
-              <Row label="Cancel at period end">{subscription.cancel_at_period_end ? "Yes" : "No"}</Row>
+              <Row label="Period end">
+                {subscription.current_period_end
+                  ? new Date(subscription.current_period_end).toLocaleDateString()
+                  : "—"}
+              </Row>
+              <Row label="Cancel at period end">
+                {subscription.cancel_at_period_end ? "Yes" : "No"}
+              </Row>
               <Row label="Stripe customer">
                 <span className="font-mono text-xs">{subscription.stripe_customer_id ?? "—"}</span>
               </Row>
-              {respRate !== null && (
-                <Row label="Response rate (recent)">{respRate}%</Row>
-              )}
+              {respRate !== null && <Row label="Response rate (recent)">{respRate}%</Row>}
             </dl>
           ) : (
             <div className="text-sm text-muted-foreground">No subscription record.</div>
@@ -290,7 +327,9 @@ function ClubDetail() {
             {teams.map((t) => (
               <li key={t.id} className="px-1 py-2 flex items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <div className={t.deleted_at ? "line-through text-muted-foreground" : "font-medium"}>
+                  <div
+                    className={t.deleted_at ? "line-through text-muted-foreground" : "font-medium"}
+                  >
                     {t.name}
                   </div>
                   <div className="text-[11px] text-muted-foreground truncate">
@@ -315,7 +354,13 @@ function ClubDetail() {
           <ul className="space-y-1.5 text-sm">
             {recent_events.map((e) => (
               <li key={e.id} className="flex items-center justify-between gap-3">
-                <span className={(e.deleted_at || e.cancelled_at) ? "line-through text-muted-foreground truncate" : "truncate"}>
+                <span
+                  className={
+                    e.deleted_at || e.cancelled_at
+                      ? "line-through text-muted-foreground truncate"
+                      : "truncate"
+                  }
+                >
                   {e.title}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
@@ -332,7 +377,10 @@ function ClubDetail() {
         <Card title={`Members (${members.length})`}>
           <ul className="divide-y divide-border -mx-1 max-h-80 overflow-auto">
             {members.map((m) => {
-              const name = m.profile?.full_name || `${m.profile?.first_name ?? ""} ${m.profile?.last_name ?? ""}`.trim() || "—";
+              const name =
+                m.profile?.full_name ||
+                `${m.profile?.first_name ?? ""} ${m.profile?.last_name ?? ""}`.trim() ||
+                "—";
               return (
                 <li key={m.user_id} className="px-1 py-2 flex items-center gap-3">
                   <Avatar url={m.profile?.avatar_url} name={name} size={32} />
@@ -342,7 +390,9 @@ function ClubDetail() {
                     className="min-w-0 flex-1 hover:underline"
                   >
                     <div className="text-sm font-medium truncate">{name}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">{m.profile?.phone ?? m.user_id.slice(0, 8)}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {m.profile?.phone ?? m.user_id.slice(0, 8)}
+                    </div>
                   </Link>
                   <StatusBadge tone={roleTone(m.role)}>{m.role}</StatusBadge>
                 </li>
@@ -364,7 +414,15 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function KPI({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+function KPI({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) {
   return (
     <div className="rounded-lg border border-border bg-card p-3">
       <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">

@@ -20,9 +20,7 @@ describe("tournament payment settings schema", () => {
   };
 
   it("rejects negative registration_fee", () => {
-    expect(() =>
-      paymentSettingsSchema.parse({ ...base, registration_fee: -10 }),
-    ).toThrow();
+    expect(() => paymentSettingsSchema.parse({ ...base, registration_fee: -10 })).toThrow();
   });
 
   it("accepts zero registration_fee", () => {

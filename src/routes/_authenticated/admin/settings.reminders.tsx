@@ -118,9 +118,7 @@ function RemindersSettings() {
                   <button
                     key={preset.label}
                     type="button"
-                    onClick={() =>
-                      setForm({ ...form, auto_reminder_hours_before: preset.value })
-                    }
+                    onClick={() => setForm({ ...form, auto_reminder_hours_before: preset.value })}
                     className={`w-full text-left rounded-lg border px-3 py-2.5 text-sm transition-colors ${
                       selected
                         ? "border-primary bg-primary/5 font-medium"

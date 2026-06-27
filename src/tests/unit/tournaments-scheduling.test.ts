@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { generateRoundRobin, distributeIntoGroups, type Pairing } from "@/modules/tournaments/lib/scheduling";
+import {
+  generateRoundRobin,
+  distributeIntoGroups,
+  type Pairing,
+} from "@/modules/tournaments/lib/scheduling";
 import { computeStandings } from "@/modules/tournaments/lib/standings";
 import { generateKnockoutBracket, type BracketMatch } from "@/modules/tournaments/lib/bracket";
 

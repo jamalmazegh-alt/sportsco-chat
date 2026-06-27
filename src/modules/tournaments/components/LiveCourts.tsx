@@ -188,9 +188,7 @@ function FieldGroupedView({
                   muted
                 />
               )}
-              {!current && !next && (
-                <p className="px-1 py-2 text-xs text-muted-foreground/70">—</p>
-              )}
+              {!current && !next && <p className="px-1 py-2 text-xs text-muted-foreground/70">—</p>}
             </div>
           );
         })}
@@ -233,9 +231,7 @@ function MatchRow({
         muted && "opacity-70",
       )}
     >
-      {isLive && (
-        <span aria-hidden className="absolute left-0 top-0 h-full w-1 bg-rose-500" />
-      )}
+      {isLive && <span aria-hidden className="absolute left-0 top-0 h-full w-1 bg-rose-500" />}
       {!hideField && (
         <div className="flex w-14 shrink-0 flex-col items-center justify-center gap-0.5">
           <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-muted-foreground">

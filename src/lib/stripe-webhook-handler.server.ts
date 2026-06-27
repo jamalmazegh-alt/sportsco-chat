@@ -61,8 +61,7 @@ async function upsertSubscription(sub: Stripe.Subscription) {
     ((sub.customer as Stripe.Customer | null)?.metadata?.club_id as string | undefined);
 
   let resolvedClubId = clubId ?? null;
-  const customerId =
-    typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null;
+  const customerId = typeof sub.customer === "string" ? sub.customer : (sub.customer?.id ?? null);
   if (!resolvedClubId && customerId) {
     const { data } = await supabaseAdmin
       .from("subscriptions")
@@ -111,8 +110,7 @@ async function upsertSubscription(sub: Stripe.Subscription) {
  * tournament_entitlements (NOT the club subscriptions table).
  */
 async function upsertTournamentAnnualEntitlement(sub: Stripe.Subscription) {
-  const organizerId =
-    (sub.metadata?.organizer_id as string | undefined) ?? null;
+  const organizerId = (sub.metadata?.organizer_id as string | undefined) ?? null;
   if (!organizerId) {
     console.warn("tournament_annual sub without organizer_id metadata", sub.id);
     return;
@@ -124,8 +122,7 @@ async function upsertTournamentAnnualEntitlement(sub: Stripe.Subscription) {
   const validUntil = item?.current_period_end
     ? new Date(item.current_period_end * 1000).toISOString()
     : null;
-  const customerId =
-    typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null;
+  const customerId = typeof sub.customer === "string" ? sub.customer : (sub.customer?.id ?? null);
   const status =
     sub.status === "active" || sub.status === "trialing"
       ? "active"
@@ -165,7 +162,6 @@ async function upsertTournamentAnnualEntitlement(sub: Stripe.Subscription) {
 function isTournamentAnnualSub(sub: Stripe.Subscription): boolean {
   return sub.metadata?.purpose === "tournament_annual";
 }
-
 
 /** Shared Stripe webhook POST handler (platform + Connect). */
 export async function handleStripeWebhookPost(request: Request): Promise<Response> {
@@ -220,7 +216,7 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
           const piId =
             typeof session.payment_intent === "string"
               ? session.payment_intent
-              : session.payment_intent?.id ?? null;
+              : (session.payment_intent?.id ?? null);
           let chargeId: string | null = null;
           let amount = session.amount_total ?? 0;
           let fee: number | null = null;
@@ -263,9 +259,8 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
           const paymentIntentId =
             typeof session.payment_intent === "string"
               ? session.payment_intent
-              : session.payment_intent?.id ?? null;
-          const buyerEmail =
-            session.customer_details?.email ?? session.metadata?.email ?? null;
+              : (session.payment_intent?.id ?? null);
+          const buyerEmail = session.customer_details?.email ?? session.metadata?.email ?? null;
           if (buyerEmail) {
             const qty = readTournamentPassQuantity(session.metadata?.quantity);
             const totalCents = session.amount_total;
@@ -334,11 +329,11 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
           const piId =
             typeof session.payment_intent === "string"
               ? session.payment_intent
-              : session.payment_intent?.id ?? null;
+              : (session.payment_intent?.id ?? null);
           const customerId =
             typeof session.customer === "string"
               ? session.customer
-              : session.customer?.id ?? null;
+              : (session.customer?.id ?? null);
           const { data: existing } = await supabaseAdmin
             .from("tournament_entitlements")
             .select("id")
@@ -363,7 +358,6 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
           // Nothing to do here besides letting the upsertTournamentAnnualEntitlement
           // helper run when the subscription event arrives.
           break;
-
         }
         if (session.subscription) {
           const subId =
@@ -424,8 +418,7 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
         if (resolvedClubId && previous) {
           const wasScheduled =
             previous.cancel_at_period_end === true || previous.cancel_at !== null;
-          const nowScheduled =
-            fresh.cancel_at_period_end === true || fresh.cancel_at !== null;
+          const nowScheduled = fresh.cancel_at_period_end === true || fresh.cancel_at !== null;
           if (!wasScheduled && nowScheduled) {
             await notifyAdmin("cancellation_scheduled", fresh, resolvedClubId);
           } else if (wasScheduled && !nowScheduled && fresh.status !== "canceled") {
@@ -521,24 +514,22 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
             .eq("id", club.id);
 
           try {
-            await supabaseAdmin
-              .from("tournament_payment_events")
-              .upsert(
-                {
-                  tournament_id: null,
-                  event_type: "account_updated",
-                  stripe_event_id: event.id,
-                  metadata: {
-                    club_id: club.id,
-                    stripe_account_id: account.id,
-                    status,
-                    charges_enabled: chargesEnabled,
-                    payouts_enabled: payoutsEnabled,
-                    disabled_reason: disabledReason,
-                  } as unknown as never,
-                },
-                { onConflict: "stripe_event_id", ignoreDuplicates: true },
-              );
+            await supabaseAdmin.from("tournament_payment_events").upsert(
+              {
+                tournament_id: null,
+                event_type: "account_updated",
+                stripe_event_id: event.id,
+                metadata: {
+                  club_id: club.id,
+                  stripe_account_id: account.id,
+                  status,
+                  charges_enabled: chargesEnabled,
+                  payouts_enabled: payoutsEnabled,
+                  disabled_reason: disabledReason,
+                } as unknown as never,
+              },
+              { onConflict: "stripe_event_id", ignoreDuplicates: true },
+            );
           } catch (e) {
             console.error("tournament_payment_events upsert failed (swallowed)", e);
           }
@@ -569,7 +560,7 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
         const piId =
           typeof charge.payment_intent === "string"
             ? charge.payment_intent
-            : charge.payment_intent?.id ?? null;
+            : (charge.payment_intent?.id ?? null);
         const totalRefunded = charge.amount_refunded ?? 0;
 
         if (piId) {
@@ -634,7 +625,7 @@ export async function handleStripeWebhookPost(request: Request): Promise<Respons
         const piId =
           typeof session.payment_intent === "string"
             ? session.payment_intent
-            : session.payment_intent?.id ?? null;
+            : (session.payment_intent?.id ?? null);
         let tx: { id: string; status: string } | null = null;
         {
           const { data } = await supabaseAdmin

@@ -527,7 +527,9 @@ function MatchDetailsSection({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="yellow_card">🟨 {t("matches.events.yellow_card")}</SelectItem>
+                    <SelectItem value="yellow_card">
+                      🟨 {t("matches.events.yellow_card")}
+                    </SelectItem>
                     <SelectItem value="red_card">🟥 {t("matches.events.red_card")}</SelectItem>
                   </SelectContent>
                 </Select>
@@ -928,8 +930,7 @@ function MatchCard({
     scheduled: {
       border: "border-l-[hsl(149_50%_36%)]/60",
       headerBg: "bg-[hsl(149_50%_36%)]/5",
-      badge:
-        "bg-[hsl(149_50%_36%)]/10 text-[hsl(149_55%_25%)] border border-[hsl(149_50%_36%)]/25",
+      badge: "bg-[hsl(149_50%_36%)]/10 text-[hsl(149_55%_25%)] border border-[hsl(149_50%_36%)]/25",
       cta: "bg-[hsl(149_50%_36%)] text-white hover:bg-[hsl(149_55%_30%)]",
       dot: "bg-[hsl(149_50%_36%)]/70",
     },
@@ -1352,7 +1353,6 @@ function MatchCard({
             </DropdownMenu>
           </div>
         )}
-
       </div>
 
       <ResponsiveFormDialog
@@ -1515,9 +1515,7 @@ function MatchCard({
               events={events}
               pendingEvents={pendingEvents}
               onRemoveSaved={(id) => removeEvent.mutate(id)}
-              onRemovePending={(id) =>
-                setPendingEvents((prev) => prev.filter((d) => d.id !== id))
-              }
+              onRemovePending={(id) => setPendingEvents((prev) => prev.filter((d) => d.id !== id))}
               onAddGoal={(draft) =>
                 setPendingEvents((prev) => [
                   ...prev,

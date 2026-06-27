@@ -399,7 +399,6 @@ export function EventFormSheet({
   backLabel,
 }: Props) {
   const { t } = useTranslation();
-  
 
   const [teamId, setTeamId] = useState(initial?.team_id ?? "");
   const [type, setType] = useState<EventType>((initial?.type as EventType) ?? "training");
@@ -417,9 +416,11 @@ export function EventFormSheet({
   );
   const [meetingPoint, setMeetingPoint] = useState(initial?.meeting_point ?? "");
   const [isOfficial, setIsOfficial] = useState<boolean>(
-    initial?.is_official ?? ((initial?.type as EventType) === "match"),
+    initial?.is_official ?? (initial?.type as EventType) === "match",
   );
-  const [attachments, setAttachments] = useState<Attachment[]>((initial?.attachments as Attachment[] | undefined) ?? []);
+  const [attachments, setAttachments] = useState<Attachment[]>(
+    (initial?.attachments as Attachment[] | undefined) ?? [],
+  );
 
   const startsInit = splitDateTime(initial?.starts_at);
   const endsInit = splitDateTime(initial?.ends_at);
@@ -455,7 +456,7 @@ export function EventFormSheet({
     setCompetitionName(initial?.competition_name ?? "");
     setIsHome(initial?.is_home === false ? "away" : "home");
     setMeetingPoint(initial?.meeting_point ?? "");
-    setIsOfficial(initial?.is_official ?? ((initial?.type as EventType) === "match"));
+    setIsOfficial(initial?.is_official ?? (initial?.type as EventType) === "match");
     setAttachments((initial?.attachments as Attachment[] | undefined) ?? []);
     const s = splitDateTime(initial?.starts_at);
     const e = splitDateTime(initial?.ends_at);
@@ -505,11 +506,7 @@ export function EventFormSheet({
     setBusy(true);
 
     const finalTitle =
-      type === "match"
-        ? opponent
-          ? `vs ${opponent}`
-          : t("events.types.match")
-        : title.trim();
+      type === "match" ? (opponent ? `vs ${opponent}` : t("events.types.match")) : title.trim();
 
     const finalLocationUrl = locationUrl?.trim()
       ? locationUrl.trim()
@@ -544,7 +541,7 @@ export function EventFormSheet({
     if (mode === "create") {
       const shouldRepeat = type === "training" && repeatWeeks > 1;
       if (shouldRepeat) {
-        const rows = [] as typeof payload[];
+        const rows = [] as (typeof payload)[];
         for (let i = 0; i < repeatWeeks; i++) {
           const offsetMs = i * 7 * 24 * 60 * 60 * 1000;
           const shifted = {
@@ -565,9 +562,14 @@ export function EventFormSheet({
           .select("starts_at")
           .eq("team_id", teamId)
           .eq("type", type)
-          .in("starts_at", rows.map((r) => r.starts_at))
+          .in(
+            "starts_at",
+            rows.map((r) => r.starts_at),
+          )
           .is("deleted_at", null);
-        const existingSet = new Set((existing ?? []).map((e) => new Date(e.starts_at).toISOString()));
+        const existingSet = new Set(
+          (existing ?? []).map((e) => new Date(e.starts_at).toISOString()),
+        );
         const toInsert = rows.filter((r) => !existingSet.has(r.starts_at));
         if (toInsert.length === 0) {
           setBusy(false);
@@ -576,7 +578,14 @@ export function EventFormSheet({
         }
         const { data, error } = await supabase
           .from("events")
-          .insert(toInsert.map((r) => ({ ...r, status: "published", created_by: userId, convocations_sent: false })) as never)
+          .insert(
+            toInsert.map((r) => ({
+              ...r,
+              status: "published",
+              created_by: userId,
+              convocations_sent: false,
+            })) as never,
+          )
           .select("id");
         setBusy(false);
         if (error || !data || data.length === 0) {
@@ -607,7 +616,12 @@ export function EventFormSheet({
       }
       const { data, error } = await supabase
         .from("events")
-        .insert({ ...payload, status: "published", created_by: userId, convocations_sent: false } as never)
+        .insert({
+          ...payload,
+          status: "published",
+          created_by: userId,
+          convocations_sent: false,
+        } as never)
         .select("id")
         .single();
       setBusy(false);
@@ -619,10 +633,17 @@ export function EventFormSheet({
       onOpenChange(false);
       onSaved(data.id);
       if (sendNow && type !== "meeting") {
-        navigate({ to: "/events/$eventId", params: { eventId: data.id }, search: { send: 1 } as any });
+        navigate({
+          to: "/events/$eventId",
+          params: { eventId: data.id },
+          search: { send: 1 } as any,
+        });
       }
     } else {
-      const { error } = await supabase.from("events").update(payload as never).eq("id", initial!.id!);
+      const { error } = await supabase
+        .from("events")
+        .update(payload as never)
+        .eq("id", initial!.id!);
       setBusy(false);
       if (error) {
         toast.error(error.message);
@@ -642,302 +663,320 @@ export function EventFormSheet({
       title={mode === "create" ? t("events.create") : t("common.edit")}
     >
       <form onSubmit={onSubmit} className="space-y-4 mt-4 pb-8">
-          {onBack && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-8 px-2 -ml-2"
-              onClick={onBack}
-            >
-              ← {backLabel ?? t("common.back", { defaultValue: "Retour" })}
-            </Button>
-          )}
-          <div className="space-y-1.5">
-            <Label>{t("events.selectTeam")}</Label>
-            <Select value={teamId} onValueChange={setTeamId} required>
-              <SelectTrigger>
-                <SelectValue placeholder={t("events.selectTeam")} />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map((tm) => (
-                  <SelectItem key={tm.id} value={tm.id}>
-                    {tm.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {onBack && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 -ml-2"
+            onClick={onBack}
+          >
+            ← {backLabel ?? t("common.back", { defaultValue: "Retour" })}
+          </Button>
+        )}
+        <div className="space-y-1.5">
+          <Label>{t("events.selectTeam")}</Label>
+          <Select value={teamId} onValueChange={setTeamId} required>
+            <SelectTrigger>
+              <SelectValue placeholder={t("events.selectTeam")} />
+            </SelectTrigger>
+            <SelectContent>
+              {teams.map((tm) => (
+                <SelectItem key={tm.id} value={tm.id}>
+                  {tm.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="space-y-1.5">
-            <Label>{t("events.type")}</Label>
-            <Select value={type} onValueChange={(v) => setType(v as EventType)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
-                  <SelectItem key={k} value={k}>
-                    {t(`events.types.${k}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-1.5">
+          <Label>{t("events.type")}</Label>
+          <Select value={type} onValueChange={(v) => setType(v as EventType)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(["training", "match", "tournament", "meeting", "other"] as const).map((k) => (
+                <SelectItem key={k} value={k}>
+                  {t(`events.types.${k}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {type === "tournament" && (
-            <div className="space-y-2 rounded-xl border border-border bg-card px-3 py-2.5">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-normal">{t("events.isOfficialTournament")}</Label>
-                <Switch checked={isOfficial} onCheckedChange={setIsOfficial} />
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t("events.isOfficialTournamentDescription")}
-              </p>
+        {type === "tournament" && (
+          <div className="space-y-2 rounded-xl border border-border bg-card px-3 py-2.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-normal">{t("events.isOfficialTournament")}</Label>
+              <Switch checked={isOfficial} onCheckedChange={setIsOfficial} />
             </div>
-          )}
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {t("events.isOfficialTournamentDescription")}
+            </p>
+          </div>
+        )}
 
+        {type !== "match" && (
+          <div className="space-y-1.5">
+            <Label>{t("events.name")}</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={type === "training" ? t("events.types.training") : ""}
+              required
+            />
+          </div>
+        )}
 
-          {type !== "match" && (
+        {type === "match" && (
+          <>
             <div className="space-y-1.5">
-              <Label>{t("events.name")}</Label>
+              <Label>{t("events.competitionType")}</Label>
+              <Select
+                value={competitionType}
+                onValueChange={(v) => setCompetitionType(v as CompetitionType)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCompetitionTypes.map((k) => (
+                    <SelectItem key={k} value={k}>
+                      {t(`events.competitionTypes.${k}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("events.opponent")}</Label>
               <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={type === "training" ? t("events.types.training") : ""}
                 required
+                value={opponent ?? ""}
+                onChange={(e) => setOpponent(e.target.value)}
               />
             </div>
-          )}
+            <div className="space-y-1.5">
+              <Label>{t("events.venue")}</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {(["home", "away"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setIsHome(v)}
+                    className={cn(
+                      "rounded-xl py-2.5 text-sm font-medium border transition",
+                      isHome === v
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card border-border text-muted-foreground",
+                    )}
+                  >
+                    {t(`events.${v}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {isHome === "away" && (
+              <AddressField
+                label={t("events.meetingPoint")}
+                value={meetingPoint ?? ""}
+                onValueChange={setMeetingPoint}
+                onPlaceUrl={() => undefined}
+                placeholder={t("events.meetingPointHint")}
+                helper={t("events.locationGoogleHelper")}
+              />
+            )}
+          </>
+        )}
 
-          {type === "match" && (
-            <>
+        {type === "match" ? (
+          <>
+            <DateTimeField
+              label={t("events.convocationDateTime")}
+              date={convocDate}
+              time={convocTime}
+              onDate={setConvocDate}
+              onTime={setConvocTime}
+            />
+            <DateTimeField
+              label={t("events.matchDateTime")}
+              date={startDate}
+              time={startTime}
+              onDate={setStartDate}
+              onTime={setStartTime}
+              required
+            />
+          </>
+        ) : type === "training" ? (
+          <>
+            {mode === "create" && (
               <div className="space-y-1.5">
-                <Label>{t("events.competitionType")}</Label>
-                <Select
-                  value={competitionType}
-                  onValueChange={(v) => setCompetitionType(v as CompetitionType)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableCompetitionTypes.map((k) => (
-                      <SelectItem key={k} value={k}>
-                        {t(`events.competitionTypes.${k}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("events.opponent")}</Label>
-                <Input
-                  required
-                  value={opponent ?? ""}
-                  onChange={(e) => setOpponent(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("events.venue")}</Label>
+                <Label>{t("events.series.mode", { defaultValue: "Planification" })}</Label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(["home", "away"] as const).map((v) => (
+                  {(
+                    [
+                      {
+                        v: false,
+                        label: t("events.series.modeSingle", { defaultValue: "Séance unique" }),
+                      },
+                      {
+                        v: true,
+                        label: t("events.series.modeRecurring", {
+                          defaultValue: "Planning récurrent",
+                        }),
+                      },
+                    ] as const
+                  ).map((opt) => (
                     <button
-                      key={v}
+                      key={String(opt.v)}
                       type="button"
-                      onClick={() => setIsHome(v)}
+                      onClick={() => setIsRecurring(opt.v)}
                       className={cn(
                         "rounded-xl py-2.5 text-sm font-medium border transition",
-                        isHome === v
+                        isRecurring === opt.v
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-card border-border text-muted-foreground",
                       )}
                     >
-                      {t(`events.${v}`)}
+                      {opt.label}
                     </button>
                   ))}
                 </div>
               </div>
-              {isHome === "away" && (
-                <AddressField
-                  label={t("events.meetingPoint")}
-                  value={meetingPoint ?? ""}
-                  onValueChange={setMeetingPoint}
-                  onPlaceUrl={() => undefined}
-                  placeholder={t("events.meetingPointHint")}
-                  helper={t("events.locationGoogleHelper")}
+            )}
+            {!(mode === "create" && isRecurring) && (
+              <>
+                <DateOnlyField
+                  label={t("events.trainingDate")}
+                  date={startDate}
+                  onDate={setStartDate}
+                  required
                 />
-              )}
-            </>
-          )}
-
-          {type === "match" ? (
-            <>
-              <DateTimeField
-                label={t("events.convocationDateTime")}
-                date={convocDate}
-                time={convocTime}
-                onDate={setConvocDate}
-                onTime={setConvocTime}
-              />
-              <DateTimeField
-                label={t("events.matchDateTime")}
-                date={startDate}
-                time={startTime}
-                onDate={setStartDate}
-                onTime={setStartTime}
-                required
-              />
-            </>
-          ) : type === "training" ? (
-            <>
-              {mode === "create" && (
-                <div className="space-y-1.5">
-                  <Label>{t("events.series.mode", { defaultValue: "Planification" })}</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {([
-                      { v: false, label: t("events.series.modeSingle", { defaultValue: "Séance unique" }) },
-                      { v: true, label: t("events.series.modeRecurring", { defaultValue: "Planning récurrent" }) },
-                    ] as const).map((opt) => (
-                      <button
-                        key={String(opt.v)}
-                        type="button"
-                        onClick={() => setIsRecurring(opt.v)}
-                        className={cn(
-                          "rounded-xl py-2.5 text-sm font-medium border transition",
-                          isRecurring === opt.v
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-card border-border text-muted-foreground",
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {!(mode === "create" && isRecurring) && (
-                <>
-                  <DateOnlyField
-                    label={t("events.trainingDate")}
-                    date={startDate}
-                    onDate={setStartDate}
+                <div className="grid grid-cols-3 gap-2">
+                  <TimeField
+                    label={t("events.convocationTimeShort")}
+                    time={convocTime}
+                    onTime={setConvocTime}
+                  />
+                  <TimeField
+                    label={t("events.startTime")}
+                    time={startTime}
+                    onTime={(v) => {
+                      setStartTime(v);
+                      if (!endTime && v) {
+                        setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
+                      }
+                    }}
                     required
                   />
-                  <div className="grid grid-cols-3 gap-2">
-                    <TimeField
-                      label={t("events.convocationTimeShort")}
-                      time={convocTime}
-                      onTime={setConvocTime}
-                    />
-                    <TimeField
-                      label={t("events.startTime")}
-                      time={startTime}
-                      onTime={(v) => {
-                        setStartTime(v);
-                        if (!endTime && v) {
-                          setEndTime(addMinutesToTime(v, TRAINING_DEFAULT_DURATION_MIN));
-                        }
-                      }}
-                      required
-                    />
-                    <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
-                  </div>
-                </>
-              )}
-              {mode === "create" && isRecurring && teamId && title.trim() && (
-                <RecurringTrainingPlanner
-                  teamId={teamId}
-                  title={title.trim()}
-                  defaultLocation={location || null}
-                  isOfficial={true}
-                  onCreated={(res) => {
-                    toast.success(
-                      t("events.series.created", {
-                        defaultValue: "{{count}} séances créées",
-                        count: res.createdCount,
-                      }),
-                    );
-                    onOpenChange(false);
-                    onSaved(res.seriesId);
-                  }}
+                  <TimeField label={t("events.endTime")} time={endTime} onTime={setEndTime} />
+                </div>
+              </>
+            )}
+            {mode === "create" && isRecurring && teamId && title.trim() && (
+              <RecurringTrainingPlanner
+                teamId={teamId}
+                title={title.trim()}
+                defaultLocation={location || null}
+                isOfficial={true}
+                onCreated={(res) => {
+                  toast.success(
+                    t("events.series.created", {
+                      defaultValue: "{{count}} séances créées",
+                      count: res.createdCount,
+                    }),
+                  );
+                  onOpenChange(false);
+                  onSaved(res.seriesId);
+                }}
+              />
+            )}
+            {mode === "create" && isRecurring && (!teamId || !title.trim()) && (
+              <p className="text-xs text-muted-foreground rounded-lg border border-dashed border-border p-3">
+                {t("events.series.needsTitleAndTeam", {
+                  defaultValue: "Choisissez une équipe et donnez un nom pour configurer la série.",
+                })}
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <DateTimeField
+              label={t("events.startsAt")}
+              date={startDate}
+              time={startTime}
+              onDate={setStartDate}
+              onTime={setStartTime}
+              required
+            />
+            <DateTimeField
+              label={t("events.convocationTime")}
+              date={convocDate}
+              time={convocTime}
+              onDate={setConvocDate}
+              onTime={setConvocTime}
+            />
+          </>
+        )}
+
+        {!(mode === "create" && type === "training" && isRecurring) && (
+          <>
+            <AddressField
+              label={t("events.location")}
+              value={location ?? ""}
+              onValueChange={setLocation}
+              onPlaceUrl={(url) => setLocationUrl(url ?? "")}
+              placeholder={t("events.locationHint")}
+              helper={t("events.locationGoogleHelper")}
+            />
+            <div className="space-y-1.5">
+              <Label>{t("events.details")}</Label>
+              <Textarea
+                value={description ?? ""}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>{t("events.attachments")}</Label>
+              <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
+            </div>
+
+            {mode === "create" && type !== "meeting" && (
+              <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
+                <Checkbox
+                  checked={sendNow}
+                  onCheckedChange={(v) => setSendNow(v === true)}
+                  className="mt-0.5"
                 />
-              )}
-              {mode === "create" && isRecurring && (!teamId || !title.trim()) && (
-                <p className="text-xs text-muted-foreground rounded-lg border border-dashed border-border p-3">
-                  {t("events.series.needsTitleAndTeam", { defaultValue: "Choisissez une équipe et donnez un nom pour configurer la série." })}
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              <DateTimeField
-                label={t("events.startsAt")}
-                date={startDate}
-                time={startTime}
-                onDate={setStartDate}
-                onTime={setStartTime}
-                required
-              />
-              <DateTimeField
-                label={t("events.convocationTime")}
-                date={convocDate}
-                time={convocTime}
-                onDate={setConvocDate}
-                onTime={setConvocTime}
-              />
-            </>
-          )}
-
-          {!(mode === "create" && type === "training" && isRecurring) && (
-            <>
-              <AddressField
-                label={t("events.location")}
-                value={location ?? ""}
-                onValueChange={setLocation}
-                onPlaceUrl={(url) => setLocationUrl(url ?? "")}
-                placeholder={t("events.locationHint")}
-                helper={t("events.locationGoogleHelper")}
-              />
-              <div className="space-y-1.5">
-                <Label>{t("events.details")}</Label>
-                <Textarea value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label>{t("events.attachments")}</Label>
-                <AttachmentPicker value={attachments} onChange={setAttachments} prefix="events" />
-              </div>
-
-              {mode === "create" && type !== "meeting" && (
-                <label className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3 cursor-pointer">
-                  <Checkbox
-                    checked={sendNow}
-                    onCheckedChange={(v) => setSendNow(v === true)}
-                    className="mt-0.5"
-                  />
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">
-                      {t("events.openConvocationAfterCreate")}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground">
-                      {t("events.openConvocationAfterCreateHint")}
-                    </div>
+                <div className="space-y-0.5">
+                  <div className="text-sm font-medium">
+                    {t("events.openConvocationAfterCreate")}
                   </div>
-                </label>
-              )}
+                  <div className="text-[11px] text-muted-foreground">
+                    {t("events.openConvocationAfterCreateHint")}
+                  </div>
+                </div>
+              </label>
+            )}
 
-              <Button type="submit" className="w-full h-11" disabled={busy || !teamId || titleMissing}>
-                {busy ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : mode === "create" ? (
-                  t("events.publish")
-                ) : (
-                  t("common.save")
-                )}
-              </Button>
-            </>
-          )}
+            <Button
+              type="submit"
+              className="w-full h-11"
+              disabled={busy || !teamId || titleMissing}
+            >
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : mode === "create" ? (
+                t("events.publish")
+              ) : (
+                t("common.save")
+              )}
+            </Button>
+          </>
+        )}
       </form>
     </ResponsiveFormDialog>
   );

@@ -41,10 +41,7 @@ export function OnboardingChecklist({
     queryFn: async () => {
       const [teamsRes, players, invites] = await Promise.all([
         supabase.from("teams").select("id").eq("club_id", clubId),
-        supabase
-          .from("players")
-          .select("id", { count: "exact", head: true })
-          .eq("club_id", clubId),
+        supabase.from("players").select("id", { count: "exact", head: true }).eq("club_id", clubId),
         supabase
           .from("member_invites")
           .select("id", { count: "exact", head: true })
@@ -169,10 +166,7 @@ export function OnboardingChecklist({
             · {completed}/{total}
           </p>
           <div className="mt-2 h-1.5 w-full rounded-full bg-primary/10 overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all"
-              style={{ width: `${pct}%` }}
-            />
+            <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
           </div>
         </div>
       </div>
@@ -215,9 +209,7 @@ function StepRow({ step }: { step: Step }) {
         >
           {step.label}
         </p>
-        {!step.done && (
-          <p className="text-[11px] text-muted-foreground truncate">{step.hint}</p>
-        )}
+        {!step.done && <p className="text-[11px] text-muted-foreground truncate">{step.hint}</p>}
       </div>
       {!step.done && (
         <span className="text-xs font-medium text-primary flex items-center gap-0.5 shrink-0">

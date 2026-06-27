@@ -29,28 +29,29 @@ const InboundInquiryEmail = (props: Props) => {
   const label = LABELS[kind];
   const isDemo = kind === "demo";
   return (
-    <EmailShell preview={`${label} — ${props.firstName || props.name || props.email}`} locale={"fr"}>
-          <Heading style={h1}>{label}</Heading>
-          <Section style={card}>
-            {props.firstName && <Row k="Prénom" v={props.firstName} />}
-            {(props.lastName || props.name) && (
-              <Row k="Nom" v={props.lastName || props.name || "—"} />
-            )}
-            <Row k="E-mail" v={props.email || "—"} />
-            {props.phone && <Row k="Téléphone" v={props.phone} />}
-            {props.role && <Row k="Rôle" v={props.role} />}
-            {isDemo && <Row k="Club" v={props.club || "—"} />}
-            {isDemo && <Row k="Équipes" v={props.teams || "—"} />}
-          </Section>
-          {(props.message || props.notes) && (
-            <>
-              <Heading as="h2" style={h2}>
-                {isDemo ? "Notes" : "Message"}
-              </Heading>
-              <Text style={msg}>{props.message || props.notes}</Text>
-            </>
-          )}
-          </EmailShell>
+    <EmailShell
+      preview={`${label} — ${props.firstName || props.name || props.email}`}
+      locale={"fr"}
+    >
+      <Heading style={h1}>{label}</Heading>
+      <Section style={card}>
+        {props.firstName && <Row k="Prénom" v={props.firstName} />}
+        {(props.lastName || props.name) && <Row k="Nom" v={props.lastName || props.name || "—"} />}
+        <Row k="E-mail" v={props.email || "—"} />
+        {props.phone && <Row k="Téléphone" v={props.phone} />}
+        {props.role && <Row k="Rôle" v={props.role} />}
+        {isDemo && <Row k="Club" v={props.club || "—"} />}
+        {isDemo && <Row k="Équipes" v={props.teams || "—"} />}
+      </Section>
+      {(props.message || props.notes) && (
+        <>
+          <Heading as="h2" style={h2}>
+            {isDemo ? "Notes" : "Message"}
+          </Heading>
+          <Text style={msg}>{props.message || props.notes}</Text>
+        </>
+      )}
+    </EmailShell>
   );
 };
 
@@ -84,9 +85,25 @@ export const template = {
 } satisfies TemplateEntry;
 
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
-const h2 = { fontSize: "14px", fontWeight: "bold" as const, color: "#0f172a", margin: "20px 0 8px" };
-const card = { background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 16px" };
+const h2 = {
+  fontSize: "14px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "20px 0 8px",
+};
+const card = {
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  borderRadius: "10px",
+  padding: "12px 16px",
+};
 const row = { fontSize: "13px", color: "#0f172a", margin: "4px 0", lineHeight: "1.5" };
 const key = { color: "#64748b", marginRight: "6px" };
 const val = { fontWeight: "bold" as const };
-const msg = { fontSize: "14px", color: "#334155", lineHeight: "1.55", whiteSpace: "pre-wrap" as const, margin: "0" };
+const msg = {
+  fontSize: "14px",
+  color: "#334155",
+  lineHeight: "1.55",
+  whiteSpace: "pre-wrap" as const,
+  margin: "0",
+};

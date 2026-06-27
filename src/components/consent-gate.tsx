@@ -4,7 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth-context";
 import { getConsentStatus, recordConsent } from "@/lib/privacy.functions";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -56,7 +62,7 @@ function ConsentModal({ items }: { items: Item[] }) {
   const [viewKind, setViewKind] = useState<string | null>(null);
   // Prefill checked = currently granted
   const [checked, setChecked] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(items.map((i) => [i.kind, i.granted]))
+    Object.fromEntries(items.map((i) => [i.kind, i.granted])),
   );
 
   useEffect(() => {
@@ -117,9 +123,7 @@ function ConsentModal({ items }: { items: Item[] }) {
                 >
                   <Checkbox
                     checked={!!checked[i.kind]}
-                    onCheckedChange={(v) =>
-                      setChecked((c) => ({ ...c, [i.kind]: !!v }))
-                    }
+                    onCheckedChange={(v) => setChecked((c) => ({ ...c, [i.kind]: !!v }))}
                     className="mt-0.5"
                   />
                   <div className="text-sm flex-1 min-w-0">

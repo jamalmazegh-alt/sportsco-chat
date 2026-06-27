@@ -23,11 +23,7 @@ export type SportKey =
   | typeof CUSTOM_SPORT;
 
 /** Sports où un match ne peut pas se terminer sur un score d'égalité. */
-export const SPORTS_WITHOUT_DRAW: readonly SportKey[] = [
-  "volleyball",
-  "tennis",
-  "padel",
-];
+export const SPORTS_WITHOUT_DRAW: readonly SportKey[] = ["volleyball", "tennis", "padel"];
 
 export function sportAllowsDraw(sport: string | null | undefined): boolean {
   if (!sport) return true;

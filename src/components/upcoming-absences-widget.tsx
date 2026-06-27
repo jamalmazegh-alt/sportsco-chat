@@ -59,7 +59,9 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
       if (playerIds.length === 0) return [];
       const { data } = await supabase
         .from("player_availabilities")
-        .select("id, player_id, start_date, end_date, reason, players:player_id(id, first_name, last_name)")
+        .select(
+          "id, player_id, start_date, end_date, reason, players:player_id(id, first_name, last_name)",
+        )
         .in("player_id", playerIds)
         .eq("status", "active")
         .gte("end_date", today)
@@ -82,9 +84,7 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
   const reducedSquad = upcoming14.length >= 3;
 
   const noAbsences = total === 0 && !isLoading;
-  const headerBg = noAbsences
-    ? undefined
-    : "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)";
+  const headerBg = noAbsences ? undefined : "linear-gradient(135deg, #92400e 0%, #f59e0b 100%)";
   const headerBgClass = noAbsences ? "bg-muted/40" : "";
   const headerTextClass = noAbsences ? "text-foreground" : "text-white";
   const headerSubTextClass = noAbsences ? "text-muted-foreground" : "text-white/85";
@@ -105,14 +105,23 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
       )}
     >
       {/* Header gradient */}
-      <div className={cn("relative overflow-hidden p-4", headerBgClass)} style={headerBg ? { background: headerBg } : undefined}>
+      <div
+        className={cn("relative overflow-hidden p-4", headerBgClass)}
+        style={headerBg ? { background: headerBg } : undefined}
+      >
         <svg
           aria-hidden
           className="absolute inset-0 h-full w-full opacity-[0.12] pointer-events-none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <pattern id="abs-pat" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <pattern
+              id="abs-pat"
+              width="30"
+              height="30"
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
               <line x1="0" y1="0" x2="0" y2="30" stroke={patternColor} strokeWidth="1" />
             </pattern>
           </defs>
@@ -120,7 +129,12 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
         </svg>
         <div className="relative flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className={cn("h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0", iconTileClass)}>
+            <div
+              className={cn(
+                "h-10 w-10 rounded-[12px] flex items-center justify-center shrink-0",
+                iconTileClass,
+              )}
+            >
               {noAbsences ? (
                 <CheckCircle2 className={cn("h-5 w-5", iconColorClass)} strokeWidth={2.4} />
               ) : (
@@ -134,7 +148,12 @@ export function UpcomingAbsencesWidget({ clubId, className }: Props) {
                   : t("availability.upcomingWidget", { defaultValue: "Absences à venir" })}
               </h2>
               {!noAbsences && (
-                <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em] mt-0.5", headerSubTextClass)}>
+                <p
+                  className={cn(
+                    "text-[11px] font-bold uppercase tracking-[0.1em] mt-0.5",
+                    headerSubTextClass,
+                  )}
+                >
                   {total} {total > 1 ? "joueurs" : "joueur"}
                 </p>
               )}

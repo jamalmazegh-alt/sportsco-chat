@@ -19,9 +19,7 @@ export const PLATFORM_FEE_PERCENT = getRate(
 
 /** Reduced rate for clubs with an active Clubero subscription. */
 export const PLATFORM_FEE_PERCENT_SUBSCRIBER = getRate(
-  typeof process !== "undefined"
-    ? process.env?.PLATFORM_FEE_PERCENT_SUBSCRIBER
-    : undefined,
+  typeof process !== "undefined" ? process.env?.PLATFORM_FEE_PERCENT_SUBSCRIBER : undefined,
   SUBSCRIBER_RATE,
 );
 
@@ -34,13 +32,8 @@ export function computeNetAmount(amountCents: number): number {
 }
 
 /** Picks the right rate based on subscription status, returns fee in cents. */
-export function computeFeeForClub(
-  amountCents: number,
-  hasActiveSubscription: boolean,
-): number {
-  const rate = hasActiveSubscription
-    ? PLATFORM_FEE_PERCENT_SUBSCRIBER
-    : PLATFORM_FEE_PERCENT;
+export function computeFeeForClub(amountCents: number, hasActiveSubscription: boolean): number {
+  const rate = hasActiveSubscription ? PLATFORM_FEE_PERCENT_SUBSCRIBER : PLATFORM_FEE_PERCENT;
   return Math.round(amountCents * rate);
 }
 

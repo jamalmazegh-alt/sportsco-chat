@@ -61,10 +61,7 @@ export function PublicStandings({ groups, teams, matches }: Props) {
           }));
         const rows = computeStandings(ids, groupMatches);
         return (
-          <section
-            key={g.id}
-            className="rounded-xl border border-border bg-card overflow-hidden"
-          >
+          <section key={g.id} className="rounded-xl border border-border bg-card overflow-hidden">
             <header className="px-3 py-2 border-b border-border bg-muted/40 flex items-center justify-between">
               <h3 className="font-medium text-sm">{g.name}</h3>
               <span className="text-xs text-muted-foreground">
@@ -115,22 +112,16 @@ export function PublicStandings({ groups, teams, matches }: Props) {
                           )}
                         </span>
                       </td>
-                      <td className="px-1 py-2 text-center tabular-nums">
-                        {r.played}
-                      </td>
+                      <td className="px-1 py-2 text-center tabular-nums">{r.played}</td>
                       <td className="px-1 py-2 text-center tabular-nums">{r.won}</td>
-                      <td className="px-1 py-2 text-center tabular-nums">
-                        {r.drawn}
-                      </td>
-                      <td className="px-1 py-2 text-center tabular-nums">
-                        {r.lost}
-                      </td>
-                      <td className={`px-1 py-2 text-center tabular-nums ${r.goalDiff > 0 ? "text-emerald-600 dark:text-emerald-400" : r.goalDiff < 0 ? "text-red-600 dark:text-red-400" : ""}`}>
+                      <td className="px-1 py-2 text-center tabular-nums">{r.drawn}</td>
+                      <td className="px-1 py-2 text-center tabular-nums">{r.lost}</td>
+                      <td
+                        className={`px-1 py-2 text-center tabular-nums ${r.goalDiff > 0 ? "text-emerald-600 dark:text-emerald-400" : r.goalDiff < 0 ? "text-red-600 dark:text-red-400" : ""}`}
+                      >
                         {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
                       </td>
-                      <td className="px-2 py-2 text-center font-bold tabular-nums">
-                        {r.points}
-                      </td>
+                      <td className="px-2 py-2 text-center font-bold tabular-nums">{r.points}</td>
                     </tr>
                   );
                 })}

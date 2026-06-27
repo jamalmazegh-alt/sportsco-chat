@@ -42,7 +42,22 @@ function isMimeAllowed(file: File): boolean {
   // On valide alors par extension.
   const ext = file.name.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
   if (!ext) return false;
-  return ["jpg", "jpeg", "png", "gif", "webp", "heic", "heif", "pdf", "doc", "docx", "xls", "xlsx", "txt", "csv"].includes(ext);
+  return [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "heic",
+    "heif",
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "txt",
+    "csv",
+  ].includes(ext);
 }
 
 export function AttachmentPicker({
@@ -130,11 +145,7 @@ export function AttachmentPicker({
           onClick={() => inputRef.current?.click()}
           disabled={busy || value.length >= max}
         >
-          {busy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Paperclip className="h-4 w-4" />
-          )}
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}
           <span className="ml-1.5">{t("attachments.add")}</span>
         </Button>
       </div>

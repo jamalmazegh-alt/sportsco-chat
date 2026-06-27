@@ -25,10 +25,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
       const next7 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
       const nowIso = now.toISOString();
 
-      const { data: teams } = await supabase
-        .from("teams")
-        .select("id")
-        .eq("club_id", clubId);
+      const { data: teams } = await supabase.from("teams").select("id").eq("club_id", clubId);
       const teamIds = (teams ?? []).map((t) => t.id);
       if (teamIds.length === 0) {
         return { attendancePct: null, pendingResponses: 0, upcoming7d: 0 };
@@ -86,10 +83,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
     {
       icon: TrendingUp,
       label: t("dashboard.kpis.attendance30d"),
-      value:
-        data?.attendancePct == null
-          ? t("dashboard.kpis.noData")
-          : `${data.attendancePct}%`,
+      value: data?.attendancePct == null ? t("dashboard.kpis.noData") : `${data.attendancePct}%`,
       bar: "linear-gradient(90deg, #0f4a26 0%, #2d9d5f 100%)",
       iconBg: "linear-gradient(135deg, #d4ead9 0%, #b8dcc4 100%)",
       iconColor: "#0f4a26",

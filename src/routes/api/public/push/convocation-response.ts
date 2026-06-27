@@ -9,7 +9,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  token: z.string().min(16).max(128).regex(/^[a-f0-9-]+$/i),
+  token: z
+    .string()
+    .min(16)
+    .max(128)
+    .regex(/^[a-f0-9-]+$/i),
 });
 
 function tokenFromReferer(request: Request): string | null {
@@ -65,9 +69,8 @@ export const Route = createFileRoute("/api/public/push/convocation-response")({
           return Response.json({ skipped: "stale" });
         }
 
-        const { fanoutConvocationResponse, fanoutConvocationComplete } = await import(
-          "@/lib/push-fanout.server"
-        );
+        const { fanoutConvocationResponse, fanoutConvocationComplete } =
+          await import("@/lib/push-fanout.server");
         const r1 = await fanoutConvocationResponse((conv as any).id as string);
         const r2 = r1.eventId ? await fanoutConvocationComplete(r1.eventId) : { dispatched: 0 };
 

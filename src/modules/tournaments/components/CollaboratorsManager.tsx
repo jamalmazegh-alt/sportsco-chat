@@ -14,16 +14,7 @@ import {
 } from "@/components/ui/select";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
 import { toast } from "sonner";
-import {
-  Loader2,
-  Plus,
-  ShieldCheck,
-  Flag,
-  Copy,
-  Trash2,
-  CheckCircle2,
-  Clock,
-} from "lucide-react";
+import { Loader2, Plus, ShieldCheck, Flag, Copy, Trash2, CheckCircle2, Clock } from "lucide-react";
 import {
   listTournamentCollaborators,
   inviteTournamentCollaborator,
@@ -113,9 +104,7 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-semibold">{t("collab.title")}</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t("collab.subtitle")}
-          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t("collab.subtitle")}</p>
         </div>
         <Button size="sm" onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4" />
@@ -148,11 +137,7 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
         </>
       )}
 
-      <ResponsiveFormDialog
-        open={open}
-        onOpenChange={setOpen}
-        title={t("collab.dialogTitle")}
-      >
+      <ResponsiveFormDialog open={open} onOpenChange={setOpen} title={t("collab.dialogTitle")}>
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label>{t("collab.roleLabel")}</Label>
@@ -190,7 +175,11 @@ export function CollaboratorsManager({ tournamentId }: { tournamentId: string })
             disabled={!email.trim() || invite.isPending}
             onClick={() => invite.mutate()}
           >
-            {invite.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("collab.sendInvite")}
+            {invite.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              t("collab.sendInvite")
+            )}
           </Button>
         </div>
       </ResponsiveFormDialog>
@@ -234,9 +223,7 @@ function Section({
               className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3"
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {c.display_name || c.email}
-                </p>
+                <p className="text-sm font-medium truncate">{c.display_name || c.email}</p>
                 {c.display_name && (
                   <p className="text-xs text-muted-foreground truncate">{c.email}</p>
                 )}
@@ -254,11 +241,7 @@ function Section({
               </div>
               <div className="flex gap-1">
                 {!c.accepted_at && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onCopy(c.invitation_token)}
-                  >
+                  <Button size="sm" variant="outline" onClick={() => onCopy(c.invitation_token)}>
                     <Copy className="h-3.5 w-3.5" />
                     {t("collab.copyLink")}
                   </Button>

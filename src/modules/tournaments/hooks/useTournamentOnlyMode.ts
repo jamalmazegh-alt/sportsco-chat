@@ -16,10 +16,8 @@ export function useTournamentOnlyMode(): {
   const { user, memberships } = useAuth();
   const userId = user?.id ?? null;
   const clubIds = memberships.map((m) => m.club_id);
-  const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)
-    ?.signup_role;
-  const isTournamentOrganizer =
-    signupRole === "tournament_organizer" && memberships.length === 0;
+  const signupRole = (user?.user_metadata as { signup_role?: string } | undefined)?.signup_role;
+  const isTournamentOrganizer = signupRole === "tournament_organizer" && memberships.length === 0;
 
   const { data, isLoading } = useQuery({
     queryKey: ["tournament-only-mode", userId, clubIds.sort().join(",")],
@@ -54,8 +52,6 @@ export function useTournamentOnlyMode(): {
 
   const tournamentOnly =
     isTournamentOrganizer ||
-    (!!data &&
-      (data.usedCount > 0 || data.activeEntitlements > 0) &&
-      data.activeSubs === 0);
+    (!!data && (data.usedCount > 0 || data.activeEntitlements > 0) && data.activeSubs === 0);
   return { isLoading: isLoading && !isTournamentOrganizer, tournamentOnly };
 }

@@ -19,7 +19,11 @@ export const Route = createFileRoute("/api/public/hooks/tournament-match-reminde
         const auth = verifyCronSecret(request, {
           primaryEnv: "TOURNAMENT_MATCH_REMINDERS_SECRET",
           legacyEnv: "EVENT_REMINDERS_SECRET",
-          headerNames: ["x-tournament-match-reminders-secret", "x-event-reminders-secret", "x-cron-secret"],
+          headerNames: [
+            "x-tournament-match-reminders-secret",
+            "x-event-reminders-secret",
+            "x-cron-secret",
+          ],
         });
         if (!auth.ok) {
           return new Response(auth.status === 503 ? "Not configured" : "Forbidden", {

@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -72,9 +68,7 @@ export function PositionCombobox({
       o.fr.toLowerCase() === value.toLowerCase(),
   );
 
-  const displayLabel = matchedOption
-    ? localizedPositionLabel(matchedOption, lang)
-    : value;
+  const displayLabel = matchedOption ? localizedPositionLabel(matchedOption, lang) : value;
 
   const q = query.trim().toLowerCase();
   const filtered = q
@@ -89,14 +83,17 @@ export function PositionCombobox({
   const customAvailable =
     q.length > 0 &&
     !filtered.some(
-      (o) =>
-        o.fr.toLowerCase() === q ||
-        o.en.toLowerCase() === q ||
-        o.value.toLowerCase() === q,
+      (o) => o.fr.toLowerCase() === q || o.en.toLowerCase() === q || o.value.toLowerCase() === q,
     );
 
   return (
-    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(""); }}>
+    <Popover
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) setQuery("");
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -113,9 +110,7 @@ export function PositionCombobox({
           <span className="truncate">
             {displayLabel || placeholder || t("position.placeholder", { defaultValue: "Position" })}
             {matchedOption?.abbr && (
-              <span className="ml-2 text-xs text-muted-foreground">
-                {matchedOption.abbr}
-              </span>
+              <span className="ml-2 text-xs text-muted-foreground">{matchedOption.abbr}</span>
             )}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -130,14 +125,15 @@ export function PositionCombobox({
           />
           <CommandList>
             {filtered.length === 0 && !customAvailable && (
-              <CommandEmpty>{t("position.empty", { defaultValue: "Aucune suggestion" })}</CommandEmpty>
+              <CommandEmpty>
+                {t("position.empty", { defaultValue: "Aucune suggestion" })}
+              </CommandEmpty>
             )}
             {filtered.length > 0 && (
               <CommandGroup heading={t("position.suggested", { defaultValue: "Suggestions" })}>
                 {filtered.map((o) => {
                   const label = localizedPositionLabel(o, lang);
-                  const isSelected =
-                    matchedOption && matchedOption.value === o.value;
+                  const isSelected = matchedOption && matchedOption.value === o.value;
                   return (
                     <CommandItem
                       key={o.value}
@@ -149,16 +145,11 @@ export function PositionCombobox({
                       }}
                     >
                       <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          isSelected ? "opacity-100" : "opacity-0",
-                        )}
+                        className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
                       />
                       <span className="flex-1 truncate">{label}</span>
                       {o.abbr && (
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          {o.abbr}
-                        </span>
+                        <span className="ml-2 text-xs text-muted-foreground">{o.abbr}</span>
                       )}
                     </CommandItem>
                   );

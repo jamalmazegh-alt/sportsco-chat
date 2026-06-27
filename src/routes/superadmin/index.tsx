@@ -29,7 +29,11 @@ type Finance = Awaited<ReturnType<typeof getFinanceOverview>>;
 function SuperAdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [finance, setFinance] = useState<Finance | null>(null);
-  const [supportStats, setSupportStats] = useState<{ open: number; urgent: number; unread: number } | null>(null);
+  const [supportStats, setSupportStats] = useState<{
+    open: number;
+    urgent: number;
+    unread: number;
+  } | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
@@ -65,10 +69,7 @@ function SuperAdminDashboard() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
             <CircleDollarSign className="h-4 w-4" /> Business & finance
           </h2>
-          <Link
-            to="/superadmin/billing"
-            className="text-xs text-primary hover:underline"
-          >
+          <Link to="/superadmin/billing" className="text-xs text-primary hover:underline">
             All subscriptions →
           </Link>
         </div>
@@ -151,10 +152,7 @@ function SuperAdminDashboard() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
             <LifeBuoy className="h-4 w-4" /> Support tickets
           </h2>
-          <Link
-            to="/superadmin/support-tickets"
-            className="text-xs text-primary hover:underline"
-          >
+          <Link to="/superadmin/support-tickets" className="text-xs text-primary hover:underline">
             All tickets →
           </Link>
         </div>
@@ -189,8 +187,6 @@ function SuperAdminDashboard() {
       </section>
 
       <PrivacyRequestsSection />
-
-
 
       {(stats?.generated_at || finance?.generated_at) && (
         <div className="text-xs text-muted-foreground">
@@ -228,9 +224,7 @@ function BigTile({
         {icon} {label}
       </div>
       <div className="mt-2 text-3xl font-semibold tabular-nums">{primary}</div>
-      {secondary && (
-        <div className="text-xs text-muted-foreground mt-1">{secondary}</div>
-      )}
+      {secondary && <div className="text-xs text-muted-foreground mt-1">{secondary}</div>}
     </div>
   );
 }
@@ -257,9 +251,7 @@ function MiniTile({
     >
       <div className="mt-0.5">{icon}</div>
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-          {label}
-        </div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
         <div className="text-lg font-semibold tabular-nums">{value}</div>
         {sub && <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>}
       </div>

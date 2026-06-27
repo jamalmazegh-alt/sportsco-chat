@@ -133,7 +133,15 @@ const T: Record<
 
 function pickLocale(l?: string): Locale {
   const v = (l ?? "fr").slice(0, 2).toLowerCase();
-  if (v === "fr" || v === "en" || v === "de" || v === "es" || v === "it" || v === "nl" || v === "pt") {
+  if (
+    v === "fr" ||
+    v === "en" ||
+    v === "de" ||
+    v === "es" ||
+    v === "it" ||
+    v === "nl" ||
+    v === "pt"
+  ) {
     return v;
   }
   return "fr";

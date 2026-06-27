@@ -16,13 +16,43 @@ export interface PositionOption {
 
 // NB: `value` mirrors the French label to preserve existing free-text rows.
 const FOOTBALL: PositionOption[] = [
-  { value: "Gardien de but", fr: "Gardien de but", en: "Goalkeeper", abbr: "GK", group: "goalkeeper" },
+  {
+    value: "Gardien de but",
+    fr: "Gardien de but",
+    en: "Goalkeeper",
+    abbr: "GK",
+    group: "goalkeeper",
+  },
   { value: "Arrière droit", fr: "Arrière droit", en: "Right Back", abbr: "RB", group: "defense" },
   { value: "Arrière gauche", fr: "Arrière gauche", en: "Left Back", abbr: "LB", group: "defense" },
-  { value: "Défenseur central", fr: "Défenseur central", en: "Center Back", abbr: "CB", group: "defense" },
-  { value: "Milieu défensif", fr: "Milieu défensif", en: "Defensive Midfielder", abbr: "DM", group: "midfield" },
-  { value: "Milieu central", fr: "Milieu central", en: "Central Midfielder", abbr: "CM", group: "midfield" },
-  { value: "Milieu offensif", fr: "Milieu offensif", en: "Attacking Midfielder", abbr: "AM", group: "midfield" },
+  {
+    value: "Défenseur central",
+    fr: "Défenseur central",
+    en: "Center Back",
+    abbr: "CB",
+    group: "defense",
+  },
+  {
+    value: "Milieu défensif",
+    fr: "Milieu défensif",
+    en: "Defensive Midfielder",
+    abbr: "DM",
+    group: "midfield",
+  },
+  {
+    value: "Milieu central",
+    fr: "Milieu central",
+    en: "Central Midfielder",
+    abbr: "CM",
+    group: "midfield",
+  },
+  {
+    value: "Milieu offensif",
+    fr: "Milieu offensif",
+    en: "Attacking Midfielder",
+    abbr: "AM",
+    group: "midfield",
+  },
   { value: "Ailier droit", fr: "Ailier droit", en: "Right Winger", abbr: "RW", group: "attack" },
   { value: "Ailier gauche", fr: "Ailier gauche", en: "Left Winger", abbr: "LW", group: "attack" },
   { value: "Attaquant", fr: "Attaquant", en: "Striker", abbr: "ST", group: "attack" },

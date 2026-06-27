@@ -79,7 +79,10 @@ function TrophyPattern() {
         />
         <path d="M -3 6 q -6 4 0 10" stroke="#ffffff" strokeWidth="1.4" fill="none" />
         <path d="M 25 6 q 6 4 0 10" stroke="#ffffff" strokeWidth="1.4" fill="none" />
-        <path d="M 28 -2 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z" fill="#ffffff" />
+        <path
+          d="M 28 -2 l 1.5 4 l 4 1.5 l -4 1.5 l -1.5 4 l -1.5 -4 l -4 -1.5 l 4 -1.5 z"
+          fill="#ffffff"
+        />
       </g>
     </svg>
   );
@@ -158,7 +161,6 @@ function ShimmerButton({
   );
 }
 
-
 function TournamentsList() {
   const { t } = useTranslation("tournaments");
   const { activeClubId, memberships } = useAuth();
@@ -200,7 +202,7 @@ function TournamentsList() {
     queryFn: () => personalClubFn({ data: undefined as never }),
     staleTime: 5 * 60 * 1000,
   });
-  const effectiveClubId = noClub ? personalClubQ.data?.clubId ?? null : activeClubId;
+  const effectiveClubId = noClub ? (personalClubQ.data?.clubId ?? null) : activeClubId;
 
   function openCreate() {
     if (noClub && !canCreate) return;
@@ -208,7 +210,6 @@ function TournamentsList() {
   }
 
   const tournaments = q.data?.tournaments ?? [];
-
 
   return (
     <div className="space-y-5 px-4 pb-24 pt-5">
@@ -242,7 +243,6 @@ function TournamentsList() {
       {canManage && effectiveClubId && (
         <TournamentCreateChooser clubId={effectiveClubId} open={open} onOpenChange={setOpen} />
       )}
-
 
       {/* ─── Bandeau organisateur "30s avec l'IA" ─────────────────── */}
       {noClub && (
@@ -351,7 +351,6 @@ function TournamentsList() {
             ) : null
           }
         />
-
       ) : (
         <ul className="space-y-3">
           {tournaments.map((trn: any) => (
@@ -404,9 +403,7 @@ function TournamentsList() {
                       )}
                     </div>
                   </div>
-                  <ChevronRight
-                    className="h-5 w-5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-emerald-600"
-                  />
+                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-emerald-600" />
                 </div>
               </Link>
             </li>
@@ -419,11 +416,7 @@ function TournamentsList() {
         <div className="pt-1">
           {noClub ? (
             canCreate ? (
-              <ShimmerButton
-                onClick={openCreate}
-                disabled={!effectiveClubId}
-                className="w-full"
-              >
+              <ShimmerButton onClick={openCreate} disabled={!effectiveClubId} className="w-full">
                 <Plus className="h-4 w-4" />
                 {t("list.create")}
               </ShimmerButton>
@@ -443,7 +436,6 @@ function TournamentsList() {
               </ShimmerButton>
             )
           )}
-
         </div>
       )}
     </div>

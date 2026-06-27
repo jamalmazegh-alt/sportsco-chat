@@ -6,11 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Clock, MapPin, Plus, Timer, Trophy, Flag } from "lucide-react";
-import {
-  computeSchedule,
-  formatLunchRange,
-  type ScheduleVerdict,
-} from "../lib/planner";
+import { computeSchedule, formatLunchRange, type ScheduleVerdict } from "../lib/planner";
 import { LUNCH_DURATION_PRESETS } from "../lib/assistant-config";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +32,7 @@ function formatHHMM(min: number): string {
   return `${String(Math.floor(t / 60) % 24).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
 }
 
-export function TournamentSimulator({
-  initialTeams = 16,
-  initialFlights = false,
-}: Props) {
+export function TournamentSimulator({ initialTeams = 16, initialFlights = false }: Props) {
   const { t } = useTranslation("tournaments");
   const [startHHMM, setStartHHMM] = useState("09:00");
   const [teams, setTeams] = useState(initialTeams);
@@ -72,11 +65,7 @@ export function TournamentSimulator({
     let poolEnd = startMin + poolRounds * slot;
     // lunch absorbed inside poolEnd if it crosses
     const lunchStartMin = parseHHMM(lunchStart);
-    if (
-      lunchDurationMin > 0 &&
-      startMin < lunchStartMin &&
-      poolEnd > lunchStartMin
-    ) {
+    if (lunchDurationMin > 0 && startMin < lunchStartMin && poolEnd > lunchStartMin) {
       poolEnd += lunchDurationMin;
     }
     const semiEnd = poolEnd + Math.max(0, finalRounds - 1) * slot;
@@ -131,11 +120,15 @@ export function TournamentSimulator({
         </div>
         <div className="mt-2 flex items-end justify-between gap-3">
           <div>
-            <div className="text-[11px] opacity-80">{t("simulator.startTime", { defaultValue: "Début" })}</div>
+            <div className="text-[11px] opacity-80">
+              {t("simulator.startTime", { defaultValue: "Début" })}
+            </div>
             <div className="text-2xl font-bold tabular-nums">{startHHMM}</div>
           </div>
           <div className="text-center">
-            <div className="text-[11px] opacity-80">{t("simulator.finalAt", { defaultValue: "Finale" })}</div>
+            <div className="text-[11px] opacity-80">
+              {t("simulator.finalAt", { defaultValue: "Finale" })}
+            </div>
             <div className="text-2xl font-bold tabular-nums">{formatHHMM(phases.semiEnd)}</div>
           </div>
           <div className="text-right">
@@ -165,15 +158,24 @@ export function TournamentSimulator({
           </div>
           <div className="mt-1.5 grid grid-cols-3 gap-1 text-[10px] font-semibold opacity-90">
             <div>
-              <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-emerald-300" />{t("simulator.phasePools", { defaultValue: "Poules" })}</div>
+              <div className="flex items-center gap-1">
+                <span className="h-2 w-2 rounded-sm bg-emerald-300" />
+                {t("simulator.phasePools", { defaultValue: "Poules" })}
+              </div>
               <div className="tabular-nums opacity-80">→ {formatHHMM(phases.poolEnd)}</div>
             </div>
             <div>
-              <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-amber-300" />{t("simulator.phaseSemi", { defaultValue: "Demis" })}</div>
+              <div className="flex items-center gap-1">
+                <span className="h-2 w-2 rounded-sm bg-amber-300" />
+                {t("simulator.phaseSemi", { defaultValue: "Demis" })}
+              </div>
               <div className="tabular-nums opacity-80">→ {formatHHMM(phases.semiEnd)}</div>
             </div>
             <div>
-              <div className="flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-yellow-200" />{t("simulator.phaseFinal", { defaultValue: "Finale" })}</div>
+              <div className="flex items-center gap-1">
+                <span className="h-2 w-2 rounded-sm bg-yellow-200" />
+                {t("simulator.phaseFinal", { defaultValue: "Finale" })}
+              </div>
               <div className="tabular-nums opacity-80">→ {formatHHMM(phases.finalEnd)}</div>
             </div>
           </div>
@@ -191,7 +193,8 @@ export function TournamentSimulator({
           <div>
             <div className="opacity-80">{t("simulator.margin")}</div>
             <div className="font-semibold text-base">
-              {result.marginMin >= 0 ? "+" : ""}{result.marginMin} min
+              {result.marginMin >= 0 ? "+" : ""}
+              {result.marginMin} min
             </div>
           </div>
         </div>
@@ -200,7 +203,8 @@ export function TournamentSimulator({
       {/* Start time */}
       <div>
         <Label className="text-xs font-semibold uppercase text-muted-foreground flex items-center gap-1.5">
-          <Flag className="h-3.5 w-3.5" /> {t("simulator.startTime", { defaultValue: "Heure de début" })}
+          <Flag className="h-3.5 w-3.5" />{" "}
+          {t("simulator.startTime", { defaultValue: "Heure de début" })}
         </Label>
         <Input
           type="time"
@@ -310,9 +314,7 @@ export function TournamentSimulator({
                   : "border-border bg-card text-foreground hover:border-primary/50",
               )}
             >
-              {min === 0
-                ? t("simulator.lunchNone")
-                : t("simulator.lunchMin", { min })}
+              {min === 0 ? t("simulator.lunchNone") : t("simulator.lunchMin", { min })}
             </button>
           ))}
         </div>

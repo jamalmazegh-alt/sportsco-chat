@@ -142,18 +142,14 @@ export function PublishWorkflow({
 
   return (
     <section
-      className={cn(
-        "rounded-[18px] border-[1.5px] overflow-hidden bg-card",
-        meta.borderClass,
-      )}
+      className={cn("rounded-[18px] border-[1.5px] overflow-hidden bg-card", meta.borderClass)}
       style={{ boxShadow: "0 4px 16px -6px rgba(29,122,69,0.12)" }}
     >
       {/* Stepper anime premium */}
       <div
         className="relative px-4 pt-4 pb-3 overflow-hidden"
         style={{
-          background:
-            "linear-gradient(135deg,#0f4a26 0%,#1d7a45 60%,#2d9d5f 100%)",
+          background: "linear-gradient(135deg,#0f4a26 0%,#1d7a45 60%,#2d9d5f 100%)",
         }}
       >
         <svg
@@ -206,7 +202,6 @@ export function PublishWorkflow({
         </div>
       </div>
 
-
       {/* Banner body */}
       <div className="px-5 pt-5 pb-5">
         <div className="flex items-start gap-4">
@@ -222,7 +217,6 @@ export function PublishWorkflow({
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-extrabold leading-tight tracking-tight">{meta.title}</h2>
             <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
-
 
             {/* Fix D — the "Publier" action lives only in the Continue CTA
                 (publish_tournament step) to avoid two competing publish buttons.

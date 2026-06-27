@@ -11,7 +11,10 @@ type SupabaseAuthError = {
  * Map a Supabase auth error to a localized message.
  * Falls back to the raw error.message if no known code matches.
  */
-export function localizeAuthError(error: SupabaseAuthError | null | undefined, t: TFunction): string {
+export function localizeAuthError(
+  error: SupabaseAuthError | null | undefined,
+  t: TFunction,
+): string {
   if (!error) return "";
   const code = (error.code || "").toLowerCase();
   const msg = (error.message || "").toLowerCase();

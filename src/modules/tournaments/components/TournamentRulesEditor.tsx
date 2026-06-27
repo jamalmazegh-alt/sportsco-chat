@@ -19,7 +19,18 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, RotateCcw, Save, Plus, Loader2, FileDown, ExternalLink, Upload, FileText, X } from "lucide-react";
+import {
+  GripVertical,
+  RotateCcw,
+  Save,
+  Plus,
+  Loader2,
+  FileDown,
+  ExternalLink,
+  Upload,
+  FileText,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -46,11 +57,7 @@ import {
 import type { Sponsor } from "../lib/rules";
 import { SponsorsEditor } from "./SponsorsEditor";
 import type { Tiebreaker } from "../lib/standings";
-import {
-  resolveScoring,
-  type ScoringMode,
-  type ScoringRules,
-} from "../lib/formats";
+import { resolveScoring, type ScoringMode, type ScoringRules } from "../lib/formats";
 import { sportAllowsDraw } from "@/lib/sports";
 import {
   updateTournamentRules,
@@ -79,17 +86,14 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     () => resolveScoring(sport, rules.scoring),
     [sport, rules.scoring],
   );
-  const setScoring = (next: ScoringRules) =>
-    setRules({ ...rules, scoring: next });
+  const setScoring = (next: ScoringRules) => setRules({ ...rules, scoring: next });
   const updateFn = useServerFn(updateTournamentRules);
   const qc = useQueryClient();
   const allowsDraw = sportAllowsDraw(sport);
 
   const save = useMutation({
     mutationFn: () => {
-      const payload = allowsDraw
-        ? rules
-        : { ...rules, points: { ...rules.points, draw: 0 } };
+      const payload = allowsDraw ? rules : { ...rules, points: { ...rules.points, draw: 0 } };
       return updateFn({ data: { tournament_id: tournamentId, rules: payload as any } });
     },
     onSuccess: () => {
@@ -108,8 +112,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
   });
   const [pdfLang, setPdfLang] = useState<"fr" | "en">(rules.language);
   const generate = useMutation({
-    mutationFn: () =>
-      genPdfFn({ data: { tournament_id: tournamentId, language: pdfLang } }),
+    mutationFn: () => genPdfFn({ data: { tournament_id: tournamentId, language: pdfLang } }),
     onSuccess: (res: any) => {
       toast.success(t("rules.pdfGeneratedToast"));
       qc.invalidateQueries({ queryKey: ["tournament-documents", tournamentId] });
@@ -124,9 +127,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
   );
 
   const activeTBs = rules.tiebreakers;
-  const inactiveTBs = ALL_TIEBREAKERS.map((tb) => tb.key).filter(
-    (k) => !activeTBs.includes(k),
-  );
+  const inactiveTBs = ALL_TIEBREAKERS.map((tb) => tb.key).filter((k) => !activeTBs.includes(k));
 
   function onDragEnd(e: DragEndEvent) {
     const { active, over } = e;
@@ -147,7 +148,8 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
     setRules({ ...rules, tiebreakers: [...activeTBs, key] });
   }
 
-  const defaultScoreMode = sport === "volleyball" ? t("rules.scoreModeSets") : t("rules.scoreModeSimple");
+  const defaultScoreMode =
+    sport === "volleyball" ? t("rules.scoreModeSets") : t("rules.scoreModeSimple");
 
   return (
     <div className="space-y-4">
@@ -165,8 +167,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  if (p.value)
-                    setRules({ ...rules, points: { ...p.value } });
+                  if (p.value) setRules({ ...rules, points: { ...p.value } });
                 }}
                 disabled={!p.value}
               >
@@ -184,17 +185,13 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               <NumberField
                 label={t("rules.draw")}
                 value={rules.points.draw}
-                onChange={(v) =>
-                  setRules({ ...rules, points: { ...rules.points, draw: v } })
-                }
+                onChange={(v) => setRules({ ...rules, points: { ...rules.points, draw: v } })}
               />
             )}
             <NumberField
               label={t("rules.loss")}
               value={rules.points.loss}
-              onChange={(v) =>
-                setRules({ ...rules, points: { ...rules.points, loss: v } })
-              }
+              onChange={(v) => setRules({ ...rules, points: { ...rules.points, loss: v } })}
             />
           </div>
           {(rules.points.otWin != null || rules.points.otLoss != null) && (
@@ -202,16 +199,12 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               <NumberField
                 label={t("rules.otWin", { defaultValue: "Victoire en prolongation" })}
                 value={rules.points.otWin ?? rules.points.win}
-                onChange={(v) =>
-                  setRules({ ...rules, points: { ...rules.points, otWin: v } })
-                }
+                onChange={(v) => setRules({ ...rules, points: { ...rules.points, otWin: v } })}
               />
               <NumberField
                 label={t("rules.otLoss", { defaultValue: "Défaite en prolongation" })}
                 value={rules.points.otLoss ?? rules.points.loss}
-                onChange={(v) =>
-                  setRules({ ...rules, points: { ...rules.points, otLoss: v } })
-                }
+                onChange={(v) => setRules({ ...rules, points: { ...rules.points, otLoss: v } })}
               />
             </div>
           )}
@@ -228,9 +221,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             <Label>{t("rules.scoreMode")}</Label>
             <Select
               value={scoring.mode}
-              onValueChange={(v) =>
-                setScoring({ ...scoring, mode: v as ScoringMode })
-              }
+              onValueChange={(v) => setScoring({ ...scoring, mode: v as ScoringMode })}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -379,22 +370,16 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             label={t("rules.playersPerTeam", { defaultValue: "Joueurs par équipe" })}
             value={rules.roster.playersPerTeam}
             min={1}
-            onChange={(v) =>
-              setRules({ ...rules, roster: { ...rules.roster, playersPerTeam: v } })
-            }
+            onChange={(v) => setRules({ ...rules, roster: { ...rules.roster, playersPerTeam: v } })}
           />
           <NumberField
             label={t("rules.maxSubstitutes", { defaultValue: "Remplaçants max" })}
             value={rules.roster.maxSubstitutes}
             min={0}
-            onChange={(v) =>
-              setRules({ ...rules, roster: { ...rules.roster, maxSubstitutes: v } })
-            }
+            onChange={(v) => setRules({ ...rules, roster: { ...rules.roster, maxSubstitutes: v } })}
           />
         </CardContent>
-
       </Card>
-
 
       {/* Fair play */}
       <Card>
@@ -414,9 +399,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             <NumberField
               label={t("rules.yellowCard")}
               value={rules.fairPlay.yellow}
-              onChange={(v) =>
-                setRules({ ...rules, fairPlay: { ...rules.fairPlay, yellow: v } })
-              }
+              onChange={(v) => setRules({ ...rules, fairPlay: { ...rules.fairPlay, yellow: v } })}
             />
             <NumberField
               label={t("rules.secondYellowCard")}
@@ -431,9 +414,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
             <NumberField
               label={t("rules.redCard")}
               value={rules.fairPlay.red}
-              onChange={(v) =>
-                setRules({ ...rules, fairPlay: { ...rules.fairPlay, red: v } })
-              }
+              onChange={(v) => setRules({ ...rules, fairPlay: { ...rules.fairPlay, red: v } })}
             />
           </CardContent>
         )}
@@ -459,18 +440,14 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               label={t("rules.otDuration")}
               value={rules.overtime.minutes ?? 10}
               min={1}
-              onChange={(v) =>
-                setRules({ ...rules, overtime: { ...rules.overtime, minutes: v } })
-              }
+              onChange={(v) => setRules({ ...rules, overtime: { ...rules.overtime, minutes: v } })}
             />
           )}
           <div className="flex items-center justify-between pt-2 border-t border-border">
             <Label>{t("rules.shootoutIfStillTied")}</Label>
             <Switch
               checked={rules.penaltyShootout.enabled}
-              onCheckedChange={(v) =>
-                setRules({ ...rules, penaltyShootout: { enabled: v } })
-              }
+              onCheckedChange={(v) => setRules({ ...rules, penaltyShootout: { enabled: v } })}
             />
           </div>
         </CardContent>
@@ -485,9 +462,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           <div className="flex items-center justify-between">
             <div>
               <Label>{t("rules.validationLabel")}</Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                {t("rules.validationHint")}
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">{t("rules.validationHint")}</p>
             </div>
             <Switch
               checked={rules.matchValidation.requireValidation}
@@ -513,9 +488,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
               <Label>{t("rules.language")}</Label>
               <Select
                 value={rules.language}
-                onValueChange={(v) =>
-                  setRules({ ...rules, language: v as "fr" | "en" })
-                }
+                onValueChange={(v) => setRules({ ...rules, language: v as "fr" | "en" })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -678,7 +651,9 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                         <span className="font-medium uppercase text-xs text-muted-foreground mr-2">
                           {d.language}
                         </span>
-                        {new Date(d.generated_at).toLocaleString(lang.startsWith("en") ? "en-US" : "fr-FR")}
+                        {new Date(d.generated_at).toLocaleString(
+                          lang.startsWith("en") ? "en-US" : "fr-FR",
+                        )}
                       </span>
                       <a
                         href={d.file_url}
@@ -705,8 +680,6 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
         </CardContent>
       </Card>
 
-
-
       <div className="flex gap-2 sticky bottom-0 bg-background/95 backdrop-blur py-3 border-t border-border">
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
           {save.isPending ? (
@@ -716,11 +689,7 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           )}
           {t("rules.save")}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setRules(DEFAULT_RULES)}
-        >
+        <Button type="button" variant="outline" onClick={() => setRules(DEFAULT_RULES)}>
           <RotateCcw className="h-4 w-4" />
           {t("rules.reset")}
         </Button>
@@ -769,8 +738,9 @@ function SortableTB({
   canRemove: boolean;
   onRemove: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -855,11 +825,13 @@ function UploadedRegulations({
       const path = `${tournamentId}/regulations/${crypto.randomUUID()}.pdf`;
       const { error } = await supabase.storage
         .from("tournament-documents")
-        .upload(path, file, { cacheControl: "3600", upsert: false, contentType: "application/pdf" });
+        .upload(path, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: "application/pdf",
+        });
       if (error) throw error;
-      const { data: pub } = supabase.storage
-        .from("tournament-documents")
-        .getPublicUrl(path);
+      const { data: pub } = supabase.storage.from("tournament-documents").getPublicUrl(path);
       onChange({
         uploadedUrl: pub.publicUrl,
         uploadedName: file.name,
@@ -880,7 +852,10 @@ function UploadedRegulations({
       const idx = regulations.uploadedUrl.indexOf(marker);
       if (idx >= 0) {
         const path = regulations.uploadedUrl.slice(idx + marker.length);
-        await supabase.storage.from("tournament-documents").remove([path]).catch(() => {});
+        await supabase.storage
+          .from("tournament-documents")
+          .remove([path])
+          .catch(() => {});
       }
     }
     onChange({ uploadedUrl: null, uploadedName: null, uploadedAt: null });
@@ -898,7 +873,9 @@ function UploadedRegulations({
             className="flex items-center gap-2 min-w-0 text-primary hover:underline"
           >
             <FileText className="h-4 w-4 shrink-0" />
-            <span className="truncate">{regulations.uploadedName ?? t("rules.regulationsCurrentFile")}</span>
+            <span className="truncate">
+              {regulations.uploadedName ?? t("rules.regulationsCurrentFile")}
+            </span>
             <ExternalLink className="h-3 w-3 shrink-0" />
           </a>
           <Button type="button" size="sm" variant="ghost" onClick={remove}>
@@ -923,7 +900,11 @@ function UploadedRegulations({
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
         >
-          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
           {regulations.uploadedUrl ? t("rules.regulationsReplace") : t("rules.regulationsUpload")}
         </Button>
       </div>

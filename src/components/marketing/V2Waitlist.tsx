@@ -21,13 +21,7 @@ const FEATURES = [
   "championship_stats",
 ] as const;
 
-const ROLES = [
-  "coach",
-  "admin",
-  "tournament_organizer",
-  "parent",
-  "player",
-] as const;
+const ROLES = ["coach", "admin", "tournament_organizer", "parent", "player"] as const;
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -41,9 +35,7 @@ export function V2Waitlist() {
   const [status, setStatus] = useState<Status>("idle");
 
   function toggleFeature(f: string) {
-    setFeatures((prev) =>
-      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f],
-    );
+    setFeatures((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -172,9 +164,7 @@ export function V2Waitlist() {
                       onCheckedChange={() => toggleFeature(f)}
                       data-testid={`waitlist-feature-${f}`}
                     />
-                    <span>
-                      {t(`waitlist.features.${f}`, { defaultValue: f })}
-                    </span>
+                    <span>{t(`waitlist.features.${f}`, { defaultValue: f })}</span>
                   </label>
                 ))}
               </div>

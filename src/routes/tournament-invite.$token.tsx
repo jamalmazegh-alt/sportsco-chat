@@ -75,9 +75,7 @@ function AcceptInvitePage() {
 
   const Icon = invite.role === "co_organizer" ? ShieldCheck : Flag;
   const roleLabel =
-    invite.role === "co_organizer"
-      ? t("invite.roleCoOrganizer")
-      : t("invite.roleReferee");
+    invite.role === "co_organizer" ? t("invite.roleCoOrganizer") : t("invite.roleReferee");
 
   return (
     <div className="max-w-md mx-auto p-6 space-y-5">
@@ -107,31 +105,19 @@ function AcceptInvitePage() {
             {t("invite.alreadyAccepted")}
           </div>
           <Button asChild className="w-full">
-            <Link to={`/tournament/${invite.tournament_slug}`}>
-              {t("invite.viewTournament")}
-            </Link>
+            <Link to={`/tournament/${invite.tournament_slug}`}>{t("invite.viewTournament")}</Link>
           </Button>
         </div>
       ) : !user ? (
         <div className="space-y-2">
-          <p className="text-sm text-center text-muted-foreground">
-            {t("invite.loginPrompt")}
-          </p>
+          <p className="text-sm text-center text-muted-foreground">{t("invite.loginPrompt")}</p>
           <Button asChild className="w-full">
             <Link to="/login">{t("invite.signIn")}</Link>
           </Button>
         </div>
       ) : (
-        <Button
-          className="w-full"
-          disabled={accept.isPending}
-          onClick={() => accept.mutate()}
-        >
-          {accept.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("invite.accept")
-          )}
+        <Button className="w-full" disabled={accept.isPending} onClick={() => accept.mutate()}>
+          {accept.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("invite.accept")}
         </Button>
       )}
     </div>

@@ -18,12 +18,18 @@ export const Route = createFileRoute("/_authenticated/tournaments/pricing")({
   }),
   head: () => ({
     meta: [
-      { title: i18n.t("pricing.metaTitle", { ns: "tournaments", defaultValue: "Facturation tournois — Clubero" }) },
+      {
+        title: i18n.t("pricing.metaTitle", {
+          ns: "tournaments",
+          defaultValue: "Facturation tournois — Clubero",
+        }),
+      },
       {
         name: "description",
         content: i18n.t("pricing.metaDesc", {
           ns: "tournaments",
-          defaultValue: "Choisissez votre plan pour organiser un tournoi avec Clubero — 39€ à l'unité ou 149€/an en illimité.",
+          defaultValue:
+            "Choisissez votre plan pour organiser un tournoi avec Clubero — 39€ à l'unité ou 149€/an en illimité.",
         }),
       },
     ],
@@ -73,8 +79,7 @@ function TournamentPricingPage() {
       <header
         className="relative overflow-hidden text-white"
         style={{
-          background:
-            "linear-gradient(135deg, #0f4a26 0%, #1d7a45 60%, #2d9d5f 100%)",
+          background: "linear-gradient(135deg, #0f4a26 0%, #1d7a45 60%, #2d9d5f 100%)",
         }}
       >
         <svg
@@ -82,10 +87,7 @@ function TournamentPricingPage() {
           viewBox="0 0 200 200"
           className="absolute -right-8 -top-8 h-56 w-56 opacity-10"
         >
-          <path
-            fill="currentColor"
-            d="M100 20l20 50h52l-42 32 16 60-46-34-46 34 16-60-42-32h52z"
-          />
+          <path fill="currentColor" d="M100 20l20 50h52l-42 32 16 60-46-34-46 34 16-60-42-32h52z" />
         </svg>
         <div className="relative mx-auto max-w-3xl px-5 pt-10 pb-12">
           <Button
@@ -102,17 +104,15 @@ function TournamentPricingPage() {
               <Trophy className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-white/80">
-                Facturation tournois
-              </p>
+              <p className="text-xs uppercase tracking-wider text-white/80">Facturation tournois</p>
               <h1 className="font-display text-2xl font-bold sm:text-3xl">
                 Lancez votre tournoi en 30 secondes
               </h1>
             </div>
           </div>
           <p className="mt-4 max-w-xl text-sm text-white/90 sm:text-base">
-            Notre assistant IA configure votre tournoi en quelques questions —
-            poules, phases finales, planning. Choisissez votre plan ci-dessous.
+            Notre assistant IA configure votre tournoi en quelques questions — poules, phases
+            finales, planning. Choisissez votre plan ci-dessous.
           </p>
         </div>
       </header>
@@ -132,7 +132,8 @@ function TournamentPricingPage() {
             Vous avez déjà un <strong>Pass Annuel</strong> actif — création illimitée jusqu'au{" "}
             {entQ.data?.activeAnnual?.valid_until
               ? new Date(entQ.data.activeAnnual.valid_until!).toLocaleDateString("fr-FR")
-              : "—"}.
+              : "—"}
+            .
           </div>
         </div>
       )}
@@ -236,8 +237,7 @@ function PlanCard({
         <span
           className="absolute -top-3 right-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg"
           style={{
-            background:
-              "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
+            background: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)",
           }}
         >
           {badge}
@@ -280,8 +280,7 @@ function PlanCard({
         style={
           highlight
             ? {
-                background:
-                  "linear-gradient(135deg, #1d7a45 0%, #2d9d5f 100%)",
+                background: "linear-gradient(135deg, #1d7a45 0%, #2d9d5f 100%)",
                 color: "white",
               }
             : undefined
@@ -293,9 +292,7 @@ function PlanCard({
       </Button>
 
       {footnote && (
-        <p className="mt-3 text-center text-xs font-medium text-emerald-700">
-          {footnote}
-        </p>
+        <p className="mt-3 text-center text-xs font-medium text-emerald-700">{footnote}</p>
       )}
     </div>
   );

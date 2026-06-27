@@ -28,17 +28,7 @@ import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { cn } from "@/lib/utils";
 
-const ECOSYSTEM_ICONS = [
-  Users,
-  LayoutGrid,
-  Swords,
-  Trophy,
-  CalendarRange,
-  Flag,
-  Globe2,
-  Tv,
-  Radio,
-];
+const ECOSYSTEM_ICONS = [Users, LayoutGrid, Swords, Trophy, CalendarRange, Flag, Globe2, Tv, Radio];
 
 const LIVE_ICONS = [Smartphone, ShieldCheck, Zap, MapPin, CalendarRange, Eye, QrCode];
 const PUBLIC_ICONS = [Trophy, Swords, Radio, Users, Smartphone, Share2];
@@ -76,7 +66,9 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
       }
     };
     i18n.on("languageChanged", handler);
-    return () => { i18n.off("languageChanged", handler); };
+    return () => {
+      i18n.off("languageChanged", handler);
+    };
   }, [locale, i18n, navigate]);
 
   const ecosystem = t("tournamentsPage.ecosystem", { returnObjects: true }) as Item[];
@@ -138,7 +130,9 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
                 </div>
                 <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
                   <div className="text-right">
-                    <p className="font-display text-sm font-semibold">{t("tournamentsPage.heroTeamA")}</p>
+                    <p className="font-display text-sm font-semibold">
+                      {t("tournamentsPage.heroTeamA")}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2 rounded-xl bg-muted px-3 py-1.5 font-display text-2xl font-bold tabular-nums">
                     <span>2</span>
@@ -146,7 +140,9 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
                     <span>1</span>
                   </div>
                   <div>
-                    <p className="font-display text-sm font-semibold">{t("tournamentsPage.heroTeamB")}</p>
+                    <p className="font-display text-sm font-semibold">
+                      {t("tournamentsPage.heroTeamB")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -200,7 +196,10 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
                 <div className="mt-3 grid grid-cols-3 items-center gap-2 text-[11px]">
                   <div className="space-y-1.5">
                     {["Team A", "Team B", "Team C", "Team D"].map((nm) => (
-                      <div key={nm} className="rounded-md border border-border px-2 py-1 font-medium">
+                      <div
+                        key={nm}
+                        className="rounded-md border border-border px-2 py-1 font-medium"
+                      >
                         {nm}
                       </div>
                     ))}
@@ -209,7 +208,9 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
                     <div className="rounded-md border border-primary/50 bg-primary/5 px-2 py-1 font-semibold text-primary">
                       Team A
                     </div>
-                    <div className="rounded-md border border-border px-2 py-1 font-medium">Team D</div>
+                    <div className="rounded-md border border-border px-2 py-1 font-medium">
+                      Team D
+                    </div>
                   </div>
                   <div className="flex h-full items-center">
                     <div className="w-full rounded-md border border-primary bg-primary px-2 py-1 text-center font-semibold text-primary-foreground">
@@ -459,10 +460,7 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
             {formats.map((f, i) => {
               const Icon = FORMAT_ICONS[i] ?? LayoutGrid;
               return (
-                <div
-                  key={f.t}
-                  className="rounded-2xl border border-border bg-card p-5 text-center"
-                >
+                <div key={f.t} className="rounded-2xl border border-border bg-card p-5 text-center">
                   <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
                     <Icon className="h-5 w-5" />
                   </div>
@@ -551,9 +549,7 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
                   variant={tier.highlight ? "default" : "outline"}
                   className="mt-6 h-11"
                 >
-                  <Link to="/tournaments/start">
-                    {tier.cta}
-                  </Link>
+                  <Link to="/tournaments/start">{tier.cta}</Link>
                 </Button>
               </div>
             ))}
@@ -570,9 +566,7 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
           <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
             {t("tournamentsPage.finalTitle")}
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-white/80">
-            {t("tournamentsPage.finalBody")}
-          </p>
+          <p className="mx-auto mt-4 max-w-2xl text-white/80">{t("tournamentsPage.finalBody")}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button
               asChild
@@ -604,7 +598,10 @@ export function TournamentExperiencePage({ locale }: { locale: "fr" | "en" }) {
           </h2>
           <div className="mt-10 space-y-3">
             {(() => {
-              const faq = t("tournamentsPage.faq", { returnObjects: true }) as { q: string; a: string }[];
+              const faq = t("tournamentsPage.faq", { returnObjects: true }) as {
+                q: string;
+                a: string;
+              }[];
               return faq.map((item) => (
                 <details
                   key={item.q}

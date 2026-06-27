@@ -6,21 +6,13 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 // ============================================================
 // Constants
 // ============================================================
-const CLUB_ROLES = [
-  "admin",
-  "coach",
-  "assistant_coach",
-  "staff",
-  "tournament_manager",
-] as const;
+const CLUB_ROLES = ["admin", "coach", "assistant_coach", "staff", "tournament_manager"] as const;
 type ClubRole = (typeof CLUB_ROLES)[number];
 
 const TOURNAMENT_ROLES = ["tournament_admin", "staff", "referee"] as const;
 type TournamentRole = (typeof TOURNAMENT_ROLES)[number];
 
-const rolesSchema = z
-  .array(z.enum(CLUB_ROLES))
-  .min(1, "At least one role required");
+const rolesSchema = z.array(z.enum(CLUB_ROLES)).min(1, "At least one role required");
 
 /** Non-staff roles kept on club_members.roles when staff roles are edited. */
 const NON_STAFF_CLUB_ROLES = new Set(["player", "parent", "dirigeant"]);
@@ -36,11 +28,7 @@ function mergeStaffWithNonStaffRoles(
 // ============================================================
 // Helpers
 // ============================================================
-async function assertClubAdmin(
-  supabase: any,
-  clubId: string,
-  callerId: string,
-) {
+async function assertClubAdmin(supabase: any, clubId: string, callerId: string) {
   const { data, error } = await supabase
     .from("club_members")
     .select("roles")
@@ -53,15 +41,11 @@ async function assertClubAdmin(
   }
 }
 
-async function assertTournamentAdmin(
-  supabaseAuth: any,
-  tournamentId: string,
-  callerId: string,
-) {
-  const { data, error } = await supabaseAuth.rpc(
-    "can_manage_tournament_members",
-    { _user_id: callerId, _tournament_id: tournamentId },
-  );
+async function assertTournamentAdmin(supabaseAuth: any, tournamentId: string, callerId: string) {
+  const { data, error } = await supabaseAuth.rpc("can_manage_tournament_members", {
+    _user_id: callerId,
+    _tournament_id: tournamentId,
+  });
   if (error) throw new Response(error.message, { status: 500 });
   if (!data) throw new Response("Forbidden", { status: 403 });
 }
@@ -105,15 +89,14 @@ async function findAuthUserByEmail(email: string): Promise<string | null> {
 // ============================================================
 export const setClubMemberRoles = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { club_id: string; user_id: string; roles: ClubRole[] }) =>
-      z
-        .object({
-          club_id: z.string().uuid(),
-          user_id: z.string().uuid(),
-          roles: rolesSchema,
-        })
-        .parse(input),
+  .inputValidator((input: { club_id: string; user_id: string; roles: ClubRole[] }) =>
+    z
+      .object({
+        club_id: z.string().uuid(),
+        user_id: z.string().uuid(),
+        roles: rolesSchema,
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -132,10 +115,7 @@ export const setClubMemberRoles = createServerFn({ method: "POST" })
     }
 
     // Prevent self-removing admin
-    if (
-      data.user_id === userId &&
-      !data.roles.includes("admin")
-    ) {
+    if (data.user_id === userId && !data.roles.includes("admin")) {
       throw new Response("You cannot remove your own admin role", {
         status: 400,
       });
@@ -230,9 +210,7 @@ export const inviteClubMember = createServerFn({ method: "POST" })
         .maybeSingle();
 
       if (existingRow) {
-        const merged = Array.from(
-          new Set([...(existingRow.roles ?? []), ...data.roles]),
-        );
+        const merged = Array.from(new Set([...(existingRow.roles ?? []), ...data.roles]));
         const { error } = await supabaseAdmin
           .from("club_members")
           .update({ roles: merged })
@@ -390,9 +368,7 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
       z
         .object({
           tournament_id: z.string().uuid(),
-          email: z
-            .union([z.string().email().max(255), z.literal(""), z.null()])
-            .optional(),
+          email: z.union([z.string().email().max(255), z.literal(""), z.null()]).optional(),
           first_name: z.string().min(1).max(120),
           last_name: z.string().min(1).max(120),
           role: z.enum(TOURNAMENT_ROLES),
@@ -461,15 +437,14 @@ export const inviteTournamentMember = createServerFn({ method: "POST" })
 // ============================================================
 export const convertOfflineMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { tournament_id: string; member_id: string; email: string }) =>
-      z
-        .object({
-          tournament_id: z.string().uuid(),
-          member_id: z.string().uuid(),
-          email: z.string().email().max(255),
-        })
-        .parse(input),
+  .inputValidator((input: { tournament_id: string; member_id: string; email: string }) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        member_id: z.string().uuid(),
+        email: z.string().email().max(255),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -516,12 +491,7 @@ export const convertOfflineMember = createServerFn({ method: "POST" })
 export const assignRefereeToMatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: {
-      tournament_id: string;
-      member_id: string;
-      match_id: string;
-      remove?: boolean;
-    }) =>
+    (input: { tournament_id: string; member_id: string; match_id: string; remove?: boolean }) =>
       z
         .object({
           tournament_id: z.string().uuid(),
@@ -595,14 +565,13 @@ export const assignRefereeToMatch = createServerFn({ method: "POST" })
 // ============================================================
 export const removeTournamentMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { tournament_id: string; member_id: string }) =>
-      z
-        .object({
-          tournament_id: z.string().uuid(),
-          member_id: z.string().uuid(),
-        })
-        .parse(input),
+  .inputValidator((input: { tournament_id: string; member_id: string }) =>
+    z
+      .object({
+        tournament_id: z.string().uuid(),
+        member_id: z.string().uuid(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -623,10 +592,7 @@ export const removeTournamentMember = createServerFn({ method: "POST" })
         .eq("tournament_id", data.tournament_id)
         .eq("role", "tournament_admin");
       if ((count ?? 0) <= 1) {
-        throw new Response(
-          "Cannot remove the last tournament admin",
-          { status: 400 },
-        );
+        throw new Response("Cannot remove the last tournament admin", { status: 400 });
       }
     }
 
@@ -655,15 +621,13 @@ export const removeTournamentMember = createServerFn({ method: "POST" })
 // ============================================================
 export const acceptTournamentInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { token: string }) =>
-    z.object({ token: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: { token: string }) => z.object({ token: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: id, error } = await supabase.rpc(
-      "accept_tournament_member_invite",
-      { _token: data.token, _user_id: userId },
-    );
+    const { data: id, error } = await supabase.rpc("accept_tournament_member_invite", {
+      _token: data.token,
+      _user_id: userId,
+    });
     if (error) throw new Response(error.message, { status: 500 });
     if (!id) {
       throw new Response("Invalid or already-used invite", { status: 400 });
@@ -718,15 +682,14 @@ export const listTournamentMembers = createServerFn({ method: "POST" })
 // ============================================================
 export const getLastPermissionChange = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { scope: "club" | "tournament"; scope_id: string; target_id: string }) =>
-      z
-        .object({
-          scope: z.enum(["club", "tournament"]),
-          scope_id: z.string().uuid(),
-          target_id: z.string().uuid(),
-        })
-        .parse(input),
+  .inputValidator((input: { scope: "club" | "tournament"; scope_id: string; target_id: string }) =>
+    z
+      .object({
+        scope: z.enum(["club", "tournament"]),
+        scope_id: z.string().uuid(),
+        target_id: z.string().uuid(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;

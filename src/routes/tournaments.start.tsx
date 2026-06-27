@@ -31,7 +31,6 @@ export const Route = createFileRoute("/tournaments/start")({
   }),
 });
 
-
 function StartPage() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
@@ -67,14 +66,10 @@ function StartPage() {
             <Trophy className="h-6 w-6 text-primary" />
           </div>
           <h1 className="mt-4 font-display text-2xl font-bold">{t("tournaments.start.heading")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("tournaments.start.subheading")}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("tournaments.start.subheading")}</p>
         </div>
 
         {auth_error ? <ExpiredLinkBlock /> : null}
-
-
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
           <Tabs defaultValue="signup" className="w-full">
@@ -135,16 +130,10 @@ function ExpiredLinkBlock() {
 
   return (
     <div className="mb-5 rounded-2xl border border-destructive/30 bg-destructive/5 p-4">
-      <p className="text-sm font-medium text-destructive">
-        {t("tournaments.start.expiredTitle")}
-      </p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        {t("tournaments.start.expiredBody")}
-      </p>
+      <p className="text-sm font-medium text-destructive">{t("tournaments.start.expiredTitle")}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{t("tournaments.start.expiredBody")}</p>
       {sent ? (
-        <p className="mt-3 text-xs text-foreground">
-          {t("tournaments.start.resendSent")}
-        </p>
+        <p className="mt-3 text-xs text-foreground">{t("tournaments.start.resendSent")}</p>
       ) : (
         <form onSubmit={resend} className="mt-3 flex gap-2">
           <Input
@@ -162,7 +151,6 @@ function ExpiredLinkBlock() {
     </div>
   );
 }
-
 
 function SignupForm() {
   const navigate = useNavigate();
@@ -257,9 +245,7 @@ function SignupForm() {
         />
         <p
           className={`text-xs ${
-            password.length === 0 || passwordValid
-              ? "text-muted-foreground"
-              : "text-destructive"
+            password.length === 0 || passwordValid ? "text-muted-foreground" : "text-destructive"
           }`}
         >
           {t("tournaments.start.passwordHelp")}
@@ -325,7 +311,10 @@ function LoginForm() {
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("tournaments.start.loginCta")}
       </Button>
       <p className="text-center text-xs">
-        <Link to="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
+        <Link
+          to="/forgot-password"
+          className="text-muted-foreground hover:text-primary hover:underline"
+        >
           {t("tournaments.start.forgotPassword")}
         </Link>
       </p>

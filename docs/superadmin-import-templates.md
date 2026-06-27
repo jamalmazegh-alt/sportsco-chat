@@ -22,17 +22,18 @@ L'écran `/superadmin/onboarding/import` permet à un super-admin de pré-charge
 In scope : génération des fichiers `.xlsx` (joueurs, entraîneurs, planning), parsing des templates v2 à l'import, sélecteur de langue dans l'UI.
 
 Hors scope :
+
 - Refonte du wizard d'import (étapes, IA fallback).
 - Templates CSV multi-langues (CSV reste FR, sans onglet d'instructions).
 - Édition in-app du template (toujours téléchargé puis ré-uploadé).
 
 ## 4. Choix retenus (réponses utilisateur)
 
-| Question | Choix |
-|---|---|
+| Question   | Choix                                               |
+| ---------- | --------------------------------------------------- |
 | Lisibilité | Ligne d'exemple pré-remplie + onglet "Instructions" |
-| Langues | FR + EN + ES + DE + IT + NL + PT |
-| Spec | Oui, spec d'abord |
+| Langues    | FR + EN + ES + DE + IT + NL + PT                    |
+| Spec       | Oui, spec d'abord                                   |
 
 Pas de listes déroulantes Excel (data validation) ni de double ligne d'en-têtes — repoussé à une v3 si besoin.
 
@@ -42,11 +43,11 @@ Chaque fichier `.xlsx` contient **2 onglets** :
 
 ### Onglet 1 — `Données` (nom traduit : `Data`, `Datos`, `Daten`, `Dati`, `Gegevens`, `Dados`)
 
-| Ligne | Contenu |
-|---|---|
-| 1 | En-têtes humanisés traduits, avec `*` suffixé pour les champs obligatoires (ex. `Date de naissance *`) |
-| 2 | **Exemple fictif pré-rempli** (1 ligne réaliste : `Dupont` / `Jean` / `2010-05-12` / `U13` / `Masculin` …) en gris italique |
-| 3+ | Vide, prêt à être rempli |
+| Ligne | Contenu                                                                                                                     |
+| ----- | --------------------------------------------------------------------------------------------------------------------------- |
+| 1     | En-têtes humanisés traduits, avec `*` suffixé pour les champs obligatoires (ex. `Date de naissance *`)                      |
+| 2     | **Exemple fictif pré-rempli** (1 ligne réaliste : `Dupont` / `Jean` / `2010-05-12` / `U13` / `Masculin` …) en gris italique |
+| 3+    | Vide, prêt à être rempli                                                                                                    |
 
 Parsing : on continue d'utiliser `templateMatchRatio` sur la ligne 1 normalisée (toLowerCase + suppression accents/espaces/`*`). On ajoute aussi une **table de correspondance label-traduit → clé technique** pour mapper les en-têtes humanisés vers `key`. La ligne 2 (exemple) est détectée et **ignorée** au parsing (heuristique : exactement les valeurs de l'exemple par défaut OU marqueur `__example__` dans la première cellule masquée).
 
@@ -71,7 +72,15 @@ type TemplateStrings = {
   sheets: { data: string; instructions: string };
   intro: { players: string; coaches: string; planning: string };
   conseils: string[];
-  table: { col: string; required: string; format: string; example: string; allowed: string; yes: string; no: string };
+  table: {
+    col: string;
+    required: string;
+    format: string;
+    example: string;
+    allowed: string;
+    yes: string;
+    no: string;
+  };
   fieldLabels: Record<string /* key */, string>;
   fieldExamples: Record<string, string>;
   fieldFormats: Record<string, string>;
@@ -97,28 +106,30 @@ function downloadTemplate(type: ImportType, locale: TemplateLocale) {
   const fields = getFields(type);
 
   // Sheet 1 : Données
-  const headers = fields.map(f => t.fieldLabels[f.key] + (f.required ? " *" : ""));
-  const example = fields.map(f => t.fieldExamples[f.key] ?? "");
+  const headers = fields.map((f) => t.fieldLabels[f.key] + (f.required ? " *" : ""));
+  const example = fields.map((f) => t.fieldExamples[f.key] ?? "");
   const ws1 = XLSX.utils.aoa_to_sheet([headers, example]);
   // largeur colonnes auto (max 30)
-  ws1["!cols"] = headers.map(h => ({ wch: Math.min(30, Math.max(12, h.length + 2)) }));
+  ws1["!cols"] = headers.map((h) => ({ wch: Math.min(30, Math.max(12, h.length + 2)) }));
   // style ligne 2 : gris italique (SheetJS community edition ne supporte pas le style → on accepte le compromis et on l'indique dans l'onglet Instructions)
 
   // Sheet 2 : Instructions
-  const rows: (string|number)[][] = [
-    [t.intro[type]], [""],
+  const rows: (string | number)[][] = [
+    [t.intro[type]],
+    [""],
     [t.table.col, t.table.required, t.table.format, t.table.example, t.table.allowed],
-    ...fields.map(f => [
+    ...fields.map((f) => [
       t.fieldLabels[f.key],
       f.required ? t.table.yes : t.table.no,
       t.fieldFormats[f.key] ?? "",
       t.fieldExamples[f.key] ?? "",
       enumOptionsFor(f.key, t) ?? "",
     ]),
-    [""], ...t.conseils.map(c => [c]),
+    [""],
+    ...t.conseils.map((c) => [c]),
   ];
   const ws2 = XLSX.utils.aoa_to_sheet(rows);
-  ws2["!cols"] = [{wch:30},{wch:14},{wch:24},{wch:24},{wch:40}];
+  ws2["!cols"] = [{ wch: 30 }, { wch: 14 }, { wch: 24 }, { wch: 24 }, { wch: 40 }];
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws1, t.sheets.data);
@@ -137,6 +148,7 @@ const HEADER_ALIASES: Record<ImportType, Record<string /* normalized header */, 
 ```
 
 `tplParse(headers, rows, type)` :
+
 1. Normalise chaque en-tête (lowercase, retire accents/espaces/`*`).
 2. Si match dans `HEADER_ALIASES[type]` → on remappe vers la `key` canonique.
 3. Sinon, fallback existant (la `key` est déjà la valeur d'en-tête).

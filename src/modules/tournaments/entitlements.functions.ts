@@ -7,7 +7,10 @@ function getOrigin(): string {
 }
 
 function safeOrigin(origin: string | undefined | null): string {
-  if (origin && /^https?:\/\/([a-z0-9-]+\.)*(clubero\.app|lovable\.app|localhost)(:\d+)?$/i.test(origin)) {
+  if (
+    origin &&
+    /^https?:\/\/([a-z0-9-]+\.)*(clubero\.app|lovable\.app|localhost)(:\d+)?$/i.test(origin)
+  ) {
     return origin;
   }
   return getOrigin();
@@ -73,14 +76,11 @@ export const createTournamentPlanCheckout = createServerFn({ method: "POST" })
     const email = (claims as { email?: string }).email ?? undefined;
 
     const priceId =
-      data.plan === "single"
-        ? STRIPE_PRICE_TOURNAMENT_SINGLE
-        : STRIPE_PRICE_TOURNAMENT_ANNUAL;
+      data.plan === "single" ? STRIPE_PRICE_TOURNAMENT_SINGLE : STRIPE_PRICE_TOURNAMENT_ANNUAL;
     if (!priceId) {
-      throw new Response(
-        "Plan tournoi non configuré côté serveur (Stripe price id manquant)",
-        { status: 500 },
-      );
+      throw new Response("Plan tournoi non configuré côté serveur (Stripe price id manquant)", {
+        status: 500,
+      });
     }
 
     const purpose = data.plan === "single" ? "tournament_single" : "tournament_annual";
@@ -134,9 +134,7 @@ export const createTournamentPlanCheckout = createServerFn({ method: "POST" })
  */
 export const confirmEntitlementSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ session_id: z.string().min(8).max(255) }).parse(input),
-  )
+  .inputValidator((input) => z.object({ session_id: z.string().min(8).max(255) }).parse(input))
   .handler(async ({ data, context }) => {
     const { getStripe } = await import("@/lib/stripe.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -145,10 +143,7 @@ export const confirmEntitlementSession = createServerFn({ method: "POST" })
 
     const session = await stripe.checkout.sessions.retrieve(data.session_id);
 
-    if (
-      session.metadata?.organizer_id &&
-      session.metadata.organizer_id !== userId
-    ) {
+    if (session.metadata?.organizer_id && session.metadata.organizer_id !== userId) {
       throw new Response("Cette session ne vous appartient pas", { status: 403 });
     }
     if (session.payment_status !== "paid") {
@@ -161,13 +156,13 @@ export const confirmEntitlementSession = createServerFn({ method: "POST" })
 
     const purpose = session.metadata?.purpose;
     const customerId =
-      typeof session.customer === "string" ? session.customer : session.customer?.id ?? null;
+      typeof session.customer === "string" ? session.customer : (session.customer?.id ?? null);
 
     if (purpose === "tournament_single") {
       const piId =
         typeof session.payment_intent === "string"
           ? session.payment_intent
-          : session.payment_intent?.id ?? null;
+          : (session.payment_intent?.id ?? null);
 
       // Check existence first to avoid duplicate
       const { data: existing } = await supabaseAdmin
@@ -188,9 +183,7 @@ export const confirmEntitlementSession = createServerFn({ method: "POST" })
       }
     } else if (purpose === "tournament_annual" && session.subscription) {
       const subId =
-        typeof session.subscription === "string"
-          ? session.subscription
-          : session.subscription.id;
+        typeof session.subscription === "string" ? session.subscription : session.subscription.id;
       const sub = await stripe.subscriptions.retrieve(subId);
       const item = sub.items.data[0];
       const validUntil = item?.current_period_end
@@ -272,20 +265,16 @@ export const createTournamentFromEntitlement = createServerFn({ method: "POST" }
       _user_id: userId,
     });
     if (!canCreate) {
-      throw new Response(
-        "Aucun crédit tournoi disponible. Choisissez un plan.",
-        { status: 402 },
-      );
+      throw new Response("Aucun crédit tournoi disponible. Choisissez un plan.", { status: 402 });
     }
 
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
 
     let personalClubId: string | null = null;
     try {
-      const { data: clubIdRow } = await supabaseAdmin.rpc(
-        "get_or_create_personal_club",
-        { _user_id: userId },
-      );
+      const { data: clubIdRow } = await supabaseAdmin.rpc("get_or_create_personal_club", {
+        _user_id: userId,
+      });
       if (typeof clubIdRow === "string") personalClubId = clubIdRow;
     } catch {
       personalClubId = null;
@@ -345,7 +334,7 @@ export const ensurePersonalClubId = createServerFn({ method: "POST" })
       _user_id: userId,
     });
     if (error) throw new Response(error.message, { status: 500 });
-    if (typeof data !== "string") throw new Response("Could not resolve personal club", { status: 500 });
+    if (typeof data !== "string")
+      throw new Response("Could not resolve personal club", { status: 500 });
     return { clubId: data };
   });
-

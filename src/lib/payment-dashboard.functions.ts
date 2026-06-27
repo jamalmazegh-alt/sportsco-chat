@@ -15,8 +15,7 @@ async function assertFinAdmin(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
+  const isAdmin = !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
@@ -30,8 +29,14 @@ async function assertFinAdmin(
 const FilterSchema = z.object({
   clubId: z.string().uuid(),
   seasonId: z.string().uuid().optional(),
-  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
 });
 
 /* --------------------------- DASHBOARD SUMMARY --------------------------- */
@@ -58,7 +63,15 @@ export const getPaymentDashboard = createServerFn({ method: "POST" })
           .from("payment_obligations")
           .select("id, payment_item_id, amount_due_cents, status, currency")
           .in("payment_item_id", itemIds)
-      : { data: [] as Array<{ id: string; payment_item_id: string; amount_due_cents: number; status: string; currency: string }> };
+      : {
+          data: [] as Array<{
+            id: string;
+            payment_item_id: string;
+            amount_due_cents: number;
+            status: string;
+            currency: string;
+          }>,
+        };
 
     const obligationIds = (obligations ?? []).map((o) => o.id);
 
@@ -82,22 +95,10 @@ export const getPaymentDashboard = createServerFn({ method: "POST" })
     const succeeded = (txs ?? []).filter((t) => t.status === "succeeded");
 
     // KPIs
-    const totalDue = (obligations ?? []).reduce(
-      (s, o) => s + (o.amount_due_cents ?? 0),
-      0,
-    );
-    const totalCollected = succeeded.reduce(
-      (s, t) => s + (t.amount_gross_cents ?? 0),
-      0,
-    );
-    const totalNet = succeeded.reduce(
-      (s, t) => s + (t.amount_net_cents ?? 0),
-      0,
-    );
-    const totalFees = succeeded.reduce(
-      (s, t) => s + (t.provider_fee_cents ?? 0),
-      0,
-    );
+    const totalDue = (obligations ?? []).reduce((s, o) => s + (o.amount_due_cents ?? 0), 0);
+    const totalCollected = succeeded.reduce((s, t) => s + (t.amount_gross_cents ?? 0), 0);
+    const totalNet = succeeded.reduce((s, t) => s + (t.amount_net_cents ?? 0), 0);
+    const totalFees = succeeded.reduce((s, t) => s + (t.provider_fee_cents ?? 0), 0);
 
     const countByStatus: Record<string, number> = {};
     (obligations ?? []).forEach((o) => {
@@ -130,18 +131,12 @@ export const getPaymentDashboard = createServerFn({ method: "POST" })
     const collectedByObligation: Record<string, number> = {};
     succeeded.forEach((t) => {
       collectedByObligation[t.obligation_id] =
-        (collectedByObligation[t.obligation_id] ?? 0) +
-        (t.amount_gross_cents ?? 0);
+        (collectedByObligation[t.obligation_id] ?? 0) + (t.amount_gross_cents ?? 0);
     });
     const itemRollup = (items ?? []).map((it) => {
-      const obs = (obligations ?? []).filter(
-        (o) => o.payment_item_id === it.id,
-      );
+      const obs = (obligations ?? []).filter((o) => o.payment_item_id === it.id);
       const due = obs.reduce((s, o) => s + (o.amount_due_cents ?? 0), 0);
-      const collected = obs.reduce(
-        (s, o) => s + (collectedByObligation[o.id] ?? 0),
-        0,
-      );
+      const collected = obs.reduce((s, o) => s + (collectedByObligation[o.id] ?? 0), 0);
       const paid = obs.filter((o) => o.status === "paid").length;
       const partial = obs.filter((o) => o.status === "partial").length;
       const pending = obs.filter((o) => o.status === "pending").length;
@@ -167,19 +162,13 @@ export const getPaymentDashboard = createServerFn({ method: "POST" })
         totalFeesCents: totalFees,
         obligationsCount: (obligations ?? []).length,
         transactionsCount: succeeded.length,
-        rate:
-          totalDue > 0
-            ? Math.min(1, totalCollected / totalDue)
-            : 0,
+        rate: totalDue > 0 ? Math.min(1, totalCollected / totalDue) : 0,
       },
       countByStatus,
       byMethod,
       monthly,
       itemRollup,
-      currency:
-        (obligations ?? [])[0]?.currency ??
-        (items ?? [])[0]?.currency ??
-        "eur",
+      currency: (obligations ?? [])[0]?.currency ?? (items ?? [])[0]?.currency ?? "eur",
     };
   });
 
@@ -214,19 +203,22 @@ export const listClubTransactions = createServerFn({ method: "POST" })
     const { data: txs, error } = await q;
     if (error) throw new Error(error.message);
 
-    const obligationIds = Array.from(
-      new Set((txs ?? []).map((t) => t.obligation_id)),
-    );
+    const obligationIds = Array.from(new Set((txs ?? []).map((t) => t.obligation_id)));
     const { data: obs } = obligationIds.length
       ? await supabaseAdmin
           .from("payment_obligations")
           .select("id, payment_item_id, player_id, payer_user_id")
           .in("id", obligationIds)
-      : { data: [] as Array<{ id: string; payment_item_id: string; player_id: string | null; payer_user_id: string | null }> };
+      : {
+          data: [] as Array<{
+            id: string;
+            payment_item_id: string;
+            player_id: string | null;
+            payer_user_id: string | null;
+          }>,
+        };
 
-    const itemIds = Array.from(
-      new Set((obs ?? []).map((o) => o.payment_item_id)),
-    );
+    const itemIds = Array.from(new Set((obs ?? []).map((o) => o.payment_item_id)));
     const { data: itemsList } = itemIds.length
       ? await supabaseAdmin
           .from("payment_items")
@@ -238,23 +230,15 @@ export const listClubTransactions = createServerFn({ method: "POST" })
       new Set((obs ?? []).map((o) => o.player_id).filter(Boolean) as string[]),
     );
     const { data: players } = playerIds.length
-      ? await supabaseAdmin
-          .from("players")
-          .select("id, first_name, last_name")
-          .in("id", playerIds)
+      ? await supabaseAdmin.from("players").select("id, first_name, last_name").in("id", playerIds)
       : { data: [] as Array<{ id: string; first_name: string; last_name: string }> };
 
     const payerIds = Array.from(
-      new Set(
-        (obs ?? []).map((o) => o.payer_user_id).filter(Boolean) as string[],
-      ),
+      new Set((obs ?? []).map((o) => o.payer_user_id).filter(Boolean) as string[]),
     );
     const { data: profiles } = payerIds.length
-      ? await supabaseAdmin
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .in("id", payerIds)
-      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null}> };
+      ? await supabaseAdmin.from("profiles").select("id, first_name, last_name").in("id", payerIds)
+      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null }> };
 
     const itemById = new Map((itemsList ?? []).map((i) => [i.id, i]));
     const playerById = new Map((players ?? []).map((p) => [p.id, p]));
@@ -282,10 +266,7 @@ export const listClubTransactions = createServerFn({ method: "POST" })
         item_title: it?.title ?? "—",
         item_type: it?.type ?? null,
         player_name: pl ? `${pl.first_name} ${pl.last_name}` : null,
-        payer_name: pr
-          ? [pr.first_name, pr.last_name].filter(Boolean).join(" ")
-          : null,
-        
+        payer_name: pr ? [pr.first_name, pr.last_name].filter(Boolean).join(" ") : null,
       };
     });
 
@@ -319,44 +300,41 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
     const { data: txs, error } = await q;
     if (error) throw new Error(error.message);
 
-    const obligationIds = Array.from(
-      new Set((txs ?? []).map((t) => t.obligation_id)),
-    );
+    const obligationIds = Array.from(new Set((txs ?? []).map((t) => t.obligation_id)));
     const { data: obs } = obligationIds.length
       ? await supabaseAdmin
           .from("payment_obligations")
           .select("id, payment_item_id, player_id, payer_user_id")
           .in("id", obligationIds)
-      : { data: [] as Array<{ id: string; payment_item_id: string; player_id: string | null; payer_user_id: string | null }> };
-    const itemIds = Array.from(
-      new Set((obs ?? []).map((o) => o.payment_item_id)),
-    );
+      : {
+          data: [] as Array<{
+            id: string;
+            payment_item_id: string;
+            player_id: string | null;
+            payer_user_id: string | null;
+          }>,
+        };
+    const itemIds = Array.from(new Set((obs ?? []).map((o) => o.payment_item_id)));
     const { data: itemsList } = itemIds.length
       ? await supabaseAdmin
           .from("payment_items")
           .select("id, title, type, season_id")
           .in("id", itemIds)
-      : { data: [] as Array<{ id: string; title: string; type: string; season_id: string | null }> };
+      : {
+          data: [] as Array<{ id: string; title: string; type: string; season_id: string | null }>,
+        };
     const playerIds = Array.from(
       new Set((obs ?? []).map((o) => o.player_id).filter(Boolean) as string[]),
     );
     const { data: players } = playerIds.length
-      ? await supabaseAdmin
-          .from("players")
-          .select("id, first_name, last_name")
-          .in("id", playerIds)
+      ? await supabaseAdmin.from("players").select("id, first_name, last_name").in("id", playerIds)
       : { data: [] as Array<{ id: string; first_name: string; last_name: string }> };
     const payerIds = Array.from(
-      new Set(
-        (obs ?? []).map((o) => o.payer_user_id).filter(Boolean) as string[],
-      ),
+      new Set((obs ?? []).map((o) => o.payer_user_id).filter(Boolean) as string[]),
     );
     const { data: profiles } = payerIds.length
-      ? await supabaseAdmin
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .in("id", payerIds)
-      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null}> };
+      ? await supabaseAdmin.from("profiles").select("id, first_name, last_name").in("id", payerIds)
+      : { data: [] as Array<{ id: string; first_name: string | null; last_name: string | null }> };
 
     const itemById = new Map((itemsList ?? []).map((i) => [i.id, i]));
     const playerById = new Map((players ?? []).map((p) => [p.id, p]));
@@ -388,9 +366,7 @@ export const exportTransactionsCsv = createServerFn({ method: "POST" })
       const it = o ? itemById.get(o.payment_item_id) : null;
       const pl = o?.player_id ? playerById.get(o.player_id) : null;
       const pr = o?.payer_user_id ? profileById.get(o.payer_user_id) : null;
-      const payer = pr
-        ? [pr.first_name, pr.last_name].filter(Boolean).join(" ")
-        : "";
+      const payer = pr ? [pr.first_name, pr.last_name].filter(Boolean).join(" ") : "";
       lines.push(
         [
           t.id,
@@ -441,7 +417,14 @@ export const exportItemsRollupCsv = createServerFn({ method: "POST" })
           .from("payment_obligations")
           .select("id, payment_item_id, amount_due_cents, status")
           .in("payment_item_id", itemIds)
-      : { data: [] as Array<{ id: string; payment_item_id: string; amount_due_cents: number; status: string }> };
+      : {
+          data: [] as Array<{
+            id: string;
+            payment_item_id: string;
+            amount_due_cents: number;
+            status: string;
+          }>,
+        };
 
     const obligationIds = (obligations ?? []).map((o) => o.id);
     const { data: txs } = obligationIds.length
@@ -450,12 +433,13 @@ export const exportItemsRollupCsv = createServerFn({ method: "POST" })
           .select("obligation_id, amount_gross_cents, status")
           .in("obligation_id", obligationIds)
           .eq("status", "succeeded")
-      : { data: [] as Array<{ obligation_id: string; amount_gross_cents: number; status: string }> };
+      : {
+          data: [] as Array<{ obligation_id: string; amount_gross_cents: number; status: string }>,
+        };
 
     const collectedByOb: Record<string, number> = {};
     (txs ?? []).forEach((t) => {
-      collectedByOb[t.obligation_id] =
-        (collectedByOb[t.obligation_id] ?? 0) + t.amount_gross_cents;
+      collectedByOb[t.obligation_id] = (collectedByOb[t.obligation_id] ?? 0) + t.amount_gross_cents;
     });
 
     const headers = [
@@ -476,14 +460,9 @@ export const exportItemsRollupCsv = createServerFn({ method: "POST" })
     ];
     const lines = [headers.join(",")];
     (items ?? []).forEach((it) => {
-      const obs = (obligations ?? []).filter(
-        (o) => o.payment_item_id === it.id,
-      );
+      const obs = (obligations ?? []).filter((o) => o.payment_item_id === it.id);
       const due = obs.reduce((s, o) => s + o.amount_due_cents, 0);
-      const collected = obs.reduce(
-        (s, o) => s + (collectedByOb[o.id] ?? 0),
-        0,
-      );
+      const collected = obs.reduce((s, o) => s + (collectedByOb[o.id] ?? 0), 0);
       lines.push(
         [
           it.id,

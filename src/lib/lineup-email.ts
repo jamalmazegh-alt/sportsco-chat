@@ -60,8 +60,7 @@ export async function loadLineupForConvocationEmail(
     .in("id", Array.from(ids));
 
   const byId = new Map<string, any>((players ?? []).map((p: any) => [p.id, p]));
-  const fullName = (p: any) =>
-    `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
+  const fullName = (p: any) => `${p?.first_name ?? ""} ${p?.last_name ?? ""}`.trim() || "—";
 
   const starting: LineupEmailPlayer[] = slots
     .filter((s) => s.player_id)

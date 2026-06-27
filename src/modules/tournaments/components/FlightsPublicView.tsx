@@ -52,7 +52,10 @@ function findChampion(matches: Match[], teams: Team[]): Team | null {
   const finals = matches.filter(
     (m) =>
       m.placement_kind === "final" ||
-      (typeof m.round === "string" && m.round.toLowerCase().includes("final") && !m.round.toLowerCase().includes("semi") && !m.round.toLowerCase().includes("quarter")),
+      (typeof m.round === "string" &&
+        m.round.toLowerCase().includes("final") &&
+        !m.round.toLowerCase().includes("semi") &&
+        !m.round.toLowerCase().includes("quarter")),
   );
   const completed = finals.find((m) => m.status === "completed" && m.winner_team_id);
   if (!completed?.winner_team_id) return null;
@@ -65,7 +68,9 @@ export function FlightsPublicView({ flights, matches, teams }: Props) {
   if (!flights || flights.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-        {t("flights.public.empty", { defaultValue: "Aucun flight n'a encore été configuré pour ce tournoi." })}
+        {t("flights.public.empty", {
+          defaultValue: "Aucun flight n'a encore été configuré pour ce tournoi.",
+        })}
       </div>
     );
   }
@@ -118,7 +123,8 @@ export function FlightsPublicView({ flights, matches, teams }: Props) {
                 {flightMatches.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-6">
                     {t("flights.public.noMatches", {
-                      defaultValue: "Les matchs de ce flight seront générés après la phase de poules.",
+                      defaultValue:
+                        "Les matchs de ce flight seront générés après la phase de poules.",
                     })}
                   </p>
                 ) : (

@@ -65,7 +65,6 @@ export function generateDoubleRoundRobin(teamIds: string[]): Pairing[] {
   return [...first, ...second];
 }
 
-
 /**
  * Distribue des équipes (avec seeds optionnels) dans N groupes équilibrés
  * via "snake draft" pour répartir les têtes de série.

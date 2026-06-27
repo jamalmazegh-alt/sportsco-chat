@@ -26,9 +26,7 @@ export function SponsorsStrip({
   const { t } = useTranslation("tournaments");
   const resolvedTitle = title ?? t("public.sponsorsTitleDefault");
   if (!sponsors || sponsors.length === 0) return null;
-  const sorted = [...sponsors].sort(
-    (a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier],
-  );
+  const sorted = [...sponsors].sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier]);
   return (
     <section className="rounded-2xl border border-border bg-card px-4 py-5">
       <p className="text-xs uppercase tracking-wider text-muted-foreground text-center mb-4">

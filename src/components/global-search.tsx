@@ -105,7 +105,9 @@ export function GlobalSearch() {
                     {p.first_name} {p.last_name}
                   </span>
                   {p.jersey_number != null && (
-                    <span className="ml-auto text-xs text-muted-foreground">#{p.jersey_number}</span>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      #{p.jersey_number}
+                    </span>
                   )}
                 </CommandItem>
               ))}

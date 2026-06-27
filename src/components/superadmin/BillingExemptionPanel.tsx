@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ShieldCheck, Loader2, Calendar as CalendarIcon, X, Pencil, ShieldOff, History } from "lucide-react";
+import {
+  ShieldCheck,
+  Loader2,
+  Calendar as CalendarIcon,
+  X,
+  Pencil,
+  ShieldOff,
+  History,
+} from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -58,7 +66,6 @@ type AuditEntry = {
   actor_name: string;
   metadata: Record<string, string | number | boolean | null> | null;
 };
-
 
 const ACTION_LABEL: Record<string, string> = {
   billing_exemption_granted: "Exemption accordée",
@@ -179,10 +186,17 @@ export function BillingExemptionPanel({
               <ShieldCheck className={cn("h-5 w-5", isExempt ? "text-white" : "text-slate-600")} />
             </div>
             <div>
-              <h2 className={cn("font-extrabold text-base leading-tight", isExempt ? "text-white" : "text-slate-900")}>
+              <h2
+                className={cn(
+                  "font-extrabold text-base leading-tight",
+                  isExempt ? "text-white" : "text-slate-900",
+                )}
+              >
                 Exemption de facturation
               </h2>
-              <p className={cn("text-[11px] mt-0.5", isExempt ? "text-white/80" : "text-slate-500")}>
+              <p
+                className={cn("text-[11px] mt-0.5", isExempt ? "text-white/80" : "text-slate-500")}
+              >
                 {isExempt ? "Club exempté" : "Aucune exemption active"}
               </p>
             </div>
@@ -231,7 +245,9 @@ export function BillingExemptionPanel({
                 </Field>
                 <Field label="Accordé le">
                   {subscription?.exempt_granted_at
-                    ? format(new Date(subscription.exempt_granted_at), "d MMM yyyy 'à' HH:mm", { locale: fr })
+                    ? format(new Date(subscription.exempt_granted_at), "d MMM yyyy 'à' HH:mm", {
+                        locale: fr,
+                      })
                     : "—"}
                 </Field>
                 <Field label="Accordé par">
@@ -391,7 +407,8 @@ export function BillingExemptionPanel({
                 ✅ <strong>{clubName}</strong> aura accès gratuit{" "}
                 {until
                   ? `jusqu'au ${format(until, "d MMM yyyy", { locale: fr })}`
-                  : "sans limite de temps"}.
+                  : "sans limite de temps"}
+                .
               </div>
             )}
           </div>
@@ -424,8 +441,8 @@ export function BillingExemptionPanel({
             <AlertDialogTitle>Retirer l&apos;exemption ?</AlertDialogTitle>
             <AlertDialogDescription>
               Le club <strong>{clubName}</strong> perdra son accès gratuit. S&apos;il n&apos;a pas
-              d&apos;abonnement Stripe actif, il sera redirigé vers le tunnel d&apos;abonnement à
-              la prochaine connexion.
+              d&apos;abonnement Stripe actif, il sera redirigé vers le tunnel d&apos;abonnement à la
+              prochaine connexion.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

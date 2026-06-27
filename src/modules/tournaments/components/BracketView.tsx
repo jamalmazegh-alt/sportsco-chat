@@ -42,8 +42,7 @@ const ROUND_ORDER = ["r32", "r16", "qf", "sf", "final"];
 
 export function BracketView({ matches, teams }: Props) {
   const { t } = useTranslation("tournaments");
-  const roundLabel = (r: string) =>
-    t(`bracket.rounds.${r}`, { defaultValue: r });
+  const roundLabel = (r: string) => t(`bracket.rounds.${r}`, { defaultValue: r });
   const teamMap = new Map(teams.map((t) => [t.id, t]));
   const knockout = matches.filter((m) => m.round !== "group");
   if (knockout.length === 0) {
@@ -61,7 +60,6 @@ export function BracketView({ matches, teams }: Props) {
   sortedKnockout.forEach((m, i) => {
     matchByCounter.set(i + 1, m);
   });
-
 
   const byRound = new Map<string, Match[]>();
   for (const m of knockout) {
@@ -106,11 +104,7 @@ export function BracketView({ matches, teams }: Props) {
             {t("bracket.thirdPlace")}
           </div>
           <div className="max-w-[220px]">
-            <BracketMatch
-              match={thirdPlace[0]}
-              teamMap={teamMap}
-              matchByCounter={matchByCounter}
-            />
+            <BracketMatch match={thirdPlace[0]} teamMap={teamMap} matchByCounter={matchByCounter} />
           </div>
         </div>
       )}

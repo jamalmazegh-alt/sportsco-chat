@@ -27,9 +27,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(
-        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)),
-      );
+      await Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)));
       await self.clients.claim();
     })(),
   );
@@ -53,12 +51,18 @@ self.addEventListener("fetch", (event) => {
 
   // Static same-origin assets: stale-while-revalidate-lite (network, fallback to cache)
   const url = new URL(req.url);
-  if (url.origin === self.location.origin && /\.(png|jpg|jpeg|svg|webp|ico|woff2?)$/.test(url.pathname)) {
+  if (
+    url.origin === self.location.origin &&
+    /\.(png|jpg|jpeg|svg|webp|ico|woff2?)$/.test(url.pathname)
+  ) {
     event.respondWith(
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(req, copy)).catch(() => {});
+          caches
+            .open(CACHE_NAME)
+            .then((c) => c.put(req, copy))
+            .catch(() => {});
           return res;
         })
         .catch(() => caches.match(req)),

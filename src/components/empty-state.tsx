@@ -26,7 +26,7 @@ export function EmptyState({
     <div
       className={cn(
         "rounded-2xl border border-dashed border-border bg-card p-8 text-center flex flex-col items-center gap-3",
-        className
+        className,
       )}
     >
       {icon && (

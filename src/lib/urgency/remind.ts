@@ -27,11 +27,7 @@ export async function remindAllForEvent(
       .eq("convocation_id", c.id)
       .order("sent_at", { ascending: false })
       .limit(1);
-    if (
-      recent &&
-      recent[0] &&
-      Date.now() - new Date(recent[0].sent_at).getTime() < RATE_LIMIT_MS
-    ) {
+    if (recent && recent[0] && Date.now() - new Date(recent[0].sent_at).getTime() < RATE_LIMIT_MS) {
       continue;
     }
 

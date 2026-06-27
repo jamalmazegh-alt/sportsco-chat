@@ -5,7 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Lock, Star, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,7 +76,7 @@ export function PlayerFeedbackForm({
   const toggleTag = (tag: string) =>
     set(
       "tags",
-      value.tags.includes(tag) ? value.tags.filter((x) => x !== tag) : [...value.tags, tag]
+      value.tags.includes(tag) ? value.tags.filter((x) => x !== tag) : [...value.tags, tag],
     );
 
   return (
@@ -93,7 +97,9 @@ export function PlayerFeedbackForm({
                 onClick={() => set("rating", value.rating === n ? null : n)}
                 className={cn(
                   "h-8 w-7 rounded-md flex items-center justify-center transition-colors",
-                  active ? "text-amber-500" : "text-muted-foreground/40 hover:text-muted-foreground"
+                  active
+                    ? "text-amber-500"
+                    : "text-muted-foreground/40 hover:text-muted-foreground",
                 )}
               >
                 <Star className={cn("h-4 w-4", active && "fill-current")} />
@@ -123,7 +129,7 @@ export function PlayerFeedbackForm({
                   "text-[11px] px-2 py-1 rounded-full border transition-colors",
                   active
                     ? "border-primary bg-primary/15 text-primary"
-                    : "border-border bg-muted/30 text-muted-foreground hover:bg-muted"
+                    : "border-border bg-muted/30 text-muted-foreground hover:bg-muted",
                 )}
               >
                 {t(`feedback.tag.${tag}`, { defaultValue: tag })}
@@ -197,12 +203,7 @@ export function PlayerFeedbackForm({
 
       {/* Visibility is locked to coach_only — feedback always stays internal. */}
 
-      <Button
-        type="button"
-        onClick={() => onSubmit()}
-        disabled={busy}
-        className="w-full h-10"
-      >
+      <Button type="button" onClick={() => onSubmit()} disabled={busy} className="w-full h-10">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
       </Button>
     </div>

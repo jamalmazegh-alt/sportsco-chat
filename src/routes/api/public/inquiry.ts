@@ -31,17 +31,15 @@ const InquirySchema = z.object({
   website: z.string().max(0).optional().default(""),
 });
 
-
 function generateToken(): string {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-async function getOrCreateUnsubscribeToken(
-  supabase: any,
-  email: string,
-): Promise<string> {
+async function getOrCreateUnsubscribeToken(supabase: any, email: string): Promise<string> {
   const normalized = email.toLowerCase();
   const { data: existing } = await supabase
     .from("email_unsubscribe_tokens")
@@ -89,7 +87,6 @@ export const Route = createFileRoute("/api/public/inquiry")({
         if (!allowed) {
           return Response.json({ error: "Too many requests" }, { status: 429 });
         }
-
 
         const adminTemplate = TEMPLATES[ADMIN_TEMPLATE];
         const confirmTemplate = TEMPLATES[CONFIRM_TEMPLATE];

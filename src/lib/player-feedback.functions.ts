@@ -50,8 +50,10 @@ function getRequestedSentenceCount(instruction: string) {
   if (!/phras/.test(normalized)) return null;
   const digit = normalized.match(/(?:en|dans|sur|de)?\s*(\d{1,2})\s+\w*phras/i)?.[1];
   if (digit) return Number(digit);
-  const word = normalized.match(/(?:en|dans|sur|de)?\s*(une|un|deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s+\w*phras/i)?.[1];
-  return word ? FRENCH_NUMBER_WORDS[word] ?? null : null;
+  const word = normalized.match(
+    /(?:en|dans|sur|de)?\s*(une|un|deux|trois|quatre|cinq|six|sept|huit|neuf|dix)\s+\w*phras/i,
+  )?.[1];
+  return word ? (FRENCH_NUMBER_WORDS[word] ?? null) : null;
 }
 
 function splitSentences(content: string) {
@@ -77,7 +79,7 @@ function locallyLimitSentences(content: string, sentenceCount: number) {
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((line) => /[.!?…]$/.test(line) ? line : `${line}.`)
+    .map((line) => (/[.!?…]$/.test(line) ? line : `${line}.`))
     .join(" ");
   const sentences = splitSentences(withoutHeadings);
   return sentences.slice(0, sentenceCount).join(" ").trim();
@@ -130,7 +132,7 @@ async function assertStaffCanViewPlayerFeedback(
 export const listPlayerFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { playerId: string }) =>
-    z.object({ playerId: z.string().uuid() }).parse(input)
+    z.object({ playerId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -138,7 +140,7 @@ export const listPlayerFeedback = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabase
       .from("player_feedback" as any)
       .select(
-        "id, event_id, author_user_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary, created_at, team_id, club_id"
+        "id, event_id, author_user_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary, created_at, team_id, club_id",
       )
       .eq("player_id", data.playerId)
       .is("deleted_at", null)
@@ -146,12 +148,13 @@ export const listPlayerFeedback = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 500 });
 
     const authorIds = Array.from(new Set((rows ?? []).map((r: any) => r.author_user_id)));
-    const eventIds = Array.from(
-      new Set((rows ?? []).map((r: any) => r.event_id).filter(Boolean))
-    );
+    const eventIds = Array.from(new Set((rows ?? []).map((r: any) => r.event_id).filter(Boolean)));
     const [authorsRes, eventsRes] = await Promise.all([
       authorIds.length
-        ? supabase.from("profiles").select("id, full_name, first_name, last_name").in("id", authorIds)
+        ? supabase
+            .from("profiles")
+            .select("id, full_name, first_name, last_name")
+            .in("id", authorIds)
         : Promise.resolve({ data: [] as any[] }),
       eventIds.length
         ? supabase
@@ -167,7 +170,7 @@ export const listPlayerFeedback = createServerFn({ method: "POST" })
       feedback: (rows ?? []).map((r: any) => ({
         ...r,
         author: authorById.get(r.author_user_id) ?? null,
-        event: r.event_id ? eventById.get(r.event_id) ?? null : null,
+        event: r.event_id ? (eventById.get(r.event_id) ?? null) : null,
       })),
     };
   });
@@ -214,9 +217,7 @@ export const createPlayerFeedback = createServerFn({ method: "POST" })
 export const updatePlayerFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    FeedbackInput.partial()
-      .extend({ id: z.string().uuid() })
-      .parse(input)
+    FeedbackInput.partial().extend({ id: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -231,7 +232,9 @@ export const updatePlayerFeedback = createServerFn({ method: "POST" })
     if (data.sharedSummary !== undefined) patch.shared_summary = data.sharedSummary;
     const { data: current, error: currentError } = await supabase
       .from("player_feedback" as any)
-      .select("player_id, event_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary")
+      .select(
+        "player_id, event_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary",
+      )
       .eq("id", data.id)
       .maybeSingle();
     if (currentError || !current) throw new Response("Retour introuvable", { status: 404 });
@@ -260,9 +263,7 @@ export const updatePlayerFeedback = createServerFn({ method: "POST" })
 // ------------------------------------------------------------------
 export const deletePlayerFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(input)
-  )
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase
@@ -279,7 +280,7 @@ export const deletePlayerFeedback = createServerFn({ method: "POST" })
 export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { eventId: string }) =>
-    z.object({ eventId: z.string().uuid() }).parse(input)
+    z.object({ eventId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -293,9 +294,7 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
 
     const { data: convs } = await supabase
       .from("convocations")
-      .select(
-        "id, status, player:player_id(id, first_name, last_name, photo_url, jersey_number)"
-      )
+      .select("id, status, player:player_id(id, first_name, last_name, photo_url, jersey_number)")
       .eq("event_id", data.eventId);
 
     const players = (convs ?? [])
@@ -318,7 +317,9 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
     if (playerIds.length) {
       const { data: rows } = await supabase
         .from("player_feedback" as any)
-        .select("id, player_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary")
+        .select(
+          "id, player_id, rating, comment, dev_notes, strengths, improvements, tags, visibility, shared_summary",
+        )
         .eq("event_id", data.eventId)
         .eq("author_user_id", context.userId)
         .is("deleted_at", null)
@@ -335,14 +336,16 @@ export const listEventPlayersForFeedback = createServerFn({ method: "POST" })
 export const listPlayerReviews = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { playerId: string }) =>
-    z.object({ playerId: z.string().uuid() }).parse(input)
+    z.object({ playerId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertStaffCanViewPlayerFeedback(supabase, userId, data.playerId);
     const { data: rows, error } = await supabase
       .from("player_reviews" as any)
-      .select("id, kind, period_start, period_end, content, visibility, model, created_at, author_user_id")
+      .select(
+        "id, kind, period_start, period_end, content, visibility, model, created_at, author_user_id",
+      )
       .eq("player_id", data.playerId)
       .order("created_at", { ascending: false });
     if (error) throw new Response(error.message, { status: 500 });
@@ -363,7 +366,7 @@ export const generatePlayerReview = createServerFn({ method: "POST" })
         periodEnd: z.string().nullish(),
         visibility: FeedbackVisibility.default("coach_only"),
       })
-      .parse(input)
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -389,7 +392,7 @@ export const generatePlayerReview = createServerFn({ method: "POST" })
     const { data: feedbacks } = await supabase
       .from("player_feedback" as any)
       .select(
-        "rating, comment, dev_notes, strengths, improvements, tags, created_at, event:event_id(title, starts_at, type, opponent)"
+        "rating, comment, dev_notes, strengths, improvements, tags, created_at, event:event_id(title, starts_at, type, opponent)",
       )
       .eq("player_id", data.playerId)
       .is("deleted_at", null)
@@ -416,20 +419,13 @@ export const generatePlayerReview = createServerFn({ method: "POST" })
 
     // Goals & assists
     const [{ data: goalsScored }, { data: assists }] = await Promise.all([
-      supabase
-        .from("event_goals")
-        .select("kind, created_at")
-        .eq("scorer_player_id", data.playerId),
-      supabase
-        .from("event_goals")
-        .select("created_at")
-        .eq("assist_player_id", data.playerId),
+      supabase.from("event_goals").select("kind, created_at").eq("scorer_player_id", data.playerId),
+      supabase.from("event_goals").select("created_at").eq("assist_player_id", data.playerId),
     ]);
 
     const stats = {
       attendance: att,
-      attendance_rate:
-        att.total > 0 ? Math.round((att.present / att.total) * 100) : null,
+      attendance_rate: att.total > 0 ? Math.round((att.present / att.total) * 100) : null,
       goals: (goalsScored ?? []).filter((g: any) => g.kind === "goal").length,
       own_goals: (goalsScored ?? []).filter((g: any) => g.kind === "own_goal").length,
       assists: (assists ?? []).length,
@@ -494,9 +490,7 @@ Consignes de rédaction :
 
 export const deletePlayerReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(input)
-  )
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase
@@ -520,7 +514,7 @@ export const refinePlayerReview = createServerFn({ method: "POST" })
         reviewId: z.string().uuid(),
         instruction: z.string().trim().min(2).max(2000),
       })
-      .parse(input)
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -571,7 +565,10 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
         const { text, finishReason } = await generateText({
           model: gateway(modelName),
           system: systemPrompt,
-          prompt: userPrompt + sentenceInstruction + `\n\nRéponds uniquement avec la synthèse complète réécrite.`,
+          prompt:
+            userPrompt +
+            sentenceInstruction +
+            `\n\nRéponds uniquement avec la synthèse complète réécrite.`,
           maxOutputTokens: 8192,
           temperature: 0.2,
         });
@@ -600,16 +597,24 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
     if (!content) {
       const fallback = localInstructionFallback(previousContent, requestedSentenceCount);
       if (!fallback) {
-        throw new Response("L'IA a renvoyé une réponse vide. Rien n'a été modifié.", { status: 502 });
+        throw new Response("L'IA a renvoyé une réponse vide. Rien n'a été modifié.", {
+          status: 502,
+        });
       }
       content = fallback;
       usedModel = "local-fallback";
       changes = `L'IA a renvoyé une réponse vide, j'ai appliqué localement la réduction à ${requestedSentenceCount} phrase${requestedSentenceCount && requestedSentenceCount > 1 ? "s" : ""}.`;
-      console.warn("[refinePlayerReview] used local fallback", { requestedSentenceCount, lastError });
+      console.warn("[refinePlayerReview] used local fallback", {
+        requestedSentenceCount,
+        lastError,
+      });
     }
 
     if (requestedSentenceCount) {
-      content = locallyLimitSentences(content, requestedSentenceCount) || localInstructionFallback(previousContent, requestedSentenceCount) || content;
+      content =
+        locallyLimitSentences(content, requestedSentenceCount) ||
+        localInstructionFallback(previousContent, requestedSentenceCount) ||
+        content;
       const finalSentenceCount = splitSentences(content).length;
       changes ||= `J'ai réduit la synthèse à ${finalSentenceCount} phrase${finalSentenceCount > 1 ? "s" : ""} comme demandé.`;
     } else {
@@ -617,16 +622,20 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
     }
 
     content = cleanReviewContent(content);
-    if (!content) throw new Response("La synthèse générée est vide. Rien n'a été modifié.", { status: 502 });
+    if (!content)
+      throw new Response("La synthèse générée est vide. Rien n'a été modifié.", { status: 502 });
     if (!hasVisibleDifference(previousContent, content)) {
-      changes = "Je n'ai pas détecté de changement visible après traitement ; la synthèse affichée reste identique.";
+      changes =
+        "Je n'ai pas détecté de changement visible après traitement ; la synthèse affichée reste identique.";
     }
 
     const { data: row, error } = await supabase
       .from("player_reviews" as any)
       .update({ content, model: usedModel })
       .eq("id", data.reviewId)
-      .select("id, kind, period_start, period_end, content, visibility, model, created_at, author_user_id")
+      .select(
+        "id, kind, period_start, period_end, content, visibility, model, created_at, author_user_id",
+      )
       .maybeSingle();
 
     if (error) {
@@ -636,11 +645,17 @@ Renvoie uniquement la synthèse COMPLÈTE mise à jour selon l'instruction : pas
         message: error.message,
         details: error.details,
       });
-      throw new Response(`La synthèse a été générée mais n'a pas pu être enregistrée : ${error.message}`, { status: 500 });
+      throw new Response(
+        `La synthèse a été générée mais n'a pas pu être enregistrée : ${error.message}`,
+        { status: 500 },
+      );
     }
     if (!row) {
       console.error("[refinePlayerReview] update returned no row", { reviewId: data.reviewId });
-      throw new Response("La synthèse a été générée mais l'enregistrement est introuvable après mise à jour.", { status: 500 });
+      throw new Response(
+        "La synthèse a été générée mais l'enregistrement est introuvable après mise à jour.",
+        { status: 500 },
+      );
     }
     return { review: row as unknown as PlayerReviewRow, changes };
   });

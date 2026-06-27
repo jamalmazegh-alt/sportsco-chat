@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  formationSlots,
-  FORMATIONS,
-  type FormationKey,
-} from "@/lib/football-formations";
+import { formationSlots, FORMATIONS, type FormationKey } from "@/lib/football-formations";
 
 describe("formationSlots — structure générale", () => {
   const allFormations: FormationKey[] = ["4-4-2", "4-3-3", "4-2-3-1", "3-5-2", "3-4-3", "custom"];
@@ -159,9 +155,7 @@ describe("formationSlots — custom", () => {
 describe("répartition horizontale", () => {
   it("les joueurs d'une même ligne sont équidistants", () => {
     const slots = formationSlots("4-4-2");
-    const defenders = slots
-      .filter((s) => s.role === "DEF")
-      .sort((a, b) => a.x - b.x);
+    const defenders = slots.filter((s) => s.role === "DEF").sort((a, b) => a.x - b.x);
     const gaps = defenders.slice(1).map((s, i) => s.x - defenders[i].x);
     const firstGap = gaps[0];
     for (const gap of gaps) {

@@ -1,6 +1,8 @@
 import * as Sentry from "@sentry/react";
 
-const DSN = import.meta.env.VITE_SENTRY_DSN ?? "https://e2d872518bc593819079553d18a330c4@o4511446455549952.ingest.de.sentry.io/4511446461710417";
+const DSN =
+  import.meta.env.VITE_SENTRY_DSN ??
+  "https://e2d872518bc593819079553d18a330c4@o4511446455549952.ingest.de.sentry.io/4511446461710417";
 
 let initialized = false;
 
@@ -10,7 +12,8 @@ export function initSentry() {
 
   // Skip in dev / preview to avoid noise
   const host = window.location.hostname;
-  const isProd = host === "clubero.app" || host === "www.clubero.app" || host === "sportsco-chat.lovable.app";
+  const isProd =
+    host === "clubero.app" || host === "www.clubero.app" || host === "sportsco-chat.lovable.app";
   if (!isProd) return;
 
   Sentry.init({

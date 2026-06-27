@@ -216,7 +216,11 @@ export function PoolEditorDialog({ open, onOpenChange, tournamentId }: Props) {
         </div>
 
         <DialogFooter className="px-5 pb-5 pt-3 gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl border-[1.5px]">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="rounded-xl border-[1.5px]"
+          >
             {t("common.cancel", "Annuler")}
           </Button>
           <Button

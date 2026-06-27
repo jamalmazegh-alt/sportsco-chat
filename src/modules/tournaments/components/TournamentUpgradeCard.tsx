@@ -63,14 +63,8 @@ export function TournamentUpgradeCard() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-semibold">{t("upgrade.heading")}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("upgrade.body")}
-            </p>
-            <Button
-              size="sm"
-              className="mt-3"
-              onClick={() => setOpen(true)}
-            >
+            <p className="mt-1 text-sm text-muted-foreground">{t("upgrade.body")}</p>
+            <Button size="sm" className="mt-3" onClick={() => setOpen(true)}>
               <Sparkles className="h-4 w-4" />
               {t("upgrade.ctaSubscribe")}
             </Button>
@@ -82,9 +76,7 @@ export function TournamentUpgradeCard() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t("upgrade.dialogTitle")}</DialogTitle>
-            <DialogDescription>
-              {t("upgrade.dialogDesc")}
-            </DialogDescription>
+            <DialogDescription>{t("upgrade.dialogDesc")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">

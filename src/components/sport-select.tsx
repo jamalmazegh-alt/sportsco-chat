@@ -1,6 +1,13 @@
 import { useTranslation } from "react-i18next";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator, SelectLabel, SelectGroup,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectSeparator,
+  SelectLabel,
+  SelectGroup,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { TOP_SPORTS, COLLECTIVE_SPORTS, RACKET_SPORTS, CUSTOM_SPORT } from "@/lib/sports";
@@ -31,21 +38,29 @@ export function SportSelect({
         <SelectContent className="max-h-72">
           <SelectGroup>
             {TOP_SPORTS.map((s) => (
-              <SelectItem key={s} value={s}>{t(`teams.sports.${s}`)}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {t(`teams.sports.${s}`)}
+              </SelectItem>
             ))}
           </SelectGroup>
           <SelectSeparator />
           <SelectGroup>
-            <SelectLabel>{t("teams.sportsCollective", { defaultValue: "Sports collectifs" })}</SelectLabel>
+            <SelectLabel>
+              {t("teams.sportsCollective", { defaultValue: "Sports collectifs" })}
+            </SelectLabel>
             {COLLECTIVE_SPORTS.map((s) => (
-              <SelectItem key={s} value={s}>{t(`teams.sports.${s}`)}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {t(`teams.sports.${s}`)}
+              </SelectItem>
             ))}
           </SelectGroup>
           <SelectSeparator />
           <SelectGroup>
             <SelectLabel>{t("teams.sportsRacket", { defaultValue: "Raquette" })}</SelectLabel>
             {RACKET_SPORTS.map((s) => (
-              <SelectItem key={s} value={s}>{t(`teams.sports.${s}`, { defaultValue: s })}</SelectItem>
+              <SelectItem key={s} value={s}>
+                {t(`teams.sports.${s}`, { defaultValue: s })}
+              </SelectItem>
             ))}
           </SelectGroup>
           <SelectSeparator />

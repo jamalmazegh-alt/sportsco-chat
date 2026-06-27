@@ -12,7 +12,14 @@ interface PlayerInviteProps {
   roleLabel?: string;
 }
 
-const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteUrl, roleLabel }: PlayerInviteProps) => {
+const PlayerInviteEmail = ({
+  firstName,
+  teamName,
+  clubName,
+  clubLogoUrl,
+  inviteUrl,
+  roleLabel,
+}: PlayerInviteProps) => {
   const club = clubName ?? "Votre club";
   const isStaff = !!roleLabel && roleLabel.toLowerCase() !== "joueur";
   const role = roleLabel ?? "joueur";
@@ -23,26 +30,30 @@ const PlayerInviteEmail = ({ firstName, teamName, clubName, clubLogoUrl, inviteU
       clubName={clubName}
       clubLogoUrl={clubLogoUrl}
     >
-          <Heading style={h1}>
-            {firstName ? `Bonjour ${firstName},` : "Bonjour,"}
-          </Heading>
-          <Text style={text}>
-            <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>{role}</strong>
-            {isStaff ? null : teamName ? <> au sein de l'équipe <strong>{teamName}</strong></> : null}.
-          </Text>
-          <Text style={text}>
-            {isStaff
-              ? "Acceptez l'invitation pour créer votre compte et accéder à votre espace d'encadrement : gestion des équipes, convocations, suivi des joueurs et événements du club."
-              : "Acceptez l'invitation pour créer votre compte, consulter vos prochains événements et répondre à vos convocations."}
-          </Text>
-          <Button style={button} href={inviteUrl}>
-            Accepter l'invitation
-          </Button>
-          <Text style={small}>
-            Ou copiez ce lien dans votre navigateur :<br />
-            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
-          </Text>
-          </EmailShell>
+      <Heading style={h1}>{firstName ? `Bonjour ${firstName},` : "Bonjour,"}</Heading>
+      <Text style={text}>
+        <strong>{club}</strong> vous invite à rejoindre Clubero en tant que <strong>{role}</strong>
+        {isStaff ? null : teamName ? (
+          <>
+            {" "}
+            au sein de l'équipe <strong>{teamName}</strong>
+          </>
+        ) : null}
+        .
+      </Text>
+      <Text style={text}>
+        {isStaff
+          ? "Acceptez l'invitation pour créer votre compte et accéder à votre espace d'encadrement : gestion des équipes, convocations, suivi des joueurs et événements du club."
+          : "Acceptez l'invitation pour créer votre compte, consulter vos prochains événements et répondre à vos convocations."}
+      </Text>
+      <Button style={button} href={inviteUrl}>
+        Accepter l'invitation
+      </Button>
+      <Text style={small}>
+        Ou copiez ce lien dans votre navigateur :<br />
+        <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
+      </Text>
+    </EmailShell>
   );
 };
 
@@ -75,4 +86,3 @@ const button = {
   display: "inline-block",
 };
 const small = { fontSize: "12px", color: "#64748b", margin: "20px 0 0", lineHeight: "1.5" };
-

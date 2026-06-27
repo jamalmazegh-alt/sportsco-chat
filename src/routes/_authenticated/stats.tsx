@@ -4,12 +4,25 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, ShieldCheck, ChevronDown, Trophy, Minus, X, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  BarChart3,
+  ShieldCheck,
+  ChevronDown,
+  Trophy,
+  Minus,
+  X,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { PlayerAttendanceStats } from "@/components/player-attendance-stats";
 import { TeamAttendanceStats } from "@/components/team-attendance-stats";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -32,7 +45,11 @@ function StatsPage() {
   const role = useActiveRole();
   const roles = useMyRoles();
 
-  const isStaff = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach") || roles.includes("staff");
+  const isStaff =
+    roles.includes("admin") ||
+    roles.includes("coach") ||
+    roles.includes("assistant_coach") ||
+    roles.includes("staff");
 
   return (
     <div className="container max-w-5xl px-4 py-4 pb-24 space-y-5">
@@ -42,9 +59,15 @@ function StatsPage() {
       </header>
 
       {!activeClubId ? (
-        <p className="text-sm text-muted-foreground">{t("common.noClubSelected", { defaultValue: "Aucun club sélectionné" })}</p>
+        <p className="text-sm text-muted-foreground">
+          {t("common.noClubSelected", { defaultValue: "Aucun club sélectionné" })}
+        </p>
       ) : isStaff ? (
-        <StaffStats clubId={activeClubId} isAdmin={roles.includes("admin")} userId={user?.id ?? ""} />
+        <StaffStats
+          clubId={activeClubId}
+          isAdmin={roles.includes("admin")}
+          userId={user?.id ?? ""}
+        />
       ) : (
         <PlayerOrParentStats clubId={activeClubId} userId={user?.id ?? ""} />
       )}
@@ -130,7 +153,11 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
           .select("player_id, players:player_id(id, first_name, last_name, club_id, deleted_at)")
           .eq("parent_user_id", userId),
       ]);
-      const own = (ownRes.data ?? []).map((p) => ({ id: p.id, name: `${p.first_name} ${p.last_name}`, isOwn: true }));
+      const own = (ownRes.data ?? []).map((p) => ({
+        id: p.id,
+        name: `${p.first_name} ${p.last_name}`,
+        isOwn: true,
+      }));
       const children = (parentRes.data ?? [])
         .map((r: any) => r.players)
         .filter((p: any) => p && p.club_id === clubId && !p.deleted_at)
@@ -151,7 +178,9 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
   if (!players || players.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
-        {t("stats.noPlayerLinked", { defaultValue: "Aucun joueur n'est lié à votre compte pour ce club." })}
+        {t("stats.noPlayerLinked", {
+          defaultValue: "Aucun joueur n'est lié à votre compte pour ce club.",
+        })}
       </div>
     );
   }
@@ -162,13 +191,18 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
     <div className="space-y-4">
       {players.length > 1 && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">{t("stats.player", { defaultValue: "Joueur" })}</span>
+          <span className="text-sm text-muted-foreground">
+            {t("stats.player", { defaultValue: "Joueur" })}
+          </span>
           <Select value={selectedId ?? undefined} onValueChange={setSelectedId}>
-            <SelectTrigger className="h-9 w-[240px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9 w-[240px]">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {players.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
-                  {p.name}{p.isOwn ? "" : ` · ${t("stats.child", { defaultValue: "enfant" })}`}
+                  {p.name}
+                  {p.isOwn ? "" : ` · ${t("stats.child", { defaultValue: "enfant" })}`}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -199,10 +233,7 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
       const sport = (tm?.[0] as any)?.teams?.sport ?? null;
 
       const [goalsRes, assistsRes, matchesRes] = await Promise.all([
-        supabase
-          .from("event_goals")
-          .select("id, kind")
-          .eq("scorer_player_id", playerId),
+        supabase.from("event_goals").select("id, kind").eq("scorer_player_id", playerId),
         supabase
           .from("event_goals")
           .select("id", { count: "exact", head: true })
@@ -219,7 +250,7 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
       });
       const assists = assistsRes.count ?? 0;
       const matchesPlayed = (matchesRes.data ?? []).filter(
-        (c: any) => c.events?.type === "match" && c.events?.status !== "cancelled"
+        (c: any) => c.events?.type === "match" && c.events?.status !== "cancelled",
       ).length;
       return { sport, byKind, assists, matchesPlayed };
     },
@@ -227,7 +258,10 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
 
   const cfg = getSportConfig(data?.sport);
   const tiles: Array<{ label: string; value: number; negative?: boolean }> = [
-    { label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }), value: data?.matchesPlayed ?? 0 },
+    {
+      label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }),
+      value: data?.matchesPlayed ?? 0,
+    },
   ];
   // Per-kind tiles from sport config (scorer_player_id kinds)
   cfg.statKinds.forEach((k) => {
@@ -239,9 +273,15 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
     });
   });
   if (cfg.assistsEnabled && cfg.statKinds.includes("assist")) {
-    tiles.push({ label: t("match.kinds.assist", { defaultValue: "Passes" }), value: data?.assists ?? 0 });
+    tiles.push({
+      label: t("match.kinds.assist", { defaultValue: "Passes" }),
+      value: data?.assists ?? 0,
+    });
   } else if (cfg.assistsEnabled) {
-    tiles.push({ label: t("match.kinds.assist", { defaultValue: "Passes" }), value: data?.assists ?? 0 });
+    tiles.push({
+      label: t("match.kinds.assist", { defaultValue: "Passes" }),
+      value: data?.assists ?? 0,
+    });
   }
 
   return (
@@ -263,7 +303,15 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
 
 /* =================== Coach / Admin =================== */
 
-function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: boolean; userId: string }) {
+function StaffStats({
+  clubId,
+  isAdmin,
+  userId,
+}: {
+  clubId: string;
+  isAdmin: boolean;
+  userId: string;
+}) {
   const { t } = useTranslation();
 
   const { data: teams, isLoading } = useQuery({
@@ -310,12 +358,18 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">{t("stats.team", { defaultValue: "Équipe" })}</span>
+        <span className="text-sm text-muted-foreground">
+          {t("stats.team", { defaultValue: "Équipe" })}
+        </span>
         <Select value={teamId ?? undefined} onValueChange={setTeamId}>
-          <SelectTrigger className="h-9 w-[240px]"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 w-[240px]">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             {teams.map((tm) => (
-              <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>
+              <SelectItem key={tm.id} value={tm.id}>
+                {tm.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -324,9 +378,15 @@ function StaffStats({ clubId, isAdmin, userId }: { clubId: string; isAdmin: bool
       {teamId && (
         <Tabs defaultValue="overview">
           <TabsList>
-            <TabsTrigger value="overview">{t("stats.tabOverview", { defaultValue: "Vue d'ensemble" })}</TabsTrigger>
-            <TabsTrigger value="players">{t("stats.tabPlayers", { defaultValue: "Joueurs" })}</TabsTrigger>
-            <TabsTrigger value="attendance">{t("stats.tabAttendance", { defaultValue: "Présences" })}</TabsTrigger>
+            <TabsTrigger value="overview">
+              {t("stats.tabOverview", { defaultValue: "Vue d'ensemble" })}
+            </TabsTrigger>
+            <TabsTrigger value="players">
+              {t("stats.tabPlayers", { defaultValue: "Joueurs" })}
+            </TabsTrigger>
+            <TabsTrigger value="attendance">
+              {t("stats.tabAttendance", { defaultValue: "Présences" })}
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="mt-4">
             <TeamMatchRecord teamId={teamId} sport={selectedSport} />
@@ -391,12 +451,19 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
         .from("match_results")
         .select("event_id, home_score, away_score")
         .in("event_id", matchIds);
-      let w = 0, d = 0, l = 0, gf = 0, ga = 0, played = 0;
+      let w = 0,
+        d = 0,
+        l = 0,
+        gf = 0,
+        ga = 0,
+        played = 0;
       (results ?? []).forEach((r: any) => {
         const isHome = homeMap.get(r.event_id);
         const our = isHome ? r.home_score : r.away_score;
         const opp = isHome ? r.away_score : r.home_score;
-        gf += our; ga += opp; played++;
+        gf += our;
+        ga += opp;
+        played++;
         if (our > opp) w++;
         else if (our < opp) l++;
         else d++;
@@ -411,14 +478,40 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
   const [expanded, setExpanded] = useState(false);
 
   const chips = [
-    { icon: null, label: `${r.played} ${t("stats.matchesWithResult", { defaultValue: "Matchs" }).toLowerCase()}`, cls: "bg-muted text-foreground" },
-    { icon: <Trophy className="h-3 w-3" />, label: `${r.w}V`, cls: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" },
-    { icon: <Minus className="h-3 w-3" />, label: `${r.d}N`, cls: "bg-muted text-muted-foreground" },
-    { icon: <X className="h-3 w-3" />, label: `${r.l}D`, cls: "bg-destructive/10 text-destructive" },
     {
-      icon: diff > 0 ? <TrendingUp className="h-3 w-3" /> : diff < 0 ? <TrendingDown className="h-3 w-3" /> : null,
+      icon: null,
+      label: `${r.played} ${t("stats.matchesWithResult", { defaultValue: "Matchs" }).toLowerCase()}`,
+      cls: "bg-muted text-foreground",
+    },
+    {
+      icon: <Trophy className="h-3 w-3" />,
+      label: `${r.w}V`,
+      cls: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    },
+    {
+      icon: <Minus className="h-3 w-3" />,
+      label: `${r.d}N`,
+      cls: "bg-muted text-muted-foreground",
+    },
+    {
+      icon: <X className="h-3 w-3" />,
+      label: `${r.l}D`,
+      cls: "bg-destructive/10 text-destructive",
+    },
+    {
+      icon:
+        diff > 0 ? (
+          <TrendingUp className="h-3 w-3" />
+        ) : diff < 0 ? (
+          <TrendingDown className="h-3 w-3" />
+        ) : null,
       label: `${diff > 0 ? "+" : ""}${diff}`,
-      cls: diff > 0 ? "bg-primary/10 text-primary" : diff < 0 ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground",
+      cls:
+        diff > 0
+          ? "bg-primary/10 text-primary"
+          : diff < 0
+            ? "bg-destructive/10 text-destructive"
+            : "bg-muted text-muted-foreground",
     },
   ];
 
@@ -431,7 +524,10 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
   const detailCards = [
     { label: unitLabels.for, value: r.gf },
     { label: unitLabels.against, value: r.ga },
-    { label: t("stats.diff", { defaultValue: "Différence" }), value: `${diff > 0 ? "+" : ""}${diff}` },
+    {
+      label: t("stats.diff", { defaultValue: "Différence" }),
+      value: `${diff > 0 ? "+" : ""}${diff}`,
+    },
     { label: t("stats.winRate", { defaultValue: "% Victoires" }), value: `${winRate}%` },
   ];
 
@@ -456,7 +552,7 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
             key={i}
             className={cn(
               "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums",
-              c.cls
+              c.cls,
             )}
           >
             {c.icon}
@@ -474,8 +570,12 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
             <div className="bg-destructive transition-all" style={{ width: `${lPct}%` }} />
           </div>
           <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums">
-            <span>{winRate}% {t("stats.wins", { defaultValue: "Victoires" }).toLowerCase()}</span>
-            <span>{unitLabels.for}: {r.gf} · {unitLabels.against}: {r.ga}</span>
+            <span>
+              {winRate}% {t("stats.wins", { defaultValue: "Victoires" }).toLowerCase()}
+            </span>
+            <span>
+              {unitLabels.for}: {r.gf} · {unitLabels.against}: {r.ga}
+            </span>
           </div>
         </div>
       )}
@@ -497,7 +597,9 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-border animate-in fade-in slide-in-from-top-1 duration-200">
           {detailCards.map((c) => (
             <div key={c.label} className="rounded-xl border bg-card p-3">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{c.label}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {c.label}
+              </div>
               <div className="mt-1 text-xl font-bold tabular-nums">{c.value}</div>
             </div>
           ))}
@@ -506,7 +608,6 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
     </section>
   );
 }
-
 
 type PlayerRow = {
   player_id: string;
@@ -524,10 +625,7 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
 
   // Columns: name, matches, then one per scorer-kind from cfg.statKinds (except "assist"),
   // then assists (if enabled), then attendance.
-  const scorerKinds = useMemo<StatKind[]>(
-    () => cfg.statKinds.filter((k) => k !== "assist"),
-    [cfg]
-  );
+  const scorerKinds = useMemo<StatKind[]>(() => cfg.statKinds.filter((k) => k !== "assist"), [cfg]);
   const showAssistCol = cfg.assistsEnabled;
 
   type SortKey = "name" | "matches" | "attendance" | `kind:${StatKind}` | "assists";
@@ -556,30 +654,36 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
         .neq("status", "cancelled");
       const eventIds = (events ?? []).map((e) => e.id);
       const matchEventIds = new Set(
-        (events ?? []).filter((e) => e.type === "match").map((e) => e.id)
+        (events ?? []).filter((e) => e.type === "match").map((e) => e.id),
       );
 
-      const { data: convocs } = eventIds.length > 0
-        ? await supabase
-            .from("convocations")
-            .select("player_id, status, event_id")
-            .in("event_id", eventIds)
-            .in("player_id", playerIds)
-        : { data: [] as any[] };
+      const { data: convocs } =
+        eventIds.length > 0
+          ? await supabase
+              .from("convocations")
+              .select("player_id, status, event_id")
+              .in("event_id", eventIds)
+              .in("player_id", playerIds)
+          : { data: [] as any[] };
 
-      const { data: goals } = matchEventIds.size > 0
-        ? await supabase
-            .from("event_goals")
-            .select("scorer_player_id, assist_player_id, kind, event_id")
-            .in("event_id", Array.from(matchEventIds))
-        : { data: [] as any[] };
+      const { data: goals } =
+        matchEventIds.size > 0
+          ? await supabase
+              .from("event_goals")
+              .select("scorer_player_id, assist_player_id, kind, event_id")
+              .in("event_id", Array.from(matchEventIds))
+          : { data: [] as any[] };
 
       const rows: Record<string, PlayerRow> = {};
       players.forEach((p: any) => {
         rows[p.id] = {
           player_id: p.id,
           name: `${p.first_name} ${p.last_name}`,
-          matches: 0, present: 0, total: 0, byKind: {}, assists: 0,
+          matches: 0,
+          present: 0,
+          total: 0,
+          byKind: {},
+          assists: 0,
         };
       });
 
@@ -609,11 +713,18 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
     const list = [...(data ?? [])];
     const dir = sortDir === "asc" ? 1 : -1;
     list.sort((a, b) => {
-      let av: number | string = 0, bv: number | string = 0;
-      if (sortKey === "name") { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
-      else if (sortKey === "matches") { av = a.matches; bv = b.matches; }
-      else if (sortKey === "assists") { av = a.assists; bv = b.assists; }
-      else if (sortKey === "attendance") {
+      let av: number | string = 0,
+        bv: number | string = 0;
+      if (sortKey === "name") {
+        av = a.name.toLowerCase();
+        bv = b.name.toLowerCase();
+      } else if (sortKey === "matches") {
+        av = a.matches;
+        bv = b.matches;
+      } else if (sortKey === "assists") {
+        av = a.assists;
+        bv = b.assists;
+      } else if (sortKey === "attendance") {
         av = a.total > 0 ? a.present / a.total : 0;
         bv = b.total > 0 ? b.present / b.total : 0;
       } else if (sortKey.startsWith("kind:")) {
@@ -628,10 +739,18 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
 
   function toggleSort(k: SortKey) {
     if (k === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(k); setSortDir(k === "name" ? "asc" : "desc"); }
+    else {
+      setSortKey(k);
+      setSortDir(k === "name" ? "asc" : "desc");
+    }
   }
 
-  if (isLoading) return <p className="text-sm text-muted-foreground">{t("common.loading", { defaultValue: "Chargement…" })}</p>;
+  if (isLoading)
+    return (
+      <p className="text-sm text-muted-foreground">
+        {t("common.loading", { defaultValue: "Chargement…" })}
+      </p>
+    );
   if (sorted.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
@@ -647,12 +766,24 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
       key: `kind:${k}` as SortKey,
       label: t(`match.kinds.${k}`, { defaultValue: k }),
       align: "right" as const,
-      negative: SOLO_STAT_KINDS.includes(k) && (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal"),
+      negative:
+        SOLO_STAT_KINDS.includes(k) &&
+        (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal"),
     })),
     ...(showAssistCol
-      ? [{ key: "assists" as SortKey, label: t("match.kinds.assist", { defaultValue: "Passes" }), align: "right" as const }]
+      ? [
+          {
+            key: "assists" as SortKey,
+            label: t("match.kinds.assist", { defaultValue: "Passes" }),
+            align: "right" as const,
+          },
+        ]
       : []),
-    { key: "attendance", label: t("stats.col.attendance", { defaultValue: "% Présent" }), align: "right" },
+    {
+      key: "attendance",
+      label: t("stats.col.attendance", { defaultValue: "% Présent" }),
+      align: "right",
+    },
   ];
 
   return (
@@ -666,7 +797,7 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
                 onClick={() => toggleSort(h.key)}
                 className={cn(
                   "px-3 py-2 cursor-pointer select-none whitespace-nowrap",
-                  h.align === "right" ? "text-right" : "text-left"
+                  h.align === "right" ? "text-right" : "text-left",
                 )}
               >
                 {h.label}
@@ -687,14 +818,20 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
                     key={k}
                     className={cn(
                       "px-3 py-2 text-right tabular-nums",
-                      (k === "yellow_card" || k === "red_card" || k === "foul" || k === "own_goal") &&
-                        (r.byKind[k] ?? 0) > 0 && "text-destructive"
+                      (k === "yellow_card" ||
+                        k === "red_card" ||
+                        k === "foul" ||
+                        k === "own_goal") &&
+                        (r.byKind[k] ?? 0) > 0 &&
+                        "text-destructive",
                     )}
                   >
                     {r.byKind[k] ?? 0}
                   </td>
                 ))}
-                {showAssistCol && <td className="px-3 py-2 text-right tabular-nums">{r.assists}</td>}
+                {showAssistCol && (
+                  <td className="px-3 py-2 text-right tabular-nums">{r.assists}</td>
+                )}
                 <td className="px-3 py-2 text-right">{r.total > 0 ? `${pct}%` : "—"}</td>
               </tr>
             );
@@ -703,7 +840,9 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
       </table>
       {scorerKinds.length === 0 && (
         <p className="px-3 py-3 text-xs text-muted-foreground italic">
-          {t("stats.noStatKindsForSport", { defaultValue: "Aucune stat individuelle configurée pour ce sport." })}
+          {t("stats.noStatKindsForSport", {
+            defaultValue: "Aucune stat individuelle configurée pour ce sport.",
+          })}
         </p>
       )}
     </div>

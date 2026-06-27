@@ -7,7 +7,6 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 const MARKETING_CHAT_RATE_LIMIT_PER_HOUR = 20;
 const MAX_MESSAGE_CHARS = 2000;
 
-
 type ChatRequestBody = { messages?: unknown; language?: unknown };
 
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -110,7 +109,10 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
         const langName = LANGUAGE_NAMES[langCode.slice(0, 2)] ?? "French";
 
         // Reject oversized prompts (LLM cost abuse).
-        for (const m of messages as Array<{ content?: unknown; parts?: Array<{ text?: string }> }>) {
+        for (const m of messages as Array<{
+          content?: unknown;
+          parts?: Array<{ text?: string }>;
+        }>) {
           const text =
             typeof m?.content === "string"
               ? m.content
@@ -124,16 +126,21 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
 
         // Per-IP hourly rate limit.
         const ip = getClientIp(request);
-        const allowed = await checkRateLimit(ip, "marketing-chat", MARKETING_CHAT_RATE_LIMIT_PER_HOUR);
+        const allowed = await checkRateLimit(
+          ip,
+          "marketing-chat",
+          MARKETING_CHAT_RATE_LIMIT_PER_HOUR,
+        );
         if (!allowed) {
-          return new Response("Trop de requêtes. Merci de réessayer dans un instant.", { status: 429 });
+          return new Response("Trop de requêtes. Merci de réessayer dans un instant.", {
+            status: 429,
+          });
         }
 
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) {
           return new Response("Missing LOVABLE_API_KEY", { status: 500 });
         }
-
 
         const gateway = createLovableAiGatewayProvider(apiKey);
         const model = gateway("google/gemini-3-flash-preview");
@@ -152,7 +159,9 @@ export const Route = createFileRoute("/api/public/marketing-chat")({
           console.error("[marketing-chat] error", err);
           const status = err?.statusCode ?? err?.status ?? 500;
           if (status === 429) {
-            return new Response("Trop de requêtes. Merci de réessayer dans un instant.", { status: 429 });
+            return new Response("Trop de requêtes. Merci de réessayer dans un instant.", {
+              status: 429,
+            });
           }
           if (status === 402) {
             return new Response("Service temporairement indisponible.", { status: 402 });

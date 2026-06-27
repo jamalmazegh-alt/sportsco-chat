@@ -98,27 +98,40 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
           reallyClose();
         }}
       >
-        <DialogContent hideClose={mode === "wizard"} className={mode === "wizard" ? "max-w-md p-0 overflow-hidden gap-0" : "max-w-md"}>
+        <DialogContent
+          hideClose={mode === "wizard"}
+          className={mode === "wizard" ? "max-w-md p-0 overflow-hidden gap-0" : "max-w-md"}
+        >
           {mode === "chooser" && (
             <>
               <DialogHeader>
-                <DialogTitle>{t("eventCreateChooser.title", { defaultValue: "Nouvel événement" })}</DialogTitle>
+                <DialogTitle>
+                  {t("eventCreateChooser.title", { defaultValue: "Nouvel événement" })}
+                </DialogTitle>
                 <DialogDescription>
-                  {t("eventCreateChooser.subtitle", { defaultValue: "Comment veux-tu créer cet événement ?" })}
+                  {t("eventCreateChooser.subtitle", {
+                    defaultValue: "Comment veux-tu créer cet événement ?",
+                  })}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-2 pt-2">
                 <DoorButton
                   icon={<Sparkles className="h-5 w-5" />}
-                  title={t("eventCreateChooser.assistant", { defaultValue: "Créer avec l'assistant" })}
-                  hint={t("eventCreateChooser.assistantHint", { defaultValue: "Guidé, question par question" })}
+                  title={t("eventCreateChooser.assistant", {
+                    defaultValue: "Créer avec l'assistant",
+                  })}
+                  hint={t("eventCreateChooser.assistantHint", {
+                    defaultValue: "Guidé, question par question",
+                  })}
                   primary
                   onClick={startWizard}
                 />
                 <DoorButton
                   icon={<Settings2 className="h-5 w-5" />}
                   title={t("eventCreateChooser.classic", { defaultValue: "Création classique" })}
-                  hint={t("eventCreateChooser.classicHint", { defaultValue: "Le formulaire complet" })}
+                  hint={t("eventCreateChooser.classicHint", {
+                    defaultValue: "Le formulaire complet",
+                  })}
                   onClick={openExpertEmpty}
                 />
               </div>
@@ -128,9 +141,13 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
           {mode === "wizard" && (
             <>
               <DialogHeader className="sr-only">
-                <DialogTitle>{t("eventWizard.title", { defaultValue: "Nouvel événement" })}</DialogTitle>
+                <DialogTitle>
+                  {t("eventWizard.title", { defaultValue: "Nouvel événement" })}
+                </DialogTitle>
                 <DialogDescription>
-                  {t("eventCreateChooser.assistantHint", { defaultValue: "Guidé, question par question" })}
+                  {t("eventCreateChooser.assistantHint", {
+                    defaultValue: "Guidé, question par question",
+                  })}
                 </DialogDescription>
               </DialogHeader>
               <EventWizard
@@ -209,9 +226,7 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => reallyClose(confirmCloseOpen === "expert")}
-            >
+            <AlertDialogAction onClick={() => reallyClose(confirmCloseOpen === "expert")}>
               {t("common.confirm", { defaultValue: "Confirmer" })}
             </AlertDialogAction>
           </AlertDialogFooter>

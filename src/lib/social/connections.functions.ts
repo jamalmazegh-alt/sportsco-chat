@@ -45,9 +45,7 @@ export const startSocialConnect = createServerFn({ method: "POST" })
       throw new Error("Forbidden");
     }
 
-    const { encodeState, randomString, pkceChallenge } = await import(
-      "@/lib/social/state.server"
-    );
+    const { encodeState, randomString, pkceChallenge } = await import("@/lib/social/state.server");
     const { getProvider } = await import("@/lib/social/providers.server");
 
     const redirectUri = `${data.origin}/api/public/social/callback`;
@@ -82,9 +80,7 @@ export const startSocialConnect = createServerFn({ method: "POST" })
 
 export const disconnectSocial = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid(), network: NETWORK }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid(), network: NETWORK }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     // Soft-delete imported posts from this source
@@ -106,9 +102,7 @@ export const disconnectSocial = createServerFn({ method: "POST" })
 
 export const syncSocialNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid(), network: NETWORK }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid(), network: NETWORK }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: member } = await supabase

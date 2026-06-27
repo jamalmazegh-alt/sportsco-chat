@@ -124,8 +124,7 @@ const I18N = {
       `À l'issue de la phase de groupes, les ${n} premières équipes de chaque groupe sont qualifiées pour la phase finale.`,
     a4WithThirds: (n: number) =>
       `Les ${n} meilleurs troisièmes (toutes poules confondues) sont également qualifiés, selon les critères de départage de l'article 3.`,
-    a4NoThirds:
-      "Aucune place supplémentaire n'est accordée aux meilleurs troisièmes.",
+    a4NoThirds: "Aucune place supplémentaire n'est accordée aux meilleurs troisièmes.",
     a5Intro:
       "Le fair-play est intégré au classement. Les sanctions disciplinaires entraînent les déductions suivantes :",
     a5Yellow: "Carton jaune",
@@ -140,8 +139,7 @@ const I18N = {
       "En cas d'égalité à l'issue du temps réglementaire d'un match à élimination directe, l'issue de la rencontre est directement décidée par une séance de tirs au but (sans prolongation).",
     a6None:
       "En cas d'égalité à l'issue du temps réglementaire d'un match à élimination directe, l'équipe la mieux classée à l'issue de la phase de groupes est qualifiée d'office.",
-    a6Outro:
-      "Les résultats sont validés par l'organisateur immédiatement après la rencontre.",
+    a6Outro: "Les résultats sont validés par l'organisateur immédiatement après la rencontre.",
     a7:
       "Chaque club participant reste responsable de ses joueurs, encadrants et accompagnants, tant sur le plan sportif que disciplinaire. " +
       "La participation au tournoi vaut acceptation pleine et entière du présent règlement. L'organisateur se réserve le droit de modifier, à tout moment et pour des raisons indépendantes de sa volonté, les modalités d'organisation, dans le respect de l'équité sportive.",
@@ -152,12 +150,32 @@ const I18N = {
     page: "Page",
     of: "sur",
     monthsLong: [
-      "janvier","février","mars","avril","mai","juin",
-      "juillet","août","septembre","octobre","novembre","décembre",
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre",
     ],
     monthsShort: [
-      "janv.","févr.","mars","avr.","mai","juin",
-      "juil.","août","sept.","oct.","nov.","déc.",
+      "janv.",
+      "févr.",
+      "mars",
+      "avr.",
+      "mai",
+      "juin",
+      "juil.",
+      "août",
+      "sept.",
+      "oct.",
+      "nov.",
+      "déc.",
     ],
   },
   en: {
@@ -214,8 +232,7 @@ const I18N = {
       "If a knockout match is tied at the end of regulation time, the match is decided directly by a penalty shootout (no extra time).",
     a6None:
       "If a knockout match is tied at the end of regulation time, the team ranked higher at the end of the group stage qualifies automatically.",
-    a6Outro:
-      "Results are validated by the organizer immediately after each match.",
+    a6Outro: "Results are validated by the organizer immediately after each match.",
     a7:
       "Each participating club remains responsible for its players, staff and accompanying persons, both on a sporting and disciplinary level. " +
       "Participation in the tournament implies full acceptance of these regulations. The organizer reserves the right to modify the organization at any time, for reasons beyond its control, while respecting sporting fairness.",
@@ -226,12 +243,32 @@ const I18N = {
     page: "Page",
     of: "of",
     monthsLong: [
-      "January","February","March","April","May","June",
-      "July","August","September","October","November","December",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ],
     monthsShort: [
-      "Jan","Feb","Mar","Apr","May","Jun",
-      "Jul","Aug","Sep","Oct","Nov","Dec",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ],
   },
 } as const;
@@ -367,7 +404,8 @@ export async function buildRegulationsPdf(
   // Article 6
   const ot = rules.overtime.enabled;
   const pso = rules.penaltyShootout.enabled;
-  const a6Main = ot && pso ? I18N[lang].a6Both : !ot && pso ? I18N[lang].a6PenaltiesOnly : I18N[lang].a6None;
+  const a6Main =
+    ot && pso ? I18N[lang].a6Both : !ot && pso ? I18N[lang].a6PenaltiesOnly : I18N[lang].a6None;
   drawArticle(ctx, 6, [a6Main, I18N[lang].a6Outro]);
 
   // Article 7
@@ -473,14 +511,21 @@ function drawCoverBlock(ctx: Ctx, t: Tournament, lang: Lang) {
 }
 
 function drawLogoCircle(ctx: Ctx, cx: number, cy: number, r: number, label: string) {
-  ctx.page.drawCircle({ x: cx, y: cy, size: r, color: SOFT_BG, borderColor: LIGHT_GREY, borderWidth: 0.6 });
+  ctx.page.drawCircle({
+    x: cx,
+    y: cy,
+    size: r,
+    color: SOFT_BG,
+    borderColor: LIGHT_GREY,
+    borderWidth: 0.6,
+  });
   const lines = label.split(" / ");
   const size = 6;
   lines.forEach((line, i) => {
     const w = ctx.font.widthOfTextAtSize(line, size);
     ctx.page.drawText(safe(line), {
       x: cx - w / 2,
-      y: cy + (lines.length === 1 ? -2 : (i === 0 ? 2 : -6)),
+      y: cy + (lines.length === 1 ? -2 : i === 0 ? 2 : -6),
       size,
       font: ctx.font,
       color: GREY,
@@ -535,7 +580,13 @@ function drawBullets(ctx: Ctx, items: string[], opts: { numbered?: boolean } = {
           ctx.page.drawText(marker, { x: MARGIN_L, y: ctx.y, size, font: ctx.font, color: GREY });
         }
       }
-      ctx.page.drawText(line, { x: MARGIN_L + indent, y: ctx.y, size, font: ctx.font, color: BLACK });
+      ctx.page.drawText(line, {
+        x: MARGIN_L + indent,
+        y: ctx.y,
+        size,
+        font: ctx.font,
+        color: BLACK,
+      });
       ctx.y -= lh;
     });
   }

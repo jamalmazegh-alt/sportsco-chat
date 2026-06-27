@@ -106,7 +106,13 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
     "own_goal",
   ];
 
-  const performanceTiles: { key: string; label: string; value: number; cls: string; icon: React.ReactNode }[] = [];
+  const performanceTiles: {
+    key: string;
+    label: string;
+    value: number;
+    cls: string;
+    icon: React.ReactNode;
+  }[] = [];
   // Inject assist count (computed separately) under "assist" key
   const assistTotal = assistCount ?? 0;
   kindOrder.forEach((k) => {
@@ -171,7 +177,7 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
               "text-xs rounded-full px-3 py-1 border transition-colors",
               period === p
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border hover:bg-muted"
+                : "bg-card text-muted-foreground border-border hover:bg-muted",
             )}
           >
             {t(`stats.period.${p}`)}
@@ -186,7 +192,7 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
               "text-xs rounded-full px-3 py-1 border transition-colors",
               typeFilter === p
                 ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card text-muted-foreground border-border hover:bg-muted"
+                : "bg-card text-muted-foreground border-border hover:bg-muted",
             )}
           >
             {t(`stats.type.${p}`)}
@@ -238,9 +244,7 @@ export function PlayerAttendanceStats({ playerId }: { playerId: string }) {
         </div>
       )}
 
-      {total === 0 && (
-        <p className="text-xs text-muted-foreground italic">{t("stats.empty")}</p>
-      )}
+      {total === 0 && <p className="text-xs text-muted-foreground italic">{t("stats.empty")}</p>}
     </section>
   );
 }

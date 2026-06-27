@@ -44,9 +44,7 @@ export function TournamentRulesAIGenerator({ tournamentId, locale = "fr", onInse
         setHtml(res.html);
       } else if ("fallback" in res && res.fallback) {
         setHtml(res.fallback);
-        toast.info(
-          res.reason === "rate_limited" ? t("rulesAi.rateLimited") : t("rulesAi.error"),
-        );
+        toast.info(res.reason === "rate_limited" ? t("rulesAi.rateLimited") : t("rulesAi.error"));
       } else {
         toast.error(t("rulesAi.error"));
       }

@@ -12,7 +12,17 @@ export const Route = createFileRoute("/superadmin/logs")({
 
 type Item = Awaited<ReturnType<typeof listSuperadminLogsEnriched>>["items"][number];
 
-const CATEGORIES = ["All", "View", "Impersonation", "Auth", "Account", "Club", "Onboarding", "Billing", "Other"];
+const CATEGORIES = [
+  "All",
+  "View",
+  "Impersonation",
+  "Auth",
+  "Account",
+  "Club",
+  "Onboarding",
+  "Billing",
+  "Other",
+];
 
 function SuperAdminLogs() {
   const [items, setItems] = useState<Item[]>([]);
@@ -140,7 +150,10 @@ function SuperAdminLogs() {
                         </>
                       )}
                       {!l.target_user_profile && !l.target_club && l.target_type && (
-                        <> · {l.target_type} {l.target_id?.slice(0, 8)}</>
+                        <>
+                          {" "}
+                          · {l.target_type} {l.target_id?.slice(0, 8)}
+                        </>
                       )}
                     </div>
                     {l.metadata && Object.keys(l.metadata).length > 0 && (

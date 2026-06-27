@@ -195,7 +195,12 @@ function SocialSettings() {
                     </Button>
                   </>
                 ) : (
-                  <Button size="sm" onClick={() => connect(net)} disabled={isBusy} className="flex-1">
+                  <Button
+                    size="sm"
+                    onClick={() => connect(net)}
+                    disabled={isBusy}
+                    className="flex-1"
+                  >
                     {isBusy ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (

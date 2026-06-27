@@ -16,11 +16,43 @@ const pickEmailLocale = (...candidates: Array<string | null | undefined>): strin
 };
 import { fmt } from "@/lib/date-locale";
 import {
-  MapPin, Bell, Lock, Unlock, Loader2, Send, Clock, ExternalLink, Pencil, Home, Plane, X, Info, Download, Ban, CalendarClock, MessageCircle, ClipboardList, CheckCircle2, XCircle, HelpCircle, CircleDot, MoreVertical, UserPlus, AlertTriangle, Trophy, Timer, LayoutGrid, Mail,
+  MapPin,
+  Bell,
+  Lock,
+  Unlock,
+  Loader2,
+  Send,
+  Clock,
+  ExternalLink,
+  Pencil,
+  Home,
+  Plane,
+  X,
+  Info,
+  Download,
+  Ban,
+  CalendarClock,
+  MessageCircle,
+  ClipboardList,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  CircleDot,
+  MoreVertical,
+  UserPlus,
+  AlertTriangle,
+  Trophy,
+  Timer,
+  LayoutGrid,
+  Mail,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toCsv, downloadCsv } from "@/lib/csv";
 import {
@@ -41,10 +73,23 @@ import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AttendancePill } from "@/components/attendance-pill";
 import { EventFormSheet } from "@/components/event-form-sheet";
@@ -55,7 +100,12 @@ import { cn } from "@/lib/utils";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import { loadLineupForConvocationEmailFn } from "@/lib/lineup-email.functions";
-import { dispatchConvocationPush, dispatchConvocationResponsePush, dispatchEventCancelPush, dispatchEventReschedulePush } from "@/lib/push-dispatch.functions";
+import {
+  dispatchConvocationPush,
+  dispatchConvocationResponsePush,
+  dispatchEventCancelPush,
+  dispatchEventReschedulePush,
+} from "@/lib/push-dispatch.functions";
 
 type AttendanceStatus = "present" | "absent" | "uncertain" | "pending";
 
@@ -64,10 +114,26 @@ const ATTENDANCE_ACTIONS: Array<{
   Icon: typeof CheckCircle2;
   className: string;
 }> = [
-  { status: "present", Icon: CheckCircle2, className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700" },
-  { status: "absent", Icon: XCircle, className: "text-absent hover:bg-absent/10 hover:text-absent" },
-  { status: "uncertain", Icon: HelpCircle, className: "text-uncertain-foreground hover:bg-uncertain/20 hover:text-uncertain-foreground" },
-  { status: "pending", Icon: CircleDot, className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground" },
+  {
+    status: "present",
+    Icon: CheckCircle2,
+    className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700",
+  },
+  {
+    status: "absent",
+    Icon: XCircle,
+    className: "text-absent hover:bg-absent/10 hover:text-absent",
+  },
+  {
+    status: "uncertain",
+    Icon: HelpCircle,
+    className: "text-uncertain-foreground hover:bg-uncertain/20 hover:text-uncertain-foreground",
+  },
+  {
+    status: "pending",
+    Icon: CircleDot,
+    className: "text-pending-foreground hover:bg-pending/40 hover:text-pending-foreground",
+  },
 ];
 
 /** Event types that support the carpool section (coach toggle + member offers). */
@@ -94,7 +160,11 @@ function buildConvocSnapshot(ev: any): Record<string, any> {
   return snap;
 }
 
-function formatSnapshotValue(field: string, value: any, t: (k: string) => string): string | undefined {
+function formatSnapshotValue(
+  field: string,
+  value: any,
+  t: (k: string) => string,
+): string | undefined {
   if (value == null || value === "") return undefined;
   if (field === "starts_at" || field === "ends_at" || field === "convocation_time") {
     try {
@@ -109,7 +179,11 @@ function formatSnapshotValue(field: string, value: any, t: (k: string) => string
   return String(value);
 }
 
-function diffSnapshot(prev: Record<string, any> | null | undefined, current: any, t: (k: string) => string): Array<{ field: string; label: string; previous?: string; current?: string }> {
+function diffSnapshot(
+  prev: Record<string, any> | null | undefined,
+  current: any,
+  t: (k: string) => string,
+): Array<{ field: string; label: string; previous?: string; current?: string }> {
   if (!prev) return [];
   const labels: Record<string, string> = {
     title: t("events.fields.title" as any) || "Title",
@@ -154,7 +228,9 @@ export const Route = createFileRoute("/_authenticated/events/$eventId")({
 });
 
 async function waitForShareAssets(node: HTMLElement) {
-  const fontsReady = (document as Document & { fonts?: FontFaceSet }).fonts?.ready.catch(() => undefined);
+  const fontsReady = (document as Document & { fonts?: FontFaceSet }).fonts?.ready.catch(
+    () => undefined,
+  );
   const imagesReady = Array.from(node.querySelectorAll("img")).map((img) => {
     if (img.complete) return Promise.resolve();
     return new Promise<void>((resolve) => {
@@ -190,7 +266,8 @@ function EventDetail() {
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isActiveCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isActiveCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const loadLineupForEmail = useServerFn(loadLineupForConvocationEmailFn);
   const dispatchConvocationPushFn = useServerFn(dispatchConvocationPush);
@@ -222,15 +299,22 @@ function EventDetail() {
         share?: (data: ShareData) => Promise<void>;
       };
       const nativeShare = typeof nav.share === "function" ? nav.share.bind(nav) : null;
-      const sharePayload: ShareData = { files: [file], text: messageText, title: "Composition Clubero" };
+      const sharePayload: ShareData = {
+        files: [file],
+        text: messageText,
+        title: "Composition Clubero",
+      };
       const canShareFull = typeof nav.canShare === "function" ? nav.canShare(sharePayload) : true;
-      const canShareFileOnly = typeof nav.canShare === "function" ? nav.canShare({ files: [file] }) : true;
+      const canShareFileOnly =
+        typeof nav.canShare === "function" ? nav.canShare({ files: [file] }) : true;
       const canNativeShare = !!nativeShare && (canShareFull || canShareFileOnly);
 
       if (nativeShare && canNativeShare) {
         if (!canShareFull) await navigator.clipboard?.writeText(messageText).catch(() => undefined);
         try {
-          await nativeShare(canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" });
+          await nativeShare(
+            canShareFull ? sharePayload : { files: [file], title: "Composition Clubero" },
+          );
         } catch (shareError: any) {
           if (shareError?.name === "AbortError") return;
           const a = document.createElement("a");
@@ -240,11 +324,21 @@ function EventDetail() {
           a.click();
           a.remove();
           await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-          window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
-          toast.success(t("events.whatsappShare.imageDownloadedAttach", { defaultValue: "Image downloaded, message copied — attach the image in WhatsApp" }));
+          window.open(
+            `https://wa.me/?text=${encodeURIComponent(messageText)}`,
+            "_blank",
+            "noopener,noreferrer",
+          );
+          toast.success(
+            t("events.whatsappShare.imageDownloadedAttach", {
+              defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
+            }),
+          );
           return;
         }
-        toast.success(t("events.whatsappShare.shareReady", { defaultValue: "Share ready — pick WhatsApp" }));
+        toast.success(
+          t("events.whatsappShare.shareReady", { defaultValue: "Share ready — pick WhatsApp" }),
+        );
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
         const a = document.createElement("a");
@@ -254,12 +348,22 @@ function EventDetail() {
         a.click();
         a.remove();
         await navigator.clipboard?.writeText(messageText).catch(() => undefined);
-        window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, "_blank", "noopener,noreferrer");
-        toast.success(t("events.whatsappShare.imageDownloadedAttach", { defaultValue: "Image downloaded, message copied — attach the image in WhatsApp" }));
+        window.open(
+          `https://wa.me/?text=${encodeURIComponent(messageText)}`,
+          "_blank",
+          "noopener,noreferrer",
+        );
+        toast.success(
+          t("events.whatsappShare.imageDownloadedAttach", {
+            defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
+          }),
+        );
       }
     } catch (e: any) {
       if (e?.name !== "AbortError") {
-        toast.error(t("events.whatsappShare.shareImageFailed", { defaultValue: "Unable to share the image" }));
+        toast.error(
+          t("events.whatsappShare.shareImageFailed", { defaultValue: "Unable to share the image" }),
+        );
       }
     } finally {
       setSharingLineup(false);
@@ -272,10 +376,18 @@ function EventDetail() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [cancelTargetId, setCancelTargetId] = useState<string | null>(null);
   const [detailConvocId, setDetailConvocId] = useState<string | null>(null);
-  const [respondTarget, setRespondTarget] = useState<{ id: string; status: AttendanceStatus } | null>(null);
+  const [respondTarget, setRespondTarget] = useState<{
+    id: string;
+    status: AttendanceStatus;
+  } | null>(null);
   const [respondReason, setRespondReason] = useState("");
   const [respondSubmitting, setRespondSubmitting] = useState(false);
-  const [coachOverrideTarget, setCoachOverrideTarget] = useState<{ id: string; status: AttendanceStatus; playerName: string; currentStatus: AttendanceStatus } | null>(null);
+  const [coachOverrideTarget, setCoachOverrideTarget] = useState<{
+    id: string;
+    status: AttendanceStatus;
+    playerName: string;
+    currentStatus: AttendanceStatus;
+  } | null>(null);
   const [cancelEventOpen, setCancelEventOpen] = useState(false);
   const [cancelEventReason, setCancelEventReason] = useState("");
   const [cancelEventSubmitting, setCancelEventSubmitting] = useState(false);
@@ -294,7 +406,9 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached")
+        .select(
+          "id, title, description, starts_at, ends_at, convocation_time, location, location_url, meeting_point, opponent, competition_type, competition_name, type, status, team_id, responses_locked, convocations_sent, is_home, is_official, attachments, cancellation_reason, cancelled_at, convocation_sent_snapshot, convocation_last_sent_at, carpool_enabled, series_id, series_detached",
+        )
         .eq("id", eventId)
         .single();
       if (error) throw error;
@@ -315,14 +429,18 @@ function EventDetail() {
       if (!current?.club_id) {
         const { data } = await supabase
           .from("teams")
-          .select("id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
+          .select(
+            "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+          )
           .eq("id", event!.team_id);
         return data ?? [];
       }
       // Fetch all teams of the same club so the coach can reassign the event
       const { data } = await supabase
         .from("teams")
-        .select("id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)")
+        .select(
+          "id, name, club_id, competitions, sport, whatsapp_group_url, communication_mode, clubs:club_id(name, convocation_channels)",
+        )
         .eq("club_id", current.club_id)
         .is("deleted_at", null)
         .order("name");
@@ -344,7 +462,12 @@ function EventDetail() {
   });
 
   const isCoach = isActiveCoach || !!canAccessFeedback;
-  const eventTeam = useMemo(() => (teams as any[] | undefined)?.find((t: any) => t.id === event?.team_id) ?? (teams as any[] | undefined)?.[0], [teams, event?.team_id]);
+  const eventTeam = useMemo(
+    () =>
+      (teams as any[] | undefined)?.find((t: any) => t.id === event?.team_id) ??
+      (teams as any[] | undefined)?.[0],
+    [teams, event?.team_id],
+  );
   const eventSport = ((eventTeam?.sport ?? "") as string).toString().toLowerCase().trim();
   const isFootball = eventSport === "football" || eventSport === "foot" || eventSport === "soccer";
 
@@ -353,7 +476,9 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("convocations")
-        .select("id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email)")
+        .select(
+          "id, status, comment, player_id, response_token, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position, email)",
+        )
         .eq("event_id", eventId);
       if (error) throw error;
       return data ?? [];
@@ -366,7 +491,9 @@ function EventDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_members")
-        .select("player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)")
+        .select(
+          "player_id, players:player_id(id, first_name, last_name, jersey_number, photo_url, user_id, preferred_position)",
+        )
         .eq("team_id", event!.team_id)
         .eq("role", "player");
       if (error) throw error;
@@ -450,7 +577,6 @@ function EventDetail() {
     return m;
   }, [eventAbsences]);
 
-
   // Published lineup (for WhatsApp + UI). Coach always sees; players see via PublishedLineupCard RLS.
   const { data: lineupData } = useQuery({
     queryKey: ["event-lineup-wa", eventId],
@@ -492,7 +618,12 @@ function EventDetail() {
         const p = byId.get(id);
         return { name: name(p), jersey: p?.jersey_number ?? null };
       });
-      return { formation: l.formation, published_at: l.published_at, _starting: starting, _bench: bench };
+      return {
+        formation: l.formation,
+        published_at: l.published_at,
+        _starting: starting,
+        _bench: bench,
+      };
     },
   });
 
@@ -506,7 +637,7 @@ function EventDetail() {
         () => {
           refetch();
           qc.invalidateQueries({ queryKey: ["my-convocations"] });
-        }
+        },
       )
       .subscribe();
     return () => {
@@ -550,11 +681,12 @@ function EventDetail() {
   async function notifyCoachesOfResponse(
     convocationId: string,
     status: "absent" | "uncertain",
-    reason: string | null
+    reason: string | null,
   ) {
     if (!event) return;
     const conv = (convocations ?? []).find((c: any) => c.id === convocationId) as any;
-    const playerName = `${conv?.players?.first_name ?? ""} ${conv?.players?.last_name ?? ""}`.trim() || "Un joueur";
+    const playerName =
+      `${conv?.players?.first_name ?? ""} ${conv?.players?.last_name ?? ""}`.trim() || "Un joueur";
 
     // Find coaches/admins of this team
     const { data: coaches } = await supabase
@@ -563,7 +695,7 @@ function EventDetail() {
       .eq("team_id", event.team_id)
       .in("role", ["coach", "admin"]);
     const coachIds = Array.from(
-      new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean))
+      new Set((coaches ?? []).map((c: any) => c.user_id).filter(Boolean)),
     );
 
     // If caller is a parent (not the player themselves), attribute the response.
@@ -575,8 +707,7 @@ function EventDetail() {
         .eq("id", user.id)
         .maybeSingle();
       declaredByName =
-        (prof as any)?.first_name ||
-        (((prof as any)?.full_name ?? "").split(" ")[0] || null);
+        (prof as any)?.first_name || ((prof as any)?.full_name ?? "").split(" ")[0] || null;
     }
 
     if (coachIds.length > 0) {
@@ -592,10 +723,9 @@ function EventDetail() {
           title: `${playerName} : ${t(`attendance.${status}`)}`,
           body,
           link: `/events/${event.id}`,
-        }))
+        })),
       );
     }
-
 
     // Email notifications via server function (looks up coach emails server-side)
     try {
@@ -609,7 +739,7 @@ function EventDetail() {
   async function submitResponse(
     convocationId: string,
     status: AttendanceStatus,
-    reason: string | null
+    reason: string | null,
   ) {
     const { error } = await supabase
       .from("convocations")
@@ -626,9 +756,11 @@ function EventDetail() {
     refetch();
     if (status === "absent" || status === "uncertain") {
       // fire-and-forget email
-      notifyCoachesOfResponse(convocationId, status, reason && reason.trim() ? reason.trim() : null).catch(
-        () => {}
-      );
+      notifyCoachesOfResponse(
+        convocationId,
+        status,
+        reason && reason.trim() ? reason.trim() : null,
+      ).catch(() => {});
     }
     // Push notification (#7 response + #8 complete) — fire-and-forget, all statuses
     void (async () => {
@@ -644,14 +776,13 @@ function EventDetail() {
   function coachChangeStatus(c: any, status: AttendanceStatus) {
     if (!c || c.status === status) return;
     if (c.status !== "pending" && c.responded_at) {
-      const playerName = `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim() || "ce joueur";
+      const playerName =
+        `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim() || "ce joueur";
       setCoachOverrideTarget({ id: c.id, status, playerName, currentStatus: c.status });
       return;
     }
     submitResponse(c.id, status, null);
   }
-
-
 
   async function confirmRespond() {
     if (!respondTarget) return;
@@ -688,7 +819,11 @@ function EventDetail() {
     try {
       const recipientIds = new Set<string>();
       if (playerUserId) recipientIds.add(playerUserId);
-      let parentsRows: Array<{ parent_user_id: string | null; email: string | null; full_name: string | null }> = [];
+      let parentsRows: Array<{
+        parent_user_id: string | null;
+        email: string | null;
+        full_name: string | null;
+      }> = [];
       if (playerId) {
         const { data: parents } = await supabase
           .from("player_parents")
@@ -723,10 +858,17 @@ function EventDetail() {
         const teamName = (clubRow as any)?.name as string | undefined;
         const clubName = (clubRow as any)?.clubs?.name as string | undefined;
         const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
-        const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
+        const clubDefaultLang = (clubRow as any)?.clubs?.default_language as
+          | string
+          | null
+          | undefined;
         const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
-        const sendOne = (toEmail: string, recipientFirstName: string | undefined, idemSuffix: string) =>
+        const sendOne = (
+          toEmail: string,
+          recipientFirstName: string | undefined,
+          idemSuffix: string,
+        ) =>
           sendTransactionalEmail({
             templateName: "convocation-cancelled",
             recipientEmail: toEmail,
@@ -775,9 +917,7 @@ function EventDetail() {
       );
     } else if (opts?.preselectAll) {
       preselect = new Set<string>(
-        teamPlayers
-          .map((tp: any) => tp.player_id)
-          .filter((pid: string) => !existing.has(pid)),
+        teamPlayers.map((tp: any) => tp.player_id).filter((pid: string) => !existing.has(pid)),
       );
     } else {
       preselect = new Set<string>();
@@ -795,9 +935,7 @@ function EventDetail() {
     if (!event || (event as any).convocations_sent) return;
     if (!teamPlayers) return;
     setAutoSendConsumed(true);
-    const preselectIds = search.preselect
-      ? search.preselect.split(",").filter(Boolean)
-      : undefined;
+    const preselectIds = search.preselect ? search.preselect.split(",").filter(Boolean) : undefined;
     if (preselectIds) {
       openPicker({ preselectIds });
     } else if (search.action === "all") {
@@ -826,7 +964,9 @@ function EventDetail() {
     const teamRow = teams?.[0] as any;
     const commMode = (teamRow?.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
     const clubChannelsRaw = teamRow?.clubs?.convocation_channels;
-    const clubChannels: string[] = Array.isArray(clubChannelsRaw) ? clubChannelsRaw : ["in_app", "email"];
+    const clubChannels: string[] = Array.isArray(clubChannelsRaw)
+      ? clubChannelsRaw
+      : ["in_app", "email"];
     const useInApp = clubChannels.includes("in_app");
     // Team-level override: whatsapp mode disables email entirely
     const useEmail = clubChannels.includes("email") && commMode !== "whatsapp";
@@ -855,7 +995,7 @@ function EventDetail() {
       new Set([
         ...(parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean),
         ...playerUserIds,
-      ])
+      ]),
     );
     if (useInApp && recipients.length > 0) {
       const { error: notificationError } = await supabase.from("notifications").insert(
@@ -865,7 +1005,7 @@ function EventDetail() {
           title: event.title,
           body: t("attendance.respondPrompt"),
           link: `/events/${event.id}`,
-        }))
+        })),
       );
       if (notificationError) toast.error(notificationError.message);
     }
@@ -879,158 +1019,171 @@ function EventDetail() {
       }
     })();
 
-
-
     // 1-tap email invitations to player + parents (best-effort, non-blocking)
-    if (useEmail) try {
-      const { data: playersInfo } = await supabase
-        .from("players")
-        .select("id, first_name, last_name, email")
-        .in("id", toInsert);
-      const { data: clubRow } = event.team_id
-        ? await supabase
-            .from("teams")
-            .select("name, clubs:club_id(name, logo_url, default_language)")
-            .eq("id", event.team_id)
-            .maybeSingle()
-        : { data: null };
-      const teamName = (clubRow as any)?.name as string | undefined;
-      const clubName = (clubRow as any)?.clubs?.name as string | undefined;
-      const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
-      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
-      const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
-      const origin = typeof window !== "undefined" ? window.location.origin : "";
-
-      // Coach (first admin/coach) for the team — best-effort
-      let coachName: string | undefined;
+    if (useEmail)
       try {
-        const { data: coachRows } = await supabase
-          .from("team_members")
-          .select("user_id, role")
-          .eq("team_id", event.team_id)
-          .in("role", ["coach", "admin"])
-          .limit(1);
-        const coachUserId = coachRows?.[0]?.user_id;
-        if (coachUserId) {
-          const { data: coachProfile } = await supabase
-            .from("profiles")
-            .select("full_name, first_name, last_name")
-            .eq("id", coachUserId)
-            .maybeSingle();
-          coachName =
-            (coachProfile as any)?.full_name ||
-            [(coachProfile as any)?.first_name, (coachProfile as any)?.last_name]
-              .filter(Boolean)
-              .join(" ") ||
-            undefined;
+        const { data: playersInfo } = await supabase
+          .from("players")
+          .select("id, first_name, last_name, email")
+          .in("id", toInsert);
+        const { data: clubRow } = event.team_id
+          ? await supabase
+              .from("teams")
+              .select("name, clubs:club_id(name, logo_url, default_language)")
+              .eq("id", event.team_id)
+              .maybeSingle()
+          : { data: null };
+        const teamName = (clubRow as any)?.name as string | undefined;
+        const clubName = (clubRow as any)?.clubs?.name as string | undefined;
+        const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
+        const clubDefaultLang = (clubRow as any)?.clubs?.default_language as
+          | string
+          | null
+          | undefined;
+        const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+        // Coach (first admin/coach) for the team — best-effort
+        let coachName: string | undefined;
+        try {
+          const { data: coachRows } = await supabase
+            .from("team_members")
+            .select("user_id, role")
+            .eq("team_id", event.team_id)
+            .in("role", ["coach", "admin"])
+            .limit(1);
+          const coachUserId = coachRows?.[0]?.user_id;
+          if (coachUserId) {
+            const { data: coachProfile } = await supabase
+              .from("profiles")
+              .select("full_name, first_name, last_name")
+              .eq("id", coachUserId)
+              .maybeSingle();
+            coachName =
+              (coachProfile as any)?.full_name ||
+              [(coachProfile as any)?.first_name, (coachProfile as any)?.last_name]
+                .filter(Boolean)
+                .join(" ") ||
+              undefined;
+          }
+        } catch {
+          // ignore
         }
-      } catch {
-        // ignore
-      }
 
-      // Full squad list (names of ALL convoked players for this event:
-      // already-existing convocations + newly inserted)
-      const existingNames = (convocations ?? [])
-        .map((c: any) =>
-          `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim(),
-        )
-        .filter(Boolean);
-      const newNames = toInsert
-        .map((pid) => {
-          const p = (playersInfo ?? []).find((pp: any) => pp.id === pid) as any;
-          return p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() : "";
-        })
-        .filter(Boolean);
-      const squadList = Array.from(new Set([...existingNames, ...newNames]));
+        // Full squad list (names of ALL convoked players for this event:
+        // already-existing convocations + newly inserted)
+        const existingNames = (convocations ?? [])
+          .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
+          .filter(Boolean);
+        const newNames = toInsert
+          .map((pid) => {
+            const p = (playersInfo ?? []).find((pp: any) => pp.id === pid) as any;
+            return p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() : "";
+          })
+          .filter(Boolean);
+        const squadList = Array.from(new Set([...existingNames, ...newNames]));
 
-      // Composition (si publiée)
-      const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined);
-
-
-      const competitionLabel = (event as any).competition_name
-        || ((event as any).competition_type
-          ? t(`events.competitionTypes.${(event as any).competition_type}`)
-          : undefined);
-
-      const locationMapsUrl = event.location
-        ? (event.location_url ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
-        : undefined;
-      const meetingPointMapsUrl = (event as any).meeting_point
-        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
-        : undefined;
-
-      const sendOne = async (
-        token: string,
-        toEmail: string,
-        recipientFirstName: string | undefined,
-        playerName: string,
-        idemSuffix: string,
-      ) =>
-        sendTransactionalEmail({
-          templateName: "convocation-invite",
-          recipientEmail: toEmail,
-          fromName: `${clubName ?? "Clubero"} via Clubero`,
-          idempotencyKey: `convoc-invite-${event.id}-${idemSuffix}`,
-          templateData: {
-            recipientFirstName,
-            playerName,
-            eventTitle: event.title,
-            eventType: event.type,
-            eventDate: event.starts_at,
-            eventDescription: (event as any).description ?? undefined,
-            convocationTime: (event as any).convocation_time ?? undefined,
-            eventLocation: event.location ?? undefined,
-            locationMapsUrl,
-            meetingPoint: (event as any).meeting_point ?? undefined,
-            meetingPointMapsUrl,
-            competitionName: competitionLabel,
-            coachName,
-            squadList,
-            teamName,
-            clubName,
-            clubLogoUrl,
-            respondUrl: `${origin}/r/${token}`,
-            lineup: lineupEmail,
-            locale: pickEmailLocale(clubDefaultLang),
-          },
-        });
-
-
-      const sends: Promise<unknown>[] = [];
-      // Dedupe by lowercased email — a parent and child sometimes share an inbox.
-      const sentToEmails = new Set<string>();
-      const enqueue = (
-        email: string | undefined | null,
-        token: string,
-        firstName: string | undefined,
-        playerName: string,
-        idemSuffix: string,
-      ) => {
-        if (!email) return;
-        const key = email.trim().toLowerCase();
-        if (!key || sentToEmails.has(key)) return;
-        sentToEmails.add(key);
-        sends.push(
-          sendOne(token, email, firstName, playerName, idemSuffix).catch(() => undefined),
+        // Composition (si publiée)
+        const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(
+          () => undefined,
         );
-      };
-      for (const conv of insertedConvs ?? []) {
-        const player = (playersInfo ?? []).find((p: any) => p.id === conv.player_id) as any;
-        if (!player) continue;
-        const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
-        // Player email
-        enqueue(player.email, conv.response_token!, player.first_name ?? undefined, playerName, `p-${conv.id}`);
-        // Parent emails
-        for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
-          const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-          enqueue(parent.email, conv.response_token!, parentFirst, playerName, `parent-${parent.player_id}-${conv.id}`);
-        }
-      }
-      await Promise.allSettled(sends);
 
-    } catch {
-      // best-effort: in-app notif already sent
-    }
+        const competitionLabel =
+          (event as any).competition_name ||
+          ((event as any).competition_type
+            ? t(`events.competitionTypes.${(event as any).competition_type}`)
+            : undefined);
+
+        const locationMapsUrl = event.location
+          ? (event.location_url ??
+            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
+          : undefined;
+        const meetingPointMapsUrl = (event as any).meeting_point
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
+          : undefined;
+
+        const sendOne = async (
+          token: string,
+          toEmail: string,
+          recipientFirstName: string | undefined,
+          playerName: string,
+          idemSuffix: string,
+        ) =>
+          sendTransactionalEmail({
+            templateName: "convocation-invite",
+            recipientEmail: toEmail,
+            fromName: `${clubName ?? "Clubero"} via Clubero`,
+            idempotencyKey: `convoc-invite-${event.id}-${idemSuffix}`,
+            templateData: {
+              recipientFirstName,
+              playerName,
+              eventTitle: event.title,
+              eventType: event.type,
+              eventDate: event.starts_at,
+              eventDescription: (event as any).description ?? undefined,
+              convocationTime: (event as any).convocation_time ?? undefined,
+              eventLocation: event.location ?? undefined,
+              locationMapsUrl,
+              meetingPoint: (event as any).meeting_point ?? undefined,
+              meetingPointMapsUrl,
+              competitionName: competitionLabel,
+              coachName,
+              squadList,
+              teamName,
+              clubName,
+              clubLogoUrl,
+              respondUrl: `${origin}/r/${token}`,
+              lineup: lineupEmail,
+              locale: pickEmailLocale(clubDefaultLang),
+            },
+          });
+
+        const sends: Promise<unknown>[] = [];
+        // Dedupe by lowercased email — a parent and child sometimes share an inbox.
+        const sentToEmails = new Set<string>();
+        const enqueue = (
+          email: string | undefined | null,
+          token: string,
+          firstName: string | undefined,
+          playerName: string,
+          idemSuffix: string,
+        ) => {
+          if (!email) return;
+          const key = email.trim().toLowerCase();
+          if (!key || sentToEmails.has(key)) return;
+          sentToEmails.add(key);
+          sends.push(
+            sendOne(token, email, firstName, playerName, idemSuffix).catch(() => undefined),
+          );
+        };
+        for (const conv of insertedConvs ?? []) {
+          const player = (playersInfo ?? []).find((p: any) => p.id === conv.player_id) as any;
+          if (!player) continue;
+          const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
+          // Player email
+          enqueue(
+            player.email,
+            conv.response_token!,
+            player.first_name ?? undefined,
+            playerName,
+            `p-${conv.id}`,
+          );
+          // Parent emails
+          for (const parent of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
+            const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
+            enqueue(
+              parent.email,
+              conv.response_token!,
+              parentFirst,
+              playerName,
+              `parent-${parent.player_id}-${conv.id}`,
+            );
+          }
+        }
+        await Promise.allSettled(sends);
+      } catch {
+        // best-effort: in-app notif already sent
+      }
 
     // Save snapshot of values just sent so we can diff later for "resend with changes"
     const snapshot = buildConvocSnapshot(event);
@@ -1086,8 +1239,10 @@ function EventDetail() {
 
     toast.success(
       useWhatsApp
-        ? t("events.whatsappShare.convocationsCreated", { defaultValue: "Call-ups created — share now via WhatsApp below" })
-        : t("events.convocationsSent")
+        ? t("events.whatsappShare.convocationsCreated", {
+            defaultValue: "Call-ups created — share now via WhatsApp below",
+          })
+        : t("events.convocationsSent"),
     );
   }
 
@@ -1099,7 +1254,11 @@ function EventDetail() {
       .eq("convocation_id", convocationId)
       .order("sent_at", { ascending: false })
       .limit(1);
-    if (recent && recent[0] && Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000) {
+    if (
+      recent &&
+      recent[0] &&
+      Date.now() - new Date(recent[0].sent_at).getTime() < 30 * 60 * 1000
+    ) {
       if (!opts?.silent) toast.info(t("attendance.alreadyRemindedRecently"));
       return false;
     }
@@ -1112,15 +1271,14 @@ function EventDetail() {
     const recipients = Array.from(
       new Set([
         ...(playerUserId ? [playerUserId] : []),
-        ...((parents ?? []).map((p) => p.parent_user_id).filter(Boolean)),
-      ])
+        ...(parents ?? []).map((p) => p.parent_user_id).filter(Boolean),
+      ]),
     );
 
     // Email + Web Push (fire-and-forget, inserts the reminders row + handles cooldown server-side too)
     try {
-      const { sendManualConvocationReminder } = await import(
-        "@/lib/convocation-reminder.functions"
-      );
+      const { sendManualConvocationReminder } =
+        await import("@/lib/convocation-reminder.functions");
       void sendManualConvocationReminder({ data: { convocationId } }).catch((e) => {
         console.error("[remind] email/push dispatch failed", e);
       });
@@ -1137,7 +1295,7 @@ function EventDetail() {
           title: event.title,
           body: t("attendance.respondPrompt"),
           link: `/events/${event.id}`,
-        }))
+        })),
       );
     }
     if (!opts?.silent) toast.success(t("attendance.remindSent"));
@@ -1201,10 +1359,7 @@ function EventDetail() {
       cancelled_at: new Date().toISOString(),
       responses_locked: true,
     };
-    const { error } = await supabase
-      .from("events")
-      .update(cancelPatch)
-      .eq("id", event.id);
+    const { error } = await supabase.from("events").update(cancelPatch).eq("id", event.id);
     if (error) {
       setCancelEventSubmitting(false);
       toast.error(error.message);
@@ -1229,7 +1384,12 @@ function EventDetail() {
       const playerUserIds = (convocations ?? [])
         .map((c: any) => c.players?.user_id)
         .filter(Boolean);
-      let parents: Array<{ parent_user_id: string | null; email: string | null; full_name: string | null; player_id: string }> = [];
+      let parents: Array<{
+        parent_user_id: string | null;
+        email: string | null;
+        full_name: string | null;
+        player_id: string;
+      }> = [];
       if (playerIds.length > 0) {
         const { data: parentsData } = await supabase
           .from("player_parents")
@@ -1261,16 +1421,20 @@ function EventDetail() {
       const clubId = (teamRow as any)?.club_id as string | undefined;
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
-      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as string | null | undefined;
+      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as
+        | string
+        | null
+        | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
 
       // Player emails
-      const { data: playersInfo } = playerIds.length > 0
-        ? await supabase
-            .from("players")
-            .select("id, first_name, last_name, email")
-            .in("id", playerIds)
-        : { data: [] as any[] };
+      const { data: playersInfo } =
+        playerIds.length > 0
+          ? await supabase
+              .from("players")
+              .select("id, first_name, last_name, email")
+              .in("id", playerIds)
+          : { data: [] as any[] };
 
       const sendOne = (
         toEmail: string,
@@ -1304,12 +1468,16 @@ function EventDetail() {
           ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
           : undefined;
         if (player?.email) {
-          sends.push(sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+          sends.push(
+            sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`),
+          );
         }
         for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
           if (!parent.email) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-          sends.push(sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+          sends.push(
+            sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`),
+          );
         }
       }
       await Promise.allSettled(sends);
@@ -1329,8 +1497,12 @@ function EventDetail() {
 
     // Fire-and-forget Web Push (#6 event_cancel)
     try {
-      void dispatchEventCancelPushFn({ data: { eventId: event.id, previousStartsAt: event.starts_at } });
-    } catch { /* noop */ }
+      void dispatchEventCancelPushFn({
+        data: { eventId: event.id, previousStartsAt: event.starts_at },
+      });
+    } catch {
+      /* noop */
+    }
 
     setCancelEventSubmitting(false);
     setCancelEventOpen(false);
@@ -1369,14 +1541,18 @@ function EventDetail() {
     }
     setRescheduleSubmitting(true);
 
-    const updates: { starts_at: string; ends_at?: string; convocation_time?: string } = { starts_at: newDate.toISOString() };
+    const updates: { starts_at: string; ends_at?: string; convocation_time?: string } = {
+      starts_at: newDate.toISOString(),
+    };
     if (event.ends_at) {
       const offsetMs = new Date(event.ends_at).getTime() - previousStart.getTime();
       updates.ends_at = new Date(newDate.getTime() + offsetMs).toISOString();
     }
     if (event.convocation_time) {
       const deltaMs = newDate.getTime() - previousStart.getTime();
-      updates.convocation_time = new Date(new Date(event.convocation_time).getTime() + deltaMs).toISOString();
+      updates.convocation_time = new Date(
+        new Date(event.convocation_time).getTime() + deltaMs,
+      ).toISOString();
     }
 
     const { error } = await supabase.from("events").update(updates).eq("id", event.id);
@@ -1395,7 +1571,12 @@ function EventDetail() {
       const playerUserIds = (convocations ?? [])
         .map((c: any) => c.players?.user_id)
         .filter(Boolean);
-      let parents: Array<{ parent_user_id: string | null; email: string | null; full_name: string | null; player_id: string }> = [];
+      let parents: Array<{
+        parent_user_id: string | null;
+        email: string | null;
+        full_name: string | null;
+        player_id: string;
+      }> = [];
       if (playerIds.length > 0) {
         const { data: parentsData } = await supabase
           .from("player_parents")
@@ -1426,14 +1607,18 @@ function EventDetail() {
       const clubId = (teamRow as any)?.club_id as string | undefined;
       const clubName = (teamRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (teamRow as any)?.clubs?.logo_url as string | undefined;
-      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as string | null | undefined;
+      const clubDefaultLang = (teamRow as any)?.clubs?.default_language as
+        | string
+        | null
+        | undefined;
 
-      const { data: playersInfo } = playerIds.length > 0
-        ? await supabase
-            .from("players")
-            .select("id, first_name, last_name, email")
-            .in("id", playerIds)
-        : { data: [] as any[] };
+      const { data: playersInfo } =
+        playerIds.length > 0
+          ? await supabase
+              .from("players")
+              .select("id, first_name, last_name, email")
+              .in("id", playerIds)
+          : { data: [] as any[] };
 
       const idemBase = newDate.getTime();
       const sendOne = (
@@ -1469,12 +1654,16 @@ function EventDetail() {
           ? `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim()
           : undefined;
         if (player?.email) {
-          sends.push(sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+          sends.push(
+            sendOne(player.email, player.first_name ?? undefined, playerName, `p-${c.id}`),
+          );
         }
         for (const parent of parents.filter((p) => p.player_id === c.player_id)) {
           if (!parent.email) continue;
           const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-          sends.push(sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+          sends.push(
+            sendOne(parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`),
+          );
         }
       }
       await Promise.allSettled(sends);
@@ -1494,7 +1683,9 @@ function EventDetail() {
     // Fire-and-forget Web Push (#5 event_reschedule)
     try {
       void dispatchEventReschedulePushFn({ data: { eventId: event.id } });
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
 
     setRescheduleSubmitting(false);
     setRescheduleOpen(false);
@@ -1513,7 +1704,9 @@ function EventDetail() {
     const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
     const lineupPublishedAt = (lineupData as any)?.published_at as string | undefined;
     const lastSentAt = (event as any)?.convocation_last_sent_at as string | undefined;
-    const lineupChangedNow = !!lineupPublishedAt && (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
+    const lineupChangedNow =
+      !!lineupPublishedAt &&
+      (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
     if (lineupChangedNow) {
       changes.push({
         field: "lineup",
@@ -1538,16 +1731,21 @@ function EventDetail() {
       const teamName = (clubRow as any)?.name as string | undefined;
       const clubName = (clubRow as any)?.clubs?.name as string | undefined;
       const clubLogoUrl = (clubRow as any)?.clubs?.logo_url as string | undefined;
-      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as string | null | undefined;
+      const clubDefaultLang = (clubRow as any)?.clubs?.default_language as
+        | string
+        | null
+        | undefined;
       const eventDateLabel = fmt(event.starts_at, "EEEE d MMMM 'à' HH'h'mm");
       const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-      const competitionLabel = (event as any).competition_name
-        || ((event as any).competition_type
+      const competitionLabel =
+        (event as any).competition_name ||
+        ((event as any).competition_type
           ? t(`events.competitionTypes.${(event as any).competition_type}`)
           : undefined);
       const locationMapsUrl = event.location
-        ? ((event as any).location_url ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
+        ? ((event as any).location_url ??
+          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`)
         : undefined;
       const meetingPointMapsUrl = (event as any).meeting_point
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event as any).meeting_point)}`
@@ -1557,11 +1755,19 @@ function EventDetail() {
         .map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
         .filter(Boolean);
 
-      const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(() => undefined);
+      const lineupEmail = await loadLineupForEmail({ data: { eventId: event.id } }).catch(
+        () => undefined,
+      );
 
       const idemBase = Date.now();
 
-      const sendOne = (token: string, toEmail: string, recipientFirstName: string | undefined, playerName: string, idemSuffix: string) =>
+      const sendOne = (
+        token: string,
+        toEmail: string,
+        recipientFirstName: string | undefined,
+        playerName: string,
+        idemSuffix: string,
+      ) =>
         sendTransactionalEmail({
           templateName: "convocation-invite",
           recipientEmail: toEmail,
@@ -1586,11 +1792,14 @@ function EventDetail() {
             clubLogoUrl,
             respondUrl: `${origin}/r/${token}`,
             isUpdate: true,
-            changes: changes.map((c) => ({ label: c.label, previous: c.previous, current: c.current })),
+            changes: changes.map((c) => ({
+              label: c.label,
+              previous: c.previous,
+              current: c.current,
+            })),
             lineup: lineupEmail,
             locale: pickEmailLocale(clubDefaultLang),
           },
-
         }).catch(() => undefined);
 
       const sends: Promise<unknown>[] = [];
@@ -1600,13 +1809,29 @@ function EventDetail() {
         const player = c.players;
         const playerName = `${player?.first_name ?? ""} ${player?.last_name ?? ""}`.trim();
         if (player?.email) {
-          sends.push(sendOne(c.response_token, player.email, player.first_name ?? undefined, playerName, `p-${c.id}`));
+          sends.push(
+            sendOne(
+              c.response_token,
+              player.email,
+              player.first_name ?? undefined,
+              playerName,
+              `p-${c.id}`,
+            ),
+          );
         }
         if (player?.user_id) inAppRecipients.add(player.user_id);
         for (const parent of (parents ?? []).filter((p: any) => p.player_id === c.player_id)) {
           if (parent.email) {
             const parentFirst = (parent.full_name ?? "").split(" ")[0] || undefined;
-            sends.push(sendOne(c.response_token, parent.email, parentFirst, playerName, `parent-${parent.player_id}-${c.id}`));
+            sends.push(
+              sendOne(
+                c.response_token,
+                parent.email,
+                parentFirst,
+                playerName,
+                `parent-${parent.player_id}-${c.id}`,
+              ),
+            );
           }
           if (parent.parent_user_id) inAppRecipients.add(parent.parent_user_id);
         }
@@ -1617,10 +1842,14 @@ function EventDetail() {
             user_id: uid,
             type: "convocation",
             title: `🔄 ${event.title}`,
-              body: changes.length > 0
-                ? t("events.resend.notifUpdated", { defaultValue: "Call-up updated: {{fields}}", fields: changes.map((ch) => ch.label).join(", ") })
+            body:
+              changes.length > 0
+                ? t("events.resend.notifUpdated", {
+                    defaultValue: "Call-up updated: {{fields}}",
+                    fields: changes.map((ch) => ch.label).join(", "),
+                  })
                 : t("events.resend.notifResent", { defaultValue: "Call-up resent" }),
-              link: `/events/${event.id}`,
+            link: `/events/${event.id}`,
           })),
         );
       }
@@ -1628,37 +1857,46 @@ function EventDetail() {
 
       await supabase
         .from("events")
-        .update({ convocation_sent_snapshot: buildConvocSnapshot(event), convocation_last_sent_at: new Date().toISOString() })
+        .update({
+          convocation_sent_snapshot: buildConvocSnapshot(event),
+          convocation_last_sent_at: new Date().toISOString(),
+        })
         .eq("id", event.id);
 
-      toast.success(t("events.resend.success", { defaultValue: "Call-up resent to {{count}} player(s)", count: convocations.length }));
+      toast.success(
+        t("events.resend.success", {
+          defaultValue: "Call-up resent to {{count}} player(s)",
+          count: convocations.length,
+        }),
+      );
       setResendOpen(false);
       refetchEvent();
     } catch (e: any) {
-      toast.error(e?.message ?? t("events.resend.error", { defaultValue: "Error while resending" }));
+      toast.error(
+        e?.message ?? t("events.resend.error", { defaultValue: "Error while resending" }),
+      );
     } finally {
       setResendSubmitting(false);
     }
   }
 
-  const convocChanges = useMemo(
-    () => {
-      const base = diffSnapshot((event as any)?.convocation_sent_snapshot, event, t);
-      const lineupPublishedAt = (lineupData as any)?.published_at as string | undefined;
-      const lastSentAt = (event as any)?.convocation_last_sent_at as string | undefined;
-      const lineupChanged = !!lineupPublishedAt && (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
-      if (lineupChanged) {
-        base.push({
-          field: "lineup",
-          label: t("events.fields.lineup" as any, { defaultValue: "Lineup" }),
-          previous: t("events.resend.lineupNotIncluded" as any, { defaultValue: "Not included" }),
-          current: t("events.resend.lineupPublished" as any, { defaultValue: "Published" }),
-        });
-      }
-      return base;
-    },
-    [event, lineupData, t],
-  );
+  const convocChanges = useMemo(() => {
+    const base = diffSnapshot((event as any)?.convocation_sent_snapshot, event, t);
+    const lineupPublishedAt = (lineupData as any)?.published_at as string | undefined;
+    const lastSentAt = (event as any)?.convocation_last_sent_at as string | undefined;
+    const lineupChanged =
+      !!lineupPublishedAt &&
+      (!lastSentAt || new Date(lineupPublishedAt).getTime() > new Date(lastSentAt).getTime());
+    if (lineupChanged) {
+      base.push({
+        field: "lineup",
+        label: t("events.fields.lineup" as any, { defaultValue: "Lineup" }),
+        previous: t("events.resend.lineupNotIncluded" as any, { defaultValue: "Not included" }),
+        current: t("events.resend.lineupPublished" as any, { defaultValue: "Published" }),
+      });
+    }
+    return base;
+  }, [event, lineupData, t]);
 
   const counts = useMemo(() => {
     const c = { present: 0, absent: 0, uncertain: 0, pending: 0 };
@@ -1728,10 +1966,8 @@ function EventDetail() {
     event.status === "cancelled" ||
     new Date((event.ends_at ?? event.starts_at) as string).getTime() <= Date.now();
   const hasPendingForMe =
-    !responsesReadOnly &&
-    visibleMyConvocs.some((c: any) => c.status === "pending");
-  const isPastMatch =
-    event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
+    !responsesReadOnly && visibleMyConvocs.some((c: any) => c.status === "pending");
+  const isPastMatch = event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
   const showFeedbackButton = isPastMatch && isCoach;
   // Joueur/parent : afficher la liste des convoqués dès que l'événement est publié/envoyé,
   // même si l'utilisateur n'a pas de réponse personnelle à donner.
@@ -1743,12 +1979,15 @@ function EventDetail() {
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
       <BackLink to="/events" />
 
-
       {/* ═════════ HERO — Anime Premium ═════════ */}
       <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(29,122,69,0.12),0_1px_4px_rgba(0,0,0,0.05)] border border-border bg-card">
         {/* Top gradient band with diagonal SVG accent + thematic glyph */}
         <div className="relative h-[88px] overflow-hidden">
-          <svg viewBox="0 0 400 88" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full">
+          <svg
+            viewBox="0 0 400 88"
+            preserveAspectRatio="xMidYMid slice"
+            className="absolute inset-0 h-full w-full"
+          >
             <defs>
               <linearGradient id={`evt-hero-${eventId}`} x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#0f4a26" />
@@ -1758,11 +1997,22 @@ function EventDetail() {
             <rect width="400" height="88" fill={`url(#evt-hero-${eventId})`} />
             <path d="M250 0 L400 0 L400 88 L320 88 Z" fill="rgba(255,255,255,0.05)" />
             <ellipse cx="360" cy="30" rx="65" ry="48" fill="rgba(45,157,95,0.2)" />
-            <line x1="225" y1="88" x2="400" y2="10" stroke="rgba(255,255,255,0.05)" strokeWidth="28" />
+            <line
+              x1="225"
+              y1="88"
+              x2="400"
+              y2="10"
+              stroke="rgba(255,255,255,0.05)"
+              strokeWidth="28"
+            />
           </svg>
           {/* Thematic glyph — Trophy for match, Timer for training/other */}
           <div aria-hidden className="absolute top-3 right-12 z-[1] text-white/25">
-            {event.type === "match" ? <Trophy className="h-10 w-10" strokeWidth={1.5} /> : <Timer className="h-10 w-10" strokeWidth={1.5} />}
+            {event.type === "match" ? (
+              <Trophy className="h-10 w-10" strokeWidth={1.5} />
+            ) : (
+              <Timer className="h-10 w-10" strokeWidth={1.5} />
+            )}
           </div>
           <div className="relative z-[2] flex items-start justify-between gap-2 px-4 pt-3">
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -1777,7 +2027,11 @@ function EventDetail() {
               )}
               {event.type === "match" && event.is_home !== null && (
                 <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white/90 bg-white/15 px-2 py-[3px] rounded-full inline-flex items-center gap-1">
-                  {event.is_home ? <Home className="h-2.5 w-2.5" /> : <Plane className="h-2.5 w-2.5" />}
+                  {event.is_home ? (
+                    <Home className="h-2.5 w-2.5" />
+                  ) : (
+                    <Plane className="h-2.5 w-2.5" />
+                  )}
                   {t(event.is_home ? "events.home" : "events.away")}
                 </span>
               )}
@@ -1801,7 +2055,6 @@ function EventDetail() {
             {/* Date box — green gradient */}
             <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 px-2.5 py-1.5 text-center leading-none">
               <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
-
                 {fmt(event.starts_at, "MMM")}
               </div>
               <div className="text-2xl font-black text-foreground mt-0.5 tabular-nums">
@@ -1825,7 +2078,9 @@ function EventDetail() {
                   </>
                 )}
                 {event.convocation_time && (
-                  <span className="text-muted-foreground/80">· {t("events.convocationTime")} {fmt(event.convocation_time, "HH:mm")}</span>
+                  <span className="text-muted-foreground/80">
+                    · {t("events.convocationTime")} {fmt(event.convocation_time, "HH:mm")}
+                  </span>
                 )}
               </div>
             </div>
@@ -1836,7 +2091,9 @@ function EventDetail() {
             <div className="flex flex-wrap items-center gap-1.5">
               <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
                 <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
-                {eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : t("events.types.match")}
+                {eventTeam?.sport
+                  ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport })
+                  : t("events.types.match")}
               </div>
               {(() => {
                 const formatLine = event.description?.match(/^Format:\s*(.+?)(?:\n|$)/);
@@ -1887,7 +2144,8 @@ function EventDetail() {
                 <Plane className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground">
-                    <span className="font-medium">{t("events.meetingPoint")}:</span> {event.meeting_point}
+                    <span className="font-medium">{t("events.meetingPoint")}:</span>{" "}
+                    {event.meeting_point}
                   </p>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
@@ -1906,7 +2164,9 @@ function EventDetail() {
             {(() => {
               const list = (event.attachments as unknown as Attachment[] | null) ?? [];
               return list.length > 0 ? (
-                <div className="pt-1"><AttachmentList items={list} /></div>
+                <div className="pt-1">
+                  <AttachmentList items={list} />
+                </div>
               ) : null;
             })()}
           </div>
@@ -1918,7 +2178,10 @@ function EventDetail() {
                 <Link
                   to="/events/$eventId/lineup"
                   params={{ eventId }}
-                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-9 gap-1.5 flex-1 min-w-[7rem]")}
+                  className={cn(
+                    buttonVariants({ variant: "secondary", size: "sm" }),
+                    "h-9 gap-1.5 flex-1 min-w-[7rem]",
+                  )}
                   title={t("lineup.title", { defaultValue: "Composition" })}
                 >
                   <CircleDot className="h-4 w-4" />
@@ -1929,7 +2192,10 @@ function EventDetail() {
                 <Link
                   to="/events/$eventId/feedback"
                   params={{ eventId }}
-                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "h-9 gap-1.5 flex-1 min-w-[7rem]")}
+                  className={cn(
+                    buttonVariants({ variant: "secondary", size: "sm" }),
+                    "h-9 gap-1.5 flex-1 min-w-[7rem]",
+                  )}
                   title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}
                 >
                   <ClipboardList className="h-4 w-4" />
@@ -1960,7 +2226,9 @@ function EventDetail() {
             )}
             {event.cancelled_at && (
               <p className="mt-1 text-[11px] text-muted-foreground">
-                {t("events.eventCancelledOn", { date: fmt(event.cancelled_at, "d MMM yyyy 'à' HH:mm") })}
+                {t("events.eventCancelledOn", {
+                  date: fmt(event.cancelled_at, "d MMM yyyy 'à' HH:mm"),
+                })}
               </p>
             )}
           </div>
@@ -1983,7 +2251,6 @@ function EventDetail() {
       )}
 
       {/* Convocation CTAs moved into the unified Convocation card below */}
-
 
       {/* Coach: secondary lifecycle actions */}
       {isCoach && event.status !== "cancelled" && (
@@ -2033,14 +2300,16 @@ function EventDetail() {
             <div className="space-y-1.5">
               <label className="text-sm font-medium">{t("events.rescheduleReasonLabel")}</label>
               <div className="flex flex-wrap gap-1.5">
-                {([
-                  ["pitchUnavailable", "Terrain impraticable"],
-                  ["weather", "Météo"],
-                  ["lackOfPlayers", "Manque de joueurs"],
-                  ["opponentRequest", "Demande adversaire"],
-                  ["scheduling", "Conflit d'agenda"],
-                  ["other", "Autre"],
-                ] as const).map(([key, fr]) => (
+                {(
+                  [
+                    ["pitchUnavailable", "Terrain impraticable"],
+                    ["weather", "Météo"],
+                    ["lackOfPlayers", "Manque de joueurs"],
+                    ["opponentRequest", "Demande adversaire"],
+                    ["scheduling", "Conflit d'agenda"],
+                    ["other", "Autre"],
+                  ] as const
+                ).map(([key, fr]) => (
                   <button
                     key={key}
                     type="button"
@@ -2084,218 +2353,293 @@ function EventDetail() {
       </Dialog>
 
       {/* Coach: WhatsApp sharing (V1 — deep links, no API) */}
-      {isCoach && (() => {
-        const team = teams?.[0] as any;
-        if (!team) return null;
-        const mode = (team.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
-        const groupUrl = normalizeGroupUrl(team.whatsapp_group_url);
-        const clubName = team.clubs?.name ?? undefined;
-        const teamName = team.name ?? undefined;
-        const competitionLabel = (event as any).competition_name
-          || ((event as any).competition_type ? t(`events.competitionTypes.${(event as any).competition_type}`) : undefined);
-        const selectedPlayers = (convocations ?? [])
-          .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
-          .filter(Boolean);
-        const base = {
-          clubName,
-          teamName,
-          type: event.type,
-          title: event.title,
-          opponent: event.opponent,
-          isHome: event.is_home,
-          competitionLabel,
-          startsAt: event.starts_at,
-          endsAt: event.ends_at,
-          convocationTime: (event as any).convocation_time,
-          location: event.location,
-          locationUrl: (event as any).location_url,
-          meetingPoint: (event as any).meeting_point,
-          description: event.description,
-          attachments: (event.attachments as any) ?? [],
-          selectedPlayers,
-          cancellationReason: event.cancellation_reason,
-          lineup: null,
-        };
-        const lineupBlock = lineupData
-          ? {
-              formation: lineupData.formation,
-              starting: (lineupData as any)._starting ?? [],
-              bench: (lineupData as any)._bench ?? [],
-            }
-          : null;
-        const respondents = (() => {
-          const buckets: { present: string[]; absent: string[]; uncertain: string[]; pending: string[] } = {
-            present: [], absent: [], uncertain: [], pending: [],
+      {isCoach &&
+        (() => {
+          const team = teams?.[0] as any;
+          if (!team) return null;
+          const mode = (team.communication_mode ?? "app") as "app" | "whatsapp" | "hybrid";
+          const groupUrl = normalizeGroupUrl(team.whatsapp_group_url);
+          const clubName = team.clubs?.name ?? undefined;
+          const teamName = team.name ?? undefined;
+          const competitionLabel =
+            (event as any).competition_name ||
+            ((event as any).competition_type
+              ? t(`events.competitionTypes.${(event as any).competition_type}`)
+              : undefined);
+          const selectedPlayers = (convocations ?? [])
+            .map((c: any) => `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim())
+            .filter(Boolean);
+          const base = {
+            clubName,
+            teamName,
+            type: event.type,
+            title: event.title,
+            opponent: event.opponent,
+            isHome: event.is_home,
+            competitionLabel,
+            startsAt: event.starts_at,
+            endsAt: event.ends_at,
+            convocationTime: (event as any).convocation_time,
+            location: event.location,
+            locationUrl: (event as any).location_url,
+            meetingPoint: (event as any).meeting_point,
+            description: event.description,
+            attachments: (event.attachments as any) ?? [],
+            selectedPlayers,
+            cancellationReason: event.cancellation_reason,
+            lineup: null,
           };
-          for (const c of (convocations ?? []) as any[]) {
-            const p = c.players ?? {};
-            const name = [p.first_name, p.last_name].filter(Boolean).join(" ") || "—";
-            if (c.status === "present") buckets.present.push(name);
-            else if (c.status === "absent") buckets.absent.push(name);
-            else if (c.status === "uncertain") buckets.uncertain.push(name);
-            else buckets.pending.push(name);
-          }
-          return buckets;
-        })();
-        const isCancelled = event.status === "cancelled";
-        const convocMsg = isCancelled
-          ? buildCancellationMessage(base)
-          : buildConvocationMessage(base);
-        const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
-        const reminderMsg = buildReminderMessage({ ...base, respondents });
-        void mode;
-        const convocCount = (convocations ?? []).length;
-        return (
-          <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-border bg-card shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
-            {/* Header — green gradient */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-5 py-4 text-white">
-              <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]" aria-hidden="true">
-                <defs>
-                  <pattern id="comm-diag" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                    <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#comm-diag)" />
-              </svg>
-              <div className="pointer-events-none absolute -top-14 -right-14 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
-              <div className="relative flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shrink-0">
-                    <Send className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="min-w-0 leading-tight">
-                    <div className="text-base font-extrabold tracking-tight">
-                      {t("events.commCard.title", { defaultValue: "Partager la convocation" })}
+          const lineupBlock = lineupData
+            ? {
+                formation: lineupData.formation,
+                starting: (lineupData as any)._starting ?? [],
+                bench: (lineupData as any)._bench ?? [],
+              }
+            : null;
+          const respondents = (() => {
+            const buckets: {
+              present: string[];
+              absent: string[];
+              uncertain: string[];
+              pending: string[];
+            } = {
+              present: [],
+              absent: [],
+              uncertain: [],
+              pending: [],
+            };
+            for (const c of (convocations ?? []) as any[]) {
+              const p = c.players ?? {};
+              const name = [p.first_name, p.last_name].filter(Boolean).join(" ") || "—";
+              if (c.status === "present") buckets.present.push(name);
+              else if (c.status === "absent") buckets.absent.push(name);
+              else if (c.status === "uncertain") buckets.uncertain.push(name);
+              else buckets.pending.push(name);
+            }
+            return buckets;
+          })();
+          const isCancelled = event.status === "cancelled";
+          const convocMsg = isCancelled
+            ? buildCancellationMessage(base)
+            : buildConvocationMessage(base);
+          const convocWithCompoMsg = buildConvocationMessage({ ...base, lineup: lineupBlock });
+          const reminderMsg = buildReminderMessage({ ...base, respondents });
+          void mode;
+          const convocCount = (convocations ?? []).length;
+          return (
+            <div className="relative overflow-hidden rounded-3xl border-[1.5px] border-border bg-card shadow-[0_8px_24px_-14px_rgba(15,23,42,0.12)]">
+              {/* Header — green gradient */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-5 py-4 text-white">
+                <svg
+                  className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <pattern
+                      id="comm-diag"
+                      width="14"
+                      height="14"
+                      patternUnits="userSpaceOnUse"
+                      patternTransform="rotate(45)"
+                    >
+                      <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#comm-diag)" />
+                </svg>
+                <div className="pointer-events-none absolute -top-14 -right-14 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
+                <div className="relative flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shrink-0">
+                      <Send className="h-5 w-5 text-white" />
                     </div>
-                    <div className="text-[11px] text-white/75 font-medium mt-0.5">
-                      {t("events.commCard.subtitle", { defaultValue: "{{count}} joueurs convoqués", count: convocCount })}
+                    <div className="min-w-0 leading-tight">
+                      <div className="text-base font-extrabold tracking-tight">
+                        {t("events.commCard.title", { defaultValue: "Partager la convocation" })}
+                      </div>
+                      <div className="text-[11px] text-white/75 font-medium mt-0.5">
+                        {t("events.commCard.subtitle", {
+                          defaultValue: "{{count}} joueurs convoqués",
+                          count: convocCount,
+                        })}
+                      </div>
                     </div>
                   </div>
+                  {groupUrl && (
+                    <a
+                      href={groupUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20 shrink-0"
+                    >
+                      {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
                 </div>
-                {groupUrl && (
+              </div>
+
+              {/* Actions */}
+              <div className="p-4 space-y-2.5">
+                {isCancelled ? (
                   <a
-                    href={groupUrl}
+                    href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20 shrink-0"
+                    className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
                   >
-                    {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
+                    <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
+                      <svg
+                        viewBox="0 0 32 32"
+                        className="h-5 w-5"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16M16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708" />
+                      </svg>
+                    </span>
+                    <span className="relative flex-1 text-left">
+                      <span className="block text-sm font-bold">
+                        {t("events.whatsappShare.shareCancellation")}
+                      </span>
+                      <span className="block text-[11px] text-white/80">
+                        {t("events.commCard.cancelledHint", { defaultValue: "Lien d'annulation" })}
+                      </span>
+                    </span>
                   </a>
+                ) : (
+                  <>
+                    {/* WhatsApp — primary. If convocations haven't been generated yet,
+                      we must first invite the players (creates convocations + tokens). */}
+                    {event.convocations_sent ? (
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
+                      >
+                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
+                        <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
+                          <svg
+                            viewBox="0 0 32 32"
+                            className="h-5 w-5"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16M16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708" />
+                          </svg>
+                        </span>
+                        <span className="relative flex-1 text-left min-w-0">
+                          <span className="block text-sm font-bold">
+                            {t("events.whatsappShare.shareConvoc")}
+                          </span>
+                          <span className="block text-[11px] text-white/80 truncate">
+                            {t("events.commCard.whatsappHint", {
+                              defaultValue: "Lien de convocation",
+                            })}
+                          </span>
+                        </span>
+                        <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
+                          {t("events.commCard.fast", { defaultValue: "Rapide" })}
+                        </span>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          sendConvocations();
+                        }}
+                        className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition text-left"
+                      >
+                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
+                        <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
+                          <UserPlus className="h-4 w-4" />
+                        </span>
+                        <span className="relative flex-1 min-w-0">
+                          <span className="block text-sm font-bold">
+                            {t("events.commCard.invitePlayersFirstTitle", {
+                              defaultValue: "Inviter les joueurs d'abord",
+                            })}
+                          </span>
+                          <span className="block text-[11px] text-white/85 truncate">
+                            {t("events.commCard.invitePlayersFirstHint", {
+                              defaultValue:
+                                "On génère les convocations, puis tu pourras les partager sur WhatsApp.",
+                            })}
+                          </span>
+                        </span>
+                        <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
+                          {t("events.commCard.start", { defaultValue: "Démarrer" })}
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Optional: share convocation + lineup as image (existing handler) */}
+                    {lineupData && (
+                      <button
+                        type="button"
+                        onClick={() => shareLineupAsImage(convocWithCompoMsg)}
+                        disabled={sharingLineup}
+                        className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60 transition active:scale-[0.99]"
+                      >
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
+                          {sharingLineup ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" />
+                          ) : (
+                            <svg
+                              viewBox="0 0 32 32"
+                              className="h-5 w-5"
+                              fill="#25D366"
+                              aria-hidden="true"
+                            >
+                              <path d="M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708zM16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262z" />
+                              <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16z" />
+                            </svg>
+                          )}
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-sm font-bold text-foreground">
+                            {t("events.whatsappShare.shareConvocWithLineup")}
+                          </span>
+                          <span className="block text-[11px] text-muted-foreground truncate">
+                            {t("events.commCard.lineupHint", {
+                              defaultValue: "Inclut la composition en image",
+                            })}
+                          </span>
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Email — only after convocations have been generated */}
+                    {event.convocations_sent && (
+                      <button
+                        type="button"
+                        onClick={() => setResendOpen(true)}
+                        className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
+                      >
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
+                          <Mail className="h-4 w-4 text-sky-700" />
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-sm font-bold text-foreground">
+                            {t("events.commCard.emailTitle", {
+                              defaultValue: "Renvoyer par email",
+                            })}
+                          </span>
+                          <span className="block text-[11px] text-muted-foreground truncate">
+                            {t("events.commCard.emailHint", {
+                              defaultValue: "Envoie à tous les joueurs",
+                            })}
+                          </span>
+                        </span>
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="p-4 space-y-2.5">
-              {isCancelled ? (
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
-                >
-                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
-                  <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
-                    <svg viewBox="0 0 32 32" className="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16M16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708"/></svg>
-                  </span>
-                  <span className="relative flex-1 text-left">
-                    <span className="block text-sm font-bold">{t("events.whatsappShare.shareCancellation")}</span>
-                    <span className="block text-[11px] text-white/80">{t("events.commCard.cancelledHint", { defaultValue: "Lien d'annulation" })}</span>
-                  </span>
-                </a>
-              ) : (
-                <>
-                  {/* WhatsApp — primary. If convocations haven't been generated yet,
-                      we must first invite the players (creates convocations + tokens). */}
-                  {event.convocations_sent ? (
-                    <a
-                      href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
-                    >
-                      <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
-                      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
-                        <svg viewBox="0 0 32 32" className="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16M16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708"/></svg>
-                      </span>
-                      <span className="relative flex-1 text-left min-w-0">
-                        <span className="block text-sm font-bold">{t("events.whatsappShare.shareConvoc")}</span>
-                        <span className="block text-[11px] text-white/80 truncate">{t("events.commCard.whatsappHint", { defaultValue: "Lien de convocation" })}</span>
-                      </span>
-                      <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
-                        {t("events.commCard.fast", { defaultValue: "Rapide" })}
-                      </span>
-                    </a>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => { sendConvocations(); }}
-                      className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition text-left"
-                    >
-                      <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
-                      <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
-                        <UserPlus className="h-4 w-4" />
-                      </span>
-                      <span className="relative flex-1 min-w-0">
-                        <span className="block text-sm font-bold">
-                          {t("events.commCard.invitePlayersFirstTitle", { defaultValue: "Inviter les joueurs d'abord" })}
-                        </span>
-                        <span className="block text-[11px] text-white/85 truncate">
-                          {t("events.commCard.invitePlayersFirstHint", { defaultValue: "On génère les convocations, puis tu pourras les partager sur WhatsApp." })}
-                        </span>
-                      </span>
-                      <span className="relative inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-white/25 shrink-0">
-                        {t("events.commCard.start", { defaultValue: "Démarrer" })}
-                      </span>
-                    </button>
-                  )}
-
-                  {/* Optional: share convocation + lineup as image (existing handler) */}
-                  {lineupData && (
-                    <button
-                      type="button"
-                      onClick={() => shareLineupAsImage(convocWithCompoMsg)}
-                      disabled={sharingLineup}
-                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-emerald-300 hover:bg-emerald-50/40 disabled:opacity-60 transition active:scale-[0.99]"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
-                        {sharingLineup ? <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" /> : (
-                          <svg viewBox="0 0 32 32" className="h-5 w-5" fill="#25D366" aria-hidden="true">
-                            <path d="M16.026 5.474c-5.853 0-10.65 4.795-10.65 10.65 0 1.832.476 3.633 1.378 5.227L4.65 27.512l6.302-1.78a10.6 10.6 0 0 0 5.073 1.32c5.873 0 10.745-4.795 10.745-10.626 0-5.852-4.795-10.708-10.624-10.708zM16.026 25.42c-1.674 0-3.31-.515-4.713-1.404l-3.385.918.92-3.345A8.86 8.86 0 0 1 7.16 16.16c0-4.892 4.018-8.92 8.91-8.92 4.89 0 8.91 4.026 8.91 8.918a8.9 8.9 0 0 1-8.954 9.262z" />
-                            <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.092-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.464-1.345.13-.387.244-.804.244-1.21 0-.099-.013-.197-.013-.297-.05-.286-1.762-.93-2.05-1.16z" />
-                          </svg>
-                        )}
-                      </span>
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-sm font-bold text-foreground">{t("events.whatsappShare.shareConvocWithLineup")}</span>
-                        <span className="block text-[11px] text-muted-foreground truncate">{t("events.commCard.lineupHint", { defaultValue: "Inclut la composition en image" })}</span>
-                      </span>
-                    </button>
-                  )}
-
-                  {/* Email — only after convocations have been generated */}
-                  {event.convocations_sent && (
-                    <button
-                      type="button"
-                      onClick={() => setResendOpen(true)}
-                      className="flex items-center gap-3 w-full rounded-2xl border-[1.5px] border-border bg-card px-4 py-3 text-left hover:border-sky-300 hover:bg-sky-50/40 transition active:scale-[0.99]"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-50 to-sky-100 ring-1 ring-sky-200/60 shrink-0">
-                        <Mail className="h-4 w-4 text-sky-700" />
-                      </span>
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-sm font-bold text-foreground">{t("events.commCard.emailTitle", { defaultValue: "Renvoyer par email" })}</span>
-                        <span className="block text-[11px] text-muted-foreground truncate">{t("events.commCard.emailHint", { defaultValue: "Envoie à tous les joueurs" })}</span>
-                      </span>
-                    </button>
-                  )}
-
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       <Dialog
         open={cancelEventOpen}
@@ -2314,7 +2658,11 @@ function EventDetail() {
           </DialogHeader>
           {event.series_id && (
             <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
-              <div className="text-sm font-medium">{t("events.series.scopeTitle", { defaultValue: "Cette séance fait partie d'une série" })}</div>
+              <div className="text-sm font-medium">
+                {t("events.series.scopeTitle", {
+                  defaultValue: "Cette séance fait partie d'une série",
+                })}
+              </div>
               <div className="space-y-1.5">
                 {(["single", "future", "all"] as const).map((s) => (
                   <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
@@ -2326,9 +2674,14 @@ function EventDetail() {
                       className="accent-primary"
                     />
                     <span>
-                      {s === "single" && t("events.series.scopeSingle", { defaultValue: "Cette séance uniquement" })}
-                      {s === "future" && t("events.series.scopeFuture", { defaultValue: "Celle-ci et toutes les suivantes" })}
-                      {s === "all" && t("events.series.scopeAll", { defaultValue: "Toute la série" })}
+                      {s === "single" &&
+                        t("events.series.scopeSingle", { defaultValue: "Cette séance uniquement" })}
+                      {s === "future" &&
+                        t("events.series.scopeFuture", {
+                          defaultValue: "Celle-ci et toutes les suivantes",
+                        })}
+                      {s === "all" &&
+                        t("events.series.scopeAll", { defaultValue: "Toute la série" })}
                     </span>
                   </label>
                 ))}
@@ -2338,14 +2691,16 @@ function EventDetail() {
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("events.cancelEventReasonLabel")}</label>
             <div className="flex flex-wrap gap-1.5">
-              {([
-                ["pitchUnavailable", "Terrain impraticable"],
-                ["weather", "Météo"],
-                ["lackOfPlayers", "Manque de joueurs"],
-                ["opponentForfeit", "Adversaire forfait"],
-                ["refereeDecision", "Décision arbitrale"],
-                ["other", "Autre"],
-              ] as const).map(([key, fr]) => (
+              {(
+                [
+                  ["pitchUnavailable", "Terrain impraticable"],
+                  ["weather", "Météo"],
+                  ["lackOfPlayers", "Manque de joueurs"],
+                  ["opponentForfeit", "Adversaire forfait"],
+                  ["refereeDecision", "Décision arbitrale"],
+                  ["other", "Autre"],
+                ] as const
+              ).map(([key, fr]) => (
                 <button
                   key={key}
                   type="button"
@@ -2393,35 +2748,62 @@ function EventDetail() {
       </Dialog>
 
       {/* Resend convocation dialog */}
-      <Dialog open={resendOpen} onOpenChange={(o) => { if (!resendSubmitting) setResendOpen(o); }}>
+      <Dialog
+        open={resendOpen}
+        onOpenChange={(o) => {
+          if (!resendSubmitting) setResendOpen(o);
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{t("events.resend.title", { defaultValue: "Resend call-up" })}</DialogTitle>
+            <DialogTitle>
+              {t("events.resend.title", { defaultValue: "Resend call-up" })}
+            </DialogTitle>
             <DialogDescription>
               {convocChanges.length > 0
-                ? t("events.resend.descChanges", { defaultValue: "{{count}} change(s) detected since the last send. The email will highlight what changed.", count: convocChanges.length })
-                : t("events.resend.descNoChanges", { defaultValue: "No changes detected since the last send. The call-up will still be resent to all players." })}
+                ? t("events.resend.descChanges", {
+                    defaultValue:
+                      "{{count}} change(s) detected since the last send. The email will highlight what changed.",
+                    count: convocChanges.length,
+                  })
+                : t("events.resend.descNoChanges", {
+                    defaultValue:
+                      "No changes detected since the last send. The call-up will still be resent to all players.",
+                  })}
             </DialogDescription>
           </DialogHeader>
           {convocChanges.length > 0 && (
             <div className="rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 p-3 space-y-2 max-h-64 overflow-auto">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-200">{t("events.resend.changesHeader", { defaultValue: "Changes" })}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-200">
+                {t("events.resend.changesHeader", { defaultValue: "Changes" })}
+              </p>
               {convocChanges.map((c) => (
                 <div key={c.field} className="text-sm">
-                  <span className="font-medium text-amber-900 dark:text-amber-200">{c.label} : </span>
+                  <span className="font-medium text-amber-900 dark:text-amber-200">
+                    {c.label} :{" "}
+                  </span>
                   <span className="text-muted-foreground line-through">{c.previous ?? "—"}</span>
                   {" → "}
-                  <span className="font-semibold text-emerald-700 dark:text-emerald-300">{c.current ?? "—"}</span>
-
+                  <span className="font-semibold text-emerald-700 dark:text-emerald-300">
+                    {c.current ?? "—"}
+                  </span>
                 </div>
               ))}
             </div>
           )}
           <p className="text-xs text-muted-foreground">
-            {t("events.resend.recipientsHint", { defaultValue: "Sent to {{count}} player(s) (+ parents). Existing responses are preserved.", count: convocations?.length ?? 0 })}
+            {t("events.resend.recipientsHint", {
+              defaultValue:
+                "Sent to {{count}} player(s) (+ parents). Existing responses are preserved.",
+              count: convocations?.length ?? 0,
+            })}
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setResendOpen(false)} disabled={resendSubmitting}>
+            <Button
+              variant="outline"
+              onClick={() => setResendOpen(false)}
+              disabled={resendSubmitting}
+            >
               {t("common.cancel")}
             </Button>
             <Button onClick={resendConvocations} disabled={resendSubmitting}>
@@ -2433,8 +2815,13 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-
-      <Dialog open={pickerOpen} onOpenChange={(o) => { setPickerOpen(o); if (!o) setPickerStep("select"); }}>
+      <Dialog
+        open={pickerOpen}
+        onOpenChange={(o) => {
+          setPickerOpen(o);
+          if (!o) setPickerStep("select");
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
@@ -2446,7 +2833,8 @@ function EventDetail() {
               {pickerStep === "select"
                 ? t("attendance.selectPlayersHint")
                 : t("attendance.reviewBeforeSendHint", {
-                    defaultValue: "Vérifie les destinataires et les détails — l'envoi est définitif.",
+                    defaultValue:
+                      "Vérifie les destinataires et les détails — l'envoi est définitif.",
                     count: selectedIds.size,
                   })}
             </DialogDescription>
@@ -2494,9 +2882,10 @@ function EventDetail() {
                   <Checkbox
                     checked={
                       selectedIds.size > 0 &&
-                      teamPlayers.every((tp: any) =>
-                        (convocations ?? []).some((c: any) => c.player_id === tp.player_id) ||
-                          selectedIds.has(tp.player_id)
+                      teamPlayers.every(
+                        (tp: any) =>
+                          (convocations ?? []).some((c: any) => c.player_id === tp.player_id) ||
+                          selectedIds.has(tp.player_id),
                       )
                     }
                     onCheckedChange={(v) => {
@@ -2506,8 +2895,8 @@ function EventDetail() {
                             .map((tp: any) => tp.player_id)
                             .filter(
                               (pid: string) =>
-                                !(convocations ?? []).some((c: any) => c.player_id === pid)
-                            )
+                                !(convocations ?? []).some((c: any) => c.player_id === pid),
+                            ),
                         );
                         setSelectedIds(all);
                       } else {
@@ -2523,7 +2912,7 @@ function EventDetail() {
                 {teamPlayers.map((tp: any) => {
                   const p = tp.players;
                   const alreadyConvoked = (convocations ?? []).some(
-                    (c: any) => c.player_id === tp.player_id
+                    (c: any) => c.player_id === tp.player_id,
                   );
                   const checked = alreadyConvoked || selectedIds.has(tp.player_id);
                   const susp = suspensionByPlayer.get(tp.player_id);
@@ -2533,7 +2922,7 @@ function EventDetail() {
                       key={tp.player_id}
                       className={cn(
                         "flex items-center gap-3 rounded-lg p-2 cursor-pointer hover:bg-accent",
-                        alreadyConvoked && "opacity-60 cursor-not-allowed"
+                        alreadyConvoked && "opacity-60 cursor-not-allowed",
                       )}
                     >
                       <Checkbox
@@ -2575,19 +2964,17 @@ function EventDetail() {
                           className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 dark:bg-amber-950 dark:text-amber-300 px-1.5 py-0.5 rounded"
                         >
                           <AlertTriangle className="h-3 w-3" />
-                          {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} · {susp.remaining}
+                          {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} ·{" "}
+                          {susp.remaining}
                         </span>
                       )}
-                      {abs && (
-                        <UnavailableBadge reason={abs.reason as UnavailableReason} />
-                      )}
+                      {abs && <UnavailableBadge reason={abs.reason as UnavailableReason} />}
                       {alreadyConvoked && (
                         <span className="text-[10px] uppercase text-muted-foreground">✓</span>
                       )}
                     </label>
                   );
                 })}
-
               </div>
             </>
           )}
@@ -2614,27 +3001,46 @@ function EventDetail() {
                     if (!s) return null;
                     const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
                     const p = tp?.players;
-                    return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), remaining: s.remaining } : null;
+                    return p
+                      ? {
+                          id: pid,
+                          name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(),
+                          remaining: s.remaining,
+                        }
+                      : null;
                   })
                   .filter(Boolean) as Array<{ id: string; name: string; remaining: number }>;
                 if (suspendedSelected.length === 0) return null;
                 const isOfficial = (event as any)?.is_official === true && event.type === "match";
                 return (
-                  <div className={cn(
-                    "rounded-xl border p-3 text-xs space-y-1",
-                    isOfficial
-                      ? "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
-                      : "border-muted bg-muted/40 text-muted-foreground"
-                  )}>
+                  <div
+                    className={cn(
+                      "rounded-xl border p-3 text-xs space-y-1",
+                      isOfficial
+                        ? "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
+                        : "border-muted bg-muted/40 text-muted-foreground",
+                    )}
+                  >
                     <p className="font-semibold flex items-center gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5" />
                       {isOfficial
-                        ? t("suspensions.warningOfficial", { defaultValue: "Joueurs suspendus dans la sélection (match officiel)" })
-                        : t("suspensions.warningNonOfficial", { defaultValue: "Joueurs suspendus dans la sélection (ce match ne décompte pas leur suspension)" })}
+                        ? t("suspensions.warningOfficial", {
+                            defaultValue: "Joueurs suspendus dans la sélection (match officiel)",
+                          })
+                        : t("suspensions.warningNonOfficial", {
+                            defaultValue:
+                              "Joueurs suspendus dans la sélection (ce match ne décompte pas leur suspension)",
+                          })}
                     </p>
                     <ul className="list-disc pl-5">
                       {suspendedSelected.map((s) => (
-                        <li key={s.id}>{s.name} — {t("suspensions.remaining", { defaultValue: "{{count}} match(s) restant(s)", count: s.remaining })}</li>
+                        <li key={s.id}>
+                          {s.name} —{" "}
+                          {t("suspensions.remaining", {
+                            defaultValue: "{{count}} match(s) restant(s)",
+                            count: s.remaining,
+                          })}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -2647,14 +3053,26 @@ function EventDetail() {
                     if (!a) return null;
                     const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
                     const p = tp?.players;
-                    return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), reason: a.reason as UnavailableReason } : null;
+                    return p
+                      ? {
+                          id: pid,
+                          name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(),
+                          reason: a.reason as UnavailableReason,
+                        }
+                      : null;
                   })
-                  .filter(Boolean) as Array<{ id: string; name: string; reason: UnavailableReason }>;
+                  .filter(Boolean) as Array<{
+                  id: string;
+                  name: string;
+                  reason: UnavailableReason;
+                }>;
                 if (absentSelected.length === 0) return null;
                 return (
                   <div className="rounded-xl border border-sky-300 bg-sky-50 dark:border-sky-800 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 p-3 text-xs space-y-2">
                     <p className="font-semibold">
-                      {t("availability.warningSelected", { defaultValue: "Joueurs signalés indisponibles pour cette date" })}
+                      {t("availability.warningSelected", {
+                        defaultValue: "Joueurs signalés indisponibles pour cette date",
+                      })}
                     </p>
                     <ul className="space-y-1">
                       {absentSelected.map((a) => (
@@ -2669,7 +3087,8 @@ function EventDetail() {
               })()}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                  {t("attendance.recipients", { defaultValue: "Destinataires" })} ({selectedIds.size})
+                  {t("attendance.recipients", { defaultValue: "Destinataires" })} (
+                  {selectedIds.size})
                 </p>
                 <div className="max-h-48 overflow-y-auto rounded-xl border divide-y">
                   {teamPlayers
@@ -2679,7 +3098,10 @@ function EventDetail() {
                       const susp = suspensionByPlayer.get(tp.player_id);
                       const abs = absenceByPlayer.get(tp.player_id);
                       return (
-                        <div key={tp.player_id} className="flex items-center gap-2 px-3 py-2 text-sm">
+                        <div
+                          key={tp.player_id}
+                          className="flex items-center gap-2 px-3 py-2 text-sm"
+                        >
                           <span className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold shrink-0">
                             {(p?.first_name?.[0] ?? "") + (p?.last_name?.[0] ?? "")}
                           </span>
@@ -2709,21 +3131,24 @@ function EventDetail() {
                 <Button variant="outline" onClick={() => setPickerOpen(false)}>
                   {t("common.cancel")}
                 </Button>
-                <Button
-                  onClick={() => setPickerStep("review")}
-                  disabled={selectedIds.size === 0}
-                >
+                <Button onClick={() => setPickerStep("review")} disabled={selectedIds.size === 0}>
                   {t("common.continue", { defaultValue: "Continuer" })} ({selectedIds.size})
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setPickerStep("select")} disabled={sending}>
+                <Button
+                  variant="outline"
+                  onClick={() => setPickerStep("select")}
+                  disabled={sending}
+                >
                   {t("common.back")}
                 </Button>
                 <Button
                   onClick={() => {
-                    const hasSuspended = Array.from(selectedIds).some((pid) => suspensionByPlayer.has(pid));
+                    const hasSuspended = Array.from(selectedIds).some((pid) =>
+                      suspensionByPlayer.has(pid),
+                    );
                     if (hasSuspended) {
                       setConfirmSendSuspendedOpen(true);
                     } else {
@@ -2732,7 +3157,11 @@ function EventDetail() {
                   }}
                   disabled={sending || selectedIds.size === 0}
                 >
-                  {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  {sending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                   {t("attendance.confirmSend", { defaultValue: "Confirmer l'envoi" })}
                 </Button>
               </>
@@ -2743,7 +3172,6 @@ function EventDetail() {
 
       {/* "My response" merged into the unified Convocation card below */}
 
-
       {/* Match result + scorers (matches only, hidden when the event is cancelled) */}
       {event.type === "match" && event.status === "cancelled" && (
         <div className="rounded-2xl border border-red-300/60 bg-red-50/30 p-4 text-sm text-red-700 dark:bg-red-950/20 dark:text-red-300">
@@ -2752,22 +3180,27 @@ function EventDetail() {
           })}
         </div>
       )}
-      {event.type === "match" && event.status !== "cancelled" && (isCoach || new Date(event.ends_at ?? event.starts_at) <= new Date()) && (
-        <MatchResultCard
-          eventId={event.id}
-          teamId={event.team_id}
-          teamName={teams?.[0]?.name ?? null}
-          isHome={event.is_home}
-          opponent={event.opponent}
-          isCoach={isCoach}
-          startsAt={event.starts_at}
-          sport={teams?.[0]?.sport ?? null}
-        />
-      )}
+      {event.type === "match" &&
+        event.status !== "cancelled" &&
+        (isCoach || new Date(event.ends_at ?? event.starts_at) <= new Date()) && (
+          <MatchResultCard
+            eventId={event.id}
+            teamId={event.team_id}
+            teamName={teams?.[0]?.name ?? null}
+            isHome={event.is_home}
+            opponent={event.opponent}
+            isCoach={isCoach}
+            startsAt={event.starts_at}
+            sport={teams?.[0]?.sport ?? null}
+          />
+        )}
 
       {/* === Unified Convocation card === */}
       {showConvocationSection && (
-        <section id="my-response" className="rounded-3xl border-[1.5px] border-border bg-card overflow-hidden scroll-mt-20 shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]">
+        <section
+          id="my-response"
+          className="rounded-3xl border-[1.5px] border-border bg-card overflow-hidden scroll-mt-20 shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]"
+        >
           {(() => {
             const totalP = counts.present + counts.uncertain + counts.absent + counts.pending;
             const respondedP = totalP - counts.pending;
@@ -2779,9 +3212,18 @@ function EventDetail() {
             if (event.convocations_sent) {
               return (
                 <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] text-white">
-                  <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]" aria-hidden="true">
+                  <svg
+                    className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
+                    aria-hidden="true"
+                  >
                     <defs>
-                      <pattern id="presences-diag" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                      <pattern
+                        id="presences-diag"
+                        width="14"
+                        height="14"
+                        patternUnits="userSpaceOnUse"
+                        patternTransform="rotate(45)"
+                      >
                         <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
                       </pattern>
                     </defs>
@@ -2804,12 +3246,16 @@ function EventDetail() {
                           )}
                           {event.responses_locked && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-amber-300/20 ring-1 ring-amber-200/40 px-2 py-0.5 text-[10px] font-semibold text-amber-100">
-                              <Lock className="h-3 w-3" /> {t("attendance.locked", { defaultValue: "Verrouillé" })}
+                              <Lock className="h-3 w-3" />{" "}
+                              {t("attendance.locked", { defaultValue: "Verrouillé" })}
                             </span>
                           )}
                           {convocChanges.length > 0 && (
                             <span className="inline-flex items-center rounded-full bg-amber-300/90 text-amber-950 px-2 py-0.5 text-[10px] font-bold">
-                              {t("events.resend.updatesBadge", { defaultValue: "{{count}} update(s)", count: convocChanges.length })}
+                              {t("events.resend.updatesBadge", {
+                                defaultValue: "{{count}} update(s)",
+                                count: convocChanges.length,
+                              })}
                             </span>
                           )}
                         </div>
@@ -2818,7 +3264,11 @@ function EventDetail() {
                         <div className="flex items-center gap-1 shrink-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/15 hover:text-white">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-white hover:bg-white/15 hover:text-white"
+                              >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -2836,9 +3286,19 @@ function EventDetail() {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={toggleLock}>
                                 {event.responses_locked ? (
-                                  <><Unlock className="h-4 w-4" /> {t("attendance.unlockResponses", { defaultValue: "Unlock responses" })}</>
+                                  <>
+                                    <Unlock className="h-4 w-4" />{" "}
+                                    {t("attendance.unlockResponses", {
+                                      defaultValue: "Unlock responses",
+                                    })}
+                                  </>
                                 ) : (
-                                  <><Lock className="h-4 w-4" /> {t("attendance.lockResponses", { defaultValue: "Lock responses" })}</>
+                                  <>
+                                    <Lock className="h-4 w-4" />{" "}
+                                    {t("attendance.lockResponses", {
+                                      defaultValue: "Lock responses",
+                                    })}
+                                  </>
                                 )}
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -2851,16 +3311,31 @@ function EventDetail() {
                                     comment: c.comment ?? "",
                                   }));
                                   const csv = toCsv(rows, [
-                                    { key: "last_name", header: t("players.lastName", { defaultValue: "Last name" }) },
-                                    { key: "first_name", header: t("players.firstName", { defaultValue: "First name" }) },
+                                    {
+                                      key: "last_name",
+                                      header: t("players.lastName", { defaultValue: "Last name" }),
+                                    },
+                                    {
+                                      key: "first_name",
+                                      header: t("players.firstName", {
+                                        defaultValue: "First name",
+                                      }),
+                                    },
                                     { key: "jersey_number", header: "#" },
-                                    { key: "status", header: t("attendance.status", { defaultValue: "Status" }) },
-                                    { key: "comment", header: t("common.comment", { defaultValue: "Comment" }) },
+                                    {
+                                      key: "status",
+                                      header: t("attendance.status", { defaultValue: "Status" }),
+                                    },
+                                    {
+                                      key: "comment",
+                                      header: t("common.comment", { defaultValue: "Comment" }),
+                                    },
                                   ]);
                                   downloadCsv(`${event.title}-attendance`, csv);
                                 }}
                               >
-                                <Download className="h-4 w-4" /> {t("common.exportCsv", { defaultValue: "Export CSV" })}
+                                <Download className="h-4 w-4" />{" "}
+                                {t("common.exportCsv", { defaultValue: "Export CSV" })}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -2872,7 +3347,9 @@ function EventDetail() {
                     <div className="flex items-end justify-between gap-3 mb-2">
                       <div className="leading-none">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">{rate}</span>
+                          <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">
+                            {rate}
+                          </span>
                           <span className="text-lg font-bold text-white/80">%</span>
                         </div>
                         <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
@@ -2881,12 +3358,19 @@ function EventDetail() {
                       </div>
                       <div className="text-right leading-tight">
                         <p className="text-xs font-bold tabular-nums">
-                          {respondedP}<span className="text-white/65 font-medium">/{totalP}</span>{" "}
-                          <span className="text-white/85 font-semibold">{t("attendance.responded", { defaultValue: "réponses" })}</span>
+                          {respondedP}
+                          <span className="text-white/65 font-medium">/{totalP}</span>{" "}
+                          <span className="text-white/85 font-semibold">
+                            {t("attendance.responded", { defaultValue: "réponses" })}
+                          </span>
                         </p>
                         {counts.pending > 0 && (
                           <p className="text-[10px] text-white/70 mt-0.5">
-                            · {t("attendance.pendingShort", { defaultValue: "{{count}} en attente", count: counts.pending })}
+                            ·{" "}
+                            {t("attendance.pendingShort", {
+                              defaultValue: "{{count}} en attente",
+                              count: counts.pending,
+                            })}
                           </p>
                         )}
                       </div>
@@ -2895,28 +3379,62 @@ function EventDetail() {
                     {/* Progress bar */}
                     <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15 flex">
                       {counts.present > 0 && (
-                        <div style={{ width: `${pct(counts.present)}%` }} className="bg-gradient-to-r from-emerald-300 to-emerald-200 transition-all" />
+                        <div
+                          style={{ width: `${pct(counts.present)}%` }}
+                          className="bg-gradient-to-r from-emerald-300 to-emerald-200 transition-all"
+                        />
                       )}
                       {counts.uncertain > 0 && (
-                        <div style={{ width: `${pct(counts.uncertain)}%` }} className="bg-gradient-to-r from-amber-300 to-amber-200 transition-all" />
+                        <div
+                          style={{ width: `${pct(counts.uncertain)}%` }}
+                          className="bg-gradient-to-r from-amber-300 to-amber-200 transition-all"
+                        />
                       )}
                       {counts.absent > 0 && (
-                        <div style={{ width: `${pct(counts.absent)}%` }} className="bg-gradient-to-r from-rose-300 to-rose-200 transition-all" />
+                        <div
+                          style={{ width: `${pct(counts.absent)}%` }}
+                          className="bg-gradient-to-r from-rose-300 to-rose-200 transition-all"
+                        />
                       )}
                     </div>
 
                     {/* 4 stat blocks */}
                     <div className="grid grid-cols-4 gap-1.5 mt-2.5">
                       {[
-                        { key: "present", val: counts.present, label: t("attendance.present"), tone: "bg-emerald-300" },
-                        { key: "uncertain", val: counts.uncertain, label: t("attendance.uncertain"), tone: "bg-amber-300" },
-                        { key: "absent", val: counts.absent, label: t("attendance.absent"), tone: "bg-rose-300" },
-                        { key: "pending", val: counts.pending, label: t("attendance.pending"), tone: "bg-white/60" },
+                        {
+                          key: "present",
+                          val: counts.present,
+                          label: t("attendance.present"),
+                          tone: "bg-emerald-300",
+                        },
+                        {
+                          key: "uncertain",
+                          val: counts.uncertain,
+                          label: t("attendance.uncertain"),
+                          tone: "bg-amber-300",
+                        },
+                        {
+                          key: "absent",
+                          val: counts.absent,
+                          label: t("attendance.absent"),
+                          tone: "bg-rose-300",
+                        },
+                        {
+                          key: "pending",
+                          val: counts.pending,
+                          label: t("attendance.pending"),
+                          tone: "bg-white/60",
+                        },
                       ].map((b) => (
-                        <div key={b.key} className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center">
+                        <div
+                          key={b.key}
+                          className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center"
+                        >
                           <div className="flex items-center justify-center gap-1">
                             <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
-                            <span className="text-sm font-extrabold tabular-nums leading-none">{b.val}</span>
+                            <span className="text-sm font-extrabold tabular-nums leading-none">
+                              {b.val}
+                            </span>
                           </div>
                           <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
                             {b.label}
@@ -2925,7 +3443,6 @@ function EventDetail() {
                       ))}
                     </div>
                   </div>
-
                 </div>
               );
             }
@@ -2955,17 +3472,22 @@ function EventDetail() {
                   "w-full h-11 rounded-2xl",
                   convocChanges.length > 0
                     ? "bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)]"
-                    : "border-[1.5px]"
+                    : "border-[1.5px]",
                 )}
               >
                 <Send className="h-4 w-4" />
                 {convocChanges.length > 0
-                  ? t("events.resend.buttonWithChanges", { defaultValue: "Resend call-up ({{count}} update(s))", count: convocChanges.length })
+                  ? t("events.resend.buttonWithChanges", {
+                      defaultValue: "Resend call-up ({{count}} update(s))",
+                      count: convocChanges.length,
+                    })
                   : t("events.resend.button", { defaultValue: "Resend call-up" })}
               </Button>
               {convocChanges.length > 0 && (
                 <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
-                  {t("events.resend.changesDetected", { defaultValue: "Changes were detected since the last send." })}
+                  {t("events.resend.changesDetected", {
+                    defaultValue: "Changes were detected since the last send.",
+                  })}
                 </p>
               )}
             </div>
@@ -2988,14 +3510,18 @@ function EventDetail() {
           {visibleMyConvocs.length > 0 && (
             <div className="px-4 py-4 space-y-4 border-b border-border/70">
               {visibleMyConvocs.map((c: any) => {
-                const playerLabel = `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim();
+                const playerLabel =
+                  `${c.players?.first_name ?? ""} ${c.players?.last_name ?? ""}`.trim();
                 return (
                   <div key={c.id}>
                     <p className="text-sm font-semibold mb-2.5 text-foreground">
                       {visibleMyConvocs.length > 1 ? (
                         <>
                           {t("attendance.respondPrompt")}
-                          <span className="text-muted-foreground font-normal"> · {playerLabel}</span>
+                          <span className="text-muted-foreground font-normal">
+                            {" "}
+                            · {playerLabel}
+                          </span>
                         </>
                       ) : (
                         t("attendance.respondPrompt")
@@ -3006,13 +3532,15 @@ function EventDetail() {
                         {event.responses_locked
                           ? t("attendance.responsesLocked")
                           : t("attendance.responsesClosedPast", {
-                              defaultValue: "Les réponses ne sont plus modifiables pour cet événement passé.",
+                              defaultValue:
+                                "Les réponses ne sont plus modifiables pour cet événement passé.",
                             })}
                       </p>
                     ) : (
                       <div className="grid grid-cols-3 gap-2">
                         {(["present", "uncertain", "absent"] as AttendanceStatus[]).map((s) => {
-                          const Icon = s === "present" ? CheckCircle2 : s === "absent" ? XCircle : HelpCircle;
+                          const Icon =
+                            s === "present" ? CheckCircle2 : s === "absent" ? XCircle : HelpCircle;
                           const active = c.status === s;
                           const inactiveTint =
                             s === "present"
@@ -3043,7 +3571,9 @@ function EventDetail() {
                                 )}
                                 strokeWidth={active ? 2.5 : 2}
                               />
-                              <span className="text-[13px] font-semibold tracking-tight">{t(`attendance.${s}`)}</span>
+                              <span className="text-[13px] font-semibold tracking-tight">
+                                {t(`attendance.${s}`)}
+                              </span>
                             </button>
                           );
                         })}
@@ -3064,11 +3594,12 @@ function EventDetail() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-xs font-bold text-amber-900 dark:text-amber-200 truncate">
-
                     {t("attendance.pendingCount", { count: counts.pending })}
                   </p>
                   <p className="text-[11px] text-amber-700/80 truncate">
-                    {t("attendance.lastSendHint", { defaultValue: "Dernier envoi de la convocation" })}
+                    {t("attendance.lastSendHint", {
+                      defaultValue: "Dernier envoi de la convocation",
+                    })}
                   </p>
                 </div>
               </div>
@@ -3090,141 +3621,170 @@ function EventDetail() {
                 <div className="p-6 text-center text-sm text-muted-foreground">
                   {t("attendance.noConvokedPlayers")}
                 </div>
-              ) : (() => {
-                const truncate = sortedConvocations.length > 4 && !presencesExpanded;
-                const shown = truncate ? sortedConvocations.slice(0, 4) : sortedConvocations;
-                return (
-                  <>
-                    <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                        {t("attendance.convokedPlayers", { defaultValue: "Joueurs convoqués" })}
-                      </p>
-                    </div>
-                    <ul className="px-2 pb-2">
-                      {shown.map((c: any) => {
-                        const first = c.players?.first_name ?? "";
-                        const last = c.players?.last_name ?? "";
-                        const initials = initialsFrom(first, last);
-                        const avatarCls = avatarGradient(`${first}-${last}-${c.players?.id ?? ""}`);
-                        const isPending = c.status === "pending";
-                        const position = c.players?.preferred_position;
-                        const jersey = c.players?.jersey_number;
-                        return (
-                          <li
-                            key={c.id}
-                            className="group rounded-2xl px-2 py-1.5 hover:bg-muted/40 transition-colors"
-                          >
-                            <div className="flex flex-row items-center justify-between gap-2">
-                              <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                                <div className="relative shrink-0">
-                                  <div className={cn("h-9 w-9 rounded-full overflow-hidden flex items-center justify-center text-[12px] font-bold", avatarCls)}>
-                                    {c.players?.photo_url ? (
-                                      <img src={c.players.photo_url} alt="" className="h-full w-full object-cover" />
-                                    ) : (
-                                      <span>{initials}</span>
-                                    )}
-                                  </div>
-                                  {isPending && (
-                                    <span
-                                      className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
-                                      aria-label={t("attendance.pending")}
-                                    />
-                                  )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-[13px] font-bold text-foreground truncate leading-tight">
-                                    {first} {last}
-                                  </p>
-                                  {(position || jersey) && (
-                                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate uppercase tracking-wide font-semibold">
-                                      {[position, jersey ? `#${jersey}` : null].filter(Boolean).join(" · ")}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-0.5 shrink-0">
-                                {isCoach ? (
-                                  <>
-                                    <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
-                                      {ATTENDANCE_ACTIONS.filter(a => a.status !== "pending").map(({ status, Icon, className }) => (
-                                        <Button
-                                          key={status}
-                                          type="button"
-                                          size="icon"
-                                          variant="ghost"
-                                          className={cn(
-                                            "h-7 w-7 rounded-full",
-                                            c.status === status
-                                              ? status === "present" ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
-                                                : status === "absent" ? "bg-absent text-white hover:bg-absent hover:text-white"
-                                                : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
-                                              : className,
-                                          )}
-                                          onClick={() => coachChangeStatus(c, status)}
-                                          title={t(`attendance.${status}`)}
-                                          aria-label={t(`attendance.${status}`)}
-                                        >
-                                          <Icon className="h-3.5 w-3.5" />
-                                        </Button>
-                                      ))}
+              ) : (
+                (() => {
+                  const truncate = sortedConvocations.length > 4 && !presencesExpanded;
+                  const shown = truncate ? sortedConvocations.slice(0, 4) : sortedConvocations;
+                  return (
+                    <>
+                      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                          {t("attendance.convokedPlayers", { defaultValue: "Joueurs convoqués" })}
+                        </p>
+                      </div>
+                      <ul className="px-2 pb-2">
+                        {shown.map((c: any) => {
+                          const first = c.players?.first_name ?? "";
+                          const last = c.players?.last_name ?? "";
+                          const initials = initialsFrom(first, last);
+                          const avatarCls = avatarGradient(
+                            `${first}-${last}-${c.players?.id ?? ""}`,
+                          );
+                          const isPending = c.status === "pending";
+                          const position = c.players?.preferred_position;
+                          const jersey = c.players?.jersey_number;
+                          return (
+                            <li
+                              key={c.id}
+                              className="group rounded-2xl px-2 py-1.5 hover:bg-muted/40 transition-colors"
+                            >
+                              <div className="flex flex-row items-center justify-between gap-2">
+                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                  <div className="relative shrink-0">
+                                    <div
+                                      className={cn(
+                                        "h-9 w-9 rounded-full overflow-hidden flex items-center justify-center text-[12px] font-bold",
+                                        avatarCls,
+                                      )}
+                                    >
+                                      {c.players?.photo_url ? (
+                                        <img
+                                          src={c.players.photo_url}
+                                          alt=""
+                                          className="h-full w-full object-cover"
+                                        />
+                                      ) : (
+                                        <span>{initials}</span>
+                                      )}
                                     </div>
                                     {isPending && (
+                                      <span
+                                        className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
+                                        aria-label={t("attendance.pending")}
+                                      />
+                                    )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-[13px] font-bold text-foreground truncate leading-tight">
+                                      {first} {last}
+                                    </p>
+                                    {(position || jersey) && (
+                                      <p className="text-[10px] text-muted-foreground mt-0.5 truncate uppercase tracking-wide font-semibold">
+                                        {[position, jersey ? `#${jersey}` : null]
+                                          .filter(Boolean)
+                                          .join(" · ")}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-0.5 shrink-0">
+                                  {isCoach ? (
+                                    <>
+                                      <div className="flex items-center gap-0.5 rounded-full border bg-background/80 p-0.5">
+                                        {ATTENDANCE_ACTIONS.filter(
+                                          (a) => a.status !== "pending",
+                                        ).map(({ status, Icon, className }) => (
+                                          <Button
+                                            key={status}
+                                            type="button"
+                                            size="icon"
+                                            variant="ghost"
+                                            className={cn(
+                                              "h-7 w-7 rounded-full",
+                                              c.status === status
+                                                ? status === "present"
+                                                  ? "bg-emerald-500 text-white hover:bg-emerald-600 hover:text-white"
+                                                  : status === "absent"
+                                                    ? "bg-absent text-white hover:bg-absent hover:text-white"
+                                                    : "bg-uncertain text-uncertain-foreground hover:bg-uncertain hover:text-uncertain-foreground"
+                                                : className,
+                                            )}
+                                            onClick={() => coachChangeStatus(c, status)}
+                                            title={t(`attendance.${status}`)}
+                                            aria-label={t(`attendance.${status}`)}
+                                          >
+                                            <Icon className="h-3.5 w-3.5" />
+                                          </Button>
+                                        ))}
+                                      </div>
+                                      {isPending && (
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          className="h-7 w-7 text-amber-600 hover:bg-amber-50"
+                                          onClick={() => remind(c.id)}
+                                          title={t("attendance.remind")}
+                                          aria-label={t("attendance.remind")}
+                                        >
+                                          <Bell className="h-3.5 w-3.5" />
+                                        </Button>
+                                      )}
                                       <Button
                                         size="icon"
                                         variant="ghost"
-                                        className="h-7 w-7 text-amber-600 hover:bg-amber-50"
-                                        onClick={() => remind(c.id)}
-                                        title={t("attendance.remind")}
-                                        aria-label={t("attendance.remind")}
+                                        className="h-7 w-7 text-muted-foreground/70"
+                                        onClick={() => setDetailConvocId(c.id)}
+                                        title={t("attendance.details")}
                                       >
-                                        <Bell className="h-3.5 w-3.5" />
+                                        <Info className="h-3.5 w-3.5" />
                                       </Button>
-                                    )}
-                                    <Button
-                                      size="icon"
-                                      variant="ghost"
-                                      className="h-7 w-7 text-muted-foreground/70"
-                                      onClick={() => setDetailConvocId(c.id)}
-                                      title={t("attendance.details")}
-                                    >
-                                      <Info className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </>
-                                ) : (
-                                  <AttendancePill status={c.status} />
-                                )}
+                                    </>
+                                  ) : (
+                                    <AttendancePill status={c.status} />
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                            {c.comment && (isCoach || c.players?.user_id === user?.id) && (
-                              <p className="text-[11px] text-muted-foreground italic truncate mt-1 pl-[44px]">"{c.comment}"</p>
+                              {c.comment && (isCoach || c.players?.user_id === user?.id) && (
+                                <p className="text-[11px] text-muted-foreground italic truncate mt-1 pl-[44px]">
+                                  "{c.comment}"
+                                </p>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+
+                      {/* D. Show-more footer */}
+                      {sortedConvocations.length > 4 && (
+                        <button
+                          type="button"
+                          onClick={() => setPresencesExpanded((v) => !v)}
+                          className="w-full px-4 py-3 border-t border-border/70 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
+                        >
+                          {presencesExpanded
+                            ? t("attendance.showLess", { defaultValue: "Réduire la liste" })
+                            : t("attendance.showAll", {
+                                defaultValue: "Voir les {{count}} joueurs",
+                                count: sortedConvocations.length,
+                              })}
+                          <span
+                            className={cn(
+                              "transition-transform",
+                              presencesExpanded ? "rotate-180" : "",
                             )}
-                          </li>
-
-                        );
-                      })}
-                    </ul>
-
-                    {/* D. Show-more footer */}
-                    {sortedConvocations.length > 4 && (
-                      <button
-                        type="button"
-                        onClick={() => setPresencesExpanded((v) => !v)}
-                        className="w-full px-4 py-3 border-t border-border/70 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
-                      >
-                        {presencesExpanded
-                          ? t("attendance.showLess", { defaultValue: "Réduire la liste" })
-                          : t("attendance.showAll", { defaultValue: "Voir les {{count}} joueurs", count: sortedConvocations.length })}
-                        <span className={cn("transition-transform", presencesExpanded ? "rotate-180" : "")}>↓</span>
-                      </button>
-                    )}
-                  </>
-                );
-              })()}
+                          >
+                            ↓
+                          </span>
+                        </button>
+                      )}
+                    </>
+                  );
+                })()
+              )}
             </>
           )}
         </section>
       )}
-
 
       <ConvocationDetailDialog
         open={!!detailConvocId}
@@ -3250,7 +3810,9 @@ function EventDetail() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("attendance.cancelConvocation")}</AlertDialogTitle>
-            <AlertDialogDescription>{t("attendance.confirmCancelConvocation")}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t("attendance.confirmCancelConvocation")}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
@@ -3268,14 +3830,22 @@ function EventDetail() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t("suspensions.confirmSendTitle", { defaultValue: "Convoquer des joueurs suspendus ?" })}
+              {t("suspensions.confirmSendTitle", {
+                defaultValue: "Convoquer des joueurs suspendus ?",
+              })}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2">
                 <p>
                   {(event as any)?.is_official === true && event?.type === "match"
-                    ? t("suspensions.confirmSendOfficial", { defaultValue: "Ce match est officiel. Convoquer un joueur suspendu peut être contraire au règlement." })
-                    : t("suspensions.confirmSendNonOfficial", { defaultValue: "Certains joueurs sélectionnés ont une suspension active. Ce match ne décompte pas leur suspension." })}
+                    ? t("suspensions.confirmSendOfficial", {
+                        defaultValue:
+                          "Ce match est officiel. Convoquer un joueur suspendu peut être contraire au règlement.",
+                      })
+                    : t("suspensions.confirmSendNonOfficial", {
+                        defaultValue:
+                          "Certains joueurs sélectionnés ont une suspension active. Ce match ne décompte pas leur suspension.",
+                      })}
                 </p>
                 <ul className="list-disc pl-5 text-sm">
                   {Array.from(selectedIds)
@@ -3284,12 +3854,22 @@ function EventDetail() {
                       if (!s) return null;
                       const tp = (teamPlayers ?? []).find((x: any) => x.player_id === pid);
                       const p = tp?.players;
-                      return p ? { id: pid, name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(), remaining: s.remaining } : null;
+                      return p
+                        ? {
+                            id: pid,
+                            name: `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim(),
+                            remaining: s.remaining,
+                          }
+                        : null;
                     })
                     .filter(Boolean)
                     .map((s: any) => (
                       <li key={s.id}>
-                        {s.name} — {t("suspensions.remaining", { defaultValue: "{{count}} match(s) restant(s)", count: s.remaining })}
+                        {s.name} —{" "}
+                        {t("suspensions.remaining", {
+                          defaultValue: "{{count}} match(s) restant(s)",
+                          count: s.remaining,
+                        })}
                       </li>
                     ))}
                 </ul>
@@ -3310,15 +3890,21 @@ function EventDetail() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={!!coachOverrideTarget} onOpenChange={(o) => !o && setCoachOverrideTarget(null)}>
+      <AlertDialog
+        open={!!coachOverrideTarget}
+        onOpenChange={(o) => !o && setCoachOverrideTarget(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("attendance.forceResponseTitle", { defaultValue: "Force response?" })}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t("attendance.forceResponseTitle", { defaultValue: "Force response?" })}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {coachOverrideTarget ? (
                 <>
                   {t("attendance.forceResponseDesc", {
-                    defaultValue: "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
+                    defaultValue:
+                      "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
                     name: coachOverrideTarget.playerName,
                     current: t(`attendance.${coachOverrideTarget.currentStatus}`),
                     next: t(`attendance.${coachOverrideTarget.status}`),
@@ -3357,38 +3943,37 @@ function EventDetail() {
             <DialogTitle>
               {respondTarget ? t(`attendance.${respondTarget.status}`) : ""}
             </DialogTitle>
-            <DialogDescription>
-              {t("attendance.reasonOptional")}
-            </DialogDescription>
+            <DialogDescription>{t("attendance.reasonOptional")}</DialogDescription>
           </DialogHeader>
-          {respondTarget && (() => {
-            const presetsKey =
-              respondTarget.status === "absent"
-                ? "attendance.reasonsAbsent"
-                : "attendance.reasonsUncertain";
-            const presets = (t(presetsKey, { returnObjects: true }) as unknown);
-            const list = Array.isArray(presets) ? (presets as string[]) : [];
-            if (list.length === 0) return null;
-            return (
-              <div className="flex flex-wrap gap-1.5 -mb-1">
-                {list.map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => setRespondReason(p)}
-                    className={cn(
-                      "text-xs rounded-full border px-2.5 py-1 transition-colors",
-                      respondReason === p
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/40",
-                    )}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            );
-          })()}
+          {respondTarget &&
+            (() => {
+              const presetsKey =
+                respondTarget.status === "absent"
+                  ? "attendance.reasonsAbsent"
+                  : "attendance.reasonsUncertain";
+              const presets = t(presetsKey, { returnObjects: true }) as unknown;
+              const list = Array.isArray(presets) ? (presets as string[]) : [];
+              if (list.length === 0) return null;
+              return (
+                <div className="flex flex-wrap gap-1.5 -mb-1">
+                  {list.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setRespondReason(p)}
+                      className={cn(
+                        "text-xs rounded-full border px-2.5 py-1 transition-colors",
+                        respondReason === p
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/40",
+                      )}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
           <Textarea
             value={respondReason}
             onChange={(e) => setRespondReason(e.target.value)}
@@ -3417,11 +4002,13 @@ function EventDetail() {
       {isCoach && eventSupportsCarpool(event.type) && event.status !== "cancelled" && (
         <div className="rounded-2xl border bg-card p-4 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-sm font-semibold">{t("carpool.toggleTitle" as any) || "Covoiturage"}</p>
+            <p className="text-sm font-semibold">
+              {t("carpool.toggleTitle" as any) || "Covoiturage"}
+            </p>
             <p className="text-xs text-muted-foreground">
               {event.carpool_enabled
-                ? (t("carpool.toggleOn" as any) || "Activé pour cet événement")
-                : (t("carpool.toggleOff" as any) || "Désactivé pour cet événement")}
+                ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
+                : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
             </p>
           </div>
           <Button
@@ -3432,24 +4019,31 @@ function EventDetail() {
                 .from("events")
                 .update({ carpool_enabled: !event.carpool_enabled })
                 .eq("id", eventId);
-              if (error) { toast.error(error.message); return; }
+              if (error) {
+                toast.error(error.message);
+                return;
+              }
               qc.invalidateQueries({ queryKey: ["event", eventId] });
             }}
           >
-            {event.carpool_enabled ? (t("carpool.disable" as any) || "Désactiver") : (t("carpool.enable" as any) || "Activer")}
+            {event.carpool_enabled
+              ? t("carpool.disable" as any) || "Désactiver"
+              : t("carpool.enable" as any) || "Activer"}
           </Button>
         </div>
       )}
 
-      {eventSupportsCarpool(event.type) && event.carpool_enabled && event.status !== "cancelled" && (
-        <CarpoolSection
-          eventId={eventId}
-          teamId={event.team_id}
-          isCoach={isCoach}
-          convocations={(convocations ?? []) as any}
-          childrenLinks={(childrenLinks ?? []) as string[]}
-        />
-      )}
+      {eventSupportsCarpool(event.type) &&
+        event.carpool_enabled &&
+        event.status !== "cancelled" && (
+          <CarpoolSection
+            eventId={eventId}
+            teamId={event.team_id}
+            isCoach={isCoach}
+            convocations={(convocations ?? []) as any}
+            childrenLinks={(childrenLinks ?? []) as string[]}
+          />
+        )}
 
       <EventChat eventId={eventId} />
 
@@ -3477,7 +4071,17 @@ function Stat({ label, value, cls }: { label: string; value: number; cls: string
   );
 }
 
-function StatChip({ dotCls, label, value, muted }: { dotCls: string; label: string; value: number; muted?: boolean }) {
+function StatChip({
+  dotCls,
+  label,
+  value,
+  muted,
+}: {
+  dotCls: string;
+  label: string;
+  value: number;
+  muted?: boolean;
+}) {
   return (
     <span
       className={cn(

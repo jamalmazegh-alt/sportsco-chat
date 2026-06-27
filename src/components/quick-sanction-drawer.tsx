@@ -67,9 +67,7 @@ export function QuickSanctionDrawer({
   const [teamId, setTeamId] = useState<string>(initialTeamId ?? "");
   const [reason, setReason] = useState<Reason>("red_card");
   const [matches, setMatches] = useState(1);
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().slice(0, 10),
-  );
+  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
@@ -127,14 +125,15 @@ export function QuickSanctionDrawer({
     if (teamsForPlayer.length === 1) setTeamId(teamsForPlayer[0].team_id);
   }, [playerId, roster]);
 
-  const playerTeams = useMemo(
-    () => roster.filter((r) => r.id === playerId),
-    [roster, playerId],
-  );
+  const playerTeams = useMemo(() => roster.filter((r) => r.id === playerId), [roster, playerId]);
 
   async function onSubmit() {
     if (!playerId || !teamId) {
-      toast.error(t("discipline.errors.missingSelection", { defaultValue: "Sélectionnez un joueur et une équipe." }));
+      toast.error(
+        t("discipline.errors.missingSelection", {
+          defaultValue: "Sélectionnez un joueur et une équipe.",
+        }),
+      );
       return;
     }
     setBusy(true);
@@ -183,10 +182,13 @@ export function QuickSanctionDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{t("discipline.createSanction", { defaultValue: "Créer une sanction" })}</SheetTitle>
+          <SheetTitle>
+            {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
+          </SheetTitle>
           <SheetDescription>
             {t("discipline.drawerHint", {
-              defaultValue: "Renseigne le joueur et la sanction. La logique métier existante prend le relais.",
+              defaultValue:
+                "Renseigne le joueur et la sanction. La logique métier existante prend le relais.",
             })}
           </SheetDescription>
         </SheetHeader>
@@ -277,15 +279,10 @@ export function QuickSanctionDrawer({
                   if (!matches || matches < 1) setMatches(1);
                 }}
               />
-
             </div>
             <div className="space-y-1.5">
               <Label>{t("suspension.startDate")}</Label>
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
           </div>
 

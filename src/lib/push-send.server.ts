@@ -84,7 +84,9 @@ function exactArrayBuffer(bytes: Uint8Array): ArrayBuffer {
 
 function buildP256Pkcs8PrivateKey(privBytes: Uint8Array, pubBytes: Uint8Array): Uint8Array {
   const ecPublicKeyOid = new Uint8Array([0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01]);
-  const prime256v1Oid = new Uint8Array([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
+  const prime256v1Oid = new Uint8Array([
+    0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07,
+  ]);
   const algorithmIdentifier = derSeq(ecPublicKeyOid, prime256v1Oid);
   const ecPrivateKey = derSeq(
     der(0x02, new Uint8Array([0x01])),
@@ -96,7 +98,9 @@ function buildP256Pkcs8PrivateKey(privBytes: Uint8Array, pubBytes: Uint8Array): 
 
 function buildP256SpkiPublicKey(pubBytes: Uint8Array): Uint8Array {
   const ecPublicKeyOid = new Uint8Array([0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01]);
-  const prime256v1Oid = new Uint8Array([0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07]);
+  const prime256v1Oid = new Uint8Array([
+    0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07,
+  ]);
   return derSeq(
     derSeq(ecPublicKeyOid, prime256v1Oid),
     der(0x03, concatBytes(new Uint8Array([0x00]), pubBytes)),
@@ -138,7 +142,6 @@ async function loadVapidKey(): Promise<{ priv: CryptoKey; pubB64u: string }> {
   cachedVapidKey = { priv, pubB64u: pubRaw };
   return cachedVapidKey;
 }
-
 
 function getVapidSubject(): string {
   const fallback = "mailto:contact@clubero.app";
@@ -390,9 +393,13 @@ export async function sendPushToUser(
         console.warn("[push] non-2xx status", status, "endpoint:", s.endpoint);
       }
     } catch (e) {
-      console.warn("[push v3-jwk] send threw", (e as Error).message, "stack:", (e as Error).stack?.slice(0, 200));
+      console.warn(
+        "[push v3-jwk] send threw",
+        (e as Error).message,
+        "stack:",
+        (e as Error).stack?.slice(0, 200),
+      );
     }
-
   }
 
   if (toPrune.length) {

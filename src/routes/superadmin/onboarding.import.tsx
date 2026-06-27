@@ -6,7 +6,16 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Upload, ArrowLeft, FileSpreadsheet, Sparkles, Download, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  Upload,
+  ArrowLeft,
+  FileSpreadsheet,
+  Sparkles,
+  Download,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import {
   listClubsForImport,
   getClubImportStats,
@@ -46,47 +55,94 @@ function cleanSheetRows(rows: Array<Record<string, unknown>>) {
       }
       return out;
     })
-    .filter((row) => Object.values(row).some((value) => value != null && String(value).trim() !== ""));
+    .filter((row) =>
+      Object.values(row).some((value) => value != null && String(value).trim() !== ""),
+    );
 }
 
-function detectTemplateType(headers: string[], selectedType: ImportType): { type: ImportType; ratio: number } {
-  const matches = IMPORT_TYPES
-    .map((candidate) => ({ type: candidate, ratio: templateMatchRatio(headers, candidate) }))
-    .sort((a, b) => b.ratio - a.ratio);
-  const selected = matches.find((match) => match.type === selectedType) ?? { type: selectedType, ratio: 0 };
+function detectTemplateType(
+  headers: string[],
+  selectedType: ImportType,
+): { type: ImportType; ratio: number } {
+  const matches = IMPORT_TYPES.map((candidate) => ({
+    type: candidate,
+    ratio: templateMatchRatio(headers, candidate),
+  })).sort((a, b) => b.ratio - a.ratio);
+  const selected = matches.find((match) => match.type === selectedType) ?? {
+    type: selectedType,
+    ratio: 0,
+  };
   return selected.ratio >= 0.8 ? selected : matches[0];
 }
 
 const FIELD_DOCS: Record<string, { desc: string; example: string; options?: string }> = {
   equipe: { desc: "Nom de l'équipe. Sera créée si elle n'existe pas.", example: "U13 Masculin A" },
-  sport: { desc: "Sport pratiqué par l'équipe.", example: "Football", options: "Football, Basketball, Handball, Volleyball, Rugby, Hockey, Tennis, etc." },
-  categorie: { desc: "Catégorie d'âge.", example: "U13", options: "U7, U9, U11, U13, U15, U17, U19, Senior, Vétéran" },
+  sport: {
+    desc: "Sport pratiqué par l'équipe.",
+    example: "Football",
+    options: "Football, Basketball, Handball, Volleyball, Rugby, Hockey, Tennis, etc.",
+  },
+  categorie: {
+    desc: "Catégorie d'âge.",
+    example: "U13",
+    options: "U7, U9, U11, U13, U15, U17, U19, Senior, Vétéran",
+  },
   genre: { desc: "Genre de l'équipe.", example: "Masculin", options: "Masculin, Féminin, Mixte" },
-  saison: { desc: "Saison sportive (format AAAA-AAAA). Saison en cours si vide.", example: "2025-2026" },
+  saison: {
+    desc: "Saison sportive (format AAAA-AAAA). Saison en cours si vide.",
+    example: "2025-2026",
+  },
   prenom_joueur: { desc: "Prénom du joueur.", example: "Jean" },
   nom_joueur: { desc: "Nom de famille du joueur.", example: "Dupont" },
-  date_naissance: { desc: "Date de naissance. Formats acceptés : YYYY-MM-DD ou JJ/MM/AAAA.", example: "2012-05-14" },
+  date_naissance: {
+    desc: "Date de naissance. Formats acceptés : YYYY-MM-DD ou JJ/MM/AAAA.",
+    example: "2012-05-14",
+  },
   numero_maillot: { desc: "Numéro de maillot (nombre entier). Optionnel.", example: "10" },
   numero_licence: { desc: "Numéro de licence fédérale. Optionnel.", example: "123456789" },
   poste: { desc: "Poste préféré du joueur. Texte libre.", example: "Attaquant" },
-  telephone_joueur: { desc: "Téléphone du joueur (mobile). Optionnel.", example: "+33 6 12 34 56 78" },
-  email_contact: { desc: "Email de contact principal du joueur. Une invitation joueur est envoyée si l'option est activée.", example: "joueur@example.com" },
+  telephone_joueur: {
+    desc: "Téléphone du joueur (mobile). Optionnel.",
+    example: "+33 6 12 34 56 78",
+  },
+  email_contact: {
+    desc: "Email de contact principal du joueur. Une invitation joueur est envoyée si l'option est activée.",
+    example: "joueur@example.com",
+  },
   prenom_parent_1: { desc: "Prénom du parent 1.", example: "Marie" },
   nom_parent_1: { desc: "Nom du parent 1.", example: "Dupont" },
-  email_parent_1: { desc: "Email du parent 1. Une invitation sera envoyée si activée.", example: "marie.dupont@example.com" },
+  email_parent_1: {
+    desc: "Email du parent 1. Une invitation sera envoyée si activée.",
+    example: "marie.dupont@example.com",
+  },
   telephone_parent_1: { desc: "Téléphone du parent 1.", example: "+33 6 12 34 56 78" },
   lien_parent_1: { desc: "Lien de parenté.", example: "Mère", options: "Père, Mère, Tuteur" },
   prenom_parent_2: { desc: "Prénom du parent 2. Optionnel.", example: "Paul" },
   nom_parent_2: { desc: "Nom du parent 2. Optionnel.", example: "Dupont" },
   email_parent_2: { desc: "Email du parent 2. Optionnel.", example: "paul.dupont@example.com" },
   telephone_parent_2: { desc: "Téléphone du parent 2.", example: "+33 6 98 76 54 32" },
-  lien_parent_2: { desc: "Lien de parenté du parent 2.", example: "Père", options: "Père, Mère, Tuteur" },
+  lien_parent_2: {
+    desc: "Lien de parenté du parent 2.",
+    example: "Père",
+    options: "Père, Mère, Tuteur",
+  },
   prenom: { desc: "Prénom de l'entraîneur.", example: "Pierre" },
   nom: { desc: "Nom de l'entraîneur.", example: "Martin" },
-  email: { desc: "Email de l'entraîneur. Obligatoire — une invitation sera envoyée si activée.", example: "pierre.martin@example.com" },
+  email: {
+    desc: "Email de l'entraîneur. Obligatoire — une invitation sera envoyée si activée.",
+    example: "pierre.martin@example.com",
+  },
   telephone: { desc: "Téléphone de l'entraîneur. Optionnel.", example: "+33 6 11 22 33 44" },
-  role: { desc: "Rôle dans l'équipe.", example: "coach", options: "coach, assistant_coach, manager" },
-  type: { desc: "Type d'événement.", example: "Entraînement", options: "Entraînement, Match, Tournoi, Réunion" },
+  role: {
+    desc: "Rôle dans l'équipe.",
+    example: "coach",
+    options: "coach, assistant_coach, manager",
+  },
+  type: {
+    desc: "Type d'événement.",
+    example: "Entraînement",
+    options: "Entraînement, Match, Tournoi, Réunion",
+  },
   titre: { desc: "Titre court de l'événement. Optionnel.", example: "Match de championnat" },
   date_debut: { desc: "Date de début. Format YYYY-MM-DD ou JJ/MM/AAAA.", example: "2026-09-15" },
   heure_debut: { desc: "Heure de début. Format HH:MM (24h).", example: "18:30" },
@@ -94,14 +150,21 @@ const FIELD_DOCS: Record<string, { desc: string; example: string; options?: stri
   lieu: { desc: "Lieu / adresse. Texte libre.", example: "Stade Municipal" },
   adversaire: { desc: "Nom de l'équipe adverse (matchs). Optionnel.", example: "FC Voisins" },
   domicile: { desc: "Domicile ou extérieur.", example: "Domicile", options: "Domicile, Extérieur" },
-  recurrence_jours: { desc: "Jours de récurrence séparés par virgules. Optionnel.", example: "Mardi, Jeudi", options: "Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche" },
+  recurrence_jours: {
+    desc: "Jours de récurrence séparés par virgules. Optionnel.",
+    example: "Mardi, Jeudi",
+    options: "Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi, Dimanche",
+  },
   recurrence_fin: { desc: "Date de fin de récurrence. Format YYYY-MM-DD.", example: "2027-06-30" },
 };
 
 const TYPE_INTRO: Record<ImportType, string> = {
-  players: "Ce fichier permet d'importer en masse les joueurs et leurs parents dans un club Clubero. Une ligne = un joueur.",
-  coaches: "Ce fichier permet d'importer en masse les entraîneurs d'un club Clubero. Une ligne = un entraîneur.",
-  planning: "Ce fichier permet d'importer en masse les événements (entraînements, matchs) d'un club Clubero. Une ligne = un événement.",
+  players:
+    "Ce fichier permet d'importer en masse les joueurs et leurs parents dans un club Clubero. Une ligne = un joueur.",
+  coaches:
+    "Ce fichier permet d'importer en masse les entraîneurs d'un club Clubero. Une ligne = un entraîneur.",
+  planning:
+    "Ce fichier permet d'importer en masse les événements (entraînements, matchs) d'un club Clubero. Une ligne = un événement.",
 };
 
 function downloadTemplate(type: ImportType) {
@@ -167,14 +230,19 @@ function ImportPage() {
 
   // Load all clubs on mount so the dropdown is populated immediately.
   useEffect(() => {
-    listClubs({ data: {} }).then(({ clubs }) => setClubs(clubs)).catch(() => {});
+    listClubs({ data: {} })
+      .then(({ clubs }) => setClubs(clubs))
+      .catch(() => {});
   }, [listClubs]);
 
-  const doSearch = useCallback(async (q: string) => {
-    setSearch(q);
-    const { clubs } = await listClubs({ data: q ? { search: q } : {} });
-    setClubs(clubs);
-  }, [listClubs]);
+  const doSearch = useCallback(
+    async (q: string) => {
+      setSearch(q);
+      const { clubs } = await listClubs({ data: q ? { search: q } : {} });
+      setClubs(clubs);
+    },
+    [listClubs],
+  );
 
   const selectClub = async (c: Club) => {
     setClub(c);
@@ -234,7 +302,9 @@ function ImportPage() {
       setStep(4);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fields = useMemo(() => (type ? getFields(type) : []), [type]);
@@ -242,16 +312,23 @@ function ImportPage() {
   const editCell = (rowIdx: number, key: string, val: string) => {
     if (!analysis) return;
     const newRows = [...analysis.rows];
-    const cell = { ...newRows[rowIdx][key], value: val || null, original: newRows[rowIdx][key].value, auto_corrected: false };
+    const cell = {
+      ...newRows[rowIdx][key],
+      value: val || null,
+      original: newRows[rowIdx][key].value,
+      auto_corrected: false,
+    };
     const fdef = fields.find((f) => f.key === key);
     cell.error = fdef?.validate ? fdef.validate(cell.value) : null;
     newRows[rowIdx] = { ...newRows[rowIdx], [key]: cell };
     // recompute summary
-    let valid = 0; let to_fix = 0;
+    let valid = 0;
+    let to_fix = 0;
     const required = fields.filter((f) => f.required).map((f) => f.key);
     for (const r of newRows) {
       const ok = required.every((k) => r[k]?.value) && Object.values(r).every((c) => !c.error);
-      if (ok) valid++; else to_fix++;
+      if (ok) valid++;
+      else to_fix++;
     }
     setAnalysis({ ...analysis, rows: newRows, summary: { total: newRows.length, valid, to_fix } });
   };
@@ -272,18 +349,35 @@ function ImportPage() {
       setStep(5);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const reset = (keepClub: boolean) => {
-    setStep(2); setType(null); setFileName(""); setHeaders([]); setRawRows([]);
-    setAnalysis(null); setResult(null); setIaUsed(false); setSendInvitations(false);
-    if (!keepClub) { setClub(null); setStats(null); setSearch(""); setStep(1); }
+    setStep(2);
+    setType(null);
+    setFileName("");
+    setHeaders([]);
+    setRawRows([]);
+    setAnalysis(null);
+    setResult(null);
+    setIaUsed(false);
+    setSendInvitations(false);
+    if (!keepClub) {
+      setClub(null);
+      setStats(null);
+      setSearch("");
+      setStep(1);
+    }
   };
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
-      <Link to="/superadmin" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        to="/superadmin"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-4 w-4" /> Super Admin
       </Link>
       <div>
@@ -293,7 +387,7 @@ function ImportPage() {
 
       {/* Stepper */}
       <div className="flex gap-1">
-        {[1,2,3,4,5].map(n => (
+        {[1, 2, 3, 4, 5].map((n) => (
           <div key={n} className={`h-1 flex-1 rounded ${step >= n ? "bg-primary" : "bg-muted"}`} />
         ))}
       </div>
@@ -302,11 +396,19 @@ function ImportPage() {
       {step === 1 && (
         <div className="space-y-4">
           <h2 className="font-medium">Sélectionner le club</h2>
-          <Input placeholder="Rechercher un club..." value={search} onChange={(e) => doSearch(e.target.value)} />
+          <Input
+            placeholder="Rechercher un club..."
+            value={search}
+            onChange={(e) => doSearch(e.target.value)}
+          />
           {clubs.length > 0 && !club && (
             <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
               {clubs.map((c) => (
-                <button key={c.id} onClick={() => selectClub(c)} className="block w-full text-left px-3 py-2 hover:bg-muted">
+                <button
+                  key={c.id}
+                  onClick={() => selectClub(c)}
+                  className="block w-full text-left px-3 py-2 hover:bg-muted"
+                >
                   {c.name}
                 </button>
               ))}
@@ -316,14 +418,18 @@ function ImportPage() {
             <div className="rounded-lg border p-4 space-y-2">
               <div className="font-medium">✓ {club.name}</div>
               <div className="text-sm text-muted-foreground">
-                {stats.teams} équipes · {stats.players} joueurs · {stats.coaches} coachs déjà en base
+                {stats.teams} équipes · {stats.players} joueurs · {stats.coaches} coachs déjà en
+                base
               </div>
               {stats.imports.length > 0 && (
                 <div className="text-xs text-muted-foreground">
-                  {stats.imports.length} import(s) effectué(s) — dernier le {new Date(stats.imports[0].created_at).toLocaleDateString("fr-FR")}
+                  {stats.imports.length} import(s) effectué(s) — dernier le{" "}
+                  {new Date(stats.imports[0].created_at).toLocaleDateString("fr-FR")}
                 </div>
               )}
-              <Button onClick={() => setStep(2)} className="mt-2">Continuer</Button>
+              <Button onClick={() => setStep(2)} className="mt-2">
+                Continuer
+              </Button>
             </div>
           )}
         </div>
@@ -333,7 +439,9 @@ function ImportPage() {
       {step === 2 && club && (
         <div className="space-y-4">
           <h2 className="font-medium">Choisir le type d'import</h2>
-          <p className="text-xs text-muted-foreground">Ordre conseillé : Joueurs → Coachs → Planning (les événements dépendent des équipes).</p>
+          <p className="text-xs text-muted-foreground">
+            Ordre conseillé : Joueurs → Coachs → Planning (les événements dépendent des équipes).
+          </p>
           <div className="grid md:grid-cols-3 gap-3">
             {(Object.keys(TYPE_LABELS) as ImportType[]).map((t) => (
               <button
@@ -344,7 +452,10 @@ function ImportPage() {
                 <FileSpreadsheet className="h-5 w-5 mb-2 text-primary" />
                 <div className="font-medium">{TYPE_LABELS[t]}</div>
                 <button
-                  onClick={(e) => { e.stopPropagation(); downloadTemplate(t); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    downloadTemplate(t);
+                  }}
                   className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
                 >
                   <Download className="h-3 w-3" /> Télécharger le modèle
@@ -355,16 +466,35 @@ function ImportPage() {
           {type && (
             <label
               className="block border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors data-[drag=true]:bg-primary/10 data-[drag=true]:border-primary"
-              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.dataset.drag = "true"; }}
-              onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.dataset.drag = "true"; }}
-              onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.dataset.drag = "false"; }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.dataset.drag = "true";
+              }}
+              onDragEnter={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.dataset.drag = "true";
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.dataset.drag = "false";
+              }}
               onDrop={(e) => {
-                e.preventDefault(); e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
                 e.currentTarget.dataset.drag = "false";
                 const f = e.dataTransfer.files?.[0];
                 if (!f) return;
-                if (!/\.(xlsx|xls|csv)$/i.test(f.name)) { toast.error("Format non supporté (xlsx/xls/csv uniquement)"); return; }
-                if (f.size > 5 * 1024 * 1024) { toast.error("Fichier trop volumineux (max 5 Mo)"); return; }
+                if (!/\.(xlsx|xls|csv)$/i.test(f.name)) {
+                  toast.error("Format non supporté (xlsx/xls/csv uniquement)");
+                  return;
+                }
+                if (f.size > 5 * 1024 * 1024) {
+                  toast.error("Fichier trop volumineux (max 5 Mo)");
+                  return;
+                }
                 onFile(f);
               }}
             >
@@ -374,7 +504,16 @@ function ImportPage() {
                 type="file"
                 accept=".xlsx,.xls,.csv"
                 className="hidden"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) { if (f.size > 5*1024*1024) { toast.error("Fichier trop volumineux (max 5 Mo)"); return; } onFile(f); } }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    if (f.size > 5 * 1024 * 1024) {
+                      toast.error("Fichier trop volumineux (max 5 Mo)");
+                      return;
+                    }
+                    onFile(f);
+                  }
+                }}
               />
               {loading && <Loader2 className="h-4 w-4 animate-spin mx-auto mt-2" />}
             </label>
@@ -389,11 +528,17 @@ function ImportPage() {
             <Sparkles className="h-5 w-5 text-amber-600 flex-shrink-0" />
             <div className="text-sm">
               <p className="font-medium">Ce fichier ne correspond pas au modèle standard.</p>
-              <p className="text-muted-foreground">L'IA peut analyser et mapper les colonnes vers les champs Clubero.</p>
+              <p className="text-muted-foreground">
+                L'IA peut analyser et mapper les colonnes vers les champs Clubero.
+              </p>
             </div>
           </div>
           <Button onClick={runAI} disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
             Analyser avec l'IA
           </Button>
         </div>
@@ -406,7 +551,9 @@ function ImportPage() {
             <div className="text-sm">
               <span className="font-medium">{analysis.summary.total} lignes</span>
               {" · "}
-              <span className={analysis.summary.to_fix === 0 ? "text-emerald-600" : "text-amber-600"}>
+              <span
+                className={analysis.summary.to_fix === 0 ? "text-emerald-600" : "text-amber-600"}
+              >
                 {analysis.summary.to_fix} à compléter
               </span>
               {iaUsed && <span className="ml-2 text-xs text-primary">✨ analysé par l'IA</span>}
@@ -419,7 +566,9 @@ function ImportPage() {
               </summary>
               <ul className="mt-2 space-y-1">
                 {analysis.corrections.map((c, i) => (
-                  <li key={i}><code>{c.field}</code> : "{c.original}" → "{c.corrected}" ({c.count}×)</li>
+                  <li key={i}>
+                    <code>{c.field}</code> : "{c.original}" → "{c.corrected}" ({c.count}×)
+                  </li>
                 ))}
               </ul>
             </details>
@@ -431,7 +580,8 @@ function ImportPage() {
                   <th className="px-2 py-1.5 text-left">#</th>
                   {fields.map((f) => (
                     <th key={f.key} className="px-2 py-1.5 text-left whitespace-nowrap">
-                      {f.label}{f.required && <span className="text-destructive">*</span>}
+                      {f.label}
+                      {f.required && <span className="text-destructive">*</span>}
                     </th>
                   ))}
                 </tr>
@@ -462,12 +612,23 @@ function ImportPage() {
           </div>
           {(type === "players" || type === "coaches") && (
             <label className="flex items-center gap-2 text-sm">
-              <Checkbox checked={sendInvitations} onCheckedChange={(v) => setSendInvitations(!!v)} />
+              <Checkbox
+                checked={sendInvitations}
+                onCheckedChange={(v) => setSendInvitations(!!v)}
+              />
               Envoyer les invitations par email après import
             </label>
           )}
-          <Button onClick={confirmImport} disabled={loading || analysis.summary.to_fix > 0} className="w-full">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+          <Button
+            onClick={confirmImport}
+            disabled={loading || analysis.summary.to_fix > 0}
+            className="w-full"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4" />
+            )}
             Confirmer et importer
           </Button>
         </div>
@@ -476,32 +637,55 @@ function ImportPage() {
       {/* STEP 5 — Résumé */}
       {step === 5 && result && (
         <div className="space-y-4">
-          <div className={`rounded-lg border p-5 ${result.status === "success" ? "border-emerald-500/40 bg-emerald-500/10" : "border-amber-500/40 bg-amber-500/10"}`}>
+          <div
+            className={`rounded-lg border p-5 ${result.status === "success" ? "border-emerald-500/40 bg-emerald-500/10" : "border-amber-500/40 bg-amber-500/10"}`}
+          >
             <div className="flex items-center gap-2 font-medium">
-              {result.status === "success" ? <CheckCircle2 className="h-5 w-5 text-emerald-600" /> : <AlertCircle className="h-5 w-5 text-amber-600" />}
-              Import {result.status === "success" ? "réussi" : result.status === "partial" ? "partiel" : "échoué"}
+              {result.status === "success" ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              ) : (
+                <AlertCircle className="h-5 w-5 text-amber-600" />
+              )}
+              Import{" "}
+              {result.status === "success"
+                ? "réussi"
+                : result.status === "partial"
+                  ? "partiel"
+                  : "échoué"}
             </div>
             <div className="mt-2 text-sm">
               {result.imported} / {result.total} lignes importées
             </div>
             <div className="mt-2 text-xs text-muted-foreground space-y-0.5">
               {Object.entries(result.summary).map(([k, v]) => (
-                <div key={k}>{k.replace(/_/g, " ")} : {v}</div>
+                <div key={k}>
+                  {k.replace(/_/g, " ")} : {v}
+                </div>
               ))}
             </div>
             {result.errors.length > 0 && (
               <details className="mt-3 text-xs">
                 <summary className="cursor-pointer">{result.errors.length} erreur(s)</summary>
                 <ul className="mt-1 max-h-40 overflow-auto">
-                  {result.errors.map((e, i) => <li key={i}>Ligne {e.row} : {e.error}</li>)}
+                  {result.errors.map((e, i) => (
+                    <li key={i}>
+                      Ligne {e.row} : {e.error}
+                    </li>
+                  ))}
                 </ul>
               </details>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => reset(true)}>Importer un autre type</Button>
-            <Button variant="outline" onClick={() => reset(false)}>Changer de club</Button>
-            <Link to="/superadmin"><Button variant="ghost">Retour au dashboard</Button></Link>
+            <Button variant="outline" onClick={() => reset(true)}>
+              Importer un autre type
+            </Button>
+            <Button variant="outline" onClick={() => reset(false)}>
+              Changer de club
+            </Button>
+            <Link to="/superadmin">
+              <Button variant="ghost">Retour au dashboard</Button>
+            </Link>
           </div>
         </div>
       )}

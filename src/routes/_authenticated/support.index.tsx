@@ -43,12 +43,16 @@ function SupportListPage() {
       </header>
 
       {isLoading ? (
-        <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
+        <div className="flex justify-center py-10">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
       ) : !data || data.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-8 text-center space-y-3">
           <LifeBuoy className="h-10 w-10 text-muted-foreground mx-auto" />
           <p className="text-sm text-muted-foreground">{t("page.empty")}</p>
-          <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> {t("page.report")}</Button>
+          <Button onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4" /> {t("page.report")}
+          </Button>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -72,7 +76,9 @@ function SupportListPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${cls}`}>
+                      <span
+                        className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${cls}`}
+                      >
                         {t(`status.${status}`, { defaultValue: status })}
                       </span>
                       <span>· #{ticket.id.slice(0, 6).toUpperCase()}</span>
@@ -87,7 +93,13 @@ function SupportListPage() {
         </ul>
       )}
 
-      <SupportFormDialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) refetch(); }} />
+      <SupportFormDialog
+        open={open}
+        onOpenChange={(v) => {
+          setOpen(v);
+          if (!v) refetch();
+        }}
+      />
     </div>
   );
 }

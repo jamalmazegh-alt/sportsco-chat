@@ -44,9 +44,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
-    const { loadLineupForConvocationEmailServer } = await import(
-      "@/lib/lineup-email.server"
-    );
+    const { loadLineupForConvocationEmailServer } = await import("@/lib/lineup-email.server");
     const { sendPushToUserFireAndForget } = await import("@/lib/push-send.server");
     const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
 
@@ -56,7 +54,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)))"
+        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)))",
       )
       .eq("id", data.convocationId)
       .maybeSingle();
@@ -102,9 +100,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       .eq("convocation_id", data.convocationId)
       .order("sent_at", { ascending: false })
       .limit(1);
-    const lastAt = (recent ?? [])[0]?.sent_at
-      ? new Date((recent as any)[0].sent_at).getTime()
-      : 0;
+    const lastAt = (recent ?? [])[0]?.sent_at ? new Date((recent as any)[0].sent_at).getTime() : 0;
     if (lastAt && Date.now() - lastAt < 30 * 60 * 1000) {
       return { ok: false as const, reason: "cooldown" };
     }
@@ -129,11 +125,10 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     // 5. Locale resolution
     const profileIds = Array.from(
       new Set(
-        [
-          (player as any).user_id,
-          ...((parents ?? []).map((p: any) => p.parent_user_id)),
-        ].filter(Boolean) as string[]
-      )
+        [(player as any).user_id, ...(parents ?? []).map((p: any) => p.parent_user_id)].filter(
+          Boolean,
+        ) as string[],
+      ),
     );
     const langByUser = new Map<string, string>();
     if (profileIds.length > 0) {
@@ -152,15 +147,13 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
     const respondUrl = `${baseUrl}/r/${(conv as any).response_token}`;
     const locationMapsUrl = ev.location
-      ? ev.location_url ??
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}`
+      ? (ev.location_url ??
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}`)
       : undefined;
     const meetingPointMapsUrl = ev.meeting_point
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.meeting_point)}`
       : undefined;
-    const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(
-      () => undefined
-    );
+    const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
 
     // 6. Build recipients + send emails (fire-and-forget per recipient).
     const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
@@ -199,15 +192,12 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             eventType: ev.type,
             eventDate: eventDateLabel,
             eventDescription: ev.description ?? undefined,
-            convocationTime: ev.convocation_time
-              ? fmtDate(ev.convocation_time, locale)
-              : undefined,
+            convocationTime: ev.convocation_time ? fmtDate(ev.convocation_time, locale) : undefined,
             eventLocation: ev.location ?? undefined,
             locationMapsUrl,
             meetingPoint: ev.meeting_point ?? undefined,
             meetingPointMapsUrl,
-            competitionName:
-              ev.competition_name ?? ev.competition_type ?? undefined,
+            competitionName: ev.competition_name ?? ev.competition_type ?? undefined,
             teamName: ev.teams?.name ?? undefined,
             clubName: ev.teams?.clubs?.name ?? undefined,
             clubLogoUrl: ev.teams?.clubs?.logo_url ?? undefined,
@@ -246,8 +236,14 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
         headline = ev.title || "Événement";
       }
       const venueBit = isMatch
-        ? (isHome === true ? " · Domicile" : isHome === false ? " · Extérieur" : "")
-        : (ev.location ? ` · ${ev.location}` : "");
+        ? isHome === true
+          ? " · Domicile"
+          : isHome === false
+            ? " · Extérieur"
+            : ""
+        : ev.location
+          ? ` · ${ev.location}`
+          : "";
       const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
       for (const uid of pushTargets) {
         sendPushToUserFireAndForget(uid, {

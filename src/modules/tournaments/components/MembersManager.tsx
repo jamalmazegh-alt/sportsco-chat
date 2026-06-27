@@ -25,11 +25,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import {
-  Loader2, UserPlus, Mail, Trash2, ShieldCheck, Gavel, Briefcase, Copy,
-} from "lucide-react";
+import { Loader2, UserPlus, Mail, Trash2, ShieldCheck, Gavel, Briefcase, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 type TournamentRole = "tournament_admin" | "staff" | "referee";
@@ -86,7 +88,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   const teamById = new Map(teams.map((tm) => [tm.id, tm.name]));
 
   function resetForm() {
-    setEmail(""); setFirstName(""); setLastName(""); setRole("staff");
+    setEmail("");
+    setFirstName("");
+    setLastName("");
+    setRole("staff");
   }
 
   async function onInvite(e: FormEvent) {
@@ -145,8 +150,6 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           console.error("tournament-member invite email failed", err);
         });
       }
-
-
 
       setOpen(false);
       resetForm();
@@ -259,7 +262,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
         </h3>
         <ResponsiveFormDialog
           open={open}
-          onOpenChange={(o) => { setOpen(o); if (!o) resetForm(); }}
+          onOpenChange={(o) => {
+            setOpen(o);
+            if (!o) resetForm();
+          }}
           trigger={
             <Button size="sm" className="h-9">
               <UserPlus className="h-4 w-4" />
@@ -272,7 +278,9 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             <div className="space-y-1.5">
               <Label>{t("tournamentMembers.role", { defaultValue: "Rôle" })}</Label>
               <Select value={role} onValueChange={(v) => setRole(v as TournamentRole)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="tournament_admin">
                     {t("roles.tournament_admin", { defaultValue: "Admin du tournoi" })}
@@ -288,11 +296,17 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>{t("players.firstName")}<span className="text-destructive ml-1">*</span></Label>
+                <Label>
+                  {t("players.firstName")}
+                  <span className="text-destructive ml-1">*</span>
+                </Label>
                 <Input required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>{t("players.lastName")}<span className="text-destructive ml-1">*</span></Label>
+                <Label>
+                  {t("players.lastName")}
+                  <span className="text-destructive ml-1">*</span>
+                </Label>
                 <Input required value={lastName} onChange={(e) => setLastName(e.target.value)} />
               </div>
             </div>
@@ -306,13 +320,19 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               <p className="text-[11px] text-muted-foreground leading-snug">
                 {t("tournamentMembers.emailHint", {
-                  defaultValue: "Laissez vide pour ajouter sans compte. Vous pourrez l'inviter plus tard.",
+                  defaultValue:
+                    "Laissez vide pour ajouter sans compte. Vous pourrez l'inviter plus tard.",
                 })}
               </p>
             </div>
             <Button type="submit" className="w-full h-11" disabled={busy}>
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-                <><Mail className="h-4 w-4" />{t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}</>
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Mail className="h-4 w-4" />
+                  {t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}
+                </>
               )}
             </Button>
           </form>
@@ -366,8 +386,13 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                         size="sm"
                         variant="outline"
                         className="h-8"
-                        onClick={() => { setConvertMember(m); setConvertEmail(""); }}
-                        title={t("tournamentMembers.inviteOffline", { defaultValue: "Inviter par email" })}
+                        onClick={() => {
+                          setConvertMember(m);
+                          setConvertEmail("");
+                        }}
+                        title={t("tournamentMembers.inviteOffline", {
+                          defaultValue: "Inviter par email",
+                        })}
                       >
                         <Mail className="h-3.5 w-3.5" />
                         {t("tournamentMembers.invite", { defaultValue: "Inviter" })}
@@ -397,7 +422,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                 {m.role === "referee" && matches.length > 0 && (
                   <details className="text-xs">
                     <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                      {t("tournamentMembers.assignMatches", { defaultValue: "Affecter à des matchs" })} ({assigned.length})
+                      {t("tournamentMembers.assignMatches", {
+                        defaultValue: "Affecter à des matchs",
+                      })}{" "}
+                      ({assigned.length})
                     </summary>
                     <div className="mt-2 grid gap-1 max-h-64 overflow-y-auto pr-1">
                       {matches.map((mt) => {
@@ -430,19 +458,30 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
         </ul>
       )}
 
-      <AlertDialog open={!!removeId} onOpenChange={(o) => { if (!o) setRemoveId(null); }}>
+      <AlertDialog
+        open={!!removeId}
+        onOpenChange={(o) => {
+          if (!o) setRemoveId(null);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {t("tournamentMembers.confirmRemoveTitle", { defaultValue: "Retirer ce membre ?" })}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("tournamentMembers.confirmRemoveDesc", { defaultValue: "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard." })}
+              {t("tournamentMembers.confirmRemoveDesc", {
+                defaultValue:
+                  "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard.",
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={confirmRemove}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               {t("tournamentMembers.confirmRemoveAction", { defaultValue: "Retirer" })}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -451,20 +490,31 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
 
       <ResponsiveFormDialog
         open={!!convertMember}
-        onOpenChange={(o) => { if (!o) { setConvertMember(null); setConvertEmail(""); } }}
+        onOpenChange={(o) => {
+          if (!o) {
+            setConvertMember(null);
+            setConvertEmail("");
+          }
+        }}
         title={t("tournamentMembers.inviteTitle", { defaultValue: "Inviter un membre" })}
       >
         <form onSubmit={onConvert} className="space-y-4 mt-4 pb-6">
           <p className="text-sm text-muted-foreground">
             {convertMember
               ? t("tournamentMembers.convertDesc", {
-                  defaultValue: "Envoyer une invitation par email à {{name}} pour qu'il/elle puisse se connecter et valider ses matchs.",
-                  name: [convertMember.first_name, convertMember.last_name].filter(Boolean).join(" "),
+                  defaultValue:
+                    "Envoyer une invitation par email à {{name}} pour qu'il/elle puisse se connecter et valider ses matchs.",
+                  name: [convertMember.first_name, convertMember.last_name]
+                    .filter(Boolean)
+                    .join(" "),
                 })
               : null}
           </p>
           <div className="space-y-1.5">
-            <Label>{t("players.email")}<span className="text-destructive ml-1">*</span></Label>
+            <Label>
+              {t("players.email")}
+              <span className="text-destructive ml-1">*</span>
+            </Label>
             <Input
               type="email"
               required
@@ -474,8 +524,13 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             />
           </div>
           <Button type="submit" className="w-full h-11" disabled={convertBusy}>
-            {convertBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-              <><Mail className="h-4 w-4" />{t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}</>
+            {convertBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Mail className="h-4 w-4" />
+                {t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}
+              </>
             )}
           </Button>
         </form>

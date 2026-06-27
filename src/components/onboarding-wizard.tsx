@@ -22,8 +22,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-const SEEN_KEY = (userId: string, clubId: string) =>
-  `clubero-wizard-seen:${userId}:${clubId}`;
+const SEEN_KEY = (userId: string, clubId: string) => `clubero-wizard-seen:${userId}:${clubId}`;
 
 type Step = {
   id: string;
@@ -38,9 +37,7 @@ type Step = {
 export function OnboardingWizard() {
   const { t } = useTranslation();
   const { user, memberships, activeClubId } = useAuth();
-  const isAdmin = !!memberships.find(
-    (m) => m.club_id === activeClubId && m.role === "admin",
-  );
+  const isAdmin = !!memberships.find((m) => m.club_id === activeClubId && m.role === "admin");
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
@@ -113,7 +110,8 @@ export function OnboardingWizard() {
         icon: Users,
         title: t("onboarding.wizard.teamTitle"),
         body: t("onboarding.wizard.teamBody"),
-        cta: c.teams > 0 ? t("onboarding.wizard.teamCtaView") : t("onboarding.wizard.teamCtaCreate"),
+        cta:
+          c.teams > 0 ? t("onboarding.wizard.teamCtaView") : t("onboarding.wizard.teamCtaCreate"),
         to: "/teams",
         done: c.teams > 0,
       },
@@ -122,7 +120,10 @@ export function OnboardingWizard() {
         icon: UserPlus,
         title: t("onboarding.wizard.playersTitle"),
         body: t("onboarding.wizard.playersBody"),
-        cta: c.players > 0 ? t("onboarding.wizard.playersCtaManage") : t("onboarding.wizard.playersCtaAdd"),
+        cta:
+          c.players > 0
+            ? t("onboarding.wizard.playersCtaManage")
+            : t("onboarding.wizard.playersCtaAdd"),
         to: "/teams",
         done: c.players > 0,
       },
@@ -131,7 +132,10 @@ export function OnboardingWizard() {
         icon: CalendarPlus,
         title: t("onboarding.wizard.eventTitle"),
         body: t("onboarding.wizard.eventBody"),
-        cta: c.events > 0 ? t("onboarding.wizard.eventCtaView") : t("onboarding.wizard.eventCtaCreate"),
+        cta:
+          c.events > 0
+            ? t("onboarding.wizard.eventCtaView")
+            : t("onboarding.wizard.eventCtaCreate"),
         to: "/events",
         done: c.events > 0,
       },
@@ -167,9 +171,7 @@ export function OnboardingWizard() {
             <Icon className="h-6 w-6 text-primary" />
           </div>
           <DialogTitle className="text-center">{current.title}</DialogTitle>
-          <DialogDescription className="text-center">
-            {current.body}
-          </DialogDescription>
+          <DialogDescription className="text-center">{current.body}</DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center justify-center gap-1.5 py-2">
@@ -201,10 +203,7 @@ export function OnboardingWizard() {
               </Link>
             </Button>
           ) : (
-            <Button
-              className="w-full"
-              onClick={() => (isLast ? close() : setStep(step + 1))}
-            >
+            <Button className="w-full" onClick={() => (isLast ? close() : setStep(step + 1))}>
               {current.cta}
             </Button>
           )}

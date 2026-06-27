@@ -25,13 +25,7 @@ const FEATURE_KEYS = [
   "championship_stats",
 ] as const;
 
-const ROLE_KEYS = [
-  "coach",
-  "admin",
-  "tournament_organizer",
-  "parent",
-  "player",
-] as const;
+const ROLE_KEYS = ["coach", "admin", "tournament_organizer", "parent", "player"] as const;
 
 const WaitlistSchema = z.object({
   email: z.string().trim().email().max(255),

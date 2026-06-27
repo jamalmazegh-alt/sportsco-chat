@@ -86,7 +86,6 @@ export const grantBillingExemption = createServerFn({ method: "POST" })
     return { ok: true, alreadyExempt: existing?.exempt_from_billing === true };
   });
 
-
 export const revokeBillingExemption = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
@@ -154,9 +153,7 @@ export const getClubBillingAudit = createServerFn({ method: "POST" })
     const nameById = new Map(
       (profiles ?? []).map((p) => [
         p.id,
-        p.full_name ||
-          `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() ||
-          p.id.slice(0, 8),
+        p.full_name || `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || p.id.slice(0, 8),
       ]),
     );
 
@@ -164,8 +161,9 @@ export const getClubBillingAudit = createServerFn({ method: "POST" })
       id: l.id as string,
       action: l.action as string,
       created_at: l.created_at as string,
-      actor_name: l.actor_user_id ? (nameById.get(l.actor_user_id) ?? l.actor_user_id.slice(0, 8)) : "—",
+      actor_name: l.actor_user_id
+        ? (nameById.get(l.actor_user_id) ?? l.actor_user_id.slice(0, 8))
+        : "—",
       metadata: (l.metadata ?? null) as Record<string, string | number | boolean | null> | null,
     }));
-
   });

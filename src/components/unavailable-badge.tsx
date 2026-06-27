@@ -1,6 +1,12 @@
 import { useTranslation } from "react-i18next";
 import {
-  ShieldAlert, HeartPulse, Palmtree, GraduationCap, Users, Briefcase, HelpCircle,
+  ShieldAlert,
+  HeartPulse,
+  Palmtree,
+  GraduationCap,
+  Users,
+  Briefcase,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

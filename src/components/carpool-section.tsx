@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -62,7 +66,10 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
     queryKey: ["carpools", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("carpools").select("*").eq("event_id", eventId).order("created_at");
+        .from("carpools")
+        .select("*")
+        .eq("event_id", eventId)
+        .order("created_at");
       if (error) throw error;
       return (data ?? []) as Carpool[];
     },
@@ -75,7 +82,9 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
       const ids = carpools.map((c) => c.id);
       if (ids.length === 0) return [] as Passenger[];
       const { data, error } = await supabase
-        .from("carpool_passengers").select("*").in("carpool_id", ids);
+        .from("carpool_passengers")
+        .select("*")
+        .in("carpool_id", ids);
       if (error) throw error;
       return (data ?? []) as Passenger[];
     },
@@ -85,7 +94,9 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
     queryKey: ["carpool-needs", eventId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("carpool_needs").select("*").eq("event_id", eventId);
+        .from("carpool_needs")
+        .select("*")
+        .eq("event_id", eventId);
       if (error) throw error;
       return (data ?? []) as Need[];
     },
@@ -94,14 +105,23 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
   useEffect(() => {
     const channel = supabase
       .channel(`carpool:${eventId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "carpools", filter: `event_id=eq.${eventId}` },
-        () => qc.invalidateQueries({ queryKey: ["carpools", eventId] }))
-      .on("postgres_changes", { event: "*", schema: "public", table: "carpool_passengers" },
-        () => qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] }))
-      .on("postgres_changes", { event: "*", schema: "public", table: "carpool_needs", filter: `event_id=eq.${eventId}` },
-        () => qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] }))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "carpools", filter: `event_id=eq.${eventId}` },
+        () => qc.invalidateQueries({ queryKey: ["carpools", eventId] }),
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "carpool_passengers" }, () =>
+        qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "carpool_needs", filter: `event_id=eq.${eventId}` },
+        () => qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] }),
+      )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [eventId, qc]);
 
   // Players convoked (present/uncertain/pending) — denominator for coach coverage
@@ -192,16 +212,25 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
           {isCoach && total > 0 && (
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">{t("carpool.coverage", { n: covered, total })}</span>
+                <span className="text-muted-foreground">
+                  {t("carpool.coverage", { n: covered, total })}
+                </span>
                 <span className="font-semibold tabular-nums">{pct}%</span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div className={cn("h-full transition-all", coverageColor)} style={{ width: `${pct}%` }} />
+                <div
+                  className={cn("h-full transition-all", coverageColor)}
+                  style={{ width: `${pct}%` }}
+                />
               </div>
               {withoutTransport.length > 0 && (
                 <p className="text-xs text-muted-foreground pt-1">
                   <span className="font-medium text-foreground">{t("carpool.noTransport")} :</span>{" "}
-                  {withoutTransport.map((c) => `${c.players?.first_name ?? ""} ${c.players?.last_name?.[0] ?? ""}.`).join(", ")}
+                  {withoutTransport
+                    .map(
+                      (c) => `${c.players?.first_name ?? ""} ${c.players?.last_name?.[0] ?? ""}.`,
+                    )
+                    .join(", ")}
                 </p>
               )}
             </div>
@@ -231,26 +260,40 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 text-sm font-semibold">
                         <Car className="h-3.5 w-3.5" /> {cp.driver_name}
-                        <span className="text-muted-foreground font-normal">· {t(`carpool.vehicleType.${cp.vehicle_type}`)}</span>
+                        <span className="text-muted-foreground font-normal">
+                          · {t(`carpool.vehicleType.${cp.vehicle_type}`)}
+                        </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {seatsLeft === 0 ? t("carpool.full") : t("carpool.seatsLeft", { count: seatsLeft })}
+                        {seatsLeft === 0
+                          ? t("carpool.full")
+                          : t("carpool.seatsLeft", { count: seatsLeft })}
                       </p>
                       {cp.departure_note && (
-                        <p className="text-xs text-foreground/80 italic mt-1">"{cp.departure_note}"</p>
+                        <p className="text-xs text-foreground/80 italic mt-1">
+                          "{cp.departure_note}"
+                        </p>
                       )}
                       {passengerPlayerNames && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          <span className="font-medium text-foreground">{t("carpool.takes")} :</span> {passengerPlayerNames}
+                          <span className="font-medium text-foreground">
+                            {t("carpool.takes")} :
+                          </span>{" "}
+                          {passengerPlayerNames}
                         </p>
                       )}
                     </div>
                     {(isMine || isCoach) && (
                       <Button
-                        size="icon" variant="ghost" className="h-7 w-7 shrink-0"
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 shrink-0"
                         onClick={async () => {
                           if (!confirm(t("carpool.remove") + " ?")) return;
-                          const { error } = await supabase.from("carpools").delete().eq("id", cp.id);
+                          const { error } = await supabase
+                            .from("carpools")
+                            .delete()
+                            .eq("id", cp.id);
                           if (error) toast.error(error.message);
                           else qc.invalidateQueries({ queryKey: ["carpools", eventId] });
                         }}
@@ -261,23 +304,32 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
                   </div>
                   {iAmBookedHere ? (
                     <Button
-                      size="sm" variant="outline" className="w-full"
+                      size="sm"
+                      variant="outline"
+                      className="w-full"
                       onClick={async () => {
-                        const { error } = await supabase.from("carpool_passengers").delete().eq("id", myBooking!.id);
+                        const { error } = await supabase
+                          .from("carpool_passengers")
+                          .delete()
+                          .eq("id", myBooking!.id);
                         if (error) toast.error(error.message);
                         else qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] });
                       }}
                     >
                       {t("carpool.cancel")}
                     </Button>
-                  ) : !isMine && canParticipate && (
-                    <Button
-                      size="sm" className="w-full"
-                      disabled={seatsLeft === 0 || !!myBooking}
-                      onClick={() => setReserveCarpool(cp)}
-                    >
-                      {seatsLeft === 0 ? t("carpool.full") : t("carpool.reserve")}
-                    </Button>
+                  ) : (
+                    !isMine &&
+                    canParticipate && (
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        disabled={seatsLeft === 0 || !!myBooking}
+                        onClick={() => setReserveCarpool(cp)}
+                      >
+                        {seatsLeft === 0 ? t("carpool.full") : t("carpool.reserve")}
+                      </Button>
+                    )
                   )}
                 </div>
               );
@@ -293,7 +345,11 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
           {/* Actions */}
           <div className="flex flex-wrap gap-2 pt-1">
             {!myCarpool && (
-              <Button size="sm" variant={isCoach ? "default" : "ghost"} onClick={() => setOfferOpen(true)}>
+              <Button
+                size="sm"
+                variant={isCoach ? "default" : "ghost"}
+                onClick={() => setOfferOpen(true)}
+              >
                 <Plus className="h-3.5 w-3.5" />
                 {isCoach ? t("carpool.offerSeats") : t("carpool.iCanDrive")}
               </Button>
@@ -314,18 +370,17 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
       </div>
 
       {offerOpen && (
-        <OfferDialog
-          eventId={eventId}
-          open={offerOpen}
-          onClose={() => setOfferOpen(false)}
-        />
+        <OfferDialog eventId={eventId} open={offerOpen} onClose={() => setOfferOpen(false)} />
       )}
       {reserveCarpool && (
         <ReserveDialog
           carpool={reserveCarpool}
           selectablePlayers={bookableConvocations}
           onClose={() => setReserveCarpool(null)}
-          onDone={() => { qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] }); setReserveCarpool(null); }}
+          onDone={() => {
+            qc.invalidateQueries({ queryKey: ["carpool-passengers", eventId] });
+            setReserveCarpool(null);
+          }}
         />
       )}
       {needOpen && (
@@ -333,14 +388,25 @@ export function CarpoolSection({ eventId, isCoach, convocations, childrenLinks }
           eventId={eventId}
           myConvokedChildren={bookableConvocations}
           onClose={() => setNeedOpen(false)}
-          onDone={() => { qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] }); setNeedOpen(false); }}
+          onDone={() => {
+            qc.invalidateQueries({ queryKey: ["carpool-needs", eventId] });
+            setNeedOpen(false);
+          }}
         />
       )}
     </>
   );
 }
 
-function OfferDialog({ eventId, open, onClose }: { eventId: string; open: boolean; onClose: () => void }) {
+function OfferDialog({
+  eventId,
+  open,
+  onClose,
+}: {
+  eventId: string;
+  open: boolean;
+  onClose: () => void;
+}) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -352,7 +418,11 @@ function OfferDialog({ eventId, open, onClose }: { eventId: string; open: boolea
   async function submit() {
     if (!user) return;
     setBusy(true);
-    const { data: prof } = await supabase.from("profiles").select("full_name, first_name").eq("id", user.id).maybeSingle();
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("full_name, first_name")
+      .eq("id", user.id)
+      .maybeSingle();
     const name = prof?.full_name?.trim() || prof?.first_name || user.email || "Conducteur";
     const { error } = await supabase.from("carpools").insert({
       event_id: eventId,
@@ -371,35 +441,64 @@ function OfferDialog({ eventId, open, onClose }: { eventId: string; open: boolea
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{t("carpool.offerSeats")}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{t("carpool.offerSeats")}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-3">
           <div className="flex gap-2">
             {(["car", "van"] as const).map((v) => (
               <button
-                key={v} type="button" onClick={() => setVehicle(v)}
-                className={cn("flex-1 rounded-lg border px-3 py-2 text-sm",
-                  vehicle === v ? "border-primary bg-primary/10 font-medium" : "border-border")}
-              >{t(`carpool.vehicleType.${v}`)}</button>
+                key={v}
+                type="button"
+                onClick={() => setVehicle(v)}
+                className={cn(
+                  "flex-1 rounded-lg border px-3 py-2 text-sm",
+                  vehicle === v ? "border-primary bg-primary/10 font-medium" : "border-border",
+                )}
+              >
+                {t(`carpool.vehicleType.${v}`)}
+              </button>
             ))}
           </div>
           <div>
             <label className="text-xs font-medium">{t("carpool.seats")}</label>
-            <input type="number" min={1} max={8} value={seats}
+            <input
+              type="number"
+              min={1}
+              max={8}
+              value={seats}
               onChange={(e) => setSeats(Math.min(8, Math.max(1, Number(e.target.value) || 1)))}
-              className="mt-1 w-full rounded-lg border border-border px-3 py-2" />
+              className="mt-1 w-full rounded-lg border border-border px-3 py-2"
+            />
           </div>
-          <Textarea placeholder={t("carpool.note")} value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={200} />
+          <Textarea
+            placeholder={t("carpool.note")}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={2}
+            maxLength={200}
+          />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button onClick={submit} disabled={busy}>{busy && <Loader2 className="h-4 w-4 animate-spin" />}{t("carpool.confirm")}</Button>
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
+          <Button onClick={submit} disabled={busy}>
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+            {t("carpool.confirm")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-function ReserveDialog({ carpool, selectablePlayers, onClose, onDone }: {
+function ReserveDialog({
+  carpool,
+  selectablePlayers,
+  onClose,
+  onDone,
+}: {
   carpool: Carpool;
   selectablePlayers: Convocation[];
   onClose: () => void;
@@ -428,25 +527,37 @@ function ReserveDialog({ carpool, selectablePlayers, onClose, onDone }: {
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{t("carpool.selectPlayers")}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{t("carpool.selectPlayers")}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-2 max-h-[50vh] overflow-y-auto">
           {selectablePlayers.length === 0 && (
             <p className="text-sm text-muted-foreground italic">{t("carpool.noTransport")}</p>
           )}
           {selectablePlayers.map((c) => (
-            <label key={c.player_id} className="flex items-center gap-2 cursor-pointer rounded-lg border border-border p-2">
+            <label
+              key={c.player_id}
+              className="flex items-center gap-2 cursor-pointer rounded-lg border border-border p-2"
+            >
               <Checkbox
                 checked={selected.includes(c.player_id)}
-                onCheckedChange={(v) => setSelected((s) => v ? [...s, c.player_id] : s.filter((x) => x !== c.player_id))}
+                onCheckedChange={(v) =>
+                  setSelected((s) => (v ? [...s, c.player_id] : s.filter((x) => x !== c.player_id)))
+                }
               />
-              <span className="text-sm">{c.players?.first_name} {c.players?.last_name}</span>
+              <span className="text-sm">
+                {c.players?.first_name} {c.players?.last_name}
+              </span>
             </label>
           ))}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
           <Button onClick={submit} disabled={busy || selected.length === 0}>
-            {busy && <Loader2 className="h-4 w-4 animate-spin" />}{t("carpool.confirm")}
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+            {t("carpool.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -454,7 +565,12 @@ function ReserveDialog({ carpool, selectablePlayers, onClose, onDone }: {
   );
 }
 
-function NeedDialog({ eventId, myConvokedChildren, onClose, onDone }: {
+function NeedDialog({
+  eventId,
+  myConvokedChildren,
+  onClose,
+  onDone,
+}: {
   eventId: string;
   myConvokedChildren: Convocation[];
   onClose: () => void;
@@ -483,23 +599,41 @@ function NeedDialog({ eventId, myConvokedChildren, onClose, onDone }: {
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{t("carpool.iNeedRide")}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{t("carpool.iNeedRide")}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-2">
           {myConvokedChildren.map((c) => (
-            <label key={c.player_id} className="flex items-center gap-2 cursor-pointer rounded-lg border border-border p-2">
+            <label
+              key={c.player_id}
+              className="flex items-center gap-2 cursor-pointer rounded-lg border border-border p-2"
+            >
               <Checkbox
                 checked={selected.includes(c.player_id)}
-                onCheckedChange={(v) => setSelected((s) => v ? [...s, c.player_id] : s.filter((x) => x !== c.player_id))}
+                onCheckedChange={(v) =>
+                  setSelected((s) => (v ? [...s, c.player_id] : s.filter((x) => x !== c.player_id)))
+                }
               />
-              <span className="text-sm">{c.players?.first_name} {c.players?.last_name}</span>
+              <span className="text-sm">
+                {c.players?.first_name} {c.players?.last_name}
+              </span>
             </label>
           ))}
-          <Textarea placeholder={t("carpool.note")} value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={200} />
+          <Textarea
+            placeholder={t("carpool.note")}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={2}
+            maxLength={200}
+          />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
           <Button onClick={submit} disabled={busy || selected.length === 0}>
-            {busy && <Loader2 className="h-4 w-4 animate-spin" />}{t("carpool.confirm")}
+            {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+            {t("carpool.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

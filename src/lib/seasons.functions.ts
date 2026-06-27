@@ -15,9 +15,7 @@ async function assertClubAdmin(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .maybeSingle();
-  const isAdmin =
-    !!data &&
-    ((data.roles ?? []).includes("admin") || data.role === "admin");
+  const isAdmin = !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
@@ -37,9 +35,7 @@ const SeasonInput = z.object({
 
 export const listSeasons = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     // Any club member can read
     const { data: seasons, error } = await context.supabase
@@ -111,9 +107,7 @@ export const updateSeason = createServerFn({ method: "POST" })
 export const setCurrentSeason = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z
-      .object({ clubId: z.string().uuid(), seasonId: z.string().uuid() })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), seasonId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
@@ -134,9 +128,7 @@ export const setCurrentSeason = createServerFn({ method: "POST" })
 export const deleteSeason = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z
-      .object({ clubId: z.string().uuid(), seasonId: z.string().uuid() })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), seasonId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
@@ -147,9 +139,7 @@ export const deleteSeason = createServerFn({ method: "POST" })
       .eq("club_id", data.clubId);
     if (error) {
       // Likely FK restrict (payment_items / fundraising_campaigns)
-      throw new Error(
-        "Cannot delete season: payment items or campaigns reference it.",
-      );
+      throw new Error("Cannot delete season: payment items or campaigns reference it.");
     }
     return { ok: true };
   });

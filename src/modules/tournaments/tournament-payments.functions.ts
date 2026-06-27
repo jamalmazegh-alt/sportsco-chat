@@ -29,7 +29,6 @@ async function assertCanManage(
   return { tournament: t };
 }
 
-
 // ---------- Admin: configure fee + payment mode
 
 export const updateTournamentPaymentSettings = createServerFn({ method: "POST" })
@@ -40,12 +39,7 @@ export const updateTournamentPaymentSettings = createServerFn({ method: "POST" }
         tournament_id: z.string().uuid(),
         registration_fee: z.number().int().min(0).max(1_000_000),
         registration_currency: z.enum(CURRENCIES).default("eur"),
-        registration_fee_description: z
-          .string()
-          .trim()
-          .max(500)
-          .nullable()
-          .optional(),
+        registration_fee_description: z.string().trim().max(500).nullable().optional(),
         payment_mode: z.enum(PAYMENT_MODES).default("offline"),
       })
       .parse(input),
@@ -59,9 +53,7 @@ export const updateTournamentPaymentSettings = createServerFn({ method: "POST" }
     }
 
     const needsStripe =
-      data.registration_fee > 0 ||
-      data.payment_mode === "online" ||
-      data.payment_mode === "both";
+      data.registration_fee > 0 || data.payment_mode === "online" || data.payment_mode === "both";
     if (needsStripe && tournament.club_id) {
       const { data: club } = await supabaseAdmin
         .from("clubs")
@@ -90,9 +82,7 @@ export const updateTournamentPaymentSettings = createServerFn({ method: "POST" }
 
 export const listTournamentRegistrationsWithPayments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ tournament_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertCanManage(context.supabase, context.userId, data.tournament_id);
     const { data: rows } = await supabaseAdmin
@@ -192,10 +182,7 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
     await assertCanManage(supabase, userId, reg.tournament_id);
 
     if (reg.payment_status !== "paid_online") {
-      throw new Response(
-        "Only Stripe-paid registrations can be refunded",
-        { status: 400 },
-      );
+      throw new Response("Only Stripe-paid registrations can be refunded", { status: 400 });
     }
     if (!reg.stripe_payment_intent_id && !reg.stripe_charge_id) {
       throw new Response("Missing Stripe reference", { status: 400 });
@@ -205,7 +192,7 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
     const stripe = getStripe();
     const refund = await stripe.refunds.create({
       payment_intent: reg.stripe_payment_intent_id ?? undefined,
-      charge: reg.stripe_payment_intent_id ? undefined : reg.stripe_charge_id ?? undefined,
+      charge: reg.stripe_payment_intent_id ? undefined : (reg.stripe_charge_id ?? undefined),
       reason: "requested_by_customer",
       refund_application_fee: true,
       reverse_transfer: true,
@@ -245,7 +232,6 @@ export const refundRegistrationPayment = createServerFn({ method: "POST" })
 // and re-exported above. This keeps server routes free of the createServerFn
 // graph (avoids production build OOM).
 
-
 // ---------- Public: retrieve an in-flight checkout url (retry/resume)
 
 export const startRegistrationCheckout = createServerFn({ method: "POST" })
@@ -258,9 +244,7 @@ export const startRegistrationCheckout = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const { buildCheckoutForRegistration } = await import(
-      "./tournament-payments.server"
-    );
+    const { buildCheckoutForRegistration } = await import("./tournament-payments.server");
     const result = await buildCheckoutForRegistration({
       registrationId: data.registration_id,
       origin: data.origin,
@@ -296,9 +280,7 @@ export const confirmRegistrationSession = createServerFn({ method: "POST" })
       };
     }
 
-    const { handleTournamentCheckoutCompleted } = await import(
-      "./tournament-payments.server"
-    );
+    const { handleTournamentCheckoutCompleted } = await import("./tournament-payments.server");
     await handleTournamentCheckoutCompleted(session, `self-heal-${session.id}`);
 
     return {
@@ -437,8 +419,7 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
     // Reuse or regenerate the link
     let link = reg.payment_link as string | null;
     const expired =
-      !reg.payment_link_expires_at ||
-      new Date(reg.payment_link_expires_at).getTime() < Date.now();
+      !reg.payment_link_expires_at || new Date(reg.payment_link_expires_at).getTime() < Date.now();
     if (!link || expired) {
       const now = new Date();
       const expires = new Date(now.getTime() + LINK_TTL_DAYS * 24 * 3600 * 1000);
@@ -461,9 +442,7 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
       if (!reg.contact_email) {
         throw new Response("Team has no contact email", { status: 400 });
       }
-      const { enqueueTransactionalEmailServer } = await import(
-        "@/lib/email/send.server"
-      );
+      const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
       await enqueueTransactionalEmailServer({
         templateName: "tournament-payment-request",
         recipientEmail: reg.contact_email,
@@ -480,13 +459,10 @@ export const sendPaymentLinkToTeam = createServerFn({ method: "POST" })
         .from("tournament_registrations")
         .update({ payment_link_sent_via: "email", payment_link_sent_at: sentAt })
         .eq("id", reg.id);
-      await logPaymentEvent(
-        t.id,
-        reg.id,
-        "checkout_created",
-        t.registration_fee,
-        { payment_link_sent: "email", to: reg.contact_email },
-      );
+      await logPaymentEvent(t.id, reg.id, "checkout_created", t.registration_fee, {
+        payment_link_sent: "email",
+        to: reg.contact_email,
+      });
       return { ok: true, channel: "email", link };
     }
 
@@ -538,9 +514,7 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
 
     const { data: t } = await supabaseAdmin
       .from("tournaments")
-      .select(
-        "id, name, slug, registration_fee, registration_currency, payment_mode, club_id",
-      )
+      .select("id, name, slug, registration_fee, registration_currency, payment_mode, club_id")
       .eq("id", data.tournament_id)
       .single();
     if (!t || !t.registration_fee || t.registration_fee <= 0) {
@@ -600,14 +574,9 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
       .eq("id", reg.id);
 
     // Send the personalized payment-request email.
-    const amountLabel = formatMoney(
-      t.registration_fee,
-      t.registration_currency ?? "eur",
-    );
+    const amountLabel = formatMoney(t.registration_fee, t.registration_currency ?? "eur");
     try {
-      const { enqueueTransactionalEmailServer } = await import(
-        "@/lib/email/send.server"
-      );
+      const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
       await enqueueTransactionalEmailServer({
         templateName: "tournament-payment-request",
         recipientEmail: data.contact_email,
@@ -643,16 +612,13 @@ export const inviteTeamForPayment = createServerFn({ method: "POST" })
 // Webhook helpers moved to tournament-payments.server.ts to keep
 // the stripe-webhook route bundle free of the createServerFn graph.
 
-
 // ---------- Admin: publish tournament programme (irreversible)
 // Pre-flight checks → flip status to 'in_progress', stamp published_programme_at,
 // notify every confirmed team by email with their first match (if any).
 
 export const publishTournamentProgramme = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ tournament_id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ tournament_id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { tournament } = await assertCanManage(supabase, userId, data.tournament_id);
@@ -818,7 +784,7 @@ export const publishTournamentProgramme = createServerFn({ method: "POST" })
       const ttId = reg.tournament_team_id;
       const fm = ttId ? firstMatchByTeam.get(ttId) : null;
       const opponentName = fm?.opponentTeamId
-        ? teamsById.get(fm.opponentTeamId)?.name ?? null
+        ? (teamsById.get(fm.opponentTeamId)?.name ?? null)
         : null;
 
       try {
@@ -866,5 +832,3 @@ export const publishTournamentProgramme = createServerFn({ method: "POST" })
       confirmed_teams: confirmed.length,
     };
   });
-
-

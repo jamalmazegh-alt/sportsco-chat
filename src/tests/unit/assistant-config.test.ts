@@ -89,7 +89,9 @@ describe("assistant-config", () => {
   });
 
   it("legacy answers map to eliminatedContinue", () => {
-    expect(legacyAnswersToConfig({ teams: 16, allDay: true, multipleTrophies: false, paid: false })).toMatchObject({
+    expect(
+      legacyAnswersToConfig({ teams: 16, allDay: true, multipleTrophies: false, paid: false }),
+    ).toMatchObject({
       eliminatedContinue: true,
     });
     expect(
@@ -120,7 +122,9 @@ describe("assistant-config", () => {
       lunchStart: "12:30",
     });
     const payload = configToCreatePayload("00000000-0000-0000-0000-000000000001", cfg);
-    expect((payload.update.settings as unknown as Record<string, unknown>).lunch_start).toBe("12:30");
+    expect((payload.update.settings as unknown as Record<string, unknown>).lunch_start).toBe(
+      "12:30",
+    );
     expect((payload.update.settings as unknown as Record<string, unknown>).lunch_end).toBe("13:15");
   });
 

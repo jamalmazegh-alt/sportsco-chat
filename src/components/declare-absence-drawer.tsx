@@ -23,7 +23,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Palmtree, HeartPulse, GraduationCap, Users, Briefcase, HelpCircle, Swords, Dumbbell, Trophy, Calendar } from "lucide-react";
+import {
+  Loader2,
+  Palmtree,
+  HeartPulse,
+  GraduationCap,
+  Users,
+  Briefcase,
+  HelpCircle,
+  Swords,
+  Dumbbell,
+  Trophy,
+  Calendar,
+} from "lucide-react";
 
 type ImpactedEvent = { id: string; title: string; starts_at: string; type: string };
 
@@ -48,7 +60,12 @@ interface Props {
 
 type Candidate = { id: string; first_name: string; last_name: string };
 
-export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlayerId, onCreated }: Props) {
+export function DeclareAbsenceDrawer({
+  open,
+  onOpenChange,
+  playerId: initialPlayerId,
+  onCreated,
+}: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -111,7 +128,10 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
   }, [candidates, playerId, initialPlayerId]);
 
   // Debounced dates for impacted-events query
-  const [debouncedDates, setDebouncedDates] = useState<{ s: string; e: string }>({ s: startDate, e: endDate });
+  const [debouncedDates, setDebouncedDates] = useState<{ s: string; e: string }>({
+    s: startDate,
+    e: endDate,
+  });
   useEffect(() => {
     const t = setTimeout(() => setDebouncedDates({ s: startDate, e: endDate }), 400);
     return () => clearTimeout(t);
@@ -119,7 +139,12 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
 
   const { data: impactedEvents = [] } = useQuery({
     queryKey: ["absence-impacted-events", playerId, debouncedDates.s, debouncedDates.e],
-    enabled: open && !!playerId && !!debouncedDates.s && !!debouncedDates.e && debouncedDates.e >= debouncedDates.s,
+    enabled:
+      open &&
+      !!playerId &&
+      !!debouncedDates.s &&
+      !!debouncedDates.e &&
+      debouncedDates.e >= debouncedDates.s,
     queryFn: async (): Promise<ImpactedEvent[]> => {
       const { data: tm } = await supabase
         .from("team_members")
@@ -140,18 +165,28 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
         .is("deleted_at", null)
         .order("starts_at", { ascending: true })
         .limit(11);
-      return (data ?? []).map((r: any) => ({ id: r.id, title: r.title, starts_at: r.starts_at, type: r.type }));
+      return (data ?? []).map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        starts_at: r.starts_at,
+        type: r.type,
+      }));
     },
     staleTime: 30_000,
   });
 
   function eventIcon(type: string) {
     switch (type) {
-      case "match": return Swords;
-      case "training": return Dumbbell;
-      case "tournament": return Trophy;
-      case "meeting": return Users;
-      default: return Calendar;
+      case "match":
+        return Swords;
+      case "training":
+        return Dumbbell;
+      case "tournament":
+        return Trophy;
+      case "meeting":
+        return Users;
+      default:
+        return Calendar;
     }
   }
 
@@ -188,7 +223,11 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       .in("team_id", teamIds)
       .in("role", ["coach", "assistant_coach", "admin"] as any);
     const uids = Array.from(
-      new Set((coaches ?? []).map((c: any) => c.user_id).filter((u: string | null) => u && u !== user?.id)),
+      new Set(
+        (coaches ?? [])
+          .map((c: any) => c.user_id)
+          .filter((u: string | null) => u && u !== user?.id),
+      ),
     );
     if (uids.length === 0) return;
     let body = t("notification.absenceDeclared", {
@@ -199,19 +238,26 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       defaultValue: `${playerName} sera absent(e) du ${startStr} au ${endStr}. Motif : ${reasonLabel}`,
     });
     if (declaredByName) {
-      body += " — " + t("notification.declaredBy", {
-        name: declaredByName,
-        defaultValue: `déclaré par ${declaredByName}`,
-      });
+      body +=
+        " — " +
+        t("notification.declaredBy", {
+          name: declaredByName,
+          defaultValue: `déclaré par ${declaredByName}`,
+        });
     }
     if (events.length > 0) {
       const labelFor = (type: string) => {
         switch (type) {
-          case "match": return t("eventType.match", { defaultValue: "Match" });
-          case "training": return t("eventType.training", { defaultValue: "Entraînement" });
-          case "tournament": return t("eventType.tournament", { defaultValue: "Tournoi" });
-          case "meeting": return t("eventType.meeting", { defaultValue: "Réunion" });
-          default: return t("eventType.other", { defaultValue: "Événement" });
+          case "match":
+            return t("eventType.match", { defaultValue: "Match" });
+          case "training":
+            return t("eventType.training", { defaultValue: "Entraînement" });
+          case "tournament":
+            return t("eventType.tournament", { defaultValue: "Tournoi" });
+          case "meeting":
+            return t("eventType.meeting", { defaultValue: "Réunion" });
+          default:
+            return t("eventType.other", { defaultValue: "Événement" });
         }
       };
       const fmtShort = (d: string) =>
@@ -221,7 +267,12 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       if (events.length > 3) {
         eventsStr += `, ${t("availability.impactedEventsMore", { n: events.length - 3, defaultValue: `et ${events.length - 3} autre(s) événement(s)` })}`;
       }
-      body += "\n" + t("availability.notifImpacted", { events: eventsStr, defaultValue: `Événements impactés : ${eventsStr}` });
+      body +=
+        "\n" +
+        t("availability.notifImpacted", {
+          events: eventsStr,
+          defaultValue: `Événements impactés : ${eventsStr}`,
+        });
     }
     await supabase.from("notifications").insert(
       uids.map((uid) => ({
@@ -234,11 +285,11 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     );
   }
 
-
-
   async function onSubmit() {
     if (!playerId) {
-      toast.error(t("availability.errors.missingPlayer", { defaultValue: "Sélectionnez un joueur." }));
+      toast.error(
+        t("availability.errors.missingPlayer", { defaultValue: "Sélectionnez un joueur." }),
+      );
       return;
     }
     if (endDate < startDate) {
@@ -253,7 +304,8 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
           setBusy(false);
           const ok = window.confirm(
             t("availability.overlapWarning", {
-              defaultValue: "⚠️ Une absence est déjà déclarée sur cette période. Confirmer quand même ?",
+              defaultValue:
+                "⚠️ Une absence est déjà déclarée sur cette période. Confirmer quand même ?",
             }),
           );
           if (!ok) return;
@@ -279,23 +331,34 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       try {
         const [playerRes, declarerRes] = await Promise.all([
           supabase.from("players").select("first_name, last_name").eq("id", playerId).maybeSingle(),
-          supabase.from("profiles").select("first_name, full_name").eq("id", user!.id).maybeSingle(),
+          supabase
+            .from("profiles")
+            .select("first_name, full_name")
+            .eq("id", user!.id)
+            .maybeSingle(),
         ]);
         const p = playerRes.data;
         const name = p ? `${p.first_name ?? ""} ${p.last_name?.[0] ?? ""}.`.trim() : "";
         const declaredByName =
           (declarerRes.data as any)?.first_name ||
-          (((declarerRes.data as any)?.full_name ?? "").split(" ")[0] || null);
+          ((declarerRes.data as any)?.full_name ?? "").split(" ")[0] ||
+          null;
         // Only attribute if declarer is NOT the player themselves
-        const isSelf = !!p && (await supabase
-          .from("players")
-          .select("user_id")
-          .eq("id", playerId)
-          .maybeSingle()).data?.user_id === user!.id;
+        const isSelf =
+          !!p &&
+          (await supabase.from("players").select("user_id").eq("id", playerId).maybeSingle()).data
+            ?.user_id === user!.id;
         const attribution = isSelf ? null : declaredByName;
         const reasonLabel = t(`availability.reason.${reason}`, { defaultValue: reason });
         const fmt = (d: string) => new Date(d).toLocaleDateString();
-        await notifyCoaches(name, fmt(startDate), fmt(endDate), reasonLabel, impactedEvents, attribution);
+        await notifyCoaches(
+          name,
+          fmt(startDate),
+          fmt(endDate),
+          reasonLabel,
+          impactedEvents,
+          attribution,
+        );
 
         // Email coaches via server fn (per-coach language, excludes caller)
         if (inserted?.id) {
@@ -305,7 +368,6 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
       } catch {
         /* ignore notify errors */
       }
-
 
       toast.success(t("availability.saved", { defaultValue: "Absence enregistrée" }));
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
@@ -327,7 +389,9 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{t("availability.declare", { defaultValue: "Déclarer une absence" })}</SheetTitle>
+          <SheetTitle>
+            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+          </SheetTitle>
           <SheetDescription>
             {t("availability.drawerHint", {
               defaultValue: "Indique la période et le motif. Le coach sera informé.",
@@ -422,7 +486,10 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
                 {impactedEvents.slice(0, 10).map((ev) => {
                   const Icon = eventIcon(ev.type);
                   return (
-                    <li key={ev.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <li
+                      key={ev.id}
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
                       <Icon className="h-3.5 w-3.5 shrink-0 opacity-70" />
                       <span className="truncate flex-1">{ev.title}</span>
                       <span className="shrink-0">
@@ -447,7 +514,6 @@ export function DeclareAbsenceDrawer({ open, onOpenChange, playerId: initialPlay
             </div>
           )}
         </div>
-
 
         <SheetFooter className="mt-6 flex-row gap-2 sm:justify-end">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>

@@ -57,14 +57,15 @@ import {
   type WizardEventType,
   type RecurrenceMode,
 } from "./event-wizard-config";
-import {
-  readDraft,
-  writeDraft,
-  clearDraft,
-  draftHasProgress,
-} from "./event-wizard-draft";
+import { readDraft, writeDraft, clearDraft, draftHasProgress } from "./event-wizard-draft";
 
-type Team = { id: string; name: string; sport?: string | null; championship?: string | null; competitions?: string[] | null };
+type Team = {
+  id: string;
+  name: string;
+  sport?: string | null;
+  championship?: string | null;
+  competitions?: string[] | null;
+};
 
 interface Props {
   teams: Team[];
@@ -277,15 +278,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
       ...s,
       recurrence: {
         mode,
-        weekdays: mode === "weekly_one" ? [wd] : s.recurrence?.weekdays ?? [wd],
+        weekdays: mode === "weekly_one" ? [wd] : (s.recurrence?.weekdays ?? [wd]),
         startsOn: s.recurrence?.startsOn ?? today,
         endsOn: s.recurrence?.endsOn ?? format(addDays(startOfDate, 30 * 9), "yyyy-MM-dd"),
       },
     }));
   }
-
-
-
 
   // A series is offered (and honored) for recurring trainings AND "other" events.
   const seriesEligible = state.type === "training" || state.type === "other";
@@ -318,8 +316,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             startsOn: recurrence.startsOn!,
             endsOn: recurrence.endsOn!,
             isOfficial: false,
-            carpoolEnabled:
-              typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : null,
+            carpoolEnabled: typeof state.carpoolEnabled === "boolean" ? state.carpoolEnabled : null,
             slots,
             excludedDates: [],
             excludedRanges: [],
@@ -387,17 +384,25 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     when: t("eventWizard.hint.when", { defaultValue: "Date et heure de début." }),
     duration: t("eventWizard.hint.duration", { defaultValue: "Combien de temps ?" }),
     halves: t("eventWizard.hint.halves", { defaultValue: "Format du temps de jeu." }),
-    gameformat: t("eventWizard.hint.gameformat", { defaultValue: "Combien de joueurs sur le terrain ?" }),
+    gameformat: t("eventWizard.hint.gameformat", {
+      defaultValue: "Combien de joueurs sur le terrain ?",
+    }),
     series: t("eventWizard.hint.series", { defaultValue: "Unique ou récurrent ?" }),
     homeaway: t("eventWizard.hint.homeaway", { defaultValue: "À domicile ou en déplacement ?" }),
-    meetingpoint: t("eventWizard.hint.meetingpoint", { defaultValue: "Adresse et heure de rendez-vous." }),
-    meetingtime: t("eventWizard.hint.meetingtime", { defaultValue: "À quelle heure les joueurs doivent-ils se présenter ?" }),
+    meetingpoint: t("eventWizard.hint.meetingpoint", {
+      defaultValue: "Adresse et heure de rendez-vous.",
+    }),
+    meetingtime: t("eventWizard.hint.meetingtime", {
+      defaultValue: "À quelle heure les joueurs doivent-ils se présenter ?",
+    }),
     opponent: t("eventWizard.hint.opponent", { defaultValue: "L'adversaire." }),
     official: t("eventWizard.hint.official", { defaultValue: "Officiel ou amical ?" }),
     location: t("eventWizard.hint.location", { defaultValue: "Où ça se passe ?" }),
     convocation: t("eventWizard.hint.convocation", { defaultValue: "À qui on envoie ?" }),
     carpool: t("eventWizard.hint.carpool", { defaultValue: "Activer le covoiturage ?" }),
-    comment: t("eventWizard.hint.comment", { defaultValue: "Un commentaire à ajouter ? (facultatif)" }),
+    comment: t("eventWizard.hint.comment", {
+      defaultValue: "Un commentaire à ajouter ? (facultatif)",
+    }),
     summary: t("eventWizard.hint.summary", { defaultValue: "Tout est prêt." }),
   };
 
@@ -407,20 +412,41 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
     type: { text: t("eventWizard.qShort.type", { defaultValue: "Quel type" }), mark: "?" },
     team: { text: t("eventWizard.qShort.team", { defaultValue: "Quelle équipe" }), mark: "?" },
     when: { text: t("eventWizard.qShort.when", { defaultValue: "Quand" }), mark: "?" },
-    duration: { text: t("eventWizard.qShort.duration", { defaultValue: "Combien de temps" }), mark: "?" },
+    duration: {
+      text: t("eventWizard.qShort.duration", { defaultValue: "Combien de temps" }),
+      mark: "?",
+    },
     halves: { text: t("eventWizard.qShort.halves", { defaultValue: "Format" }), mark: "?" },
-    gameformat: { text: t("eventWizard.qShort.gameformat", { defaultValue: "Effectif" }), mark: "?" },
+    gameformat: {
+      text: t("eventWizard.qShort.gameformat", { defaultValue: "Effectif" }),
+      mark: "?",
+    },
     series: { text: t("eventWizard.qShort.series", { defaultValue: "Récurrence" }), mark: "?" },
-    homeaway: { text: t("eventWizard.qShort.homeaway", { defaultValue: "Domicile ou extérieur" }), mark: "?" },
-    meetingpoint: { text: t("eventWizard.qShort.meetingpoint", { defaultValue: "Point de RDV" }), mark: "?" },
-    meetingtime: { text: t("eventWizard.qShort.meetingtime", { defaultValue: "Heure de RDV" }), mark: "?" },
+    homeaway: {
+      text: t("eventWizard.qShort.homeaway", { defaultValue: "Domicile ou extérieur" }),
+      mark: "?",
+    },
+    meetingpoint: {
+      text: t("eventWizard.qShort.meetingpoint", { defaultValue: "Point de RDV" }),
+      mark: "?",
+    },
+    meetingtime: {
+      text: t("eventWizard.qShort.meetingtime", { defaultValue: "Heure de RDV" }),
+      mark: "?",
+    },
     opponent: { text: t("eventWizard.qShort.opponent", { defaultValue: "Contre qui" }), mark: "?" },
     official: { text: t("eventWizard.qShort.official", { defaultValue: "Officiel" }), mark: "?" },
     location: { text: t("eventWizard.qShort.location", { defaultValue: "Où" }), mark: "?" },
-    convocation: { text: t("eventWizard.qShort.convocation", { defaultValue: "Convoquer auto" }), mark: "?" },
+    convocation: {
+      text: t("eventWizard.qShort.convocation", { defaultValue: "Convoquer auto" }),
+      mark: "?",
+    },
     carpool: { text: t("eventWizard.qShort.carpool", { defaultValue: "Covoiturage" }), mark: "?" },
     comment: { text: t("eventWizard.qShort.comment", { defaultValue: "Un message" }), mark: "?" },
-    summary: { text: t("eventWizard.qShort.summary", { defaultValue: "Tout est prêt" }), mark: "!" },
+    summary: {
+      text: t("eventWizard.qShort.summary", { defaultValue: "Tout est prêt" }),
+      mark: "!",
+    },
   };
 
   // ---- Render ----
@@ -439,10 +465,16 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         onClose={onClose}
       />
 
-
-
       {/* Live recap chips — hidden on small screens to match clean mockup */}
-      {false && <LiveRecap state={state} teamName={selectedTeam?.name} title={title} seriesCount={seriesCount} t={t} />}
+      {false && (
+        <LiveRecap
+          state={state}
+          teamName={selectedTeam?.name}
+          title={title}
+          seriesCount={seriesCount}
+          t={t}
+        />
+      )}
 
       {/* Draft resume bar */}
       {hasDraftPrompt && (
@@ -486,13 +518,21 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "type" && (
-          <StepQuestion title={t("eventWizard.q.type", { defaultValue: "Quel type d'événement ?" })}>
+          <StepQuestion
+            title={t("eventWizard.q.type", { defaultValue: "Quel type d'événement ?" })}
+          >
             {(
               [
                 ["training", "⚽", t("events.types.training"), "Entraînement régulier", "green"],
                 ["match", "🆚", t("events.types.match"), "Match officiel ou amical", "red"],
                 ["meeting", "👥", t("events.types.meeting"), "Réunion club ou équipe", "blue"],
-                ["other", "📌", t("events.types.other", { defaultValue: "Autre" }), "Stage, tournoi, événement…", "amber"],
+                [
+                  "other",
+                  "📌",
+                  t("events.types.other", { defaultValue: "Autre" }),
+                  "Stage, tournoi, événement…",
+                  "amber",
+                ],
               ] as const
             ).map(([v, e, l, s, c]) => (
               <DoorButton
@@ -533,8 +573,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
-
-
         {current === "when" && (
           <StepQuestion title={t("eventWizard.q.when", { defaultValue: "Quand ?" })}>
             <div className="flex flex-wrap gap-2">
@@ -573,7 +611,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   <Button variant="outline" className="h-10 justify-start font-normal">
                     <CalendarIcon className="h-4 w-4" />
                     {state.startDate
-                      ? format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", { locale: dateLocale })
+                      ? format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM", {
+                          locale: dateLocale,
+                        })
                       : t("eventWizard.pickDate", { defaultValue: "Choisir une date" })}
                   </Button>
                 </PopoverTrigger>
@@ -587,7 +627,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   />
                 </PopoverContent>
               </Popover>
-              <TimePicker value={state.startTime} onChange={(v: string) => patch("startTime", v)} className="w-full" />
+              <TimePicker
+                value={state.startTime}
+                onChange={(v: string) => patch("startTime", v)}
+                className="w-full"
+              />
             </div>
             <Button
               className="w-full mt-3"
@@ -631,11 +675,18 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "series" && (
-          <StepQuestion title={t("eventWizard.q.series", { defaultValue: "Cet entraînement est-il récurrent ?" })}>
+          <StepQuestion
+            title={t("eventWizard.q.series", {
+              defaultValue: "Cet entraînement est-il récurrent ?",
+            })}
+          >
             {(
               [
                 ["single", t("eventWizard.series.single", { defaultValue: "Événement unique" })],
-                ["weekly_one", t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" })],
+                [
+                  "weekly_one",
+                  t("eventWizard.series.weeklyOne", { defaultValue: "Toutes les semaines" }),
+                ],
               ] as const
             ).map(([m, l]) => (
               <DoorButton
@@ -660,7 +711,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                         onClick={() =>
                           setState((s) => ({
                             ...s,
-                            recurrence: { ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }), weekdays: [wd] },
+                            recurrence: {
+                              ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }),
+                              weekdays: [wd],
+                            },
                           }))
                         }
                         className={cn(
@@ -682,7 +736,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                     <Label className="text-xs">
                       {t("eventWizard.series.time", { defaultValue: "Heure" })}
                     </Label>
-                    <TimePicker value={state.startTime} onChange={(v: string) => patch("startTime", v)} className="w-full" />
+                    <TimePicker
+                      value={state.startTime}
+                      onChange={(v: string) => patch("startTime", v)}
+                      className="w-full"
+                    />
                   </div>
                   <div>
                     <Label className="text-xs">
@@ -712,7 +770,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                       onChange={(e) =>
                         setState((s) => ({
                           ...s,
-                          recurrence: { ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }), startsOn: e.target.value },
+                          recurrence: {
+                            ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }),
+                            startsOn: e.target.value,
+                          },
                         }))
                       }
                     />
@@ -727,7 +788,10 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                       onChange={(e) =>
                         setState((s) => ({
                           ...s,
-                          recurrence: { ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }), endsOn: e.target.value },
+                          recurrence: {
+                            ...(s.recurrence ?? { mode: "weekly_one", weekdays: [] }),
+                            endsOn: e.target.value,
+                          },
                         }))
                       }
                     />
@@ -748,9 +812,25 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "homeaway" && (
-          <StepQuestion title={t("eventWizard.q.homeaway", { defaultValue: "Domicile ou extérieur ?" })}>
-            <DoorButton icon="🏠" label={t("eventWizard.home", { defaultValue: "Domicile" })} subtitle="On reçoit" color="green" active={state.isHome === "home"} onClick={() => answer("isHome", "home")} />
-            <DoorButton icon="🚌" label={t("eventWizard.away", { defaultValue: "Extérieur" })} subtitle="On se déplace" color="blue" active={state.isHome === "away"} onClick={() => answer("isHome", "away")} />
+          <StepQuestion
+            title={t("eventWizard.q.homeaway", { defaultValue: "Domicile ou extérieur ?" })}
+          >
+            <DoorButton
+              icon="🏠"
+              label={t("eventWizard.home", { defaultValue: "Domicile" })}
+              subtitle="On reçoit"
+              color="green"
+              active={state.isHome === "home"}
+              onClick={() => answer("isHome", "home")}
+            />
+            <DoorButton
+              icon="🚌"
+              label={t("eventWizard.away", { defaultValue: "Extérieur" })}
+              subtitle="On se déplace"
+              color="blue"
+              active={state.isHome === "away"}
+              onClick={() => answer("isHome", "away")}
+            />
           </StepQuestion>
         )}
 
@@ -767,7 +847,12 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                     onClick={() => {
                       markTouched("halves");
                       const mins = halvesToMinutes(label) ?? state.durationMin;
-                      setState((s) => ({ ...s, halvesFormat: label, durationMin: mins, step: s.step + 1 }));
+                      setState((s) => ({
+                        ...s,
+                        halvesFormat: label,
+                        durationMin: mins,
+                        step: s.step + 1,
+                      }));
                     }}
                     className={cn(
                       "rounded-lg border-2 py-3 text-sm font-semibold transition-colors",
@@ -790,7 +875,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               <Input
                 placeholder="3x30"
                 value={
-                  state.halvesFormat && !getHalvesPresets(selectedTeam?.sport).includes(state.halvesFormat)
+                  state.halvesFormat &&
+                  !getHalvesPresets(selectedTeam?.sport).includes(state.halvesFormat)
                     ? state.halvesFormat
                     : ""
                 }
@@ -847,7 +933,8 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               <Input
                 placeholder="6v6"
                 value={
-                  state.gameFormat && !getGameFormatPresets(selectedTeam?.sport).includes(state.gameFormat)
+                  state.gameFormat &&
+                  !getGameFormatPresets(selectedTeam?.sport).includes(state.gameFormat)
                     ? state.gameFormat
                     : ""
                 }
@@ -864,7 +951,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "meetingpoint" && (
-          <StepQuestion title={t("eventWizard.q.meetingpoint", { defaultValue: "Adresse et heure de rendez-vous" })}>
+          <StepQuestion
+            title={t("eventWizard.q.meetingpoint", {
+              defaultValue: "Adresse et heure de rendez-vous",
+            })}
+          >
             <Label className="text-xs">
               {t("eventWizard.meeting.address", { defaultValue: "Adresse" })}
             </Label>
@@ -894,7 +985,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "meetingtime" && (
-          <StepQuestion title={t("eventWizard.q.meetingtime", { defaultValue: "Heure de rendez-vous ?" })}>
+          <StepQuestion
+            title={t("eventWizard.q.meetingtime", { defaultValue: "Heure de rendez-vous ?" })}
+          >
             <p className="text-xs text-muted-foreground">
               {t("eventWizard.meetingtimeHint", {
                 defaultValue: "À quelle heure les joueurs doivent-ils se présenter ? (facultatif)",
@@ -908,21 +1001,35 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <Button className="w-full mt-2" onClick={() => go(1)}>
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
             </Button>
-            <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => { patch("meetingTime", undefined); go(1); }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full text-xs"
+              onClick={() => {
+                patch("meetingTime", undefined);
+                go(1);
+              }}
+            >
               {t("eventWizard.skip", { defaultValue: "Passer" })}
             </Button>
           </StepQuestion>
         )}
 
         {current === "opponent" && (
-          <StepQuestion title={t("eventWizard.q.opponent", { defaultValue: "Contre quelle équipe ?" })}>
+          <StepQuestion
+            title={t("eventWizard.q.opponent", { defaultValue: "Contre quelle équipe ?" })}
+          >
             <Input
               autoFocus
               value={state.opponent ?? ""}
               onChange={(e) => patch("opponent", e.target.value)}
               placeholder="FC Voisin"
             />
-            <Button className="w-full mt-2" disabled={!state.opponent?.trim()} onClick={() => go(1)}>
+            <Button
+              className="w-full mt-2"
+              disabled={!state.opponent?.trim()}
+              onClick={() => go(1)}
+            >
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
             </Button>
           </StepQuestion>
@@ -983,11 +1090,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 />
               </div>
             )}
-            <Button
-              className="w-full mt-2"
-              disabled={!state.competitionType}
-              onClick={() => go(1)}
-            >
+            <Button className="w-full mt-2" disabled={!state.competitionType} onClick={() => go(1)}>
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
             </Button>
           </StepQuestion>
@@ -998,43 +1101,96 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <LocationAutocomplete
               value={state.location ?? ""}
               onChange={(v) => patch("location", v)}
-              placeholder={t("eventWizard.locationPlaceholder", { defaultValue: "Stade municipal" })}
+              placeholder={t("eventWizard.locationPlaceholder", {
+                defaultValue: "Stade municipal",
+              })}
             />
-            <Button className="w-full mt-2" disabled={!state.location?.trim()} onClick={() => go(1)}>
+            <Button
+              className="w-full mt-2"
+              disabled={!state.location?.trim()}
+              onClick={() => go(1)}
+            >
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
             </Button>
           </StepQuestion>
         )}
 
         {current === "convocation" && (
-          <StepQuestion title={t("eventWizard.q.convocation", { defaultValue: "Convoquer les joueurs ?" })}>
-            {([
-              ["all", "👥", t("eventWizard.convoc.all", { defaultValue: "Toute l'équipe" }), "Tout le monde reçoit", "green"],
-              ["selection", "✋", t("eventWizard.convoc.selection", { defaultValue: "Choisir les joueurs" }), "Sélection manuelle", "amber"],
-              ["none", "⏸️", t("eventWizard.convoc.none", { defaultValue: "Pas maintenant" }), "Brouillon, à envoyer plus tard", "blue"],
-            ] as const).map(([v, e, l, s, c]) => (
-              <DoorButton key={v} icon={e} label={l} subtitle={s} color={c} active={state.convocScope === v} onClick={() => answer("convocScope", v)} />
+          <StepQuestion
+            title={t("eventWizard.q.convocation", { defaultValue: "Convoquer les joueurs ?" })}
+          >
+            {(
+              [
+                [
+                  "all",
+                  "👥",
+                  t("eventWizard.convoc.all", { defaultValue: "Toute l'équipe" }),
+                  "Tout le monde reçoit",
+                  "green",
+                ],
+                [
+                  "selection",
+                  "✋",
+                  t("eventWizard.convoc.selection", { defaultValue: "Choisir les joueurs" }),
+                  "Sélection manuelle",
+                  "amber",
+                ],
+                [
+                  "none",
+                  "⏸️",
+                  t("eventWizard.convoc.none", { defaultValue: "Pas maintenant" }),
+                  "Brouillon, à envoyer plus tard",
+                  "blue",
+                ],
+              ] as const
+            ).map(([v, e, l, s, c]) => (
+              <DoorButton
+                key={v}
+                icon={e}
+                label={l}
+                subtitle={s}
+                color={c}
+                active={state.convocScope === v}
+                onClick={() => answer("convocScope", v)}
+              />
             ))}
           </StepQuestion>
         )}
 
         {current === "carpool" && (
-          <StepQuestion title={t("eventWizard.q.carpool", { defaultValue: "Activer le covoiturage ?" })}>
-            <div className={cn(
-              "flex items-center justify-between rounded-2xl border-[1.5px] px-3 py-3 transition-all",
-              state.carpoolEnabled
-                ? "border-emerald-300 bg-gradient-to-br from-emerald-50 to-white"
-                : "border-muted bg-muted/40",
-            )}>
+          <StepQuestion
+            title={t("eventWizard.q.carpool", { defaultValue: "Activer le covoiturage ?" })}
+          >
+            <div
+              className={cn(
+                "flex items-center justify-between rounded-2xl border-[1.5px] px-3 py-3 transition-all",
+                state.carpoolEnabled
+                  ? "border-emerald-300 bg-gradient-to-br from-emerald-50 to-white"
+                  : "border-muted bg-muted/40",
+              )}
+            >
               <div className="flex-1 min-w-0 pr-3">
-                <div className={cn("text-[13px] font-bold", state.carpoolEnabled ? "text-emerald-900" : "text-foreground")}>
+                <div
+                  className={cn(
+                    "text-[13px] font-bold",
+                    state.carpoolEnabled ? "text-emerald-900" : "text-foreground",
+                  )}
+                >
                   {t("eventWizard.carpoolLabel", { defaultValue: "Activer le covoiturage" })}
                 </div>
-                <div className={cn("text-[11px] font-medium mt-0.5", state.carpoolEnabled ? "text-emerald-600" : "text-muted-foreground")}>
+                <div
+                  className={cn(
+                    "text-[11px] font-medium mt-0.5",
+                    state.carpoolEnabled ? "text-emerald-600" : "text-muted-foreground",
+                  )}
+                >
                   Les familles s'organisent
                 </div>
               </div>
-              <Switch checked={!!state.carpoolEnabled} onCheckedChange={(v) => patch("carpoolEnabled", v)} />
+              <Switch
+                checked={!!state.carpoolEnabled}
+                onCheckedChange={(v) => patch("carpoolEnabled", v)}
+              />
             </div>
             <Button className="w-full mt-3" onClick={() => go(1)}>
               {t("eventWizard.continue", { defaultValue: "Continuer" })}
@@ -1043,9 +1199,13 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
         )}
 
         {current === "comment" && (
-          <StepQuestion title={t("eventWizard.q.comment", { defaultValue: "Un commentaire à ajouter ?" })}>
+          <StepQuestion
+            title={t("eventWizard.q.comment", { defaultValue: "Un commentaire à ajouter ?" })}
+          >
             <p className="text-xs text-muted-foreground">
-              {t("eventWizard.commentHint", { defaultValue: "Facultatif — visible par les joueurs / parents." })}
+              {t("eventWizard.commentHint", {
+                defaultValue: "Facultatif — visible par les joueurs / parents.",
+              })}
             </p>
             <Textarea
               value={state.description ?? ""}
@@ -1061,7 +1221,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           </StepQuestion>
         )}
 
-
         {current === "summary" && (
           <div className="space-y-3">
             <div className="text-center pt-2">
@@ -1070,7 +1229,13 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 {t("eventWizard.readyTitle", { defaultValue: "Tout est prêt" })}
               </h3>
             </div>
-            <SummaryCard state={state} title={title} teamName={selectedTeam?.name} seriesCount={seriesCount} t={t} />
+            <SummaryCard
+              state={state}
+              title={title}
+              teamName={selectedTeam?.name}
+              seriesCount={seriesCount}
+              t={t}
+            />
           </div>
         )}
       </div>
@@ -1085,7 +1250,11 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 disabled={createMut.isPending}
                 onClick={() => createMut.mutate()}
               >
-                {createMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("eventWizard.create", { defaultValue: "Créer" })}
+                {createMut.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("eventWizard.create", { defaultValue: "Créer" })
+                )}
               </Button>
               {state.convocScope !== "none" && (
                 <Button
@@ -1142,7 +1311,6 @@ function StepQuestion({ title, children }: { title: string; children: React.Reac
     </div>
   );
 }
-
 
 type DoorColor = "green" | "blue" | "red" | "amber" | "purple" | "pink";
 
@@ -1232,7 +1400,6 @@ function DoorButton({
   );
 }
 
-
 function Chip({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
@@ -1311,14 +1478,7 @@ function WizardHero({
       >
         <path d="M250 0 L400 0 L400 160 L310 160 Z" fill="rgba(255,255,255,0.05)" />
         <ellipse cx="355" cy="55" rx="70" ry="55" fill="rgba(255,255,255,0.08)" />
-        <line
-          x1="220"
-          y1="160"
-          x2="400"
-          y2="28"
-          stroke="rgba(255,255,255,0.05)"
-          strokeWidth="28"
-        />
+        <line x1="220" y1="160" x2="400" y2="28" stroke="rgba(255,255,255,0.05)" strokeWidth="28" />
       </svg>
 
       <div className="relative z-10 px-4 pt-3 pb-3">
@@ -1362,8 +1522,6 @@ function WizardHero({
   );
 }
 
-
-
 function LiveRecap({
   state,
   teamName,
@@ -1383,7 +1541,10 @@ function LiveRecap({
   if (state.startDate) chips.push(format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM"));
   if (state.startTime && state.startDate) chips.push(state.startTime);
   if (state.durationMin) chips.push(`${state.durationMin}min`);
-  if (seriesCount > 0) chips.push(t("eventWizard.recap.series", { count: seriesCount, defaultValue: "série {{count}}" }));
+  if (seriesCount > 0)
+    chips.push(
+      t("eventWizard.recap.series", { count: seriesCount, defaultValue: "série {{count}}" }),
+    );
   if (state.type === "match" && state.isHome) chips.push(state.isHome === "home" ? "🏠" : "🚌");
   if (state.opponent) chips.push(`vs ${state.opponent}`);
   if (state.location) chips.push(`📍 ${state.location}`);
@@ -1395,7 +1556,10 @@ function LiveRecap({
       </div>
       <div className="flex flex-wrap gap-1">
         {chips.map((c, i) => (
-          <span key={i} className="rounded-full bg-background border border-border px-2 py-0.5 text-[11px]">
+          <span
+            key={i}
+            className="rounded-full bg-background border border-border px-2 py-0.5 text-[11px]"
+          >
             {c}
           </span>
         ))}
@@ -1422,13 +1586,23 @@ function SummaryCard({
       <div className="font-semibold text-base">{title}</div>
       {teamName && <div className="text-muted-foreground">{teamName}</div>}
       {state.startDate && (
-        <div>📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.startTime} · {state.durationMin} min</div>
+        <div>
+          📅 {format(new Date(`${state.startDate}T00:00:00`), "EEE d MMM")} · {state.startTime} ·{" "}
+          {state.durationMin} min
+        </div>
       )}
       {state.location && <div>📍 {state.location}</div>}
-      {state.opponent && <div>🆚 {state.opponent} ({state.isHome === "home" ? "🏠" : "🚌"})</div>}
+      {state.opponent && (
+        <div>
+          🆚 {state.opponent} ({state.isHome === "home" ? "🏠" : "🚌"})
+        </div>
+      )}
       {seriesCount > 0 && (
         <div className="text-primary font-semibold">
-          {t("eventWizard.series.preview", { count: seriesCount, defaultValue: "Créer {{count}} entraînements" })}
+          {t("eventWizard.series.preview", {
+            count: seriesCount,
+            defaultValue: "Créer {{count}} entraînements",
+          })}
         </div>
       )}
       <div className="text-muted-foreground text-xs pt-1">

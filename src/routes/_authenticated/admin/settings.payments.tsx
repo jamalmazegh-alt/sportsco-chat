@@ -11,20 +11,9 @@ import {
   createStripeConnectOnboardingLink,
   refreshStripeConnectStatus,
 } from "@/lib/stripe-connect.functions";
-import {
-  getPaymentSettings,
-  updatePaymentSettings,
-} from "@/lib/payment-settings.functions";
-import {
-  listSeasons,
-  createSeason,
-  setCurrentSeason,
-  deleteSeason,
-} from "@/lib/seasons.functions";
-import {
-  getReminderSettings,
-  updateReminderSettings,
-} from "@/lib/payment-reminders.functions";
+import { getPaymentSettings, updatePaymentSettings } from "@/lib/payment-settings.functions";
+import { listSeasons, createSeason, setCurrentSeason, deleteSeason } from "@/lib/seasons.functions";
+import { getReminderSettings, updateReminderSettings } from "@/lib/payment-reminders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,9 +80,7 @@ function PaymentsSettingsPage() {
           <CreditCard className="h-6 w-6 text-primary" />
           {t("admin.payments.title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
-          {t("admin.payments.subtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("admin.payments.subtitle")}</p>
       </header>
 
       <Tabs defaultValue={search.tab ?? "stripe"} className="w-full">
@@ -225,29 +212,58 @@ function StripeTab({ clubId, successFlag }: { clubId: string; successFlag: boole
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{t("admin.payments.notActivatedTitle")}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{t("admin.payments.notActivatedHint")}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("admin.payments.notActivatedHint")}
+                </p>
               </div>
             </div>
             <Button onClick={handleActivate} disabled={busy !== null} className="w-full">
-              {busy === "create" ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>{t("admin.payments.activate")}<ExternalLink className="h-4 w-4" /></>)}
+              {busy === "create" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  {t("admin.payments.activate")}
+                  <ExternalLink className="h-4 w-4" />
+                </>
+              )}
             </Button>
           </>
         )}
         {s?.stripeAccountId && s.status === "pending" && (
           <>
             <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-amber-500/10 p-2.5"><AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" /></div>
+              <div className="rounded-xl bg-amber-500/10 p-2.5">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{t("admin.payments.pending")}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{t("admin.payments.pendingHint")}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("admin.payments.pendingHint")}
+                </p>
               </div>
             </div>
             <div className="flex gap-2">
               <Button onClick={handleContinue} disabled={busy !== null} className="flex-1">
-                {busy === "link" ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>{t("admin.payments.completeProfile")}<ExternalLink className="h-4 w-4" /></>)}
+                {busy === "link" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    {t("admin.payments.completeProfile")}
+                    <ExternalLink className="h-4 w-4" />
+                  </>
+                )}
               </Button>
-              <Button variant="outline" onClick={handleRefresh} disabled={busy !== null} size="icon">
-                {busy === "refresh" ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              <Button
+                variant="outline"
+                onClick={handleRefresh}
+                disabled={busy !== null}
+                size="icon"
+              >
+                {busy === "refresh" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </>
@@ -255,28 +271,58 @@ function StripeTab({ clubId, successFlag }: { clubId: string; successFlag: boole
         {s?.stripeAccountId && s.status === "active" && (
           <>
             <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-emerald-500/10 p-2.5"><CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /></div>
+              <div className="rounded-xl bg-emerald-500/10 p-2.5">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{t("admin.payments.active")}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{t("admin.payments.activeHint", { charges: s.chargesEnabled ? "✓" : "✗", payouts: s.payoutsEnabled ? "✓" : "✗" })}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("admin.payments.activeHint", {
+                    charges: s.chargesEnabled ? "✓" : "✗",
+                    payouts: s.payoutsEnabled ? "✓" : "✗",
+                  })}
+                </p>
               </div>
             </div>
-            <Button variant="outline" onClick={handleRefresh} disabled={busy !== null} className="w-full">
-              {busy === "refresh" ? <Loader2 className="h-4 w-4 animate-spin" /> : <><RefreshCw className="h-4 w-4" />{t("admin.payments.refreshStatus")}</>}
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={busy !== null}
+              className="w-full"
+            >
+              {busy === "refresh" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4" />
+                  {t("admin.payments.refreshStatus")}
+                </>
+              )}
             </Button>
           </>
         )}
         {s?.stripeAccountId && (s.status === "restricted" || s.status === "disabled") && (
           <>
             <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-destructive/10 p-2.5"><AlertCircle className="h-5 w-5 text-destructive" /></div>
+              <div className="rounded-xl bg-destructive/10 p-2.5">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold">{t("admin.payments.restricted")}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{t("admin.payments.restrictedHint")}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("admin.payments.restrictedHint")}
+                </p>
               </div>
             </div>
             <Button onClick={handleContinue} disabled={busy !== null} className="w-full">
-              {busy === "link" ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>{t("admin.payments.completeProfile")}<ExternalLink className="h-4 w-4" /></>)}
+              {busy === "link" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  {t("admin.payments.completeProfile")}
+                  <ExternalLink className="h-4 w-4" />
+                </>
+              )}
             </Button>
           </>
         )}
@@ -284,7 +330,11 @@ function StripeTab({ clubId, successFlag }: { clubId: string; successFlag: boole
 
       <div className="rounded-2xl border border-border bg-muted/30 p-5 space-y-2">
         <p className="text-sm font-semibold">{t("admin.payments.platformFee", { rate })}</p>
-        <p className="text-xs text-muted-foreground">{s?.hasActiveSubscription ? t("admin.payments.feeReduced") : t("admin.payments.feeStandard")}</p>
+        <p className="text-xs text-muted-foreground">
+          {s?.hasActiveSubscription
+            ? t("admin.payments.feeReduced")
+            : t("admin.payments.feeStandard")}
+        </p>
       </div>
     </div>
   );
@@ -345,7 +395,11 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
   });
 
   if (q.isLoading) {
-    return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -358,20 +412,49 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold">HelloAsso</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Encaissez sans commission via la plateforme HelloAsso (pourboire libre laissé au donateur).
+              Encaissez sans commission via la plateforme HelloAsso (pourboire libre laissé au
+              donateur).
             </p>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
         </div>
 
         <div className="grid gap-4">
-          <UrlField label="Adhésions / licences" placeholder="https://www.helloasso.com/associations/..." value={urls.membership} onChange={(v) => setUrls((s) => ({ ...s, membership: v }))} disabled={!enabled} />
-          <UrlField label="Collectes / cagnottes" placeholder="https://www.helloasso.com/associations/.../collectes/..." value={urls.fundraising} onChange={(v) => setUrls((s) => ({ ...s, fundraising: v }))} disabled={!enabled} />
-          <UrlField label="Boutique" placeholder="https://www.helloasso.com/associations/.../boutiques/..." value={urls.shop} onChange={(v) => setUrls((s) => ({ ...s, shop: v }))} disabled={!enabled} />
-          <UrlField label="Tournois / événements" placeholder="https://www.helloasso.com/associations/.../evenements/..." value={urls.tournament} onChange={(v) => setUrls((s) => ({ ...s, tournament: v }))} disabled={!enabled} />
+          <UrlField
+            label="Adhésions / licences"
+            placeholder="https://www.helloasso.com/associations/..."
+            value={urls.membership}
+            onChange={(v) => setUrls((s) => ({ ...s, membership: v }))}
+            disabled={!enabled}
+          />
+          <UrlField
+            label="Collectes / cagnottes"
+            placeholder="https://www.helloasso.com/associations/.../collectes/..."
+            value={urls.fundraising}
+            onChange={(v) => setUrls((s) => ({ ...s, fundraising: v }))}
+            disabled={!enabled}
+          />
+          <UrlField
+            label="Boutique"
+            placeholder="https://www.helloasso.com/associations/.../boutiques/..."
+            value={urls.shop}
+            onChange={(v) => setUrls((s) => ({ ...s, shop: v }))}
+            disabled={!enabled}
+          />
+          <UrlField
+            label="Tournois / événements"
+            placeholder="https://www.helloasso.com/associations/.../evenements/..."
+            value={urls.tournament}
+            onChange={(v) => setUrls((s) => ({ ...s, tournament: v }))}
+            disabled={!enabled}
+          />
         </div>
 
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="w-full sm:w-auto">
+        <Button
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+          className="w-full sm:w-auto"
+        >
           {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
         </Button>
       </div>
@@ -379,13 +462,30 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
   );
 }
 
-function UrlField({ label, placeholder, value, onChange, disabled }: {
-  label: string; placeholder: string; value: string; onChange: (v: string) => void; disabled?: boolean;
+function UrlField({
+  label,
+  placeholder,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">{label}</Label>
-      <Input type="url" inputMode="url" placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} />
+      <Input
+        type="url"
+        inputMode="url"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+      />
     </div>
   );
 }
@@ -451,7 +551,11 @@ function SeasonsTab({ clubId }: { clubId: string }) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs">Libellé</Label>
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="2025/2026" />
+            <Input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="2025/2026"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Début</Label>
@@ -464,16 +568,29 @@ function SeasonsTab({ clubId }: { clubId: string }) {
         </div>
         <div className="flex items-center gap-2">
           <Switch checked={isCurrent} onCheckedChange={setIsCurrent} id="is-current" />
-          <Label htmlFor="is-current" className="text-xs">Définir comme saison courante</Label>
+          <Label htmlFor="is-current" className="text-xs">
+            Définir comme saison courante
+          </Label>
         </div>
         <Button onClick={() => create.mutate()} disabled={create.isPending}>
-          {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Plus className="h-4 w-4" />Créer</>}
+          {create.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <Plus className="h-4 w-4" />
+              Créer
+            </>
+          )}
         </Button>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <p className="text-sm font-semibold">Saisons existantes</p>
-        {q.isLoading && <div className="flex justify-center py-6"><Loader2 className="h-4 w-4 animate-spin text-primary" /></div>}
+        {q.isLoading && (
+          <div className="flex justify-center py-6">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+          </div>
+        )}
         {q.data?.seasons.length === 0 && (
           <p className="text-xs text-muted-foreground">Aucune saison pour le moment.</p>
         )}
@@ -483,16 +600,33 @@ function SeasonsTab({ clubId }: { clubId: string }) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium flex items-center gap-1.5">
                   {s.label}
-                  {s.is_current && <span className="inline-flex items-center gap-0.5 text-[10px] uppercase tracking-wide bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded"><Star className="h-2.5 w-2.5" /> en cours</span>}
+                  {s.is_current && (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] uppercase tracking-wide bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded">
+                      <Star className="h-2.5 w-2.5" /> en cours
+                    </span>
+                  )}
                 </p>
-                <p className="text-xs text-muted-foreground">{s.start_date} → {s.end_date}</p>
+                <p className="text-xs text-muted-foreground">
+                  {s.start_date} → {s.end_date}
+                </p>
               </div>
               {!s.is_current && (
-                <Button size="sm" variant="outline" onClick={() => setCurrent.mutate(s.id)} disabled={setCurrent.isPending}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setCurrent.mutate(s.id)}
+                  disabled={setCurrent.isPending}
+                >
                   <Star className="h-3.5 w-3.5" /> Définir
                 </Button>
               )}
-              <Button size="icon" variant="ghost" onClick={() => remove.mutate(s.id)} disabled={remove.isPending} className="text-destructive hover:text-destructive">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => remove.mutate(s.id)}
+                disabled={remove.isPending}
+                className="text-destructive hover:text-destructive"
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </li>
@@ -544,7 +678,11 @@ function GeneralTab({ clubId }: { clubId: string }) {
   });
 
   if (q.isLoading) {
-    return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -553,12 +691,25 @@ function GeneralTab({ clubId }: { clubId: string }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs">Devise (ISO 4217)</Label>
-            <Input value={currency} onChange={(e) => setCurrency(e.target.value)} maxLength={3} placeholder="eur" />
+            <Input
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              maxLength={3}
+              placeholder="eur"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Montant minimum de paiement partiel</Label>
-            <Input type="number" min={0} step="0.01" value={minPartial} onChange={(e) => setMinPartial(e.target.value)} />
-            <p className="text-[11px] text-muted-foreground">En dessous de ce montant, les parents devront payer la totalité.</p>
+            <Input
+              type="number"
+              min={0}
+              step="0.01"
+              value={minPartial}
+              onChange={(e) => setMinPartial(e.target.value)}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              En dessous de ce montant, les parents devront payer la totalité.
+            </p>
           </div>
         </div>
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
@@ -614,7 +765,11 @@ function RemindersTab({ clubId }: { clubId: string }) {
   });
 
   if (q.isLoading) {
-    return <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>;
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -627,8 +782,8 @@ function RemindersTab({ clubId }: { clubId: string }) {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold">Rappels automatiques de paiement</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Envoyés chaque matin par email aux familles dont les obligations sont impayées,
-              en fonction de la date d'échéance configurée sur chaque item.
+              Envoyés chaque matin par email aux familles dont les obligations sont impayées, en
+              fonction de la date d'échéance configurée sur chaque item.
             </p>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
@@ -639,8 +794,7 @@ function RemindersTab({ clubId }: { clubId: string }) {
           <div className="grid gap-2">
             {PRESET_OFFSETS.map((p) => {
               const selected =
-                p.value.length === offsets.length &&
-                p.value.every((v) => offsets.includes(v));
+                p.value.length === offsets.length && p.value.every((v) => offsets.includes(v));
               return (
                 <button
                   key={p.label}
@@ -683,8 +837,14 @@ function RemindersTab({ clubId }: { clubId: string }) {
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground space-y-1">
-        <p><strong>Note :</strong> Les rappels sont envoyés aux payeurs, joueurs et parents/tuteurs reliés. Chaque famille ne reçoit qu'un email par jalon.</p>
-        <p>Vous pouvez également déclencher une relance manuelle depuis la page <em>Items de paiement</em> via le bouton « Relancer ».</p>
+        <p>
+          <strong>Note :</strong> Les rappels sont envoyés aux payeurs, joueurs et parents/tuteurs
+          reliés. Chaque famille ne reçoit qu'un email par jalon.
+        </p>
+        <p>
+          Vous pouvez également déclencher une relance manuelle depuis la page{" "}
+          <em>Items de paiement</em> via le bouton « Relancer ».
+        </p>
       </div>
     </div>
   );

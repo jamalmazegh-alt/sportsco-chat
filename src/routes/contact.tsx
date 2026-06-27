@@ -53,11 +53,27 @@ function ContactPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "contact", firstName, lastName, email, phone, role, club, message, locale: i18n.language?.slice(0, 2) || "fr" }),
+        body: JSON.stringify({
+          kind: "contact",
+          firstName,
+          lastName,
+          email,
+          phone,
+          role,
+          club,
+          message,
+          locale: i18n.language?.slice(0, 2) || "fr",
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setClub(""); setMessage("");
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone("");
+      setRole("");
+      setClub("");
+      setMessage("");
       toast.success(t("contact.successToast"));
     } catch (err) {
       console.error(err);
@@ -93,7 +109,9 @@ function ContactPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
                   <Mail className="h-5 w-5" />
                 </div>
-                <h2 className="mt-4 font-display text-base font-semibold">{t("contact.emailLabel")}</h2>
+                <h2 className="mt-4 font-display text-base font-semibold">
+                  {t("contact.emailLabel")}
+                </h2>
                 <a
                   href="mailto:hello@clubero.app"
                   className="mt-1 block text-sm text-muted-foreground hover:text-foreground"
@@ -105,10 +123,10 @@ function ContactPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color:var(--brand-blue-soft)] text-[color:var(--brand-blue-deep)]">
                   <MapPin className="h-5 w-5" />
                 </div>
-                <h2 className="mt-4 font-display text-base font-semibold">{t("contact.whereLabel")}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t("contact.whereBody")}
-                </p>
+                <h2 className="mt-4 font-display text-base font-semibold">
+                  {t("contact.whereLabel")}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">{t("contact.whereBody")}</p>
               </div>
             </div>
           </div>
@@ -171,7 +189,9 @@ function ContactPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {roles.map((r) => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                      <SelectItem key={r} value={r}>
+                        {r}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -198,7 +218,11 @@ function ContactPage() {
               />
             </div>
             <Button type="submit" size="lg" disabled={submitting} className="mt-6 w-full h-12">
-              {submitting ? t("contact.submitting") : sent ? t("contact.submitted") : t("contact.submit")}
+              {submitting
+                ? t("contact.submitting")
+                : sent
+                  ? t("contact.submitted")
+                  : t("contact.submit")}
             </Button>
           </form>
         </div>

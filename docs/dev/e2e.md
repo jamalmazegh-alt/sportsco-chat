@@ -21,14 +21,14 @@ bunx playwright test tests/e2e/01-onboarding-club.e2e.ts
 
 ## Variables d'env requises
 
-| Var | Source |
-|-----|--------|
-| `SUPABASE_URL` | `https://woawmhuntajpiezmmgzm.supabase.co` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Lovable Cloud → Backend (secret) |
-| `SUPABASE_PUBLISHABLE_KEY` | `.env` (publique) |
-| `E2E_BASE_URL` | **obligatoire** — URL preview Lovable |
-| `E2E_REAL_AI` | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
-| `E2E_UI` | `1` pour passer le timeout global à 90s (sinon 30s) |
+| Var                         | Source                                                            |
+| --------------------------- | ----------------------------------------------------------------- |
+| `SUPABASE_URL`              | `https://woawmhuntajpiezmmgzm.supabase.co`                        |
+| `SUPABASE_SERVICE_ROLE_KEY` | Lovable Cloud → Backend (secret)                                  |
+| `SUPABASE_PUBLISHABLE_KEY`  | `.env` (publique)                                                 |
+| `E2E_BASE_URL`              | **obligatoire** — URL preview Lovable                             |
+| `E2E_REAL_AI`               | `1` pour appeler la vraie IA (test 10 + test 14), sinon mock/skip |
+| `E2E_UI`                    | `1` pour passer le timeout global à 90s (sinon 30s)               |
 
 ## Stratégie
 
@@ -41,26 +41,27 @@ nettoie en `afterAll`. Aucune dépendance entre fichiers.
 
 ## Couverture
 
-| # | Fichier | Périmètre |
-|---|---------|-----------|
-| 01 | `onboarding-club` | Signup admin, email log, création club |
-| 02 | `teams-multi-sport` | Football, basket, rugby, handball, volley |
-| 03 | `users-roles` | Invites admin/coach, rattachement équipe |
-| 04 | `players-parents` | Joueurs avec/sans parents, RLS parent |
-| 05 | `events-all-types` | training/match/tournament/meeting × 2 sports |
-| 06 | `lineup` | Compo 4-4-2, publication, lecture joueur |
-| 07 | `convocations-send` | Création conv + lien WhatsApp |
-| 08 | `convocations-respond` | Réponse joueur, parent, override coach |
-| 09 | `event-chat` | Coach poste, joueur lit, joueur répond |
-| 10 | `coach-feedback` | Feedback × 2 + synthèse IA + édition |
-| 11 | `match-result-stats` | Score, buts, cartons, vérif stats |
-| 12 | `convocation-lifecycle` | Annuler / renvoyer / reporter |
-| 13 | `player-profile` | MAJ profil par coach + consent parent |
-| 14 | `assistant-chat` | Appel /api/chat authentifié (skippé sans `E2E_REAL_AI=1`) |
+| #   | Fichier                 | Périmètre                                                 |
+| --- | ----------------------- | --------------------------------------------------------- |
+| 01  | `onboarding-club`       | Signup admin, email log, création club                    |
+| 02  | `teams-multi-sport`     | Football, basket, rugby, handball, volley                 |
+| 03  | `users-roles`           | Invites admin/coach, rattachement équipe                  |
+| 04  | `players-parents`       | Joueurs avec/sans parents, RLS parent                     |
+| 05  | `events-all-types`      | training/match/tournament/meeting × 2 sports              |
+| 06  | `lineup`                | Compo 4-4-2, publication, lecture joueur                  |
+| 07  | `convocations-send`     | Création conv + lien WhatsApp                             |
+| 08  | `convocations-respond`  | Réponse joueur, parent, override coach                    |
+| 09  | `event-chat`            | Coach poste, joueur lit, joueur répond                    |
+| 10  | `coach-feedback`        | Feedback × 2 + synthèse IA + édition                      |
+| 11  | `match-result-stats`    | Score, buts, cartons, vérif stats                         |
+| 12  | `convocation-lifecycle` | Annuler / renvoyer / reporter                             |
+| 13  | `player-profile`        | MAJ profil par coach + consent parent                     |
+| 14  | `assistant-chat`        | Appel /api/chat authentifié (skippé sans `E2E_REAL_AI=1`) |
 
 ## CI
 
 Workflow `.github/workflows/e2e-tests.yml` :
+
 - **Cron** : 4 AM UTC (après les RLS de 3 AM)
 - **Manuel** : Actions → E2E Tests → Run workflow
 - Rapport HTML uploadé en artifact (14 jours)

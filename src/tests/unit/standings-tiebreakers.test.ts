@@ -16,12 +16,7 @@ import {
   type Tiebreaker,
 } from "@/modules/tournaments/lib/standings";
 
-const completed = (
-  a: string,
-  b: string,
-  sa: number,
-  sb: number,
-): MatchInput => ({
+const completed = (a: string, b: string, sa: number, sb: number): MatchInput => ({
   teamAId: a,
   teamBId: b,
   scoreA: sa,
@@ -203,16 +198,10 @@ describe("computeStandings — tie-breakers", () => {
     });
     // Not asserting flipped specifically (could collide), but the function
     // must remain deterministic for each salt.
-    const flippedAgain = computeStandings(
-      ["alpha", "beta"],
-      [],
-      undefined,
-      undefined,
-      { drawLotSalt: "different-salt-xyz" },
-    );
-    expect(flipped.map((r) => r.teamId)).toEqual(
-      flippedAgain.map((r) => r.teamId),
-    );
+    const flippedAgain = computeStandings(["alpha", "beta"], [], undefined, undefined, {
+      drawLotSalt: "different-salt-xyz",
+    });
+    expect(flipped.map((r) => r.teamId)).toEqual(flippedAgain.map((r) => r.teamId));
   });
 
   it("respects a custom tie-break order (fair_play before goal_diff)", () => {
@@ -233,23 +222,11 @@ describe("computeStandings — tie-breakers", () => {
     expect(defaultRank[0].teamId).toBe("A");
 
     // Custom order: fair_play before goal_diff → B wins because A has -3 fair-play.
-    const custom: Tiebreaker[] = [
-      "points",
-      "fair_play",
-      "goal_diff",
-      "goals_for",
-      "draw_lot",
-    ];
-    const customRank = computeStandings(
-      ["A", "B", "C"],
-      matches,
-      undefined,
-      custom,
-      {
-        fairPlay: { enabled: true, yellow: -1, red: -3, secondYellow: -3 },
-        events,
-      },
-    );
+    const custom: Tiebreaker[] = ["points", "fair_play", "goal_diff", "goals_for", "draw_lot"];
+    const customRank = computeStandings(["A", "B", "C"], matches, undefined, custom, {
+      fairPlay: { enabled: true, yellow: -1, red: -3, secondYellow: -3 },
+      events,
+    });
     expect(customRank[0].teamId).toBe("B");
     expect(customRank[1].teamId).toBe("A");
   });

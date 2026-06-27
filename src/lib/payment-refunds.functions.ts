@@ -23,7 +23,6 @@ async function assertFinAdmin(
   throw new Error("Only financial admins can manage refunds/exemptions");
 }
 
-
 async function sumPaid(obligationId: string): Promise<number> {
   const { data } = await supabaseAdmin
     .from("payment_transactions")
@@ -145,9 +144,7 @@ export const refundTransaction = createServerFn({ method: "POST" })
           tx: tx.id,
           error: err instanceof Error ? err.message : String(err),
         });
-        throw new Error(
-          `Stripe refund failed: ${err instanceof Error ? err.message : "unknown"}`,
-        );
+        throw new Error(`Stripe refund failed: ${err instanceof Error ? err.message : "unknown"}`);
       }
     }
 
@@ -283,9 +280,7 @@ export const cancelObligation = createServerFn({ method: "POST" })
     if (!obl) throw new Error("Obligation not found");
     await assertFinAdmin(context.supabase, context.userId, obl.club_id);
     if (obl.status === "paid" || obl.status === "partially_paid") {
-      throw new Error(
-        "Cannot cancel an obligation with payments — refund first",
-      );
+      throw new Error("Cannot cancel an obligation with payments — refund first");
     }
 
     await supabaseAdmin
@@ -315,9 +310,7 @@ export const cancelObligation = createServerFn({ method: "POST" })
 
 export const reopenObligation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ obligationId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ obligationId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: obl } = await supabaseAdmin
       .from("payment_obligations")

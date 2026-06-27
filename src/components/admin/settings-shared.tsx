@@ -6,10 +6,7 @@ export function SettingsSubHeader({ title, description }: { title: string; descr
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
-      <BackLink
-        to="/admin"
-        label={t("admin.back", { defaultValue: "Retour aux paramètres" })}
-      />
+      <BackLink to="/admin" label={t("admin.back", { defaultValue: "Retour aux paramètres" })} />
       <div>
         <h1 className="text-xl font-semibold">{title}</h1>
         {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}

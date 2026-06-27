@@ -129,12 +129,8 @@ function SuperAdminUsers() {
               <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">
                 Clubs & roles
               </th>
-              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">
-                Plan
-              </th>
-              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">
-                Last seen
-              </th>
+              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Plan</th>
+              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Last seen</th>
               <th className="text-left font-medium px-3 py-2">Status</th>
               <th className="w-10" />
             </tr>
@@ -157,13 +153,11 @@ function SuperAdminUsers() {
             )}
             {!loading &&
               items.map((u) => {
-                const name =
-                  u.full_name ?? u.email ?? u.phone ?? u.id.slice(0, 8);
+                const name = u.full_name ?? u.email ?? u.phone ?? u.id.slice(0, 8);
                 const onboardingOk = !!u.email_confirmed_at;
                 const dormant =
                   u.last_sign_in_at &&
-                  Date.now() - new Date(u.last_sign_in_at).getTime() >
-                    60 * 24 * 3600 * 1000;
+                  Date.now() - new Date(u.last_sign_in_at).getTime() > 60 * 24 * 3600 * 1000;
                 const never = !u.last_sign_in_at;
                 return (
                   <tr
@@ -178,9 +172,7 @@ function SuperAdminUsers() {
                       >
                         <Avatar url={u.avatar_url} name={name} />
                         <div className="min-w-0">
-                          <div className="font-medium truncate group-hover:underline">
-                            {name}
-                          </div>
+                          <div className="font-medium truncate group-hover:underline">{name}</div>
                           <div className="text-xs text-muted-foreground truncate">
                             {u.email ?? u.phone ?? "—"}
                           </div>
@@ -189,9 +181,7 @@ function SuperAdminUsers() {
                     </td>
                     <td className="px-3 py-2.5 hidden lg:table-cell">
                       {u.clubs.length === 0 ? (
-                        <span className="text-xs text-muted-foreground">
-                          No club
-                        </span>
+                        <span className="text-xs text-muted-foreground">No club</span>
                       ) : (
                         <div className="flex flex-wrap gap-1.5 max-w-md">
                           {u.clubs.slice(0, 3).map((c) => (
@@ -202,9 +192,7 @@ function SuperAdminUsers() {
                               <span className="text-foreground truncate max-w-[140px]">
                                 {c.name ?? c.club_id.slice(0, 6)}
                               </span>
-                              <StatusBadge tone={roleTone(c.role)}>
-                                {c.role}
-                              </StatusBadge>
+                              <StatusBadge tone={roleTone(c.role)}>{c.role}</StatusBadge>
                             </span>
                           ))}
                           {u.clubs.length > 3 && (
@@ -217,9 +205,7 @@ function SuperAdminUsers() {
                     </td>
                     <td className="px-3 py-2.5 hidden md:table-cell">
                       {u.clubs[0] ? (
-                        <StatusBadge
-                          tone={subTone(u.clubs[0].subscription_status).tone}
-                        >
+                        <StatusBadge tone={subTone(u.clubs[0].subscription_status).tone}>
                           {subTone(u.clubs[0].subscription_status).label}
                         </StatusBadge>
                       ) : (
@@ -246,19 +232,13 @@ function SuperAdminUsers() {
                             <ShieldCheck className="h-3 w-3" /> active
                           </StatusBadge>
                         )}
-                        {!onboardingOk && (
-                          <StatusBadge tone="warn">unverified</StatusBadge>
-                        )}
+                        {!onboardingOk && <StatusBadge tone="warn">unverified</StatusBadge>}
                       </div>
                     </td>
                     <td className="px-2 py-2.5">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            disabled={busyId === u.id}
-                          >
+                          <Button size="icon-sm" variant="ghost" disabled={busyId === u.id}>
                             {busyId === u.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
@@ -267,16 +247,10 @@ function SuperAdminUsers() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuLabel className="text-xs">
-                            Quick actions
-                          </DropdownMenuLabel>
+                          <DropdownMenuLabel className="text-xs">Quick actions</DropdownMenuLabel>
                           <DropdownMenuItem asChild>
-                            <Link
-                              to="/superadmin/users/$userId"
-                              params={{ userId: u.id }}
-                            >
-                              <ExternalLink className="h-4 w-4 mr-2" /> View
-                              profile
+                            <Link to="/superadmin/users/$userId" params={{ userId: u.id }}>
+                              <ExternalLink className="h-4 w-4 mr-2" /> View profile
                             </Link>
                           </DropdownMenuItem>
                           {u.clubs[0] && (
@@ -285,8 +259,7 @@ function SuperAdminUsers() {
                                 to="/superadmin/clubs/$clubId"
                                 params={{ clubId: u.clubs[0].club_id }}
                               >
-                                <ExternalLink className="h-4 w-4 mr-2" /> Open
-                                club
+                                <ExternalLink className="h-4 w-4 mr-2" /> Open club
                               </Link>
                             </DropdownMenuItem>
                           )}
@@ -301,8 +274,7 @@ function SuperAdminUsers() {
                               )
                             }
                           >
-                            <KeyRound className="h-4 w-4 mr-2" /> Send reset
-                            email
+                            <KeyRound className="h-4 w-4 mr-2" /> Send reset email
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={!u.email}
@@ -340,14 +312,12 @@ function SuperAdminUsers() {
                                 runAction(
                                   u.id,
                                   "Disable",
-                                  () =>
-                                    disableUser({ data: { user_id: u.id } }),
+                                  () => disableUser({ data: { user_id: u.id } }),
                                   true,
                                 )
                               }
                             >
-                              <ShieldOff className="h-4 w-4 mr-2" /> Disable
-                              account
+                              <ShieldOff className="h-4 w-4 mr-2" /> Disable account
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -400,12 +370,8 @@ function Mini({
   };
   return (
     <div className="rounded-lg border border-border bg-card px-4 py-3">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
-        {label}
-      </div>
-      <div className={`text-2xl font-semibold mt-1 tabular-nums ${colors[tone]}`}>
-        {value}
-      </div>
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`text-2xl font-semibold mt-1 tabular-nums ${colors[tone]}`}>{value}</div>
     </div>
   );
 }

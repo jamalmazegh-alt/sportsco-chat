@@ -4,7 +4,15 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
 
-const CATEGORIES = ["bug", "payment", "account", "team", "event", "feature_request", "other"] as const;
+const CATEGORIES = [
+  "bug",
+  "payment",
+  "account",
+  "team",
+  "event",
+  "feature_request",
+  "other",
+] as const;
 const PRIORITIES = ["low", "normal", "high", "urgent"] as const;
 const STATUSES = ["open", "in_progress", "waiting_user", "resolved", "closed"] as const;
 
@@ -13,11 +21,7 @@ const shortId = (id: string) => id.slice(0, 6).toUpperCase();
 
 // ---------- Helpers ----------
 
-async function notifySuperAdmins(opts: {
-  title: string;
-  body: string;
-  link: string;
-}) {
+async function notifySuperAdmins(opts: { title: string; body: string; link: string }) {
   const { data: admins } = await supabaseAdmin.from("super_admins").select("user_id");
   if (!admins?.length) return;
   await supabaseAdmin.from("notifications").insert(
@@ -149,7 +153,9 @@ export const listMySupportTickets = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("support_tickets")
-      .select("id, subject, category, priority, status, last_activity_at, created_at, user_unread_count")
+      .select(
+        "id, subject, category, priority, status, last_activity_at, created_at, user_unread_count",
+      )
       .eq("user_id", context.userId)
       .order("last_activity_at", { ascending: false })
       .limit(100);
@@ -315,12 +321,16 @@ export const listAllSupportTickets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ListInput.parse(input ?? {}))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
     if (!isAdmin) throw new Error("forbidden");
 
     let q = supabaseAdmin
       .from("support_tickets")
-      .select("id, user_id, club_id, subject, category, priority, status, staff_unread_count, last_activity_at, created_at, assigned_to")
+      .select(
+        "id, user_id, club_id, subject, category, priority, status, staff_unread_count, last_activity_at, created_at, assigned_to",
+      )
       .order("last_activity_at", { ascending: false })
       .limit(data.limit ?? 50);
     if (data.status) q = q.eq("status", data.status);
@@ -359,12 +369,14 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => UpdateInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
     if (!isAdmin) throw new Error("forbidden");
 
     const patch: {
-      status?: typeof STATUSES[number];
-      priority?: typeof PRIORITIES[number];
+      status?: (typeof STATUSES)[number];
+      priority?: (typeof PRIORITIES)[number];
       assigned_to?: string | null;
     } = {};
     if (data.status !== undefined) patch.status = data.status;
@@ -385,7 +397,9 @@ export const updateSupportTicket = createServerFn({ method: "POST" })
 export const getSupportStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
     if (!isAdmin) throw new Error("forbidden");
 
     const { count: openCount } = await supabaseAdmin
@@ -416,7 +430,9 @@ export const getSupportStats = createServerFn({ method: "GET" })
 export const getSupportUnreadCount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", { _user_id: context.userId });
+    const { data: isAdmin } = await context.supabase.rpc("has_super_admin", {
+      _user_id: context.userId,
+    });
     if (isAdmin) {
       // With head:true, Supabase returns `count` and `data` is null.
       const { count } = await supabaseAdmin

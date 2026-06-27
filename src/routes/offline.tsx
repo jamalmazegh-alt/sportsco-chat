@@ -16,9 +16,7 @@ function OfflinePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-white text-center">
       <img src={cluberoLogo} alt="Clubero" className="h-20 w-auto mb-6" />
-      <h1 className="text-2xl font-bold text-[#1d7a45] mb-2">
-        Vous êtes hors ligne
-      </h1>
+      <h1 className="text-2xl font-bold text-[#1d7a45] mb-2">Vous êtes hors ligne</h1>
       <p className="text-sm text-gray-600 max-w-sm">
         Reconnectez-vous à internet pour accéder à Clubero.
       </p>

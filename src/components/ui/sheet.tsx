@@ -61,31 +61,48 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, closeLabel = "Close", onCloseClick, showClose = true, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-      {showClose && (
-        <SheetPrimitive.Close asChild>
-          <button
-            type="button"
-            aria-label={closeLabel}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.stopPropagation();
-              onCloseClick?.();
-            }}
-            className="absolute right-3 top-3 z-[60] flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm ring-offset-background cursor-pointer transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">{closeLabel}</span>
-          </button>
-        </SheetPrimitive.Close>
-      )}
-      {children}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-));
+>(
+  (
+    {
+      side = "right",
+      className,
+      children,
+      closeLabel = "Close",
+      onCloseClick,
+      showClose = true,
+      ...props
+    },
+    ref,
+  ) => (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        className={cn(sheetVariants({ side }), className)}
+        {...props}
+      >
+        {showClose && (
+          <SheetPrimitive.Close asChild>
+            <button
+              type="button"
+              aria-label={closeLabel}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                onCloseClick?.();
+              }}
+              className="absolute right-3 top-3 z-[60] flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background/95 text-foreground shadow-sm ring-offset-background cursor-pointer transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">{closeLabel}</span>
+            </button>
+          </SheetPrimitive.Close>
+        )}
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  ),
+);
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

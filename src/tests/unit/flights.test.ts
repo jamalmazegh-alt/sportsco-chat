@@ -56,9 +56,7 @@ describe("proposeFlightDistributions", () => {
     const opts = proposeFlightDistributions(24);
     expect(opts.length).toBeGreaterThan(0);
     // 3 flights de 8 doit exister
-    expect(
-      opts.some((o) => o.sizes.length === 3 && o.sizes.every((s) => s === 8)),
-    ).toBe(true);
+    expect(opts.some((o) => o.sizes.length === 3 && o.sizes.every((s) => s === 8))).toBe(true);
   });
 
   it("handles 13 teams (odd) with multiple options", () => {
@@ -81,9 +79,7 @@ describe("defaultQualificationRules", () => {
     expect(rules).toHaveLength(2);
     expect(rules[0]).toEqual([{ kind: "group_position", positions: [1] }]);
     // Dernier flight prend positions 2..4
-    expect(rules[1]).toEqual([
-      { kind: "group_position", positions: [2, 3, 4] },
-    ]);
+    expect(rules[1]).toEqual([{ kind: "group_position", positions: [2, 3, 4] }]);
   });
 
   it("uses wild cards when size doesn't divide evenly", () => {
@@ -169,10 +165,7 @@ describe("generateFlightBracket", () => {
   });
 
   it("generates an 8-team bracket", () => {
-    const bracket = generateFlightBracket(
-      ["t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"],
-      {},
-    );
+    const bracket = generateFlightBracket(["t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"], {});
     expect(bracket.some((m) => m.placement_kind === "quarter")).toBe(true);
     expect(bracket.some((m) => m.placement_kind === "final")).toBe(true);
   });

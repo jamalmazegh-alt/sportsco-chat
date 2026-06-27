@@ -68,10 +68,7 @@ export function UrgencyCenter({ className }: Props) {
   if (surface === "error") {
     return (
       <section
-        className={cn(
-          "rounded-[16px] border-[1.5px] border-[#fecaca] bg-[#fef2f2] p-4",
-          className,
-        )}
+        className={cn("rounded-[16px] border-[1.5px] border-[#fecaca] bg-[#fef2f2] p-4", className)}
       >
         <div className="flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-[#dc2626] shrink-0 mt-0.5" strokeWidth={2.4} />
@@ -88,9 +85,7 @@ export function UrgencyCenter({ className }: Props) {
           <Button
             size="sm"
             variant="outline"
-            onClick={() =>
-              qc.invalidateQueries({ queryKey: ["urgency"], exact: false })
-            }
+            onClick={() => qc.invalidateQueries({ queryKey: ["urgency"], exact: false })}
           >
             {t("common.retry", { defaultValue: "Réessayer" })}
           </Button>
@@ -138,8 +133,7 @@ export function UrgencyCenter({ className }: Props) {
             t("attendance.respondPrompt"),
             item.title,
           );
-          if (sent > 0)
-            toast.success(t("attendance.remindAllSent", { count: sent }));
+          if (sent > 0) toast.success(t("attendance.remindAllSent", { count: sent }));
           else toast.info(t("attendance.alreadyRemindedRecently"));
           qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
         },

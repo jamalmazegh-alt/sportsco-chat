@@ -25,7 +25,11 @@ console.log("Stripe webhook reachability (unsigned POST — expect 400, never 3x
 for (const r of results) {
   const ok = r.status >= 200 && r.status < 300;
   const redirect = r.status >= 300 && r.status < 400;
-  const flag = redirect ? "FAIL (redirect — Stripe will not deliver)" : ok ? "OK" : "OK (handler reached)";
+  const flag = redirect
+    ? "FAIL (redirect — Stripe will not deliver)"
+    : ok
+      ? "OK"
+      : "OK (handler reached)";
   console.log(`${flag}  ${r.status}  ${r.url}`);
   console.log(`       ${r.body}\n`);
 }

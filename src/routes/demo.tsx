@@ -47,11 +47,30 @@ function DemoPage() {
       const res = await fetch("/api/public/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ kind: "demo", firstName, lastName, name: `${firstName} ${lastName}`.trim(), email, phone, club, role, teams, notes, locale: i18n.language?.slice(0, 2) || "fr" }),
+        body: JSON.stringify({
+          kind: "demo",
+          firstName,
+          lastName,
+          name: `${firstName} ${lastName}`.trim(),
+          email,
+          phone,
+          club,
+          role,
+          teams,
+          notes,
+          locale: i18n.language?.slice(0, 2) || "fr",
+        }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSent(true);
-      setClub(""); setFirstName(""); setLastName(""); setEmail(""); setPhone(""); setRole(""); setTeams(""); setNotes("");
+      setClub("");
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone("");
+      setRole("");
+      setTeams("");
+      setNotes("");
       toast.success(t("demo.successToast"));
     } catch (err) {
       console.error(err);
@@ -155,9 +174,13 @@ function DemoPage() {
                   onChange={(e) => setRole(e.target.value)}
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="" disabled>{t("demo.rolePh")}</option>
+                  <option value="" disabled>
+                    {t("demo.rolePh")}
+                  </option>
                   {roles.map((r) => (
-                    <option key={r} value={r}>{r}</option>
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -186,9 +209,7 @@ function DemoPage() {
             <Button type="submit" size="lg" disabled={submitting} className="mt-6 w-full h-12">
               {submitting ? t("demo.submitting") : sent ? t("demo.submitted") : t("demo.submit")}
             </Button>
-            <p className="mt-3 text-center text-xs text-muted-foreground">
-              {t("demo.rgpd")}
-            </p>
+            <p className="mt-3 text-center text-xs text-muted-foreground">{t("demo.rgpd")}</p>
           </form>
         </div>
       </section>

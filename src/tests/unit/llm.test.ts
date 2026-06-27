@@ -7,11 +7,7 @@
  *  - sanitizeRestrictedHtml strips dangerous tags & attributes
  */
 import { describe, it, expect } from "vitest";
-import {
-  anonymizePlayers,
-  ageToCategory,
-  sanitizeRestrictedHtml,
-} from "../../lib/llm/core.server";
+import { anonymizePlayers, ageToCategory, sanitizeRestrictedHtml } from "../../lib/llm/core.server";
 import {
   buildConsecutiveAbsencePrompt,
   buildPendingConvocationsPrompt,

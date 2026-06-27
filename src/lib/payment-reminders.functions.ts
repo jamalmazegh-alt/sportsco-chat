@@ -43,8 +43,7 @@ async function assertAdminOrFinancialAdmin(userId: string, clubId: string) {
     .eq("user_id", userId)
     .maybeSingle();
   const isAdmin =
-    !!memberRow &&
-    ((memberRow.roles ?? []).includes("admin") || memberRow.role === "admin");
+    !!memberRow && ((memberRow.roles ?? []).includes("admin") || memberRow.role === "admin");
   if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
@@ -109,9 +108,7 @@ async function recipientsForObligation(o: {
 /** Send reminder now to all unpaid obligations of a payment item. */
 export const sendItemRemindersNow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ paymentItemId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ paymentItemId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: item, error } = await supabaseAdmin
       .from("payment_items")
@@ -176,23 +173,18 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
                 itemTitle: item.title,
                 amountLabel: fmtMoney(o.amount_due_cents, item.currency),
                 remainingLabel:
-                  remaining !== o.amount_due_cents
-                    ? fmtMoney(remaining, item.currency)
-                    : null,
+                  remaining !== o.amount_due_cents ? fmtMoney(remaining, item.currency) : null,
                 dueDateLabel: frDate(item.due_date),
                 offsetDays: item.due_date
                   ? Math.round(
-                      (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) /
-                        86_400_000,
+                      (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) / 86_400_000,
                     )
                   : 0,
                 payUrl: `${baseUrl}/payments`,
               },
             });
           } else {
-            console.info(
-              "[manual-reminder] payment email skipped — payments_v2 flag off",
-            );
+            console.info("[manual-reminder] payment email skipped — payments_v2 flag off");
           }
           await supabaseAdmin.from("payment_reminder_log").insert({
             club_id: item.club_id,
@@ -219,35 +211,28 @@ export const updateReminderSettings = createServerFn({ method: "POST" })
       .object({
         clubId: z.string().uuid(),
         enabled: z.boolean(),
-        offsets: z
-          .array(z.number().int().min(-60).max(60))
-          .min(0)
-          .max(8),
+        offsets: z.array(z.number().int().min(-60).max(60)).min(0).max(8),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertFinancialAdmin(context.userId, data.clubId);
     const uniq = Array.from(new Set(data.offsets)).sort((a, b) => a - b);
-    const { error } = await supabaseAdmin
-      .from("club_payment_settings")
-      .upsert(
-        {
-          club_id: data.clubId,
-          payment_reminders_enabled: data.enabled,
-          payment_reminder_offsets_days: uniq,
-        },
-        { onConflict: "club_id" },
-      );
+    const { error } = await supabaseAdmin.from("club_payment_settings").upsert(
+      {
+        club_id: data.clubId,
+        payment_reminders_enabled: data.enabled,
+        payment_reminder_offsets_days: uniq,
+      },
+      { onConflict: "club_id" },
+    );
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
 export const getReminderSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
     const { data: s } = await supabaseAdmin
       .from("club_payment_settings")

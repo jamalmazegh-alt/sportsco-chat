@@ -44,11 +44,13 @@ export const Route = createFileRoute("/tournament/$slug")({
   head: ({ loaderData, params }) => {
     const data = loaderData?.initial?.tournament as any;
     const title = data?.name
-      ? i18n.t("public.metaTitle", {
-          ns: "tournaments",
-          name: data.name,
-          sport: data.sport ?? "",
-        }).trim() + " · Clubero"
+      ? i18n
+          .t("public.metaTitle", {
+            ns: "tournaments",
+            name: data.name,
+            sport: data.sport ?? "",
+          })
+          .trim() + " · Clubero"
       : i18n.t("public.metaTitleFallback", {
           ns: "tournaments",
           slug: params.slug,
@@ -96,7 +98,6 @@ function PublicTournamentPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [teamFilter, setTeamFilter] = useState<string>("all");
 
-
   if (q.isLoading && !q.data) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -111,11 +112,7 @@ function PublicTournamentPage() {
           <Trophy className="h-10 w-10 mx-auto text-muted-foreground" />
           <p className="text-lg font-medium">{t("public.unavailableTitle")}</p>
           <p className="text-sm text-muted-foreground">
-            <Trans
-              i18nKey="public.unavailableBody"
-              t={t}
-              components={{ 1: <strong /> }}
-            />
+            <Trans i18nKey="public.unavailableBody" t={t} components={{ 1: <strong /> }} />
           </p>
           <Link to="/" className="text-sm text-primary underline">
             {t("public.backHome")}
@@ -181,7 +178,13 @@ function PublicTournamentPage() {
     { id: "standings", label: t("public.tabs.standings"), icon: ListOrdered },
     { id: "bracket", label: t("public.tabs.bracket"), icon: GitBranch },
     ...(flights.length > 0
-      ? [{ id: "flights" as Tab, label: t("public.tabs.flights", { defaultValue: "Flights" }), icon: Trophy }]
+      ? [
+          {
+            id: "flights" as Tab,
+            label: t("public.tabs.flights", { defaultValue: "Flights" }),
+            icon: Trophy,
+          },
+        ]
       : []),
     ...(fieldStreamEntries.length > 0
       ? [{ id: "streams" as Tab, label: t("public.tabs.streams"), icon: Tv }]
@@ -194,26 +197,35 @@ function PublicTournamentPage() {
   const playedMatches = (matches as any[]).filter((m: any) => m.status === "completed").length;
   const liveCount = (matches as any[]).filter((m: any) => m.status === "live").length;
   const todayMs = new Date().setHours(0, 0, 0, 0);
-  const startMs = tournament.starts_on ? new Date(tournament.starts_on as any).setHours(0, 0, 0, 0) : null;
-  const endMs = tournament.ends_on ? new Date(tournament.ends_on as any).setHours(0, 0, 0, 0) : null;
-  const daysToStart =
-    startMs !== null ? Math.round((startMs - todayMs) / 86_400_000) : null;
+  const startMs = tournament.starts_on
+    ? new Date(tournament.starts_on as any).setHours(0, 0, 0, 0)
+    : null;
+  const endMs = tournament.ends_on
+    ? new Date(tournament.ends_on as any).setHours(0, 0, 0, 0)
+    : null;
+  const daysToStart = startMs !== null ? Math.round((startMs - todayMs) / 86_400_000) : null;
   const statusBadgeKey =
     tournament.status === "completed"
       ? "completedBadge"
       : tournament.status === "in_progress"
-      ? "publishedBadge"
-      : "publishedBadge";
+        ? "publishedBadge"
+        : "publishedBadge";
   const heroSubline =
     tournament.status === "completed" && endMs
-      ? t("public.hero.endedOn", { date: new Date(endMs).toLocaleDateString(i18n.language, { day: "numeric", month: "long", year: "numeric" }) })
+      ? t("public.hero.endedOn", {
+          date: new Date(endMs).toLocaleDateString(i18n.language, {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }),
+        })
       : liveCount > 0
-      ? t("public.hero.inProgress")
-      : daysToStart != null && daysToStart > 0
-      ? t("public.hero.startsIn", { count: daysToStart })
-      : daysToStart === 0
-      ? t("public.hero.today")
-      : null;
+        ? t("public.hero.inProgress")
+        : daysToStart != null && daysToStart > 0
+          ? t("public.hero.startsIn", { count: daysToStart })
+          : daysToStart === 0
+            ? t("public.hero.today")
+            : null;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -238,7 +250,14 @@ function PublicTournamentPage() {
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
-            <pattern id="trophy-pattern-pub" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+            <pattern
+              id="trophy-pattern-pub"
+              x="0"
+              y="0"
+              width="60"
+              height="60"
+              patternUnits="userSpaceOnUse"
+            >
               <path d="M30 12l3 6 6 1-4.5 4 1 6L30 26l-5.5 3 1-6L21 19l6-1z" fill="currentColor" />
             </pattern>
           </defs>
@@ -288,9 +307,7 @@ function PublicTournamentPage() {
                 {tournament.name}
               </h1>
               {heroSubline && (
-                <p className="mt-1.5 text-sm font-semibold text-white/85">
-                  {heroSubline}
-                </p>
+                <p className="mt-1.5 text-sm font-semibold text-white/85">{heroSubline}</p>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] font-medium text-white/85">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2 py-1 backdrop-blur-sm">
@@ -366,27 +383,27 @@ function PublicTournamentPage() {
       </header>
 
       {/* Confirmation banner shown right after programme publication */}
-      {tournament.status === "in_progress" && (() => {
-        const ppa = (tournament as any).published_programme_at;
-        if (!ppa) return null;
-        const ageMs = Date.now() - new Date(ppa).getTime();
-        if (ageMs < 0 || ageMs > 3_600_000) return null;
-        return (
-          <div className="max-w-3xl mx-auto px-5 mt-4">
-            <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm">
-              <p className="font-semibold text-emerald-700 dark:text-emerald-300">
-                ✅ {t("tournament.registrationConfirmed")}
-              </p>
-              <p className="text-emerald-700/80 dark:text-emerald-300/80 mt-0.5">
-                {t("tournament.programmeComingSoon")}
-              </p>
+      {tournament.status === "in_progress" &&
+        (() => {
+          const ppa = (tournament as any).published_programme_at;
+          if (!ppa) return null;
+          const ageMs = Date.now() - new Date(ppa).getTime();
+          if (ageMs < 0 || ageMs > 3_600_000) return null;
+          return (
+            <div className="max-w-3xl mx-auto px-5 mt-4">
+              <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm">
+                <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                  ✅ {t("tournament.registrationConfirmed")}
+                </p>
+                <p className="text-emerald-700/80 dark:text-emerald-300/80 mt-0.5">
+                  {t("tournament.programmeComingSoon")}
+                </p>
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       <div className="max-w-3xl mx-auto px-5 mt-5">
-
         <nav className="sticky top-0 z-10 -mx-5 border-b-[1.5px] border-slate-200 bg-white/95 px-5 py-2.5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/95">
           <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {tabs.map((tabItem) => {
@@ -405,8 +422,7 @@ function PublicTournamentPage() {
                   style={
                     active
                       ? {
-                          background:
-                            "linear-gradient(135deg,#16a34a 0%,#15803d 100%)",
+                          background: "linear-gradient(135deg,#16a34a 0%,#15803d 100%)",
                           boxShadow: "0 4px 12px -2px rgba(22,163,74,.4)",
                         }
                       : undefined
@@ -424,9 +440,7 @@ function PublicTournamentPage() {
           {(tab === "overview" || tab === "matches") && teams.length > 0 && (
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <label className="text-xs text-muted-foreground">
-                {t("public.filterByTeam")}
-              </label>
+              <label className="text-xs text-muted-foreground">{t("public.filterByTeam")}</label>
               <select
                 value={teamFilter}
                 onChange={(e) => setTeamFilter(e.target.value)}
@@ -464,21 +478,18 @@ function PublicTournamentPage() {
           )}
 
           {tab === "standings" && (
-            <PublicStandings
-              groups={groups as any}
-              teams={teams as any}
-              matches={matches as any}
-            />
+            <PublicStandings groups={groups as any} teams={teams as any} matches={matches as any} />
           )}
-          {tab === "bracket" && (
-            <BracketView matches={matches as any} teams={teams as any} />
-          )}
+          {tab === "bracket" && <BracketView matches={matches as any} teams={teams as any} />}
           {tab === "flights" && (
-            <FlightsPublicView flights={flights as any} matches={matches as any} teams={teams as any} />
+            <FlightsPublicView
+              flights={flights as any}
+              matches={matches as any}
+              teams={teams as any}
+            />
           )}
           {tab === "streams" && <FieldStreams streams={fieldStreamEntries} />}
         </div>
-
 
         {(data as any).rulesDocument?.file_url && (
           <div className="pb-2">
@@ -497,12 +508,9 @@ function PublicTournamentPage() {
         <div className="pb-8">
           <SponsorsStrip
             sponsors={rules.branding.sponsors}
-            title={
-              rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault")
-            }
+            title={rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault")}
           />
         </div>
-
       </div>
     </div>
   );
@@ -525,7 +533,10 @@ function Overview({
   const teamMap = new Map(teams.map((tm: any) => [tm.id, tm]));
   const live = matches.filter((m: any) => m.status === "live");
   const upcoming = matches.filter((m: any) => m.status === "scheduled").slice(0, 5);
-  const recent = matches.filter((m: any) => m.status === "completed").slice(-5).reverse();
+  const recent = matches
+    .filter((m: any) => m.status === "completed")
+    .slice(-5)
+    .reverse();
 
   return (
     <div className="grid gap-5 md:grid-cols-2">
@@ -544,10 +555,7 @@ function Overview({
           </Card>
         </div>
       )}
-      <Card
-        title={t("public.sections.upcoming")}
-        empty={t("public.sections.noUpcoming")}
-      >
+      <Card title={t("public.sections.upcoming")} empty={t("public.sections.noUpcoming")}>
         {upcoming.map((m: any) => (
           <MatchRow
             key={m.id}
@@ -558,10 +566,7 @@ function Overview({
           />
         ))}
       </Card>
-      <Card
-        title={t("public.sections.recent")}
-        empty={t("public.sections.noRecent")}
-      >
+      <Card title={t("public.sections.recent")} empty={t("public.sections.noRecent")}>
         {recent.map((m: any) => (
           <MatchRow
             key={m.id}
@@ -617,7 +622,14 @@ function Card({
             <span className="relative inline-flex h-2 w-2 rounded-full bg-red-600" />
           </span>
         )}
-        <h3 className={cn("font-medium text-sm", accent && "text-red-700 dark:text-red-400 uppercase tracking-wider text-xs font-bold")}>{title}</h3>
+        <h3
+          className={cn(
+            "font-medium text-sm",
+            accent && "text-red-700 dark:text-red-400 uppercase tracking-wider text-xs font-bold",
+          )}
+        >
+          {title}
+        </h3>
       </header>
       {hasContent ? (
         <ul className="divide-y divide-border">{children}</ul>
@@ -653,13 +665,7 @@ const EVENT_EMOJI: Record<string, string> = {
   foul: "⚠️",
 };
 
-function EventsList({
-  events,
-  teamMap,
-}: {
-  events: any[];
-  teamMap: Map<string, any>;
-}) {
+function EventsList({ events, teamMap }: { events: any[]; teamMap: Map<string, any> }) {
   const EVENT_LABELS = useEventLabels();
   if (!events || events.length === 0) return null;
   const sorted = [...events].sort((a, b) => {
@@ -673,17 +679,12 @@ function EventsList({
       {sorted.map((e) => {
         const team = e.team_id ? teamMap.get(e.team_id) : null;
         return (
-          <li
-            key={e.id}
-            className="flex items-center gap-2 text-[11px] text-muted-foreground"
-          >
+          <li key={e.id} className="flex items-center gap-2 text-[11px] text-muted-foreground">
             <span className="tabular-nums w-7 text-right">
               {e.minute != null ? `${e.minute}'` : "—"}
             </span>
             <span>{EVENT_EMOJI[e.kind] ?? "•"}</span>
-            <span className="font-medium text-foreground">
-              {EVENT_LABELS[e.kind] ?? e.kind}
-            </span>
+            <span className="font-medium text-foreground">{EVENT_LABELS[e.kind] ?? e.kind}</span>
             {e.player_name && <span>· {e.player_name}</span>}
             {team && <span>· {team.short_name ?? team.name}</span>}
           </li>
@@ -790,19 +791,38 @@ function MatchRow({
   const winnerA = match.winner_team_id && match.winner_team_id === match.team_a_id;
   const winnerB = match.winner_team_id && match.winner_team_id === match.team_b_id;
   return (
-    <li className={cn("px-3 py-2 text-sm transition-colors", isLive && "bg-red-500/5 animate-pulse-ring")}>
+    <li
+      className={cn(
+        "px-3 py-2 text-sm transition-colors",
+        isLive && "bg-red-500/5 animate-pulse-ring",
+      )}
+    >
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-        <span className={cn("truncate text-right inline-flex items-center justify-end gap-1.5", winnerA && "font-semibold text-foreground")}>
+        <span
+          className={cn(
+            "truncate text-right inline-flex items-center justify-end gap-1.5",
+            winnerA && "font-semibold text-foreground",
+          )}
+        >
           {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
           {a?.name ?? t("common.tbd")}
         </span>
         <span className="tabular-nums font-semibold flex items-center gap-1.5">
-          <span className={cn(winnerA && "text-foreground", !winnerA && "text-muted-foreground")}>{match.score_a ?? "–"}</span>
+          <span className={cn(winnerA && "text-foreground", !winnerA && "text-muted-foreground")}>
+            {match.score_a ?? "–"}
+          </span>
           <span className="text-muted-foreground">:</span>
-          <span className={cn(winnerB && "text-foreground", !winnerB && "text-muted-foreground")}>{match.score_b ?? "–"}</span>
+          <span className={cn(winnerB && "text-foreground", !winnerB && "text-muted-foreground")}>
+            {match.score_b ?? "–"}
+          </span>
           {isLive && <LiveBadge />}
         </span>
-        <span className={cn("truncate inline-flex items-center gap-1.5", winnerB && "font-semibold text-foreground")}>
+        <span
+          className={cn(
+            "truncate inline-flex items-center gap-1.5",
+            winnerB && "font-semibold text-foreground",
+          )}
+        >
           {b?.name ?? t("common.tbd")}
           {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
         </span>
@@ -822,9 +842,7 @@ function TeamsGrid({ teams }: { teams: any[] }) {
   const { t } = useTranslation("tournaments");
   if (teams.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-slate-500">
-        {t("public.sections.noTeams")}
-      </p>
+      <p className="py-8 text-center text-sm text-slate-500">{t("public.sections.noTeams")}</p>
     );
   }
   return (
@@ -890,12 +908,17 @@ function PublicMatches({
               isLive
                 ? "border-red-500/40 bg-red-500/5"
                 : m.status === "completed"
-                ? "border-border"
-                : "border-border hover:border-primary/30",
+                  ? "border-border"
+                  : "border-border hover:border-primary/30",
             )}
           >
             <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center">
-              <span className={cn("truncate text-right text-sm inline-flex items-center justify-end gap-1.5", winnerA ? "font-bold text-foreground" : "font-medium text-muted-foreground")}>
+              <span
+                className={cn(
+                  "truncate text-right text-sm inline-flex items-center justify-end gap-1.5",
+                  winnerA ? "font-bold text-foreground" : "font-medium text-muted-foreground",
+                )}
+              >
                 {winnerA && <Crown className="h-3 w-3 text-amber-500" />}
                 {teamMap.get(m.team_a_id)?.name ?? t("common.tbd")}
               </span>
@@ -905,7 +928,12 @@ function PublicMatches({
                 <span className={cn(!winnerB && "text-muted-foreground")}>{m.score_b ?? "–"}</span>
                 {isLive && <LiveBadge />}
               </span>
-              <span className={cn("truncate text-sm inline-flex items-center gap-1.5", winnerB ? "font-bold text-foreground" : "font-medium text-muted-foreground")}>
+              <span
+                className={cn(
+                  "truncate text-sm inline-flex items-center gap-1.5",
+                  winnerB ? "font-bold text-foreground" : "font-medium text-muted-foreground",
+                )}
+              >
                 {teamMap.get(m.team_b_id)?.name ?? t("common.tbd")}
                 {winnerB && <Crown className="h-3 w-3 text-amber-500" />}
               </span>
@@ -935,13 +963,7 @@ function PublicMatches({
   );
 }
 
-function PublishedRegistrationView({
-  slug,
-  data,
-}: {
-  slug: string;
-  data: any;
-}) {
+function PublishedRegistrationView({ slug, data }: { slug: string; data: any }) {
   const { t } = useTranslation("tournaments");
   const { tournament, teams } = data;
   const rules = mergeRules(tournament.settings);
@@ -953,7 +975,7 @@ function PublishedRegistrationView({
     // local time (matching what the organizer typed in the form).
     const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
     const t = new Date(s).getTime(); // no-TZ string => parsed as local
-    return Number.isFinite(t) ? t : (hasTz ? null : null);
+    return Number.isFinite(t) ? t : hasTz ? null : null;
   };
 
   const now = Date.now();
@@ -967,14 +989,10 @@ function PublishedRegistrationView({
   const reachedCap = maxTeams != null && teamsCount >= maxTeams;
   const closedByDate = closes !== null && now > closes;
   const notYetOpen = opens !== null && now < opens;
-  const canRegister =
-    rules.registration.enabled && !reachedCap && !closedByDate && !notYetOpen;
-
+  const canRegister = rules.registration.enabled && !reachedCap && !closedByDate && !notYetOpen;
 
   const daysToClose =
-    closes !== null && closes > now
-      ? Math.ceil((closes - now) / 86_400_000)
-      : null;
+    closes !== null && closes > now ? Math.ceil((closes - now) / 86_400_000) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -998,8 +1016,15 @@ function PublishedRegistrationView({
               className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl flex items-center justify-center shrink-0 ring-1 ring-border shadow-sm"
               style={
                 accent
-                  ? { background: `linear-gradient(135deg, ${accent}22, ${accent}05)`, color: accent }
-                  : { background: "linear-gradient(135deg, hsl(var(--primary)/0.18), hsl(var(--primary)/0.04))", color: "hsl(var(--primary))" }
+                  ? {
+                      background: `linear-gradient(135deg, ${accent}22, ${accent}05)`,
+                      color: accent,
+                    }
+                  : {
+                      background:
+                        "linear-gradient(135deg, hsl(var(--primary)/0.18), hsl(var(--primary)/0.04))",
+                      color: "hsl(var(--primary))",
+                    }
               }
             >
               <Trophy className="h-8 w-8 sm:h-10 sm:w-10" />
@@ -1028,7 +1053,9 @@ function PublishedRegistrationView({
                 <span className="inline-flex items-center gap-1.5">
                   <Trophy className="h-3.5 w-3.5" />
                   {tournament.sport}
-                  {tournament.format ? ` · ${t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}` : ""}
+                  {tournament.format
+                    ? ` · ${t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}`
+                    : ""}
                 </span>
               </div>
             </div>
@@ -1041,9 +1068,7 @@ function PublishedRegistrationView({
         <section
           className={cn(
             "rounded-2xl border p-5 space-y-3",
-            canRegister
-              ? "border-primary/40 bg-primary/5"
-              : "border-border bg-muted/30",
+            canRegister ? "border-primary/40 bg-primary/5" : "border-border bg-muted/30",
           )}
         >
           {reachedCap ? (
@@ -1077,7 +1102,6 @@ function PublishedRegistrationView({
                 </p>
               )}
             </div>
-
           ) : (
             <>
               <div>
@@ -1085,7 +1109,6 @@ function PublishedRegistrationView({
                   {feeCents > 0
                     ? `${t("tournament.registrationFee")}: ${(feeCents / 100).toFixed(2)} ${currency}`
                     : t("tournament.freeRegistration")}
-
                 </p>
                 {maxTeams != null ? (
                   <p className="text-sm text-muted-foreground mt-0.5">
@@ -1123,17 +1146,28 @@ function PublishedRegistrationView({
           </h2>
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <dt className="text-xs text-muted-foreground">{t("public.tabs.standings", { defaultValue: "Format" })}</dt>
-              <dd className="font-medium">{t(`wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`, { defaultValue: tournament.format })}</dd>
+              <dt className="text-xs text-muted-foreground">
+                {t("public.tabs.standings", { defaultValue: "Format" })}
+              </dt>
+              <dd className="font-medium">
+                {t(
+                  `wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`,
+                  { defaultValue: tournament.format },
+                )}
+              </dd>
             </div>
             {maxTeams != null && (
               <div>
-                <dt className="text-xs text-muted-foreground">{t("create.numTeams", { defaultValue: "Équipes max" })}</dt>
+                <dt className="text-xs text-muted-foreground">
+                  {t("create.numTeams", { defaultValue: "Équipes max" })}
+                </dt>
                 <dd className="font-medium">{maxTeams}</dd>
               </div>
             )}
             <div>
-              <dt className="text-xs text-muted-foreground">{t("common.match", { defaultValue: "Sport" })}</dt>
+              <dt className="text-xs text-muted-foreground">
+                {t("common.match", { defaultValue: "Sport" })}
+              </dt>
               <dd className="font-medium">{tournament.sport}</dd>
             </div>
             {tournament.location && googleMapsSearchUrl(tournament.location) && (
@@ -1161,9 +1195,7 @@ function PublishedRegistrationView({
               {t("tournament.rules")}
             </h2>
             {rules.registration.publicMessage && (
-              <div className="whitespace-pre-wrap text-sm">
-                {rules.registration.publicMessage}
-              </div>
+              <div className="whitespace-pre-wrap text-sm">{rules.registration.publicMessage}</div>
             )}
             {(data as any).rulesDocument?.file_url && (
               <a
@@ -1178,7 +1210,6 @@ function PublishedRegistrationView({
             )}
           </section>
         )}
-
 
         {/* Registered teams — names only */}
         <section className="rounded-2xl border border-border bg-card p-5">
@@ -1210,8 +1241,6 @@ function PublishedRegistrationView({
     </div>
   );
 }
-
-
 
 function streamEmbedUrl(raw: string): string | null {
   const url = raw.trim();

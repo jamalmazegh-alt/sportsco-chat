@@ -1,7 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fmt } from "@/lib/date-locale";
-import { Bell, Mail, MessageSquare, Smartphone, Send, X, CheckCircle2, XCircle, HelpCircle } from "lucide-react";
+import {
+  Bell,
+  Mail,
+  MessageSquare,
+  Smartphone,
+  Send,
+  X,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,9 +26,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
 const STATUS_ACTIONS = [
-  { status: "present", Icon: CheckCircle2, activeCls: "bg-emerald-500 text-white border-emerald-500", idleCls: "text-emerald-600 hover:bg-emerald-50" },
-  { status: "uncertain", Icon: HelpCircle, activeCls: "bg-uncertain text-uncertain-foreground border-uncertain", idleCls: "text-uncertain-foreground hover:bg-uncertain/20" },
-  { status: "absent", Icon: XCircle, activeCls: "bg-absent text-white border-absent", idleCls: "text-absent hover:bg-absent/10" },
+  {
+    status: "present",
+    Icon: CheckCircle2,
+    activeCls: "bg-emerald-500 text-white border-emerald-500",
+    idleCls: "text-emerald-600 hover:bg-emerald-50",
+  },
+  {
+    status: "uncertain",
+    Icon: HelpCircle,
+    activeCls: "bg-uncertain text-uncertain-foreground border-uncertain",
+    idleCls: "text-uncertain-foreground hover:bg-uncertain/20",
+  },
+  {
+    status: "absent",
+    Icon: XCircle,
+    activeCls: "bg-absent text-white border-absent",
+    idleCls: "text-absent hover:bg-absent/10",
+  },
 ] as const;
 
 type Convocation = {
@@ -127,9 +152,7 @@ export function ConvocationDetailDialog({
               ) : null}
             </span>
           </DialogTitle>
-          {p.preferred_position && (
-            <DialogDescription>{p.preferred_position}</DialogDescription>
-          )}
+          {p.preferred_position && <DialogDescription>{p.preferred_position}</DialogDescription>}
         </DialogHeader>
 
         <div className="space-y-4">
@@ -165,12 +188,13 @@ export function ConvocationDetailDialog({
             </div>
           )}
 
-          {convocation.comment && (isCoach || (currentUserId && convocation.players?.user_id === currentUserId)) && (
-            <div className="rounded-xl border bg-muted/50 p-3">
-              <p className="text-xs text-muted-foreground mb-1">{t("attendance.comment")}</p>
-              <p className="text-sm italic">"{convocation.comment}"</p>
-            </div>
-          )}
+          {convocation.comment &&
+            (isCoach || (currentUserId && convocation.players?.user_id === currentUserId)) && (
+              <div className="rounded-xl border bg-muted/50 p-3">
+                <p className="text-xs text-muted-foreground mb-1">{t("attendance.comment")}</p>
+                <p className="text-sm italic">"{convocation.comment}"</p>
+              </div>
+            )}
 
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -180,9 +204,7 @@ export function ConvocationDetailDialog({
               {sentAt && (
                 <li className="flex items-center gap-2 text-sm">
                   <Send className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-muted-foreground">
-                    {t("events.convocationsSent")}
-                  </span>
+                  <span className="text-muted-foreground">{t("events.convocationsSent")}</span>
                   <span className="ml-auto tabular-nums text-xs">
                     {fmt(new Date(sentAt), "d MMM HH:mm")}
                   </span>
@@ -203,7 +225,9 @@ export function ConvocationDetailDialog({
                   <li key={r.id} className="flex items-center gap-2 text-sm">
                     <Icon className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-muted-foreground">
-                      {t("attendance.reminderVia", { channel: t(`channels.${r.channel}`, r.channel) })}
+                      {t("attendance.reminderVia", {
+                        channel: t(`channels.${r.channel}`, r.channel),
+                      })}
                     </span>
                     <span className="ml-auto tabular-nums text-xs">
                       {fmt(new Date(r.sent_at), "d MMM HH:mm")}
@@ -218,43 +242,54 @@ export function ConvocationDetailDialog({
           </div>
         </div>
 
-        {isCoach && (() => {
-          const lastReminderAt = meta?.reminders?.[0]?.sent_at
-            ? new Date(meta.reminders[0].sent_at).getTime()
-            : 0;
-          const cooldownMs = 30 * 60 * 1000;
-          const remainingMs = lastReminderAt ? cooldownMs - (Date.now() - lastReminderAt) : 0;
-          const inCooldown = remainingMs > 0;
-          const remainingMin = Math.ceil(remainingMs / 60000);
-          return (
-            <DialogFooter className="gap-2 sm:gap-2">
-              {convocation.status === "pending" && onRemind && (
-                <Button
-                  variant="outline"
-                  onClick={() => onRemind(convocation.id)}
-                  disabled={inCooldown}
-                  className="gap-2"
-                  title={inCooldown ? t("attendance.cooldownHint", { defaultValue: "Encore {{m}} min avant de pouvoir relancer", m: remainingMin }) : undefined}
-                >
-                  <Bell className="h-4 w-4" />
-                  {inCooldown
-                    ? t("attendance.remindIn", { defaultValue: "Relancer dans {{m}} min", m: remainingMin })
-                    : t("attendance.remind")}
-                </Button>
-              )}
-              {onCancel && (
-                <Button
-                  variant="outline"
-                  onClick={() => onCancel(convocation.id)}
-                  className="gap-2 text-destructive hover:text-destructive"
-                >
-                  <X className="h-4 w-4" />
-                  {t("attendance.cancelConvocation")}
-                </Button>
-              )}
-            </DialogFooter>
-          );
-        })()}
+        {isCoach &&
+          (() => {
+            const lastReminderAt = meta?.reminders?.[0]?.sent_at
+              ? new Date(meta.reminders[0].sent_at).getTime()
+              : 0;
+            const cooldownMs = 30 * 60 * 1000;
+            const remainingMs = lastReminderAt ? cooldownMs - (Date.now() - lastReminderAt) : 0;
+            const inCooldown = remainingMs > 0;
+            const remainingMin = Math.ceil(remainingMs / 60000);
+            return (
+              <DialogFooter className="gap-2 sm:gap-2">
+                {convocation.status === "pending" && onRemind && (
+                  <Button
+                    variant="outline"
+                    onClick={() => onRemind(convocation.id)}
+                    disabled={inCooldown}
+                    className="gap-2"
+                    title={
+                      inCooldown
+                        ? t("attendance.cooldownHint", {
+                            defaultValue: "Encore {{m}} min avant de pouvoir relancer",
+                            m: remainingMin,
+                          })
+                        : undefined
+                    }
+                  >
+                    <Bell className="h-4 w-4" />
+                    {inCooldown
+                      ? t("attendance.remindIn", {
+                          defaultValue: "Relancer dans {{m}} min",
+                          m: remainingMin,
+                        })
+                      : t("attendance.remind")}
+                  </Button>
+                )}
+                {onCancel && (
+                  <Button
+                    variant="outline"
+                    onClick={() => onCancel(convocation.id)}
+                    className="gap-2 text-destructive hover:text-destructive"
+                  >
+                    <X className="h-4 w-4" />
+                    {t("attendance.cancelConvocation")}
+                  </Button>
+                )}
+              </DialogFooter>
+            );
+          })()}
       </DialogContent>
     </Dialog>
   );

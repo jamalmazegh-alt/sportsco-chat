@@ -33,8 +33,23 @@ type FollowRow = {
   followed_club_id: string | null;
 };
 
-type Player = { id: string; first_name: string | null; last_name: string | null; photo_url: string | null; club: { name: string } | null };
-type Coach = { id: string; sport: string | null; profile: { first_name: string | null; last_name: string | null; avatar_url: string | null } | null; club: { name: string } | null };
+type Player = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  photo_url: string | null;
+  club: { name: string } | null;
+};
+type Coach = {
+  id: string;
+  sport: string | null;
+  profile: {
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+  } | null;
+  club: { name: string } | null;
+};
 type Club = { id: string; name: string; logo_url: string | null; sport: string | null };
 
 function FollowingPage() {
@@ -52,18 +67,29 @@ function FollowingPage() {
         .select("id, target_type, followed_player_id, followed_coach_id, followed_club_id")
         .eq("follower_id", user!.id);
       const list = (rows ?? []) as FollowRow[];
-      const playerIds = list.filter((r) => r.followed_player_id).map((r) => r.followed_player_id!) as string[];
-      const coachIds = list.filter((r) => r.followed_coach_id).map((r) => r.followed_coach_id!) as string[];
-      const clubIds = list.filter((r) => r.followed_club_id).map((r) => r.followed_club_id!) as string[];
+      const playerIds = list
+        .filter((r) => r.followed_player_id)
+        .map((r) => r.followed_player_id!) as string[];
+      const coachIds = list
+        .filter((r) => r.followed_coach_id)
+        .map((r) => r.followed_coach_id!) as string[];
+      const clubIds = list
+        .filter((r) => r.followed_club_id)
+        .map((r) => r.followed_club_id!) as string[];
 
       const [playersRes, coachesRes, clubsRes] = await Promise.all([
         playerIds.length
-          ? supabase.from("players").select("id, first_name, last_name, photo_url, club:clubs(name)").in("id", playerIds)
+          ? supabase
+              .from("players")
+              .select("id, first_name, last_name, photo_url, club:clubs(name)")
+              .in("id", playerIds)
           : Promise.resolve({ data: [] as any[] }),
         coachIds.length
           ? supabase
               .from("coach_profiles")
-              .select("id, sport, user_id, current_club_id, club:clubs!coach_profiles_current_club_id_fkey(name)")
+              .select(
+                "id, sport, user_id, current_club_id, club:clubs!coach_profiles_current_club_id_fkey(name)",
+              )
               .in("id", coachIds)
           : Promise.resolve({ data: [] as any[] }),
         clubIds.length
@@ -73,7 +99,10 @@ function FollowingPage() {
 
       const coachUserIds = ((coachesRes.data ?? []) as any[]).map((c) => c.user_id).filter(Boolean);
       const profilesRes = coachUserIds.length
-        ? await supabase.from("profiles").select("id, first_name, last_name, avatar_url").in("id", coachUserIds)
+        ? await supabase
+            .from("profiles")
+            .select("id, first_name, last_name, avatar_url")
+            .in("id", coachUserIds)
         : { data: [] as any[] };
       const profilesById = new Map(((profilesRes.data ?? []) as any[]).map((p) => [p.id, p]));
 
@@ -102,9 +131,15 @@ function FollowingPage() {
         const removed = prev.rows.find((r: FollowRow) => r.id === rowId);
         qc.setQueryData(queryKey, {
           rows: prev.rows.filter((r: FollowRow) => r.id !== rowId),
-          players: removed?.followed_player_id ? prev.players.filter((p: Player) => p.id !== removed.followed_player_id) : prev.players,
-          coaches: removed?.followed_coach_id ? prev.coaches.filter((c: Coach) => c.id !== removed.followed_coach_id) : prev.coaches,
-          clubs: removed?.followed_club_id ? prev.clubs.filter((c: Club) => c.id !== removed.followed_club_id) : prev.clubs,
+          players: removed?.followed_player_id
+            ? prev.players.filter((p: Player) => p.id !== removed.followed_player_id)
+            : prev.players,
+          coaches: removed?.followed_coach_id
+            ? prev.coaches.filter((c: Coach) => c.id !== removed.followed_coach_id)
+            : prev.coaches,
+          clubs: removed?.followed_club_id
+            ? prev.clubs.filter((c: Club) => c.id !== removed.followed_club_id)
+            : prev.clubs,
         });
       }
       return { prev };
@@ -126,13 +161,19 @@ function FollowingPage() {
   const { rows, players, coaches, clubs } = data;
   const findRowId = (type: "player" | "coach" | "club", id: string) =>
     rows.find((r) =>
-      type === "player" ? r.followed_player_id === id : type === "coach" ? r.followed_coach_id === id : r.followed_club_id === id,
+      type === "player"
+        ? r.followed_player_id === id
+        : type === "coach"
+          ? r.followed_coach_id === id
+          : r.followed_club_id === id,
     )?.id;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 space-y-6 pb-24">
       <header>
-        <h1 className="text-2xl font-bold">{t("following.title", { defaultValue: "Mes abonnements" })}</h1>
+        <h1 className="text-2xl font-bold">
+          {t("following.title", { defaultValue: "Mes abonnements" })}
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
           {t("following.summary", {
             p: players.length,
@@ -154,7 +195,9 @@ function FollowingPage() {
               {t("following.emptyPlayers", { defaultValue: "Tu ne suis aucun joueur." })}
             </p>
             <Button asChild variant="outline" size="sm">
-              <Link to="/players">{t("following.discoverPlayers", { defaultValue: "Découvrir des joueurs" })}</Link>
+              <Link to="/players">
+                {t("following.discoverPlayers", { defaultValue: "Découvrir des joueurs" })}
+              </Link>
             </Button>
           </div>
         ) : (
@@ -163,15 +206,33 @@ function FollowingPage() {
               const name = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "—";
               const rowId = findRowId("player", p.id);
               return (
-                <li key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-                  <div className={cn("h-10 w-10 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold shrink-0", !p.photo_url && avatarGradient(name))}>
-                    {p.photo_url ? <img src={p.photo_url} alt={name} className="h-full w-full object-cover" /> : initialsFrom(p.first_name ?? "", p.last_name ?? "")}
+                <li
+                  key={p.id}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
+                >
+                  <div
+                    className={cn(
+                      "h-10 w-10 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold shrink-0",
+                      !p.photo_url && avatarGradient(name),
+                    )}
+                  >
+                    {p.photo_url ? (
+                      <img src={p.photo_url} alt={name} className="h-full w-full object-cover" />
+                    ) : (
+                      initialsFrom(p.first_name ?? "", p.last_name ?? "")
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{name}</div>
-                    {p.club?.name && <div className="text-xs text-muted-foreground truncate">{p.club.name}</div>}
+                    {p.club?.name && (
+                      <div className="text-xs text-muted-foreground truncate">{p.club.name}</div>
+                    )}
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => rowId && unfollow.mutate({ rowId })}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => rowId && unfollow.mutate({ rowId })}
+                  >
                     <UserCheck className="h-4 w-4" />
                     {t("follow.unfollow", { defaultValue: "Ne plus suivre" })}
                   </Button>
@@ -194,18 +255,41 @@ function FollowingPage() {
         ) : (
           <ul className="space-y-2">
             {coaches.map((c) => {
-              const name = `${c.profile?.first_name ?? ""} ${c.profile?.last_name ?? ""}`.trim() || "Coach";
+              const name =
+                `${c.profile?.first_name ?? ""} ${c.profile?.last_name ?? ""}`.trim() || "Coach";
               const rowId = findRowId("coach", c.id);
               return (
-                <li key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-                  <div className={cn("h-10 w-10 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold shrink-0", !c.profile?.avatar_url && avatarGradient(c.id))}>
-                    {c.profile?.avatar_url ? <img src={c.profile.avatar_url} alt={name} className="h-full w-full object-cover" /> : initialsFrom(name)}
+                <li
+                  key={c.id}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
+                >
+                  <div
+                    className={cn(
+                      "h-10 w-10 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold shrink-0",
+                      !c.profile?.avatar_url && avatarGradient(c.id),
+                    )}
+                  >
+                    {c.profile?.avatar_url ? (
+                      <img
+                        src={c.profile.avatar_url}
+                        alt={name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initialsFrom(name)
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{name}</div>
-                    {c.club?.name && <div className="text-xs text-muted-foreground truncate">{c.club.name}</div>}
+                    {c.club?.name && (
+                      <div className="text-xs text-muted-foreground truncate">{c.club.name}</div>
+                    )}
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => rowId && unfollow.mutate({ rowId })}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => rowId && unfollow.mutate({ rowId })}
+                  >
                     <UserCheck className="h-4 w-4" />
                     {t("follow.unfollow", { defaultValue: "Ne plus suivre" })}
                   </Button>
@@ -230,15 +314,30 @@ function FollowingPage() {
             {clubs.map((c) => {
               const rowId = findRowId("club", c.id);
               return (
-                <li key={c.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                <li
+                  key={c.id}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
+                >
                   <div className="h-10 w-10 rounded-lg overflow-hidden bg-muted flex items-center justify-center shrink-0">
-                    {c.logo_url ? <img src={c.logo_url} alt={c.name} className="h-full w-full object-cover" /> : <span className="font-semibold text-muted-foreground">{c.name.charAt(0)}</span>}
+                    {c.logo_url ? (
+                      <img src={c.logo_url} alt={c.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="font-semibold text-muted-foreground">
+                        {c.name.charAt(0)}
+                      </span>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{c.name}</div>
-                    {c.sport && <div className="text-xs text-muted-foreground capitalize">{c.sport}</div>}
+                    {c.sport && (
+                      <div className="text-xs text-muted-foreground capitalize">{c.sport}</div>
+                    )}
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => rowId && unfollow.mutate({ rowId })}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => rowId && unfollow.mutate({ rowId })}
+                  >
                     <UserCheck className="h-4 w-4" />
                     {t("follow.unfollow", { defaultValue: "Ne plus suivre" })}
                   </Button>

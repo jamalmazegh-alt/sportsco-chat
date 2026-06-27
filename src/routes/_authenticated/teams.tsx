@@ -15,7 +15,6 @@ import { toast } from "sonner";
 import { EmptyState } from "@/components/empty-state";
 import { avatarGradient, initialsFrom } from "@/lib/avatar-color";
 
-
 import i18n from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/teams")({
@@ -196,11 +195,7 @@ function TeamsPage() {
         <EmptyState
           icon={<Users className="h-6 w-6" />}
           title={t("teams.noTeams")}
-          description={
-            isAdmin
-              ? t("teams.emptyHintAdmin")
-              : t("teams.emptyHintMember")
-          }
+          description={isAdmin ? t("teams.emptyHintAdmin") : t("teams.emptyHintMember")}
           action={
             isAdmin ? (
               <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
@@ -222,9 +217,15 @@ function TeamsPage() {
                 >
                   <div className="h-14 w-14 rounded-xl shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
                     {tm.image_url ? (
-                      <img src={tm.image_url} alt={tm.name} className="h-full w-full object-cover" />
+                      <img
+                        src={tm.image_url}
+                        alt={tm.name}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
-                      <div className={`h-full w-full flex items-center justify-center text-sm font-bold tracking-tight ${avatarGradient(tm.id)}`}>
+                      <div
+                        className={`h-full w-full flex items-center justify-center text-sm font-bold tracking-tight ${avatarGradient(tm.id)}`}
+                      >
                         {initialsFrom(tm.name)}
                       </div>
                     )}
@@ -264,7 +265,9 @@ function TeamsPage() {
               <BarChart3 className="h-5 w-5 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">{t("nav.viewStats", { defaultValue: "Voir les statistiques" })}</p>
+              <p className="text-sm font-semibold">
+                {t("nav.viewStats", { defaultValue: "Voir les statistiques" })}
+              </p>
               <p className="text-xs text-muted-foreground">{t("nav.stats")}</p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />

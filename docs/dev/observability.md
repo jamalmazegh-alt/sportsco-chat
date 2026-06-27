@@ -18,6 +18,7 @@ Sensitive keys (`email`, `phone`, `token`, `authorization`, `secret`,
 adding a new sensitive field, extend `REDACT_KEYS` in the logger.
 
 ### Shipping logs externally
+
 Cloudflare Workers expose `console.*` to the platform log drain. Logs
 emitted via the logger are already JSON, so any drain (Logpush →
 S3/Logflare/Datadog) ingests them directly. No code change needed when

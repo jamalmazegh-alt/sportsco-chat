@@ -70,7 +70,7 @@ function LanguageSwitcher({
             onClick={() => onChange(opt.value)}
             className={cn(
               "cursor-pointer gap-2",
-              current === opt.value && "bg-primary/10 text-primary font-medium"
+              current === opt.value && "bg-primary/10 text-primary font-medium",
             )}
           >
             <span>{opt.flag}</span>
@@ -100,20 +100,18 @@ export function MarketingHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {[
-            ...NAV_LEFT,
-            ...LOCALIZED_NAV[current === "fr" ? "fr" : "en"],
-            ...NAV_RIGHT,
-          ].map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
-            >
-              {t(`nav.${item.key}`)}
-            </Link>
-          ))}
+          {[...NAV_LEFT, ...LOCALIZED_NAV[current === "fr" ? "fr" : "en"], ...NAV_RIGHT].map(
+            (item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+              >
+                {t(`nav.${item.key}`)}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -144,21 +142,19 @@ export function MarketingHeader() {
       {open && (
         <div className="border-t border-border/60 bg-background md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-5 py-3">
-            {[
-              ...NAV_LEFT,
-              ...LOCALIZED_NAV[current === "fr" ? "fr" : "en"],
-              ...NAV_RIGHT,
-            ].map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
-              >
-                {t(`nav.${item.key}`)}
-              </Link>
-            ))}
+            {[...NAV_LEFT, ...LOCALIZED_NAV[current === "fr" ? "fr" : "en"], ...NAV_RIGHT].map(
+              (item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                  activeProps={{ className: "bg-primary/20 text-primary font-semibold" }}
+                >
+                  {t(`nav.${item.key}`)}
+                </Link>
+              ),
+            )}
             <div className="mt-3 flex items-center justify-center">
               <LanguageSwitcher current={current} onChange={setLang} />
             </div>

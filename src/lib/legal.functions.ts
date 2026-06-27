@@ -2,11 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const KindSchema = z.enum(["terms", "privacy", "data_processing", "media", "notifications", "legal_notice", "parental_consent"]);
+const KindSchema = z.enum([
+  "terms",
+  "privacy",
+  "data_processing",
+  "media",
+  "notifications",
+  "legal_notice",
+  "parental_consent",
+]);
 
 export const getLegalDoc = createServerFn({ method: "GET" })
   .inputValidator((input: { kind: string; locale?: string }) =>
-    z.object({ kind: KindSchema, locale: z.string().min(2).max(5).default("en") }).parse(input)
+    z.object({ kind: KindSchema, locale: z.string().min(2).max(5).default("en") }).parse(input),
   )
   .handler(async ({ data }) => {
     const fetchOne = (locale: string) =>

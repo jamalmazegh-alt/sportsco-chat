@@ -57,9 +57,15 @@ describe("cohérence TOP_SPORTS / COLLECTIVE_SPORTS", () => {
 // en isolant les primitives.
 
 const CONVOC_SNAPSHOT_FIELDS = [
-  "title", "description", "starts_at", "ends_at",
-  "convocation_time", "location", "meeting_point",
-  "competition_name", "type",
+  "title",
+  "description",
+  "starts_at",
+  "ends_at",
+  "convocation_time",
+  "location",
+  "meeting_point",
+  "competition_name",
+  "type",
 ] as const;
 
 type SnapshotField = (typeof CONVOC_SNAPSHOT_FIELDS)[number];
@@ -73,14 +79,18 @@ function buildConvocSnapshot(ev: Record<string, any>): Record<string, any> {
 function diffSnapshot(
   prev: Record<string, any> | null | undefined,
   current: Record<string, any>,
-  t: (k: string) => string = (k) => k
+  t: (k: string) => string = (k) => k,
 ): Array<{ field: string; label: string; previous?: string; current?: string }> {
   if (!prev) return [];
   const labels: Record<string, string> = {
-    title: "Titre", description: "Description",
-    starts_at: "Date / heure", ends_at: "Fin",
-    convocation_time: "Heure de RDV", location: "Lieu",
-    meeting_point: "Point de RDV", competition_name: "Compétition",
+    title: "Titre",
+    description: "Description",
+    starts_at: "Date / heure",
+    ends_at: "Fin",
+    convocation_time: "Heure de RDV",
+    location: "Lieu",
+    meeting_point: "Point de RDV",
+    competition_name: "Compétition",
     type: "Type",
   };
   const out: Array<{ field: string; label: string; previous?: string; current?: string }> = [];
@@ -88,7 +98,12 @@ function diffSnapshot(
     const a = prev[k] ?? null;
     const b = current?.[k] ?? null;
     if ((a ?? "") !== (b ?? "")) {
-      out.push({ field: k, label: labels[k] ?? k, previous: a ?? undefined, current: b ?? undefined });
+      out.push({
+        field: k,
+        label: labels[k] ?? k,
+        previous: a ?? undefined,
+        current: b ?? undefined,
+      });
     }
   }
   return out;

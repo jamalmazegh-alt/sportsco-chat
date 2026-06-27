@@ -28,56 +28,53 @@ const TrialReminderEmail = ({
 
   return (
     <EmailShell preview={`${previewText}`} locale={"fr"} clubName={clubName}>
-          <Heading style={h1}>
-            {recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
-          </Heading>
+      <Heading style={h1}>
+        {recipientFirstName ? `Bonjour ${recipientFirstName},` : "Bonjour,"}
+      </Heading>
 
-          {expired ? (
-            <>
-              <Text style={text}>
-                Votre période d'essai gratuite de 30 jours pour <strong>{clubName}</strong> sur
-                Clubero est <strong>terminée</strong>.
-              </Text>
-              <Section style={cardRed}>
-                <Text style={cardKickerRed}>ESSAI TERMINÉ</Text>
-                <Text style={cardTitle}>Activez votre abonnement pour continuer</Text>
-                <Text style={cardMeta}>
-                  La création de nouveaux événements est suspendue jusqu'à l'activation d'un
-                  abonnement.
-                </Text>
-              </Section>
-            </>
-          ) : (
-            <>
-              <Text style={text}>
-                Votre période d'essai gratuite pour <strong>{clubName}</strong> sur Clubero se
-                termine {daysRemaining === 1 ? "demain" : `dans ${daysRemaining} jours`} (
-                {trialEndDate}).
-              </Text>
-              <Section style={urgent ? cardOrange : cardBlue}>
-                <Text style={urgent ? cardKickerOrange : cardKickerBlue}>
-                  {daysRemaining === 1 ? "PLUS QU'1 JOUR" : `J-${daysRemaining}`}
-                </Text>
-                <Text style={cardTitle}>Activez votre abonnement avant la fin de l'essai</Text>
-                <Text style={cardMeta}>
-                  Vos données, équipes, joueurs et événements sont conservés. Activez votre
-                  abonnement pour continuer à créer des événements sans interruption.
-                </Text>
-              </Section>
-            </>
-          )}
-
-          <Section style={{ textAlign: "center", margin: "24px 0" }}>
-            <Button href={billingUrl} style={button}>
-              {expired ? "Activer mon abonnement" : "Voir les offres"}
-            </Button>
-          </Section>
-
-          <Text style={smallText}>
-            Une question ? Répondez simplement à cet e-mail ou écrivez-nous à hello@clubero.app.
+      {expired ? (
+        <>
+          <Text style={text}>
+            Votre période d'essai gratuite de 30 jours pour <strong>{clubName}</strong> sur Clubero
+            est <strong>terminée</strong>.
           </Text>
+          <Section style={cardRed}>
+            <Text style={cardKickerRed}>ESSAI TERMINÉ</Text>
+            <Text style={cardTitle}>Activez votre abonnement pour continuer</Text>
+            <Text style={cardMeta}>
+              La création de nouveaux événements est suspendue jusqu'à l'activation d'un abonnement.
+            </Text>
+          </Section>
+        </>
+      ) : (
+        <>
+          <Text style={text}>
+            Votre période d'essai gratuite pour <strong>{clubName}</strong> sur Clubero se termine{" "}
+            {daysRemaining === 1 ? "demain" : `dans ${daysRemaining} jours`} ({trialEndDate}).
+          </Text>
+          <Section style={urgent ? cardOrange : cardBlue}>
+            <Text style={urgent ? cardKickerOrange : cardKickerBlue}>
+              {daysRemaining === 1 ? "PLUS QU'1 JOUR" : `J-${daysRemaining}`}
+            </Text>
+            <Text style={cardTitle}>Activez votre abonnement avant la fin de l'essai</Text>
+            <Text style={cardMeta}>
+              Vos données, équipes, joueurs et événements sont conservés. Activez votre abonnement
+              pour continuer à créer des événements sans interruption.
+            </Text>
+          </Section>
+        </>
+      )}
 
-          </EmailShell>
+      <Section style={{ textAlign: "center", margin: "24px 0" }}>
+        <Button href={billingUrl} style={button}>
+          {expired ? "Activer mon abonnement" : "Voir les offres"}
+        </Button>
+      </Section>
+
+      <Text style={smallText}>
+        Une question ? Répondez simplement à cet e-mail ou écrivez-nous à hello@clubero.app.
+      </Text>
+    </EmailShell>
   );
 };
 
@@ -102,13 +99,54 @@ export const template = {
 const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 16px" };
 const smallText = { fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: "20px 0 0" };
-const cardBlue = { backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "12px", padding: "16px 18px", margin: "0 0 8px" };
-const cardOrange = { backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "12px", padding: "16px 18px", margin: "0 0 8px" };
-const cardRed = { backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "12px", padding: "16px 18px", margin: "0 0 8px" };
-const cardKickerBlue = { fontSize: "11px", letterSpacing: "1px", color: "#2563eb", fontWeight: "bold" as const, margin: "0 0 6px" };
-const cardKickerOrange = { fontSize: "11px", letterSpacing: "1px", color: "#c2410c", fontWeight: "bold" as const, margin: "0 0 6px" };
-const cardKickerRed = { fontSize: "11px", letterSpacing: "1px", color: "#dc2626", fontWeight: "bold" as const, margin: "0 0 6px" };
-const cardTitle = { fontSize: "16px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 8px" };
+const cardBlue = {
+  backgroundColor: "#eff6ff",
+  border: "1px solid #bfdbfe",
+  borderRadius: "12px",
+  padding: "16px 18px",
+  margin: "0 0 8px",
+};
+const cardOrange = {
+  backgroundColor: "#fff7ed",
+  border: "1px solid #fed7aa",
+  borderRadius: "12px",
+  padding: "16px 18px",
+  margin: "0 0 8px",
+};
+const cardRed = {
+  backgroundColor: "#fef2f2",
+  border: "1px solid #fecaca",
+  borderRadius: "12px",
+  padding: "16px 18px",
+  margin: "0 0 8px",
+};
+const cardKickerBlue = {
+  fontSize: "11px",
+  letterSpacing: "1px",
+  color: "#2563eb",
+  fontWeight: "bold" as const,
+  margin: "0 0 6px",
+};
+const cardKickerOrange = {
+  fontSize: "11px",
+  letterSpacing: "1px",
+  color: "#c2410c",
+  fontWeight: "bold" as const,
+  margin: "0 0 6px",
+};
+const cardKickerRed = {
+  fontSize: "11px",
+  letterSpacing: "1px",
+  color: "#dc2626",
+  fontWeight: "bold" as const,
+  margin: "0 0 6px",
+};
+const cardTitle = {
+  fontSize: "16px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 8px",
+};
 const cardMeta = { fontSize: "13px", color: "#475569", margin: 0, lineHeight: "1.5" };
 const button = {
   backgroundColor: "#0f172a",

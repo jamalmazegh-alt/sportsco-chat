@@ -56,7 +56,10 @@ async function recipientsForObligation(o: {
       .maybeSingle();
     if (player?.email && !seen.has(player.email.toLowerCase())) {
       seen.add(player.email.toLowerCase());
-      out.push({ email: player.email, name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() });
+      out.push({
+        email: player.email,
+        name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim(),
+      });
     }
     const { data: parents } = await supabaseAdmin
       .from("player_parents")
@@ -118,13 +121,14 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
         // Clubs with reminders enabled
         const { data: clubs, error: clubsErr } = await supabaseAdmin
           .from("club_payment_settings")
-          .select("club_id, payment_reminders_enabled, payment_reminder_offsets_days, clubs:club_id(name)")
+          .select(
+            "club_id, payment_reminders_enabled, payment_reminder_offsets_days, clubs:club_id(name)",
+          )
           .eq("payment_reminders_enabled", true);
         if (clubsErr) {
           // Let it surface as a 500 — masking real DB errors behind 200 hides regressions.
           throw new Error(`clubs query failed: ${clubsErr.message}`);
         }
-
 
         let processed = 0;
         let sent = 0;
@@ -230,7 +234,6 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
-
       },
     },
   },

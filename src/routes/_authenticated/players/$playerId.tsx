@@ -15,10 +15,32 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PhoneInput } from "@/components/phone-input";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Camera, Plus, Trash2, UserCircle2, ShieldCheck, X, Send, ClipboardList, Trophy, CalendarDays, History, Globe, Copy, Palmtree } from "lucide-react";
+import {
+  Loader2,
+  Camera,
+  Plus,
+  Trash2,
+  UserCircle2,
+  ShieldCheck,
+  X,
+  Send,
+  ClipboardList,
+  Trophy,
+  CalendarDays,
+  History,
+  Globe,
+  Copy,
+  Palmtree,
+} from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { PositionCombobox } from "@/components/position-combobox";
@@ -98,7 +120,8 @@ function PlayerProfile() {
   const { user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const isCoach = roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
+  const isCoach =
+    roles.includes("admin") || roles.includes("coach") || roles.includes("assistant_coach");
   const qc = useQueryClient();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -117,12 +140,18 @@ function PlayerProfile() {
     setDeleting(true);
     const { error } = await supabase.rpc("soft_delete_entity", { _kind: "player", _id: player.id });
     setDeleting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast(t("players.deleted"), {
       action: {
         label: t("common.undo", { defaultValue: "Undo" }),
         onClick: async () => {
-          const { error: e2 } = await supabase.rpc("restore_entity", { _kind: "player", _id: player.id });
+          const { error: e2 } = await supabase.rpc("restore_entity", {
+            _kind: "player",
+            _id: player.id,
+          });
           if (e2) toast.error(e2.message);
           else qc.invalidateQueries({ queryKey: ["team-players"] });
         },
@@ -132,24 +161,50 @@ function PlayerProfile() {
     navigate({ to: "/teams" });
   }
 
-  async function resendParentInvite(pp: { id: string; full_name: string | null; email: string | null; phone: string | null; parent_user_id: string | null }) {
+  async function resendParentInvite(pp: {
+    id: string;
+    full_name: string | null;
+    email: string | null;
+    phone: string | null;
+    parent_user_id: string | null;
+  }) {
     if (!player || !user) return;
-    if (!player.club_id) { toast.warning(t("players.inviteNoContact")); return; }
+    if (!player.club_id) {
+      toast.warning(t("players.inviteNoContact"));
+      return;
+    }
     const clubId = player.club_id;
-    if (pp.parent_user_id) { toast.info(t("players.alreadyLinked")); return; }
-    if (!pp.email && !pp.phone) { toast.warning(t("players.inviteNoContact")); return; }
+    if (pp.parent_user_id) {
+      toast.info(t("players.alreadyLinked"));
+      return;
+    }
+    if (!pp.email && !pp.phone) {
+      toast.warning(t("players.inviteNoContact"));
+      return;
+    }
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
-      club_id: clubId, created_by: user.id, token,
-      parent_for_player_id: player.id, role: "parent",
-      email: pp.email ?? null, phone: pp.phone ?? null,
+      club_id: clubId,
+      created_by: user.id,
+      token,
+      parent_for_player_id: player.id,
+      role: "parent",
+      email: pp.email ?? null,
+      phone: pp.phone ?? null,
     });
 
-    if (invErr) { toast.error(invErr.message); return; }
+    if (invErr) {
+      toast.error(invErr.message);
+      return;
+    }
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     if (pp.email) {
       try {
-        const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+        const { data: clubRow } = await supabase
+          .from("clubs")
+          .select("name, logo_url")
+          .eq("id", clubId)
+          .maybeSingle();
 
         await sendTransactionalEmail({
           templateName: "player-invite",
@@ -162,7 +217,6 @@ function PlayerProfile() {
             inviteUrl,
             roleLabel: "parent",
           },
-
         });
         toast.success(t("players.inviteSent"));
       } catch (e: any) {
@@ -173,13 +227,14 @@ function PlayerProfile() {
     }
   }
 
-
   const { data: player, refetch: refetchPlayer } = useQuery({
     queryKey: ["player", playerId],
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
-        .select("id, first_name, last_name, jersey_number, license_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status, public_profile_enabled, public_slug")
+        .select(
+          "id, first_name, last_name, jersey_number, license_number, preferred_position, phone, email, photo_url, user_id, can_respond, club_id, birth_date, child_platform_access, media_consent_status, public_profile_enabled, public_slug",
+        )
         .eq("id", playerId)
         .single();
       return data;
@@ -196,9 +251,7 @@ function PlayerProfile() {
       if (error) throw error;
 
       const rows = data ?? [];
-      const userIds = [
-        ...new Set(rows.map((r) => r.parent_user_id).filter(Boolean)),
-      ] as string[];
+      const userIds = [...new Set(rows.map((r) => r.parent_user_id).filter(Boolean))] as string[];
 
       const profileMap = new Map<
         string,
@@ -214,9 +267,7 @@ function PlayerProfile() {
 
       return rows.map((row) => ({
         ...row,
-        parent_profile: row.parent_user_id
-          ? profileMap.get(row.parent_user_id) ?? null
-          : null,
+        parent_profile: row.parent_user_id ? (profileMap.get(row.parent_user_id) ?? null) : null,
       })) satisfies PlayerParentRow[];
     },
   });
@@ -231,9 +282,7 @@ function PlayerProfile() {
         .select("teams:team_id(sport)")
         .eq("player_id", playerId)
         .limit(5);
-      const sports = (data ?? [])
-        .map((r: any) => r?.teams?.sport)
-        .filter(Boolean) as string[];
+      const sports = (data ?? []).map((r: any) => r?.teams?.sport).filter(Boolean) as string[];
       return sports[0] ?? null;
     },
   });
@@ -270,7 +319,10 @@ function PlayerProfile() {
 
   async function sendChildOnboardingInvite(targetEmail: string) {
     if (!player || !user) return;
-    if (!player.club_id) { toast.warning(t("players.inviteNoContact")); return; }
+    if (!player.club_id) {
+      toast.warning(t("players.inviteNoContact"));
+      return;
+    }
     const clubId = player.club_id;
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error: invErr } = await supabase.from("member_invites").insert({
@@ -281,10 +333,17 @@ function PlayerProfile() {
       token,
       email: targetEmail,
     });
-    if (invErr) { toast.error(invErr.message); return; }
+    if (invErr) {
+      toast.error(invErr.message);
+      return;
+    }
     const inviteUrl = `${window.location.origin}/register?invite=${encodeURIComponent(token)}`;
     try {
-      const { data: clubRow } = await supabase.from("clubs").select("name, logo_url").eq("id", clubId).maybeSingle();
+      const { data: clubRow } = await supabase
+        .from("clubs")
+        .select("name, logo_url")
+        .eq("id", clubId)
+        .maybeSingle();
 
       await sendTransactionalEmail({
         templateName: "player-invite",
@@ -315,8 +374,9 @@ function PlayerProfile() {
         setBusy(false);
         toast.error(
           t("players.photoBlockedMinor", {
-            defaultValue: "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
-          })
+            defaultValue:
+              "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
+          }),
         );
         return;
       }
@@ -328,7 +388,9 @@ function PlayerProfile() {
       }
       if (!photoFile.type.startsWith("image/")) {
         setBusy(false);
-        toast.error(t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }));
+        toast.error(
+          t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }),
+        );
         return;
       }
       const ext = photoFile.name.split(".").pop() || "jpg";
@@ -415,14 +477,21 @@ function PlayerProfile() {
   const [pBusy, setPBusy] = useState(false);
 
   function resetParentForm() {
-    setPFirstName(""); setPLastName(""); setPPhone(""); setPEmail(""); setPCanRespond(true);
+    setPFirstName("");
+    setPLastName("");
+    setPPhone("");
+    setPEmail("");
+    setPCanRespond(true);
   }
 
   async function onAddParent(e: FormEvent) {
     e.preventDefault();
     if (!playerId) return;
     setPBusy(true);
-    const fullName = [pFirstName, pLastName].map((s) => s.trim()).filter(Boolean).join(" ");
+    const fullName = [pFirstName, pLastName]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(" ");
     const { error } = await supabase.from("player_parents").insert({
       player_id: playerId,
       parent_user_id: null,
@@ -455,14 +524,15 @@ function PlayerProfile() {
     <div className="px-5 pt-6 pb-10 space-y-5">
       <BackLink to="/teams" />
 
-
       {/* PLAYER (main) */}
       <div className="flex items-center gap-4">
         <div className="relative h-16 w-16 rounded-full overflow-hidden shrink-0 shadow-sm">
           {player.photo_url ? (
             <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className={`h-full w-full flex items-center justify-center text-lg font-bold ${avatarGradient(player.id)}`}>
+            <div
+              className={`h-full w-full flex items-center justify-center text-lg font-bold ${avatarGradient(player.id)}`}
+            >
               {initialsFrom(player.first_name, player.last_name)}
             </div>
           )}
@@ -471,7 +541,7 @@ function PlayerProfile() {
             <span
               className={cn(
                 "absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-background",
-                player.user_id ? "bg-present" : "bg-muted-foreground/40"
+                player.user_id ? "bg-present" : "bg-muted-foreground/40",
               )}
             />
           )}
@@ -482,10 +552,12 @@ function PlayerProfile() {
           </h1>
           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
             {(isCoach || isSelf || isParentOfThisPlayer) && (
-              <span className={cn(
-                "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
-                player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-              )}>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full",
+                  player.user_id ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
+                )}
+              >
                 {player.user_id ? t("players.accountActive") : t("players.accountInactive")}
               </span>
             )}
@@ -497,7 +569,12 @@ function PlayerProfile() {
           </div>
         </div>
         {isCoach && (
-          <Button size="icon" variant="ghost" className="h-9 w-9 shrink-0 text-destructive" onClick={() => setConfirmDelete(true)}>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-9 w-9 shrink-0 text-destructive"
+            onClick={() => setConfirmDelete(true)}
+          >
             <Trash2 className="h-4 w-4" />
           </Button>
         )}
@@ -506,11 +583,7 @@ function PlayerProfile() {
       {/* Quick action: declare absence for self/child */}
       {!isCoach && (isSelf || isParentOfThisPlayer) && (
         <>
-          <Button
-            variant="outline"
-            className="w-full h-11"
-            onClick={() => setAbsenceOpen(true)}
-          >
+          <Button variant="outline" className="w-full h-11" onClick={() => setAbsenceOpen(true)}>
             <Palmtree className="h-4 w-4" />
             {t("availability.declare", { defaultValue: "Déclarer une absence" })}
           </Button>
@@ -526,70 +599,76 @@ function PlayerProfile() {
       {(isCoach || isSelf || isParentOfThisPlayer) && (
         <div className="flex gap-1 border-b border-border -mx-5 px-5 -mt-2 pt-1 overflow-x-auto">
           {isCoach && (
-          <>
-          <Link
-            to="/players/$playerId"
-            params={{ playerId }}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
-              !isSubRoute
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {t("players.tabProfile", { defaultValue: "Profil" })}
-          </Link>
-          {SHOW_PUBLIC_PROFILE_FEATURES && (
-          <>
-          <Link
-            to="/players/$playerId/seasons"
-            params={{ playerId }}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
-              isSeasons ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <CalendarDays className="h-3.5 w-3.5" />
-            {t("journey.tab.season", { defaultValue: "Saison" })}
-          </Link>
-          <Link
-            to="/players/$playerId/achievements"
-            params={{ playerId }}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
-              isAchievements ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Trophy className="h-3.5 w-3.5" />
-            {t("journey.tab.achievements", { defaultValue: "Palmarès" })}
-          </Link>
-          <Link
-            to="/players/$playerId/timeline"
-            params={{ playerId }}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
-              isTimeline ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <History className="h-3.5 w-3.5" />
-            {t("journey.tab.timeline", { defaultValue: "Timeline" })}
-          </Link>
-          </>
-          )}
-          <Link
-            to="/players/$playerId/feedback"
-            params={{ playerId }}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
-              isFeedback
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <ClipboardList className="h-3.5 w-3.5" />
-            {t("players.tabFeedback", { defaultValue: "Retours coach" })}
-          </Link>
-          </>
+            <>
+              <Link
+                to="/players/$playerId"
+                params={{ playerId }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+                  !isSubRoute
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t("players.tabProfile", { defaultValue: "Profil" })}
+              </Link>
+              {SHOW_PUBLIC_PROFILE_FEATURES && (
+                <>
+                  <Link
+                    to="/players/$playerId/seasons"
+                    params={{ playerId }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+                      isSeasons
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {t("journey.tab.season", { defaultValue: "Saison" })}
+                  </Link>
+                  <Link
+                    to="/players/$playerId/achievements"
+                    params={{ playerId }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+                      isAchievements
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <Trophy className="h-3.5 w-3.5" />
+                    {t("journey.tab.achievements", { defaultValue: "Palmarès" })}
+                  </Link>
+                  <Link
+                    to="/players/$playerId/timeline"
+                    params={{ playerId }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+                      isTimeline
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <History className="h-3.5 w-3.5" />
+                    {t("journey.tab.timeline", { defaultValue: "Timeline" })}
+                  </Link>
+                </>
+              )}
+              <Link
+                to="/players/$playerId/feedback"
+                params={{ playerId }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
+                  isFeedback
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <ClipboardList className="h-3.5 w-3.5" />
+                {t("players.tabFeedback", { defaultValue: "Retours coach" })}
+              </Link>
+            </>
           )}
           <Link
             to="/players/$playerId/availability"
@@ -598,7 +677,7 @@ function PlayerProfile() {
               "inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition-colors whitespace-nowrap",
               isAvailability
                 ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
             <Palmtree className="h-3.5 w-3.5" />
@@ -607,264 +686,348 @@ function PlayerProfile() {
         </div>
       )}
 
-
       {isSubRoute ? (
         <Outlet />
       ) : (
-      <>
-      {SHOW_PUBLIC_PROFILE_FEATURES && (isCoach || isSelf || isParentOfThisPlayer) && !minor && (
-        <PublicProfileCard
-          playerId={player.id}
-          enabled={!!(player as { public_profile_enabled?: boolean }).public_profile_enabled}
-          slug={(player as { public_slug?: string | null }).public_slug ?? null}
-          onChanged={() => qc.invalidateQueries({ queryKey: ["player", playerId] })}
-        />
-      )}
-      <form onSubmit={onSave} className="space-y-4 rounded-2xl border border-border bg-card p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {t("players.details")}
-        </h2>
-
-{(() => {
-          const canUploadPhoto =
-            isCoach || isParentOfThisPlayer || (isSelf && !minor);
-          if (!canUploadPhoto) return null;
-          return (
-        <div className="space-y-1.5">
-          <Label>{t("players.photo")}</Label>
-          <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-              {photoFile ? (
-                <img src={URL.createObjectURL(photoFile)} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <Camera className="h-5 w-5 text-muted-foreground" />
-              )}
-            </div>
-            <span className="text-sm text-muted-foreground">{t("players.uploadPhoto")}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
-          {minor && player.media_consent_status !== "granted" && (
-            <p className="text-xs text-amber-600 dark:text-amber-400">
-              {t("players.photoConsentRequired")}
-              <b>{player.media_consent_status}</b>
-            </p>
-          )}
-        </div>
-          );
-        })()}
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>{t("players.firstName")}</Label>
-            <Input required value={first} onChange={(e) => setFirst(e.target.value)} disabled={!isCoach} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t("players.lastName")}</Label>
-            <Input required value={last} onChange={(e) => setLast(e.target.value)} disabled={!isCoach} />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>{t("players.jerseyNumber")}</Label>
-            <Input type="number" value={jersey} onChange={(e) => setJersey(e.target.value)} disabled={!isCoach} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>{t("players.preferredPosition")}</Label>
-            <PositionCombobox
-              value={position}
-              onChange={setPosition}
-              sport={playerSport ?? null}
-              disabled={!isCoach}
-            />
-          </div>
-        </div>
-        {canSeePrivate && (
-          <div className="space-y-1.5">
-            <Label>{t("players.licenseNumber")}</Label>
-            <Input value={license} onChange={(e) => setLicense(e.target.value)} disabled={!isCoach} placeholder="FFF-2025-12345" />
-          </div>
-        )}
-        {canSeePrivate && (
-          <>
-            <div className="space-y-1.5">
-              <Label>{t("players.birthDate")}</Label>
-              <Input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={!isCoach} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("players.phone")}</Label>
-              {isCoach ? (
-                <PhoneInput value={phone} onChange={setPhone} />
-              ) : (
-                <Input value={phone} disabled />
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("players.email")}</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!isCoach} />
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
-              <span className="text-sm">{t("players.canRespond")} ({t("players.respondPlayer")})</span>
-              <input
-                type="checkbox"
-                className="h-5 w-5 accent-primary"
-                checked={canRespond}
-                onChange={(e) => setCanRespond(e.target.checked)}
-                disabled={!isCoach}
+        <>
+          {SHOW_PUBLIC_PROFILE_FEATURES &&
+            (isCoach || isSelf || isParentOfThisPlayer) &&
+            !minor && (
+              <PublicProfileCard
+                playerId={player.id}
+                enabled={!!(player as { public_profile_enabled?: boolean }).public_profile_enabled}
+                slug={(player as { public_slug?: string | null }).public_slug ?? null}
+                onChanged={() => qc.invalidateQueries({ queryKey: ["player", playerId] })}
               />
-            </div>
-          </>
-        )}
+            )}
+          <form
+            onSubmit={onSave}
+            className="space-y-4 rounded-2xl border border-border bg-card p-5"
+          >
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("players.details")}
+            </h2>
 
-        {isCoach && (
-          <Button type="submit" className="w-full h-11" disabled={busy}>
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
-          </Button>
-        )}
-      </form>
-
-      {isCoach && player.club_id && (
-        <PlayerSuspensions playerId={player.id} clubId={player.club_id} />
-      )}
-      {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
-      {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
-
-      {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
-      {minor && (isParentOfThisPlayer || isCoach) && (
-        <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-          <div className="flex items-start gap-3">
-            <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">{t("players.childAccessTitle")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("players.childAccessHint")}</p>
-            </div>
-            <Switch
-              checked={!!player.child_platform_access}
-              onCheckedChange={toggleChildAccess}
-              disabled={!isParentOfThisPlayer && !isCoach}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* PARENTS — separate card (private) */}
-      {canSeePrivate && (
-      <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("players.parents")}
-          </h2>
-          {isCoach && !showParentForm && (
-            <Button size="sm" variant="outline" className="h-8" onClick={() => setShowParentForm(true)}>
-              <Plus className="h-4 w-4" /> {t("players.addParent")}
-            </Button>
-          )}
-        </div>
-
-        {(parents ?? []).length === 0 && !showParentForm && (
-          <div className="rounded-xl border border-dashed border-border p-6 text-center">
-            <UserCircle2 className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-xs text-muted-foreground">
-              {minor ? t("players.parentRequiredForMinor") : t("players.noParents")}
-            </p>
-          </div>
-        )}
-
-        <ul className="space-y-2">
-          {(parents ?? []).map((pp) => {
-            const linked = !!pp.parent_user_id;
-            const displayName = parentDisplayName(pp);
-            const contactLine = parentContactLine(pp, displayName);
-            return (
-              <li key={pp.id} className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
-                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
-                  <UserCircle2 className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium truncate text-sm">
-                      {displayName ?? t("players.linkedParentNoDetails")}
-                    </p>
-                    <span className={cn(
-                      "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                      linked ? "bg-present/15 text-present" : "bg-muted text-muted-foreground",
-                    )}>
-                      {linked ? t("players.accountActive") : t("players.accountInactive")}
+            {(() => {
+              const canUploadPhoto = isCoach || isParentOfThisPlayer || (isSelf && !minor);
+              if (!canUploadPhoto) return null;
+              return (
+                <div className="space-y-1.5">
+                  <Label>{t("players.photo")}</Label>
+                  <label className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
+                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                      {photoFile ? (
+                        <img
+                          src={URL.createObjectURL(photoFile)}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <Camera className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {t("players.uploadPhoto")}
                     </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">
-                    {[
-                      contactLine,
-                      pp.can_respond ? t("players.canRespond") : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ") || "—"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
+                    />
+                  </label>
+                  {minor && player.media_consent_status !== "granted" && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400">
+                      {t("players.photoConsentRequired")}
+                      <b>{player.media_consent_status}</b>
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>{t("players.firstName")}</Label>
+                <Input
+                  required
+                  value={first}
+                  onChange={(e) => setFirst(e.target.value)}
+                  disabled={!isCoach}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("players.lastName")}</Label>
+                <Input
+                  required
+                  value={last}
+                  onChange={(e) => setLast(e.target.value)}
+                  disabled={!isCoach}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>{t("players.jerseyNumber")}</Label>
+                <Input
+                  type="number"
+                  value={jersey}
+                  onChange={(e) => setJersey(e.target.value)}
+                  disabled={!isCoach}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("players.preferredPosition")}</Label>
+                <PositionCombobox
+                  value={position}
+                  onChange={setPosition}
+                  sport={playerSport ?? null}
+                  disabled={!isCoach}
+                />
+              </div>
+            </div>
+            {canSeePrivate && (
+              <div className="space-y-1.5">
+                <Label>{t("players.licenseNumber")}</Label>
+                <Input
+                  value={license}
+                  onChange={(e) => setLicense(e.target.value)}
+                  disabled={!isCoach}
+                  placeholder="FFF-2025-12345"
+                />
+              </div>
+            )}
+            {canSeePrivate && (
+              <>
+                <div className="space-y-1.5">
+                  <Label>{t("players.birthDate")}</Label>
+                  <Input
+                    type="date"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    disabled={!isCoach}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{t("players.phone")}</Label>
+                  {isCoach ? (
+                    <PhoneInput value={phone} onChange={setPhone} />
+                  ) : (
+                    <Input value={phone} disabled />
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{t("players.email")}</Label>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={!isCoach}
+                  />
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
+                  <span className="text-sm">
+                    {t("players.canRespond")} ({t("players.respondPlayer")})
+                  </span>
+                  <input
+                    type="checkbox"
+                    className="h-5 w-5 accent-primary"
+                    checked={canRespond}
+                    onChange={(e) => setCanRespond(e.target.checked)}
+                    disabled={!isCoach}
+                  />
+                </div>
+              </>
+            )}
+
+            {isCoach && (
+              <Button type="submit" className="w-full h-11" disabled={busy}>
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
+              </Button>
+            )}
+          </form>
+
+          {isCoach && player.club_id && (
+            <PlayerSuspensions playerId={player.id} clubId={player.club_id} />
+          )}
+          {canSeePrivate && <PlayerAttendanceStats playerId={player.id} />}
+          {canSeePrivate && <AttendanceHeatmap playerId={player.id} />}
+
+          {/* CHILD PLATFORM ACCESS — only meaningful for minors, controlled by their parent */}
+          {minor && (isParentOfThisPlayer || isCoach) && (
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="h-5 w-5 text-primary mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">{t("players.childAccessTitle")}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("players.childAccessHint")}
                   </p>
                 </div>
-                {isCoach && !linked && (pp.email || pp.phone) && (
-                  <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => resendParentInvite(pp)} title={t("players.resendInvite")}>
-                    <Send className="h-4 w-4 text-primary" />
-                  </Button>
-                )}
-                {isCoach && (
-                  <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => onDeleteParent(pp.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                <Switch
+                  checked={!!player.child_platform_access}
+                  onCheckedChange={toggleChildAccess}
+                  disabled={!isParentOfThisPlayer && !isCoach}
+                />
+              </div>
+            </div>
+          )}
 
-        {isCoach && showParentForm && (
-          <form onSubmit={onAddParent} className="space-y-3 pt-3 border-t border-border">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">{t("players.addParent")}</p>
-              <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => { resetParentForm(); setShowParentForm(false); }}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>{t("players.parentFirstName")}</Label>
-                <Input value={pFirstName} onChange={(e) => setPFirstName(e.target.value)} required />
+          {/* PARENTS — separate card (private) */}
+          {canSeePrivate && (
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                  {t("players.parents")}
+                </h2>
+                {isCoach && !showParentForm && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8"
+                    onClick={() => setShowParentForm(true)}
+                  >
+                    <Plus className="h-4 w-4" /> {t("players.addParent")}
+                  </Button>
+                )}
               </div>
-              <div className="space-y-1.5">
-                <Label>{t("players.parentLastName")}</Label>
-                <Input value={pLastName} onChange={(e) => setPLastName(e.target.value)} required />
-              </div>
+
+              {(parents ?? []).length === 0 && !showParentForm && (
+                <div className="rounded-xl border border-dashed border-border p-6 text-center">
+                  <UserCircle2 className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                  <p className="text-xs text-muted-foreground">
+                    {minor ? t("players.parentRequiredForMinor") : t("players.noParents")}
+                  </p>
+                </div>
+              )}
+
+              <ul className="space-y-2">
+                {(parents ?? []).map((pp) => {
+                  const linked = !!pp.parent_user_id;
+                  const displayName = parentDisplayName(pp);
+                  const contactLine = parentContactLine(pp, displayName);
+                  return (
+                    <li
+                      key={pp.id}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3"
+                    >
+                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+                        <UserCircle2 className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium truncate text-sm">
+                            {displayName ?? t("players.linkedParentNoDetails")}
+                          </p>
+                          <span
+                            className={cn(
+                              "inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded-full",
+                              linked
+                                ? "bg-present/15 text-present"
+                                : "bg-muted text-muted-foreground",
+                            )}
+                          >
+                            {linked ? t("players.accountActive") : t("players.accountInactive")}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {[contactLine, pp.can_respond ? t("players.canRespond") : null]
+                            .filter(Boolean)
+                            .join(" · ") || "—"}
+                        </p>
+                      </div>
+                      {isCoach && !linked && (pp.email || pp.phone) && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => resendParentInvite(pp)}
+                          title={t("players.resendInvite")}
+                        >
+                          <Send className="h-4 w-4 text-primary" />
+                        </Button>
+                      )}
+                      {isCoach && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => onDeleteParent(pp.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {isCoach && showParentForm && (
+                <form onSubmit={onAddParent} className="space-y-3 pt-3 border-t border-border">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{t("players.addParent")}</p>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7"
+                      onClick={() => {
+                        resetParentForm();
+                        setShowParentForm(false);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>{t("players.parentFirstName")}</Label>
+                      <Input
+                        value={pFirstName}
+                        onChange={(e) => setPFirstName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>{t("players.parentLastName")}</Label>
+                      <Input
+                        value={pLastName}
+                        onChange={(e) => setPLastName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>{t("players.phone")}</Label>
+                      <PhoneInput value={pPhone} onChange={setPPhone} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>{t("players.email")}</Label>
+                      <Input
+                        type="email"
+                        value={pEmail}
+                        onChange={(e) => setPEmail(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
+                    <span className="text-sm">{t("players.canRespond")}</span>
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5 accent-primary"
+                      checked={pCanRespond}
+                      onChange={(e) => setPCanRespond(e.target.checked)}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full h-10" disabled={pBusy}>
+                    {pBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.addParent")}
+                  </Button>
+                </form>
+              )}
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>{t("players.phone")}</Label>
-                <PhoneInput value={pPhone} onChange={setPPhone} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("players.email")}</Label>
-                <Input type="email" value={pEmail} onChange={(e) => setPEmail(e.target.value)} />
-              </div>
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-muted/40 p-3">
-              <span className="text-sm">{t("players.canRespond")}</span>
-              <input
-                type="checkbox"
-                className="h-5 w-5 accent-primary"
-                checked={pCanRespond}
-                onChange={(e) => setPCanRespond(e.target.checked)}
-              />
-            </div>
-            <Button type="submit" className="w-full h-10" disabled={pBusy}>
-              {pBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("players.addParent")}
-            </Button>
-          </form>
-        )}
-      </div>
-      )}
-      </>
+          )}
+        </>
       )}
 
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
@@ -875,7 +1038,11 @@ function PlayerProfile() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={onDeletePlayer} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={onDeletePlayer}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>

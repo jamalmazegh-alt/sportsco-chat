@@ -2,14 +2,12 @@ import { describe, it, expect } from "vitest";
 import { mergeUrgencies } from "./pure";
 import type { UrgencyItem, UrgencyRole, UrgencySeverity } from "./types";
 
-function make(
-  o: {
-    eventId: string;
-    role: UrgencyRole;
-    severity?: UrgencySeverity;
-    anchorAt?: string;
-  },
-): UrgencyItem {
+function make(o: {
+  eventId: string;
+  role: UrgencyRole;
+  severity?: UrgencySeverity;
+  anchorAt?: string;
+}): UrgencyItem {
   const severity = o.severity ?? "high";
   return {
     id: `convocation-silence:${o.eventId}:${o.role}`,

@@ -5,7 +5,6 @@ import { loadLineupForConvocationEmailServer } from "@/lib/lineup-email.server";
 import { verifyCronSecret } from "@/lib/cron-secret.server";
 import { sendPushToUserFireAndForget } from "@/lib/push-send.server";
 
-
 const TOLERANCE_MIN = 20; // cron runs every 15 min; pick a slightly larger window
 
 const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
@@ -48,7 +47,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
         const { data: events, error } = await supabaseAdmin
           .from("events")
           .select(
-            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before, default_language))"
+            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before, default_language))",
           )
           .is("cancelled_at", null)
           .is("deleted_at", null)
@@ -116,10 +115,12 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           ]);
 
           // Fetch preferred_language for any linked profiles (player or parent)
-          const profileIds = Array.from(new Set([
-            ...((players ?? []).map((p: any) => p.user_id).filter(Boolean)),
-            ...((parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean)),
-          ]));
+          const profileIds = Array.from(
+            new Set([
+              ...(players ?? []).map((p: any) => p.user_id).filter(Boolean),
+              ...(parents ?? []).map((p: any) => p.parent_user_id).filter(Boolean),
+            ]),
+          );
           const langByUser = new Map<string, string>();
           if (profileIds.length > 0) {
             const { data: profs } = await supabaseAdmin
@@ -134,21 +135,19 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           }
 
           const clubLang = (club as any).default_language as string | null | undefined;
-          const baseUrl =
-            process.env.SITE_URL ||
-            "https://www.clubero.app";
+          const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
 
           const locationMapsUrl = ev.location
-            ? ev.location_url ??
-              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}`
+            ? (ev.location_url ??
+              `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}`)
             : undefined;
           const meetingPointMapsUrl = ev.meeting_point
             ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.meeting_point)}`
             : undefined;
 
-          const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(() => undefined);
-
-
+          const lineupEmail = await loadLineupForConvocationEmailServer(ev.id).catch(
+            () => undefined,
+          );
 
           for (const conv of toSend) {
             const player: any = (players ?? []).find((p: any) => p.id === conv.player_id);
@@ -158,12 +157,20 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
 
             const recipients: { email: string; firstName?: string; userId?: string | null }[] = [];
             if (player.email) {
-              recipients.push({ email: player.email, firstName: player.first_name ?? undefined, userId: player.user_id ?? null });
+              recipients.push({
+                email: player.email,
+                firstName: player.first_name ?? undefined,
+                userId: player.user_id ?? null,
+              });
             }
             for (const pp of (parents ?? []).filter((p: any) => p.player_id === conv.player_id)) {
               if (!pp.email) continue;
               const first = (pp.full_name ?? "").split(" ")[0] || undefined;
-              recipients.push({ email: pp.email, firstName: first, userId: pp.parent_user_id ?? null });
+              recipients.push({
+                email: pp.email,
+                firstName: first,
+                userId: pp.parent_user_id ?? null,
+              });
             }
 
             for (const r of recipients) {
@@ -189,8 +196,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     locationMapsUrl,
                     meetingPoint: ev.meeting_point ?? undefined,
                     meetingPointMapsUrl,
-                    competitionName:
-                      ev.competition_name ?? ev.competition_type ?? undefined,
+                    competitionName: ev.competition_name ?? ev.competition_type ?? undefined,
                     teamName: ev.teams?.name ?? undefined,
                     clubName: club.name ?? undefined,
                     clubLogoUrl: club.logo_url ?? undefined,
@@ -200,7 +206,6 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     lineup: lineupEmail,
                     locale,
                   },
-
                 });
                 sent++;
               } catch (e) {
@@ -211,7 +216,9 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             // Web Push parallèle à l'email — au joueur lui-même + chaque parent lié
             // Gate: convocation_reminder (l'email continue à partir si OFF)
             const { getClubNotifSettings } = await import("@/lib/club-notif-settings.server");
-            const notifSettings = await getClubNotifSettings((ev.teams?.club_id as string | null) ?? null);
+            const notifSettings = await getClubNotifSettings(
+              (ev.teams?.club_id as string | null) ?? null,
+            );
             if (notifSettings.convocation_reminder) {
               const pushTargets = new Set<string>();
               if (player.user_id) pushTargets.add(player.user_id);
@@ -223,7 +230,10 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
               const opponent = (ev.opponent as string | null) ?? null;
               const isHome = ev.is_home as boolean | null | undefined;
               const startDt = new Date(ev.starts_at);
-              const timeStr = startDt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+              const timeStr = startDt.toLocaleTimeString("fr-FR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
               let headline: string;
               if (isMatch && opponent) {
                 headline = teamName ? `${teamName} vs ${opponent}` : `vs ${opponent}`;
@@ -233,8 +243,14 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                 headline = ev.title || "Événement";
               }
               const venueBit = isMatch
-                ? (isHome === true ? " · Domicile" : isHome === false ? " · Extérieur" : "")
-                : (ev.location ? ` · ${ev.location}` : "");
+                ? isHome === true
+                  ? " · Domicile"
+                  : isHome === false
+                    ? " · Extérieur"
+                    : ""
+                : ev.location
+                  ? ` · ${ev.location}`
+                  : "";
               const reminderBody = `${playerName || "Tu"} n'as pas encore répondu — ${headline} · ${timeStr}${venueBit}`;
               for (const uid of pushTargets) {
                 sendPushToUserFireAndForget(uid, {
@@ -246,7 +262,6 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
               }
             }
 
-
             await supabaseAdmin.from("reminders").insert({
               convocation_id: conv.id,
               channel: "email",
@@ -255,10 +270,10 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           }
         }
 
-        return new Response(
-          JSON.stringify({ processed, sent }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ processed, sent }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
       },
     },
   },

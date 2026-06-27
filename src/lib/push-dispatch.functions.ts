@@ -24,7 +24,9 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
 
     const { data: ev } = await supabaseAdmin
       .from("events")
-      .select("id, title, starts_at, type, team_id, opponent, is_home, location, teams:team_id(name, club_id)")
+      .select(
+        "id, title, starts_at, type, team_id, opponent, is_home, location, teams:team_id(name, club_id)",
+      )
       .eq("id", data.eventId)
       .maybeSingle();
     if (!ev) return { dispatched: 0 };
@@ -35,12 +37,8 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
     const settings = await getClubNotifSettings(clubId);
     if (!settings.convocation_on_create) return { dispatched: 0 };
 
-
     const [{ data: players }, { data: parents }] = await Promise.all([
-      supabaseAdmin
-        .from("players")
-        .select("id, user_id")
-        .in("id", data.playerIds),
+      supabaseAdmin.from("players").select("id, user_id").in("id", data.playerIds),
       supabaseAdmin
         .from("player_parents")
         .select("player_id, parent_user_id")
@@ -49,7 +47,8 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
 
     const targets = new Set<string>();
     for (const p of players ?? []) if ((p as any).user_id) targets.add((p as any).user_id);
-    for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+    for (const p of parents ?? [])
+      if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
 
     const dt = new Date((ev as any).starts_at);
     const dateStr = dt.toLocaleDateString("fr-FR", {
@@ -73,8 +72,14 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
       headline = (ev as any).title || "Événement";
     }
     const venueBit = isMatch
-      ? (isHome === true ? " · Domicile" : isHome === false ? " · Extérieur" : "")
-      : (location ? ` · ${location}` : "");
+      ? isHome === true
+        ? " · Domicile"
+        : isHome === false
+          ? " · Extérieur"
+          : ""
+      : location
+        ? ` · ${location}`
+        : "";
 
     const sends = Array.from(targets).map((uid) =>
       sendPushToUser(uid, {
@@ -131,9 +136,7 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
     const home = (ev as any).is_home !== false;
     const sh = (result as any).home_score;
     const sa = (result as any).away_score;
-    const body = home
-      ? `${teamName} ${sh}-${sa} ${opp}`
-      : `${opp} ${sh}-${sa} ${teamName}`;
+    const body = home ? `${teamName} ${sh}-${sa} ${opp}` : `${opp} ${sh}-${sa} ${teamName}`;
 
     // Fan out to all convoqués + coaches of the team
     const teamId = (ev as any).team_id as string | null;
@@ -161,7 +164,8 @@ export const dispatchScorePush = createServerFn({ method: "POST" })
         .from("player_parents")
         .select("parent_user_id")
         .in("player_id", playerIds);
-      for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+      for (const p of parents ?? [])
+        if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
     }
 
     const sends = Array.from(targets).map((uid) =>
@@ -212,7 +216,10 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       .from("push_dispatch_log")
       .insert({ kind: "wall_post", ref_id: data.postId });
     if (dedupErr) {
-      console.log("[push] wall BAIL already dispatched", { postId: data.postId, code: dedupErr.code });
+      console.log("[push] wall BAIL already dispatched", {
+        postId: data.postId,
+        code: dedupErr.code,
+      });
       return { dispatched: 0, deduped: true };
     }
 
@@ -247,7 +254,7 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
       supabaseAdmin.from("clubs").select("name").eq("id", clubId).maybeSingle(),
     ]);
     const authorName =
-      ([(author as any)?.first_name, (author as any)?.last_name].filter(Boolean).join(" ").trim()) ||
+      [(author as any)?.first_name, (author as any)?.last_name].filter(Boolean).join(" ").trim() ||
       ((author as any)?.full_name as string) ||
       "Un membre";
     const clubName = ((club as any)?.name as string) || "votre club";
@@ -469,7 +476,6 @@ export const dispatchWallPostPush = createServerFn({ method: "POST" })
     return { dispatched: targets.length, sent, pruned };
   });
 
-
 /* ------------------------------------------------------------------ */
 /* Wall post push — opened analytics                                   */
 /* ------------------------------------------------------------------ */
@@ -492,7 +498,10 @@ export const trackWallPostPushOpened = createServerFn({ method: "POST" })
       .eq("id", data.postId)
       .maybeSingle();
     if (!visible) {
-      console.log("[push] wall_post_push_opened DENIED", { postId: data.postId, userId: context.userId });
+      console.log("[push] wall_post_push_opened DENIED", {
+        postId: data.postId,
+        userId: context.userId,
+      });
       return { tracked: false, reason: "no_access" as const };
     }
 
@@ -523,9 +532,6 @@ export const trackWallPostPushOpened = createServerFn({ method: "POST" })
     return { tracked: true };
   });
 
-
-
-
 /* ------------------------------------------------------------------ */
 /* #7 — Convocation response push (authenticated caller)              */
 /* ------------------------------------------------------------------ */
@@ -537,9 +543,8 @@ export const dispatchConvocationResponsePush = createServerFn({ method: "POST" }
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ResponseInput.parse(input))
   .handler(async ({ data }) => {
-    const { fanoutConvocationResponse, fanoutConvocationComplete } = await import(
-      "@/lib/push-fanout.server"
-    );
+    const { fanoutConvocationResponse, fanoutConvocationComplete } =
+      await import("@/lib/push-fanout.server");
     // No excludeUserId: targets are coaches only; even when a coach responds
     // on behalf of a player, the coach still wants to see the confirmation.
     const { dispatched, eventId } = await fanoutConvocationResponse(data.convocationId);
@@ -583,7 +588,9 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
 
     const { data: ev } = await supabaseAdmin
       .from("events")
-      .select("id, title, starts_at, type, team_id, opponent, is_home, convocations_sent, teams:team_id(name, club_id)")
+      .select(
+        "id, title, starts_at, type, team_id, opponent, is_home, convocations_sent, teams:team_id(name, club_id)",
+      )
       .eq("id", data.eventId)
       .maybeSingle();
     if (!ev) return { dispatched: 0 };
@@ -610,11 +617,16 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
         .from("player_parents")
         .select("parent_user_id")
         .in("player_id", playerIds);
-      for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+      for (const p of parents ?? [])
+        if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
     }
 
     const dt = new Date((ev as any).starts_at);
-    const dateStr = dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+    const dateStr = dt.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
     const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;
@@ -663,7 +675,9 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
 
     const { data: ev } = await supabaseAdmin
       .from("events")
-      .select("id, title, starts_at, type, team_id, opponent, is_home, teams:team_id(name, club_id)")
+      .select(
+        "id, title, starts_at, type, team_id, opponent, is_home, teams:team_id(name, club_id)",
+      )
       .eq("id", data.eventId)
       .maybeSingle();
     if (!ev) return { dispatched: 0 };
@@ -688,12 +702,17 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
         .from("player_parents")
         .select("parent_user_id")
         .in("player_id", playerIds);
-      for (const p of parents ?? []) if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
+      for (const p of parents ?? [])
+        if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
     }
 
     const startIso = data.previousStartsAt || ((ev as any).starts_at as string);
     const dt = new Date(startIso);
-    const dateStr = dt.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+    const dateStr = dt.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
     const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;

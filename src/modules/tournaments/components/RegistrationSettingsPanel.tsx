@@ -20,11 +20,7 @@ interface Props {
   settings: unknown;
 }
 
-export function RegistrationSettingsPanel({
-  tournamentId,
-  tournamentSlug,
-  settings,
-}: Props) {
+export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settings }: Props) {
   const { t } = useTranslation("tournaments");
   const initial = useMemo(() => mergeRules(settings), [settings]);
   const [rules, setRules] = useState<TournamentRules>(initial);
@@ -32,8 +28,7 @@ export function RegistrationSettingsPanel({
   const qc = useQueryClient();
 
   const save = useMutation({
-    mutationFn: () =>
-      updateFn({ data: { tournament_id: tournamentId, rules: rules as any } }),
+    mutationFn: () => updateFn({ data: { tournament_id: tournamentId, rules: rules as any } }),
     onSuccess: () => {
       toast.success(t("rules.savedToast"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
@@ -74,8 +69,7 @@ export function RegistrationSettingsPanel({
               </Label>
               <p className="text-xs text-muted-foreground mt-1">
                 {t("registrationSettings.enableHint", {
-                  defaultValue:
-                    "Active un bouton « S'inscrire » sur la page publique du tournoi.",
+                  defaultValue: "Active un bouton « S'inscrire » sur la page publique du tournoi.",
                 })}
               </p>
             </div>

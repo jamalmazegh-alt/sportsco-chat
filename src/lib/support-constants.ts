@@ -28,12 +28,9 @@ export type SupportCategory = (typeof SUPPORT_CATEGORIES)[number];
 // Tailwind classes for status badges (shared between user + admin views).
 export const STATUS_BADGE_CLASS: Record<SupportStatus, string> = {
   open: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200",
-  in_progress:
-    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200",
-  waiting_user:
-    "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200",
-  resolved:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
+  in_progress: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200",
+  waiting_user: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200",
+  resolved: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
   closed: "bg-muted text-muted-foreground",
 };
 

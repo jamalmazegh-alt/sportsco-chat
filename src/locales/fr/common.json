@@ -838,20 +838,8 @@
     "pendingCount_plural": "{{count}} joueurs n'ont pas encore répondu",
     "remindAllSent": "{{count}} relance envoyée",
     "remindAllSent_plural": "{{count}} relances envoyées",
-    "reasonsAbsent": [
-      "Travail",
-      "Famille",
-      "Blessure",
-      "Maladie",
-      "Études",
-      "Autre engagement"
-    ],
-    "reasonsUncertain": [
-      "À confirmer",
-      "Travail",
-      "Famille",
-      "Léger souci de santé"
-    ],
+    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
+    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",

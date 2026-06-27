@@ -30,7 +30,6 @@ vi.mock("@/integrations/supabase/client.server", () => {
   };
 });
 
-
 import { assertSuperAdmin, assertClubRole } from "@/lib/authz.server";
 
 // ---------- minimal SupabaseClient fake for context.supabase --------------

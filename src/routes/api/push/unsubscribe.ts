@@ -16,11 +16,9 @@ export const Route = createFileRoute("/api/push/unsubscribe")({
         if (!token) return new Response("Unauthorized", { status: 401 });
 
         const { createClient } = await import("@supabase/supabase-js");
-        const sb = createClient(
-          process.env.SUPABASE_URL!,
-          process.env.SUPABASE_PUBLISHABLE_KEY!,
-          { auth: { persistSession: false, autoRefreshToken: false } },
-        );
+        const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        });
         const { data: userData } = await sb.auth.getUser(token);
         if (!userData?.user) return new Response("Unauthorized", { status: 401 });
 
@@ -36,10 +34,7 @@ export const Route = createFileRoute("/api/push/unsubscribe")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        let q = supabaseAdmin
-          .from("push_subscriptions")
-          .delete()
-          .eq("user_id", userData.user.id);
+        let q = supabaseAdmin.from("push_subscriptions").delete().eq("user_id", userData.user.id);
         if (parsed.endpoint) q = q.eq("endpoint", parsed.endpoint);
         if (parsed.keep_endpoint) q = q.neq("endpoint", parsed.keep_endpoint);
         await q;

@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  getSportConfig,
-  SOLO_STAT_KINDS,
-  type StatKind,
-} from "@/lib/sport-config";
+import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 
 describe("getSportConfig — sports connus", () => {
   it("football retourne config complète", () => {
@@ -151,9 +147,16 @@ describe("SOLO_STAT_KINDS", () => {
 
   it("tous les éléments sont des StatKind valides", () => {
     const validKinds: StatKind[] = [
-      "goal", "own_goal", "penalty", "assist",
-      "try", "point", "yellow_card", "red_card",
-      "white_card", "foul",
+      "goal",
+      "own_goal",
+      "penalty",
+      "assist",
+      "try",
+      "point",
+      "yellow_card",
+      "red_card",
+      "white_card",
+      "foul",
     ];
     for (const kind of SOLO_STAT_KINDS) {
       expect(validKinds).toContain(kind);

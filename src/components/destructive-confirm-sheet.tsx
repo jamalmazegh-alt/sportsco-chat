@@ -126,8 +126,8 @@ export function DestructiveConfirmSheet(props: DestructiveConfirmSheetProps) {
       {props.mode === "type" && (
         <div className="space-y-2">
           <label className="text-xs text-muted-foreground">
-            Tape <span className="font-mono font-semibold text-foreground">{confirmWord}</span>{" "}
-            pour débloquer
+            Tape <span className="font-mono font-semibold text-foreground">{confirmWord}</span> pour
+            débloquer
           </label>
           <Input
             value={typed}

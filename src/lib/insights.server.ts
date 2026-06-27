@@ -165,11 +165,7 @@ async function detectConsecutiveAbsences(clubId: string): Promise<DetectedInsigh
 
   // 3. All team names — ONE query
   const teamIds = [
-    ...new Set(
-      ((convs ?? []) as any[])
-        .map((c) => c.event?.team_id)
-        .filter(Boolean),
-    ),
+    ...new Set(((convs ?? []) as any[]).map((c) => c.event?.team_id).filter(Boolean)),
   ];
   let teams: { id: string; name: string }[] = [];
   if (teamIds.length) {
@@ -180,7 +176,7 @@ async function detectConsecutiveAbsences(clubId: string): Promise<DetectedInsigh
 
   // 4. Group convocations by player and check consecutive absences
   const byPlayer = new Map<string, any[]>();
-  for (const c of ((convs ?? []) as any[])) {
+  for (const c of (convs ?? []) as any[]) {
     if (!c.event || c.event.status === "cancelled") continue;
     const arr = byPlayer.get(c.player_id) ?? [];
     arr.push(c);
@@ -197,9 +193,7 @@ async function detectConsecutiveAbsences(clubId: string): Promise<DetectedInsigh
     );
     if (sorted.length < 3) continue;
     const lastThree = sorted.slice(0, 3);
-    const allAbsent = lastThree.every(
-      (c: any) => c.status === "absent" || c.status === "no_show",
-    );
+    const allAbsent = lastThree.every((c: any) => c.status === "absent" || c.status === "no_show");
     if (!allAbsent) continue;
 
     const p = playerMap.get(playerId);
@@ -311,7 +305,7 @@ async function detectMissingGuardian(clubId: string): Promise<DetectedInsight[]>
     .select("player_id, team_id, teams:team_id(name)")
     .in("player_id", minorIds);
   const teamByPlayer = new Map<string, { team_id: string; team_name: string }>();
-  for (const m of ((memberships ?? []) as any[])) {
+  for (const m of (memberships ?? []) as any[]) {
     if (!teamByPlayer.has(m.player_id)) {
       teamByPlayer.set(m.player_id, {
         team_id: m.team_id,
@@ -476,7 +470,8 @@ export async function detectAndGenerateInsightsForClub(
       expires_at: ins.expires_at,
     });
     if (!error) created++;
-    else if (!/duplicate key/i.test(error.message)) console.error("[insights] insert failed", error);
+    else if (!/duplicate key/i.test(error.message))
+      console.error("[insights] insert failed", error);
   }
   return { detected: detected.length, created };
 }

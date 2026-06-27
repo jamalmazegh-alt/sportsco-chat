@@ -119,8 +119,19 @@ function extractMessage(err: unknown): string {
   if (typeof err === "string") return err;
   if (err instanceof Error) return err.message;
   if (typeof err === "object") {
-    const anyErr = err as { message?: string; error_description?: string; msg?: string; details?: string };
-    return anyErr.message || anyErr.error_description || anyErr.msg || anyErr.details || JSON.stringify(err);
+    const anyErr = err as {
+      message?: string;
+      error_description?: string;
+      msg?: string;
+      details?: string;
+    };
+    return (
+      anyErr.message ||
+      anyErr.error_description ||
+      anyErr.msg ||
+      anyErr.details ||
+      JSON.stringify(err)
+    );
   }
   return String(err);
 }

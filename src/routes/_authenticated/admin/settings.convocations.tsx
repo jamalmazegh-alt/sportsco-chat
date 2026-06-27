@@ -49,7 +49,9 @@ function ConvocationsSettings() {
   useEffect(() => {
     if (data) {
       setChannels(
-        Array.isArray(data.convocation_channels) ? (data.convocation_channels as string[]) : ["email", "in_app"],
+        Array.isArray(data.convocation_channels)
+          ? (data.convocation_channels as string[])
+          : ["email", "in_app"],
       );
     }
   }, [data]);

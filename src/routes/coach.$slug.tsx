@@ -32,8 +32,22 @@ type CoachProfile = {
     bio: string | null;
   } | null;
   club: { id: string; name: string; logo_url: string | null; theme_color: string | null } | null;
-  diplomas: Array<{ id: string; name: string; issuing_body: string | null; obtained_at: string | null; expiry_date: string | null }>;
-  history: Array<{ id: string; club_name: string; role: string | null; sport: string | null; joined_at: string | null; left_at: string | null; is_current: boolean }>;
+  diplomas: Array<{
+    id: string;
+    name: string;
+    issuing_body: string | null;
+    obtained_at: string | null;
+    expiry_date: string | null;
+  }>;
+  history: Array<{
+    id: string;
+    club_name: string;
+    role: string | null;
+    sport: string | null;
+    joined_at: string | null;
+    left_at: string | null;
+    is_current: boolean;
+  }>;
 };
 
 const coachQuery = (slug: string) =>
@@ -95,7 +109,10 @@ function CoachPublicPage() {
   }
 
   const { coach, profile, club, diplomas, history } = data;
-  const fullName = profile?.full_name || `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim() || "Coach";
+  const fullName =
+    profile?.full_name ||
+    `${profile?.first_name ?? ""} ${profile?.last_name ?? ""}`.trim() ||
+    "Coach";
   const initials = initialsFrom(fullName);
   const gradient = avatarGradient(coach.id);
 
@@ -103,8 +120,17 @@ function CoachPublicPage() {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
       <div className="mx-auto max-w-4xl px-5 py-10 lg:px-8">
         <header className="flex flex-col items-center gap-4 text-center md:flex-row md:items-end md:text-left">
-          <div className={cn("flex h-28 w-28 items-center justify-center overflow-hidden rounded-full text-3xl font-bold text-white", gradient)}>
-            {profile?.avatar_url ? <img src={profile.avatar_url} alt={fullName} className="h-full w-full object-cover" /> : <span>{initials}</span>}
+          <div
+            className={cn(
+              "flex h-28 w-28 items-center justify-center overflow-hidden rounded-full text-3xl font-bold text-white",
+              gradient,
+            )}
+          >
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt={fullName} className="h-full w-full object-cover" />
+            ) : (
+              <span>{initials}</span>
+            )}
           </div>
           <div className="flex-1">
             <h1 className="text-3xl font-bold md:text-4xl">{fullName}</h1>
@@ -114,10 +140,19 @@ function CoachPublicPage() {
                   <Trophy className="h-3.5 w-3.5" /> {club.name}
                 </span>
               )}
-              {coach.sport && <span className="rounded-full bg-muted px-3 py-1">{coach.sport}</span>}
-              {coach.speciality && <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">{coach.speciality}</span>}
+              {coach.sport && (
+                <span className="rounded-full bg-muted px-3 py-1">{coach.sport}</span>
+              )}
+              {coach.speciality && (
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-primary">
+                  {coach.speciality}
+                </span>
+              )}
               {(profile?.city || profile?.region) && (
-                <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {[profile.city, profile.region].filter(Boolean).join(", ")}</span>
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" />{" "}
+                  {[profile.city, profile.region].filter(Boolean).join(", ")}
+                </span>
               )}
             </div>
             <div className="mt-3 flex flex-wrap items-center justify-center gap-3 md:justify-start">
@@ -126,7 +161,11 @@ function CoachPublicPage() {
                   <Sparkles className="h-3.5 w-3.5" /> Disponible — Open to opportunities
                 </span>
               )}
-              <FollowButton targetType="coach" targetId={coach.id} initialFollowersCount={coach.followers_count} />
+              <FollowButton
+                targetType="coach"
+                targetId={coach.id}
+                initialFollowersCount={coach.followers_count}
+              />
             </div>
           </div>
         </header>
@@ -142,22 +181,35 @@ function CoachPublicPage() {
             <h2 className="text-lg font-semibold">Philosophie de jeu</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{coach.philosophy}</p>
             {coach.years_experience != null && (
-              <p className="mt-3 text-xs text-muted-foreground">{coach.years_experience} an(s) d'expérience</p>
+              <p className="mt-3 text-xs text-muted-foreground">
+                {coach.years_experience} an(s) d'expérience
+              </p>
             )}
           </section>
         )}
 
         {diplomas.length > 0 && (
           <section className="mt-6 rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="flex items-center gap-2 text-lg font-semibold"><GraduationCap className="h-5 w-5" /> Diplômes</h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <GraduationCap className="h-5 w-5" /> Diplômes
+            </h2>
             <ul className="mt-3 space-y-2">
               {diplomas.map((d) => (
-                <li key={d.id} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2 last:border-0">
+                <li
+                  key={d.id}
+                  className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2 last:border-0"
+                >
                   <div>
                     <div className="font-medium">{d.name}</div>
-                    {d.issuing_body && <div className="text-xs text-muted-foreground">{d.issuing_body}</div>}
+                    {d.issuing_body && (
+                      <div className="text-xs text-muted-foreground">{d.issuing_body}</div>
+                    )}
                   </div>
-                  {d.obtained_at && <span className="text-xs text-muted-foreground">{new Date(d.obtained_at).getFullYear()}</span>}
+                  {d.obtained_at && (
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(d.obtained_at).getFullYear()}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -166,16 +218,33 @@ function CoachPublicPage() {
 
         {history.length > 0 && (
           <section className="mt-6 rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="flex items-center gap-2 text-lg font-semibold"><History className="h-5 w-5" /> Parcours</h2>
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <History className="h-5 w-5" /> Parcours
+            </h2>
             <ul className="mt-3 space-y-2">
               {history.map((h) => (
-                <li key={h.id} className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2 last:border-0">
+                <li
+                  key={h.id}
+                  className="flex items-baseline justify-between gap-3 border-b border-border/40 pb-2 last:border-0"
+                >
                   <div>
-                    <div className="font-medium">{h.club_name} {h.is_current && <span className="ml-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Actuel</span>}</div>
-                    {(h.role || h.sport) && <div className="text-xs text-muted-foreground">{[h.role, h.sport].filter(Boolean).join(" · ")}</div>}
+                    <div className="font-medium">
+                      {h.club_name}{" "}
+                      {h.is_current && (
+                        <span className="ml-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                          Actuel
+                        </span>
+                      )}
+                    </div>
+                    {(h.role || h.sport) && (
+                      <div className="text-xs text-muted-foreground">
+                        {[h.role, h.sport].filter(Boolean).join(" · ")}
+                      </div>
+                    )}
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {h.joined_at ? new Date(h.joined_at).getFullYear() : ""}{h.left_at ? `–${new Date(h.left_at).getFullYear()}` : h.is_current ? "–" : ""}
+                    {h.joined_at ? new Date(h.joined_at).getFullYear() : ""}
+                    {h.left_at ? `–${new Date(h.left_at).getFullYear()}` : h.is_current ? "–" : ""}
                   </span>
                 </li>
               ))}

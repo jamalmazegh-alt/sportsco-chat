@@ -28,10 +28,7 @@ export interface SwissPairing {
 /**
  * Génère les appariements d'une ronde donnée.
  */
-export function generateSwissRound(
-  state: SwissTeamState[],
-  round: number,
-): SwissPairing[] {
+export function generateSwissRound(state: SwissTeamState[], round: number): SwissPairing[] {
   if (state.length < 2) return [];
 
   // Tri : par points décroissants, puis par seed croissant (meilleur d'abord)

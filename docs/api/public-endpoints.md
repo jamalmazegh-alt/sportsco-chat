@@ -51,7 +51,6 @@ LLM cost abuse.
 - **Response**: text/event-stream, `413` if a message exceeds the size cap,
   `429` on throttle
 
-
 ## `POST /api/public/hooks/event-reminders`
 
 Cron-triggered. Sends D-1 reminders for upcoming events.

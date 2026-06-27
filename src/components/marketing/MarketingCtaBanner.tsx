@@ -47,10 +47,14 @@ export function MarketingCtaBanner() {
       />
       {/* Glow accents */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 -top-24 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
-             style={{ background: "radial-gradient(circle, rgba(46,107,255,.55), transparent 65%)" }} />
-        <div className="absolute -right-32 top-1/3 h-[440px] w-[440px] rounded-full opacity-30 blur-3xl"
-             style={{ background: "radial-gradient(circle, rgba(56,189,248,.45), transparent 65%)" }} />
+        <div
+          className="absolute -left-32 -top-24 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(46,107,255,.55), transparent 65%)" }}
+        />
+        <div
+          className="absolute -right-32 top-1/3 h-[440px] w-[440px] rounded-full opacity-30 blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(56,189,248,.45), transparent 65%)" }}
+        />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
@@ -103,7 +107,12 @@ export function MarketingCtaBanner() {
                     aria-label={s.name}
                     className="flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:border-white/30 hover:bg-white/10"
                   >
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="h-5 w-5"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
                       <path d={s.path} />
                     </svg>
                   </a>

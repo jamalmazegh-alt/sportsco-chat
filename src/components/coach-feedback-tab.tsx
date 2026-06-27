@@ -8,10 +8,18 @@ import { Loader2, Lock, Sparkles, Trash2, Star, Wand2, Volume2, Square } from "l
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -26,13 +34,7 @@ import { cn } from "@/lib/utils";
 import { ReviewRefineDialog } from "@/components/review-refine-dialog";
 import { useTextToSpeech } from "@/hooks/use-text-to-speech";
 
-export function CoachFeedbackTab({
-  playerId,
-  isCoach,
-}: {
-  playerId: string;
-  isCoach: boolean;
-}) {
+export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCoach: boolean }) {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const fetchFb = useServerFn(listPlayerFeedback);
@@ -42,7 +44,11 @@ export function CoachFeedbackTab({
   const delRv = useServerFn(deletePlayerReview);
   const { speak, stop: stopSpeech } = useTextToSpeech();
   const [speakingId, setSpeakingId] = useState<string | null>(null);
-  const [refineTarget, setRefineTarget] = useState<{ id: string; content: string; revision: number } | null>(null);
+  const [refineTarget, setRefineTarget] = useState<{
+    id: string;
+    content: string;
+    revision: number;
+  } | null>(null);
 
   const { data: fb, isLoading: lFb } = useQuery({
     queryKey: ["player-feedback", playerId],
@@ -55,7 +61,9 @@ export function CoachFeedbackTab({
 
   const [genOpen, setGenOpen] = useState(false);
   const [genBusy, setGenBusy] = useState(false);
-  const [kind, setKind] = useState<"end_of_season" | "meeting" | "development" | "coaching">("development");
+  const [kind, setKind] = useState<"end_of_season" | "meeting" | "development" | "coaching">(
+    "development",
+  );
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
 
@@ -76,20 +84,28 @@ export function CoachFeedbackTab({
       if (generated?.review) {
         const review = generated.review as any;
         qc.setQueryData(["player-reviews", playerId], (current: any) => ({
-          reviews: [review, ...((current?.reviews ?? []).filter((r: any) => r.id !== review.id))],
+          reviews: [review, ...(current?.reviews ?? []).filter((r: any) => r.id !== review.id)],
         }));
       }
-      toast.success(t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }));
+      toast.success(
+        t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }),
+      );
       setGenOpen(false);
       await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
       // Scroll to the reviews section so the new synthesis is immediately visible.
       setTimeout(() => {
-        document.getElementById("coach-reviews-anchor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document
+          .getElementById("coach-reviews-anchor")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 150);
     } catch (e: any) {
       const msg = e?.message ?? "";
-      if (msg.includes("429")) toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." }));
-      else if (msg.includes("402")) toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
+      if (msg.includes("429"))
+        toast.error(
+          t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." }),
+        );
+      else if (msg.includes("402"))
+        toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
       else toast.error(msg || "Error");
     } finally {
       setGenBusy(false);
@@ -132,7 +148,11 @@ export function CoachFeedbackTab({
         </p>
         {(rv?.reviews ?? []).length > 0 ? (
           (rv?.reviews ?? []).map((r: any, idx: number) => (
-            <details key={r.id} className="rounded-xl border border-primary/30 bg-primary/5 p-3" open={idx === 0}>
+            <details
+              key={r.id}
+              className="rounded-xl border border-primary/30 bg-primary/5 p-3"
+              open={idx === 0}
+            >
               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium">
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="flex-1 truncate">
@@ -154,16 +174,27 @@ export function CoachFeedbackTab({
                       speak(r.content);
                       setSpeakingId(r.id);
                       const duration = Math.min(60000, r.content.length * 80);
-                      setTimeout(() => setSpeakingId((cur) => cur === r.id ? null : cur), duration);
+                      setTimeout(
+                        () => setSpeakingId((cur) => (cur === r.id ? null : cur)),
+                        duration,
+                      );
                     }
                   }}
                   className={cn(
                     "text-[11px] inline-flex items-center gap-1 font-medium transition-colors",
-                    speakingId === r.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                    speakingId === r.id
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {speakingId === r.id ? <Square className="h-3 w-3 fill-current" /> : <Volume2 className="h-3 w-3" />}
-                  {speakingId === r.id ? t("common.stop", "Arrêter") : t("common.listen", "Écouter")}
+                  {speakingId === r.id ? (
+                    <Square className="h-3 w-3 fill-current" />
+                  ) : (
+                    <Volume2 className="h-3 w-3" />
+                  )}
+                  {speakingId === r.id
+                    ? t("common.stop", "Arrêter")
+                    : t("common.listen", "Écouter")}
                 </button>
                 {isCoach && (
                   <div className="flex items-center gap-2">
@@ -178,7 +209,9 @@ export function CoachFeedbackTab({
                       size="sm"
                       variant="outline"
                       className="h-8"
-                      onClick={() => setRefineTarget({ id: r.id, content: r.content, revision: Date.now() })}
+                      onClick={() =>
+                        setRefineTarget({ id: r.id, content: r.content, revision: Date.now() })
+                      }
                     >
                       <Wand2 className="h-3.5 w-3.5" />
                       {t("feedback.refineWithAi", { defaultValue: "Affiner avec l'IA" })}
@@ -223,7 +256,6 @@ export function CoachFeedbackTab({
                       <span className="truncate">{f.event.title}</span>
                     </>
                   )}
-                  
                 </div>
 
                 {f.rating && (
@@ -233,7 +265,7 @@ export function CoachFeedbackTab({
                         key={n}
                         className={cn(
                           "h-3 w-3",
-                          n <= f.rating ? "fill-current" : "text-muted-foreground/30"
+                          n <= f.rating ? "fill-current" : "text-muted-foreground/30",
                         )}
                       />
                     ))}
@@ -256,7 +288,7 @@ export function CoachFeedbackTab({
                 {f.strengths && (
                   <p className="text-sm">
                     <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                      {t("feedback.strengths")} : 
+                      {t("feedback.strengths")} :
                     </span>
                     {f.strengths}
                   </p>
@@ -264,7 +296,7 @@ export function CoachFeedbackTab({
                 {f.improvements && (
                   <p className="text-sm">
                     <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-                      {t("feedback.improvements")} : 
+                      {t("feedback.improvements")} :
                     </span>
                     {f.improvements}
                   </p>
@@ -293,34 +325,60 @@ export function CoachFeedbackTab({
       <Dialog open={genOpen} onOpenChange={setGenOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{t("feedback.generateTitle", { defaultValue: "Générer une synthèse" })}</DialogTitle>
+            <DialogTitle>
+              {t("feedback.generateTitle", { defaultValue: "Générer une synthèse" })}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
               <Label className="text-xs">{t("feedback.kindLabel", { defaultValue: "Type" })}</Label>
               <Select value={kind} onValueChange={(v) => setKind(v as any)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="end_of_season">{t("feedback.kind_end_of_season", { defaultValue: "Bilan de saison" })}</SelectItem>
-                  <SelectItem value="meeting">{t("feedback.kind_meeting", { defaultValue: "Préparation d'entretien" })}</SelectItem>
-                  <SelectItem value="development">{t("feedback.kind_development", { defaultValue: "Rapport de développement" })}</SelectItem>
-                  <SelectItem value="coaching">{t("feedback.kind_coaching", { defaultValue: "Synthèse staff coaching" })}</SelectItem>
+                  <SelectItem value="end_of_season">
+                    {t("feedback.kind_end_of_season", { defaultValue: "Bilan de saison" })}
+                  </SelectItem>
+                  <SelectItem value="meeting">
+                    {t("feedback.kind_meeting", { defaultValue: "Préparation d'entretien" })}
+                  </SelectItem>
+                  <SelectItem value="development">
+                    {t("feedback.kind_development", { defaultValue: "Rapport de développement" })}
+                  </SelectItem>
+                  <SelectItem value="coaching">
+                    {t("feedback.kind_coaching", { defaultValue: "Synthèse staff coaching" })}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">{t("feedback.periodStart", { defaultValue: "Début" })}</Label>
-                <Input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} />
+                <Label className="text-xs">
+                  {t("feedback.periodStart", { defaultValue: "Début" })}
+                </Label>
+                <Input
+                  type="date"
+                  value={periodStart}
+                  onChange={(e) => setPeriodStart(e.target.value)}
+                />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">{t("feedback.periodEnd", { defaultValue: "Fin" })}</Label>
-                <Input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} />
+                <Label className="text-xs">
+                  {t("feedback.periodEnd", { defaultValue: "Fin" })}
+                </Label>
+                <Input
+                  type="date"
+                  value={periodEnd}
+                  onChange={(e) => setPeriodEnd(e.target.value)}
+                />
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
               <Lock className="h-3 w-3" />
-              {t("feedback.generateInternalHint", { defaultValue: "Synthèse interne, visible uniquement par le staff coach." })}
+              {t("feedback.generateInternalHint", {
+                defaultValue: "Synthèse interne, visible uniquement par le staff coach.",
+              })}
             </p>
           </div>
           <DialogFooter>
@@ -328,7 +386,11 @@ export function CoachFeedbackTab({
               {t("common.cancel")}
             </Button>
             <Button onClick={onGenerate} disabled={genBusy}>
-              {genBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {genBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
               {t("feedback.generate", { defaultValue: "Générer" })}
             </Button>
           </DialogFooter>
@@ -343,7 +405,11 @@ export function CoachFeedbackTab({
           reviewId={refineTarget.id}
           playerId={playerId}
           initialContent={refineTarget.content}
-          onUpdated={(review) => setRefineTarget((current) => current ? { ...current, content: review.content } : current)}
+          onUpdated={(review) =>
+            setRefineTarget((current) =>
+              current ? { ...current, content: review.content } : current,
+            )
+          }
         />
       )}
     </div>

@@ -20,9 +20,7 @@ const T = {
       s === e ? `${n} sera absent·e le ${s}` : `${n} sera absent·e du ${s} au ${e}`,
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
     body: (player: string, s: string, e: string) =>
-      s === e
-        ? `${player} sera absent·e le ${s}.`
-        : `${player} sera absent·e du ${s} au ${e}.`,
+      s === e ? `${player} sera absent·e le ${s}.` : `${player} sera absent·e du ${s} au ${e}.`,
     declaredBy: (n: string) => `Déclaré par ${n}.`,
     reason: "Motif",
     seeProfile: "Voir le profil joueur",
@@ -45,7 +43,16 @@ const T = {
 
 const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
-const Email = ({ coachFirstName, playerName, startDate, endDate, reasonLabel, declaredByName, eventUrl, locale }: Props) => {
+const Email = ({
+  coachFirstName,
+  playerName,
+  startDate,
+  endDate,
+  reasonLabel,
+  declaredByName,
+  eventUrl,
+  locale,
+}: Props) => {
   const l = pickLocale(locale);
   const t = pick(l);
   return (
@@ -60,7 +67,9 @@ const Email = ({ coachFirstName, playerName, startDate, endDate, reasonLabel, de
           <strong>{t.reason} :</strong> {reasonLabel}
         </Text>
       )}
-      <Button style={button} href={eventUrl}>{t.seeProfile}</Button>
+      <Button style={button} href={eventUrl}>
+        {t.seeProfile}
+      </Button>
     </EmailShell>
   );
 };
@@ -88,7 +97,12 @@ const h1 = { fontSize: "20px", fontWeight: "bold" as const, color: "#0f172a", ma
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 12px" };
 const subtle = { fontSize: "13px", color: "#64748b", margin: "0 0 16px" };
 const button = {
-  backgroundColor: "#0f172a", color: "#ffffff", fontSize: "14px",
-  borderRadius: "10px", padding: "12px 20px", textDecoration: "none", display: "inline-block",
+  backgroundColor: "#0f172a",
+  color: "#ffffff",
+  fontSize: "14px",
+  borderRadius: "10px",
+  padding: "12px 20px",
+  textDecoration: "none",
+  display: "inline-block",
   marginTop: "8px",
 };

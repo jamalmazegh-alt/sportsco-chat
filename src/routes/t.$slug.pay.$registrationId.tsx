@@ -107,7 +107,10 @@ function PayPage() {
 
   const { registration, tournament } = q.data;
 
-  if (registration.payment_status === "paid_online" || registration.payment_status === "paid_offline") {
+  if (
+    registration.payment_status === "paid_online" ||
+    registration.payment_status === "paid_offline"
+  ) {
     return (
       <CenterCard
         icon={<CheckCircle2 className="h-10 w-10 text-emerald-600" />}
@@ -153,11 +156,7 @@ function PayPage() {
         </div>
         <p className="text-4xl font-bold tracking-tight">{amount}</p>
         <Button onClick={onPay} disabled={paying} size="lg" className="w-full">
-          {paying ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("payments.payNow", { amount })
-          )}
+          {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : t("payments.payNow", { amount })}
         </Button>
         <p className="text-[11px] text-muted-foreground">
           {t("register.securePayment", {
@@ -169,15 +168,7 @@ function PayPage() {
   );
 }
 
-function CenterCard({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
+function CenterCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-md text-center space-y-3">

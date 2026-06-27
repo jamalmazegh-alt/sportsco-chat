@@ -7,17 +7,13 @@ import { Button } from "@/components/ui/button";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { trackConversion } from "@/lib/conversion-tracking";
 
-
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
   validateSearch: (search: Record<string, unknown>) => ({
     source: typeof search.source === "string" ? (search.source as string) : undefined,
-    utm_source:
-      typeof search.utm_source === "string" ? (search.utm_source as string) : undefined,
+    utm_source: typeof search.utm_source === "string" ? (search.utm_source as string) : undefined,
     tournament_id:
-      typeof search.tournament_id === "string"
-        ? (search.tournament_id as string)
-        : undefined,
+      typeof search.tournament_id === "string" ? (search.tournament_id as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -35,8 +31,7 @@ function PricingPage() {
   const { t: tc } = useTranslation("common");
   const search = Route.useSearch();
   const fromTournament =
-    search.source === "tournament_conversion" ||
-    (search.utm_source ?? "").includes("tournament");
+    search.source === "tournament_conversion" || (search.utm_source ?? "").includes("tournament");
   const clubBenefits = tc("pricing.clubBenefits", { returnObjects: true }) as string[];
   const CLUBERO_FEATURES = t("pricing.clubFeatures", { returnObjects: true }) as string[];
   const ENTERPRISE_FEATURES = t("pricing.enterpriseFeatures", { returnObjects: true }) as string[];
@@ -80,7 +75,6 @@ function PricingPage() {
         </section>
       )}
       <section className="border-b border-border/60">
-
         <div className="mx-auto max-w-4xl px-5 py-16 text-center lg:px-8 lg:py-24">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             {t("pricing.badge")}
@@ -104,9 +98,7 @@ function PricingPage() {
           <h2 className="mt-4 font-display text-2xl font-bold sm:text-3xl">
             {t("pricing.trialTitle")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            {t("pricing.trialBody")}
-          </p>
+          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{t("pricing.trialBody")}</p>
           <Button asChild className="mt-6 h-11 px-8">
             <Link to="/register">{t("pricing.trialCta")}</Link>
           </Button>
@@ -128,9 +120,7 @@ function PricingPage() {
                 </div>
                 <div>
                   <h2 className="font-display text-xl font-bold">{t("pricing.planName")}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {t("pricing.planSubtitle")}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t("pricing.planSubtitle")}</p>
                 </div>
               </div>
 
@@ -171,7 +161,9 @@ function PricingPage() {
                   <Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl font-bold">{t("tournaments.pricing.title")}</h2>
+                  <h2 className="font-display text-xl font-bold">
+                    {t("tournaments.pricing.title")}
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     {t("tournaments.pricing.subtitle")}
                   </p>
@@ -209,7 +201,6 @@ function PricingPage() {
               </ul>
             </div>
 
-
             {/* Enterprise */}
             <div className="flex flex-col rounded-3xl border border-border bg-card p-8">
               <div className="flex items-center gap-3">
@@ -218,9 +209,7 @@ function PricingPage() {
                 </div>
                 <div>
                   <h2 className="font-display text-xl font-bold">{t("pricing.enterpriseName")}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {t("pricing.enterpriseSubtitle")}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t("pricing.enterpriseSubtitle")}</p>
                 </div>
               </div>
 
@@ -228,9 +217,7 @@ function PricingPage() {
                 <div className="font-display text-5xl font-bold">
                   {t("pricing.enterprisePrice")}
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t("pricing.enterpriseBody")}
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{t("pricing.enterpriseBody")}</p>
               </div>
 
               <Button asChild variant="outline" className="mt-6 w-full h-11">
@@ -239,7 +226,6 @@ function PricingPage() {
 
               <ul className="mt-8 space-y-3">
                 {ENTERPRISE_FEATURES.map((f) => (
-
                   <li key={f} className="flex items-start gap-2.5 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
                     <span className="text-foreground/80">{f}</span>
@@ -249,9 +235,7 @@ function PricingPage() {
             </div>
           </div>
 
-          <p className="mt-10 text-center text-sm text-muted-foreground">
-            {t("pricing.footer")}
-          </p>
+          <p className="mt-10 text-center text-sm text-muted-foreground">{t("pricing.footer")}</p>
         </div>
       </section>
     </MarketingLayout>

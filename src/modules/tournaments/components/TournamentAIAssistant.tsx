@@ -71,12 +71,7 @@ function diffMinutes(start: string, end: string): number {
   return parseHHMM(end) - parseHHMM(start);
 }
 
-export function TournamentAIAssistant({
-  clubId,
-  defaultSport,
-  onOpenExpert,
-  onSimulate,
-}: Props) {
+export function TournamentAIAssistant({ clubId, defaultSport, onOpenExpert, onSimulate }: Props) {
   const { t } = useTranslation("tournaments");
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -242,7 +237,9 @@ export function TournamentAIAssistant({
   function confirmCustomPause() {
     const n = parseInt(customPause, 10);
     if (!Number.isFinite(n) || n < 0 || n > 60) {
-      toast.error(t("aiAssistant.errors.invalidPause", { defaultValue: "Pause invalide (0-60 min)" }));
+      toast.error(
+        t("aiAssistant.errors.invalidPause", { defaultValue: "Pause invalide (0-60 min)" }),
+      );
       return;
     }
     patch({ pauseMin: n });
@@ -369,7 +366,6 @@ export function TournamentAIAssistant({
       className="relative flex min-h-[500px] flex-col rounded-2xl border border-border bg-card [--background:oklch(0.985_0.003_240)] [--foreground:oklch(0.22_0.13_262)] [--card:oklch(1_0_0)] [--card-foreground:oklch(0.22_0.13_262)] [--muted:oklch(0.96_0.01_240)] [--muted-foreground:oklch(0.46_0.05_262)] [--border:oklch(0.91_0.018_50)] [--input:oklch(0.91_0.018_50)] [--popover:oklch(1_0_0)] [--popover-foreground:oklch(0.22_0.13_262)] [--primary:oklch(0.55_0.18_149)] [--primary-foreground:oklch(1_0_0)] [--secondary:oklch(0.96_0.01_240)] [--secondary-foreground:oklch(0.22_0.13_262)] [--accent:oklch(0.96_0.01_240)] [--accent-foreground:oklch(0.22_0.13_262)]"
       style={{ colorScheme: "light" }}
     >
-
       {/* Persistent AI header — Lizard green gradient fix */}
       <div className="bg-gradient-to-br from-[hsl(149_55%_46%)] to-[hsl(149_50%_32%)] px-4 pt-3 pb-3 text-white rounded-t-2xl">
         <div className="flex items-center gap-2">
@@ -387,9 +383,7 @@ export function TournamentAIAssistant({
           </span>
         </div>
         {hint && (
-          <p className="mt-1.5 min-h-[28px] text-[12.5px] leading-snug text-white/85">
-            {hint}
-          </p>
+          <p className="mt-1.5 min-h-[28px] text-[12.5px] leading-snug text-white/85">{hint}</p>
         )}
         <div className="mt-2 flex gap-1">
           {Array.from({ length: totalSteps }).map((_, i) => (
@@ -490,9 +484,7 @@ export function TournamentAIAssistant({
           )}
         </div>
         <p className="mt-1.5 text-center text-[11px] text-muted-foreground">
-          {onSummary
-            ? t("aiAssistant.footerSub.summary")
-            : t("aiAssistant.footerSub.question")}
+          {onSummary ? t("aiAssistant.footerSub.summary") : t("aiAssistant.footerSub.question")}
         </p>
         <AssistantAskBox config={config} t={t} />
       </div>
@@ -597,8 +589,7 @@ function RecapChips({
     chips.push(t(`teams.sports.${config.sport}`, { defaultValue: config.sport }));
   if (past("playersPerTeam") && config.playersPerTeam)
     chips.push(t("aiAssistant.recap.playersPerTeam", { n: config.playersPerTeam }));
-  if (past("numTeams"))
-    chips.push(t("aiAssistant.recap.teams", { n: config.numTeams }));
+  if (past("numTeams")) chips.push(t("aiAssistant.recap.teams", { n: config.numTeams }));
   if (past("scheduleFormat") && config.scheduleFormat === "pools_finals" && config.numTeams) {
     const label = poolsLabel(config.numTeams, t);
     if (label) chips.push(label);
@@ -612,10 +603,8 @@ function RecapChips({
     if (config.lunchDurationMin > 0)
       chips.push(t("aiAssistant.recap.lunch", { range: lunchLabelForConfig(config) }));
   }
-  if (past("fairPlay") && config.useFairPlay)
-    chips.push(t("aiAssistant.recap.fairPlay"));
-  if (past("terrains"))
-    chips.push(t("aiAssistant.recap.terrains", { n: config.terrains }));
+  if (past("fairPlay") && config.useFairPlay) chips.push(t("aiAssistant.recap.fairPlay"));
+  if (past("terrains")) chips.push(t("aiAssistant.recap.terrains", { n: config.terrains }));
   if (past("paid")) {
     if (config.paid && config.registrationFeeCents > 0)
       chips.push(`${(config.registrationFeeCents / 100).toFixed(0)} €`);
@@ -629,9 +618,7 @@ function RecapChips({
     <div className="mb-3 rounded-2xl border border-border bg-white p-3 shadow-sm">
       <div className="mb-2 flex items-center justify-between text-[10.5px] font-bold uppercase tracking-wider text-muted-foreground">
         <span>{t("aiAssistant.recap.title")}</span>
-        <span className="text-[hsl(149_50%_36%)]">
-          {t("aiAssistant.recap.building")}
-        </span>
+        <span className="text-[hsl(149_50%_36%)]">{t("aiAssistant.recap.building")}</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {filtered.map((c, i) => (
@@ -647,10 +634,7 @@ function RecapChips({
   );
 }
 
-function poolsLabel(
-  n: number,
-  t: (k: string, o?: Record<string, unknown>) => string,
-): string {
+function poolsLabel(n: number, t: (k: string, o?: Record<string, unknown>) => string): string {
   const map: Record<number, string> = {
     8: t("aiAssistant.recap.pools284"),
     12: t("aiAssistant.recap.pools4x3"),
@@ -904,7 +888,9 @@ function QuestionView(p: QuestionViewProps) {
                   type="number"
                   min={0}
                   max={60}
-                  placeholder={t("aiAssistant.opts.customPausePlaceholder", { defaultValue: "Autre…" })}
+                  placeholder={t("aiAssistant.opts.customPausePlaceholder", {
+                    defaultValue: "Autre…",
+                  })}
                   value={customPause}
                   onChange={(e) => setCustomPause(e.target.value)}
                 />
@@ -984,12 +970,8 @@ function QuestionView(p: QuestionViewProps) {
 
         {stepId === "fairPlay" && (
           <OptList>
-            <Opt onClick={() => p.onFairPlay(true)}>
-              {t("aiAssistant.opts.fairPlayYes")}
-            </Opt>
-            <Opt onClick={() => p.onFairPlay(false)}>
-              {t("aiAssistant.opts.fairPlayNo")}
-            </Opt>
+            <Opt onClick={() => p.onFairPlay(true)}>{t("aiAssistant.opts.fairPlayYes")}</Opt>
+            <Opt onClick={() => p.onFairPlay(false)}>{t("aiAssistant.opts.fairPlayNo")}</Opt>
           </OptList>
         )}
 
@@ -1024,9 +1006,7 @@ function QuestionView(p: QuestionViewProps) {
           <div className="space-y-2">
             {Array.from({ length: config.terrains }).map((_, i) => (
               <div key={i} className="flex items-center gap-2">
-                <span className="w-6 text-sm font-bold text-muted-foreground">
-                  {i + 1}.
-                </span>
+                <span className="w-6 text-sm font-bold text-muted-foreground">{i + 1}.</span>
                 <Input
                   value={config.terrainNames[i] ?? ""}
                   placeholder={`Terrain ${i + 1}`}
@@ -1038,11 +1018,7 @@ function QuestionView(p: QuestionViewProps) {
                 />
               </div>
             ))}
-            <Button
-              type="button"
-              className="w-full"
-              onClick={p.onConfirmTerrainNames}
-            >
+            <Button type="button" className="w-full" onClick={p.onConfirmTerrainNames}>
               {t("aiAssistant.cta.next")}
             </Button>
           </div>
@@ -1110,9 +1086,7 @@ function QuestionView(p: QuestionViewProps) {
                 value={paidAmount}
                 onChange={(e) => setPaidAmount(e.target.value)}
               />
-              <span className="flex items-center text-sm font-medium text-muted-foreground">
-                €
-              </span>
+              <span className="flex items-center text-sm font-medium text-muted-foreground">€</span>
             </div>
             <Button type="button" className="w-full" onClick={p.onConfirmPaidAmount}>
               {t("aiAssistant.cta.confirm")}
@@ -1145,10 +1119,7 @@ function QuestionView(p: QuestionViewProps) {
                     const startsOn = e.target.value;
                     patch({
                       startsOn,
-                      endsOn:
-                        config.endsOn && config.endsOn >= startsOn
-                          ? config.endsOn
-                          : startsOn,
+                      endsOn: config.endsOn && config.endsOn >= startsOn ? config.endsOn : startsOn,
                     });
                   }}
                 />
@@ -1213,21 +1184,13 @@ function Opt({
     >
       <span className="block">{children}</span>
       {hint && (
-        <small className="mt-0.5 block text-[12px] font-normal text-muted-foreground">
-          {hint}
-        </small>
+        <small className="mt-0.5 block text-[12px] font-normal text-muted-foreground">{hint}</small>
       )}
     </button>
   );
 }
 
-function OptGrid({
-  children,
-  cols = 3,
-}: {
-  children: React.ReactNode;
-  cols?: 2 | 3 | 4;
-}) {
+function OptGrid({ children, cols = 3 }: { children: React.ReactNode; cols?: 2 | 3 | 4 }) {
   const cls = cols === 2 ? "grid-cols-2" : cols === 4 ? "grid-cols-4" : "grid-cols-3";
   return <div className={cn("grid gap-2", cls)}>{children}</div>;
 }
@@ -1278,9 +1241,7 @@ function SummaryView({
       <h2 className="text-[21px] font-bold tracking-tight text-foreground">
         {t("aiAssistant.summary.title")}
       </h2>
-      <p className="mb-3 text-[13px] text-muted-foreground">
-        {t("aiAssistant.summary.subtitle")}
-      </p>
+      <p className="mb-3 text-[13px] text-muted-foreground">{t("aiAssistant.summary.subtitle")}</p>
 
       <div className="rounded-2xl border border-border bg-white px-3.5 py-1 mb-3 shadow-sm">
         <SRow
@@ -1311,7 +1272,11 @@ function SummaryView({
         />
         <SRow
           k={t("aiAssistant.summary.pause", { defaultValue: "Pause entre matchs" })}
-          v={config.pauseMin > 0 ? `${config.pauseMin} min` : t("aiAssistant.opts.none", { defaultValue: "Aucune" })}
+          v={
+            config.pauseMin > 0
+              ? `${config.pauseMin} min`
+              : t("aiAssistant.opts.none", { defaultValue: "Aucune" })
+          }
           onEdit={() => onEdit("breaks")}
         />
         <SRow
@@ -1326,7 +1291,11 @@ function SummaryView({
         />
         <SRow
           k={t("aiAssistant.expertSheet.fairPlay")}
-          v={config.useFairPlay ? t("aiAssistant.opts.fairPlayYes") : t("aiAssistant.opts.fairPlayNo")}
+          v={
+            config.useFairPlay
+              ? t("aiAssistant.opts.fairPlayYes")
+              : t("aiAssistant.opts.fairPlayNo")
+          }
           onEdit={() => onEdit("fairPlay")}
         />
         <SRow
@@ -1341,7 +1310,10 @@ function SummaryView({
         <SRow k={t("aiAssistant.summary.name")} v={config.name} onEdit={() => onEdit("name")} />
         <SRow
           k={t("aiAssistant.summary.date")}
-          v={config.startsOn + (config.endsOn && config.endsOn !== config.startsOn ? ` → ${config.endsOn}` : "")}
+          v={
+            config.startsOn +
+            (config.endsOn && config.endsOn !== config.startsOn ? ` → ${config.endsOn}` : "")
+          }
           onEdit={() => onEdit("date")}
         />
         <SRow
@@ -1380,15 +1352,11 @@ function SummaryView({
                 <Label className="text-[11px] text-muted-foreground">
                   {t("aiAssistant.summary.simSlot")}
                 </Label>
-                <p className="text-lg font-bold">
-                  {config.matchDurationMin + config.pauseMin} min
-                </p>
+                <p className="text-lg font-bold">{config.matchDurationMin + config.pauseMin} min</p>
               </div>
               <div className="col-span-2 border-t pt-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">
-                    {t("aiAssistant.summary.simLunch")}
-                  </span>
+                  <span className="text-sm font-semibold">{t("aiAssistant.summary.simLunch")}</span>
                   <div className="flex gap-2">
                     {[0, 30, 45, 60].map((m) => (
                       <button
@@ -1455,9 +1423,7 @@ function SummaryView({
                   {schedule.endHHMM}
                 </span>
               </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                {schedule.verdict}
-              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">{schedule.verdict}</p>
             </div>
           </div>
         )}

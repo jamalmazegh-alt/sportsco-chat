@@ -1225,11 +1225,7 @@
         "b": "Finalerondes na een regulier seizoen."
       }
     ],
-    "formatsExtras": [
-      "Automatische planning",
-      "Veldtoewijzing",
-      "Beheer van kwalificaties"
-    ],
+    "formatsExtras": ["Automatische planning", "Veldtoewijzing", "Beheer van kwalificaties"],
     "mobileTitle": "Mobile first, direct op het veld.",
     "mobileSubtitle": "Gemaakt om met één hand te bedienen, tussen twee wedstrijden door.",
     "mobilePoints": [

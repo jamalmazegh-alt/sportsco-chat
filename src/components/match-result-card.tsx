@@ -28,14 +28,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import {
-  getSportConfig,
-  SOLO_STAT_KINDS,
-  type StatKind,
-} from "@/lib/sport-config";
+import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 import { ConfettiBurst } from "@/components/confetti-burst";
 import { dispatchScorePush } from "@/lib/push-dispatch.functions";
-
 
 type Goal = {
   id: string;
@@ -87,7 +82,6 @@ export function MatchResultCard({
   const [saving, setSaving] = useState(false);
   const [celebrate, setCelebrate] = useState(0);
 
-
   // New event form
   const [showGoalForm, setShowGoalForm] = useState(false);
   const [scorerId, setScorerId] = useState<string>("");
@@ -106,15 +100,13 @@ export function MatchResultCard({
         .select("id, home_score, away_score, notes, score_details")
         .eq("event_id", eventId)
         .maybeSingle();
-      return data as
-        | {
-            id: string;
-            home_score: number;
-            away_score: number;
-            notes: string | null;
-            score_details: { sets?: SetScore[] } | null;
-          }
-        | null;
+      return data as {
+        id: string;
+        home_score: number;
+        away_score: number;
+        notes: string | null;
+        score_details: { sets?: SetScore[] } | null;
+      } | null;
     },
   });
 
@@ -138,9 +130,7 @@ export function MatchResultCard({
         .select("players:player_id(id, first_name, last_name, jersey_number)")
         .eq("event_id", eventId);
       if (error) throw error;
-      const fromConv = ((data ?? [])
-        .map((r: any) => r.players)
-        .filter(Boolean)) as Player[];
+      const fromConv = (data ?? []).map((r: any) => r.players).filter(Boolean) as Player[];
       if (fromConv.length > 0) return fromConv;
 
       // Fallback: load roster directly from team_members when no convocations exist
@@ -151,12 +141,9 @@ export function MatchResultCard({
         .eq("team_id", teamId)
         .eq("role", "player");
       if (tmErr) throw tmErr;
-      return ((tm ?? [])
-        .map((r: any) => r.players)
-        .filter(Boolean)) as Player[];
+      return (tm ?? []).map((r: any) => r.players).filter(Boolean) as Player[];
     },
   });
-
 
   const playersById = useMemo(() => {
     const m = new Map<string, Player>();
@@ -169,9 +156,7 @@ export function MatchResultCard({
       setHome(String(result.home_score));
       setAway(String(result.away_score));
       setNotes(result.notes ?? "");
-      setSets(
-        Array.isArray(result.score_details?.sets) ? result.score_details!.sets! : []
-      );
+      setSets(Array.isArray(result.score_details?.sets) ? result.score_details!.sets! : []);
     }
   }, [result]);
 
@@ -225,8 +210,6 @@ export function MatchResultCard({
         console.warn("[push] score dispatch failed", e);
       }
     })();
-
-
   }
 
   async function addGoal() {
@@ -240,8 +223,7 @@ export function MatchResultCard({
     const { error } = await supabase.from("event_goals").insert({
       event_id: eventId,
       scorer_player_id: scorerId,
-      assist_player_id:
-        !cfg.assistsEnabled || isSolo || assistId === "none" ? null : assistId,
+      assist_player_id: !cfg.assistsEnabled || isSolo || assistId === "none" ? null : assistId,
       minute: min,
       kind,
       created_by: user.id,
@@ -279,8 +261,7 @@ export function MatchResultCard({
   const ourSide = isHome === false ? "away" : "home";
   const ourScore = ourSide === "home" ? homeScore : awayScore;
   const theirScore = ourSide === "home" ? awayScore : homeScore;
-  const outcome =
-    ourScore > theirScore ? "win" : ourScore < theirScore ? "loss" : "draw";
+  const outcome = ourScore > theirScore ? "win" : ourScore < theirScore ? "loss" : "draw";
 
   const savedSets = result?.score_details?.sets ?? [];
 
@@ -288,10 +269,19 @@ export function MatchResultCard({
 
   const outcomePill =
     outcome === "win"
-      ? { label: t("match.outcomeWin", { defaultValue: "Victoire" }), cls: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white ring-emerald-500/30" }
+      ? {
+          label: t("match.outcomeWin", { defaultValue: "Victoire" }),
+          cls: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white ring-emerald-500/30",
+        }
       : outcome === "loss"
-      ? { label: t("match.outcomeLoss", { defaultValue: "Défaite" }), cls: "bg-rose-500/15 text-rose-500 ring-rose-500/30" }
-      : { label: t("match.outcomeDraw", { defaultValue: "Nul" }), cls: "bg-muted text-muted-foreground ring-border" };
+        ? {
+            label: t("match.outcomeLoss", { defaultValue: "Défaite" }),
+            cls: "bg-rose-500/15 text-rose-500 ring-rose-500/30",
+          }
+        : {
+            label: t("match.outcomeDraw", { defaultValue: "Nul" }),
+            cls: "bg-muted text-muted-foreground ring-border",
+          };
 
   return (
     <section className="rounded-2xl border-[1.5px] border-border bg-card text-card-foreground shadow-sm overflow-hidden">
@@ -327,7 +317,9 @@ export function MatchResultCard({
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                   {teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
                 </p>
-                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">{ourScore}</p>
+                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">
+                  {ourScore}
+                </p>
               </div>
               <span
                 className="text-[28px] font-black tabular-nums bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] bg-clip-text text-transparent select-none"
@@ -339,11 +331,18 @@ export function MatchResultCard({
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                   {opponent ?? t("events.opponent")}
                 </p>
-                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">{theirScore}</p>
+                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">
+                  {theirScore}
+                </p>
               </div>
             </div>
             <div className="flex justify-center">
-              <span className={cn("inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wide ring-1", outcomePill.cls)}>
+              <span
+                className={cn(
+                  "inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wide ring-1",
+                  outcomePill.cls,
+                )}
+              >
                 {outcomePill.label}
               </span>
             </div>
@@ -379,8 +378,8 @@ export function MatchResultCard({
                 <div className="space-y-1.5">
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                     {ourSide === "home"
-                      ? teamName ?? t("events.home")
-                      : opponent ?? t("events.home")}
+                      ? (teamName ?? t("events.home"))
+                      : (opponent ?? t("events.home"))}
                   </Label>
                   <Input
                     type="number"
@@ -393,8 +392,8 @@ export function MatchResultCard({
                 <div className="space-y-1.5">
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
                     {ourSide === "home"
-                      ? opponent ?? t("events.away")
-                      : teamName ?? t("events.away")}
+                      ? (opponent ?? t("events.away"))
+                      : (teamName ?? t("events.away"))}
                   </Label>
                   <Input
                     type="number"
@@ -408,7 +407,9 @@ export function MatchResultCard({
             )}
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{t("match.notesOptional")}</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                {t("match.notesOptional")}
+              </Label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -440,7 +441,11 @@ export function MatchResultCard({
                 disabled={saving}
                 className="rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.6)] active:scale-[0.98] transition"
               >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
                 {t("common.save")}
               </Button>
             </div>
@@ -655,8 +660,7 @@ function KindIcon({ kind }: { kind: StatKind }) {
     return <Square className="h-3.5 w-3.5 fill-white text-muted-foreground shrink-0" />;
   if (kind === "foul" || kind === "penalty" || kind === "own_goal")
     return <AlertTriangle className="h-3.5 w-3.5 text-orange-500 shrink-0" />;
-  if (kind === "goal")
-    return <FootballBall className="h-3.5 w-3.5 text-primary shrink-0" />;
+  if (kind === "goal") return <FootballBall className="h-3.5 w-3.5 text-primary shrink-0" />;
   return <Trophy className="h-3.5 w-3.5 text-primary shrink-0" />;
 }
 

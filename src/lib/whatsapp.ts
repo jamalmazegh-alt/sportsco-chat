@@ -180,12 +180,18 @@ function pushNavLinks(lines: string[], location?: string | null, locationUrl?: s
 
 function emojiForType(type?: string | null) {
   switch (type) {
-    case "match": return "⚽";
-    case "training": return "🏋️";
-    case "tournament": return "🏆";
-    case "friendly": return "🤝";
-    case "meeting": return "📋";
-    default: return "📅";
+    case "match":
+      return "⚽";
+    case "training":
+      return "🏋️";
+    case "tournament":
+      return "🏆";
+    case "friendly":
+      return "🤝";
+    case "meeting":
+      return "📋";
+    default:
+      return "📅";
   }
 }
 
@@ -194,9 +200,10 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
   const d = DICTS[loc];
   const lines: string[] = [];
   const emoji = emojiForType(input.type);
-  const header = input.type === "match" && input.opponent
-    ? `${emoji} *${input.teamName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}*`
-    : `${emoji} *${input.title ?? d.convocation}*`;
+  const header =
+    input.type === "match" && input.opponent
+      ? `${emoji} *${input.teamName ?? ""}${input.teamName ? " " : ""}vs ${input.opponent}*`
+      : `${emoji} *${input.title ?? d.convocation}*`;
   lines.push(header);
   if (input.clubName || input.teamName) {
     lines.push(`_${[input.clubName, input.teamName].filter(Boolean).join(" · ")}_`);
@@ -254,7 +261,6 @@ export function buildConvocationMessage(input: WhatsAppEventInput): string {
       }
     }
   }
-
 
   const att = (input.attachments ?? []).filter((a) => a?.url);
   if (att.length > 0) {
@@ -338,7 +344,8 @@ export function buildReminderMessage(input: WhatsAppEventInput): string {
       lines.push(d.responses);
       if (present.length) lines.push(`✅ ${d.present} (${present.length}) : ${present.join(", ")}`);
       if (absent.length) lines.push(`❌ ${d.absent} (${absent.length}) : ${absent.join(", ")}`);
-      if (uncertain.length) lines.push(`❔ ${d.uncertain} (${uncertain.length}) : ${uncertain.join(", ")}`);
+      if (uncertain.length)
+        lines.push(`❔ ${d.uncertain} (${uncertain.length}) : ${uncertain.join(", ")}`);
       if (pending.length) {
         lines.push("");
         lines.push(d.notRespondedYet(pending.length));

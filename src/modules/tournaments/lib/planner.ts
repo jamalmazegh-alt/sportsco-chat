@@ -147,8 +147,7 @@ export function computeSchedule(input: ScheduleInput): ScheduleResult {
   const slotMin = duration + changeover;
   const rounds = Math.ceil(total / terrains);
   const playEndMin = startMin + rounds * slotMin;
-  const crossesLunch =
-    lunchDuration > 0 && startMin < lunchStartMin && playEndMin > lunchStartMin;
+  const crossesLunch = lunchDuration > 0 && startMin < lunchStartMin && playEndMin > lunchStartMin;
   const endMin = crossesLunch ? playEndMin + lunchDuration : playEndMin;
   const marginMin = deadlineMin - endMin;
 
@@ -236,9 +235,10 @@ export function recommendFormat(answers: AssistantAnswers): Recommendation {
  * Map a Recommendation to the existing TournamentWizard `format` enum.
  * Keeps the AI path identical to a manual creation.
  */
-export function recommendationToWizardFormat(
-  reco: Recommendation,
-): { format: "mixed" | "group" | "knockout"; numTeams: number } {
+export function recommendationToWizardFormat(reco: Recommendation): {
+  format: "mixed" | "group" | "knockout";
+  numTeams: number;
+} {
   return {
     format:
       reco.format === "round_robin"

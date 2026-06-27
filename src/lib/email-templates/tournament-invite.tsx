@@ -22,35 +22,41 @@ const TournamentInviteEmail = ({
   const role = roleLabel ?? "collaborateur";
   return (
     <EmailShell preview={`Vous êtes invité comme ${role} sur ${tournament}`} locale="fr">
-          <Section style={header}>
-            <Img
-              src="https://www.clubero.app/clubero-logo.png"
-              alt="Clubero"
-              width="56"
-              height="56"
-              style={logo}
-            />
-            <Text style={brand}>Clubero · Tournois</Text>
-          </Section>
-          <Heading style={h1}>
-            {displayName ? `Bonjour ${displayName},` : "Bonjour,"}
-          </Heading>
-          <Text style={text}>
-            {inviterName ? <><strong>{inviterName}</strong> vous invite</> : "Vous êtes invité"} à rejoindre l'organisation du tournoi <strong>{tournament}</strong> en tant que <strong>{role}</strong>.
-          </Text>
-          <Text style={text}>
-            {role.toLowerCase().includes("arbitre")
-              ? "En tant qu'arbitre, vous pourrez saisir les scores et valider les matchs qui vous sont assignés."
-              : "En tant que co-organisateur, vous disposerez de droits complets sur la gestion du tournoi."}
-          </Text>
-          <Button style={button} href={inviteUrl}>
-            Accepter l'invitation
-          </Button>
-          <Text style={small}>
-            Ou copiez ce lien dans votre navigateur :<br />
-            <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
-          </Text>
-          </EmailShell>
+      <Section style={header}>
+        <Img
+          src="https://www.clubero.app/clubero-logo.png"
+          alt="Clubero"
+          width="56"
+          height="56"
+          style={logo}
+        />
+        <Text style={brand}>Clubero · Tournois</Text>
+      </Section>
+      <Heading style={h1}>{displayName ? `Bonjour ${displayName},` : "Bonjour,"}</Heading>
+      <Text style={text}>
+        {inviterName ? (
+          <>
+            <strong>{inviterName}</strong> vous invite
+          </>
+        ) : (
+          "Vous êtes invité"
+        )}{" "}
+        à rejoindre l'organisation du tournoi <strong>{tournament}</strong> en tant que{" "}
+        <strong>{role}</strong>.
+      </Text>
+      <Text style={text}>
+        {role.toLowerCase().includes("arbitre")
+          ? "En tant qu'arbitre, vous pourrez saisir les scores et valider les matchs qui vous sont assignés."
+          : "En tant que co-organisateur, vous disposerez de droits complets sur la gestion du tournoi."}
+      </Text>
+      <Button style={button} href={inviteUrl}>
+        Accepter l'invitation
+      </Button>
+      <Text style={small}>
+        Ou copiez ce lien dans votre navigateur :<br />
+        <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
+      </Text>
+    </EmailShell>
   );
 };
 
@@ -73,7 +79,13 @@ export const template = {
 
 const header = { textAlign: "center" as const, margin: "0 0 20px" };
 const logo = { display: "inline-block", borderRadius: "12px", objectFit: "cover" as const };
-const brand = { fontSize: "13px", fontWeight: "bold" as const, color: "#0f172a", margin: "8px 0 0", textAlign: "center" as const };
+const brand = {
+  fontSize: "13px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "8px 0 0",
+  textAlign: "center" as const,
+};
 const h1 = { fontSize: "22px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 16px" };
 const text = { fontSize: "15px", color: "#334155", lineHeight: "1.55", margin: "0 0 20px" };
 const button = {

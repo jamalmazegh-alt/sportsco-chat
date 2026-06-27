@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { generateDoubleRoundRobin } from "@/modules/tournaments/lib/scheduling";
-import { generateSwissRound, recommendedSwissRounds, type SwissTeamState } from "@/modules/tournaments/lib/swiss";
+import {
+  generateSwissRound,
+  recommendedSwissRounds,
+  type SwissTeamState,
+} from "@/modules/tournaments/lib/swiss";
 import { generateDoubleEliminationBracket } from "@/modules/tournaments/lib/double-elim";
 import { computeStandings, type PointsConfig } from "@/modules/tournaments/lib/standings";
 
@@ -55,7 +59,7 @@ describe("système suisse", () => {
 
 describe("double élimination", () => {
   it("8 équipes : winner + loser + grand final", () => {
-    const b = generateDoubleEliminationBracket(["s1","s2","s3","s4","s5","s6","s7","s8"]);
+    const b = generateDoubleEliminationBracket(["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"]);
     const wb = b.filter((m) => m.side === "winner");
     const lb = b.filter((m) => m.side === "loser");
     const gf = b.filter((m) => m.side === "grand_final");
@@ -64,7 +68,7 @@ describe("double élimination", () => {
     expect(lb.length).toBeGreaterThan(0);
   });
   it("4 équipes", () => {
-    const b = generateDoubleEliminationBracket(["s1","s2","s3","s4"]);
+    const b = generateDoubleEliminationBracket(["s1", "s2", "s3", "s4"]);
     expect(b.filter((m) => m.side === "winner")).toHaveLength(3);
     expect(b.filter((m) => m.side === "grand_final")).toHaveLength(1);
   });

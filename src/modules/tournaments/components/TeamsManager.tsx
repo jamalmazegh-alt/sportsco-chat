@@ -393,9 +393,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
       </div>
 
       {teams.length === 0 ? (
-        <div
-          className="rounded-2xl border-[1.5px] border-dashed border-border p-8 text-center bg-gradient-to-br from-white to-slate-50"
-        >
+        <div className="rounded-2xl border-[1.5px] border-dashed border-border p-8 text-center bg-gradient-to-br from-white to-slate-50">
           <div
             className="h-12 w-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white"
             style={{ background: "linear-gradient(135deg,#1d7a45 0%,#2d9d5f 100%)" }}
@@ -495,7 +493,6 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
           })}
         </ul>
       )}
-
 
       {editing && (
         <EditTeamDialog

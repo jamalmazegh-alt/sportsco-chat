@@ -133,7 +133,11 @@ const FALLBACK: SportConfig = {
 
 export function getSportConfig(sport: string | null | undefined): SportConfig {
   if (!sport) return FOOTBALL; // sensible default
-  const key = sport.toString().trim().toLowerCase().replace(/[\s-]+/g, "_");
+  const key = sport
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
   return CONFIGS[key] ?? FALLBACK;
 }
 

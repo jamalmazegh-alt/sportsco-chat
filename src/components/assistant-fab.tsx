@@ -27,7 +27,7 @@ export function AssistantFab() {
       className={cn(
         "fixed right-4 z-30 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
-        "bottom-[calc(env(safe-area-inset-bottom)+104px)]"
+        "bottom-[calc(env(safe-area-inset-bottom)+104px)]",
       )}
     >
       <Bot className="h-5 w-5" />

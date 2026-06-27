@@ -21,12 +21,28 @@ interface Props {
 const T = {
   fr: {
     subject: (title: string, date?: string) => `❌ Annulé : ${title}${date ? ` — ${date}` : ""}`,
-    preview: (title: string, date?: string) => `Événement annulé : ${title}${date ? ` — ${date}` : ""}`,
+    preview: (title: string, date?: string) =>
+      `Événement annulé : ${title}${date ? ` — ${date}` : ""}`,
     hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
     intro: "L'événement",
-    forWhich: (n: string) => <> auquel <strong>{n}</strong> était convoqué·e</>,
-    withTeam: (n: string) => <> avec <strong>{n}</strong></>,
-    hasBeen: <> a été <strong>annulé</strong>.</>,
+    forWhich: (n: string) => (
+      <>
+        {" "}
+        auquel <strong>{n}</strong> était convoqué·e
+      </>
+    ),
+    withTeam: (n: string) => (
+      <>
+        {" "}
+        avec <strong>{n}</strong>
+      </>
+    ),
+    hasBeen: (
+      <>
+        {" "}
+        a été <strong>annulé</strong>.
+      </>
+    ),
     kicker: "ANNULÉ",
     reasonLabel: "Raison de l'annulation",
     foot: "Aucune action n'est requise de votre part. Vous serez prévenu·e en cas de reprogrammation.",
@@ -35,12 +51,28 @@ const T = {
   },
   en: {
     subject: (title: string, date?: string) => `❌ Cancelled: ${title}${date ? ` — ${date}` : ""}`,
-    preview: (title: string, date?: string) => `Event cancelled: ${title}${date ? ` — ${date}` : ""}`,
+    preview: (title: string, date?: string) =>
+      `Event cancelled: ${title}${date ? ` — ${date}` : ""}`,
     hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
     intro: "The event",
-    forWhich: (n: string) => <> that <strong>{n}</strong> was called up to</>,
-    withTeam: (n: string) => <> with <strong>{n}</strong></>,
-    hasBeen: <> has been <strong>cancelled</strong>.</>,
+    forWhich: (n: string) => (
+      <>
+        {" "}
+        that <strong>{n}</strong> was called up to
+      </>
+    ),
+    withTeam: (n: string) => (
+      <>
+        {" "}
+        with <strong>{n}</strong>
+      </>
+    ),
+    hasBeen: (
+      <>
+        {" "}
+        has been <strong>cancelled</strong>.
+      </>
+    ),
     kicker: "CANCELLED",
     reasonLabel: "Cancellation reason",
     foot: "Nothing else is required from you. We'll let you know if the event is rescheduled.",
@@ -65,31 +97,35 @@ const EventCancelledEmail = ({
   const t = T[l];
   const eventDateFmt = formatEmailDateTime(eventDate, l);
   return (
-  <EmailShell preview={`${t.preview(eventTitle, eventDateFmt)}`} locale={l} clubName={clubName} clubLogoUrl={clubLogoUrl}>
-        <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
+    <EmailShell
+      preview={`${t.preview(eventTitle, eventDateFmt)}`}
+      locale={l}
+      clubName={clubName}
+      clubLogoUrl={clubLogoUrl}
+    >
+      <Heading style={h1}>{t.hello(recipientFirstName)}</Heading>
 
-        <Text style={text}>
-          {t.intro}
-          {playerName ? t.forWhich(playerName) : null}
-          {teamName ? t.withTeam(teamName) : null}
-          {t.hasBeen}
-        </Text>
+      <Text style={text}>
+        {t.intro}
+        {playerName ? t.forWhich(playerName) : null}
+        {teamName ? t.withTeam(teamName) : null}
+        {t.hasBeen}
+      </Text>
 
-        <Section style={card}>
-          <Text style={cardKicker}>{t.kicker}</Text>
-          <Text style={cardTitle}>{eventTitle}</Text>
-          {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
-          {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
-        </Section>
+      <Section style={card}>
+        <Text style={cardKicker}>{t.kicker}</Text>
+        <Text style={cardTitle}>{eventTitle}</Text>
+        {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
+        {eventLocation ? <Text style={cardMeta}>📍 {eventLocation}</Text> : null}
+      </Section>
 
-        <Section style={reasonCard}>
-          <Text style={reasonLabel}>{t.reasonLabel}</Text>
-          <Text style={reasonText}>{reason}</Text>
-        </Section>
+      <Section style={reasonCard}>
+        <Text style={reasonLabel}>{t.reasonLabel}</Text>
+        <Text style={reasonText}>{reason}</Text>
+      </Section>
 
-        <Text style={smallText}>{t.foot}</Text>
-
-        </EmailShell>
+      <Text style={smallText}>{t.foot}</Text>
+    </EmailShell>
   );
 };
 
@@ -97,7 +133,10 @@ export const template = {
   component: EventCancelledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    return T[l].subject(d.eventTitle as string, formatEmailDateTime(d.eventDate as string | undefined, l));
+    return T[l].subject(
+      d.eventTitle as string,
+      formatEmailDateTime(d.eventDate as string | undefined, l),
+    );
   },
   displayName: "Event cancelled",
   previewData: {
@@ -130,7 +169,13 @@ const cardKicker = {
   fontWeight: "bold" as const,
   margin: "0 0 6px",
 };
-const cardTitle = { fontSize: "17px", fontWeight: "bold" as const, color: "#0f172a", margin: "0 0 10px", textDecoration: "line-through" as const };
+const cardTitle = {
+  fontSize: "17px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 10px",
+  textDecoration: "line-through" as const,
+};
 const cardMeta = { fontSize: "13px", color: "#475569", margin: "0 0 4px" };
 const reasonCard = {
   backgroundColor: "#fef2f2",
@@ -147,4 +192,10 @@ const reasonLabel = {
   textTransform: "uppercase" as const,
   margin: "0 0 6px",
 };
-const reasonText = { fontSize: "14px", color: "#7f1d1d", lineHeight: "1.5", margin: 0, whiteSpace: "pre-wrap" as const };
+const reasonText = {
+  fontSize: "14px",
+  color: "#7f1d1d",
+  lineHeight: "1.5",
+  margin: 0,
+  whiteSpace: "pre-wrap" as const,
+};

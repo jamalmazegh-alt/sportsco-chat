@@ -66,7 +66,8 @@ async function main() {
       .select("*", { count: "exact", head: true })
       .limit(0);
     // pgmq tables may not be exposed via REST — try RPC or raw
-    if (error) console.log(`\nQueue ${queue}: (not queryable via REST — ${error.message.slice(0, 80)})`);
+    if (error)
+      console.log(`\nQueue ${queue}: (not queryable via REST — ${error.message.slice(0, 80)})`);
     else console.log(`\nQueue ${queue}: ${count ?? 0} messages`);
   }
 
@@ -77,7 +78,10 @@ async function main() {
 
   // Trigger a reset if email provided (dry info only)
   if (email) {
-    const anon = createClient(url, process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY!);
+    const anon = createClient(
+      url,
+      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY!,
+    );
     const { error } = await anon.auth.resetPasswordForEmail(email, {
       redirectTo: "https://clubero.app/reset-password",
     });

@@ -31,7 +31,6 @@ export interface MatchInput {
   decidedIn?: "regulation" | "overtime" | "shootout" | null;
 }
 
-
 export interface ForfeitConfig {
   winnerScore: number;
   loserScore: number;
@@ -48,10 +47,7 @@ export const DEFAULT_FORFEIT: ForfeitConfig = {
  * Normalise un match selon son statut spécial (forfait, équipe absente, abandon).
  * Retourne null si le match doit être ignoré (annulé, non joué).
  */
-function normalizeSpecialStatus(
-  m: MatchInput,
-  forfeit: ForfeitConfig,
-): MatchInput | null {
+function normalizeSpecialStatus(m: MatchInput, forfeit: ForfeitConfig): MatchInput | null {
   switch (m.status) {
     case "completed":
       return m.scoreA !== null && m.scoreB !== null ? m : null;
@@ -70,10 +66,20 @@ function normalizeSpecialStatus(
       // Sinon : l'équipe qui mène garde la victoire par forfait ; à défaut, équipe A perd
       if (m.scoreA !== null && m.scoreB !== null) {
         if (m.scoreA > m.scoreB) {
-          return { ...m, scoreA: forfeit.winnerScore, scoreB: forfeit.loserScore, status: "completed" };
+          return {
+            ...m,
+            scoreA: forfeit.winnerScore,
+            scoreB: forfeit.loserScore,
+            status: "completed",
+          };
         }
         if (m.scoreB > m.scoreA) {
-          return { ...m, scoreA: forfeit.loserScore, scoreB: forfeit.winnerScore, status: "completed" };
+          return {
+            ...m,
+            scoreA: forfeit.loserScore,
+            scoreB: forfeit.winnerScore,
+            status: "completed",
+          };
         }
       }
       return null;
@@ -82,7 +88,6 @@ function normalizeSpecialStatus(
       return null;
   }
 }
-
 
 export interface MatchEventInput {
   matchId: string;
@@ -108,7 +113,6 @@ export interface PointsConfig {
   /** Préset Hockey OT : points attribués au perdant en prolongation / TAB. */
   otLoss?: number;
 }
-
 
 export interface FairPlayConfig {
   enabled: boolean;
@@ -191,9 +195,7 @@ export function computeStandings(
   }
 
   const playedMatches = matches
-    .map((m) =>
-      m.teamAId && m.teamBId ? normalizeSpecialStatus(m, forfeit) : null,
-    )
+    .map((m) => (m.teamAId && m.teamBId ? normalizeSpecialStatus(m, forfeit) : null))
     .filter((m): m is MatchInput => m !== null);
 
   for (const m of playedMatches) {
@@ -238,8 +240,7 @@ export function computeStandings(
       if (!r) continue;
       if (ev.kind === "yellow_card") r.fairPlay += fp.yellow;
       else if (ev.kind === "red_card") r.fairPlay += fp.red;
-      else if (ev.kind === "second_yellow")
-        r.fairPlay += fp.secondYellow ?? fp.red;
+      else if (ev.kind === "second_yellow") r.fairPlay += fp.secondYellow ?? fp.red;
     }
   }
 
@@ -314,20 +315,11 @@ export function computeStandings(
         return b.fairPlay - a.fairPlay; // higher (less negative) wins
       case "head_to_head":
       case "head_to_head_points":
-        return (
-          (h2hPts.get(k(b.teamId, a.teamId)) ?? 0) -
-          (h2hPts.get(k(a.teamId, b.teamId)) ?? 0)
-        );
+        return (h2hPts.get(k(b.teamId, a.teamId)) ?? 0) - (h2hPts.get(k(a.teamId, b.teamId)) ?? 0);
       case "head_to_head_gd":
-        return (
-          (h2hGd.get(k(b.teamId, a.teamId)) ?? 0) -
-          (h2hGd.get(k(a.teamId, b.teamId)) ?? 0)
-        );
+        return (h2hGd.get(k(b.teamId, a.teamId)) ?? 0) - (h2hGd.get(k(a.teamId, b.teamId)) ?? 0);
       case "head_to_head_gf":
-        return (
-          (h2hGf.get(k(b.teamId, a.teamId)) ?? 0) -
-          (h2hGf.get(k(a.teamId, b.teamId)) ?? 0)
-        );
+        return (h2hGf.get(k(b.teamId, a.teamId)) ?? 0) - (h2hGf.get(k(a.teamId, b.teamId)) ?? 0);
       case "draw_lot": {
         // Deterministic pseudo-random based on team id + salt
         return djb2(salt + a.teamId) - djb2(salt + b.teamId);

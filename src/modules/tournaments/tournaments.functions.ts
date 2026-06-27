@@ -151,7 +151,6 @@ export const createTournament = createServerFn({ method: "POST" })
       }
     }
 
-
     const slug = await uniqueTournamentSlug(supabaseAdmin, slugify(data.name));
     const initialRules = defaultRulesForSport(data.sport);
     const { data: row, error } = await supabase
@@ -196,7 +195,6 @@ export const createTournament = createServerFn({ method: "POST" })
     }
     return { tournament: row };
   });
-
 
 export const listMyTournaments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

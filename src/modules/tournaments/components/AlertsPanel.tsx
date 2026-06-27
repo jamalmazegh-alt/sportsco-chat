@@ -84,10 +84,7 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
                   interactive && "hover:-translate-y-0.5 hover:shadow-md",
                 )}
               >
-                <span
-                  aria-hidden
-                  className={cn("absolute left-0 top-0 h-full w-1", styles.dot)}
-                />
+                <span aria-hidden className={cn("absolute left-0 top-0 h-full w-1", styles.dot)} />
                 <div
                   className={cn(
                     "ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",

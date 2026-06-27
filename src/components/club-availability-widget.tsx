@@ -184,9 +184,7 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
           <div
             className={cn(
               "h-8 w-8 rounded-lg flex items-center justify-center shrink-0",
-              total > 0
-                ? "bg-primary/10 text-primary"
-                : "bg-emerald-500/10 text-emerald-600",
+              total > 0 ? "bg-primary/10 text-primary" : "bg-emerald-500/10 text-emerald-600",
             )}
           >
             {total > 0 ? <Users className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -269,7 +267,10 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
                   <p className="font-medium truncate">{it.name}</p>
                   {it.kind === "absence" && (
                     <p className="text-[11px] text-muted-foreground truncate">
-                      {t("availability.until", { defaultValue: "jusqu'au {{date}}", date: formatUntil(it.end_date) })}
+                      {t("availability.until", {
+                        defaultValue: "jusqu'au {{date}}",
+                        date: formatUntil(it.end_date),
+                      })}
                     </p>
                   )}
                 </Link>
@@ -323,11 +324,7 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
         )}
       </div>
 
-      <QuickSanctionDrawer
-        open={sanctionOpen}
-        onOpenChange={setSanctionOpen}
-        clubId={clubId}
-      />
+      <QuickSanctionDrawer open={sanctionOpen} onOpenChange={setSanctionOpen} clubId={clubId} />
       {canDeclare && <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />}
     </section>
   );

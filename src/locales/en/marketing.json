@@ -1225,11 +1225,7 @@
         "b": "Final phase after a regular season."
       }
     ],
-    "formatsExtras": [
-      "Automatic scheduling",
-      "Field assignment",
-      "Qualification management"
-    ],
+    "formatsExtras": ["Automatic scheduling", "Field assignment", "Qualification management"],
     "mobileTitle": "Mobile first, on the field.",
     "mobileSubtitle": "Designed to be used one-handed, between matches.",
     "mobilePoints": [

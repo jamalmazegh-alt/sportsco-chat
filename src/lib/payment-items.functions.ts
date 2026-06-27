@@ -60,14 +60,7 @@ const ITEM_TYPES = [
   "other",
 ] as const;
 
-const PROVIDERS = [
-  "stripe",
-  "helloasso",
-  "cash",
-  "cheque",
-  "bank_transfer",
-  "manual",
-] as const;
+const PROVIDERS = ["stripe", "helloasso", "cash", "cheque", "bank_transfer", "manual"] as const;
 
 const STATUSES = ["draft", "open", "closed", "cancelled"] as const;
 
@@ -82,8 +75,7 @@ async function assertFinAdmin(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .maybeSingle();
-  const isAdmin =
-    !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
+  const isAdmin = !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
@@ -91,7 +83,9 @@ async function assertFinAdmin(
     _role: "financial_admin",
   });
   if (isFin === true) return;
-  throw new Error("Seuls les admins du club ou les admins financiers peuvent gérer les collectes de fonds");
+  throw new Error(
+    "Seuls les admins du club ou les admins financiers peuvent gérer les collectes de fonds",
+  );
 }
 
 const ItemInput = z.object({
@@ -149,9 +143,7 @@ export const listPaymentItems = createServerFn({ method: "POST" })
 export const getPaymentItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z
-      .object({ clubId: z.string().uuid(), itemId: z.string().uuid() })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), itemId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { data: item, error } = await context.supabase
@@ -170,9 +162,7 @@ export const getPaymentItem = createServerFn({ method: "POST" })
 
     const { data: obligations } = await context.supabase
       .from("payment_obligations")
-      .select(
-        "id, player_id, payer_user_id, amount_due_cents, status, created_at",
-      )
+      .select("id, player_id, payer_user_id, amount_due_cents, status, created_at")
       .eq("payment_item_id", data.itemId);
 
     return {
@@ -282,9 +272,7 @@ export const updatePaymentItem = createServerFn({ method: "POST" })
 export const deletePaymentItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z
-      .object({ clubId: z.string().uuid(), itemId: z.string().uuid() })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), itemId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertFinAdmin(context.supabase, context.userId, data.clubId);
@@ -333,19 +321,14 @@ export const reassignPaymentItem = createServerFn({ method: "POST" })
     await assertFinAdmin(context.supabase, context.userId, data.clubId);
     const { data: item } = await supabaseAdmin
       .from("payment_items")
-      .select(
-        "id, amount_cents, currency, club_id",
-      )
+      .select("id, amount_cents, currency, club_id")
       .eq("id", data.itemId)
       .eq("club_id", data.clubId)
       .maybeSingle();
     if (!item) throw new Error("Collecte de fonds introuvable");
 
     // Remove assignments + pending obligations (keep paid/partial untouched)
-    await supabaseAdmin
-      .from("payment_assignments")
-      .delete()
-      .eq("payment_item_id", data.itemId);
+    await supabaseAdmin.from("payment_assignments").delete().eq("payment_item_id", data.itemId);
     await supabaseAdmin
       .from("payment_obligations")
       .delete()
@@ -446,12 +429,10 @@ async function applyTarget(
   }));
 
   // upsert ignoring conflicts to be re-assignment safe
-  await supabaseAdmin
-    .from("payment_obligations")
-    .upsert(rows, {
-      onConflict: "payment_item_id,player_id,payer_user_id",
-      ignoreDuplicates: true,
-    });
+  await supabaseAdmin.from("payment_obligations").upsert(rows, {
+    onConflict: "payment_item_id,player_id,payer_user_id",
+    ignoreDuplicates: true,
+  });
 }
 
 /* --------------------------- notifications --------------------------- */
@@ -482,15 +463,10 @@ function fmtMoney(cents: number, currency: string): string {
  * - Non bloquant : un échec d'envoi est loggé mais ne fait pas remonter
  *   d'erreur à l'admin (qui voit "Poste créé" malgré tout).
  */
-async function notifyMembersOfNewPaymentItem(
-  clubId: string,
-  itemId: string,
-): Promise<void> {
+async function notifyMembersOfNewPaymentItem(clubId: string, itemId: string): Promise<void> {
   const { data: item } = await supabaseAdmin
     .from("payment_items")
-    .select(
-      "id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name)",
-    )
+    .select("id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name)")
     .eq("id", itemId)
     .maybeSingle();
   if (!item) return;
@@ -504,15 +480,11 @@ async function notifyMembersOfNewPaymentItem(
 
   if (!obligations || obligations.length === 0) return;
 
-
   const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
   const clubName = (item as any).clubs?.name ?? "Clubero";
   const dueLabel = frDate(item.due_date);
   const offsetDays = item.due_date
-    ? Math.round(
-        (Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) /
-          86_400_000,
-      )
+    ? Math.round((Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) / 86_400_000)
     : 0;
 
   for (const o of obligations) {
@@ -520,9 +492,7 @@ async function notifyMembersOfNewPaymentItem(
 
     // Payeur (tuteur principal) — récupère l'email via auth.admin.
     if (o.payer_user_id) {
-      const { data: u } = await supabaseAdmin.auth.admin.getUserById(
-        o.payer_user_id,
-      );
+      const { data: u } = await supabaseAdmin.auth.admin.getUserById(o.payer_user_id);
       if (u?.user?.email) recipients.add(u.user.email.toLowerCase());
     }
 

@@ -15,9 +15,7 @@ async function assertClubAdmin(
     .eq("club_id", clubId)
     .eq("user_id", userId)
     .maybeSingle();
-  const isAdmin =
-    !!data &&
-    ((data.roles ?? []).includes("admin") || data.role === "admin");
+  const isAdmin = !!data && ((data.roles ?? []).includes("admin") || data.role === "admin");
   if (isAdmin) return;
   const { data: isFin } = await supabaseAdmin.rpc("has_club_role_text", {
     _user_id: userId,
@@ -30,9 +28,7 @@ async function assertClubAdmin(
 
 export const getPaymentSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ clubId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ clubId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     // Any club member can read
     const { data: settings, error } = await context.supabase
@@ -69,18 +65,13 @@ const SettingsInput = z.object({
 export const updatePaymentSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z
-      .object({ clubId: z.string().uuid(), patch: SettingsInput })
-      .parse(input),
+    z.object({ clubId: z.string().uuid(), patch: SettingsInput }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertClubAdmin(context.supabase, context.userId, data.clubId);
     const { error } = await supabaseAdmin
       .from("club_payment_settings")
-      .upsert(
-        { club_id: data.clubId, ...data.patch },
-        { onConflict: "club_id" },
-      );
+      .upsert({ club_id: data.clubId, ...data.patch }, { onConflict: "club_id" });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

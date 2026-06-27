@@ -108,7 +108,9 @@ export function defaultTerrains(numTeams: number): number {
   return Math.max(2, Math.min(5, Math.ceil(numTeams / 6)));
 }
 
-export function emptyConfig(partial?: Partial<AssistantTournamentConfig>): AssistantTournamentConfig {
+export function emptyConfig(
+  partial?: Partial<AssistantTournamentConfig>,
+): AssistantTournamentConfig {
   return {
     sport: "football",
     playersPerTeam: 11,
@@ -193,11 +195,7 @@ export function draftHasProgress(draft: AssistantDraft | null): boolean {
   if (draft.stepIdx > 0) return true;
   const c = draft.config;
   return (
-    !!c.name?.trim() ||
-    !!c.startsOn ||
-    !!c.location?.trim() ||
-    c.paid ||
-    c.registrationFeeCents > 0
+    !!c.name?.trim() || !!c.startsOn || !!c.location?.trim() || c.paid || c.registrationFeeCents > 0
   );
 }
 

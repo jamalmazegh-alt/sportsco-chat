@@ -43,13 +43,25 @@ function parseYmd(s: string): Date {
   return new Date(y, m - 1, d);
 }
 
-function DateField({ value, onChange, label }: { value?: string; onChange: (v: string) => void; label: string }) {
+function DateField({
+  value,
+  onChange,
+  label,
+}: {
+  value?: string;
+  onChange: (v: string) => void;
+  label: string;
+}) {
   return (
     <div className="space-y-1.5 flex-1">
       <Label className="text-xs">{label}</Label>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" className={cn("w-full justify-start font-normal", !value && "text-muted-foreground")} type="button">
+          <Button
+            variant="outline"
+            className={cn("w-full justify-start font-normal", !value && "text-muted-foreground")}
+            type="button"
+          >
             <CalendarIcon className="h-4 w-4" />
             {value ? format(parseYmd(value), "dd/MM/yyyy") : "—"}
           </Button>
@@ -67,17 +79,32 @@ function DateField({ value, onChange, label }: { value?: string; onChange: (v: s
   );
 }
 
-export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOfficial, onCreated }: Props) {
+export function RecurringTrainingPlanner({
+  teamId,
+  title,
+  defaultLocation,
+  isOfficial,
+  onCreated,
+}: Props) {
   const { t, i18n } = useTranslation();
   const create = useServerFn(createTrainingSeries);
   const [busy, setBusy] = useState(false);
 
   const today = new Date();
   const [startsOn, setStartsOn] = useState<string>(ymd(today));
-  const [endsOn, setEndsOn] = useState<string>(ymd(new Date(today.getFullYear() + (today.getMonth() >= 6 ? 1 : 0), 5, 30)));
+  const [endsOn, setEndsOn] = useState<string>(
+    ymd(new Date(today.getFullYear() + (today.getMonth() >= 6 ? 1 : 0), 5, 30)),
+  );
 
   const [slots, setSlots] = useState<LocalSlot[]>([
-    { uid: crypto.randomUUID(), weekday: 1, meeting_time: "", start_time: "19:00", end_time: "20:30", location: "" },
+    {
+      uid: crypto.randomUUID(),
+      weekday: 1,
+      meeting_time: "",
+      start_time: "19:00",
+      end_time: "20:30",
+      location: "",
+    },
   ]);
 
   const [excludedDates, setExcludedDates] = useState<string[]>([]);
@@ -111,7 +138,14 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
   function addSlot() {
     setSlots((s) => [
       ...s,
-      { uid: crypto.randomUUID(), weekday: 3, meeting_time: "", start_time: "19:00", end_time: "20:30", location: "" },
+      {
+        uid: crypto.randomUUID(),
+        weekday: 3,
+        meeting_time: "",
+        start_time: "19:00",
+        end_time: "20:30",
+        location: "",
+      },
     ]);
   }
   function removeSlot(uid: string) {
@@ -124,7 +158,9 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
   function toggleExcludedDate(date: Date) {
     const key = ymd(date);
     if (!occurrenceDates.has(key) && !excludedDates.includes(key)) return;
-    setExcludedDates((curr) => (curr.includes(key) ? curr.filter((d) => d !== key) : [...curr, key]));
+    setExcludedDates((curr) =>
+      curr.includes(key) ? curr.filter((d) => d !== key) : [...curr, key],
+    );
   }
 
   const [rangeFrom, setRangeFrom] = useState<string>("");
@@ -186,14 +222,24 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
       <div className="space-y-1.5">
         <Label className="text-sm">{t("events.series.period", { defaultValue: "Période" })}</Label>
         <div className="flex gap-2">
-          <DateField label={t("events.series.startDate", { defaultValue: "Début" })} value={startsOn} onChange={setStartsOn} />
-          <DateField label={t("events.series.endDate", { defaultValue: "Fin" })} value={endsOn} onChange={setEndsOn} />
+          <DateField
+            label={t("events.series.startDate", { defaultValue: "Début" })}
+            value={startsOn}
+            onChange={setStartsOn}
+          />
+          <DateField
+            label={t("events.series.endDate", { defaultValue: "Fin" })}
+            value={endsOn}
+            onChange={setEndsOn}
+          />
         </div>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label className="text-sm">{t("events.series.slots", { defaultValue: "Créneaux hebdomadaires" })}</Label>
+          <Label className="text-sm">
+            {t("events.series.slots", { defaultValue: "Créneaux hebdomadaires" })}
+          </Label>
           <Button type="button" size="sm" variant="outline" onClick={addSlot}>
             <Plus className="h-4 w-4" />
             {t("events.series.addSlot", { defaultValue: "Ajouter" })}
@@ -201,19 +247,32 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
         </div>
         <div className="space-y-2">
           {slots.map((s, idx) => (
-            <div key={s.uid} className="space-y-2 rounded-lg border border-border bg-background p-2.5">
+            <div
+              key={s.uid}
+              className="space-y-2 rounded-lg border border-border bg-background p-2.5"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-muted-foreground">#{idx + 1}</span>
                 {slots.length > 1 && (
-                  <Button type="button" size="icon-sm" variant="ghost" onClick={() => removeSlot(s.uid)}>
+                  <Button
+                    type="button"
+                    size="icon-sm"
+                    variant="ghost"
+                    onClick={() => removeSlot(s.uid)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="col-span-2">
-                  <Label className="text-xs">{t("events.series.weekday", { defaultValue: "Jour" })}</Label>
-                  <Select value={String(s.weekday)} onValueChange={(v) => updateSlot(s.uid, { weekday: Number(v) })}>
+                  <Label className="text-xs">
+                    {t("events.series.weekday", { defaultValue: "Jour" })}
+                  </Label>
+                  <Select
+                    value={String(s.weekday)}
+                    onValueChange={(v) => updateSlot(s.uid, { weekday: Number(v) })}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -230,15 +289,24 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
               <div className="grid grid-cols-3 gap-2">
                 <div>
                   <Label className="text-xs">{t("events.convocationTimeShort")}</Label>
-                  <TimePicker value={s.meeting_time ?? ""} onChange={(v) => updateSlot(s.uid, { meeting_time: v })} />
+                  <TimePicker
+                    value={s.meeting_time ?? ""}
+                    onChange={(v) => updateSlot(s.uid, { meeting_time: v })}
+                  />
                 </div>
                 <div>
                   <Label className="text-xs">{t("events.startTime")}</Label>
-                  <TimePicker value={s.start_time} onChange={(v) => updateSlot(s.uid, { start_time: v })} />
+                  <TimePicker
+                    value={s.start_time}
+                    onChange={(v) => updateSlot(s.uid, { start_time: v })}
+                  />
                 </div>
                 <div>
                   <Label className="text-xs">{t("events.endTime")}</Label>
-                  <TimePicker value={s.end_time} onChange={(v) => updateSlot(s.uid, { end_time: v })} />
+                  <TimePicker
+                    value={s.end_time}
+                    onChange={(v) => updateSlot(s.uid, { end_time: v })}
+                  />
                 </div>
               </div>
               <div>
@@ -255,8 +323,14 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-sm">{t("events.series.preview", { defaultValue: "Prévisualisation" })}</Label>
-        <p className="text-xs text-muted-foreground">{t("events.series.previewHint", { defaultValue: "Cliquez sur une date pour l'exclure / la réintégrer" })}</p>
+        <Label className="text-sm">
+          {t("events.series.preview", { defaultValue: "Prévisualisation" })}
+        </Label>
+        <p className="text-xs text-muted-foreground">
+          {t("events.series.previewHint", {
+            defaultValue: "Cliquez sur une date pour l'exclure / la réintégrer",
+          })}
+        </p>
         <div className="rounded-lg border border-border bg-background p-1 flex justify-center">
           <Calendar
             mode="single"
@@ -277,11 +351,27 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm">{t("events.series.excludedDates", { defaultValue: "Dates exclues" })}</Label>
+        <Label className="text-sm">
+          {t("events.series.excludedDates", { defaultValue: "Dates exclues" })}
+        </Label>
         <div className="flex gap-2 items-end">
-          <DateField label={t("events.series.rangeFrom", { defaultValue: "Du" })} value={rangeFrom} onChange={setRangeFrom} />
-          <DateField label={t("events.series.rangeTo", { defaultValue: "Au" })} value={rangeTo} onChange={setRangeTo} />
-          <Button type="button" size="sm" variant="outline" onClick={addRange} disabled={!rangeFrom || !rangeTo}>
+          <DateField
+            label={t("events.series.rangeFrom", { defaultValue: "Du" })}
+            value={rangeFrom}
+            onChange={setRangeFrom}
+          />
+          <DateField
+            label={t("events.series.rangeTo", { defaultValue: "Au" })}
+            value={rangeTo}
+            onChange={setRangeTo}
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={addRange}
+            disabled={!rangeFrom || !rangeTo}
+          >
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -292,7 +382,12 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
                 <span>
                   {format(parseYmd(r.from), "dd/MM/yyyy")} → {format(parseYmd(r.to), "dd/MM/yyyy")}
                 </span>
-                <Button type="button" size="icon-sm" variant="ghost" onClick={() => setExcludedRanges((x) => x.filter((_, j) => j !== i))}>
+                <Button
+                  type="button"
+                  size="icon-sm"
+                  variant="ghost"
+                  onClick={() => setExcludedRanges((x) => x.filter((_, j) => j !== i))}
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </li>
@@ -301,13 +396,18 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
         )}
         {excludedDates.length > 0 && (
           <p className="text-[11px] text-muted-foreground">
-            {t("events.series.excludedDatesCount", { defaultValue: "{{count}} date(s) exclue(s) manuellement", count: excludedDates.length })}
+            {t("events.series.excludedDatesCount", {
+              defaultValue: "{{count}} date(s) exclue(s) manuellement",
+              count: excludedDates.length,
+            })}
           </p>
         )}
       </div>
 
       <div className="rounded-lg border border-border bg-background p-2.5 text-xs space-y-1">
-        <div className="font-semibold">{t("events.series.summary", { defaultValue: "Récapitulatif" })}</div>
+        <div className="font-semibold">
+          {t("events.series.summary", { defaultValue: "Récapitulatif" })}
+        </div>
         <ul className="text-muted-foreground space-y-0.5">
           {Object.entries(byWd)
             .sort(([a], [b]) => Number(a) - Number(b))
@@ -318,12 +418,24 @@ export function RecurringTrainingPlanner({ teamId, title, defaultLocation, isOff
             ))}
         </ul>
         <div className="pt-1 font-medium text-foreground">
-          {t("events.series.totalSessions", { defaultValue: "Total : {{count}} séances", count: occurrences.length })}
+          {t("events.series.totalSessions", {
+            defaultValue: "Total : {{count}} séances",
+            count: occurrences.length,
+          })}
         </div>
       </div>
 
-      <Button type="button" className="w-full h-11" onClick={submit} disabled={busy || occurrences.length === 0}>
-        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("events.series.createSeries", { defaultValue: "Créer la série" })}
+      <Button
+        type="button"
+        className="w-full h-11"
+        onClick={submit}
+        disabled={busy || occurrences.length === 0}
+      >
+        {busy ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          t("events.series.createSeries", { defaultValue: "Créer la série" })
+        )}
       </Button>
     </div>
   );

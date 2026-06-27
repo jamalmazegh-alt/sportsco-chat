@@ -11,22 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
-import {
-  saveFlights,
-  generateAllFlightBrackets,
-  listFlights,
-} from "../flights.functions";
+import { saveFlights, generateAllFlightBrackets, listFlights } from "../flights.functions";
 import {
   proposeFlightDistributions,
   defaultQualificationRules,
   canAutoGenerateChampions,
   type QualRule,
 } from "../lib/flights";
-import {
-  FLIGHT_TEMPLATES,
-  type FlightTemplateId,
-  type Lang,
-} from "../lib/flight-templates";
+import { FLIGHT_TEMPLATES, type FlightTemplateId, type Lang } from "../lib/flight-templates";
 
 interface Props {
   tournamentId: string;
@@ -88,10 +80,7 @@ export function FlightsManager({
   const [drafts, setDrafts] = useState<DraftFlight[]>([]);
 
   const teamsPerGroup = numGroups > 0 ? Math.ceil(numTeams / numGroups) : 0;
-  const distributions = useMemo(
-    () => proposeFlightDistributions(numTeams),
-    [numTeams],
-  );
+  const distributions = useMemo(() => proposeFlightDistributions(numTeams), [numTeams]);
 
   // Fix F — le format "Champions" (3 flights) n'est pas toujours applicable
   // (poules irrégulières, trop petites, une seule poule). On informe alors
@@ -197,8 +186,7 @@ export function FlightsManager({
   });
 
   const generate = useMutation({
-    mutationFn: (force: boolean) =>
-      genFn({ data: { tournament_id: tournamentId, force } }),
+    mutationFn: (force: boolean) => genFn({ data: { tournament_id: tournamentId, force } }),
     onSuccess: (res: any) => {
       const created = res?.created ?? 0;
       if (created === 0) {
@@ -336,11 +324,7 @@ export function FlightsManager({
                 </Button>
               </details>
             ) : (
-              <Button
-                className="w-full"
-                onClick={onGenerateClick}
-                disabled={generate.isPending}
-              >
+              <Button className="w-full" onClick={onGenerateClick} disabled={generate.isPending}>
                 {generate.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -352,8 +336,7 @@ export function FlightsManager({
           ) : (
             <p className="text-xs text-muted-foreground text-center">
               {t("flights.waitGroups", {
-                defaultValue:
-                  "Termine tous les matchs de poules pour générer les brackets.",
+                defaultValue: "Termine tous les matchs de poules pour générer les brackets.",
               })}
             </p>
           )}
@@ -411,7 +394,10 @@ export function FlightsManager({
                     })}
                   </div>
                   <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                    {tpl.names.slice(0, 3).map((n) => n[lang] ?? n.en).join(" · ")}
+                    {tpl.names
+                      .slice(0, 3)
+                      .map((n) => n[lang] ?? n.en)
+                      .join(" · ")}
                   </div>
                 </button>
               ))}
@@ -438,7 +424,6 @@ export function FlightsManager({
               </div>
             )}
           </div>
-
 
           {drafts.length === 0 && (
             <div>
@@ -493,12 +478,8 @@ export function FlightsManager({
                   key={i}
                   draft={d}
                   index={i}
-                  onChange={(next) =>
-                    setDrafts((ds) => ds.map((x, j) => (j === i ? next : x)))
-                  }
-                  onRemove={() =>
-                    setDrafts((ds) => ds.filter((_, j) => j !== i))
-                  }
+                  onChange={(next) => setDrafts((ds) => ds.map((x, j) => (j === i ? next : x)))}
+                  onRemove={() => setDrafts((ds) => ds.filter((_, j) => j !== i))}
                 />
               ))}
               <div className="flex gap-2">
@@ -510,9 +491,7 @@ export function FlightsManager({
                   onClick={() => save.mutate()}
                   disabled={save.isPending || drafts.length === 0}
                 >
-                  {save.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : null}
+                  {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {t("flights.wizard.save", { defaultValue: "Enregistrer les Flights" })}
                 </Button>
               </div>
@@ -545,7 +524,8 @@ function FlightCard({ flight }: { flight: Props["flights"][number] }) {
         <p className="text-xs text-muted-foreground">
           {(flight.qualification_rules ?? []).length}{" "}
           {t("flights.rulesCount", { defaultValue: "règles" })}
-          {flight.enable_third_place && ` · ${t("flights.thirdPlace", { defaultValue: "3e place" })}`}
+          {flight.enable_third_place &&
+            ` · ${t("flights.thirdPlace", { defaultValue: "3e place" })}`}
         </p>
       </div>
     </div>
@@ -647,9 +627,7 @@ function DraftEditor({
           <Checkbox
             checked={draft.enable_seventh_place}
             disabled={!draft.enable_fifth_place}
-            onCheckedChange={(v) =>
-              onChange({ ...draft, enable_seventh_place: !!v })
-            }
+            onCheckedChange={(v) => onChange({ ...draft, enable_seventh_place: !!v })}
           />
           {t("flights.seventhPlace", { defaultValue: "7e place" })}
         </label>

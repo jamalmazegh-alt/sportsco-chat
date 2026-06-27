@@ -9,9 +9,7 @@ import { confirmRegistrationSession } from "@/modules/tournaments/tournament-pay
 export const Route = createFileRoute("/tournament/$slug_/register/success")({
   validateSearch: (s: Record<string, unknown>) => ({
     session_id:
-      typeof s.session_id === "string" && s.session_id.length >= 8
-        ? s.session_id
-        : undefined,
+      typeof s.session_id === "string" && s.session_id.length >= 8 ? s.session_id : undefined,
   }),
   component: RegisterSuccessPage,
   head: ({ params }) => ({
@@ -79,8 +77,7 @@ function RegisterSuccessPage() {
         <p className="text-sm text-muted-foreground">
           {settling && !settled
             ? t("register.success.settling", {
-                defaultValue:
-                  "Paiement reçu — finalisation de votre inscription…",
+                defaultValue: "Paiement reçu — finalisation de votre inscription…",
               })
             : t("register.success.body")}
         </p>

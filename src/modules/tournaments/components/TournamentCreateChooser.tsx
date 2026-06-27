@@ -161,7 +161,11 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
                 initialTeams={simSeed?.teams}
                 initialFlights={simSeed?.flights}
               />
-              <Button variant="ghost" size="sm" onClick={() => setMode(mode === "simulator" && simSeed ? "ai" : "chooser")}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMode(mode === "simulator" && simSeed ? "ai" : "chooser")}
+              >
                 ← {t("createChooser.back")}
               </Button>
             </>

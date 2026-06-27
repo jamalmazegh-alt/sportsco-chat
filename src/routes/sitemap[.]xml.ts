@@ -28,9 +28,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         ];
 
         try {
-          const { supabaseAdmin } = await import(
-            "@/integrations/supabase/client.server"
-          );
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { data } = await supabaseAdmin
             .from("tournaments")
             .select("slug")
@@ -49,7 +47,6 @@ export const Route = createFileRoute("/sitemap.xml")({
         } catch {
           /* sitemap stays static if DB unreachable */
         }
-
 
         const urls = entries.map((e) =>
           [

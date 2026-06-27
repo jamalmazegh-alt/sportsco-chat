@@ -68,16 +68,9 @@ export function ShareDialog({ url, title, trigger }: Props) {
             ref={wrapRef}
             className="flex items-center justify-center rounded-lg bg-card p-4 border border-border"
           >
-            <QRCodeCanvas
-              value={url}
-              size={220}
-              level="M"
-              includeMargin={false}
-            />
+            <QRCodeCanvas value={url} size={220} level="M" includeMargin={false} />
           </div>
-          <p className="text-xs text-center text-muted-foreground">
-            {t("share.qrHint")}
-          </p>
+          <p className="text-xs text-center text-muted-foreground">{t("share.qrHint")}</p>
           <div className="flex gap-2">
             <Input value={url} readOnly className="text-xs" />
             <Button size="icon" variant="outline" onClick={copy}>

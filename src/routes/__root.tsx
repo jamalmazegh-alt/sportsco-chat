@@ -1,10 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  createRootRouteWithContext,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext, HeadContent, Scripts } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { RouteNotFound } from "@/components/route-not-found";
@@ -29,8 +24,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       {
         name: "viewport",
-        content:
-          "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1",
       },
       { title: "Clubero — Team coordination, made simple" },
       {
@@ -53,7 +47,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Clubero — Team coordination, made simple" },
-      { name: "twitter:description", content: "Stop chasing parents in WhatsApp. Convocations, attendance, and reminders in one tap." },
+      {
+        name: "twitter:description",
+        content:
+          "Stop chasing parents in WhatsApp. Convocations, attendance, and reminders in one tap.",
+      },
       { property: "og:image", content: "https://clubero.app/clubero-logo.png" },
       { name: "twitter:image", content: "https://clubero.app/clubero-logo.png" },
       { name: "google-site-verification", content: "pCAoyuO5oORg-h3Q624Cs7_f9S7LLtOlnD1hMY3xE_4" },
@@ -67,7 +65,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icons/icon-512.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Manrope:wght@400;500;600&display=swap",
+      },
     ],
     scripts: [
       {
@@ -135,7 +136,9 @@ function RootComponent() {
     // iOS Settings (or browser), clean up stale rows; if granted, re-upsert.
     const runSync = () => {
       if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
-      syncPushSubscriptionState().catch(() => { /* noop */ });
+      syncPushSubscriptionState().catch(() => {
+        /* noop */
+      });
     };
     runSync();
     if (typeof document !== "undefined") {

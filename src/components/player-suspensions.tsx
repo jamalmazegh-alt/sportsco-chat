@@ -8,10 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Plus, Ban, Check, X } from "lucide-react";
 import { toast } from "sonner";
@@ -177,10 +186,14 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
               <div className="space-y-1.5">
                 <Label>{t("teams.title", { defaultValue: "Team" })}</Label>
                 <Select value={teamId} onValueChange={setTeamId}>
-                  <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="—" />
+                  </SelectTrigger>
                   <SelectContent>
                     {(teams ?? []).map((tm: any) => (
-                      <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>
+                      <SelectItem key={tm.id} value={tm.id}>
+                        {tm.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -188,27 +201,50 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
               <div className="space-y-1.5">
                 <Label>{t("suspension.reason")}</Label>
                 <Select value={reason} onValueChange={(v) => setReason(v as Reason)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    {(["red_card","accumulated_yellow_cards","federation_sanction","club_sanction","other"] as Reason[]).map((r) => (
-                      <SelectItem key={r} value={r}>{t(`suspension.reason_${r}`)}</SelectItem>
+                    {(
+                      [
+                        "red_card",
+                        "accumulated_yellow_cards",
+                        "federation_sanction",
+                        "club_sanction",
+                        "other",
+                      ] as Reason[]
+                    ).map((r) => (
+                      <SelectItem key={r} value={r}>
+                        {t(`suspension.reason_${r}`)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
                 <Label>{t("suspension.matchesToServe")}</Label>
-                <Input type="number" min={1} value={matches} onChange={(e) => setMatches(Math.max(1, Number(e.target.value) || 1))} />
+                <Input
+                  type="number"
+                  min={1}
+                  value={matches}
+                  onChange={(e) => setMatches(Math.max(1, Number(e.target.value) || 1))}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label>{t("suspension.startDate")}</Label>
-                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
               </div>
               {teamId && upcomingMatches.length > 0 && (
                 <div className="space-y-1.5">
                   <Label>{t("suspension.firstMatch")}</Label>
                   <Select value={firstMatchId} onValueChange={setFirstMatchId}>
-                    <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue placeholder="—" />
+                    </SelectTrigger>
                     <SelectContent>
                       {upcomingMatches.map((m: any) => (
                         <SelectItem key={m.id} value={m.id}>
@@ -225,7 +261,9 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setOpen(false)}>{t("common.cancel", { defaultValue: "Cancel" })}</Button>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                {t("common.cancel", { defaultValue: "Cancel" })}
+              </Button>
               <Button onClick={onCreate}>{t("suspension.save")}</Button>
             </DialogFooter>
           </DialogContent>
@@ -239,7 +277,10 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
           {suspensions.map((s) => {
             const remaining = Math.max(0, s.matches_to_serve - s.matches_served);
             return (
-              <li key={s.id} className="rounded-lg border border-border p-3 flex items-start justify-between gap-3">
+              <li
+                key={s.id}
+                className="rounded-lg border border-border p-3 flex items-start justify-between gap-3"
+              >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     {s.status === "active" && (
@@ -265,10 +306,13 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
                     </span>
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    {new Date(s.suspension_start_date).toLocaleDateString()} — {s.matches_served}/{s.matches_to_serve}
+                    {new Date(s.suspension_start_date).toLocaleDateString()} — {s.matches_served}/
+                    {s.matches_to_serve}
                   </div>
                   {s.suspension_notes && (
-                    <p className="text-xs text-muted-foreground mt-1 break-words">{s.suspension_notes}</p>
+                    <p className="text-xs text-muted-foreground mt-1 break-words">
+                      {s.suspension_notes}
+                    </p>
                   )}
                 </div>
                 {s.status === "active" && (

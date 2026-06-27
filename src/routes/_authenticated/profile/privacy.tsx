@@ -97,7 +97,14 @@ function PrivacyPage() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [legalKind, setLegalKind] = useState<
-    null | "terms" | "privacy" | "data_processing" | "media" | "notifications" | "legal_notice" | "parental_consent"
+    | null
+    | "terms"
+    | "privacy"
+    | "data_processing"
+    | "media"
+    | "notifications"
+    | "legal_notice"
+    | "parental_consent"
   >(null);
 
   async function toggleConsent(kind: string, version_id: string, currentlyGranted: boolean) {
@@ -130,7 +137,7 @@ function PrivacyPage() {
       toast.success(
         t("privacy.deletionScheduled", {
           date: format(new Date(r.scheduled_for), "PP"),
-        })
+        }),
       );
       setReason("");
     } catch (e: any) {
@@ -157,7 +164,6 @@ function PrivacyPage() {
         <BackLink to="/profile" />
       </div>
 
-
       <header className="space-y-1">
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-5 w-5 text-primary" />
@@ -170,7 +176,10 @@ function PrivacyPage() {
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h2 className="text-sm font-semibold">{t("privacy.yourConsents")}</h2>
         <p className="text-xs text-muted-foreground">
-          {t("privacy.consentsHint", { defaultValue: "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte." })}
+          {t("privacy.consentsHint", {
+            defaultValue:
+              "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte.",
+          })}
         </p>
         <div className="space-y-2">
           {status?.items.map((i) => {
@@ -180,10 +189,7 @@ function PrivacyPage() {
               ? (i.kind as any)
               : null;
             return (
-              <div
-                key={i.kind}
-                className="rounded-lg border border-border p-3 space-y-2"
-              >
+              <div key={i.kind} className="rounded-lg border border-border p-3 space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium flex items-center gap-2 flex-wrap">
@@ -225,7 +231,10 @@ function PrivacyPage() {
           <p className="text-xs text-muted-foreground">{t("privacy.childrenMediaHint")}</p>
           <div className="space-y-2">
             {children.map((c: any) => (
-              <div key={c.id} className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+              <div
+                key={c.id}
+                className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+              >
                 <div className="text-sm font-medium">
                   {c.first_name} {c.last_name}
                   <div className="text-xs text-muted-foreground">
@@ -255,7 +264,6 @@ function PrivacyPage() {
       )}
 
       {/* Legal docs section removed — each consent above opens its document. */}
-
 
       {/* GDPR rights */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
@@ -312,9 +320,7 @@ function PrivacyPage() {
               </div>
               <AlertDialogFooter>
                 <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                <AlertDialogAction onClick={onDelete}>
-                  {t("privacy.deleteCta")}
-                </AlertDialogAction>
+                <AlertDialogAction onClick={onDelete}>{t("privacy.deleteCta")}</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -335,9 +341,7 @@ function PrivacyPage() {
                 {h.granted ? t("privacy.granted") : t("privacy.denied")}
                 {h.withdrawn_at && ` (${t("privacy.withdrawn")})`}
               </span>
-              <span className="text-muted-foreground">
-                {format(new Date(h.granted_at), "PPp")}
-              </span>
+              <span className="text-muted-foreground">{format(new Date(h.granted_at), "PPp")}</span>
             </div>
           ))}
         </div>

@@ -30,11 +30,7 @@ import { computeStandings } from "@/modules/tournaments/lib/standings";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
-import {
-  resolveScoring,
-  formatSets,
-  type ScoringRules,
-} from "@/modules/tournaments/lib/formats";
+import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
 
 type TvTeam = {
   id: string;
@@ -111,22 +107,15 @@ function TvSlideshowPage() {
     const { tournament, groups, teams, matches } = data;
     const rules = mergeRules((tournament as any).settings);
     const sponsors = rules.branding.sponsors ?? [];
-    const sponsorsTitle =
-      rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault");
-    const teamMap = new Map<string, TvTeam>(
-      teams.map((t: any) => [t.id, t as TvTeam]),
-    );
+    const sponsorsTitle = rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault");
+    const teamMap = new Map<string, TvTeam>(teams.map((t: any) => [t.id, t as TvTeam]));
     const live = (matches as any[]).filter((m: any) => m.status === "live");
-    const upcoming = (matches as any[])
-      .filter((m: any) => m.status === "scheduled")
-      .slice(0, 6);
+    const upcoming = (matches as any[]).filter((m: any) => m.status === "scheduled").slice(0, 6);
     const recent = (matches as any[])
       .filter((m: any) => m.status === "completed")
       .slice(-6)
       .reverse();
-    const sortedGroups = [...(groups as any[])].sort(
-      (a, b) => a.sort_order - b.sort_order,
-    );
+    const sortedGroups = [...(groups as any[])].sort((a, b) => a.sort_order - b.sort_order);
     const hasBracket = (matches as any[]).some((m: any) => m.round !== "group");
 
     const out: Slide[] = [];
@@ -136,9 +125,7 @@ function TvSlideshowPage() {
       key: "intro",
       title: tournament.name,
       icon: <Trophy className="h-7 w-7" />,
-      render: () => (
-        <IntroSlide tournament={tournament as any} qrUrl={publicUrl} />
-      ),
+      render: () => <IntroSlide tournament={tournament as any} qrUrl={publicUrl} />,
     });
 
     // Live matches first when available
@@ -147,14 +134,7 @@ function TvSlideshowPage() {
         key: "now",
         title: t("tv.slides.nowPlaying"),
         icon: <Radio className="h-7 w-7 text-red-500" />,
-        render: () => (
-          <MatchesGrid
-            matches={live}
-            teamMap={teamMap}
-            scoring={scoring}
-            xl
-          />
-        ),
+        render: () => <MatchesGrid matches={live} teamMap={teamMap} scoring={scoring} xl />,
       });
     }
 
@@ -178,20 +158,13 @@ function TvSlideshowPage() {
         recent.length === 0 ? (
           <EmptyBig>{t("tv.slides.noRecent")}</EmptyBig>
         ) : (
-          <MatchesGrid
-            matches={recent}
-            teamMap={teamMap}
-            scoring={scoring}
-            finished
-          />
+          <MatchesGrid matches={recent} teamMap={teamMap} scoring={scoring} finished />
         ),
     });
 
     if (sortedGroups.length > 0) {
       for (const g of sortedGroups) {
-        const ids = (teams as any[])
-          .filter((t: any) => t.group_id === g.id)
-          .map((t: any) => t.id);
+        const ids = (teams as any[]).filter((t: any) => t.group_id === g.id).map((t: any) => t.id);
         const gMatches = (matches as any[])
           .filter((m: any) => m.round === "group" && m.group_id === g.id)
           .map((m: any) => ({
@@ -207,11 +180,7 @@ function TvSlideshowPage() {
           title: t("tv.slides.standings", { group: g.name }),
           icon: <ListOrdered className="h-7 w-7" />,
           render: () => (
-            <StandingsTable
-              rows={rows}
-              teamMap={teamMap}
-              qualifiers={g.qualifiers_count}
-            />
+            <StandingsTable rows={rows} teamMap={teamMap} qualifiers={g.qualifiers_count} />
           ),
         });
       }
@@ -257,10 +226,7 @@ function TvSlideshowPage() {
   useEffect(() => {
     if (paused || slides.length <= 1) return;
     const ms = refresh * 1000;
-    const id = setInterval(
-      () => setIdx((i) => (i + 1) % slides.length),
-      ms,
-    );
+    const id = setInterval(() => setIdx((i) => (i + 1) % slides.length), ms);
     return () => clearInterval(id);
   }, [paused, slides.length, refresh]);
 
@@ -355,10 +321,7 @@ function TvSlideshowPage() {
 
       <main className="flex-1 overflow-hidden p-6 md:p-10 relative">
         {/* Slide transitions: key on slide.key triggers re-mount + fade-in */}
-        <div
-          key={slide?.key ?? "empty"}
-          className="h-full w-full animate-fade-in"
-        >
+        <div key={slide?.key ?? "empty"} className="h-full w-full animate-fade-in">
           {slide?.render()}
         </div>
       </main>
@@ -389,9 +352,7 @@ function TvSlideshowPage() {
           <Button
             size="icon"
             variant="ghost"
-            onClick={() =>
-              setIdx((i) => (i - 1 + slides.length) % slides.length)
-            }
+            onClick={() => setIdx((i) => (i - 1 + slides.length) % slides.length)}
             aria-label={t("tv.controls.previous")}
           >
             <ChevronLeft className="h-5 w-5" />
@@ -429,9 +390,7 @@ function TvSlideshowPage() {
           size="sm"
           variant="ghost"
           onClick={goFullscreen}
-          aria-label={
-            isFs ? t("tv.controls.exitFullscreen") : t("tv.controls.fullscreen")
-          }
+          aria-label={isFs ? t("tv.controls.exitFullscreen") : t("tv.controls.fullscreen")}
           className="gap-2"
         >
           {isFs ? (
@@ -466,13 +425,7 @@ function EmptyBig({ children }: { children: ReactNode }) {
   );
 }
 
-function IntroSlide({
-  tournament,
-  qrUrl,
-}: {
-  tournament: any;
-  qrUrl: string;
-}) {
+function IntroSlide({ tournament, qrUrl }: { tournament: any; qrUrl: string }) {
   const { t } = useTranslation("tournaments");
   return (
     <div className="h-full grid grid-cols-1 md:grid-cols-[1fr_auto] gap-10 items-center">
@@ -554,9 +507,7 @@ function MatchesGrid({
           <li
             key={m.id}
             className={`rounded-2xl border bg-card/80 backdrop-blur p-5 flex flex-col justify-between transition-all ${
-              live
-                ? "border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.15)]"
-                : "border-border"
+              live ? "border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.15)]" : "border-border"
             }`}
           >
             <div className="flex items-center justify-between text-base font-semibold text-muted-foreground">
@@ -616,11 +567,7 @@ function MatchesGrid({
                   </span>
                 )}
               </div>
-              {setsLine && (
-                <span className="text-muted-foreground tabular-nums">
-                  {setsLine}
-                </span>
-              )}
+              {setsLine && <span className="text-muted-foreground tabular-nums">{setsLine}</span>}
             </div>
           </li>
         );
@@ -628,7 +575,6 @@ function MatchesGrid({
     </ul>
   );
 }
-
 
 function StandingsTable({
   rows,
@@ -670,27 +616,19 @@ function StandingsTable({
                   )}
                   {i + 1}
                 </td>
-                <td className="px-3 py-2.5 font-bold truncate">
-                  {team?.name ?? "—"}
-                </td>
+                <td className="px-3 py-2.5 font-bold truncate">{team?.name ?? "—"}</td>
                 <td className="px-2 py-2.5 text-right tabular-nums">{r.played}</td>
                 <td className="px-2 py-2.5 text-right tabular-nums">{r.won}</td>
                 <td className="px-2 py-2.5 text-right tabular-nums">{r.drawn}</td>
                 <td className="px-2 py-2.5 text-right tabular-nums">{r.lost}</td>
                 <td
                   className={`px-2 py-2.5 text-right tabular-nums ${
-                    r.goalDiff > 0
-                      ? "text-emerald-600"
-                      : r.goalDiff < 0
-                        ? "text-red-600"
-                        : ""
+                    r.goalDiff > 0 ? "text-emerald-600" : r.goalDiff < 0 ? "text-red-600" : ""
                   }`}
                 >
                   {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums font-black">
-                  {r.points}
-                </td>
+                <td className="px-3 py-2.5 text-right tabular-nums font-black">{r.points}</td>
               </tr>
             );
           })}

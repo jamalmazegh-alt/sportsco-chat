@@ -38,10 +38,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  listTournamentRegistrations,
-  decideRegistration,
-} from "../tournaments.functions";
+import { listTournamentRegistrations, decideRegistration } from "../tournaments.functions";
 import {
   markRegistrationPaidOffline,
   refundRegistrationPayment,
@@ -59,7 +56,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 
 type Status = "pending" | "approved" | "rejected" | "cancelled";
 type PaymentStatus =
@@ -213,7 +209,9 @@ export function RegistrationsManager({
       } else if (vars.channel === "whatsapp" && res?.whatsappUrl) {
         window.open(res.whatsappUrl, "_blank", "noopener");
       } else if (vars.channel === "email") {
-        toast.success(t("registrations.payments.linkSentEmail", { defaultValue: "Lien envoyé par email" }));
+        toast.success(
+          t("registrations.payments.linkSentEmail", { defaultValue: "Lien envoyé par email" }),
+        );
       }
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
     },
@@ -225,11 +223,9 @@ export function RegistrationsManager({
     (tournament.registration_fee ?? 0) > 0 &&
     (tournament.payment_mode === "online" || tournament.payment_mode === "both");
 
-  const stripeNotConnected =
-    isPaidOnline && !tournament?.club_stripe_charges_enabled;
+  const stripeNotConnected = isPaidOnline && !tournament?.club_stripe_charges_enabled;
 
   const canShowSendLink = isPaidOnline && !!tournament?.club_stripe_charges_enabled;
-
 
   const inviteFn = useServerFn(inviteTeamForPayment);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -349,9 +345,7 @@ export function RegistrationsManager({
                     <Input
                       id="invite-team-name"
                       value={inviteForm.team_name}
-                      onChange={(e) =>
-                        setInviteForm((f) => ({ ...f, team_name: e.target.value }))
-                      }
+                      onChange={(e) => setInviteForm((f) => ({ ...f, team_name: e.target.value }))}
                       placeholder="FC Demo"
                       maxLength={120}
                     />
@@ -453,7 +447,6 @@ export function RegistrationsManager({
         </div>
       </div>
 
-
       {q.isLoading ? (
         <div className="py-10 flex justify-center">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -467,10 +460,7 @@ export function RegistrationsManager({
       ) : (
         <ul className="space-y-2">
           {regs.map((r) => (
-            <li
-              key={r.id}
-              className="rounded-xl border border-border bg-card p-3 space-y-2"
-            >
+            <li key={r.id} className="rounded-xl border border-border bg-card p-3 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm truncate">
@@ -479,9 +469,7 @@ export function RegistrationsManager({
                       <span className="text-muted-foreground"> · {r.short_name}</span>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {r.contact_name}
-                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{r.contact_name}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <StatusBadge status={r.status} />
@@ -494,10 +482,7 @@ export function RegistrationsManager({
               <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Mail className="h-3 w-3" />
-                  <a
-                    href={`mailto:${r.contact_email}`}
-                    className="hover:underline"
-                  >
+                  <a href={`mailto:${r.contact_email}`} className="hover:underline">
                     {r.contact_email}
                   </a>
                 </span>
@@ -547,10 +532,7 @@ export function RegistrationsManager({
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      const note = window.prompt(
-                        t("registrations.rejectPrompt"),
-                        "",
-                      );
+                      const note = window.prompt(t("registrations.rejectPrompt"), "");
                       if (note === null) return;
                       decide.mutate({
                         id: r.id,
@@ -567,8 +549,7 @@ export function RegistrationsManager({
               )}
 
               {/* Payment actions */}
-              {(r.payment_status === "pending" ||
-                r.payment_status === "paid_online") && (
+              {(r.payment_status === "pending" || r.payment_status === "paid_online") && (
                 <div className="flex flex-wrap gap-2 pt-1 border-t border-border/50">
                   {r.payment_status === "pending" && (
                     <>
@@ -591,15 +572,21 @@ export function RegistrationsManager({
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "email" })}>
+                            <DropdownMenuItem
+                              onClick={() => sendLink.mutate({ id: r.id, channel: "email" })}
+                            >
                               <Mail className="h-4 w-4 mr-2" />
                               {t("registrations.payments.sendByEmail")}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "whatsapp" })}>
+                            <DropdownMenuItem
+                              onClick={() => sendLink.mutate({ id: r.id, channel: "whatsapp" })}
+                            >
                               <MessageCircle className="h-4 w-4 mr-2" />
                               {t("registrations.payments.sendByWhatsApp")}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => sendLink.mutate({ id: r.id, channel: "copy" })}>
+                            <DropdownMenuItem
+                              onClick={() => sendLink.mutate({ id: r.id, channel: "copy" })}
+                            >
                               <Copy className="h-4 w-4 mr-2" />
                               {t("registrations.payments.copyLink")}
                             </DropdownMenuItem>
@@ -629,17 +616,9 @@ export function RegistrationsManager({
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        const reason = window.prompt(
-                          t("registrations.payments.refundPrompt"),
-                          "",
-                        );
+                        const reason = window.prompt(t("registrations.payments.refundPrompt"), "");
                         if (reason === null) return;
-                        if (
-                          !window.confirm(
-                            t("registrations.payments.refundConfirm"),
-                          )
-                        )
-                          return;
+                        if (!window.confirm(t("registrations.payments.refundConfirm"))) return;
                         refund.mutate({ id: r.id, reason: reason || undefined });
                       }}
                       disabled={refund.isPending}

@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Paperclip, X, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,8 +68,10 @@ export function SupportFormDialog({
 
       const ctx = {
         url: typeof window !== "undefined" ? window.location.href : undefined,
-        user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined,
-        viewport: typeof window !== "undefined" ? `${window.innerWidth}x${window.innerHeight}` : undefined,
+        user_agent:
+          typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 400) : undefined,
+        viewport:
+          typeof window !== "undefined" ? `${window.innerWidth}x${window.innerHeight}` : undefined,
         locale: typeof navigator !== "undefined" ? navigator.language : undefined,
         app_version: "web",
       };
@@ -104,7 +112,9 @@ export function SupportFormDialog({
             <DialogTitle>{t("form.sent")}</DialogTitle>
             <p className="text-sm text-muted-foreground">{t("form.sent_desc")}</p>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" onClick={close}>{t("form.close")}</Button>
+              <Button variant="outline" onClick={close}>
+                {t("form.close")}
+              </Button>
               <Button
                 onClick={() => {
                   close();
@@ -135,10 +145,14 @@ export function SupportFormDialog({
               <div className="space-y-1.5">
                 <Label>{t("form.category")}</Label>
                 <Select value={category} onValueChange={(v) => setCategory(v as SupportCategory)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {SUPPORT_CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>{t(`category.${c}`)}</SelectItem>
+                      <SelectItem key={c} value={c}>
+                        {t(`category.${c}`)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -158,7 +172,9 @@ export function SupportFormDialog({
               <div className="space-y-1.5">
                 <Label>
                   {t("form.intent")}{" "}
-                  <span className="text-muted-foreground font-normal">{t("form.intent_optional")}</span>
+                  <span className="text-muted-foreground font-normal">
+                    {t("form.intent_optional")}
+                  </span>
                 </Label>
                 <Input
                   value={intent}
@@ -171,7 +187,9 @@ export function SupportFormDialog({
               <div className="space-y-1.5">
                 <Label>
                   {t("form.attachments")}{" "}
-                  <span className="text-muted-foreground font-normal">{t("form.attachments_hint")}</span>
+                  <span className="text-muted-foreground font-normal">
+                    {t("form.attachments_hint")}
+                  </span>
                 </Label>
                 <label className="flex items-center gap-2 h-10 px-3 rounded-md border border-dashed text-sm cursor-pointer hover:bg-accent/30">
                   <Paperclip className="h-4 w-4" />
@@ -191,7 +209,10 @@ export function SupportFormDialog({
                 {files.length > 0 && (
                   <ul className="space-y-1 mt-2">
                     {files.map((f, i) => (
-                      <li key={i} className="flex items-center gap-2 text-xs bg-muted rounded px-2 py-1">
+                      <li
+                        key={i}
+                        className="flex items-center gap-2 text-xs bg-muted rounded px-2 py-1"
+                      >
                         <span className="truncate flex-1">{f.name}</span>
                         <button
                           type="button"
@@ -207,7 +228,12 @@ export function SupportFormDialog({
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button variant="outline" className="flex-1" onClick={close} disabled={submit.isPending}>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={close}
+                  disabled={submit.isPending}
+                >
                   {t("form.cancel")}
                 </Button>
                 <Button

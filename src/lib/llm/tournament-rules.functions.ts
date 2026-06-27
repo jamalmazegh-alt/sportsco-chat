@@ -7,11 +7,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  callLLM,
-  checkLlmDailyLimit,
-  sanitizeRestrictedHtml,
-} from "./core.server";
+import { callLLM, checkLlmDailyLimit, sanitizeRestrictedHtml } from "./core.server";
 
 const InputSchema = z.object({
   tournamentId: z.string().uuid(),

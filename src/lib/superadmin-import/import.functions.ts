@@ -65,10 +65,27 @@ export const getClubImportStats = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);
     const [teams, players, coaches, imports] = await Promise.all([
-      supabaseAdmin.from("teams").select("id", { count: "exact", head: true }).eq("club_id", data.clubId).is("deleted_at", null),
-      supabaseAdmin.from("players").select("id", { count: "exact", head: true }).eq("club_id", data.clubId).is("deleted_at", null),
-      supabaseAdmin.from("club_members").select("user_id", { count: "exact", head: true }).eq("club_id", data.clubId).contains("roles", ["coach"]),
-      supabaseAdmin.from("superadmin_imports").select("id, created_at, import_type, status, rows_imported, file_name").eq("club_id", data.clubId).order("created_at", { ascending: false }).limit(10),
+      supabaseAdmin
+        .from("teams")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", data.clubId)
+        .is("deleted_at", null),
+      supabaseAdmin
+        .from("players")
+        .select("id", { count: "exact", head: true })
+        .eq("club_id", data.clubId)
+        .is("deleted_at", null),
+      supabaseAdmin
+        .from("club_members")
+        .select("user_id", { count: "exact", head: true })
+        .eq("club_id", data.clubId)
+        .contains("roles", ["coach"]),
+      supabaseAdmin
+        .from("superadmin_imports")
+        .select("id, created_at, import_type, status, rows_imported, file_name")
+        .eq("club_id", data.clubId)
+        .order("created_at", { ascending: false })
+        .limit(10),
     ]);
     return {
       teams: teams.count ?? 0,
@@ -88,7 +105,9 @@ const aiMappingSchema = z.object({
   mapping: z.array(
     z.object({
       source: z.string().describe("En-tête tel qu'il apparaît dans le fichier source"),
-      field: z.string().describe("Clé Clubero cible, ou 'ignore' si la colonne n'a pas d'équivalent"),
+      field: z
+        .string()
+        .describe("Clé Clubero cible, ou 'ignore' si la colonne n'a pas d'équivalent"),
     }),
   ),
 });
@@ -213,13 +232,15 @@ function titleCase(s: string): string {
     .join(" ");
 }
 
-function expandOccurrences(
-  dateDebut: string,
-  daysFr: string[],
-  fin: string,
-): Date[] {
+function expandOccurrences(dateDebut: string, daysFr: string[], fin: string): Date[] {
   const dayMap: Record<string, number> = {
-    Dimanche: 0, Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6,
+    Dimanche: 0,
+    Lundi: 1,
+    Mardi: 2,
+    Mercredi: 3,
+    Jeudi: 4,
+    Vendredi: 5,
+    Samedi: 6,
   };
   const targets = new Set(daysFr.map((d) => dayMap[d]).filter((n) => n !== undefined));
   const out: Date[] = [];
@@ -269,7 +290,10 @@ async function findOrCreateTeam(
 
 async function findOrCreateProfileByEmail(email: string, fullName: string): Promise<string | null> {
   // Trouver un utilisateur existant — invoque la fonction RPC dédiée (compat avec types générés)
-  const { data: rpc } = await supabaseAdmin.rpc("email_exists" as never, { _email: email } as never);
+  const { data: rpc } = await supabaseAdmin.rpc(
+    "email_exists" as never,
+    { _email: email } as never,
+  );
   if (rpc && typeof rpc === "object" && "user_id" in (rpc as object)) {
     const userId = (rpc as { user_id: string }).user_id;
     if (userId) return userId;
@@ -339,7 +363,6 @@ async function createInviteAndEmail(params: {
   }
 }
 
-
 export const runImport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -375,8 +398,6 @@ export const runImport = createServerFn({ method: "POST" })
       .maybeSingle();
     const clubName = clubRow?.name ?? undefined;
     const clubLogoUrl = clubRow?.logo_url ?? undefined;
-
-
 
     try {
       if (data.type === "players") {
@@ -430,7 +451,8 @@ export const runImport = createServerFn({ method: "POST" })
               role: "player" as never,
             });
 
-            const playerFullName = `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
+            const playerFullName =
+              `${titleCase(r.prenom_joueur!)} ${titleCase(r.nom_joueur!)}`.trim();
 
             // Invitation joueur (si email fourni et option activée)
             if (r.email_contact && data.sendInvitations) {
@@ -476,17 +498,15 @@ export const runImport = createServerFn({ method: "POST" })
               parentsCreated++;
 
               if (parentUserId) {
-                await supabaseAdmin
-                  .from("club_members")
-                  .upsert(
-                    {
-                      club_id: data.clubId,
-                      user_id: parentUserId,
-                      role: "parent" as never,
-                      roles: ["parent"] as never,
-                    },
-                    { onConflict: "club_id,user_id" } as never,
-                  );
+                await supabaseAdmin.from("club_members").upsert(
+                  {
+                    club_id: data.clubId,
+                    user_id: parentUserId,
+                    role: "parent" as never,
+                    roles: ["parent"] as never,
+                  },
+                  { onConflict: "club_id,user_id" } as never,
+                );
               } else if (data.sendInvitations) {
                 // Parent inconnu → invitation par email avec template Clubero
                 const token = await createInviteAndEmail({
@@ -507,7 +527,6 @@ export const runImport = createServerFn({ method: "POST" })
               }
               void lien; // lien_parent stocké via player_parents.full_name si besoin futur
             }
-
           } catch (e) {
             errors.push({ row: i + 2, error: e instanceof Error ? e.message : String(e) });
           }
@@ -586,8 +605,6 @@ export const runImport = createServerFn({ method: "POST" })
               continue;
             }
 
-
-
             const roleEnum = roleEnumPre;
             await supabaseAdmin.from("club_members").upsert(
               {
@@ -639,21 +656,25 @@ export const runImport = createServerFn({ method: "POST" })
             }
 
             const typeMap: Record<string, string> = {
-              "Entraînement": "training",
-              "Match": "match",
-              "Tournoi": "tournament",
-              "Réunion": "meeting",
+              Entraînement: "training",
+              Match: "match",
+              Tournoi: "tournament",
+              Réunion: "meeting",
             };
             const evType = typeMap[r.type!] ?? "other";
             const title = r.titre || `${r.type} ${r.equipe}`;
 
-            const dates: Date[] = r.recurrence_jours && r.recurrence_fin
-              ? expandOccurrences(
-                  r.date_debut!,
-                  r.recurrence_jours.split(/[,;]/).map((s) => s.trim()).filter(Boolean),
-                  r.recurrence_fin,
-                )
-              : [new Date(`${r.date_debut}T${r.heure_debut}:00`)];
+            const dates: Date[] =
+              r.recurrence_jours && r.recurrence_fin
+                ? expandOccurrences(
+                    r.date_debut!,
+                    r.recurrence_jours
+                      .split(/[,;]/)
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                    r.recurrence_fin,
+                  )
+                : [new Date(`${r.date_debut}T${r.heure_debut}:00`)];
 
             for (const d of dates) {
               const [h, m] = r.heure_debut!.split(":").map(Number);
@@ -664,7 +685,8 @@ export const runImport = createServerFn({ method: "POST" })
                 const [eh, em] = r.heure_fin.split(":").map(Number);
                 ends = new Date(starts);
                 ends.setUTCHours(eh, em, 0, 0);
-                if (ends.getTime() <= starts.getTime()) ends = new Date(starts.getTime() + 90 * 60_000);
+                if (ends.getTime() <= starts.getTime())
+                  ends = new Date(starts.getTime() + 90 * 60_000);
               } else {
                 ends = new Date(starts.getTime() + 90 * 60_000);
               }
@@ -677,7 +699,8 @@ export const runImport = createServerFn({ method: "POST" })
                 ends_at: ends.toISOString(),
                 location: r.lieu || null,
                 opponent: r.adversaire || null,
-                is_home: r.domicile === "Domicile" ? true : r.domicile === "Extérieur" ? false : null,
+                is_home:
+                  r.domicile === "Domicile" ? true : r.domicile === "Extérieur" ? false : null,
                 created_by: context.userId,
               });
               if (error) throw new Error(error.message);

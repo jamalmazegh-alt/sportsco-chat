@@ -138,11 +138,7 @@ function SuperAdminClubs() {
             </Label>
           </div>
           <div className="flex items-center gap-2">
-            <Switch
-              id="inc-system"
-              checked={includeSystem}
-              onCheckedChange={setIncludeSystem}
-            />
+            <Switch id="inc-system" checked={includeSystem} onCheckedChange={setIncludeSystem} />
             <Label htmlFor="inc-system" className="text-xs cursor-pointer">
               Test/RLS
             </Label>
@@ -189,8 +185,7 @@ function SuperAdminClubs() {
             {!loading &&
               clubs.map((c) => {
                 const pill = billingPill(c.subscription);
-                const isTest =
-                  c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
+                const isTest = c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
                 const exempt = c.subscription && isBillingExempt(c.subscription);
                 return (
                   <tr
@@ -273,9 +268,7 @@ function SuperAdminClubs() {
           </div>
         )}
         {!loading && clubs.length === 0 && (
-          <div className="text-center text-sm text-muted-foreground py-8">
-            Aucun club trouvé.
-          </div>
+          <div className="text-center text-sm text-muted-foreground py-8">Aucun club trouvé.</div>
         )}
         {!loading &&
           clubs.map((c) => {

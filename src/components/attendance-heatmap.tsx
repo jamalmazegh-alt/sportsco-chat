@@ -73,7 +73,11 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
       const rank = STATUS_RANK[c.status] ?? 0;
       const titles = [c.events.title ?? ""].filter(Boolean);
       if (!existing || rank > (STATUS_RANK[existing.status] ?? 0)) {
-        buckets.set(k, { status: c.status, titles: [...(existing?.titles ?? []), ...titles], date: d });
+        buckets.set(k, {
+          status: c.status,
+          titles: [...(existing?.titles ?? []), ...titles],
+          date: d,
+        });
       } else {
         existing.titles.push(...titles);
       }
@@ -126,7 +130,8 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <CalendarDays className="h-4 w-4" /> {t("heatmap.title", { defaultValue: "Carte de présence" })}
+          <CalendarDays className="h-4 w-4" />{" "}
+          {t("heatmap.title", { defaultValue: "Carte de présence" })}
         </h2>
         <span className="text-[10px] text-muted-foreground">
           {t("heatmap.lastWeeks", { defaultValue: "{{n}} dernières semaines", n: WEEKS })}
@@ -151,7 +156,9 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
             {/* Day-of-week labels */}
             <div className="flex flex-col gap-1 mr-1 text-[9px] text-muted-foreground leading-3 w-5">
               {["", "M", "", "W", "", "F", ""].map((d, i) => (
-                <div key={i} className="h-3.5 flex items-center">{d}</div>
+                <div key={i} className="h-3.5 flex items-center">
+                  {d}
+                </div>
               ))}
             </div>
             {/* Week columns */}
@@ -161,7 +168,7 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
                   const idx = col * 7 + row;
                   const d = days[idx];
                   if (!d) return <div key={row} className="w-3.5 h-3.5" />;
-                  const cls = d.status ? STATUS_CLASS[d.status] ?? "bg-muted" : "bg-muted/40";
+                  const cls = d.status ? (STATUS_CLASS[d.status] ?? "bg-muted") : "bg-muted/40";
                   const dateLabel = d.date.toLocaleDateString();
                   const tip = d.titles.length
                     ? `${dateLabel} · ${d.titles.join(", ")}`
@@ -175,7 +182,7 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
                       className={cn(
                         "w-3.5 h-3.5 rounded-[3px] transition-colors",
                         cls,
-                        d.isFuture && "opacity-30"
+                        d.isFuture && "opacity-30",
                       )}
                     />
                   );
@@ -189,9 +196,16 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
       {/* Legend */}
       <div className="flex items-center gap-3 flex-wrap text-[10px] text-muted-foreground pt-1">
         <LegendDot cls="bg-present/80" label={t("attendance.present")} count={counts.present} />
-        <LegendDot cls="bg-uncertain/80" label={t("attendance.uncertain")} count={counts.uncertain} />
+        <LegendDot
+          cls="bg-uncertain/80"
+          label={t("attendance.uncertain")}
+          count={counts.uncertain}
+        />
         <LegendDot cls="bg-absent/80" label={t("attendance.absent")} count={counts.absent} />
-        <LegendDot cls="bg-muted/40" label={t("heatmap.noEvent", { defaultValue: "Pas d'événement" })} />
+        <LegendDot
+          cls="bg-muted/40"
+          label={t("heatmap.noEvent", { defaultValue: "Pas d'événement" })}
+        />
       </div>
     </section>
   );
