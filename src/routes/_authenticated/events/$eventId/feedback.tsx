@@ -254,6 +254,11 @@ function PostMatchFeedback() {
   const sport = (data as any)?.sport ?? null;
   const tags = useMemo(() => getFeedbackTagsForSport(sport), [sport]);
 
+  if (!isAccessLoading && !isCoach && canAccessFeedback === false)
+    return <Navigate to="/home" replace />;
+
+
+
   return (
     <div className="px-5 pt-6 pb-28 space-y-5">
       <BackLink to="/events/$eventId" params={{ eventId } as never} />
