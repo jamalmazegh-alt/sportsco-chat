@@ -133,13 +133,47 @@ export const listAllClubs = createServerFn({ method: "POST" })
       memberCounts.set(m.club_id, (memberCounts.get(m.club_id) ?? 0) + 1);
     });
 
+    // Contact = creator profile + auth email
+    const creatorIds = Array.from(
+      new Set((clubs ?? []).map((c) => c.created_by).filter((v): v is string => !!v)),
+    );
+    const { data: creatorProfiles } = creatorIds.length
+      ? await supabaseAdmin
+          .from("profiles")
+          .select("id, full_name, first_name, last_name, phone")
+          .in("id", creatorIds)
+      : { data: [] as never[] };
+    const profileById = new Map((creatorProfiles ?? []).map((p) => [p.id, p]));
+
+    const emailById = new Map<string, string | null>();
+    await Promise.all(
+      creatorIds.map(async (uid) => {
+        try {
+          const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
+          emailById.set(uid, data.user?.email ?? null);
+        } catch {
+          emailById.set(uid, null);
+        }
+      }),
+    );
+
     return {
       total: count ?? 0,
-      items: (clubs ?? []).map((c) => ({
-        ...c,
-        subscription: subByClub.get(c.id) ?? null,
-        member_count: memberCounts.get(c.id) ?? 0,
-      })),
+      items: (clubs ?? []).map((c) => {
+        const p = c.created_by ? profileById.get(c.created_by) : null;
+        const contactName =
+          p?.full_name ||
+          [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim() ||
+          null;
+        return {
+          ...c,
+          subscription: subByClub.get(c.id) ?? null,
+          member_count: memberCounts.get(c.id) ?? 0,
+          contact_name: contactName,
+          contact_phone: p?.phone ?? null,
+          contact_email: (c.created_by && emailById.get(c.created_by)) || null,
+        };
+      }),
     };
   });
 
