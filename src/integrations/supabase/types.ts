@@ -5161,6 +5161,7 @@ export type Database = {
           visibility: Database["public"]["Enums"]["feedback_visibility"]
         }[]
       }
+      current_user_has_tournament_collab: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean

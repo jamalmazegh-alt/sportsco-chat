@@ -24,7 +24,7 @@ export function useTournamentOnlyMode(): {
     enabled: !!userId && !isTournamentOrganizer,
     staleTime: 60_000,
     queryFn: async () => {
-      const [passes, entitlements, subs] = await Promise.all([
+      const [passes, entitlements, subs, collaborations, pendingByEmail] = await Promise.all([
         supabase
           .from("tournament_passes")
           .select("id", { count: "exact", head: true })
@@ -42,16 +42,26 @@ export function useTournamentOnlyMode(): {
               .in("club_id", clubIds)
               .in("status", ["active", "trialing"])
           : Promise.resolve({ count: 0 } as { count: number }),
+        supabase
+          .from("tournament_collaborators")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId!)
+          .is("revoked_at", null),
+        (supabase.rpc as any)("current_user_has_tournament_collab"),
       ]);
       const usedCount = passes.count ?? 0;
       const activeEntitlements = entitlements.count ?? 0;
       const activeSubs = (subs as { count: number | null }).count ?? 0;
-      return { usedCount, activeEntitlements, activeSubs };
+      const activeCollaborations =
+        (collaborations.count ?? 0) + (pendingByEmail?.data === true ? 1 : 0);
+      return { usedCount, activeEntitlements, activeSubs, activeCollaborations };
     },
   });
 
   const tournamentOnly =
     isTournamentOrganizer ||
-    (!!data && (data.usedCount > 0 || data.activeEntitlements > 0) && data.activeSubs === 0);
+    (!!data &&
+      (data.usedCount > 0 || data.activeEntitlements > 0 || data.activeCollaborations > 0) &&
+      data.activeSubs === 0);
   return { isLoading: isLoading && !isTournamentOrganizer, tournamentOnly };
 }
