@@ -29,6 +29,7 @@ import { getPublicTournament } from "@/modules/tournaments/tournaments-public.fu
 import { computeStandings } from "@/modules/tournaments/lib/standings";
 import { BracketView } from "@/modules/tournaments/components/BracketView";
 import { SponsorsStrip } from "@/modules/tournaments/components/SponsorsStrip";
+import { FinalStandings } from "@/modules/tournaments/components/FinalStandings";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 import { resolveScoring, formatSets, type ScoringRules } from "@/modules/tournaments/lib/formats";
 
@@ -104,7 +105,7 @@ function TvSlideshowPage() {
 
   const slides = useMemo(() => {
     if (!data) return [] as Slide[];
-    const { tournament, groups, teams, matches } = data;
+    const { tournament, groups, teams, matches, flights } = data as any;
     const rules = mergeRules((tournament as any).settings);
     const sponsors = rules.branding.sponsors ?? [];
     const sponsorsTitle = rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault");
@@ -117,6 +118,7 @@ function TvSlideshowPage() {
       .reverse();
     const sortedGroups = [...(groups as any[])].sort((a, b) => a.sort_order - b.sort_order);
     const hasBracket = (matches as any[]).some((m: any) => m.round !== "group");
+    const isCompleted = (tournament as any).status === "completed";
 
     const out: Slide[] = [];
 
@@ -127,6 +129,27 @@ function TvSlideshowPage() {
       icon: <Trophy className="h-7 w-7" />,
       render: () => <IntroSlide tournament={tournament as any} qrUrl={publicUrl} />,
     });
+
+    // Final podium when tournament is completed
+    if (isCompleted) {
+      out.push({
+        key: "podium",
+        title: t("finalStandings.title", { defaultValue: "Classement final" }),
+        icon: <Trophy className="h-7 w-7 text-amber-500" />,
+        render: () => (
+          <div className="h-full w-full overflow-auto flex items-start justify-center">
+            <div className="w-full max-w-5xl">
+              <FinalStandings
+                matches={matches as any}
+                teams={teams as any}
+                flights={(flights as any) ?? []}
+                tournamentName={tournament.name}
+              />
+            </div>
+          </div>
+        ),
+      });
+    }
 
     // Live matches first when available
     if (live.length > 0) {
