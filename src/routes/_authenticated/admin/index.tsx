@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { ConvertPersonalClubBanner } from "@/components/convert-personal-club-banner";
 import { isV2 } from "@/config/features";
+import { useTournamentOnlyMode } from "@/modules/tournaments/hooks/useTournamentOnlyMode";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminSettingsPage,
