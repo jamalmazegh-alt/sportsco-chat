@@ -464,13 +464,23 @@ function PublicTournamentPage() {
             </div>
           )}
           {tab === "overview" && (
-            <Overview
-              groups={groups}
-              teams={teams}
-              matches={filteredMatches}
-              scoring={scoring}
-              eventsByMatch={eventsByMatch}
-            />
+            <>
+              {tournament.status === "completed" && (
+                <FinalStandings
+                  matches={matches as any}
+                  teams={teams as any}
+                  flights={flights as any}
+                  tournamentName={tournament.name}
+                />
+              )}
+              <Overview
+                groups={groups}
+                teams={teams}
+                matches={filteredMatches}
+                scoring={scoring}
+                eventsByMatch={eventsByMatch}
+              />
+            </>
           )}
           {tab === "teams" && <TeamsGrid teams={teams as any} />}
           {tab === "matches" && (
