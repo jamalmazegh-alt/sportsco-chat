@@ -25,6 +25,9 @@ import {
   Phone,
   User2,
   AlertCircle,
+  CheckCircle2,
+  Circle,
+  Banknote,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
