@@ -166,9 +166,10 @@ function TournamentsList() {
   const { activeClubId, memberships } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
-  const { tournamentOnly } = useTournamentOnlyMode();
+  const { tournamentOnly, collaboratorOnly } = useTournamentOnlyMode();
   const noClub = memberships.length === 0 || tournamentOnly;
-  const canManage = roles.includes("admin") || (role as string) === "dirigeant" || noClub;
+  const canManage =
+    !collaboratorOnly && (roles.includes("admin") || (role as string) === "dirigeant" || noClub);
   const [open, setOpen] = useState(false);
 
   const clubFn = useServerFn(listMyTournaments);
