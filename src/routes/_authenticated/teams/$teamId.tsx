@@ -214,6 +214,7 @@ function TeamDetail() {
 
   // Add player form state
   const [open, setOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
   const [jersey, setJersey] = useState("");
