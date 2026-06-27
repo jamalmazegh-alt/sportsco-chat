@@ -27,7 +27,11 @@ import { BackLink } from "@/components/back-link";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { googleMapsSearchUrl } from "@/lib/google-maps";
-import { getTournament, updateTournament } from "@/modules/tournaments/tournaments.functions";
+import {
+  getTournament,
+  updateTournament,
+  getMyTournamentRole,
+} from "@/modules/tournaments/tournaments.functions";
 import { resolveScoring, type ScoringRules } from "@/modules/tournaments/lib/formats";
 import { mergeRules } from "@/modules/tournaments/lib/rules";
 
@@ -183,6 +187,18 @@ function TournamentDetailPage() {
     roles.includes("admin") ||
     roles.includes("tournament_manager") ||
     (role as string) === "dirigeant";
+
+  // Vue arbitre : utilisateur qui n'est QUE collaborateur "referee" du tournoi
+  // (pas admin/dirigeant club, pas créateur). On masque toute la gestion et on
+  // ne laisse que matchs (avec filtre "Mes matchs"), classements et bracket.
+  const roleFn = useServerFn(getMyTournamentRole);
+  const myRoleQ = useQuery({
+    queryKey: ["tournament-my-role", tournamentId],
+    queryFn: () => roleFn({ data: { tournament_id: tournamentId } }),
+    enabled: !canManage,
+    staleTime: 5 * 60_000,
+  });
+  const isRefereeOnly = !canManage && myRoleQ.data?.role === "referee";
 
   const publicUrl = tournament?.slug
     ? typeof window !== "undefined"
@@ -380,6 +396,113 @@ function TournamentDetailPage() {
             <ContinueCTA action={continueAction} onAction={() => {}} variant="hero" />
             <AlertsPanel alerts={alerts} />
           </div>
+        </div>
+      </div>
+    );
+  }
+
+
+  // ─── Vue arbitre simplifiée ─────────────────────────────────────────────
+  if (isRefereeOnly) {
+    return (
+      <div className="pb-24">
+        <header className="px-4 pt-4 space-y-4">
+          <BackLink to="/tournaments" label={t("detail.back")} />
+          <div
+            className="relative overflow-hidden rounded-[18px] text-white p-5"
+            style={{
+              background: "linear-gradient(135deg, #0f4a26 0%, #1d7a45 60%, #2d9d5f 100%)",
+              boxShadow: "0 4px 16px rgba(29,122,69,0.18)",
+            }}
+          >
+            <div className="flex items-start gap-3">
+              {tournament.cover_image_url && (
+                <img
+                  src={tournament.cover_image_url}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-xl object-cover ring-1 ring-white/30"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
+                  {t("roles.referee", { defaultValue: "Arbitre", ns: "tournaments" })}
+                </p>
+                <h1
+                  className="text-[20px] font-extrabold leading-tight"
+                  style={{ letterSpacing: "-0.3px" }}
+                >
+                  {tournament.name}
+                </h1>
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/90">
+                  {tournament.starts_on && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5 text-amber-200" />
+                      <span className="tabular-nums">{tournament.starts_on}</span>
+                    </span>
+                  )}
+                  {tournament.location && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-rose-200" />
+                      <span className="truncate max-w-[180px]">{tournament.location}</span>
+                    </span>
+                  )}
+                  {tournament.sport && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-white/20">
+                      {tournament.sport}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="px-5 pt-6 space-y-8">
+          <FinalStandings
+            matches={matches as unknown as React.ComponentProps<typeof FinalStandings>["matches"]}
+            teams={teams as unknown as React.ComponentProps<typeof FinalStandings>["teams"]}
+            flights={flights as unknown as React.ComponentProps<typeof FinalStandings>["flights"]}
+            tournamentName={tournament.name}
+          />
+
+          <Section
+            id="section-matches"
+            icon={Calendar}
+            title={t("tabs.matches", { defaultValue: "Matchs" })}
+          >
+            <MatchesList
+              tournamentId={tournament.id}
+              matches={matches as unknown as React.ComponentProps<typeof MatchesList>["matches"]}
+              teams={teams as unknown as React.ComponentProps<typeof MatchesList>["teams"]}
+              canManage={false}
+              fields={(tournament.fields as string[] | null) ?? []}
+              scoring={scoring ?? undefined}
+              defaultOnlyMine
+            />
+          </Section>
+
+          {groups.length > 0 && (
+            <Section
+              id="section-standings"
+              icon={ListOrdered}
+              title={t("tabs.standings", { defaultValue: "Classements" })}
+            >
+              <StandingsView tournamentId={tournament.id} />
+            </Section>
+          )}
+
+          {matches.some((m) => m.round !== "group") && (
+            <Section
+              id="section-bracket"
+              icon={GitBranch}
+              title={t("tabs.bracket", { defaultValue: "Phase finale" })}
+            >
+              <BracketView
+                matches={matches as unknown as React.ComponentProps<typeof BracketView>["matches"]}
+                teams={teams as unknown as React.ComponentProps<typeof BracketView>["teams"]}
+              />
+            </Section>
+          )}
         </div>
       </div>
     );

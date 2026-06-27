@@ -2563,3 +2563,45 @@ export const assignMatchReferee = createServerFn({ method: "POST" })
     if (error) throw new Response(error.message, { status: 400 });
     return { ok: true };
   });
+
+/**
+ * Rôle effectif de l'utilisateur courant sur un tournoi, pour adapter l'UI.
+ * - owner : créateur du tournoi
+ * - co_organizer / referee : tournament_collaborators (user_id ou email pending), non révoqué
+ * - viewer : sinon
+ * Ne porte aucune sécurité — sert uniquement à choisir la vue (admin vs arbitre simplifié).
+ */
+export const getMyTournamentRole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { tournament_id: string }) =>
+    z.object({ tournament_id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId, claims } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = ((claims as any)?.email as string | undefined)?.toLowerCase() ?? null;
+
+    const { data: trn } = await supabaseAdmin
+      .from("tournaments")
+      .select("created_by")
+      .eq("id", data.tournament_id)
+      .maybeSingle();
+    if (trn?.created_by === userId) {
+      return { role: "owner" as const };
+    }
+
+    let q = supabaseAdmin
+      .from("tournament_collaborators")
+      .select("role, user_id, email")
+      .eq("tournament_id", data.tournament_id)
+      .is("revoked_at", null);
+    const { data: rows } = await q;
+    const mine = (rows ?? []).find(
+      (r: any) =>
+        r.user_id === userId ||
+        (email && typeof r.email === "string" && r.email.toLowerCase() === email),
+    );
+    if (mine?.role === "co_organizer") return { role: "co_organizer" as const };
+    if (mine?.role === "referee") return { role: "referee" as const };
+    return { role: "viewer" as const };
+  });
