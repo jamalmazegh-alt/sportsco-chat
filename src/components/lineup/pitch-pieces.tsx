@@ -42,7 +42,6 @@ export function PlayerChip({
         >
           {player.photo_url ? (
             <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
-
           ) : player.jersey_number != null ? (
             <span>{player.jersey_number}</span>
           ) : (

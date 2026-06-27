@@ -467,7 +467,6 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
 
       {/* Live recap chips — hidden on small screens to match clean mockup */}
       {(false as boolean) && (
-
         <LiveRecap
           state={state}
           teamName={selectedTeam?.name}
