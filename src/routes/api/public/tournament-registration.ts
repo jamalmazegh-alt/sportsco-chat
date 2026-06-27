@@ -62,10 +62,15 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             { status: 400 },
           );
         }
+        // Naive datetime strings (from <input type="datetime-local">) are
+        // intentionally interpreted as LOCAL time to match what the organizer
+        // typed in the form. Strings that already include a timezone are
+        // honored as-is.
         const parseLocalish = (s: string | null | undefined): number | null => {
           if (!s) return null;
           const hasTz = /([zZ]|[+-]\d{2}:?\d{2})$/.test(s);
-          const t = new Date(hasTz ? s : `${s}Z`).getTime();
+          const t = new Date(s).getTime();
+          if (hasTz) return Number.isFinite(t) ? t : null;
           return Number.isFinite(t) ? t : null;
         };
         const now = Date.now();
