@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const TokenSchema = z.string().uuid();
 
-const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
+const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_BYTES = 4 * 1024 * 1024;
 
 function getAdmin() {
