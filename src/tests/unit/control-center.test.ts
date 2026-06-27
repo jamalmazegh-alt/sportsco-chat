@@ -58,6 +58,27 @@ describe("computeContinueAction — priority order", () => {
     },
   );
 
+  // New: opt-in capacity gate via `expectedTeams` — blocks the draw until
+  // the roster is full. Legacy callers that omit it keep the old behaviour.
+  it("blocks the draw while teamsCount < expectedTeams (opt-in capacity gate)", () => {
+    const action = computeContinueAction({
+      ...args({ teamsCount: 3, tournament: { status: "published", format: "groups_knockout" } }),
+      expectedTeams: 8,
+    });
+    expect(action.kind).toBe("add_team");
+    expect(action.note).toBe("3/8");
+  });
+
+  it("unlocks the draw once the expected number of teams is reached", () => {
+    const action = computeContinueAction({
+      ...args({ teamsCount: 8, tournament: { status: "published", format: "groups_knockout" } }),
+      expectedTeams: 8,
+    });
+    expect(action.kind).toBe("run_draw");
+  });
+
+
+
   it("proposes publish when still draft after teams are added", () => {
     const action = computeContinueAction(
       args({ teamsCount: 8, tournament: { status: "draft", format: "groups_knockout" } }),
