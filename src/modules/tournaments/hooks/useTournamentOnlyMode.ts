@@ -26,12 +26,17 @@ export function useTournamentOnlyMode(): {
     enabled: !!userId && !isTournamentOrganizer,
     staleTime: 60_000,
     queryFn: async () => {
-      const [passes, subs] = await Promise.all([
+      const [passes, entitlements, subs] = await Promise.all([
         supabase
           .from("tournament_passes")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId!)
           .eq("status", "used"),
+        supabase
+          .from("tournament_entitlements")
+          .select("id", { count: "exact", head: true })
+          .eq("organizer_id", userId!)
+          .eq("status", "active"),
         clubIds.length
           ? supabase
               .from("subscriptions")
@@ -41,13 +46,16 @@ export function useTournamentOnlyMode(): {
           : Promise.resolve({ count: 0 } as { count: number }),
       ]);
       const usedCount = passes.count ?? 0;
+      const activeEntitlements = entitlements.count ?? 0;
       const activeSubs = (subs as { count: number | null }).count ?? 0;
-      return { usedCount, activeSubs };
+      return { usedCount, activeEntitlements, activeSubs };
     },
   });
 
   const tournamentOnly =
     isTournamentOrganizer ||
-    (!!data && data.usedCount > 0 && data.activeSubs === 0);
+    (!!data &&
+      (data.usedCount > 0 || data.activeEntitlements > 0) &&
+      data.activeSubs === 0);
   return { isLoading: isLoading && !isTournamentOrganizer, tournamentOnly };
 }
