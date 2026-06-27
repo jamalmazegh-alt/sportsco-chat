@@ -97,7 +97,10 @@ export function InstallBanner() {
       const onAppInstalled = () => {
         try {
           localStorage.setItem(INSTALLED_KEY, "true");
-        } catch {}
+        } catch {
+          // ignore storage failures
+        }
+
         setVisible(false);
       };
       window.addEventListener("beforeinstallprompt", onBeforeInstall);
@@ -116,7 +119,10 @@ export function InstallBanner() {
   function dismiss() {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    } catch {}
+    } catch {
+      // ignore storage failures
+    }
+
     setVisible(false);
     setShowIOSGuide(false);
   }
@@ -166,7 +172,10 @@ export function InstallBanner() {
                 onClick={() => {
                   try {
                     localStorage.setItem(INSTALLED_KEY, "true");
-                  } catch {}
+                  } catch {
+                    // ignore storage failures
+                  }
+
                   setVisible(false);
                 }}
                 className="text-xs text-gray-600 hover:text-gray-900 underline underline-offset-2"
@@ -242,7 +251,10 @@ export function InstallBanner() {
               onClick={() => {
                 try {
                   localStorage.setItem(INSTALLED_KEY, "true");
-                } catch {}
+                } catch {
+                  // ignore storage failures
+                }
+
                 dismiss();
               }}
               className="mt-5 w-full py-2.5 rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white font-semibold text-sm shadow-md hover:opacity-90 transition"

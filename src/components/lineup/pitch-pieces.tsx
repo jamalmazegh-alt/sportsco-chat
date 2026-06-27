@@ -41,8 +41,8 @@ export function PlayerChip({
           )}
         >
           {player.photo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img src={player.photo_url} alt="" className="h-full w-full object-cover" />
+
           ) : player.jersey_number != null ? (
             <span>{player.jersey_number}</span>
           ) : (
