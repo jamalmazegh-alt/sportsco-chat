@@ -431,7 +431,8 @@
       "seedOption": "N°{{n}}",
       "seedBest": " (meilleure équipe)",
       "seedHint": "Optionnel — utilisé pour le tirage et l'ordre dans le tableau.",
-      "save": "Enregistrer"
+      "save": "Enregistrer",
+      "exceedsMax": "Trop d'équipes : {{count}} dans le fichier, seulement {{remaining}} place(s) restante(s) (max {{max}}, déjà inscrites {{current}}). Réduisez votre liste puis relancez l'import."
     },
     "row": {
       "seed": "Seed {{n}}",

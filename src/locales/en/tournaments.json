@@ -431,7 +431,8 @@
       "seedOption": "#{{n}}",
       "seedBest": " (top team)",
       "seedHint": "Optional — used for the draw and bracket ordering.",
-      "save": "Save"
+      "save": "Save",
+      "exceedsMax": "Too many teams: {{count}} in the file, only {{remaining}} slot(s) left (max {{max}}, already registered {{current}}). Trim your list and import again."
     },
     "row": {
       "seed": "Seed {{n}}",

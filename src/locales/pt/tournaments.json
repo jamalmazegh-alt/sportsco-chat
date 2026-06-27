@@ -431,7 +431,8 @@
       "seedOption": "N.º {{n}}",
       "seedBest": " (equipa mais forte)",
       "seedHint": "Opcional — usado para o sorteio e a ordem na árvore do torneio.",
-      "save": "Guardar"
+      "save": "Guardar",
+      "exceedsMax": "Demasiadas equipas: {{count}} no ficheiro, apenas {{remaining}} vaga(s) disponível(is) (máx {{max}}, já inscritas {{current}}). Reduza a sua lista e reimporte."
     },
     "row": {
       "seed": "Cabeça de série {{n}}",

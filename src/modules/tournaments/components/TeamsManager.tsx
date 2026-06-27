@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ResponsiveFormDialog } from "@/components/responsive-form-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet";
 import { AttachmentPicker, type Attachment } from "@/components/attachments";
 import {
@@ -23,6 +24,7 @@ import {
   Mail,
   Phone,
   User2,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -80,6 +82,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
   // Bulk import state
   const [bulkText, setBulkText] = useState("");
+  const [bulkError, setBulkError] = useState<string | null>(null);
 
   const addFn = useServerFn(addTournamentTeam);
   const removeFn = useServerFn(removeTournamentTeam);
@@ -197,10 +200,25 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
   function onBulkSubmit(e: FormEvent) {
     e.preventDefault();
+    setBulkError(null);
     const rows = parseBulk(bulkText);
     if (rows.length === 0) {
-      toast.error(t("teams.noneDetected"));
+      setBulkError(t("teams.noneDetected"));
       return;
+    }
+    if (typeof maxTeams === "number" && maxTeams > 0) {
+      const remaining = Math.max(0, maxTeams - teams.length);
+      if (rows.length > remaining) {
+        setBulkError(
+          t("teams.dialog.exceedsMax", {
+            count: rows.length,
+            remaining,
+            max: maxTeams,
+            current: teams.length,
+          }),
+        );
+        return;
+      }
     }
     bulk.mutate(rows);
   }
@@ -273,7 +291,11 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
         <div className="flex gap-2">
           <ResponsiveFormDialog
             open={bulkOpen}
-            onOpenChange={(v) => !atLimit && setBulkOpen(v)}
+            onOpenChange={(v) => {
+              if (atLimit) return;
+              setBulkOpen(v);
+              if (!v) setBulkError(null);
+            }}
             trigger={
               <Button size="sm" variant="outline" disabled={atLimit}>
                 <Upload className="h-4 w-4" />
@@ -305,12 +327,21 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                 <Label>{t("teams.dialog.pasteLabel")}</Label>
                 <Textarea
                   value={bulkText}
-                  onChange={(e) => setBulkText(e.target.value)}
+                  onChange={(e) => {
+                    setBulkText(e.target.value);
+                    if (bulkError) setBulkError(null);
+                  }}
                   rows={8}
                   placeholder={"FC United\nReal Madrid, RMA, 1\nAtlético, ATM, 2"}
                   className="font-mono text-xs"
                 />
               </div>
+              {bulkError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{bulkError}</AlertDescription>
+                </Alert>
+              )}
               <Button type="submit" className="w-full" disabled={bulk.isPending}>
                 {bulk.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("teams.import")}
               </Button>

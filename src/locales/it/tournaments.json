@@ -431,7 +431,8 @@
       "seedOption": "N°{{n}}",
       "seedBest": " (squadra più forte)",
       "seedHint": "Opzionale — utilizzato per il sorteggio e l'ordine nel tabellone del torneo.",
-      "save": "Salva"
+      "save": "Salva",
+      "exceedsMax": "Troppe squadre: {{count}} nel file, solo {{remaining}} posto/i disponibile/i (max {{max}}, già iscritte {{current}}). Riduci l'elenco e reimporta."
     },
     "row": {
       "seed": "Testa di serie {{n}}",

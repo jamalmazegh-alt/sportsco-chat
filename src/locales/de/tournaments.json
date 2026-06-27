@@ -431,7 +431,8 @@
       "seedOption": "N°{{n}}",
       "seedBest": " (stärkstes Team)",
       "seedHint": "Optional — genutzt für die Auslosung und die Reihenfolge im Turnierbaum.",
-      "save": "Speichern"
+      "save": "Speichern",
+      "exceedsMax": "Zu viele Mannschaften: {{count}} in der Datei, nur {{remaining}} Platz/Plätze frei (max {{max}}, bereits eingetragen {{current}}). Liste kürzen und erneut importieren."
     },
     "row": {
       "seed": "Setzung {{n}}",
