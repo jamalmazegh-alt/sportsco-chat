@@ -334,6 +334,10 @@ export function configToCreatePayload(
     ...rules.fairPlay,
     enabled: cfg.useFairPlay,
   };
+  rules.registration = {
+    ...rules.registration,
+    enabled: cfg.publicRegistration,
+  };
   if (cfg.useFairPlay) {
     const ordered = rules.tiebreakers.filter((key) => key !== "fair_play");
     const drawLotIndex = ordered.indexOf("draw_lot");
