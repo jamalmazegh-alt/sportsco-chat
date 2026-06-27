@@ -210,7 +210,7 @@ export function assistantStepOrder(cfg: Partial<AssistantTournamentConfig>): Ass
   }
   steps.push("matchDuration", "breaks", "terrains", "terrainNaming");
   if (cfg.terrainNaming === "now") steps.push("terrainNames");
-  steps.push("fairPlay", "paid");
+  steps.push("fairPlay", "publicRegistration", "paid");
   if (cfg.paid) steps.push("paidAmount");
   steps.push("name", "date", "location", "summary");
   return steps;
