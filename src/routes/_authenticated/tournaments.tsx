@@ -274,11 +274,14 @@ function TournamentsList() {
           </div>
           <div className="relative mt-4 flex flex-wrap gap-2">
             {canCreate ? (
-              <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
-                <Link to="/tournaments/new-from-pass">
-                  <Zap className="h-4 w-4" />
-                  Créer maintenant
-                </Link>
+              <Button
+                size="sm"
+                className="bg-card text-emerald-800 hover:bg-card/90"
+                onClick={openCreate}
+                disabled={!effectiveClubId}
+              >
+                <Zap className="h-4 w-4" />
+                Créer maintenant
               </Button>
             ) : (
               <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
@@ -288,6 +291,7 @@ function TournamentsList() {
                 </Link>
               </Button>
             )}
+
             {!hasAnnual && canCreate && (
               <Button
                 asChild
