@@ -35,7 +35,10 @@ export interface ContinueAction {
   matchId?: string | null;
   /** Optional anchor id to scroll to. */
   anchor?: string;
+  /** Optional human-readable hint (e.g. "3/8 équipes inscrites"). */
+  note?: string;
 }
+
 
 interface MatchLike {
   id: string;
