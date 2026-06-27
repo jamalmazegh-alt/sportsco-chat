@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 
 const Schema = z.object({
   tournament_slug: z.string().trim().min(1).max(120),
@@ -18,6 +19,11 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
+        const ip = getClientIp(request);
+        if (!(await checkRateLimit(ip, "tournament-registration", 10))) {
+          return Response.json({ error: "rate_limited" }, { status: 429 });
+        }
+
         const url = process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!url || !key) {
