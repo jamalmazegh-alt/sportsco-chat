@@ -273,35 +273,37 @@ function RosterPage() {
     }
     const base = importMode === "replace" ? [] : players;
     const merged = [...base, ...parsed];
-    let truncatedNote = "";
-    let finalList = merged;
     if (merged.length > maxPlayers) {
-      finalList = merged.slice(0, maxPlayers);
-      truncatedNote = t("roster.import.truncated", {
-        defaultValue: " ({{cut}} ignoré(s) — max {{max}})",
-        cut: merged.length - maxPlayers,
-        max: maxPlayers,
-      });
+      toast.error(
+        t("roster.import.blocked", {
+          defaultValue:
+            "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
+          total: merged.length,
+          max: maxPlayers,
+        }),
+      );
+      return;
     }
     // Ensure single captain
     let captainSeen = false;
-    finalList = finalList.map((p) => {
+    const finalList = merged.map((p) => {
       if (p.is_captain && !captainSeen) {
         captainSeen = true;
         return p;
       }
       return { ...p, is_captain: false };
     });
+
     setPlayers(finalList);
     setImportOpen(false);
     setImportText("");
     toast.success(
       t("roster.import.ok", {
-        defaultValue: "{{n}} joueur(s) importé(s){{note}}",
+        defaultValue: "{{n}} joueur(s) importé(s)",
         n: parsed.length,
-        note: truncatedNote,
       }),
     );
+
   }
 
   async function handleFile(file: File) {
