@@ -5372,6 +5372,10 @@ export type Database = {
         Args: { _enabled: boolean; _player_id: string }
         Returns: Json
       }
+      set_team_logo_via_token: {
+        Args: { _logo_url: string; _token: string }
+        Returns: Json
+      }
       soft_delete_entity: {
         Args: { _id: string; _kind: string }
         Returns: undefined
