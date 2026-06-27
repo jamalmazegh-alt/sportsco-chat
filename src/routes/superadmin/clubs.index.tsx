@@ -173,7 +173,7 @@ function SuperAdminClubs() {
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
                   <Loader2 className="h-4 w-4 inline animate-spin mr-2" />
                   Chargement…
                 </td>
@@ -181,7 +181,7 @@ function SuperAdminClubs() {
             )}
             {!loading && clubs.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
                   Aucun club trouvé.
                 </td>
               </tr>
