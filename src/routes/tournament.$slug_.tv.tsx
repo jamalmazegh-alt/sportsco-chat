@@ -105,7 +105,7 @@ function TvSlideshowPage() {
 
   const slides = useMemo(() => {
     if (!data) return [] as Slide[];
-    const { tournament, groups, teams, matches } = data;
+    const { tournament, groups, teams, matches, flights } = data as any;
     const rules = mergeRules((tournament as any).settings);
     const sponsors = rules.branding.sponsors ?? [];
     const sponsorsTitle = rules.branding.sponsorsTitle || t("public.sponsorsTitleDefault");
@@ -118,6 +118,7 @@ function TvSlideshowPage() {
       .reverse();
     const sortedGroups = [...(groups as any[])].sort((a, b) => a.sort_order - b.sort_order);
     const hasBracket = (matches as any[]).some((m: any) => m.round !== "group");
+    const isCompleted = (tournament as any).status === "completed";
 
     const out: Slide[] = [];
 
