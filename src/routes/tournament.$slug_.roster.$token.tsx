@@ -338,7 +338,6 @@ function RosterPage() {
         <div className="mb-5 flex items-center gap-4 rounded-md border bg-card p-3">
           <div className="h-16 w-16 rounded-md border bg-muted overflow-hidden flex items-center justify-center shrink-0">
             {reg.logo_url ? (
-              
               <img src={reg.logo_url} alt={reg.team_name} className="h-full w-full object-cover" />
             ) : (
               <span className="text-xs text-muted-foreground">
