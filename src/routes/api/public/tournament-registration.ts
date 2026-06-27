@@ -192,36 +192,56 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         // Notify the organizer (tournament creator) of the new registration
         try {
-          const { data: organizer } = await supabase.auth.admin.getUserById(
-            (tournament as any).created_by ?? "",
-          );
-          const organizerEmail = organizer?.user?.email ?? null;
-          if (organizerEmail) {
-            const { data: organizerProfile } = await supabase
-              .from("profiles")
-              .select("first_name, full_name")
-              .eq("id", (tournament as any).created_by)
-              .maybeSingle();
-            const organizerName =
-              (organizerProfile as any)?.first_name ||
-              (organizerProfile as any)?.full_name ||
-              undefined;
-            const manageUrl = `${origin}/tournaments/${tournament.id}#section-registrations`;
-            await enqueueTransactionalEmailServer({
-              templateName: "tournament-registration-received",
-              recipientEmail: organizerEmail,
-              templateData: {
-                organizerName,
-                tournamentName: tournament.name,
-                teamName: parsed.team_name,
-                contactName: parsed.contact_name,
-                contactEmail: parsed.contact_email,
-                contactPhone: parsed.contact_phone ?? undefined,
-                manageUrl,
-                requiresApproval: !!reg.requiresApproval,
-              },
-              idempotencyKey: `registration-received:${row.id}`,
-            });
+          const createdBy = (tournament as any).created_by as string | null | undefined;
+          const UUID_RE =
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          if (!createdBy || !UUID_RE.test(createdBy)) {
+            console.warn(
+              "Skip organizer notification: missing/invalid created_by",
+              { tournamentId: tournament.id, createdBy },
+            );
+          } else {
+            const { data: organizer, error: organizerErr } =
+              await supabase.auth.admin.getUserById(createdBy);
+            if (organizerErr) {
+              console.error("auth.admin.getUserById failed", organizerErr);
+            }
+            const organizerEmail = organizer?.user?.email ?? null;
+            if (!organizerEmail) {
+              console.warn("Skip organizer notification: no email on auth user", {
+                createdBy,
+              });
+            } else {
+              const { data: organizerProfile } = await supabase
+                .from("profiles")
+                .select("first_name, full_name")
+                .eq("id", createdBy)
+                .maybeSingle();
+              const organizerName =
+                (organizerProfile as any)?.first_name ||
+                (organizerProfile as any)?.full_name ||
+                undefined;
+              const manageUrl = `${origin}/tournaments/${tournament.id}#section-registrations`;
+              await enqueueTransactionalEmailServer({
+                templateName: "tournament-registration-received",
+                recipientEmail: organizerEmail,
+                templateData: {
+                  organizerName,
+                  tournamentName: tournament.name,
+                  teamName: parsed.team_name,
+                  contactName: parsed.contact_name,
+                  contactEmail: parsed.contact_email,
+                  contactPhone: parsed.contact_phone ?? undefined,
+                  manageUrl,
+                  requiresApproval: !!reg.requiresApproval,
+                },
+                idempotencyKey: `registration-received:${row.id}`,
+              });
+              console.log("Organizer notification enqueued", {
+                to: organizerEmail,
+                regId: row.id,
+              });
+            }
           }
         } catch (e) {
           console.error("Failed to notify organizer of new registration", e);
