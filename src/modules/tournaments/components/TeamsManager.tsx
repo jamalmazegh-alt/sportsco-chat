@@ -522,153 +522,168 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
             return (
               <li
                 key={tm.id}
-                className="flex items-center gap-3 rounded-2xl border-[1.5px] border-border bg-card p-3 transition-all hover:-translate-y-0.5 hover:border-emerald-300"
+                className="rounded-2xl border-[1.5px] border-border bg-card p-3 transition-all hover:-translate-y-0.5 hover:border-emerald-300"
                 style={{ boxShadow: "0 2px 8px -4px rgba(15,23,42,0.06)" }}
               >
-                <div
-                  className="h-11 w-11 rounded-xl shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-sm tracking-tight"
-                  style={!tm.logo_url ? { background: palettes[idx % palettes.length] } : undefined}
-                >
-                  {tm.logo_url ? (
-                    <img src={tm.logo_url} alt={tm.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <span>{initials || "?"}</span>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold truncate text-sm text-foreground tracking-tight">
-                    {tm.name}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                    {tm.seed ? (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 font-bold">
-                        #{tm.seed}
-                      </span>
+                <div className="flex items-start gap-3">
+                  <div
+                    className="h-11 w-11 rounded-xl shrink-0 overflow-hidden flex items-center justify-center text-white font-black text-sm tracking-tight"
+                    style={
+                      !tm.logo_url ? { background: palettes[idx % palettes.length] } : undefined
+                    }
+                  >
+                    {tm.logo_url ? (
+                      <img
+                        src={tm.logo_url}
+                        alt={tm.name}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
-                      <span className="text-muted-foreground/70">{t("teams.row.noSeed")}</span>
+                      <span>{initials || "?"}</span>
                     )}
-                    <span
-                      className={cn(
-                        "inline-flex items-center px-1.5 py-0.5 rounded-md font-semibold",
-                        tm.team_id
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-muted text-muted-foreground",
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold truncate text-sm text-foreground tracking-tight">
+                      {tm.name}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                      {tm.seed ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 font-bold">
+                          #{tm.seed}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground/70">
+                          {t("teams.row.noSeed")}
+                        </span>
                       )}
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-1.5 py-0.5 rounded-md font-semibold",
+                          tm.team_id
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setRosterTeam(tm)}
+                      title={t("teams.row.players")}
+                      className="h-8 w-8 rounded-lg hover:bg-emerald-50 hover:text-emerald-700"
                     >
-                      {tm.team_id ? t("teams.row.clubero") : t("teams.row.external")}
-                    </span>
-                  </p>
-                  {(() => {
-                    const reg = Array.isArray(tm.tournament_registrations)
-                      ? tm.tournament_registrations[0]
-                      : tm.tournament_registrations;
-                    const contactName = reg?.contact_name ?? tm.contact_name ?? null;
-                    const contactEmail = reg?.contact_email ?? tm.contact_email ?? null;
-                    const contactPhone = reg?.contact_phone ?? tm.contact_phone ?? null;
-
-                    const hasContact = contactName || contactEmail || contactPhone;
-
-                    const ps = tm.payment_status ?? "unpaid";
-                    const cycle: Record<string, "unpaid" | "paid" | "exempt"> = {
-                      unpaid: "paid",
-                      paid: "exempt",
-                      exempt: "unpaid",
-                    };
-                    const styles =
-                      ps === "paid"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                        : ps === "exempt"
-                          ? "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
-                          : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100";
-                    const label =
-                      ps === "paid"
-                        ? t("teams.payment.paid", { defaultValue: "Payé" })
-                        : ps === "exempt"
-                          ? t("teams.payment.exempt", { defaultValue: "Exempté" })
-                          : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
-                    const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
-
-                    return (
-                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-                        {contactName && (
-                          <span className="inline-flex items-center gap-1 font-medium text-foreground/80">
-                            <User2 className="h-3 w-3" />
-                            {contactName}
-                          </span>
-                        )}
-                        {contactEmail && (
-                          <a
-                            href={`mailto:${contactEmail}`}
-                            className="inline-flex items-center gap-1 hover:text-foreground hover:underline"
-                          >
-                            <Mail className="h-3 w-3" />
-                            {contactEmail}
-                          </a>
-                        )}
-                        {contactPhone && (
-                          <a
-                            href={`tel:${contactPhone}`}
-                            className="inline-flex items-center gap-1 hover:text-foreground hover:underline"
-                          >
-                            <Phone className="h-3 w-3" />
-                            {contactPhone}
-                          </a>
-                        )}
-                        {hasContact && <span className="text-border">·</span>}
-                        <button
-                          type="button"
-                          disabled={setPayment.isPending}
-                          onClick={() =>
-                            setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
-                          }
-                          className={cn(
-                            "group inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-dashed transition-colors disabled:opacity-50 cursor-pointer",
-                            styles,
-                          )}
-                          title={t("teams.payment.cycleHint", {
-                            defaultValue: "Cliquer pour changer le statut de paiement",
-                          })}
-                        >
-                          <Icon className="h-3 w-3" />
-                          <span>{label}</span>
-                          {ps === "paid" && tm.amount_paid_cents
-                            ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
-                            : ""}
-                          <Pencil className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100 ml-0.5" />
-                        </button>
-                      </div>
-                    );
-                  })()}
-
+                      <UsersRound className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setEditing(tm)}
+                      title={t("teams.row.edit")}
+                      className="h-8 w-8 rounded-lg hover:bg-muted"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => setTeamToDelete(tm)}
+                      disabled={remove.isPending}
+                      title={t("teams.row.delete")}
+                      className="h-8 w-8 rounded-lg hover:bg-rose-50"
+                    >
+                      <Trash2 className="h-4 w-4 text-rose-500" />
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setRosterTeam(tm)}
-                  title={t("teams.row.players")}
-                  className="rounded-lg hover:bg-emerald-50 hover:text-emerald-700"
-                >
-                  <UsersRound className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setEditing(tm)}
-                  title={t("teams.row.edit")}
-                  className="rounded-lg hover:bg-muted"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setTeamToDelete(tm)}
-                  disabled={remove.isPending}
-                  title={t("teams.row.delete")}
-                  className="rounded-lg hover:bg-rose-50"
-                >
-                  <Trash2 className="h-4 w-4 text-rose-500" />
-                </Button>
+
+                {(() => {
+                  const reg = Array.isArray(tm.tournament_registrations)
+                    ? tm.tournament_registrations[0]
+                    : tm.tournament_registrations;
+                  const contactName = reg?.contact_name ?? tm.contact_name ?? null;
+                  const contactEmail = reg?.contact_email ?? tm.contact_email ?? null;
+                  const contactPhone = reg?.contact_phone ?? tm.contact_phone ?? null;
+                  const hasContact = contactName || contactEmail || contactPhone;
+
+                  const ps = tm.payment_status ?? "unpaid";
+                  const cycle: Record<string, "unpaid" | "paid" | "exempt"> = {
+                    unpaid: "paid",
+                    paid: "exempt",
+                    exempt: "unpaid",
+                  };
+                  const styles =
+                    ps === "paid"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                      : ps === "exempt"
+                        ? "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
+                        : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100";
+                  const label =
+                    ps === "paid"
+                      ? t("teams.payment.paid", { defaultValue: "Payé" })
+                      : ps === "exempt"
+                        ? t("teams.payment.exempt", { defaultValue: "Exempté" })
+                        : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
+                  const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
+
+                  return (
+                    <div className="mt-2.5 pt-2.5 border-t border-border/60 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
+                      {contactName && (
+                        <span className="inline-flex items-center gap-1 font-medium text-foreground/80 truncate max-w-full">
+                          <User2 className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{contactName}</span>
+                        </span>
+                      )}
+                      {contactEmail && (
+                        <a
+                          href={`mailto:${contactEmail}`}
+                          className="inline-flex items-center gap-1 hover:text-foreground hover:underline truncate max-w-full"
+                        >
+                          <Mail className="h-3 w-3 shrink-0" />
+                          <span className="truncate">{contactEmail}</span>
+                        </a>
+                      )}
+                      {contactPhone && (
+                        <a
+                          href={`tel:${contactPhone}`}
+                          className="inline-flex items-center gap-1 hover:text-foreground hover:underline"
+                        >
+                          <Phone className="h-3 w-3 shrink-0" />
+                          {contactPhone}
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        disabled={setPayment.isPending}
+                        onClick={() =>
+                          setPayment.mutate({ teamId: tm.id, status: cycle[ps] })
+                        }
+                        className={cn(
+                          "group ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-dashed transition-colors disabled:opacity-50 cursor-pointer",
+                          styles,
+                        )}
+                        title={t("teams.payment.cycleHint", {
+                          defaultValue: "Cliquer pour changer le statut de paiement",
+                        })}
+                      >
+                        <Icon className="h-3 w-3" />
+                        <span>{label}</span>
+                        {ps === "paid" && tm.amount_paid_cents
+                          ? ` · ${(tm.amount_paid_cents / 100).toFixed(0)} ${(tm.payment_currency ?? "eur").toUpperCase()}`
+                          : ""}
+                        <Pencil className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100 ml-0.5" />
+                      </button>
+                      {!hasContact && (
+                        <span className="text-muted-foreground/60 italic">
+                          {t("teams.row.noContact", { defaultValue: "Pas de contact" })}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
               </li>
             );
           })}
