@@ -198,10 +198,25 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
 
   function onBulkSubmit(e: FormEvent) {
     e.preventDefault();
+    setBulkError(null);
     const rows = parseBulk(bulkText);
     if (rows.length === 0) {
-      toast.error(t("teams.noneDetected"));
+      setBulkError(t("teams.noneDetected"));
       return;
+    }
+    if (typeof maxTeams === "number" && maxTeams > 0) {
+      const remaining = Math.max(0, maxTeams - teams.length);
+      if (rows.length > remaining) {
+        setBulkError(
+          t("teams.dialog.exceedsMax", {
+            count: rows.length,
+            remaining,
+            max: maxTeams,
+            current: teams.length,
+          }),
+        );
+        return;
+      }
     }
     bulk.mutate(rows);
   }
