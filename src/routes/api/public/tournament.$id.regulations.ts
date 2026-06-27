@@ -543,28 +543,6 @@ function drawCoverBlock(
   ctx.y = bottom;
 }
 
-function drawLogoCircle(ctx: Ctx, cx: number, cy: number, r: number, label: string) {
-  ctx.page.drawCircle({
-    x: cx,
-    y: cy,
-    size: r,
-    color: SOFT_BG,
-    borderColor: LIGHT_GREY,
-    borderWidth: 0.6,
-  });
-  const lines = label.split(" / ");
-  const size = 6;
-  lines.forEach((line, i) => {
-    const w = ctx.font.widthOfTextAtSize(line, size);
-    ctx.page.drawText(safe(line), {
-      x: cx - w / 2,
-      y: cy + (lines.length === 1 ? -2 : i === 0 ? 2 : -6),
-      size,
-      font: ctx.font,
-      color: GREY,
-    });
-  });
-}
 
 function drawArticle(ctx: Ctx, n: number, paragraphs: string[]) {
   ensureSpace(ctx, 40);
