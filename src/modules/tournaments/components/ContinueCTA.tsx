@@ -150,4 +150,3 @@ export function ContinueCTA({ action, onAction, variant = "sticky", disabled }: 
     </div>
   );
 }
-

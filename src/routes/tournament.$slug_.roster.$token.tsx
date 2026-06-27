@@ -76,11 +76,7 @@ function parseCSV(text: string): Player[] {
   if (!clean) return [];
   // Detect separator
   const firstLine = clean.split(/\r?\n/)[0];
-  const sep = firstLine.includes(";")
-    ? ";"
-    : firstLine.includes("\t")
-      ? "\t"
-      : ",";
+  const sep = firstLine.includes(";") ? ";" : firstLine.includes("\t") ? "\t" : ",";
   const splitLine = (line: string) => {
     const out: string[] = [];
     let cur = "";
@@ -303,7 +299,6 @@ function RosterPage() {
         n: parsed.length,
       }),
     );
-
   }
 
   async function handleFile(file: File) {
@@ -400,12 +395,7 @@ function RosterPage() {
                           e.target.value = "";
                         }}
                       />
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={downloadTemplate}
-                      >
+                      <Button type="button" size="sm" variant="ghost" onClick={downloadTemplate}>
                         <FileDown className="h-4 w-4" />
                         {t("roster.import.template", { defaultValue: "Modèle" })}
                       </Button>
@@ -439,11 +429,7 @@ function RosterPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setImportOpen(false)}
-                    >
+                    <Button type="button" variant="ghost" onClick={() => setImportOpen(false)}>
                       {t("common.cancel", { defaultValue: "Annuler" })}
                     </Button>
                     <Button

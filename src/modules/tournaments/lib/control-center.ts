@@ -39,7 +39,6 @@ export interface ContinueAction {
   note?: string;
 }
 
-
 interface MatchLike {
   id: string;
   round: string;
@@ -157,7 +156,6 @@ export interface ComputeArgs {
   expectedTeams?: number | null;
 }
 
-
 /** Returns the 5-step progress array with computed state. */
 export function computeStepper(args: ComputeArgs): StepperStep[] {
   const { tournament, teamsCount, groupsCount, matches, flightsCount } = args;
@@ -221,11 +219,7 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
   // is registered. Opt-in: only triggers when `expectedTeams` is supplied
   // (e.g. `tournaments.num_teams`) and >= 2.
   const expected = args.expectedTeams ?? null;
-  if (
-    typeof expected === "number" &&
-    expected >= MIN_TEAMS_TO_START &&
-    teamsCount < expected
-  ) {
+  if (typeof expected === "number" && expected >= MIN_TEAMS_TO_START && teamsCount < expected) {
     return {
       kind: "add_team",
       anchor: "section-teams",
@@ -237,7 +231,6 @@ export function computeContinueAction(args: ComputeArgs): ContinueAction {
   if (poolsRequired(tournament.format) && groupsCount === 0) {
     return { kind: "run_draw", anchor: "section-matches" };
   }
-
 
   // 3) Matches not generated
   if (matches.length === 0) {

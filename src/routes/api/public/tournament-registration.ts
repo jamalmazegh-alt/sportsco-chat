@@ -193,13 +193,12 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
         // Notify the organizer (tournament creator) of the new registration
         try {
           const createdBy = (tournament as any).created_by as string | null | undefined;
-          const UUID_RE =
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
           if (!createdBy || !UUID_RE.test(createdBy)) {
-            console.warn(
-              "Skip organizer notification: missing/invalid created_by",
-              { tournamentId: tournament.id, createdBy },
-            );
+            console.warn("Skip organizer notification: missing/invalid created_by", {
+              tournamentId: tournament.id,
+              createdBy,
+            });
           } else {
             const { data: organizer, error: organizerErr } =
               await supabase.auth.admin.getUserById(createdBy);

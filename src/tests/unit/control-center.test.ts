@@ -77,8 +77,6 @@ describe("computeContinueAction — priority order", () => {
     expect(action.kind).toBe("run_draw");
   });
 
-
-
   it("proposes publish when still draft after teams are added", () => {
     const action = computeContinueAction(
       args({ teamsCount: 8, tournament: { status: "draft", format: "groups_knockout" } }),

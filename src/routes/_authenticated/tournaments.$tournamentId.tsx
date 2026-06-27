@@ -193,7 +193,6 @@ function TournamentDetailPage() {
     [data],
   );
 
-
   const counters = useMemo(() => countMatches(data?.matches ?? []), [data]);
 
   // Sprint 2 — Cockpit metrics + alerts (pure, recomputed when data changes).
