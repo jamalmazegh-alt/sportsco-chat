@@ -1,0 +1,2 @@
+ALTER TABLE public.tournament_registrations DROP CONSTRAINT IF EXISTS tournament_registrations_payment_status_check;
+ALTER TABLE public.tournament_registrations ADD CONSTRAINT tournament_registrations_payment_status_check CHECK (payment_status = ANY (ARRAY['not_required'::text,'pending'::text,'paid_online'::text,'paid_offline'::text,'refunded'::text,'refund_pending'::text,'free'::text]));
