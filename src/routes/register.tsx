@@ -147,7 +147,7 @@ function RegisterPage() {
       }
       setBusy(false);
       toast.success(t("auth.signupSuccess"));
-      navigate({ to: "/home" });
+      navigate({ to: nextPath });
       return;
     }
     // No session: email confirmation is required. For invited users the
@@ -169,7 +169,7 @@ function RegisterPage() {
         }
         setBusy(false);
         toast.success(t("auth.signupSuccess"));
-        navigate({ to: "/home" });
+        navigate({ to: nextPath });
         return;
       } catch (err: any) {
         setBusy(false);
