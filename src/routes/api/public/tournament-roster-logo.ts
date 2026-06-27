@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 
 const TokenSchema = z.string().uuid();
 
@@ -18,6 +19,11 @@ export const Route = createFileRoute("/api/public/tournament-roster-logo")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
+        const ip = getClientIp(request);
+        if (!(await checkRateLimit(ip, "tournament-roster-logo", 20))) {
+          return Response.json({ error: "rate_limited" }, { status: 429 });
+        }
+
         const supabase = getAdmin();
         if (!supabase) return Response.json({ error: "Server misconfigured" }, { status: 500 });
 
